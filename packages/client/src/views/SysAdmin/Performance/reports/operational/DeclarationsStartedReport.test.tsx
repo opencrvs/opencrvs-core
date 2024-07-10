@@ -12,7 +12,7 @@ import { createTestComponent } from '@client/tests/util'
 import { DeclarationsStartedReport } from './DeclarationsStartedReport'
 import { createStore } from '@client/store'
 import * as React from 'react'
-import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLDeclarationsStartedMetrics } from '@client/utils/gateway-deprecated-do-not-use'
 import * as locationUtils from '@client/utils/locationUtils'
 import { vi } from 'vitest'
 

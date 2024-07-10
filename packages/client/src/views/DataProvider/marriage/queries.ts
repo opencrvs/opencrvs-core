@@ -215,9 +215,24 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         value
       }
       history {
+        documents {
+          id
+          data
+          uri
+          type
+        }
+        payment {
+          id
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         otherReason
         requester
         hasShowedVerifiedDocument
+        noSupportingDocumentationRequired
         date
         action
         regStatus
@@ -278,12 +293,12 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
@@ -574,12 +589,12 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument

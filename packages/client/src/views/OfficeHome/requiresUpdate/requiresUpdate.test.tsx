@@ -33,10 +33,10 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { RequiresUpdate } from './RequiresUpdate'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'

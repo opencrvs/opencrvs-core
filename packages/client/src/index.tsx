@@ -18,9 +18,7 @@ import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
-import * as pdfjs from 'pdfjs-dist/build/pdf'
 import WebFont from 'webfontloader'
 import { BrowserTracing } from '@sentry/tracing'
 
@@ -29,8 +27,6 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-const pdfjsWorker = import('pdfjs-dist/build/pdf.worker.entry')
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 storage.configStorage('OpenCRVS')
 
@@ -51,31 +47,6 @@ if (
       // for finer control
       tracesSampleRate: 1.0,
       dsn: window.config.SENTRY
-    })
-  }
-
-  // setup log rocket to ship log messages and record user errors
-  if (window.config.LOGROCKET) {
-    LogRocket.init(window.config.LOGROCKET, {
-      release: import.meta.env.VITE_APP_VERSION
-    })
-  }
-
-  // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
-    Sentry.configureScope((scope) => {
-      scope.addEventProcessor(async (event) => {
-        if (!event.extra) {
-          event.extra = {}
-        }
-        const sessionUrl = await new Promise((resolve) => {
-          LogRocket.getSessionURL((url) => {
-            resolve(url)
-          })
-        })
-        event.extra.sessionURL = sessionUrl
-        return event
-      })
     })
   }
 }

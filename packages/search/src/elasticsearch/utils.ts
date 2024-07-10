@@ -13,8 +13,7 @@ import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   findName,
   findNameLocale,
-  findTaskExtension,
-  getFromFhir
+  findTaskExtension
 } from '@search/features/fhir/fhir-utils'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 
@@ -23,6 +22,13 @@ import {
   searchForBirthDuplicates,
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
+import {
+  getFromBundleById,
+  SavedBundle,
+  SavedLocation,
+  SavedTask
+} from '@opencrvs/commons/types'
+import { hasScope } from '@opencrvs/commons/authentication'
 
 export const enum EVENT {
   BIRTH = 'Birth',
@@ -41,15 +47,61 @@ const REINSTATED_STATUS = 'REINSTATED'
 export const CERTIFIED_STATUS = 'CERTIFIED'
 export const ISSUED_STATUS = 'ISSUED'
 const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
+const DECLARATION_UPDATED_STATUS = 'DECLARATION_UPDATED'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
+
+const validStatusMapping = {
+  [ARCHIVED_STATUS]: [
+    DECLARED_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS
+  ] as const,
+  [IN_PROGRESS_STATUS]: [null] as const,
+  [DECLARED_STATUS]: [ARCHIVED_STATUS, null] as const,
+  [REJECTED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    WAITING_VALIDATION_STATUS,
+    VALIDATED_STATUS,
+    ARCHIVED_STATUS
+  ] as const,
+  [VALIDATED_STATUS]: [
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    ARCHIVED_STATUS,
+    DECLARATION_UPDATED_STATUS,
+    null
+  ] as const,
+  [WAITING_VALIDATION_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS,
+    DECLARATION_UPDATED_STATUS
+  ] as const,
+  [REGISTERED_STATUS]: [
+    null,
+    DECLARED_STATUS,
+    IN_PROGRESS_STATUS,
+    REJECTED_STATUS,
+    VALIDATED_STATUS,
+    WAITING_VALIDATION_STATUS
+  ] as const,
+  [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS] as const,
+  [ISSUED_STATUS]: [CERTIFIED_STATUS] as const,
+  [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS] as const,
+  [REINSTATED_STATUS]: [ARCHIVED_STATUS] as const
+}
 
 export interface ICorrection {
   section: string
   fieldName: string
   oldValue: string
-  newValue: string
+  newValue: string | number | boolean
 }
 
 export interface IAssignment {
@@ -60,7 +112,7 @@ export interface IAssignment {
 }
 
 export interface IOperationHistory {
-  operationType: string
+  operationType: keyof typeof validStatusMapping
   operatedOn: string
   operatorRole: string
   operatorFirstNames: string
@@ -239,7 +291,7 @@ export async function detectBirthDuplicates(
   body: IBirthCompositionBody
 ) {
   const searchResponse = await searchForBirthDuplicates(body, client)
-  const duplicates = findBirthDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -248,7 +300,7 @@ export async function detectDeathDuplicates(
   body: IDeathCompositionBody
 ) {
   const searchResponse = await searchForDeathDuplicates(body, client)
-  const duplicates = findDeathDuplicateIds(compositionId, searchResponse)
+  const duplicates = findDuplicateIds(searchResponse)
   return duplicates
 }
 
@@ -266,14 +318,19 @@ export const getStatus = async (compositionId: string) => {
 
 export const createStatusHistory = async (
   body: ICompositionBody,
-  task: fhir.Task | undefined,
-  authHeader: string
+  task: SavedTask,
+  authHeader: string,
+  bundle: SavedBundle
 ) => {
   if (!isValidOperationHistory(body)) {
     return
   }
 
-  const user: IUserModelData = await getUser(body.updatedBy || '', authHeader)
+  const isSystem = hasScope({ Authorization: authHeader }, 'notification-api')
+  const user = !isSystem
+    ? await getUser(body.updatedBy || '', authHeader)
+    : null
+
   const operatorName = user && findName(NAME_EN, user.name)
   const operatorNameLocale = user && findNameLocale(user.name)
 
@@ -282,14 +339,18 @@ export const createStatusHistory = async (
   const operatorFirstNamesLocale = operatorNameLocale?.given?.join(' ') || ''
   const operatorFamilyNameLocale = operatorNameLocale?.family || ''
 
-  const regLasOfficeExtension = findTaskExtension(
+  const regLastOfficeExtension = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/regLastOffice'
   )
 
-  const office: fhir.Location = await getFromFhir(
-    `/${regLasOfficeExtension?.valueReference?.reference}`
-  )
+  let office: SavedLocation | undefined
+  if (regLastOfficeExtension) {
+    office = getFromBundleById<SavedLocation>(
+      bundle,
+      regLastOfficeExtension.valueReference.reference.split('/')[1]
+    )?.resource
+  }
 
   const operationHistory = {
     operationType: body.type,
@@ -297,8 +358,7 @@ export const createStatusHistory = async (
     rejectReason: body.rejectReason,
     rejectComment: body.rejectComment,
     operatorRole:
-      // user could be a system as well and systems don't have role
-      user.role?.labels.find((label) => label.lang === 'en')?.label || '',
+      user?.role?.labels.find((label) => label.lang === 'en')?.label || '',
     operatorFirstNames,
     operatorFamilyName,
     operatorFirstNamesLocale,
@@ -312,9 +372,10 @@ export const createStatusHistory = async (
     isNotification(body) &&
     body.eventLocationId
   ) {
-    const facility: fhir.Location = await getFromFhir(
-      `/Location/${body.eventLocationId}`
-    )
+    const facility = getFromBundleById<SavedLocation>(
+      bundle,
+      body.eventLocationId
+    ).resource
     operationHistory.notificationFacilityName = facility?.name || ''
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
@@ -341,37 +402,23 @@ function isNotification(body: ICompositionBody): boolean {
   )
 }
 
-function findBirthDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IBirthCompositionBody>['hits']['hits']
+export function findDuplicateIds(
+  results: ISearchResponse<
+    IBirthCompositionBody | IDeathCompositionBody
+  >['hits']['hits']
 ) {
   return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
+    .filter((hit) => hit._score > MATCH_SCORE_THRESHOLD)
     .map((hit) => ({
       id: hit._id,
       trackingId: hit._source.trackingId
     }))
 }
 
-function findDeathDuplicateIds(
-  compositionIdentifier: string,
-  results: ISearchResponse<IDeathCompositionBody>['hits']['hits']
-) {
-  return results
-    .filter(
-      (hit) =>
-        hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
-    )
-    .map((hit) => ({
-      id: hit._id,
-      trackingId: hit._source.trackingId
-    }))
-}
-
-export async function getUser(practitionerId: string, authHeader: any) {
+export async function getUser(
+  practitionerId: string,
+  authHeader: any
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify({
@@ -395,52 +442,13 @@ function getPreviousStatus(body: IBirthCompositionBody) {
 }
 
 export function isValidOperationHistory(body: IBirthCompositionBody) {
-  const validStatusMapping = {
-    [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
-    [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [ARCHIVED_STATUS, null],
-    [REJECTED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      WAITING_VALIDATION_STATUS,
-      VALIDATED_STATUS,
-      ARCHIVED_STATUS
-    ],
-    [VALIDATED_STATUS]: [
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      ARCHIVED_STATUS,
-      null
-    ],
-    [WAITING_VALIDATION_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS
-    ],
-    [REGISTERED_STATUS]: [
-      null,
-      DECLARED_STATUS,
-      IN_PROGRESS_STATUS,
-      REJECTED_STATUS,
-      VALIDATED_STATUS,
-      WAITING_VALIDATION_STATUS
-    ],
-    [CERTIFIED_STATUS]: [REGISTERED_STATUS, ISSUED_STATUS],
-    [ISSUED_STATUS]: [CERTIFIED_STATUS],
-    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
-    [REINSTATED_STATUS]: [ARCHIVED_STATUS]
-  }
-
   const previousStatus = getPreviousStatus(body)
-  const currentStatus = body.type
+  const currentStatus = body.type as keyof typeof validStatusMapping
 
   if (
     currentStatus &&
     validStatusMapping[currentStatus] &&
-    !validStatusMapping[currentStatus].includes(previousStatus)
+    !validStatusMapping[currentStatus].includes(previousStatus as never)
   ) {
     return false
   }
@@ -450,7 +458,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
 function updateOperationHistoryWithCorrection(
   operationHistory: IOperationHistory,
-  task?: fhir.Task
+  task: SavedTask
 ) {
   if (
     task?.input?.length &&
@@ -464,15 +472,23 @@ function updateOperationHistoryWithCorrection(
     for (let i = 0; i < task.input.length; i += 1) {
       const section = task.input[i].valueCode || ''
       const fieldName = task.input[i].valueId || ''
-      const oldValue = task.input[i].valueString || ''
-      const newValue = task.output[i].valueString || ''
+      const oldValue =
+        task.input[i].valueString ||
+        task.output[i].valueInteger?.toString() ||
+        ''
+      const newValueString = task.output[i].valueString
+      const newValueNumber = task.output[i].valueInteger
 
-      operationHistory.correction?.push({
+      const payload: ICorrection = {
         section,
         fieldName,
         oldValue,
-        newValue
-      })
+        newValue: (newValueNumber !== undefined
+          ? newValueNumber
+          : newValueString)! // On of these the values always exist
+      }
+
+      operationHistory.correction?.push(payload)
     }
   }
 }

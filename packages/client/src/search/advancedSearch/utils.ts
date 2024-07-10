@@ -29,6 +29,7 @@ import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
+import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -59,8 +60,6 @@ const baseKeysSameAsStore = [
   'registrationStatuses',
   'registrationNumber',
   'trackingId',
-  'declarationLocationId',
-  'declarationJurisdictionId',
   'eventCountry',
   'eventLocationId',
   'eventLocationLevel1',
@@ -82,7 +81,17 @@ const baseKeysSameAsStore = [
   'informantFamilyName'
 ] as const
 
-export interface IBaseAdvancedSearchState {
+export const dateFieldTypes = [
+  'dateOfRegistration',
+  'dateOfEvent',
+  'childDoB',
+  'motherDoB',
+  'fatherDoB',
+  'deceasedDoB',
+  'informantDoB'
+]
+
+export interface IAdvancedSearchFormState {
   event?: string
   registrationStatuses?: string
   dateOfEvent?: IDateRangePickerValue
@@ -94,8 +103,6 @@ export interface IBaseAdvancedSearchState {
   dateOfRegistrationStart?: string
   dateOfRegistrationEnd?: string
   placeOfRegistration?: string
-  declarationLocationId?: string
-  declarationJurisdictionId?: string
   eventLocationType?: string
   eventCountry?: string
   eventLocationId?: string
@@ -134,7 +141,7 @@ export interface IBaseAdvancedSearchState {
 }
 
 export const transformAdvancedSearchLocalStateToStoreData = (
-  localState: IBaseAdvancedSearchState,
+  localState: IAdvancedSearchFormState,
   offlineData: IOfflineData
 ): IAdvancedSearchParamState => {
   let transformedStoreState: IAdvancedSearchParamState =
@@ -273,8 +280,8 @@ export const transformStoreDataToAdvancedSearchLocalState = (
   reduxState: IAdvancedSearchParamState,
   offlineData: IOfflineData,
   eventType: string
-): IBaseAdvancedSearchState => {
-  const localState: IBaseAdvancedSearchState = baseKeysSameAsStore.reduce(
+): IAdvancedSearchFormState => {
+  const localState: IAdvancedSearchFormState = baseKeysSameAsStore.reduce(
     (ac, curr) => {
       return { ...ac, [curr]: reduxState[curr] }
     },
@@ -503,15 +510,15 @@ export const isValidDateRangePickerValue = (
   dateRangePickerValue: IDateRangePickerValue
 ): boolean => {
   let isValid = false
-  if (!dateRangePickerValue.isDateRangeActive) {
-    if (dateRangePickerValue.exact) {
-      isValid = true
-    }
-  } else {
-    if (dateRangePickerValue.rangeStart && dateRangePickerValue.rangeEnd) {
-      isValid = true
-    }
-  }
+  if (
+    !dateRangePickerValue.isDateRangeActive &&
+    dateRangePickerValue.exact &&
+    !isInvalidDate(dateRangePickerValue.exact)
+  )
+    isValid = true
+  else if (dateRangePickerValue.rangeStart && dateRangePickerValue.rangeEnd)
+    isValid = true
+
   return isValid
 }
 
@@ -546,18 +553,7 @@ const getLabelForRegistrationStatus = (
   intl: IntlShape
 ) => {
   const statusLabelMapping: Record<string, string[]> = {
-    ALL: [
-      RegStatus.Archived,
-      RegStatus.Certified,
-      RegStatus.DeclarationUpdated,
-      RegStatus.Declared,
-      RegStatus.InProgress,
-      RegStatus.Registered,
-      RegStatus.Rejected,
-      RegStatus.Validated,
-      RegStatus.WaitingValidation,
-      RegStatus.Issued
-    ],
+    ALL: Object.values(RegStatus),
     IN_REVIEW: [
       RegStatus.WaitingValidation,
       RegStatus.Validated,
@@ -573,14 +569,12 @@ const getLabelForRegistrationStatus = (
     VALIDATED: [RegStatus.Validated],
     WAITING_VALIDATION: [RegStatus.WaitingValidation]
   }
-
   const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
       return true
     }
     return false
   })
-
   const forMattedStatusList = [
     {
       value: 'ALL',
@@ -615,7 +609,6 @@ const getLabelForRegistrationStatus = (
   const formattedLabel =
     forMattedStatusList.find((e) => statusType === e.value)?.label ||
     statusList[0]
-
   return formattedLabel
 }
 

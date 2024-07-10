@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { USER_MANAGEMENT_URL, WEBHOOKS_URL } from '@gateway/constants'
 import { getSystem, hasScope } from '@gateway/features/user/utils'
 

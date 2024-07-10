@@ -83,39 +83,41 @@ const EndComponentContainer = styled.div`
     padding: 0;
   }
 `
-class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
-  render() {
-    const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
-    return (
-      <HeaderContainer id={id} className={this.props.className}>
-        {mobileLeft &&
-          mobileLeft.map(({ icon }, index) => (
-            <EndComponentContainer key={`mobile-left-${index}`}>
+export const MobileHeader = ({
+  id,
+  className,
+  mobileLeft,
+  mobileRight,
+  title,
+  mobileBody
+}: IMobileHeaderProps & IDomProps) => {
+  return (
+    <HeaderContainer id={id} className={className}>
+      {mobileLeft &&
+        mobileLeft.map(({ icon }, index) => (
+          <EndComponentContainer key={`mobile-left-${index}`}>
+            {icon()}
+          </EndComponentContainer>
+        ))}
+
+      {mobileBody ? (
+        <SearchBody>{mobileBody}</SearchBody>
+      ) : (
+        <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
+      )}
+
+      {mobileRight &&
+        mobileRight.map(({ handler, icon }, index) => (
+          <EndComponentContainer key={`mobile-right-${index}`}>
+            <CircleButton
+              id="mobile_header_right"
+              onClick={handler}
+              color="#4972BB"
+            >
               {icon()}
-            </EndComponentContainer>
-          ))}
-
-        {mobileBody ? (
-          <SearchBody>{mobileBody}</SearchBody>
-        ) : (
-          <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
-        )}
-
-        {mobileRight &&
-          mobileRight.map(({ handler, icon }, index) => (
-            <EndComponentContainer key={`mobile-right-${index}`}>
-              <CircleButton
-                id="mobile_header_right"
-                onClick={handler}
-                color="#4972BB"
-              >
-                {icon()}
-              </CircleButton>
-            </EndComponentContainer>
-          ))}
-      </HeaderContainer>
-    )
-  }
+            </CircleButton>
+          </EndComponentContainer>
+        ))}
+    </HeaderContainer>
+  )
 }
-
-export { MobileHeader }

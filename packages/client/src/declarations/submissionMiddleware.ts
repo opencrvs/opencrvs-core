@@ -27,11 +27,12 @@ import {
 import { IStoreState } from '@client/store'
 import {
   appendGqlMetadataFromDraft,
-  draftToGqlTransformer
+  draftToGqlTransformer,
+  getChangedValues
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   MARK_EVENT_AS_DUPLICATE,
   getBirthMutation
@@ -46,6 +47,7 @@ import { Dispatch } from 'redux'
 import { captureException } from '@sentry/browser'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
 
 type IReadyDeclaration = IDeclaration & {
@@ -61,8 +63,11 @@ const STATUS_CHANGE_MAP = {
   [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVING,
   [SubmissionAction.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
   [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
-  [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
+  [SubmissionAction.REQUEST_CORRECTION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  [SubmissionAction.MAKE_CORRECTION]: SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  [SubmissionAction.APPROVE_CORRECTION]: SUBMISSION_STATUS.APPROVING,
+  [SubmissionAction.REJECT_CORRECTION]: SUBMISSION_STATUS.REJECTING,
   [SubmissionAction.CERTIFY_DECLARATION]: SUBMISSION_STATUS.CERTIFYING,
   [SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION]:
     SUBMISSION_STATUS.CERTIFYING,
@@ -81,7 +86,6 @@ function getGqlDetails(
     draft.data,
     draft.id,
     userDetails,
-    draft.originalData,
     offlineData
   )
   appendGqlMetadataFromDraft(draft, gqlDetails)
@@ -102,6 +106,23 @@ function updateWorkqueue(store: IStoreState, dispatch: Dispatch) {
     systemRole && FIELD_AGENT_ROLES.includes(systemRole) ? true : false
   const userId = store.offline.userDetails?.practitionerId
   dispatch(updateRegistrarWorkqueue(userId, 10, isFieldAgent))
+}
+
+function isCorrectionAction(action: SubmissionAction) {
+  return [
+    SubmissionAction.REQUEST_CORRECTION,
+    SubmissionAction.MAKE_CORRECTION,
+    SubmissionAction.APPROVE_CORRECTION,
+    SubmissionAction.REJECT_CORRECTION
+  ].includes(action)
+}
+
+function isValidationAction(action: SubmissionAction) {
+  return [SubmissionAction.APPROVE_DECLARATION].includes(action)
+}
+
+function isRegisterAction(action: SubmissionAction) {
+  return [SubmissionAction.REGISTER_DECLARATION].includes(action)
 }
 
 async function removeDuplicatesFromCompositionAndElastic(
@@ -151,12 +172,31 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       }
     }
 
-    const gqlDetails = getGqlDetails(
+    const form = getRegisterForm(getState())[event]
+    const offlineData = getOfflineData(getState())
+    const graphqlPayload = getGqlDetails(
       getRegisterForm(getState())[event],
       declaration,
       getOfflineData(getState()),
       getState().offline.userDetails as UserDetails
     )
+
+    if (isCorrectionAction(submissionAction)) {
+      const changedValues = getChangedValues(form, declaration, offlineData)
+      graphqlPayload.registration ??= {}
+      graphqlPayload.registration.correction =
+        declaration.data.registration.correction ?? {}
+      graphqlPayload.registration.correction.values = changedValues
+    }
+
+    if (
+      isValidationAction(submissionAction) ||
+      isRegisterAction(submissionAction)
+    ) {
+      const changedValues = getChangedValues(form, declaration, offlineData)
+      graphqlPayload.registration ??= {}
+      graphqlPayload.registration.changedValues = changedValues
+    }
 
     //then add payment while issue declaration
     if (payments) {
@@ -171,12 +211,19 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         : event === Event.Death
         ? getDeathMutation(submissionAction)
         : getMarriageMutation(submissionAction)
+
+    if (!mutation) {
+      throw new Error(
+        'Unknown mutation for submission action ' + submissionAction
+      )
+    }
+
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
         const response = await client.mutate({
           mutation,
           variables: {
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
 
@@ -193,10 +240,22 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             })
           )
         }
+      } else if (submissionAction === SubmissionAction.REQUEST_CORRECTION) {
+        await client.mutate<
+          { requestRegistrationCorrection: string },
+          MutationToRequestRegistrationCorrectionArgs
+        >({
+          mutation,
+          variables: {
+            id: declaration.id,
+            details: graphqlPayload.registration.correction
+          }
+        })
       } else if (
         [
           SubmissionAction.REJECT_DECLARATION,
-          SubmissionAction.ARCHIVE_DECLARATION
+          SubmissionAction.ARCHIVE_DECLARATION,
+          SubmissionAction.REJECT_CORRECTION
         ].includes(submissionAction)
       ) {
         if (
@@ -210,7 +269,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             }
           })
         }
-        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await removeDuplicatesFromCompositionAndElastic(
+          declaration,
+          submissionAction
+        )
         await client.mutate({
           mutation,
           variables: {
@@ -224,7 +286,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
         //delete data from certificates to identify event in workflow for markEventAsIssued
@@ -235,17 +297,21 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         }
         updateDeclaration(dispatch, {
           ...declaration,
+          registrationStatus: RegStatus.Certified,
           action: SubmissionAction.ISSUE_DECLARATION,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
         })
         return
       } else {
-        removeDuplicatesFromCompositionAndElastic(declaration, submissionAction)
+        await removeDuplicatesFromCompositionAndElastic(
+          declaration,
+          submissionAction
+        )
         await client.mutate({
           mutation,
           variables: {
             id: declaration.id,
-            details: gqlDetails
+            details: graphqlPayload
           }
         })
       }
@@ -260,15 +326,8 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         2000
       )
     } catch (error) {
-      if (!(error instanceof ApolloError)) {
-        updateDeclaration(dispatch, {
-          ...declaration,
-          submissionStatus: SUBMISSION_STATUS.FAILED
-        })
-        captureException(error)
-        return
-      }
       if (
+        error instanceof ApolloError &&
         error.graphQLErrors.length > 0 &&
         error.graphQLErrors[0].extensions.code === 'UNASSIGNED'
       ) {
@@ -280,11 +339,19 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         dispatch(deleteDeclaration(declaration.id, client))
         return
       }
+      if (error instanceof ApolloError && error.networkError) {
+        updateDeclaration(dispatch, {
+          ...declaration,
+          submissionStatus: SUBMISSION_STATUS.FAILED_NETWORK
+        })
+        captureException(error)
+        return
+      }
+
       updateDeclaration(dispatch, {
         ...declaration,
-        submissionStatus: error.networkError
-          ? SUBMISSION_STATUS.FAILED_NETWORK
-          : SUBMISSION_STATUS.FAILED
+        submissionStatus: SUBMISSION_STATUS.FAILED
       })
+      captureException(error)
     }
   }

@@ -18,13 +18,13 @@ import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
 import { connect } from 'react-redux'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import {
+import type {
   GQLUserAuditLogItemWithComposition,
   GQLUserAuditLogResultItem,
   GQLUserAuditLogResultSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
+import { LoadingGrey } from '@opencrvs/components/lib/LoadingGrey'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'

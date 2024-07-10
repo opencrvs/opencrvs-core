@@ -35,21 +35,86 @@ Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencr
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Loading...</title>
-  </head>
 
+    <style>
+      body,
+      html {
+        background-color: #f8f8f8;
+        margin: 0;
+      }
+      .pgrs-wrapper1240 {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        animation: fadeIn 2s forwards;
+        font-family: sans-serif;
+      }
+      .progress-bar {
+        width: 276px;
+        height: 8px;
+        margin-top: 27px;
+        border-radius: 100px;
+        background: #d9d9d9;
+      }
+      #root-app-progress {
+        width: 0;
+        height: 8px;
+        border-radius: 100px;
+        background: #4972bb;
+        animation: progressAnimation 200s ease-out forwards;
+      }
+      @keyframes progressAnimation {
+        0%,
+        1% {
+          min-width: 0%;
+        }
+        3% {
+          min-width: 80%;
+        }
+        6% {
+          min-width: 91%;
+        }
+        10% {
+          min-width: 94%;
+        }
+        30% {
+          min-width: 96%;
+        }
+        100% {
+          min-width: 99%;
+        }
+      }
+      @keyframes fadeIn {
+        0%,
+        85% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
   <body>
     <noscript> You need to enable JavaScript to run this app. </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <div class="pgrs-wrapper1240">
+        <img
+          src="./images/logo-90x90.svg"
+          width="90"
+          height="90"
+          alt="OpenCRVS logo"
+        />
+        <div class="progress-bar">
+          <div id="root-app-progress"></div>
+        </div>
+        <p>Installing application...</p>
+      </div>
+    </div>
     <script type="module" src="/src/index.tsx"></script>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

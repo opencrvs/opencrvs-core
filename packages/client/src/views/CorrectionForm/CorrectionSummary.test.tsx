@@ -31,7 +31,7 @@ import {
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
@@ -195,13 +195,12 @@ describe('Correction summary', () => {
           graphqlMocks: [
             {
               request: {
-                query: REQUEST_BIRTH_REG_CORRECTION,
+                query: REQUEST_REG_CORRECTION,
                 variables: draftToGqlTransformer(
                   form,
                   birthDeclaration.data,
                   birthDeclaration.id,
-                  userDetails,
-                  birthDeclaration.originalData
+                  userDetails
                 )
               },
               result: {

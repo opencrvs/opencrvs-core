@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
@@ -43,47 +43,43 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
-  state = { error: null, authError: false }
+const StyledErrorBoundaryComponent = ({ intl, children }: IFullProps) => {
+  const [authError, setAuthError] = useState(false)
 
-  onError = (error: Error) => {
-    this.setState({ error, authError: error.message === '401' })
+  const onError = (error: Error) => {
+    setAuthError(error.message === '401')
   }
 
-  render() {
-    const { intl } = this.props
-
-    return (
-      <Sentry.ErrorBoundary
-        showDialog={!development}
-        onError={this.onError}
-        fallback={
-          <PageWrapper>
-            <ErrorContainer>
-              <ErrorTitle>
-                {this.state.authError &&
-                  intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-                {this.state.authError
-                  ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
-                  : intl.formatMessage(errorMessages.errorTitle)}
-              </ErrorTitle>
-              <ErrorMessage>
-                {intl.formatMessage(errorMessages.unknownErrorDescription)}
-              </ErrorMessage>
-              <TertiaryButton
-                id="GoToHomepage"
-                onClick={() => (window.location.href = '/')}
-              >
-                {intl.formatMessage(buttonMessages.goToHomepage)}
-              </TertiaryButton>
-            </ErrorContainer>
-          </PageWrapper>
-        }
-      >
-        {this.props.children}
-      </Sentry.ErrorBoundary>
-    )
-  }
+  return (
+    <Sentry.ErrorBoundary
+      showDialog={!development}
+      onError={onError}
+      fallback={
+        <PageWrapper>
+          <ErrorContainer>
+            <ErrorTitle>
+              {authError &&
+                intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+              {authError
+                ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
+                : intl.formatMessage(errorMessages.errorTitle)}
+            </ErrorTitle>
+            <ErrorMessage>
+              {intl.formatMessage(errorMessages.unknownErrorDescription)}
+            </ErrorMessage>
+            <TertiaryButton
+              id="GoToHomepage"
+              onClick={() => (window.location.href = '/')}
+            >
+              {intl.formatMessage(buttonMessages.goToHomepage)}
+            </TertiaryButton>
+          </ErrorContainer>
+        </PageWrapper>
+      }
+    >
+      {children}
+    </Sentry.ErrorBoundary>
+  )
 }
 
 export const StyledErrorBoundary = injectIntl(StyledErrorBoundaryComponent)

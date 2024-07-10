@@ -83,7 +83,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS and resets OpenCRVS to factory settings.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 20GB of available disk space and at least 16GB of RAM.  Type: yes to continue.") ]]
+if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu, WSL or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS and resets OpenCRVS to factory settings.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 20GB of available disk space and at least 16GB of RAM.  Type: yes to continue.") ]]
 then
     echo "Exiting OpenCRVS setup."
     exit 0
@@ -113,6 +113,7 @@ sleep_if_non_ci 5
   echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
 
+wslKernelWithUbuntu=false
 if  [ -n "$(uname -r | grep microsoft-standard-WSL2)" ] && [ -n "$(cat /etc/os-release | grep Ubuntu)" ]; then
   wslKernelWithUbuntu=true
   echo -e "\033[32m:::::::::::::::: You are running Windows Subsystem for Linux .  Checking distro ::::::::::::::::\033[0m"
@@ -148,36 +149,11 @@ if [  -n "$(uname -a | grep Ubuntu)" ] || [ $wslKernelWithUbuntu == true ]; then
     else
         echo vm.max_map_count=262144 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     fi
-
-    echo
-    if [  -n "$(google-chrome --version | grep Chrome)" ]; then
-      echo -e "Chrome is \033[32minstalled!\033[0m :)"
-      echo
-    else
-      echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-      echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-      echo
-      echo "We think that you do not have Chrome installed."
-      echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-      echo
-    fi
   fi
 elif [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
   echo
   OS="MAC"
-  if [  -n "$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | grep Chrome)" ]; then
-    echo -e "Chrome is \033[32minstalled!\033[0m :)"
-    echo
-  else
-    echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-    echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-    echo
-    echo "We think that you do not have Chrome installed, or it is not available on this path: "
-    echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
-    echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-    echo
-  fi
 else
   echo "Sorry your operating system is not supported."
   echo "YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04"
@@ -190,16 +166,19 @@ echo
 echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
 
+# Reads .nvmrc and trims the whitespace
+nvmVersion=$(cat .nvmrc | tr -d '[:space:]')
+
 dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
-  dependencies+=("docker-compose" "google-chrome")
+  dependencies+=("docker compose")
 fi
 for i in "${dependencies[@]}"
 do
    :
     if which $i >/dev/null; then
 
-        echo -e "$i \033[32minstalled!\033[0m :)"
+        echo -e "✅ $i \033[32minstalled!\033[0m :)"
 
         sleep_if_non_ci 1
     else
@@ -213,9 +192,9 @@ do
                 echo "Please follow the documentation here: https://docs.docker.com/desktop/mac/install/"
             fi
         fi
-        if [ $i == "docker-compose" ] ; then
+        if [ $i == "docker compose" ] ; then
             if [ $OS == "UBUNTU" ]; then
-                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker-compose installation."
+                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker compose installation."
                 echo "Please follow the documentation here: https://docs.docker.com/compose/install/"
             else
                 echo "You need to install Docker Desktop for Mac, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker installation."
@@ -224,33 +203,25 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node 16.20.0 as this release has been tested on those versions."
+            echo "We recommend you install Node $nvmVersion as this release has been tested on that version."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
             echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
             echo
-            echo "nvm install 16.20.0"
+            echo "nvm install $nvmVersion"
             echo
             echo "When the version is installed, use it:"
             echo
-            echo "nvm use 16.20.0"
+            echo "nvm use $nvmVersion"
             echo
             echo "Finally set the version to be the default:"
             echo
-            echo "nvm alias default 16.20.0"
+            echo "nvm alias default $nvmVersion"
         fi
         if [ $i == "yarn" ] ; then
            echo "You need to install the Yarn Package Manager for Node."
            echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
-        fi
-        if [ $i == "google-chrome" ] ; then
-          echo -e "\033[32m:::::::: The OpenCRVS client application is a progressive web application. ::::::::\033[0m"
-          echo -e "\033[32m::::::::::::: It is best experienced using the Google Chrome browser. :::::::::::::\033[0m"
-          echo
-          echo "We think that you do not have Chrome installed."
-          echo -e "\033[32m:::: We recommend that you install Google Chrome: https://www.google.com/chrome ::::\033[0m"
-          echo
         fi
         if [ $i == "tmux" ] ; then
           if [ $OS == "UBUNTU" ]; then
@@ -271,6 +242,37 @@ do
     fi
 done
 
+###
+#
+# Check Node.js version
+#
+###
+
+echo
+echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
+echo
+
+versionCheckOutput=$(npx --yes check-node-version --package --print 2>&1 || true)
+currentVersion=$(echo "$versionCheckOutput" | grep 'node:' | awk '{print $2}')
+
+if echo "$versionCheckOutput" | grep -q 'Wanted node version'; then
+  echo "❌ Sorry, your Node version is not supported. Your node version is $currentVersion."
+  echo "We recommend you install Node version $nvmVersion as this release has been tested on that version."
+  echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
+  echo "Then use nvm to install the Node version of choice. For example run:"
+  echo "nvm install $nvmVersion"
+  exit 1
+else
+  echo -e "Your Node version: $currentVersion is \033[32msupported!\033[0m :)"
+fi
+
+
+###
+#
+# Stop docker containers
+#
+###
+
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
@@ -280,37 +282,20 @@ if [[ $(docker ps -aq) ]] ; then
 fi
 
 echo
-openCRVSPorts=( 3447 9200 5001 5000 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
+openCRVSPorts=( 3447 9200 27017 6379 8086 4444 3040 5050 2020 7070 9090 1050 3030 3000 3020 2525 2021 3535 3536 9050)
 for x in "${openCRVSPorts[@]}"
 do
    :
-    if lsof -i:$x; then
-      echo -e "OpenCRVS thinks that port: $x is in use by another application.\r"
+    if lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x >/dev/null; then
+      echo -e "❌ OpenCRVS thinks that port: $x is in use by another application.\r"
       echo "You need to find out which application is using this port and quit the application."
       echo "You can find out the application by running:"
-      echo "lsof -i:$x"
+      echo "lsof -nP -iTCP:$x -sTCP:LISTEN -iUDP:$x"
       exit 1
     else
-        echo -e "$x \033[32m port is available!\033[0m :)"
+        echo -e "✅ $x \033[32m port is available!\033[0m :)"
     fi
 done
-
-echo
-echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
-echo
-
-myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-if [[ $myNodeVersion != 16.* ]]; then
-  echo "Sorry your Node version is not supported.  Your node version is $myNodeVersion."
-  echo "We recommend you install Node v16.20.0 as this release has been tested on that version."
-  echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
-  echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
-  echo "nvm install 16.20.0"
-  exit 1
-  else
-    echo -e "Your Node version: $myNodeVersion is \033[32msupported!\033[0m :)"
-    echo
-fi
 
 echo
 echo -e "\033[32m:::::::::::::::::::::: Initialising Docker ::::::::::::::::::::::\033[0m"
@@ -356,7 +341,7 @@ chmod 775 data/minio
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
-echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
+echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch and Hearth docker images.  These are large files.  Then it will build them."
 echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
@@ -372,7 +357,6 @@ fi
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
-echo "wait-on tcp:5001" && wait-on -l tcp:5001
 echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
@@ -387,7 +371,7 @@ tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
-tmux split-window -h -p 30
+tmux split-window -h -l '30%'
 tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v

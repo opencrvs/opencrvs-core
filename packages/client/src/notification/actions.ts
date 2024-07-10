@@ -51,6 +51,8 @@ export const HIDE_UNASSIGNED = 'HIDE_UNASSIGNED'
 export const SHOW_UNASSIGNED_DECLARATIONS = 'SHOW_UNASSIGNED_DECLARATIONS'
 export const HIDE_UNASSIGNED_DECLARATIONS_TOAST =
   'HIDE_UNASSIGNED_DECLARATIONS_TOAST'
+export const TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST =
+  'TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST'
 
 type ConfigurationErrorAction = {
   type: typeof CONFIGURATION_ERROR
@@ -333,6 +335,24 @@ export const hideUnassignedDeclarationsToast =
     type: HIDE_UNASSIGNED_DECLARATIONS_TOAST
   })
 
+type ToggleEmailAllUsersFeedbackPayload =
+  | { visible: false }
+  | {
+      type: 'success' | 'error'
+      visible: true
+    }
+type ToggleEmailAllUsersFeedbackAction = {
+  type: typeof TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST
+  payload: ToggleEmailAllUsersFeedbackPayload
+}
+
+export const toggleEmailAllUsersFeedbackToast = (
+  data: ToggleEmailAllUsersFeedbackPayload
+): ToggleEmailAllUsersFeedbackAction => ({
+  type: TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST,
+  payload: data
+})
+
 export type Action =
   | SessionExpiredAction
   | ConfigurationErrorAction
@@ -361,3 +381,4 @@ export type Action =
   | HideUserReconnectedToastAction
   | ShowUnassignedDeclarations
   | HideUnassignedDeclarationsToast
+  | ToggleEmailAllUsersFeedbackAction

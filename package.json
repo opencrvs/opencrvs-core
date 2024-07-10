@@ -1,8 +1,15 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "private": true,
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "engines": {
+    "node": "18.x.x"
+  },
   "workspaces": [
     "packages/*"
   ],
@@ -20,10 +27,10 @@
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
     "lint": "lerna run lint",
     "test": "CI=true lerna run test --stream",
-    "compose:deps:demo": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.demo-deps.yml up",
-    "compose:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
-    "compose:deps:detached": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
-    "compose:down:deps": "docker-compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
+    "compose:deps:demo": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.demo-deps.yml up",
+    "compose:deps": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up",
+    "compose:deps:detached": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml up -d",
+    "compose:down:deps": "docker compose -p opencrvs -f docker-compose.deps.yml -f docker-compose.dev-deps.yml down",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
     "db:clear:all": "bash development-environment/clear-all-data.sh",
@@ -39,12 +46,12 @@
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
     "@types/js-yaml": "^3.12.1",
-    "concurrently": "^3.5.1",
-    "husky": "1.0.0-rc.13",
+    "concurrently": "^8.0.0",
+    "husky": "1.3.1",
     "js-yaml": "^3.13.1",
     "lerna": "^5.6.2",
     "lint-staged": "^7.1.0",
-    "prettier": "^2.5.1"
+    "prettier": "2.8.8"
   },
   "dependencies": {
     "@types/react-signature-canvas": "^1.0.2",
@@ -55,7 +62,6 @@
     "react-signature-canvas": "^1.0.6"
   },
   "resolutions": {
-    "@types/react": "18.0.26",
-    "xml2js": "0.5.0"
+    "@types/react": "18.3.1"
   }
 }

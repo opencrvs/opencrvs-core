@@ -33,17 +33,10 @@ const Content = styled.section`
   ${({ theme }) => theme.fonts.reg16};
 `
 
-export class PageWrapper extends React.Component<{
-  children: React.ReactNode
-}> {
-  render() {
-    const { children } = this.props
-    return (
-      <Page>
-        <Wrapper>
-          <Content>{children}</Content>
-        </Wrapper>
-      </Page>
-    )
-  }
-}
+export const PageWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Page>
+    <Wrapper>
+      <Content>{children}</Content>
+    </Wrapper>
+  </Page>
+)

@@ -12,7 +12,7 @@ import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
-import { logger } from '@search/logger'
+import { logger } from '@opencrvs/commons'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export const DEFAULT_SIZE = 10
@@ -62,10 +62,6 @@ export const advancedSearch = async (
       logger.error('Search error: ', error)
     }
     return undefined
-  }
-
-  if (isExternalSearch && response.body.hits.total.value > 5) {
-    throw new Error('Too many results Please narrow your search')
   }
 
   return response

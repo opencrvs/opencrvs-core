@@ -36,10 +36,10 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { ReadyForReview } from './ReadyForReview'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { REGISTRAR_HOME } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'

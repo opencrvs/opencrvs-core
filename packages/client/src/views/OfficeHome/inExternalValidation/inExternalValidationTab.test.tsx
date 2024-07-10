@@ -20,7 +20,7 @@ import { InExternalValidationTab } from './InExternalValidationTab'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { checkAuth } from '@client/profile/profileActions'
-import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { History } from 'history'
@@ -31,7 +31,7 @@ const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0
 
 const registerScopeToken = jwt.sign(
   { scope: ['register'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

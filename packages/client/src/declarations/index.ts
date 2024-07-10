@@ -45,7 +45,7 @@ import {
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import {
+import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
@@ -53,7 +53,7 @@ import {
   GQLRegistrationSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import {
   ApolloClient,
   ApolloError,
@@ -140,10 +140,11 @@ export enum SUBMISSION_STATUS {
   ISSUED = 'ISSUED',
   READY_TO_REQUEST_CORRECTION = 'READY_TO_REQUEST_CORRECTION',
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
-  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
   FAILED_NETWORK = 'FAILED_NETWORK',
-  IN_PROGRESS = 'IN_PROGRESS'
+  IN_PROGRESS = 'IN_PROGRESS',
+  CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
+  REJECT_CORRECTION = 'REJECT_CORRECTION'
 }
 
 export enum DOWNLOAD_STATUS {
@@ -171,8 +172,10 @@ export const processingStates = [
   SUBMISSION_STATUS.CERTIFYING,
   SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
   SUBMISSION_STATUS.REQUESTING_CORRECTION,
+  SUBMISSION_STATUS.CORRECTION_REQUESTED,
   SUBMISSION_STATUS.READY_TO_ISSUE,
-  SUBMISSION_STATUS.ISSUING
+  SUBMISSION_STATUS.ISSUING,
+  SUBMISSION_STATUS.REJECT_CORRECTION
 ]
 
 const DOWNLOAD_MAX_RETRY_ATTEMPT = 3
@@ -308,10 +311,9 @@ type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 export type Payment = {
   paymentId?: string
   type: PaymentType
-  total: number
   amount: number
   outcome: PaymentOutcomeType
-  date: number
+  date: string
 }
 
 interface IArchiveDeclarationAction {
@@ -452,6 +454,7 @@ interface IUnassignDeclarationSuccess {
   payload: {
     id: string
     client: ApolloClient<{}>
+    refetchQueries: InternalRefetchQueriesInclude
   }
 }
 
@@ -537,7 +540,7 @@ export function createReviewDeclaration(
     id: declarationId,
     data: formData,
     duplicates,
-    originalData: status !== 'IN_PROGRESS' ? formData : {},
+    originalData: formData,
     localData: formData,
     review: true,
     event,
@@ -728,13 +731,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
     currentUserDeclarations = currentUserData.declarations.filter((d) => {
       if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        // original data stays empty for in progress declaration
-        const history = (
-          d.originalData && Object.keys(d.originalData).length === 0
-            ? d.localData
-            : d.originalData
-        )?.history as IDynamicValues
-
+        const history = d.originalData?.history as unknown as IDynamicValues
         const downloadedTime = (
           history.filter((h: IDynamicValues) => {
             return h.action === DOWNLOAD_STATUS.DOWNLOADED
@@ -1239,15 +1236,17 @@ export function unassignDeclaration(
   }
 }
 
-function unassignDeclarationSuccess([id, client]: [
+function unassignDeclarationSuccess([id, client, refetchQueries]: [
   string,
-  ApolloClient<{}>
+  ApolloClient<{}>,
+  InternalRefetchQueriesInclude
 ]): IUnassignDeclarationSuccess {
   return {
     type: UNASSIGN_DECLARATION_SUCCESS,
     payload: {
       id,
-      client
+      client,
+      refetchQueries
     }
   }
 }
@@ -1850,7 +1849,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               variables: { id: action.payload.id },
               refetchQueries: action.payload.refetchQueries
             })
-            return [action.payload.id, action.payload.client]
+            return [
+              action.payload.id,
+              action.payload.client,
+              action.payload.refetchQueries
+            ]
           },
           {
             successActionCreator: unassignDeclarationSuccess
@@ -1878,7 +1881,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
               ? Cmd.action(
                   executeUnassignDeclaration(
                     declarationNextToUnassign.id,
-                    action.payload.client
+                    action.payload.client,
+                    action.payload.refetchQueries
                   )
                 )
               : Cmd.none

@@ -18,7 +18,7 @@ import {
   RadioSize
 } from '@opencrvs/components/lib/Radio'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use.d'
 import { MessageDescriptor } from 'react-intl'
 
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
@@ -85,9 +85,12 @@ export enum SubmissionAction {
   CERTIFY_DECLARATION = 'certify declaration',
   REJECT_DECLARATION = 'reject',
   ARCHIVE_DECLARATION = 'archive',
-  REQUEST_CORRECTION_DECLARATION = 'request correction',
   ISSUE_DECLARATION = 'issue certificate',
-  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration'
+  CERTIFY_AND_ISSUE_DECLARATION = 'certify and issue declaration',
+  MAKE_CORRECTION = 'make correction',
+  APPROVE_CORRECTION = 'approve correction',
+  REJECT_CORRECTION = 'reject correction',
+  REQUEST_CORRECTION = 'request correction'
 }
 
 export enum DownloadAction {
@@ -122,7 +125,6 @@ export interface IDynamicOptions {
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
-  initialValue?: string
 }
 
 export interface IDispatchOptions {
@@ -464,6 +466,7 @@ export interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: MessageDescriptor
+  labelParam?: Record<string, string>
   helperText?: MessageDescriptor
   tooltip?: MessageDescriptor
   validator: validators.Validation[]
@@ -581,6 +584,7 @@ export interface INumberFormField extends IFormFieldBase {
   max?: number
   inputFieldWidth?: string
   inputWidth?: number
+  maxLength?: number
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -641,6 +645,8 @@ export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
 }
 export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
+  compressImagesToSizeMB?: number
+  maxSizeMB?: number
   options: ISelectOption[]
   hideOnEmptyOption?: boolean
   splitView?: boolean
@@ -1080,6 +1086,7 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   max?: number
   inputFieldWidth?: string
   inputWidth?: number
+  maxLength?: number
 }
 
 export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
@@ -1136,6 +1143,8 @@ export interface Ii18nImageUploaderWithOptionsFormField
 export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: SelectComponentOption[]
+  compressImagesToSizeMB?: number
+  maxSizeMB?: number
   hideOnEmptyOption?: boolean
   splitView?: boolean
 }
@@ -1244,7 +1253,6 @@ type PaymentOutcomeType = 'COMPLETED' | 'ERROR' | 'PARTIAL'
 type Payment = {
   paymentId?: string
   type: PaymentType
-  total: string
   amount: string
   outcome: PaymentOutcomeType
   date: number

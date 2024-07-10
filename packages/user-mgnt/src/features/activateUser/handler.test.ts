@@ -13,7 +13,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import * as mockingoose from 'mockingoose'
 import { cloneDeep } from 'lodash'
 import { Types } from 'mongoose'
@@ -22,7 +22,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['sysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

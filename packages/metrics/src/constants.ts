@@ -12,7 +12,7 @@ import { join } from 'path'
 
 export const HOST = process.env.METRICS_HOST || '0.0.0.0'
 export const PORT = process.env.METRICS_PORT || 1050
-export const fhirUrl = process.env.FHIR_URL || 'http://localhost:5001/fhir/'
+export const fhirUrl = process.env.FHIR_URL || 'http://localhost:3447/fhir/'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'

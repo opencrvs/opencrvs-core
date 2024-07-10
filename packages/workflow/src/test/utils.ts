@@ -1,3 +1,21 @@
+import { UUID } from '@opencrvs/commons'
+import {
+  Bundle,
+  Composition,
+  DocumentReference,
+  Encounter,
+  Observation,
+  Patient,
+  RelatedPerson,
+  ResourceIdentifier,
+  Saved,
+  StrictBundle,
+  Task,
+  TrackingID,
+  URLReference,
+  URNReference
+} from '@opencrvs/commons/types'
+
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,12 +26,66 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const testFhirBundle = {
+
+export const deathTaskMock = {
+  resourceType: 'Task',
+  status: 'ready',
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'DEATH'
+      }
+    ]
+  },
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/paper-form-id',
+      value: '12345678'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/death-tracking-id',
+      value: 'B5WGYJE'
+    }
+  ],
+  focus: {
+    reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+  },
+  lastModified: '2018-11-29T15:11:13.041+00:00',
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/status',
+        code: 'DECLARED'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: { reference: '123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: '123' }
+    }
+  ],
+  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+}
+export const deathTaskMockJSON = JSON.stringify(deathTaskMock)
+
+export const testFhirBundle: StrictBundle<
+  [Composition, Task, Patient, Patient, Patient, RelatedPerson]
+> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
     {
-      fullUrl: `urn:uuid:888`,
+      fullUrl: `urn:uuid:888` as URNReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -57,7 +129,8 @@ export const testFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+                reference:
+                  'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference
               }
             ]
           },
@@ -74,7 +147,8 @@ export const testFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
+                reference:
+                  'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference
               }
             ]
           },
@@ -91,7 +165,8 @@ export const testFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221'
+                reference:
+                  'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221' as URNReference
               }
             ]
           },
@@ -108,7 +183,8 @@ export const testFhirBundle = {
             },
             entry: [
               {
-                reference: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7'
+                reference:
+                  'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7' as URNReference
               }
             ]
           }
@@ -116,19 +192,29 @@ export const testFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9' as URNReference,
       resource: {
         resourceType: 'Task',
-        status: 'requested',
-        intent: '',
+        status: 'ready',
+        intent: 'order',
+        lastModified: '2018-11-29T15:11:13.041+00:00',
+        encounter: { reference: 'Encounter/123' },
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
         focus: {
-          reference: 'urn:uuid:888'
+          reference: 'urn:uuid:888' as URNReference
         },
         code: {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'birth-registration'
+              code: 'BIRTH'
             }
           ]
         },
@@ -139,7 +225,7 @@ export const testFhirBundle = {
           },
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B5WGYJE'
+            value: 'B5WGYJE' as TrackingID
           }
         ],
         extension: [
@@ -153,17 +239,17 @@ export const testFhirBundle = {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueReference: { reference: '123' }
+            valueReference: { reference: 'Location/123' }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: { reference: '123' }
+            valueReference: { reference: 'Location/123' as `Location/${UUID}` }
           }
         ]
       }
     },
     {
-      fullUrl: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662',
+      fullUrl: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -178,7 +264,7 @@ export const testFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
+      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
@@ -199,26 +285,28 @@ export const testFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221',
+      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
         name: [
           {
             given: ['Jack'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'en'
           }
         ],
         gender: 'male'
       }
     },
     {
-      fullUrl: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7',
+      fullUrl: 'urn:uuid:b9044443-4977-4912-b0e7-4977b0e7' as URNReference,
       resource: {
         resourceType: 'RelatedPerson',
         active: true,
         patient: {
-          reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57'
+          reference:
+            'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference
         }
       }
     }
@@ -230,7 +318,7 @@ export const testFhirBundleWithIds = {
   type: 'document',
   entry: [
     {
-      fullUrl: `urn:uuid:888`,
+      fullUrl: `urn:uuid:888` as URNReference,
       resource: {
         id: '111',
         identifier: {
@@ -275,7 +363,8 @@ export const testFhirBundleWithIds = {
             },
             entry: [
               {
-                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+                reference:
+                  'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference
               }
             ]
           },
@@ -338,7 +427,7 @@ export const testFhirBundleWithIds = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -440,12 +529,12 @@ export const testFhirBundleWithIdsForDeath = {
   type: 'document',
   entry: [
     {
-      fullUrl: `urn:uuid:888`,
+      fullUrl: `urn:uuid:888` as URNReference,
       resource: {
         id: '111',
         identifier: {
           system: 'urn:ietf:rfc:3986',
-          value: '0ab5e4cd-a49b-4bf3-b03a-08b2e65e642a'
+          value: '0ab5e4cd-a49b-4bf3-b03a-08b2e65e642a' as UUID
         },
         resourceType: 'Composition',
         status: 'preliminary',
@@ -485,7 +574,8 @@ export const testFhirBundleWithIdsForDeath = {
             },
             entry: [
               {
-                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+                reference:
+                  'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference
               }
             ]
           },
@@ -502,7 +592,8 @@ export const testFhirBundleWithIdsForDeath = {
             },
             entry: [
               {
-                reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc'
+                reference:
+                  'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' as URNReference
               }
             ]
           },
@@ -519,7 +610,8 @@ export const testFhirBundleWithIdsForDeath = {
             },
             entry: [
               {
-                reference: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221'
+                reference:
+                  'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221' as URNReference
               }
             ]
           }
@@ -527,23 +619,32 @@ export const testFhirBundleWithIdsForDeath = {
       }
     },
     {
-      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9' as URNReference,
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'death-registration'
+              code: 'DEATH'
+            }
+          ]
+        },
+        lastModified: '2018-11-29T15:11:13.041+00:00',
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'REGISTERED'
             }
           ]
         },
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/death-tracking-id',
-            value: 'D5WGYJE'
+            value: 'D5WGYJE' as TrackingID
           }
         ],
         extension: [
@@ -557,17 +658,17 @@ export const testFhirBundleWithIdsForDeath = {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
-            valueReference: { reference: '123' }
+            valueReference: { reference: 'Location/123' }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastLocation',
-            valueReference: { reference: '123' }
+            valueReference: { reference: 'Location/123' }
           }
         ]
       }
     },
     {
-      fullUrl: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662',
+      fullUrl: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference,
       resource: {
         id: '333',
         resourceType: 'Patient',
@@ -583,7 +684,7 @@ export const testFhirBundleWithIdsForDeath = {
       }
     },
     {
-      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc',
+      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' as URNReference,
       resource: {
         resourceType: 'RelatedPerson',
         relationship: {
@@ -596,11 +697,14 @@ export const testFhirBundleWithIdsForDeath = {
           ],
           text: 'Nephew'
         },
-        patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
+        patient: {
+          reference:
+            'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference
+        }
       }
     },
     {
-      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
+      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference,
       resource: {
         id: '444',
         resourceType: 'Patient',
@@ -622,9 +726,18 @@ export const testFhirBundleWithIdsForDeath = {
       }
     },
     {
-      fullUrl: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221',
+      fullUrl: 'urn:uuid:p9044443-c708-4977-b0e7-7e51e60c9221' as URNReference,
       resource: {
-        id: '555',
+        id: '555' as UUID,
+        type: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/documentType',
+              code: 'PROOF_OF_PAYMENT'
+            }
+          ]
+        },
+        status: 'current',
         resourceType: 'DocumentReference',
         content: [
           {
@@ -637,19 +750,23 @@ export const testFhirBundleWithIdsForDeath = {
       }
     }
   ]
-}
+} satisfies Bundle<
+  Composition | Task | Patient | RelatedPerson | DocumentReference
+>
 
-export const testFhirTaskBundle = {
+export const testFhirTaskBundle: Saved<Bundle<Task>> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
     {
       fullUrl:
-        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc' as URLReference,
       resource: {
         resourceType: 'Task',
-        status: 'requested',
-        intent: '',
+        status: 'ready',
+        intent: 'order',
+        lastModified: '2018-11-29T15:11:13.041+00:00',
+        encounter: { reference: 'Encounter/123' },
         code: {
           coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
         },
@@ -660,7 +777,7 @@ export const testFhirTaskBundle = {
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: { reference: 'DUMMY' }
+            valueReference: { reference: 'DUMMY' as ResourceIdentifier }
           }
         ],
         note: [
@@ -671,12 +788,13 @@ export const testFhirTaskBundle = {
           }
         ],
         focus: {
-          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+          reference:
+            'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422' as ResourceIdentifier
         },
         identifier: [
           {
             system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B1mW7jA'
+            value: 'B1mW7jA' as TrackingID
           }
         ],
         businessStatus: {
@@ -688,7 +806,7 @@ export const testFhirTaskBundle = {
           lastUpdated: '2018-11-29T15:11:13.041+00:00',
           versionId: 'f2efacc4-b00c-4ee9-a9f0-4a33870e64ae'
         },
-        id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+        id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc' as UUID
       }
     }
   ]
@@ -704,7 +822,7 @@ export const testDeathFhirTaskBundle = {
       resource: {
         id: '222',
         resourceType: 'Task',
-        status: 'requested',
+        status: 'ready',
         code: {
           coding: [
             {
@@ -731,7 +849,7 @@ export const testDeathFhirTaskBundle = {
 
 export const taskResourceMock = JSON.stringify({
   resourceType: 'Task',
-  status: 'requested',
+  status: 'ready',
   code: {
     coding: [{ system: 'http://opencrvs.org/specs/types', code: 'BIRTH' }]
   },
@@ -978,6 +1096,284 @@ export const officeMock = JSON.stringify({
       }
     ]
   }
+})
+
+export const stateMock = JSON.stringify({
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/statistical-code',
+      value: 'ADMIN_STRUCTURE_AWn3s2RqgAN'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+      value: 'STATE'
+    }
+  ],
+  name: 'Central',
+  alias: ['Central'],
+  description: 'AWn3s2RqgAN',
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/0'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'ADMIN_STRUCTURE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'jdn',
+        display: 'Jurisdiction'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+      valueAttachment: {
+        contentType: 'application/geo+json',
+        data: '<base64>'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+      valueString:
+        '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+      valueString:
+        '[{"2007":20000},{"2008":20000},{"2009":20000},{"2010":20000},{"2011":20000},{"2012":20000},{"2013":20000},{"2014":20000},{"2015":20000},{"2016":20000},{"2017":20000},{"2018":20000},{"2019":20000},{"2020":20000},{"2021":20000},{"2022":30000},{"2023":40000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+      valueString:
+        '[{"2007":40000},{"2008":40000},{"2009":40000},{"2010":40000},{"2011":40000},{"2012":40000},{"2013":40000},{"2014":40000},{"2015":40000},{"2016":40000},{"2017":40000},{"2018":40000},{"2019":40000},{"2020":40000},{"2021":40000},{"2022":60000},{"2023":80000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+      valueString:
+        '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+    }
+  ],
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.122+00:00',
+    versionId: '39745e77-c524-4f12-b393-4ae1e03d756e'
+  },
+  id: 'f71b029f-fa53-45a9-8ed3-4b79f6e20c96'
+})
+
+export const districtMockOfState = JSON.stringify({
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/statistical-code',
+      value: 'ADMIN_STRUCTURE_oEBf29y8JP8'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/jurisdiction-type',
+      value: 'DISTRICT'
+    }
+  ],
+  name: 'Ibombo',
+  alias: ['Ibombo'],
+  description: 'oEBf29y8JP8',
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/f71b029f-fa53-45a9-8ed3-4b79f6e20c96'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'ADMIN_STRUCTURE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'jdn',
+        display: 'Jurisdiction'
+      }
+    ]
+  },
+  extension: [
+    {
+      url: 'http://hl7.org/fhir/StructureDefinition/location-boundary-geojson',
+      valueAttachment: {
+        contentType: 'application/geo+json',
+        data: '<base64>'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-male-populations',
+      valueString:
+        '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-female-populations',
+      valueString:
+        '[{"2007":5000},{"2008":5000},{"2009":5000},{"2010":5000},{"2011":5000},{"2012":5000},{"2013":5000},{"2014":5000},{"2015":5000},{"2016":5000},{"2017":5000},{"2018":5000},{"2019":5000},{"2020":5000},{"2021":5000},{"2022":7500},{"2023":10000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-total-populations',
+      valueString:
+        '[{"2007":10000},{"2008":10000},{"2009":10000},{"2010":10000},{"2011":10000},{"2012":10000},{"2013":10000},{"2014":10000},{"2015":10000},{"2016":10000},{"2017":10000},{"2018":10000},{"2019":10000},{"2020":10000},{"2021":10000},{"2022":15000},{"2023":20000}]'
+    },
+    {
+      url: 'http://opencrvs.org/specs/id/statistics-crude-birth-rates',
+      valueString:
+        '[{"2007":10},{"2008":10},{"2009":10},{"2010":10},{"2011":10},{"2012":10},{"2013":10},{"2014":10},{"2015":10},{"2016":10},{"2017":10},{"2018":10},{"2019":10},{"2020":10},{"2021":10},{"2022":15},{"2023":20}]'
+    }
+  ],
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.118+00:00',
+    versionId: 'b16c3805-ea38-468c-8031-23d6323583d8'
+  },
+  id: '59198c8d-ece1-46c2-9cee-1cd6ae078b25'
+})
+
+export const officeMockOfDistrict = JSON.stringify({
+  resourceType: 'Location',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/internal-id',
+      value: 'CRVS_OFFICE_JWMRGwDBXK'
+    }
+  ],
+  name: 'Ibombo District Office',
+  alias: ['Ibombo District Office'],
+  status: 'active',
+  mode: 'instance',
+  partOf: {
+    reference: 'Location/59198c8d-ece1-46c2-9cee-1cd6ae078b25'
+  },
+  type: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/location-type',
+        code: 'CRVS_OFFICE'
+      }
+    ]
+  },
+  physicalType: {
+    coding: [
+      {
+        code: 'bu',
+        display: 'Building'
+      }
+    ]
+  },
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.119+00:00',
+    versionId: 'baf90709-d589-47f1-bb9e-7631e76a4ab8'
+  },
+  id: 'd4ea52d2-0da7-4f40-8073-cf29fd0685c0'
+})
+
+export const practitionerRoleMock = JSON.stringify({
+  resourceType: 'Bundle',
+  id: '1d4c5877-abab-4e7b-9eca-49bbd6d50c0f',
+  meta: {
+    lastUpdated: '2023-11-23T11:09:02.340+00:00'
+  },
+  type: 'searchset',
+  total: 1,
+  link: [
+    {
+      relation: 'self',
+      url: 'http://localhost:3447/fhir/PractitionerRole?practitioner=5e530833-956a-4f98-af57-6edb315fe6bb'
+    }
+  ],
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/PractitionerRole/3aec06d1-90e8-4a8f-aaef-8de22875a0ee/_history/8d386f4f-6dce-4365-9f53-f817f27c97ed',
+      resource: {
+        resourceType: 'PractitionerRole',
+        practitioner: {
+          reference: 'Practitioner/5e530833-956a-4f98-af57-6edb315fe6bb'
+        },
+        code: [
+          {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/roles',
+                code: 'LOCAL_REGISTRAR'
+              }
+            ]
+          },
+          {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/types',
+                code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
+              }
+            ]
+          }
+        ],
+        location: [
+          {
+            reference: 'Location/d4ea52d2-0da7-4f40-8073-cf29fd0685c0'
+          },
+          {
+            reference: 'Location/59198c8d-ece1-46c2-9cee-1cd6ae078b25'
+          },
+          {
+            reference: 'Location/f71b029f-fa53-45a9-8ed3-4b79f6e20c96'
+          }
+        ],
+        meta: {
+          lastUpdated: '2023-11-22T12:15:05.121+00:00',
+          versionId: '8d386f4f-6dce-4365-9f53-f817f27c97ed'
+        },
+        id: '3aec06d1-90e8-4a8f-aaef-8de22875a0ee'
+      },
+      request: {
+        method: 'PUT',
+        url: 'PractitionerRole/3aec06d1-90e8-4a8f-aaef-8de22875a0ee'
+      }
+    }
+  ]
+})
+
+export const registrarMock = JSON.stringify({
+  resourceType: 'Practitioner',
+  identifier: [],
+  telecom: [
+    {
+      system: 'phone',
+      value: '0933333333'
+    },
+    {
+      system: 'email',
+      value: ''
+    }
+  ],
+  name: [
+    {
+      use: 'en',
+      family: 'Mweene',
+      given: ['Kennedy']
+    }
+  ],
+  meta: {
+    lastUpdated: '2023-11-22T12:15:05.116+00:00',
+    versionId: 'fc468c8c-85c5-4833-95d9-75223f6c756a'
+  },
+  _request: {
+    method: 'PUT'
+  },
+  id: '5e530833-956a-4f98-af57-6edb315fe6bb'
 })
 
 export const informantSMSNotificationMock = [
@@ -1315,12 +1711,14 @@ export const motherMock = JSON.stringify({
   id: '0477b181-9e79-4f41-ac5b-54cdf3a4ca9d'
 })
 
-export const testDeathFhirBundle = {
+export const testDeathFhirBundle: Bundle<
+  Composition | Patient | RelatedPerson | Encounter | Observation | Task
+> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
     {
-      fullUrl: 'urn:uuid:98df1315-47fd-4fc8-a505-9439ad7c6778',
+      fullUrl: 'urn:uuid:98df1315-47fd-4fc8-a505-9439ad7c6778' as URNReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -1357,7 +1755,10 @@ export const testDeathFhirBundle = {
               text: 'Deceased details'
             },
             entry: [
-              { reference: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624' }
+              {
+                reference:
+                  'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624' as URNReference
+              }
             ]
           },
           {
@@ -1372,7 +1773,10 @@ export const testDeathFhirBundle = {
               text: "Informant's details"
             },
             entry: [
-              { reference: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' }
+              {
+                reference:
+                  'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' as URNReference
+              }
             ]
           },
           {
@@ -1387,7 +1791,10 @@ export const testDeathFhirBundle = {
               text: 'Death encounter'
             },
             entry: [
-              { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' }
+              {
+                reference:
+                  'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference
+              }
             ]
           }
         ],
@@ -1397,11 +1804,15 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624',
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9' as URNReference,
+      resource: deathTaskMock as Task
+    },
+    {
+      fullUrl: 'urn:uuid:186f02ab-e039-4924-9cd0-32d61797e624' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
-        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
+
         name: [{ use: 'en', given: ['Jane'], family: ['Doe'] }],
         gender: 'female',
         birthDate: '2000-01-28',
@@ -1442,7 +1853,7 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc',
+      fullUrl: 'urn:uuid:43b3d0b4-2749-4494-a15d-2ad6051217bc' as URNReference,
       resource: {
         resourceType: 'RelatedPerson',
         relationship: {
@@ -1455,15 +1866,17 @@ export const testDeathFhirBundle = {
           ],
           text: 'Nephew'
         },
-        patient: { reference: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7' }
+        patient: {
+          reference:
+            'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7' as URNReference
+        }
       }
     },
     {
-      fullUrl: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7',
+      fullUrl: 'urn:uuid:030b5690-c5c9-4dc5-a55d-045c2f9b9bd7' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
-        identifier: [{ id: '123456', type: 'OTHER', otherType: 'Custom type' }],
         name: [{ use: 'en', given: ['John'], family: ['Doe'] }],
         telecom: [{ system: 'phone', value: '0171111111', use: 'mobile' }],
         gender: 'male',
@@ -1526,15 +1939,27 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a',
-      resource: { resourceType: 'Encounter', status: 'finished' }
+      fullUrl: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference,
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: { reference: 'Location/123' as ResourceIdentifier }
+          }
+        ]
+      }
     },
     {
-      fullUrl: 'urn:uuid:fff280db-e146-40bf-a53d-850bb7972f0e',
+      fullUrl: 'urn:uuid:fff280db-e146-40bf-a53d-850bb7972f0e' as URNReference,
       resource: {
         resourceType: 'Observation',
+
         status: 'final',
-        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        context: {
+          reference:
+            'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference
+        },
         category: [
           {
             coding: [
@@ -1559,11 +1984,14 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:dc488e79-0cf9-4fa1-b9d0-3dd142d01d03',
+      fullUrl: 'urn:uuid:dc488e79-0cf9-4fa1-b9d0-3dd142d01d03' as URNReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
-        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        context: {
+          reference:
+            'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference
+        },
         category: [
           {
             coding: [
@@ -1588,11 +2016,14 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:eb58c885-606b-46ef-9a44-c06a8d073ced',
+      fullUrl: 'urn:uuid:eb58c885-606b-46ef-9a44-c06a8d073ced' as URNReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
-        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        context: {
+          reference:
+            'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference
+        },
         category: [
           {
             coding: [
@@ -1624,11 +2055,14 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:04b79f83-779c-4a33-a1c9-714ea0b1d020',
+      fullUrl: 'urn:uuid:04b79f83-779c-4a33-a1c9-714ea0b1d020' as URNReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
-        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        context: {
+          reference:
+            'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference
+        },
         category: [
           {
             coding: [
@@ -1660,11 +2094,14 @@ export const testDeathFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:e01d0427-d219-41b3-8452-f23def5b824f',
+      fullUrl: 'urn:uuid:e01d0427-d219-41b3-8452-f23def5b824f' as URNReference,
       resource: {
         resourceType: 'Observation',
         status: 'final',
-        context: { reference: 'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' },
+        context: {
+          reference:
+            'urn:uuid:a2e4fe6a-5a9d-4113-8da7-5618d27f1c0a' as URNReference
+        },
         category: [
           {
             coding: [
@@ -1696,12 +2133,12 @@ export const testDeathFhirBundle = {
   meta: { lastUpdated: '2019-02-11' }
 }
 
-export const testMarriageFhirBundle = {
+export const testMarriageFhirBundle: Bundle<Task | Composition | Patient> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
     {
-      fullUrl: `urn:uuid:888`,
+      fullUrl: `urn:uuid:888` as URNReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -1733,7 +2170,7 @@ export const testMarriageFhirBundle = {
         title: 'Marriage Declaration',
         section: [
           {
-            title: 'Groom details',
+            title: "Groom's details",
             code: {
               coding: [
                 {
@@ -1741,16 +2178,17 @@ export const testMarriageFhirBundle = {
                   code: 'groom-details'
                 }
               ],
-              text: 'Groom details'
+              text: "Groom's details"
             },
             entry: [
               {
-                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+                reference:
+                  'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference
               }
             ]
           },
           {
-            title: 'Bride details',
+            title: "Bride's details",
             code: {
               coding: [
                 {
@@ -1758,11 +2196,12 @@ export const testMarriageFhirBundle = {
                   code: 'bride-details'
                 }
               ],
-              text: 'Bride details'
+              text: "Bride's details"
             },
             entry: [
               {
-                reference: 'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662'
+                reference:
+                  'urn:uuid:ab392b88-1861-44e8-b5b0-f6e0525b2662' as URNReference
               }
             ]
           }
@@ -1770,19 +2209,32 @@ export const testMarriageFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9' as URNReference,
       resource: {
         resourceType: 'Task',
-        status: 'requested',
-        intent: '',
+        status: 'ready',
+        intent: 'order',
         focus: {
-          reference: 'urn:uuid:888'
+          reference: 'urn:uuid:888' as URNReference
+        },
+        extension: [],
+        encounter: {
+          reference: 'urn:uuid:888' as URNReference
+        },
+        lastModified: '2018-05-23T14:44:58+02:00',
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'IN_PROGRESS'
+            }
+          ]
         },
         code: {
           coding: [
             {
               system: 'http://opencrvs.org/specs/types',
-              code: 'marriage-registration'
+              code: 'MARRIAGE'
             }
           ]
         },
@@ -1793,20 +2245,21 @@ export const testMarriageFhirBundle = {
           },
           {
             system: 'http://opencrvs.org/specs/id/marriage-tracking-id',
-            value: 'MYEHHN3'
+            value: 'MYEHHN3' as TrackingID
           }
         ]
       }
     },
     {
-      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57',
+      fullUrl: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
         name: [
           {
             given: ['Jane'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'en'
           }
         ],
         gender: 'female',
@@ -1819,14 +2272,15 @@ export const testMarriageFhirBundle = {
       }
     },
     {
-      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221',
+      fullUrl: 'urn:uuid:b9044443-c708-4977-b0e7-7e51ef0c9221' as URNReference,
       resource: {
         resourceType: 'Patient',
         active: true,
         name: [
           {
             given: ['Jack'],
-            family: ['Doe']
+            family: ['Doe'],
+            use: 'en'
           }
         ],
         gender: 'male'
@@ -1840,7 +2294,7 @@ export const testInProgressFhirBundle = {
   type: 'document',
   entry: [
     {
-      fullUrl: `urn:uuid:888`,
+      fullUrl: `urn:uuid:888` as URNReference,
       resource: {
         identifier: {
           system: 'urn:ietf:rfc:3986',
@@ -1880,7 +2334,7 @@ export const testInProgressFhirBundle = {
         status: 'draft',
         intent: '',
         focus: {
-          reference: 'urn:uuid:888'
+          reference: 'urn:uuid:888' as URNReference
         },
         code: {
           coding: [
@@ -1947,7 +2401,7 @@ export const testInProgressDeathFhirBundle = {
         status: 'draft',
         intent: '',
         focus: {
-          reference: 'urn:uuid:888'
+          reference: 'urn:uuid:888' as URNReference
         },
         code: {
           coding: [
@@ -1972,47 +2426,6 @@ export const testInProgressDeathFhirBundle = {
   ],
   meta: { lastUpdated: '2019-02-11' }
 }
-
-export const deathTaskMock = JSON.stringify({
-  resourceType: 'Task',
-  status: 'requested',
-  code: {
-    coding: [
-      {
-        system: 'http://opencrvs.org/specs/types',
-        code: 'DEATH'
-      }
-    ]
-  },
-  identifier: [
-    {
-      system: 'http://opencrvs.org/specs/id/paper-form-id',
-      value: '12345678'
-    },
-    {
-      system: 'http://opencrvs.org/specs/id/death-tracking-id',
-      value: 'B5WGYJE'
-    }
-  ],
-  focus: {
-    reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-  },
-  extension: [
-    {
-      url: 'http://opencrvs.org/specs/extension/contact-person',
-      valueString: 'MOTHER'
-    },
-    {
-      url: 'http://opencrvs.org/specs/extension/regLastOffice',
-      valueReference: { reference: '123' }
-    },
-    {
-      url: 'http://opencrvs.org/specs/extension/regLastLocation',
-      valueReference: { reference: '123' }
-    }
-  ],
-  id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
-})
 
 export const hearthResponseMock = JSON.stringify({
   resourceType: 'Bundle',
@@ -2093,10 +2506,12 @@ export const relatedPersonMock = JSON.stringify({
     ],
     text: 'Nephew'
   },
-  patient: { reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' }
+  patient: {
+    reference: 'urn:uuid:14fc828b-281c-4a2e-a9ef-44d4361fca57' as URNReference
+  }
 })
 
-export function wrapInBundle(...resources: [fhir.Resource | string]): string {
+export function wrapInBundle(...resources: [fhir3.Resource | string]): string {
   return JSON.stringify({
     resourceType: 'Bundle',
     type: 'document',
@@ -2138,6 +2553,8 @@ export const mockFormDraft = [
     __v: 0
   }
 ]
+type PatientIdentifier = NonNullable<Patient['identifier']>[number]
+
 const drnIdentifier = {
   type: {
     coding: [
@@ -2148,7 +2565,7 @@ const drnIdentifier = {
     ]
   },
   value: '2022DSNEYUG'
-} as fhir.CodeableConcept
+} satisfies PatientIdentifier
 
 const nidIdentifier = {
   value: '654654666',
@@ -2160,7 +2577,7 @@ const nidIdentifier = {
       }
     ]
   }
-} as fhir.CodeableConcept
+} satisfies PatientIdentifier
 
 const brnIdentifier = {
   type: {
@@ -2172,7 +2589,7 @@ const brnIdentifier = {
     ]
   },
   value: '2022BSNEYUG'
-} as fhir.CodeableConcept
+} satisfies PatientIdentifier
 
 const mosipPsutTokenIdentifier = {
   type: {
@@ -2184,7 +2601,7 @@ const mosipPsutTokenIdentifier = {
     ]
   },
   value: '257803821990055124230310596669133515'
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
 const birthPatientIdentifier = {
   type: {
@@ -2196,17 +2613,17 @@ const birthPatientIdentifier = {
     ]
   },
   value: '1c9add9b-9215-49d7-bfaa-226c82ac47d2'
-} as fhir.CodeableConcept
+} as fhir3.CodeableConcept
 
-export const mosipDeceasedPatientMock = {
+export const mosipDeceasedPatientMock: Saved<Patient> = {
   resourceType: 'Patient',
   active: true,
-  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
+  id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1' as UUID,
   name: [
     {
-      use: 'bn',
+      use: 'en',
       given: ['Sakib Al'],
-      family: 'Hasan'
+      family: ['Hasan']
     }
   ],
   gender: 'male',
@@ -2221,9 +2638,9 @@ export const mosipUpdatedDeceasedPatientMock = {
   id: '1c9add9b-9215-49d7-bfaa-226c82ac47d1',
   name: [
     {
-      use: 'bn',
+      use: 'en',
       given: ['Sakib Al'],
-      family: 'Hasan'
+      family: ['Hasan']
     }
   ],
   gender: 'male',
@@ -2240,7 +2657,7 @@ export const mosipBirthPatientMock = {
     {
       use: 'bn',
       given: ['Sakib Al'],
-      family: 'Hasan'
+      family: ['Hasan']
     }
   ],
   gender: 'male',
@@ -2249,16 +2666,16 @@ export const mosipBirthPatientMock = {
   identifier: [brnIdentifier, mosipPsutTokenIdentifier]
 }
 
-export const mosipBirthPatientBundleMock = JSON.stringify({
+export const mosipBirthPatientBundleMock = {
   resourceType: 'Bundle',
   type: 'document',
   entry: [
     {
-      fullUrl: `urn:uuid:888`,
+      fullUrl: `urn:uuid:888` as URNReference,
       resource: mosipBirthPatientMock
     }
   ]
-})
+}
 
 export const mosipErrorMock = JSON.stringify({
   transactionID: '6810356436',
@@ -2277,7 +2694,7 @@ export const mosipErrorMock = JSON.stringify({
     authToken: '278978890917620599774520674456334033'
   }
 })
-export const mosipSuccessMock = JSON.stringify({
+export const mosipSuccessMock = {
   transactionID: '5763906453',
   version: '1.0',
   id: 'mosip.identity.auth',
@@ -2287,7 +2704,7 @@ export const mosipSuccessMock = JSON.stringify({
     authStatus: true,
     authToken: '257803821990055124230310596669133515'
   }
-})
-export const mosipConfigMock = JSON.stringify([
+}
+export const mosipConfigMock = [
   { status: 'active', name: 'Sweet Health', integratingSystemType: 'MOSIP' }
-])
+]

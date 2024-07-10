@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createServer } from '@user-mgnt/server'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 import User, { AUDIT_ACTION, AUDIT_REASON, IUser } from '@user-mgnt/model/user'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
@@ -20,7 +20,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['sysadmin'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

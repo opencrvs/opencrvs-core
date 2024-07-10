@@ -20,7 +20,7 @@ const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
@@ -130,7 +130,7 @@ describe('createUser handler', () => {
         ],
         username: 'j.doe1',
         identifiers: [{ system: 'NID', value: '1234' }],
-        email: 'j.doe@gmail.com',
+        emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
         role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
@@ -260,7 +260,7 @@ describe('createUser handler', () => {
 
     expect(fetch.mock.calls.length).toBe(3)
     expect(fetch.mock.calls[2][0]).toEqual(
-      'http://localhost:5001/fhir/Practitioner/123'
+      'http://localhost:3447/fhir/Practitioner/123'
     )
     expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(500)

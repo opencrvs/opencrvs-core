@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config'
-import { logger } from '@config/config/logger'
+import { logger } from '@opencrvs/commons'
 import { badData, internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
@@ -63,11 +63,18 @@ export default async function configHandler(
   }
 }
 
-async function getConfigFromCountry() {
+async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
-  const res = await fetch(url)
+
+  const res = await fetch(url, {
+    headers: authToken
+      ? {
+          Authorization: `Bearer ${authToken}`
+        }
+      : {}
+  })
   if (!res.ok) {
-    throw new Error(`Expected to get the aplication config from ${url}`)
+    throw new Error(`Expected to get the application config from ${url}`)
   }
   return res.json()
 }
@@ -94,7 +101,9 @@ export async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
-  const configFromCountryConfig = await getConfigFromCountry()
+  const configFromCountryConfig = await getConfigFromCountry(
+    request?.headers?.authorization
+  )
   const stripApplicationConfig = stripIdFromApplicationConfig(
     configFromCountryConfig
   )
@@ -267,11 +276,15 @@ const applicationConfigResponseValidation = Joi.object({
     .required(),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string().required(),
   DECLARATION_AUDIT_LOCATIONS: Joi.string().required(),
-  EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean().required(),
-  MARRIAGE_REGISTRATION: Joi.boolean().required(),
-  DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
-  INFORMANT_SIGNATURE: Joi.boolean().required(),
-  INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required(),
+  FEATURES: {
+    DEATH_REGISTRATION: Joi.boolean().required(),
+    MARRIAGE_REGISTRATION: Joi.boolean().required(),
+    EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean().required(),
+    INFORMANT_SIGNATURE: Joi.boolean().required(),
+    PRINT_DECLARATION: Joi.boolean().required(),
+    DATE_OF_BIRTH_UNKNOWN: Joi.boolean().required(),
+    INFORMANT_SIGNATURE_REQUIRED: Joi.boolean().required()
+  },
   USER_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: Joi.string().allow('').optional(),
   SIGNATURE_REQUIRED_FOR_ROLES: Joi.array().items(

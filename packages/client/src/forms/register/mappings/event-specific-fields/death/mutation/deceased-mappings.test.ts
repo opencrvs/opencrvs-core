@@ -55,6 +55,8 @@ describe('Death registration mutation mapping related tests', () => {
     expect(transformedData.registration.certificates).toEqual([
       {
         collector: {
+          relationship: 'OTHER',
+          otherRelationship: 'Uncle',
           name: [
             {
               use: 'en',

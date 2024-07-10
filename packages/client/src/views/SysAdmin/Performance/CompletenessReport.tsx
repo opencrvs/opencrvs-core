@@ -26,7 +26,7 @@ import {
   ReportContainer,
   CompletenessRateTime
 } from '@client/views/SysAdmin/Performance/utils'
-import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { buttonMessages } from '@client/i18n/messages/buttons'

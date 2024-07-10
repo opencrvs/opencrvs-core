@@ -12,7 +12,7 @@
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "rootDir": ".",
     "lib": [
       "esnext.asynciterable",

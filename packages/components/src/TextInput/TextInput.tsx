@@ -111,7 +111,15 @@ export interface IRef {
 
 export const TextInput = React.forwardRef<IRef, ITextInputProps>(
   (
-    { focusInput, maxLength = 250, isDisabled, inputFieldWidth, ...otherProps },
+    {
+      focusInput,
+      maxLength = 250,
+      isDisabled,
+      inputFieldWidth,
+      ignoreMediaQuery,
+      error,
+      ...otherProps
+    },
     ref
   ) => {
     const $element = React.useRef<HTMLInputElement>(null)

@@ -17,7 +17,7 @@ import {
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import _, { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
+import { isNull, isUndefined, merge, flatten, isEqual } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
   PrimaryButton,
@@ -44,7 +44,6 @@ import {
 } from '@client/declarations'
 import {
   FormFieldGenerator,
-  getInitialValueForSelectDynamicValue,
   ITouchedNestedFields
 } from '@client/components/form'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
@@ -57,7 +56,6 @@ import {
   IFormData,
   CorrectionSection,
   IFormFieldValue,
-  SELECT_WITH_DYNAMIC_OPTIONS,
   SubmissionAction
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -66,7 +64,8 @@ import {
   goToCertificateCorrection,
   goToHome,
   goToHomeTab,
-  goToPageGroup as goToPageGroupAction
+  goToPageGroup as goToPageGroupAction,
+  goToPrintRecordView
 } from '@client/navigation'
 import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
@@ -151,6 +150,7 @@ interface IFormProps {
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
+  reviewSummaryHeader?: React.ReactNode
 }
 
 export type RouteProps = RouteComponentProps<{
@@ -169,6 +169,7 @@ type DispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
   deleteDeclaration: typeof deleteDeclaration
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
+  goToPrintRecord: typeof goToPrintRecordView
 }
 
 type Props = {
@@ -212,13 +213,15 @@ function FormAppBar({
   declaration,
   duplicate,
   modifyDeclarationMethod,
-  deleteDeclarationMethod
+  deleteDeclarationMethod,
+  printDeclarationMethod
 }: {
   duplicate: boolean | undefined
   section: IFormSection
   declaration: IDeclaration
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
+  printDeclarationMethod: (declarationId: string) => void
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -295,10 +298,10 @@ function FormAppBar({
     ))
 
     if (saveAndExitConfirm) {
-      //saving current changes to localData
-      //so that we can revert changes back to data.localData when users exits without saving
+      // saving current changes to localData
+      // for reverting back the changes when users exits without saving
       declaration.localData = declaration.data
-      //save declaration and exit
+      // save declaration and exit
       dispatch(writeDeclaration(declaration))
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
     }
@@ -310,23 +313,25 @@ function FormAppBar({
       dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
       return
     }
-    const [exitModalTitle, exitModalDescription] = isCorrection(declaration)
-      ? [
-          intl.formatMessage(
-            messages.exitWithoutSavingModalForCorrectionRecordTitle
-          ),
-          intl.formatMessage(
-            messages.exitWithoutSavingModalForCorrectionRecordDescription
-          )
-        ]
-      : [
-          intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalTitle
-          ),
-          intl.formatMessage(
-            messages.exitWithoutSavingDeclarationConfirmModalDescription
-          )
-        ]
+    const [exitModalTitle, exitModalDescription] =
+      isCorrection(declaration) ||
+      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+        ? [
+            intl.formatMessage(
+              messages.exitWithoutSavingModalForCorrectionRecordTitle
+            ),
+            intl.formatMessage(
+              messages.exitWithoutSavingModalForCorrectionRecordDescription
+            )
+          ]
+        : [
+            intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalTitle
+            ),
+            intl.formatMessage(
+              messages.exitWithoutSavingDeclarationConfirmModalDescription
+            )
+          ]
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -445,17 +450,33 @@ function FormAppBar({
             }
             desktopRight={
               <>
-                {!duplicate && !isCorrection(declaration) && (
-                  <Button
-                    id="save-exit-btn"
-                    type="primary"
-                    size="small"
-                    onClick={handleSaveAndExit}
-                  >
-                    <Icon name="DownloadSimple" />
-                    {intl.formatMessage(buttonMessages.saveExitButton)}
-                  </Button>
-                )}
+                {!duplicate &&
+                  !isCorrection(declaration) &&
+                  declaration.registrationStatus !==
+                    SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                    <>
+                      <Button
+                        id="save-exit-btn"
+                        type="primary"
+                        size="small"
+                        onClick={handleSaveAndExit}
+                      >
+                        <Icon name="DownloadSimple" />
+                        {intl.formatMessage(buttonMessages.saveExitButton)}
+                      </Button>
+                      {window.config.FEATURES.PRINT_DECLARATION && (
+                        <Button
+                          id="print-btn"
+                          type="secondary"
+                          size="small"
+                          onClick={() => printDeclarationMethod(declaration.id)}
+                        >
+                          <Icon name="Printer" />
+                          {intl.formatMessage(buttonMessages.printDeclaration)}
+                        </Button>
+                      )}
+                    </>
+                  )}
                 <Button
                   id="exit-btn"
                   type="secondary"
@@ -526,6 +547,18 @@ function FormAppBar({
                     {intl.formatMessage(buttonMessages.saveExitButton)}
                   </Button>
                 )}
+                {section.viewType === 'preview' &&
+                  window.config.FEATURES.PRINT_DECLARATION && (
+                    <Button
+                      id="print-btn"
+                      type="secondary"
+                      size="small"
+                      onClick={() => printDeclarationMethod(declaration.id)}
+                    >
+                      <Icon name="Printer" />
+                      {intl.formatMessage(buttonMessages.printDeclaration)}
+                    </Button>
+                  )}
                 <Button type="secondary" size="small" onClick={handleExit}>
                   <Icon name="X" />
                   {intl.formatMessage(buttonMessages.exitButton)}
@@ -955,6 +988,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       duplicate,
       activeSection,
       activeSectionGroup,
+      reviewSummaryHeader,
       userDetails
     } = this.props
 
@@ -986,6 +1020,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               duplicate={duplicate}
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
+              printDeclarationMethod={this.props.goToPrintRecord}
             />
           }
           key={activeSection.id}
@@ -1026,6 +1061,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       rejectDeclarationClickEvent={this.toggleRejectForm}
                       submitClickEvent={this.confirmSubmission}
                       onChangeReviewForm={this.modifyDeclaration}
+                      reviewSummaryHeader={reviewSummaryHeader}
                       userDetails={userDetails}
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
@@ -1330,14 +1366,6 @@ function getInitialValue(
       getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
   }
 
-  if (
-    field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-    !field.initialValue &&
-    field.dynamicOptions.initialValue === 'agentDefault' &&
-    userDetails !== undefined
-  ) {
-    fieldInitialValue = getInitialValueForSelectDynamicValue(field, userDetails)
-  }
   return fieldInitialValue
 }
 
@@ -1432,5 +1460,6 @@ export const RegisterForm = connect<
   goToCertificateCorrection,
   goToHome,
   goToHomeTab,
-  toggleDraftSavedNotification
+  toggleDraftSavedNotification,
+  goToPrintRecord: goToPrintRecordView
 })(injectIntl<'intl', FullProps>(RegisterFormView))

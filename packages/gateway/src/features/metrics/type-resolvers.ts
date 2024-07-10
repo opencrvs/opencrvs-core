@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver, GQLVSExport } from '@gateway/graphql/schema'
-import { fetchFHIR } from '@gateway/features/fhir/utils'
+import { fetchFHIR } from '@gateway/features/fhir/service'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 
 export const typeResolvers: GQLResolver = {
@@ -42,7 +42,14 @@ export const typeResolvers: GQLResolver = {
     }
   },
   VSExport: {
-    async url({ url: fileUri }: GQLVSExport, _, { headers: authHeader }) {
+    async url(
+      { url: fileUri }: GQLVSExport,
+      _,
+      { headers: authHeader, presignDocumentUrls }
+    ) {
+      if (!presignDocumentUrls) {
+        return fileUri
+      }
       return getPresignedUrlFromUri(fileUri, authHeader)
     }
   },

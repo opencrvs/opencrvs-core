@@ -31,7 +31,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -65,7 +65,7 @@ describe('Verify user handlers', () => {
     it('returns 400 if called with no username', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -95,7 +95,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -133,7 +133,7 @@ describe('Verify user handlers', () => {
     it('returns OK if the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -165,7 +165,7 @@ describe('Verify user handlers', () => {
     it('returns 400 if called with no username', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -201,7 +201,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -238,7 +238,7 @@ describe('Verify user handlers', () => {
     it('returns OK if the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -272,7 +272,7 @@ describe('Verify user handlers', () => {
     it('returns 400 if called with no code', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -309,7 +309,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -347,7 +347,7 @@ describe('Verify user handlers', () => {
     it('returns OK if the sms gets sent', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -380,7 +380,7 @@ describe('Verify user handlers', () => {
     it('returns 400 if called with no username', async () => {
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -416,7 +416,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -455,7 +455,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',
@@ -493,7 +493,7 @@ describe('Verify user handlers', () => {
 
       const token = jwt.sign(
         { scope: ['sysadmin'] },
-        readFileSync('../auth/test/cert.key'),
+        readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
           issuer: 'opencrvs:auth-service',

@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  allUsersEmailHandler,
+  allUsersEmailPayloadSchema
+} from '@notification/features/email/all-user-handler'
+import {
   sendBirthDeclarationConfirmation,
   sendBirthRegistrationConfirmation,
   sendBirthRejectionConfirmation,
@@ -18,6 +22,12 @@ import {
   rejectionNotificationSchema,
   sendBirthInProgressConfirmation
 } from '@notification/features/sms/birth-handler'
+import {
+  sendCorrectionApprovedNotification,
+  sendCorrectionApprovedNotificationInput,
+  sendCorrectionRejectedNotification,
+  sendCorrectionRejectedNotificationInput
+} from '@notification/features/sms/correction'
 import {
   sendDeathDeclarationConfirmation,
   sendDeathRegistrationConfirmation,
@@ -35,28 +45,51 @@ import {
   sendResetPasswordInvite,
   userPasswordResetNotificationSchema
 } from '@notification/features/sms/user-handler'
+import { ServerRoute, ReqRefDefaults, RouteOptionsValidate } from '@hapi/hapi'
+import * as Joi from 'joi'
+import {
+  birthInProgressNotification,
+  deathInProgressNotification
+} from '@notification/features/inProgress/handler'
+import {
+  birthReadyForReviewNotification,
+  deathReadyForReviewNotification
+} from '@notification/features/readyForReview/handler'
+import {
+  birthRegisterNotification,
+  deathRegisterNotification
+} from '@notification/features/register/handler'
+import {
+  birthSentForUpdatesNotification,
+  deathSentForUpdatesNotification
+} from '@notification/features/sentForUpdates/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
   CERTIFY = 'certify',
-  SYSADMIN = 'sysadmin'
+  SYSADMIN = 'sysadmin',
+  NATIONAL_SYSTEM_ADMIN = 'natlsysadmin'
 }
 
-export default function getRoutes() {
+const recordValidation: RouteOptionsValidate = {
+  payload: Joi.object()
+}
+
+export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
   return [
     // add ping route by default for health check
     {
       method: 'GET',
       path: '/ping',
-      handler: (request: any, h: any) => {
+      handler: (request, h) => {
         // Perform any health checks and return true or false for success prop
         return {
           success: true
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -66,7 +99,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/authenticationCode',
       handler: sendUserAuthenticationCode,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with auth code',
         validate: {
@@ -76,9 +109,119 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
+      path: '/birth/sent-notification',
+      handler: birthInProgressNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for birth in-progress declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-notification',
+      handler: deathInProgressNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for death in-progress declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/sent-notification-for-review',
+      handler: birthReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for birth ready for review declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-notification-for-review',
+      handler: deathReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for death ready for review declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/sent-for-approval',
+      handler: birthReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for validated birth declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-for-approval',
+      handler: deathReadyForReviewNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country-config for validated death declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/registered',
+      handler: birthRegisterNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for birth register declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/registered',
+      handler: deathRegisterNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for death register declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/birth/sent-for-updates',
+      handler: birthSentForUpdatesNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for rejected birth declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
+      path: '/death/sent-for-updates',
+      handler: deathSentForUpdatesNotification,
+      options: {
+        tags: ['api'],
+        description:
+          'Sends a notification to country config for rejected death declaration',
+        validate: recordValidation
+      }
+    },
+    {
+      method: 'POST',
       path: '/birthInProgressSMS',
       handler: sendBirthInProgressConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user for birth in-progress entry',
         auth: {
@@ -98,7 +241,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthDeclarationSMS',
       handler: sendBirthDeclarationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for birth declaration entry',
@@ -119,7 +262,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthRegistrationSMS',
       handler: sendBirthRegistrationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for birth registration entry',
@@ -135,7 +278,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/birthRejectionSMS',
       handler: sendBirthRejectionConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for birth declaration rejection entry',
@@ -151,7 +294,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathInProgressSMS',
       handler: sendDeathInProgressConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for death in-progress entry',
@@ -172,7 +315,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathDeclarationSMS',
       handler: sendDeathDeclarationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms or email to a user for death declaration entry',
@@ -193,7 +336,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathRegistrationSMS',
       handler: sendDeathRegistrationConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
@@ -208,7 +351,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/deathRejectionSMS',
       handler: sendDeathRejectionConfirmation,
-      config: {
+      options: {
         tags: ['api'],
         description:
           'Sends an sms to a user for death declaration rejection entry',
@@ -224,7 +367,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/userCredentialsInvite',
       handler: sendUserCredentials,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
@@ -237,9 +380,39 @@ export default function getRoutes() {
     },
     {
       method: 'POST',
+      path: '/rejectCorrectionRequest',
+      handler: sendCorrectionRejectedNotification,
+      options: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: sendCorrectionRejectedNotificationInput
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/approveCorrectionRequest',
+      handler: sendCorrectionApprovedNotification,
+      options: {
+        tags: ['api'],
+        description: 'Sends an sms to a user with credentials',
+        auth: {
+          scope: [RouteScope.REGISTER]
+        },
+        validate: {
+          payload: sendCorrectionApprovedNotificationInput
+        }
+      }
+    },
+    {
+      method: 'POST',
       path: '/resetPasswordInvite',
       handler: sendResetPasswordInvite,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
@@ -254,7 +427,7 @@ export default function getRoutes() {
       method: 'POST',
       path: '/retrieveUserName',
       handler: retrieveUserName,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with username',
         validate: {
@@ -266,11 +439,26 @@ export default function getRoutes() {
       method: 'POST',
       path: '/updateUserNameSMS',
       handler: updateUserName,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Sends an sms to a user with new username',
         validate: {
           payload: retrieveUserNameNotificationSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/allUsersEmail',
+      handler: allUsersEmailHandler,
+      options: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]
+        },
+        description: 'Sends emails to all users given in payload',
+        validate: {
+          payload: allUsersEmailPayloadSchema
         }
       }
     }

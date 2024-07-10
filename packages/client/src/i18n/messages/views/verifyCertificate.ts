@@ -29,7 +29,7 @@ interface IVerifyCertificateMessages
   registar: MessageDescriptor
   brn: MessageDescriptor
   drn: MessageDescriptor
-  createdAt: MessageDescriptor
+  certifiedAt: MessageDescriptor
   toastMessage: MessageDescriptor
 }
 
@@ -110,8 +110,8 @@ const messagesToDefine: IVerifyCertificateMessages = {
     defaultMessage: 'Name of registar',
     description: 'Label for name of registar center'
   },
-  createdAt: {
-    id: 'verifyCertificate.createdAt',
+  certifiedAt: {
+    id: 'verifyCertificate.certifiedAt',
     defaultMessage: 'Date of certification',
     description: 'Label for date of certification'
   },
@@ -140,6 +140,11 @@ const messagesToDefine: IVerifyCertificateMessages = {
     defaultMessage: 'Male',
     description: 'Option for form field: Sex name',
     id: 'verifyCertificate.sexMale'
+  },
+  unknown: {
+    defaultMessage: 'Unknown',
+    description: 'Option for form field: Sex name',
+    id: 'form.field.label.sexUnknown'
   }
 }
 

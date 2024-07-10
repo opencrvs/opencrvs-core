@@ -119,7 +119,9 @@ export const internationaliseFieldObject = (
   const base = {
     ...field,
     label:
-      field.type === PARAGRAPH ? field.label : intl.formatMessage(field.label),
+      field.type === PARAGRAPH
+        ? field.label
+        : intl.formatMessage(field.label, field.labelParam),
     helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
     unit: field.unit && intl.formatMessage(field.unit),
@@ -343,13 +345,16 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
 export const getFieldOptions = (
   field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
   values: IFormSectionData,
-  offlineCountryConfig: IOfflineData
+  offlineCountryConfig: IOfflineData,
+  declaration?: IFormData
 ) => {
   if (field.type === SELECT_WITH_OPTIONS) {
     if (field.optionCondition) {
       // eslint-disable-next-line no-eval
       const conditionEvaluator = eval(field.optionCondition!)
-      return field.options.filter(conditionEvaluator)
+      return field.options.filter((field) =>
+        conditionEvaluator({ field, values, declaration })
+      )
     }
 
     return field.options
@@ -684,20 +689,16 @@ export const isDateField = (
   return field.type === DATE
 }
 
-export const stringifyFieldValue = (
+export const serializeFieldValue = (
   field: IFormField,
   fieldValue: IFormFieldValue,
   sectionData: IFormSectionData
-): string => {
-  if (!fieldValue) {
-    return ''
-  }
-
+) => {
   if (isDateField(field, sectionData)) {
-    return fieldValue.toString()
+    return fieldValue?.toString()
   }
 
-  return fieldValue.toString()
+  return fieldValue
 }
 
 export const getSelectedRadioOptionWithNestedFields = (

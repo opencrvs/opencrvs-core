@@ -19,6 +19,7 @@ import * as elasticsearch from '@elastic/elasticsearch'
 
 import { StartedElasticsearchContainer } from 'testcontainers'
 
+// Test timeout is increased due to the fact that testcontainers can take a while to pull Docker images
 jest.setTimeout(10 * 60 * 1000)
 
 let container: StartedElasticsearchContainer

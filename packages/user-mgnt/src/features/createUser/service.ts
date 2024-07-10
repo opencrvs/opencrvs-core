@@ -11,7 +11,7 @@
 import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 import User, { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
-import { logger } from '@user-mgnt/logger'
+import { logger } from '@opencrvs/commons'
 
 export const createFhirPractitioner = (
   user: IUser,
@@ -23,7 +23,7 @@ export const createFhirPractitioner = (
       identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
-        { system: 'email', value: user.email }
+        { system: 'email', value: user.emailForNotification }
       ],
       name: [
         {
@@ -39,7 +39,7 @@ export const createFhirPractitioner = (
       identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
-        { system: 'email', value: user.email }
+        { system: 'email', value: user.emailForNotification }
       ],
       name: user.name,
       extension: user.signature && [

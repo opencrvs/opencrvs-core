@@ -8,44 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  previewCertificate,
-  downloadFile
-} from '@client/views/PrintCertificate/PDFUtils'
-import {
-  createTestStore,
-  mockDeathDeclarationData,
-  mockOfflineData
-} from '@client/tests/util'
-import { createIntl } from 'react-intl'
-import { Event } from '@client/utils/gateway'
-import { omit } from 'lodash'
+import { downloadFile } from '@client/views/PrintCertificate/PDFUtils'
 import { validImageB64String } from '@client/tests/mock-offline-data'
 import { vi } from 'vitest'
 
-const intl = createIntl({
-  locale: 'en'
-})
-
 describe('PDFUtils related tests', () => {
-  it('Throws exception if invalid userDetails found for previewCertificate', async () => {
-    const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
-    const { store } = await createTestStore()
-    expect(
-      previewCertificate(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: deathDeclaration,
-          event: Event.Death
-        },
-        null,
-        mockOfflineData,
-        (pdf: string) => {},
-        store.getState()
-      )
-    ).rejects.toThrowError('No user details found')
-  })
   it('downloadFile functionality', () => {
     const createElementMock = vi.fn()
     const setAttributeMock = vi.fn()

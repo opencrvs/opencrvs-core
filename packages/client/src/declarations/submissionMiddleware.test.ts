@@ -124,6 +124,18 @@ describe('Submission middleware', () => {
 
   Object.values(Event).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
+      if (
+        event === Event.Marriage &&
+        [
+          SubmissionAction.APPROVE_CORRECTION,
+          SubmissionAction.REJECT_CORRECTION,
+          SubmissionAction.MAKE_CORRECTION,
+          SubmissionAction.REQUEST_CORRECTION
+        ].includes(submissionAction)
+      ) {
+        return
+      }
+
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
         mockDeclarationData.registration.certificates[0] = {
           collector: {
@@ -142,7 +154,6 @@ describe('Submission middleware', () => {
             {
               paymentId: '1234',
               type: 'MANUAL',
-              total: 50,
               amount: 50,
               outcome: 'COMPLETED',
               date: '2018-10-22'

@@ -18,17 +18,18 @@ on:
   push:
     branches:
       - 'develop'
+      - 'release*'
 
 jobs:
   base:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
       - name: Set version
@@ -55,14 +56,14 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: github.event_name == 'push'
 
       - name: Login to DockerHub
@@ -73,7 +74,28 @@ jobs:
 
       - name: Build ${{ matrix.service }}
         run: |
+          export VERSION="${{ needs.base.outputs.version }}"
           echo ${{ matrix.service }}
-          export VERSION=`git log -1 --pretty=format:%h`
-          docker-compose build ${{ matrix.service }}
-          docker-compose push ${{ matrix.service }}
+          docker compose build ${{ matrix.service }}
+          docker compose push ${{ matrix.service }}
+
+  security-scans:
+    needs: [base, build]
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.base.outputs.services) }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            trivy.yaml
+            .trivyignore.yaml
+          sparse-checkout-cone-mode: false
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          trivy-config: trivy.yaml

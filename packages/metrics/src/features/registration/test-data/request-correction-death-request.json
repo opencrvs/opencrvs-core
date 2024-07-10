@@ -298,10 +298,6 @@
             "valueString": true
           },
           {
-            "url": "http://opencrvs.org/specs/extension/attestedAndCopied",
-            "valueString": true
-          },
-          {
             "url": "http://opencrvs.org/specs/extension/payment",
             "valueReference": {
               "reference": "urn:uuid:85c4acb6-9a0c-4062-a242-785dad734be4"

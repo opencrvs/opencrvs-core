@@ -33,15 +33,15 @@ echo -e "\033[32m::::::::::::::: Cloning the Country Configuration :::::::::::::
 echo
 
 cd ../
-git clone https://github.com/opencrvs/opencrvs-countryconfig.git
 
-cd opencrvs-countryconfig
+BRANCH=master
 if [[ $CI == "true" ]]; then
-  git checkout develop
-else
-  git checkout master
+  BRANCH=develop
 fi
 
+git clone --branch $BRANCH --depth 1 https://github.com/opencrvs/opencrvs-countryconfig.git
+
+cd opencrvs-countryconfig
 
 echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"

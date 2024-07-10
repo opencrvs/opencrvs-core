@@ -152,101 +152,99 @@ export enum ActionType {
   BUTTON = 'button'
 }
 
-export class ListRow extends React.Component<IListRowProps> {
-  render() {
-    const {
-      id,
-      label,
-      value,
-      placeHolder,
-      action,
-      actionsMenu,
-      actionType,
-      isLinkLabel,
-      onClickLabelLink,
-      nameWithAvatar
-    } = this.props
-
-    return (
-      <Container id={id}>
-        {label && (
-          <>
-            <LabelValueLayer>
-              <ListDataContainer>
-                {isLinkLabel ? (
-                  <Label id={`${id}_label`}>
-                    <Link
-                      onClick={() => onClickLabelLink && onClickLabelLink()}
-                    >
-                      {label}
-                    </Link>
-                  </Label>
-                ) : nameWithAvatar ? (
-                  <ProfileInfoContainer id={`${id}_label`}>
-                    {nameWithAvatar}
-                  </ProfileInfoContainer>
-                ) : (
-                  <Label id={`${id}_label`}>{label}</Label>
-                )}
-                {value && <Value id={`${id}_value`}>{value}</Value>}
-                {placeHolder && (
-                  <PlaceHolder id={`${id}_placeholder`}>
-                    {placeHolder}
-                  </PlaceHolder>
-                )}
-                <HideOnDesktop>
-                  {this.props.status && (
-                    <StatusContainer>{this.props.status}</StatusContainer>
-                  )}
-                </HideOnDesktop>
-              </ListDataContainer>
-              <HideOnMobile>
-                {actionsMenu && <MenuContainer>{actionsMenu}</MenuContainer>}
-              </HideOnMobile>
-            </LabelValueLayer>
-            {action && (actionType === ActionType.LINK || !actionType) && (
-              <Action>
-                <Link
-                  id={action.id}
-                  font="reg16"
-                  disabled={action.disabled}
-                  onClick={action.handler}
-                >
-                  {action.label}
-                </Link>
-              </Action>
-            )}
-            {action && actionType === ActionType.ICON && (
-              <Action>
-                <Link
-                  id={action.id}
-                  font="reg16"
-                  disabled={action.disabled}
-                  onClick={action.handler}
-                >
-                  {action.label}
-                </Link>
-              </Action>
-            )}
-            {action && actionType === ActionType.BUTTON && (
-              <Action>
-                <Button
-                  type="primary"
-                  id={action.id}
-                  disabled={action.disabled}
-                  onClick={action.handler}
-                >
-                  {action.label}
-                </Button>
-              </Action>
-            )}
-            <HideOnDesktop>
-              {actionsMenu && <MenuContainer>{actionsMenu}</MenuContainer>}
-            </HideOnDesktop>
-          </>
+const RowLabel = ({
+  id,
+  label,
+  value,
+  placeHolder,
+  action,
+  actionsMenu,
+  actionType,
+  isLinkLabel,
+  onClickLabelLink,
+  nameWithAvatar,
+  status
+}: IListRowProps) => (
+  <>
+    <LabelValueLayer>
+      <ListDataContainer>
+        {isLinkLabel ? (
+          <Label id={`${id}_label`}>
+            <Link onClick={() => onClickLabelLink && onClickLabelLink()}>
+              {label}
+            </Link>
+          </Label>
+        ) : nameWithAvatar ? (
+          <ProfileInfoContainer id={`${id}_label`}>
+            {nameWithAvatar}
+          </ProfileInfoContainer>
+        ) : (
+          <Label id={`${id}_label`}>{label}</Label>
         )}
-        {!label && <ValueContainer>{value}</ValueContainer>}
-      </Container>
-    )
+        {value && <Value id={`${id}_value`}>{value}</Value>}
+        {placeHolder && (
+          <PlaceHolder id={`${id}_placeholder`}>{placeHolder}</PlaceHolder>
+        )}
+        <HideOnDesktop>
+          {status && <StatusContainer>{status}</StatusContainer>}
+        </HideOnDesktop>
+      </ListDataContainer>
+      <HideOnMobile>
+        {actionsMenu && <MenuContainer>{actionsMenu}</MenuContainer>}
+      </HideOnMobile>
+    </LabelValueLayer>
+    {action && (actionType === ActionType.LINK || !actionType) && (
+      <Action>
+        <Link
+          id={action.id}
+          font="reg16"
+          disabled={action.disabled}
+          onClick={action.handler}
+        >
+          {action.label}
+        </Link>
+      </Action>
+    )}
+    {action && actionType === ActionType.ICON && (
+      <Action>
+        <Link
+          id={action.id}
+          font="reg16"
+          disabled={action.disabled}
+          onClick={action.handler}
+        >
+          {action.label}
+        </Link>
+      </Action>
+    )}
+    {action && actionType === ActionType.BUTTON && (
+      <Action>
+        <Button
+          type="primary"
+          id={action.id}
+          disabled={action.disabled}
+          onClick={action.handler}
+        >
+          {action.label}
+        </Button>
+      </Action>
+    )}
+    <HideOnDesktop>
+      {actionsMenu && <MenuContainer>{actionsMenu}</MenuContainer>}
+    </HideOnDesktop>
+  </>
+)
+
+export const ListRow = (props: IListRowProps) => {
+  const { id, label, value } = props
+
+  if (label) {
+    return <RowLabel {...props} />
   }
+
+  return (
+    <Container id={id}>
+      <ValueContainer>{value}</ValueContainer>
+    </Container>
+  )
 }

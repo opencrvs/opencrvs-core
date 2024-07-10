@@ -10,7 +10,13 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IImage, validateImage, ERROR_TYPES } from '@client/utils/imageUtils'
+import {
+  IImage,
+  validateImage,
+  ERROR_TYPES,
+  IMAGE_UPLOAD_MAX_SIZE_IN_BYTES,
+  bytesToMB
+} from '@client/utils/imageUtils'
 import { ALLOWED_IMAGE_TYPE } from '@client/utils/constants'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -47,9 +53,17 @@ function ImageLoaderComp({
       } catch (error) {
         if (error instanceof Error) {
           if (error.message === ERROR_TYPES.OVERSIZED) {
-            onError(intl.formatMessage(messages.overSized))
+            onError(
+              intl.formatMessage(messages.overSized, {
+                maxSize: bytesToMB(IMAGE_UPLOAD_MAX_SIZE_IN_BYTES)
+              })
+            )
           } else {
-            onError(intl.formatMessage(messages.imageFormat))
+            onError(
+              intl.formatMessage(messages.imageFormat, {
+                maxSize: bytesToMB(IMAGE_UPLOAD_MAX_SIZE_IN_BYTES)
+              })
+            )
           }
         }
       } finally {

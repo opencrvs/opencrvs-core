@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { withTheme } from 'styled-components'
@@ -32,15 +32,7 @@ import {
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@client/utils/authUtils'
-import {
-  BRN_DRN_TEXT,
-  EMPTY_STRING,
-  NAME_TEXT,
-  NATIONAL_ID_TEXT,
-  PHONE_TEXT,
-  SEARCH_RESULT_SORT,
-  TRACKING_ID_TEXT
-} from '@client/utils/constants'
+import { EMPTY_STRING } from '@client/utils/constants'
 import {
   buttonMessages,
   constantsMessages,
@@ -48,14 +40,17 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import { RegStatus, SearchEventsQuery } from '@client/utils/gateway'
+import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { HOME, REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import {
+  HOME,
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
 import {
   ColumnContentAlignment,
   COLUMNS,
@@ -73,7 +68,6 @@ import {
   NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { convertToMSISDN } from '@client/forms/utils'
 import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
@@ -86,6 +80,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
+import { UserDetails } from '@client/utils/userUtils'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -136,9 +131,16 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     (properties: string | null) =>
       properties === null || properties === EMPTY_STRING
   )
+
   const offlineData = useSelector(getOfflineData)
   const DEFAULT_PAGE_SIZE = 10
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
+
+  const searchEventsQueryVariables = {
+    advancedSearchParameters: filteredAdvancedSearchParams,
+    count: DEFAULT_PAGE_SIZE,
+    skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
+  }
 
   useEffect(() => {
     const recordWindowWidth = () => {
@@ -209,9 +211,6 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const userHasCertifyScope = () => {
     return props.scope && props.scope.includes('certify')
   }
-  const userHasValidateOrRegistrarScope = () => {
-    return userHasValidateScope() || userHasRegisterScope()
-  }
 
   const transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
@@ -233,28 +232,35 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const downloadStatus =
           (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-        const declarationIsArchived =
-          reg.declarationStatus === RegStatus.Archived
         const declarationIsRequestedCorrection =
           reg.declarationStatus === 'REQUESTED_CORRECTION'
-        const declarationIsRegistered =
-          reg.declarationStatus === RegStatus.Registered
-        const declarationIsCertified =
-          reg.declarationStatus === RegStatus.Certified
-        const declarationIsRejected =
-          reg.declarationStatus === RegStatus.Rejected
-        const declarationIsValidated =
-          reg.declarationStatus === RegStatus.Validated
-        const declarationIsInProgress =
-          reg.declarationStatus === RegStatus.InProgress
-        const declarationIsIssued = reg.declarationStatus === RegStatus.Issued
+        const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
+        const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
+        const declarationIsRejected = reg.declarationStatus === 'REJECTED'
+        const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
+        const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+        const declarationIsIssued = reg.declarationStatus === 'ISSUED'
+        const isDeclared = reg.declarationStatus === 'DECLARED'
+        const declarationIsCorrectionRequested =
+          reg.declarationStatus === 'CORRECTION_REQUESTED'
         const isDuplicate =
           reg.duplicates &&
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { match, userDetails } = props
-        const { searchText, searchType } = match.params
+        const isDeclarationReviewableByRegistrar =
+          declarationIsRejected ||
+          declarationIsValidated ||
+          declarationIsCorrectionRequested ||
+          isDeclared ||
+          declarationIsInProgress
+
+        const isDeclarationReviewableByRegAgent =
+          isDeclared || declarationIsInProgress || declarationIsRejected
+
+        const shouldShowReviewButton =
+          (userHasRegisterScope() && isDeclarationReviewableByRegistrar) ||
+          (userHasValidateScope() && isDeclarationReviewableByRegAgent)
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
@@ -281,14 +287,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (
-            (declarationIsValidated && userHasRegisterScope()) ||
-            (!declarationIsValidated &&
-              !declarationIsRegistered &&
-              !declarationIsCertified &&
-              !declarationIsArchived &&
-              userHasValidateOrRegistrarScope())
-          ) {
+          } else if (shouldShowReviewButton) {
             actions.push({
               label:
                 declarationIsRejected || declarationIsInProgress
@@ -296,7 +295,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                   : intl.formatMessage(constantsMessages.review),
               handler: () =>
                 props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.declarationStatus === 'CORRECTION_REQUESTED'
+                    ? REVIEW_CORRECTION
+                    : REVIEW_EVENT_PARENT_FORM_PAGE,
                   reg.id,
                   'review',
                   reg.event.toLowerCase()
@@ -316,25 +317,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 refetchQueries: [
                   {
                     query: SEARCH_EVENTS,
-                    variables: {
-                      advancedSearchParameters: {
-                        trackingId:
-                          searchType === TRACKING_ID_TEXT ? searchText : '',
-                        nationalId:
-                          searchType === NATIONAL_ID_TEXT ? searchText : '',
-                        registrationNumber:
-                          searchType === BRN_DRN_TEXT ? searchText : '',
-                        contactNumber:
-                          searchType === PHONE_TEXT
-                            ? convertToMSISDN(searchText, window.config.COUNTRY)
-                            : '',
-                        name: searchType === NAME_TEXT ? searchText : '',
-                        declarationLocationId: userDetails
-                          ? getUserLocation(userDetails).id
-                          : ''
-                      },
-                      sort: SEARCH_RESULT_SORT
-                    }
+                    variables: searchEventsQueryVariables
                   }
                 ],
                 action:
@@ -417,13 +400,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
       {isEnoughParams() && (
         <Query<SearchEventsQuery>
           query={SEARCH_EVENTS}
-          variables={{
-            advancedSearchParameters: {
-              ...filteredAdvancedSearchParams
-            },
-            count: DEFAULT_PAGE_SIZE,
-            skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
-          }}
+          variables={searchEventsQueryVariables}
           fetchPolicy="cache-and-network"
         >
           {({ loading, error, data }) => {
@@ -496,7 +473,7 @@ const SearchModifierComponent = () => {
   return (
     <>
       <SearchParamContainer>
-        {Object.keys(formattedMapOfParams).map((pillKey, i) => {
+        {Object.keys(formattedMapOfParams).map((pillKey) => {
           return (
             <Pill
               key={pillKey}

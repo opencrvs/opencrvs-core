@@ -149,30 +149,30 @@ export interface ISelectProps
   searchableLength?: number
 }
 
-export class Select extends React.Component<ISelectProps> {
-  change = (selectedOption: ISelectOption) => {
-    if (this.props.onChange) {
-      this.props.onChange(selectedOption.value)
+export const Select = (props: ISelectProps) => {
+  const { searchableLength, onChange, disabled, options, value } = props
+
+  const handleChange = (selectedOption: ISelectOption) => {
+    if (onChange) {
+      onChange(selectedOption.value)
     }
   }
-  render() {
-    const length = this.props.searchableLength || 10
+  const length = searchableLength || 10
 
-    return (
-      <StyledSelect
-        classNamePrefix="react-select"
-        components={{ DropdownIndicator }}
-        {...this.props}
-        onChange={this.change}
-        isDisabled={this.props.disabled}
-        isSearchable={this.props.options.length > length}
-        value={getSelectedOption(this.props.value, this.props.options)}
-        isOptionDisabled={({ value }: { value: string }) =>
-          this.props.options.some(
-            (option: ISelectOption) => option.value === value && option.disabled
-          )
-        }
-      />
-    )
-  }
+  return (
+    <StyledSelect
+      classNamePrefix="react-select"
+      components={{ DropdownIndicator }}
+      {...props}
+      onChange={handleChange}
+      isDisabled={disabled}
+      isSearchable={options.length > length}
+      value={getSelectedOption(value, options)}
+      isOptionDisabled={({ value }: { value: string }) =>
+        options.some(
+          (option: ISelectOption) => option.value === value && option.disabled
+        )
+      }
+    />
+  )
 }

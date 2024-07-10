@@ -8,14 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { modifyDeclaration, writeDeclaration } from '@client/declarations'
+import {
+  IDeclaration,
+  modifyDeclaration,
+  writeDeclaration
+} from '@client/declarations'
 import { selectCountryLogo, getOfflineData } from '@client/offline/selectors'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   addNidUserInfoToDeclaration,
-  useCheckNonce,
   useExtractCallBackState,
   useQueryParams
 } from '@client/views/OIDPVerificationCallback/utils'
@@ -34,7 +37,6 @@ import { OIDP_VERIFICATION_CALLBACK } from '@client/navigation/routes'
 // OIDP Verification Callback
 // --
 // Checks the ?state= query parameter for a JSON string like: { pathname: "/path/somewhere" }
-// Checks that the &nonce= parameter matches the one in localStorage, removes it if yes, throws if not
 // Redirects to the pathname in state
 
 const Page = styled.div`
@@ -61,14 +63,13 @@ const UserActionsContainer = styled.div`
 export const OIDPVerificationCallback = () => {
   const params = useQueryParams()
   const { pathname, declarationId, section } = useExtractCallBackState()
-  const isNonceOk = useCheckNonce()
   const code = params.get('code')
   const offlineData = useSelector(getOfflineData)
   const clientId = offlineData.systems.find((s) => s.type === 'NATIONAL_ID')
     ?.settings?.openIdProviderClientId
   const intl = useIntl()
   const logo = useSelector(selectCountryLogo)
-  const declaration = useDeclaration(declarationId)
+  const declaration = useDeclaration<IDeclaration>(declarationId)
   const dispatch = useDispatch()
   const history = useHistory()
   const oidpUserInfoQueryVariables = {
@@ -87,7 +88,7 @@ export const OIDPVerificationCallback = () => {
     }
   })
 
-  if (!pathname || !isNonceOk) {
+  if (!pathname) {
     // Do not redirect and let the hooks throw
     return null
   }

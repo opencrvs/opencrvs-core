@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 import * as Sentry from '@sentry/react'
 
@@ -19,17 +19,11 @@ const development = ['127.0.0.1', 'localhost'].includes(
   window.location.hostname
 )
 
-export class ErrorBoundary extends React.Component<{
-  children?: React.ReactNode
-}> {
-  render() {
-    return (
-      <Sentry.ErrorBoundary
-        showDialog={!development}
-        fallback={<ErrorMessage>Something went wrong...</ErrorMessage>}
-      >
-        {this.props.children}
-      </Sentry.ErrorBoundary>
-    )
-  }
-}
+export const ErrorBoundary = ({ children }: { children: ReactNode }) => (
+  <Sentry.ErrorBoundary
+    showDialog={!development}
+    fallback={<ErrorMessage>Something went wrong...</ErrorMessage>}
+  >
+    {children}
+  </Sentry.ErrorBoundary>
+)

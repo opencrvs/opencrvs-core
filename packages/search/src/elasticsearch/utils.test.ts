@@ -17,13 +17,11 @@ import {
   mockSearchResponse,
   mockCompositionBody,
   mockBirthFhirBundle,
-  mockUserModelResponse,
-  mockLocationResponse,
-  mockFacilityResponse,
-  mockTaskBirthCorrectionBundle
+  mockUserModelResponse
 } from '@search/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
+import { getTaskFromSavedBundle, SavedTask } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 
@@ -43,23 +41,23 @@ describe('elastic search utils', () => {
   })
 
   it('should return appropriate history with facility name for notifications', async () => {
-    fetch.mockResponses(
-      [JSON.stringify(mockUserModelResponse), { status: 200 }],
-      [JSON.stringify(mockLocationResponse), { status: 200 }],
-      [JSON.stringify(mockFacilityResponse), { status: 200 }]
-    )
+    fetch.mockResponses([
+      JSON.stringify(mockUserModelResponse),
+      { status: 200 }
+    ])
     const mockNotificationBody = {
-      compositionId: '9c0dde8d-65b2-49dd-8b7e-5dd0c7c63779',
+      compositionId: 'c8b8e843-c5e0-49b5-96d9-a702ddb46454',
       compositionType: 'birth-notification',
       type: 'IN_PROGRESS',
-      updatedBy: '489b76cf-6b58-4b0d-96ba-caa1271f787b',
-      eventLocationId: '489b76cf-6b58-4b0d-96ba-caa1271f787c',
+      updatedBy: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
+      eventLocationId: '146251e9-df90-4068-82b0-27d8f979e8e2',
       operationHistories: []
     }
     await createStatusHistory(
       mockNotificationBody,
-      mockBirthFhirBundle.entry[1].resource as fhir.Task,
-      'Bearer abc'
+      getTaskFromSavedBundle(mockBirthFhirBundle),
+      'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNzE0MTI1NjI4LCJleHAiOjE3MTQ3MzA0MjgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NjEzOWNjY2IyMTAwOTI3ZjY4OTJhNGYifQ.gQcNbMtCd3V96LRbw7buTSgk_wPkNYEepGhAaE0Z5fH4c1jNG4dn6Jm2J0QgvmEkm6cgPp240e9imT4pG3md7_gO9iwqXg84gn5cU9nhfF7Xi_pxbqDAbprBIB-1smxGOPGYy4LhgSydAa47XwaPLwtQRBoHQtsys13TH_ypw2SY0KQFJVm7OuAJiyvtJsQ6JA2a4oddRTPpbwqc3l-IEEESUktduMMFoHA4DmwHgIylVRKOB58NlxruV-YQRS78X99VBHCnq9f8aecW91dtvw9P_rcTihW8K1x5ua3GYw69sxn-KuJcBzydynp8IKEqCKaeNrtFu8TxMvamIOZTXg',
+      mockBirthFhirBundle
     )
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
@@ -80,7 +78,7 @@ describe('elastic search utils', () => {
           operatorFirstNamesLocale: '',
           operatorOfficeName: 'Baniajan Union Parishad',
           operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ'],
-          operationType: 'REGISTERED',
+          operationType: 'REGISTERED' as const,
           operatorRole: 'LOCAL_REGISTRAR'
         }
       ]
@@ -88,18 +86,18 @@ describe('elastic search utils', () => {
 
     await createStatusHistory(
       mockNotificationBody,
-      mockBirthFhirBundle.entry[1].resource as fhir.Task,
-      'Bearer abc'
+      getTaskFromSavedBundle(mockBirthFhirBundle),
+      'Bearer abc',
+      mockBirthFhirBundle
     )
     expect(mockNotificationBody.operationHistories.length).toEqual(1)
   })
 
   it('should create correction data in operation history when requested for correction', async () => {
-    fetch.mockResponses(
-      [JSON.stringify(mockUserModelResponse), { status: 200 }],
-      [JSON.stringify(mockLocationResponse), { status: 200 }],
-      [JSON.stringify(mockFacilityResponse), { status: 200 }]
-    )
+    fetch.mockResponses([
+      JSON.stringify(mockUserModelResponse),
+      { status: 200 }
+    ])
     const compositionBody: IBirthCompositionBody = {
       ...mockCompositionBody,
       type: 'REQUESTED_CORRECTION',
@@ -119,10 +117,52 @@ describe('elastic search utils', () => {
         }
       ]
     }
+    const correctionTask: SavedTask = {
+      ...getTaskFromSavedBundle(mockBirthFhirBundle),
+      businessStatus: {
+        coding: [
+          {
+            system: 'http://opencrvs.org/specs/reg-status',
+            code: 'REGISTERED'
+          }
+        ]
+      },
+      input: [
+        {
+          type: {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                code: 'update'
+              }
+            ]
+          },
+          valueCode: 'child',
+          valueId: 'name',
+          valueString: 'Old name'
+        }
+      ],
+      output: [
+        {
+          type: {
+            coding: [
+              {
+                system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                code: 'update'
+              }
+            ]
+          },
+          valueCode: 'child',
+          valueId: 'name',
+          valueString: 'New name'
+        }
+      ]
+    }
     await createStatusHistory(
       compositionBody,
-      mockTaskBirthCorrectionBundle.entry[0].resource,
-      'Bearer abc'
+      correctionTask,
+      'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNzE0MTI1NjI4LCJleHAiOjE3MTQ3MzA0MjgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NjEzOWNjY2IyMTAwOTI3ZjY4OTJhNGYifQ.gQcNbMtCd3V96LRbw7buTSgk_wPkNYEepGhAaE0Z5fH4c1jNG4dn6Jm2J0QgvmEkm6cgPp240e9imT4pG3md7_gO9iwqXg84gn5cU9nhfF7Xi_pxbqDAbprBIB-1smxGOPGYy4LhgSydAa47XwaPLwtQRBoHQtsys13TH_ypw2SY0KQFJVm7OuAJiyvtJsQ6JA2a4oddRTPpbwqc3l-IEEESUktduMMFoHA4DmwHgIylVRKOB58NlxruV-YQRS78X99VBHCnq9f8aecW91dtvw9P_rcTihW8K1x5ua3GYw69sxn-KuJcBzydynp8IKEqCKaeNrtFu8TxMvamIOZTXg',
+      mockBirthFhirBundle
     )
 
     expect(compositionBody).toHaveProperty('operationHistories')

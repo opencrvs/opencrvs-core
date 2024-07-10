@@ -30,13 +30,8 @@ const InputErrorWrapper = styled.div<IInputError>`
   max-width: 535px;
 `
 
-export class InputError extends React.Component<IInputError> {
-  render() {
-    const { children, centred, ...props } = this.props
-    return (
-      <InputErrorWrapper centred={centred} {...props}>
-        {children}
-      </InputErrorWrapper>
-    )
-  }
-}
+export const InputError = ({ children, centred, ...rest }: IInputError) => (
+  <InputErrorWrapper centred={centred} {...rest}>
+    {children}
+  </InputErrorWrapper>
+)

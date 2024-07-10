@@ -34,8 +34,9 @@ import { IDateRangePickerValue } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
 import {
+  dateFieldTypes,
   getAccordionActiveStateMap,
-  IBaseAdvancedSearchState,
+  IAdvancedSearchFormState,
   isValidDateRangePickerValue,
   transformAdvancedSearchLocalStateToStoreData,
   transformStoreDataToAdvancedSearchLocalState
@@ -67,48 +68,54 @@ const {
   deathSearchInformantSection
 } = advancedSearchDeathSections
 
-const dateFieldTypes = [
-  'dateOfRegistration',
-  'dateOfEvent',
-  'childDoB',
-  'motherDoB',
-  'fatherDoB',
-  'deceasedDoB',
-  'informantDoB'
-]
-
-export const isAdvancedSearchFormValid = (value: IBaseAdvancedSearchState) => {
+export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
   const validNonDateFields = Object.keys(value).filter(
     (key) =>
       !['event', 'eventLocationType'].includes(key) &&
       !dateFieldTypes.includes(key) &&
-      Boolean(value[key as keyof IBaseAdvancedSearchState])
+      Boolean(value[key as keyof IAdvancedSearchFormState])
   )
   //handle date fields separately
-  const validDateFields = dateFieldTypes.filter(
-    (key) =>
-      value[key as keyof IBaseAdvancedSearchState] &&
-      isValidDateRangePickerValue(
-        value[key as keyof IBaseAdvancedSearchState] as IDateRangePickerValue
-      )
-  )
+  const validationResultsPerDateField: boolean[] = []
 
-  const validCount = validNonDateFields.length + validDateFields.length
-  return validCount >= 2
+  for (const key of dateFieldTypes) {
+    const dateObj = value[
+      key as keyof IAdvancedSearchFormState
+    ] as IDateRangePickerValue
+
+    if (!dateObj) continue
+
+    if (isValidDateRangePickerValue(dateObj)) {
+      validationResultsPerDateField.push(true)
+      continue
+    }
+    /*
+     * if isValidDateRangePickerValue couldn't validate dateObj
+     * the date field would have an invalid value
+     */
+    if (dateObj.exact) validationResultsPerDateField.push(false)
+  }
+
+  const validCount =
+    validNonDateFields.length +
+    validationResultsPerDateField.filter((valid) => valid).length
+
+  return (
+    validCount >= 2 && validationResultsPerDateField.every((isValid) => isValid)
+  )
 }
 
 const BirthSection = () => {
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
-  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+  const [formState, setFormState] = useState<IAdvancedSearchFormState>({
     ...transformStoreDataToAdvancedSearchLocalState(
       advancedSearchParamsState,
       offlineData,
       'birth'
     )
   })
-
   const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(advancedSearchParamsState)
   )
@@ -305,7 +312,7 @@ const DeathSection = () => {
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
-  const [formState, setFormState] = useState<IBaseAdvancedSearchState>({
+  const [formState, setFormState] = useState<IAdvancedSearchFormState>({
     ...transformStoreDataToAdvancedSearchLocalState(
       advancedSearchParamsState,
       offlineData,

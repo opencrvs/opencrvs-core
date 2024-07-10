@@ -38,10 +38,10 @@ import {
 import { merge } from 'lodash'
 import * as React from 'react'
 import { InProgress, SELECTOR_ID } from './InProgress'
-import {
+import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
+} from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { vi, Mock } from 'vitest'

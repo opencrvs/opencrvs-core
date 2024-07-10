@@ -8,15 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@gateway/common-types'
+import { IAuthHeader } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   ISystemModelData,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { logger } from '@gateway/logger'
+import { logger } from '@opencrvs/commons'
 import * as decode from 'jwt-decode'
-import fetch from 'node-fetch'
+import fetch from '@gateway/fetch'
+import { Scope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string
@@ -24,6 +25,15 @@ export interface ITokenPayload {
   algorithm: string
   scope: string[]
 }
+
+export type scopeType =
+  | 'register'
+  | 'validate'
+  | 'recordsearch'
+  | 'certify'
+  | 'declare'
+  | 'sysadmin'
+  | 'performance'
 
 export async function getUser(
   body: { [key: string]: string | undefined },
@@ -73,7 +83,7 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   }
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: string) {
+export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
@@ -81,7 +91,7 @@ export function hasScope(authHeader: IAuthHeader, scope: string) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function inScope(authHeader: IAuthHeader, scopes: string[]) {
+export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
   const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
 }

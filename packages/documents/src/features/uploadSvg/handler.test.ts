@@ -23,7 +23,7 @@ describe('verify svg uploader handler', () => {
   let server: Awaited<ReturnType<typeof createServer>>
   const token = jwt.sign(
     { scope: ['declare'] },
-    readFileSync('../auth/test/cert.key'),
+    readFileSync('./test/cert.key'),
     {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',

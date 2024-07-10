@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { GQLComment } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLComment } from '@client/utils/gateway-deprecated-do-not-use'
 import { HumanName } from './gateway'
 
 interface INamesMap {

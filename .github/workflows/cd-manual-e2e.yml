@@ -32,14 +32,11 @@ on:
 jobs:
   manual-deploy-staging-e2e:
     environment: staging
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 120
-    strategy:
-      matrix:
-        node-version: [16.20.0]
     steps:
       - name: Checking out git repo
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v4.1.1
       - name: Checking out the country config repo
         run: |
           git clone -b ${{ github.event.inputs.farajaland }} https://github.com/opencrvs/opencrvs-farajaland.git

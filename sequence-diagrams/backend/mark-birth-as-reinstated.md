@@ -8,7 +8,6 @@ title: Mark birth as reinstated
 sequenceDiagram
     autonumber
     participant GraphQL gateway
-    participant OpenHIM
     participant Workflow
     participant User management
     participant Hearth
@@ -22,89 +21,43 @@ sequenceDiagram
     GraphQL gateway->>Search: Search for assignment
     Search->>ElasticSearch: Search by Composition id
     Note over GraphQL gateway,ElasticSearch: Check if the user has been assigned to this record
-    GraphQL gateway->>OpenHIM: Get Task by Composition id
-    OpenHIM->>Hearth: Get Task by Composition id
-    GraphQL gateway->>OpenHIM: Get Task history
-    OpenHIM->>Hearth: Get Task history
-    Note over GraphQL gateway, Hearth: Find the previous reg status
-    GraphQL gateway->>OpenHIM: Put Task
-    OpenHIM->>Workflow: Put Task
 
-    Workflow->>Hearth: Get Task by Task id
-    Note over Workflow,Hearth: Check for duplicate status update
+    GraphQL gateway->>Workflow: POST /records/{recordId}/reinstate
+    Workflow->>Search: Get record by id (by createRoute)
 
-    Workflow->>User management: Get Practitioner id by token
-    Workflow->>Hearth: Get Practitioner
-    Note over Workflow,Hearth: Finds practitioner to<br />1) set user to bundle<br />2) later fetch office & location to bundle
-    Workflow->>Config: Get form draft status
-    Note over Workflow,Config: Adds configuration extension to the Task Bundle distinguish records made when form is in draft
-    Workflow->>Hearth: Get PractitionerRole
+    Workflow->>User management: Fetch user/system information
+    Workflow->>Hearth: Get practitioner resource
+
     loop PractitionerRole Locations
-        Workflow->>Hearth: Get Location
+      Workflow->>Hearth: Get location by user's practitionerId
     end
-    Note over Workflow,Hearth: Adds primary location to Task Bundle
-    Workflow->>Hearth: Get PractitionerRole
-    loop PractitionerRole Locations
-        Workflow->>Hearth: Get Location
-    end
-    Note over Workflow,Hearth: Adds office to the Task Bundle
-    Workflow->>Hearth: Put updated Task Bundle
-    Workflow--)OpenHIM: Trigger mark event as archived event
-    OpenHIM--)Search: Post bundle
-    OpenHIM--)Search: Post bundle
+    Note over Workflow,Hearth: Update bundle with practitioner details
 
+    Workflow->>Hearth: Save bundle
+    Note over Workflow,Hearth: Get hearth response for all entries
+
+    Note over Workflow: Merge changed resources<br /> into record with <br /> hearth's response bundle
+
+    Workflow--)Search: Post bundle
     %% upsertEvent
-    %% updateEvent
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Get operation history
-    %% createStatusHistory
-    Search->>User management: Get user
-    Search->>Hearth: Get office location
-    Note over Search,Hearth: Compose new history entry
-    %% updateComposition
-    Search->>ElasticSearch: Update composition
-
-    %% indexAndSearchComposition
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find createdAt
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find operation history
+    Search->>ElasticSearch: Search by composition id
+    Note over Search,ElasticSearch: Get operation history and createdAt
 
     %% createIndexBody
       %% createChildIndex
       %% addEventLocation
-    Search->>Hearth: Get Encounter
-    Search->>Hearth: Get Encounter location
+    Search->>Hearth: Get event location for creating child index
 
-      %% createDeclarationIndex
-      %% getCreatedBy
-    Search->>ElasticSearch: Get composition
-    Note over Search,ElasticSearch: Find createdBy
+    %% createDeclarationIndex
+    Search->>Hearth: Get declarationJurisdictionIds for declaration index
+    Search->>ElasticSearch: Get createdBy
 
-      %% createStatusHistory
-    Search->>User management: Get user
-    Search->>Hearth: Get office location
+    %% createStatusHistory
+    Search->>User management: Get user for status history
     Note over Search,Hearth: Compose new history entry
 
-    %% indexComposition
     Search->>ElasticSearch: Index composition
 
-    %% detectAndUpdateduplicates
-      %% detectDuplicates
-        %% searchComposition
-    Search->>ElasticSearch: Search Compositions for duplicates
-      %% updateCompositionWithDuplicates
-
-    loop no of duplicates
-        Search->>Hearth: Get Composition by id
-    end
-
-    Search->>ElasticSearch: Update Composition
-    Note over Search,ElasticSearch: Add duplicates to "relatesTo"
-
-    Search->>Hearth: Get Composition by id
-    Note over Search,Hearth: Add duplicates to Composition
-
-    Search->>Hearth: Put Composition
-    Note over Search,Hearth: Update duplicates to Hearth 'relatesTo'
+    Workflow--)Metrics: POST bundle /events/{event}/reinstated
+    Metrics->>Influx DB: Write audit point
 ```

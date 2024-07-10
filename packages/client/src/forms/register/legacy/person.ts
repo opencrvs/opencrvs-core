@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ApolloQueryResult, gql } from '@apollo/client'
-import { GQLQuery, GQLPerson } from '@opencrvs/gateway/src/graphql/schema.d'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use.d'
 
 export const FETCH_PERSON = gql`
   query fetchPerson($identifier: ID!) {

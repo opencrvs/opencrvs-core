@@ -16,21 +16,11 @@ import {
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import {
-  formatUrl,
-  goBack,
-  goToHomeTab,
-  goToReviewCertificate
-} from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  useIntl
-} from 'react-intl'
+import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
+import { useIntl } from 'react-intl'
 import * as React from 'react'
 import styled from 'styled-components'
-import { Redirect, RouteComponentProps, useParams } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
@@ -45,23 +35,19 @@ import {
   Summary,
   Currency,
   ResponsiveModal
-} from '@client/../../components/lib'
-import {
-  SuccessButton,
-  TertiaryButton
-} from '@client/../../components/lib/buttons'
+} from '@opencrvs/components/lib'
+import { SuccessButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Event } from '@client/utils/gateway'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { Button } from '@client/../../components/src/Button'
+import { Button } from '@opencrvs/components/src/Button'
 import { SubmissionAction } from '@client/forms'
-import { getDraft } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { useState } from 'react'
+import { useDeclaration } from '@client/declarations/selectors'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -86,15 +72,12 @@ export const IssuePayment = () => {
   )
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const declarations = useSelector<IStoreState, IPrintableDeclaration[]>(
-    (state) => state.declarationsState.declarations as IPrintableDeclaration[]
-  )
+  const draft = useDeclaration<IDeclaration>(registrationId)
 
   const readyToIssue = () => {
     const registeredDate = getRegisteredDate(declaration.data)
     const certificate = declaration.data.registration.certificates[0]
     const eventDate = getEventDate(declaration.data, event)
-    const draft = getDraft(declarations, registrationId, eventType)
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_ISSUE
     draft.action = SubmissionAction.ISSUE_DECLARATION
 
@@ -106,10 +89,9 @@ export const IssuePayment = () => {
     )
     certificate.payments = {
       type: 'MANUAL' as const,
-      total: Number(paymentAmount),
       amount: Number(paymentAmount),
       outcome: 'COMPLETED' as const,
-      date: Date.now()
+      date: new Date().toISOString()
     }
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(declaration))

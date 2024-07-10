@@ -15,8 +15,7 @@ export const HOSTNAME = process.env.DOMAIN || '*'
 export const LOGIN_URL = process.env.LOGIN_URL || 'http://localhost:3020/'
 export const CLIENT_APP_URL =
   process.env.CLIENT_APP_URL || 'http://localhost:3000/'
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
-export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
+export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
@@ -36,6 +35,9 @@ export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const DOCUMENTS_URL =
   process.env.DOCUMENTS_URL || 'http://localhost:9050'
+/** Disables the Redis-based rate limiting globally */
+export const DISABLE_RATE_LIMIT = Boolean(process.env.DISABLE_RATE_LIMIT)
+
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'
@@ -75,7 +77,8 @@ export const DEFAULT_TIMEOUT = 600000
 export const MINIO_BUCKET = process.env.MINIO_BUCKET || 'ocrvs'
 
 export const OIDP_BASE_URL = process.env.NATIONAL_ID_OIDP_BASE_URL
-export const OIDP_REST_URL = process.env.NATIONAL_ID_OIDP_REST_URL
+export const OIDP_TOKEN_URL = process.env.NATIONAL_ID_OIDP_TOKEN_URL
+export const OIDP_USERINFO_URL = process.env.NATIONAL_ID_OIDP_USERINFO_URL
 /** Base64 encoded RS256 JSON Web Key */
 export const OIDP_CLIENT_PRIVATE_KEY =
   process.env.NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY

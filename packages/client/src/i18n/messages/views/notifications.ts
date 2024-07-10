@@ -8,43 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface INotificationsMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  declarationsSynced: MessageDescriptor
-  draftsSaved: MessageDescriptor
-  outboxText: MessageDescriptor
-  updatePINSuccess: MessageDescriptor
-  processingText: MessageDescriptor
-  statusArchiving: MessageDescriptor
-  statusCertifying: MessageDescriptor
-  statusIssuing: MessageDescriptor
-  statusRegistering: MessageDescriptor
-  statusRejecting: MessageDescriptor
-  statusReinstating: MessageDescriptor
-  statusRequestingCorrection: MessageDescriptor
-  statusSubmitting: MessageDescriptor
-  statusWaitingToBeArchived: MessageDescriptor
-  statusWaitingToValidate: MessageDescriptor
-  statusWaitingToRegister: MessageDescriptor
-  statusWaitingToReject: MessageDescriptor
-  statusWaitingToSubmit: MessageDescriptor
-  statusWaitingToCertify: MessageDescriptor
-  statusWaitingToIssue: MessageDescriptor
-  userAuditSuccess: MessageDescriptor
-  userFormFail: MessageDescriptor
-  userFormFailForOffline: MessageDescriptor
-  userFormSuccess: MessageDescriptor
-  userFormUpdateSuccess: MessageDescriptor
-  waitingToRetry: MessageDescriptor
-  downloadDeclarationFailed: MessageDescriptor
-  unassigned: MessageDescriptor
-  onlineUserStatus: MessageDescriptor
-  duplicateRecord: MessageDescriptor
-}
-
-const messagesToDefine: INotificationsMessages = {
+const messagesToDefine = {
   declarationsSynced: {
     defaultMessage:
       'As you have connectivity, we can synchronize your declarations.',
@@ -163,6 +129,12 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for declaration status waiting for reject',
     id: 'regHome.outbox.statusWaitingToSubmit'
   },
+  retry: {
+    id: 'regHome.outbox.retry',
+    defaultMessage: 'Retry',
+    description:
+      'Copy for "Retry" button in Outbox shown for records that failed to send'
+  },
   userAuditSuccess: {
     defaultMessage:
       '{name} was {action, select, DEACTIVATE {deactivated} REACTIVATE {reactivated} other {deactivated}}',
@@ -198,6 +170,11 @@ const messagesToDefine: INotificationsMessages = {
     description: 'Label for declaration status waiting for connection',
     id: 'regHome.outbox.waitingToRetry'
   },
+  failed: {
+    defaultMessage: 'Failed to send',
+    description: 'Label for declaration status failed',
+    id: 'regHome.outbox.failed'
+  },
   downloadDeclarationFailed: {
     defaultMessage: 'Failed to download declaration. Please try again',
     description: 'Label for declaration downloading failed',
@@ -219,7 +196,17 @@ const messagesToDefine: INotificationsMessages = {
     id: 'misc.notif.duplicateRecord',
     description:
       'Label for when a duplicate record is detected when registering a record.'
+  },
+  emailAllUsersSuccess: {
+    id: 'misc.notif.emailAllUsersSuccess',
+    defaultMessage: 'Email sent to all users',
+    description: 'Label for Email all users success toast'
+  },
+  emailAllUsersError: {
+    id: 'misc.notif.emailAllUsersError',
+    defaultMessage: 'Only one email can be sent per day',
+    description: 'Label for Email all users error toast'
   }
 }
 
-export const messages: INotificationsMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)

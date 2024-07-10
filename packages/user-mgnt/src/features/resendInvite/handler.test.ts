@@ -17,7 +17,7 @@ import { Types } from 'mongoose'
 
 const sysAdminToken = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
-  readFileSync('../auth/test/cert.key'),
+  readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

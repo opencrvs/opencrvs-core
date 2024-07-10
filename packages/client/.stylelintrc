@@ -11,7 +11,5 @@
     "property-no-vendor-prefix": null,
     "opencrvs/no-font-styles": true
   },
-  "plugins": [
-    "./no-font-styles.js"
-  ]
+  "plugins": ["./no-font-styles.js"]
 }

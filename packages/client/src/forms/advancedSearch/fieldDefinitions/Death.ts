@@ -12,6 +12,7 @@ import { countries } from '@client/utils/countries'
 import { IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
+import { isValidDate } from '@client/search/advancedSearch/validators'
 
 export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
   {
@@ -36,7 +37,7 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
         label: advancedSearchForm.dateOfRegistration,
         required: false,
         initialValue: '',
-        validator: []
+        validator: [isValidDate]
       },
       {
         name: 'registrationStatuses',
@@ -74,6 +75,10 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
           {
             value: 'ARCHIVED',
             label: advancedSearchForm.recordStatusAchived
+          },
+          {
+            value: 'CORRECTION_REQUESTED',
+            label: advancedSearchForm.recordStatusCorrectionRequested
           }
         ]
       }
@@ -90,7 +95,7 @@ export const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: []
+      validator: [isValidDate]
     },
     {
       name: 'deceasedFirstNames',
@@ -221,8 +226,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'eventCountry',
-        initialValue: 'agentDefault'
+        dependency: 'eventCountry'
       },
       conditionals: [
         {
@@ -257,8 +261,7 @@ export const advancedSearchDeathSectionEventDetails: IFormSectionGroup = {
       },
       dynamicOptions: {
         resource: 'locations',
-        dependency: 'eventLocationLevel1',
-        initialValue: 'agentDefault'
+        dependency: 'eventLocationLevel1'
       },
       conditionals: [
         {
@@ -292,7 +295,7 @@ export const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
       label: formMessageDescriptors.dateOfBirth,
       required: false,
       initialValue: '',
-      validator: []
+      validator: [isValidDate]
     },
     {
       name: 'informantFirstNames',

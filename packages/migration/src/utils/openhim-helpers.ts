@@ -70,7 +70,7 @@ export async function upsertChannel(db: Db, channel: Channel) {
   )
 }
 
-export async function removeChannel(db: Db, channel: Channel) {
+export async function removeChannel(db: Db, channel: { name?: string }) {
   await db.collection('channels').deleteOne({ name: channel.name })
 }
 

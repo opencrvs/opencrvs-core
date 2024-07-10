@@ -30,7 +30,7 @@ import {
   useApolloClient
 } from '@apollo/client'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
@@ -220,8 +220,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration,
     userRole,
     userId,
-    unassignDeclaration,
-    deleteDeclaration
+    unassignDeclaration
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -238,18 +237,9 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
-    if (assignment) {
-      unassignDeclaration(compositionId, client)
-    } else {
-      deleteDeclaration(compositionId, client)
-    }
-  }, [
-    compositionId,
-    client,
-    unassignDeclaration,
-    assignment,
-    deleteDeclaration
-  ])
+    unassignDeclaration(compositionId, client)
+  }, [compositionId, client, unassignDeclaration])
+
   const isFailed = useMemo(
     () =>
       status === DOWNLOAD_STATUS.FAILED ||
@@ -257,14 +247,24 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     [status]
   )
 
+  // reg agent can only retrieve validated and correction requested declarations
+  const isRetrieveableDeclarationsOfRegAgent =
+    downloadConfigs.declarationStatus &&
+    ['VALIDATED', 'CORRECTION_REQUESTED'].includes(
+      downloadConfigs.declarationStatus
+    ) &&
+    userRole === ROLE_REGISTRATION_AGENT
+
+  // field agents can only retrieve declarations
+  const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
+
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
         (assignment?.userId !== userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        (downloadConfigs.declarationStatus !== 'VALIDATED' ||
-          userRole !== ROLE_REGISTRATION_AGENT) &&
-        !FIELD_AGENT_ROLES.includes(String(userRole))
+        !isRetrieveableDeclarationsOfRegAgent &&
+        isNotFieldAgent
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -285,19 +285,21 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           )
         )
       } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
+        // retrieve declaration
         download()
       }
       e.stopPropagation()
     },
     [
       assignment,
-      userRole,
-      download,
       userId,
       status,
-      unassign,
+      isRetrieveableDeclarationsOfRegAgent,
+      isNotFieldAgent,
       hideModal,
-      downloadConfigs
+      userRole,
+      download,
+      unassign
     ]
   )
 

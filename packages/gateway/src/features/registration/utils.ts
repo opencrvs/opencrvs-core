@@ -9,9 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { fetchDocuments, fetchFHIR } from '@gateway/features/fhir/utils'
-import { IAuthHeader } from '@gateway/common-types'
-import { Context } from '@gateway/graphql/context'
+import { IAuthHeader } from '@opencrvs/commons'
+import { fetchDocuments } from '@gateway/features/documents/service'
+import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput
+} from '@gateway/graphql/schema'
 
 export async function getPresignedUrlFromUri(
   fileUri: string,
@@ -23,27 +28,39 @@ export async function getPresignedUrlFromUri(
     'POST',
     JSON.stringify({ fileUri })
   )) as { presignedURL: string }
+
   return response.presignedURL
 }
 
-export async function getPatientResource(
-  relatedPerson: fhir.RelatedPerson,
-  authHeader: IAuthHeader,
-  dataSources: Context['dataSources']
-): Promise<fhir.Patient | null> {
-  if (
-    !relatedPerson ||
-    !relatedPerson.patient ||
-    !relatedPerson.patient.reference
-  ) {
-    return null
-  }
-  if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
-    relatedPerson = await fetchFHIR(
-      `/${relatedPerson.patient.reference}`,
-      authHeader
-    )
-  }
-  const patientId = relatedPerson.patient.reference?.replace('Patient/', '')
-  return await dataSources.patientAPI.getPatient(String(patientId))
+export async function setCollectorForPrintInAdvance(
+  details:
+    | GQLBirthRegistrationInput
+    | GQLDeathRegistrationInput
+    | GQLMarriageRegistrationInput,
+  authHeader: IAuthHeader
+) {
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  const userId = tokenPayload.sub
+  const userDetails = await getUser({ userId }, authHeader)
+  const name = userDetails.name.map((nameItem) => ({
+    use: nameItem.use,
+    familyName: nameItem.family,
+    firstNames: nameItem.given.join(' ')
+  }))
+  const role = userDetails.role.labels.find(({ lang }) => lang === 'en')?.label
+
+  details?.registration?.certificates?.forEach((certificate) => {
+    if (!certificate) return
+    if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      certificate.collector = {
+        name,
+        relationship: 'PRINT_IN_ADVANCE',
+        otherRelationship: role,
+        identifier: []
+      }
+    }
+    return certificate
+  })
+
+  return details
 }

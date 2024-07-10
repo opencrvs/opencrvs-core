@@ -11,16 +11,24 @@
 import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { badRequest, badImplementation } from '@hapi/boom'
-import {
-  fetchFHIR,
-  fetchFromHearth,
-  findExtension
-} from '@gateway/features/fhir/utils'
+import { fetchFromHearth } from '@gateway/features/fhir/service'
 import { Code } from '@gateway/features/restLocation/locationHandler'
 import * as lookup from 'country-code-lookup'
 import { DEFAULT_COUNTRY } from '@gateway/constants'
-import { OPENCRVS_SPECIFICATION_URL } from '@gateway/features/fhir/constants'
 
+import {
+  Address,
+  Bundle,
+  Encounter,
+  OPENCRVS_SPECIFICATION_URL,
+  Patient,
+  Resource,
+  Task,
+  findExtension,
+  isPatient
+} from '@opencrvs/commons/types'
+import { createHospitalNotification } from '@gateway/workflow/index'
+import { getAuthHeader } from '@opencrvs/commons/http'
 const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
 
 const resourceSchema = Joi.object({
@@ -50,7 +58,7 @@ const taskSchema = Joi.object({
 const entrySchema = Joi.object({
   fullUrl: Joi.string().required(),
   resource: resourceSchema.required().unknown()
-})
+}).label('BundleEntry')
 
 export const fhirBundleSchema = Joi.object({
   resourceType: Joi.string().required().valid('Bundle'),
@@ -62,7 +70,8 @@ export const fhirBundleSchema = Joi.object({
     .ordered(compositionSchema, taskSchema)
     .items(entrySchema)
     .required()
-})
+    .label('BundleEntries')
+}).label('FhirBundle')
 
 export const validationFailedAction: Hapi.RouteOptionsValidate['failAction'] = (
   _,
@@ -72,7 +81,7 @@ export const validationFailedAction: Hapi.RouteOptionsValidate['failAction'] = (
   throw e
 }
 
-async function validateTask(bundle: fhir.Bundle) {
+async function validateTask(bundle: Bundle) {
   const taskEntry = bundle.entry?.find(
     (entry) => entry.resource?.resourceType === 'Task'
   )
@@ -85,7 +94,7 @@ async function validateTask(bundle: fhir.Bundle) {
   if (!compositionEntry) {
     throw new Error('Composition entry not found! in bundle')
   }
-  const task = taskEntry.resource as fhir.Task
+  const task = taskEntry.resource as Task
   if (task.status !== 'draft') {
     throw new Error('Task status should be draft')
   }
@@ -154,8 +163,9 @@ export async function eventNotificationHandler(
   req: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  let bundle: Bundle
   try {
-    const bundle = req.payload as fhir.Bundle
+    bundle = req.payload as Bundle
     await validateTask(bundle)
     await validateAddressesOfTask(bundle)
   } catch (e) {
@@ -170,19 +180,15 @@ export async function eventNotificationHandler(
     }
     return badRequest(e)
   }
-  return fetchFHIR(
-    '',
-    { Authorization: req.headers.authorization },
-    'POST',
-    JSON.stringify(req.payload)
-  )
+
+  return await createHospitalNotification(getAuthHeader(req), bundle)
 }
 
-export async function validateAddressesOfTask(bundle: fhir.Bundle) {
+export async function validateAddressesOfTask(bundle: Bundle) {
   //validate the patient addresses
-  const patientEntries = bundle.entry?.filter(
-    (e) => e.resource?.resourceType === 'Patient'
-  )
+  const patientEntries = bundle.entry
+    .map(({ resource }) => resource)
+    .filter(isPatient)
 
   if (!patientEntries || patientEntries.length === 0) {
     throw BoomErrorWithCustomMessage(
@@ -191,7 +197,7 @@ export async function validateAddressesOfTask(bundle: fhir.Bundle) {
   }
 
   for (const patient of patientEntries) {
-    const addresses = (patient as fhir.Patient).address
+    const addresses = (patient as Patient).address
 
     if (addresses) {
       for (const address of addresses) {
@@ -201,7 +207,7 @@ export async function validateAddressesOfTask(bundle: fhir.Bundle) {
   }
 
   // validate event encounter
-  const encounter = getResourceByType<fhir.Encounter>(bundle, 'Encounter')
+  const encounter = getResourceByType<Encounter>(bundle, 'Encounter')
   if (!encounter) {
     throw BoomErrorWithCustomMessage('Encounter entry not found!!')
   }
@@ -224,8 +230,8 @@ export async function validateAddressesOfTask(bundle: fhir.Bundle) {
   }
 }
 
-export function getResourceByType<T = fhir.Resource>(
-  bundle: fhir.Bundle,
+export function getResourceByType<T = Resource>(
+  bundle: Bundle,
   type: string
 ): T | undefined {
   const bundleEntry =
@@ -241,7 +247,7 @@ export function getResourceByType<T = fhir.Resource>(
   return bundleEntry && (bundleEntry.resource as T)
 }
 
-export async function validateLocationLevelsAndCountry(address: fhir.Address) {
+export async function validateLocationLevelsAndCountry(address: Address) {
   const isCountryValid =
     address.country === 'FAR' ||
     (address?.country && lookup.byIso(address?.country))

@@ -205,12 +205,28 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       history {
         otherReason
         requester
+        requesterOther
+        noSupportingDocumentationRequired
         hasShowedVerifiedDocument
         date
         action
         regStatus
         dhis2Notification
         ipAddress
+        documents {
+          id
+          data
+          uri
+          type
+        }
+        payment {
+          id
+          type
+          amount
+          outcome
+          date
+          attachmentURL
+        }
         statusReason {
           text
         }
@@ -271,12 +287,12 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument
@@ -548,12 +564,12 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         input {
           valueCode
           valueId
-          valueString
+          value
         }
         output {
           valueCode
           valueId
-          valueString
+          value
         }
         certificates {
           hasShowedVerifiedDocument

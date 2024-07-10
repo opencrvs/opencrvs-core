@@ -38,7 +38,7 @@ import { getCreateUserForm } from '@client/forms/user/fieldDefinitions/createUse
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Role, SystemRole } from '@client/utils/gateway'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
+import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { validators, Validator } from '@client/forms/validators'

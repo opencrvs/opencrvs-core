@@ -176,71 +176,63 @@ interface IProps {
   className?: string
 }
 
-export class UnstyledContent extends React.Component<IProps> {
-  render() {
-    const {
-      icon,
-      backButtonLabel,
-      backButtonAction,
-      title,
-      titleColor,
-      showTitleOnMobile,
-      topActionButtons,
-      tabBarContent,
-      filterContent,
-      noPadding,
-      subtitle,
-      children,
-      bottomActionButtons,
-      size,
-      className
-    } = this.props
-
-    return (
-      <Container size={size as string} className={className}>
-        <Header>
-          {backButtonLabel && (
-            <BackButtonContainer>
-              <TertiaryButton
-                align={ICON_ALIGNMENT.LEFT}
-                icon={() => <BackArrow />}
-                onClick={backButtonAction}
-              >
-                {backButtonLabel}
-              </TertiaryButton>
-            </BackButtonContainer>
-          )}
-          {(icon || title || topActionButtons) && (
-            <TopBar keepShowing={showTitleOnMobile}>
-              <TitleContainer titleColor={titleColor}>
-                {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-                {title && <Title id={`content-name`}>{title}</Title>}
-              </TitleContainer>
-              {topActionButtons && (
-                <TopActionBar>{topActionButtons}</TopActionBar>
-              )}
-            </TopBar>
-          )}
-          {(filterContent || tabBarContent) && (
-            <HeaderBottom>
-              {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
-              {filterContent && <TopFilterBar>{filterContent}</TopFilterBar>}
-            </HeaderBottom>
-          )}
-        </Header>
-        <Contents noPadding={noPadding}>
-          {subtitle && <SubHeader>{subtitle}</SubHeader>}
-          {children && <Body>{children}</Body>}
-        </Contents>
-        {bottomActionButtons && (
-          <Footer>
-            <BottomActionBar>{bottomActionButtons}</BottomActionBar>
-          </Footer>
-        )}
-      </Container>
-    )
-  }
-}
+export const UnstyledContent = ({
+  icon,
+  backButtonLabel,
+  backButtonAction,
+  title,
+  titleColor,
+  showTitleOnMobile,
+  topActionButtons,
+  tabBarContent,
+  filterContent,
+  noPadding,
+  subtitle,
+  children,
+  bottomActionButtons,
+  size,
+  className
+}: IProps) => (
+  <Container size={size as string} className={className}>
+    <Header>
+      {backButtonLabel && (
+        <BackButtonContainer>
+          <TertiaryButton
+            align={ICON_ALIGNMENT.LEFT}
+            icon={() => <BackArrow />}
+            onClick={backButtonAction}
+          >
+            {backButtonLabel}
+          </TertiaryButton>
+        </BackButtonContainer>
+      )}
+      {(icon || title || topActionButtons) && (
+        <TopBar keepShowing={showTitleOnMobile}>
+          <TitleContainer titleColor={titleColor}>
+            {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
+            {title && <Title id={`content-name`}>{title}</Title>}
+          </TitleContainer>
+          {topActionButtons && <TopActionBar>{topActionButtons}</TopActionBar>}
+        </TopBar>
+      )}
+      {(filterContent || tabBarContent) && (
+        <HeaderBottom>
+          {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
+          {filterContent && <TopFilterBar>{filterContent}</TopFilterBar>}
+        </HeaderBottom>
+      )}
+    </Header>
+    <Contents noPadding={noPadding}>
+      {subtitle && <SubHeader>{subtitle}</SubHeader>}
+      {children && <Body>{children}</Body>}
+    </Contents>
+    {bottomActionButtons && (
+      <Footer>
+        <BottomActionBar>{bottomActionButtons}</BottomActionBar>
+      </Footer>
+    )}
+  </Container>
+)
 
 // Allows styling <Content> inside styled`` -template blocks
 // https://web.archive.org/web/20220725170839/https://styled-components.com/docs/advanced#caveat
