@@ -476,8 +476,7 @@
                       "operation": "bundleFieldToSectionFieldTransformer",
                       "parameters": []
                     }
-                  },
-                  "inputFieldWidth": "78px"
+                  }
                 },
                 {
                   "name": "placeOfBirthTitle",
@@ -1011,8 +1010,7 @@
                       "expression": "((values.informantType===\"MOTHER\") || (values.informantType===\"FATHER\") || (!values.informantType))"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "nationality",
@@ -2403,8 +2401,7 @@
                       "expression": "!values.exactDateOfBirthUnknown || !values.detailsExist"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "firstNamesEng",
@@ -2934,8 +2931,7 @@
                       "expression": "!values.exactDateOfBirthUnknown || (!values.detailsExist)"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "firstNamesEng",
@@ -3808,8 +3804,7 @@
                       "expression": "!values.exactDateOfBirthUnknown"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "firstNamesEng",
@@ -4786,8 +4781,7 @@
                       "expression": "!values.exactDateOfBirthUnknown"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "nationality",
@@ -6704,8 +6698,7 @@
                       "expression": "(!values.informantType || values.informantType === \"BRIDE\" || values.informantType === \"GROOM\")"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "nationality",
@@ -8080,8 +8073,7 @@
                       "expression": "!values.exactDateOfBirthUnknown"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "nationality",
@@ -9333,8 +9325,7 @@
                       "expression": "!values.exactDateOfBirthUnknown"
                     }
                   ],
-                  "postfix": "years",
-                  "inputFieldWidth": "78px"
+                  "postfix": "years"
                 },
                 {
                   "name": "nationality",
