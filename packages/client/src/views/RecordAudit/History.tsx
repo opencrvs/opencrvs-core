@@ -163,7 +163,7 @@ export const GetHistory = ({
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
-  const { canReadUser, canReadOffice } = usePermissions()
+  const { canReadUser, canReadOfficeUsers } = usePermissions()
 
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
@@ -291,7 +291,7 @@ export const GetHistory = ({
       isVerifiedAction(item) ||
       isSystemInitiated(item) ? (
         <div />
-      ) : item.office && canReadOffice(item.office) ? (
+      ) : item.office && canReadOfficeUsers(item.office) ? (
         <Link
           font="bold14"
           onClick={() => {

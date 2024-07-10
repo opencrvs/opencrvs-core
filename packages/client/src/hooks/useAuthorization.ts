@@ -42,10 +42,20 @@ export function usePermissions() {
     return false
   }
 
-  const canReadOffice = (office: Pick<Location, 'id'>) => {
+  const canReadOfficeUsers = (office: Pick<Location, 'id'>) => {
     if (hasScope('organisation.read-locations')) return true
     if (hasScope('organisation.read-locations:my-office'))
       return office.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
+    if (hasScope('user.create')) return true
+    if (hasScope('user.create:my-jurisdiction'))
+      return office.id === userPrimaryOffice?.id
+
+    return false
   }
 
   return {
@@ -54,6 +64,7 @@ export function usePermissions() {
     hasAnyScope,
     canReadUser,
     canEditUser,
-    canReadOffice
+    canReadOfficeUsers,
+    canAddOfficeUsers
   }
 }
