@@ -32,10 +32,7 @@ import styled from 'styled-components'
 import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import {
-  PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES
-} from '@client/utils/constants'
+import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
@@ -135,12 +132,7 @@ class OfficeHomeView extends React.Component<
   pageSize = 10
   showPaginated = false
   interval: any = undefined
-  role = this.props.userDetails && this.props.userDetails.systemRole
-  isFieldAgent = this.role
-    ? FIELD_AGENT_ROLES.includes(this.role)
-      ? true
-      : false
-    : false
+  isFieldAgent = true // @TODO: Important, handle these cases in OfficeHome.tsx similarly as in Navigation.tsx
 
   constructor(props: IOfficeHomeProps) {
     super(props)
@@ -158,8 +150,7 @@ class OfficeHomeView extends React.Component<
   updateWorkqueue() {
     this.props.updateRegistrarWorkqueue(
       this.props.userDetails?.practitionerId,
-      this.pageSize,
-      this.isFieldAgent
+      this.pageSize
     )
   }
 
