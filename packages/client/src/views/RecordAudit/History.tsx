@@ -10,10 +10,10 @@
  */
 import { AvatarSmall } from '@client/components/Avatar'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { ILocation } from '@client/offline/reducer'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { Avatar, History, RegStatus, SystemType } from '@client/utils/gateway'
 import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
@@ -162,12 +162,8 @@ export const GetHistory = ({
   goToUserProfile: (user: string) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const isFieldAgent =
-    userDetails?.systemRole &&
-    FIELD_AGENT_ROLES.includes(userDetails.systemRole)
-      ? true
-      : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
+  const { canReadUser, canReadOffice } = usePermissions()
 
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
@@ -195,7 +191,6 @@ export const GetHistory = ({
         id: userDetails.userMgntUserID,
         name: userDetails.name,
         avatar: userDetails.avatar,
-        systemRole: userDetails.systemRole,
         role: userDetails.role
       },
       office: userDetails.primaryOffice,
@@ -258,7 +253,7 @@ export const GetHistory = ({
           <div />
         ) : isSystemInitiated(item) ? (
           <HealthSystemUser name={item.system?.name || ''} />
-        ) : isFieldAgent ? (
+        ) : !canReadUser(item.user!) ? (
           <GetNameWithAvatar
             id={item?.user?.id as string}
             nameObject={item?.user?.name as (GQLHumanName | null)[]}
@@ -285,7 +280,7 @@ export const GetHistory = ({
       <div />
     ) : isVerifiedAction(item) ? (
       <div />
-    ) : isSystemInitiated(item) || !item.user?.systemRole ? (
+    ) : isSystemInitiated(item) ? (
       intl.formatMessage(getSystemType(item.system?.type || ''))
     ) : (
       item.user && intl.formatMessage(item.user.role.label)
@@ -296,9 +291,7 @@ export const GetHistory = ({
       isVerifiedAction(item) ||
       isSystemInitiated(item) ? (
         <div />
-      ) : isFieldAgent ? (
-        <>{item.office?.name}</>
-      ) : (
+      ) : item.office && canReadOffice(item.office) ? (
         <Link
           font="bold14"
           onClick={() => {
@@ -312,6 +305,8 @@ export const GetHistory = ({
               )
             : ''}
         </Link>
+      ) : (
+        <>{item.office?.name}</>
       )
   }))
 

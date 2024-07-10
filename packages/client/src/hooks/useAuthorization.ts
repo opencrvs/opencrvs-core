@@ -12,7 +12,7 @@
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope } from '@opencrvs/commons/authentication'
-import { User } from '@client/utils/gateway'
+import { User, Location } from '@client/utils/gateway'
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
@@ -42,5 +42,18 @@ export function usePermissions() {
     return false
   }
 
-  return { hasScopes, hasScope, hasAnyScope, canReadUser, canEditUser }
+  const canReadOffice = (office: Pick<Location, 'id'>) => {
+    if (hasScope('organisation.read-locations')) return true
+    if (hasScope('organisation.read-locations:my-office'))
+      return office.id === userPrimaryOffice?.id
+  }
+
+  return {
+    hasScopes,
+    hasScope,
+    hasAnyScope,
+    canReadUser,
+    canEditUser,
+    canReadOffice
+  }
 }
