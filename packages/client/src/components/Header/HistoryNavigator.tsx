@@ -11,10 +11,10 @@
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { useHistory } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { useDispatch } from 'react-redux'
 import { goBack, goForward } from '@client/navigation'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { useHomePage } from '@client/hooks/useHomePage'
 
 export function HistoryNavigator({
   hideForward = false
@@ -23,25 +23,8 @@ export function HistoryNavigator({
 }) {
   const history = useHistory()
   const dispatch = useDispatch()
-  const userDetails = useSelector(getUserDetails)
+  const { isCurrentPageHome } = useHomePage()
 
-  const isLandingPage = () => {
-    // @TODO: How do we figure out if it's the front page now that it can be quite dynamic?
-    // if (
-    //   (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
-    //   (NATL_ADMIN_ROLES.includes(role as string) &&
-    //     PERFORMANCE_HOME.includes(location)) ||
-    //   (SYS_ADMIN_ROLES.includes(role as string) &&
-    //     PERFORMANCE_HOME.includes(location)) ||
-    //   (REGISTRAR_ROLES.includes(role as string) &&
-    //     REGISTRAR_HOME.includes(location))
-    // ) {
-    //   return true
-    // } else {
-    //   return false
-    // }
-    return false
-  }
   return (
     <div>
       <Button
@@ -50,7 +33,7 @@ export function HistoryNavigator({
         size="medium"
         disabled={
           (history.action === 'POP' || history.action === 'REPLACE') &&
-          isLandingPage()
+          isCurrentPageHome
         }
         onClick={() => dispatch(goBack())}
       >
