@@ -44,7 +44,7 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope, SearchEventsQuery } from '@client/utils/gateway'
 import {
   BRN_DRN_TEXT,
   EMAIL,
@@ -55,7 +55,6 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,

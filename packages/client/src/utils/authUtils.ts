@@ -13,7 +13,7 @@ import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope } from '@client/utils/gateway'
 
 export const USER_SCOPES = [
   'demo',

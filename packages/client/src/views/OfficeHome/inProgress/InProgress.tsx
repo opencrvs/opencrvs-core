@@ -54,7 +54,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Event, RegStatus, Scope } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
@@ -85,7 +85,6 @@ import {
   isDeathEvent
 } from '@client/search/transformer'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/commons/authentication'
 import { compact } from 'lodash'
 
 interface IQueryData {

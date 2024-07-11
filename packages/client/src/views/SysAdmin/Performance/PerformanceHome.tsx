@@ -29,7 +29,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
@@ -76,7 +76,6 @@ import { ICurrency } from '@client/utils/referenceApi'
 import { Box } from '@opencrvs/components/lib/Box'
 import startOfMonth from 'date-fns/startOfMonth'
 import { UserDetails } from '@client/utils/userUtils'
-import { Scope } from '@opencrvs/commons/authentication'
 
 const Layout = styled.div`
   display: flex;
@@ -712,7 +711,7 @@ function mapStateToProps(
     locationId = userDetails.primaryOffice.id
   }
 
-  let selectedLocation = !locationId
+  const selectedLocation = !locationId
     ? getAdditionalLocations(props.intl)[0]
     : selectLocation(
         locationId,

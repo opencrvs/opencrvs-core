@@ -11,8 +11,7 @@
 
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/commons/authentication'
-import { User, Location } from '@client/utils/gateway'
+import { Scope, User, Location } from '@client/utils/gateway'
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)

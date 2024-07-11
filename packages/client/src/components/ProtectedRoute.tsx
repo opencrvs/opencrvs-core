@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Redirect, Route, RouteProps } from 'react-router-dom'
+import { Redirect, Route, RouteProps } from 'react-router'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { HOME } from '@client/navigation/routes'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope } from '@client/utils/gateway'
 
 interface IProps extends RouteProps {
   scopes?: Scope[]

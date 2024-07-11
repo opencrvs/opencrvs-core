@@ -82,7 +82,7 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import { getCurrencySymbol } from '@client/utils/currencyUtils'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope } from '@client/utils/gateway'
 
 const SupportingDocument = styled.div`
   display: flex;

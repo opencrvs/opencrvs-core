@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { CodegenConfig } from '@graphql-codegen/cli'
+// @ts-expect-error @TODO: When we update to TypeScript 5.0, we can directly import scopes from commons and set `moduleResolution` to `bundler` in tsconfig.json
+import { scopes } from '@opencrvs/commons/authentication'
 
 const config: CodegenConfig = {
   schema: [
@@ -47,6 +49,8 @@ const config: CodegenConfig = {
              */
             import { PlainDate } from '@client/utils/date-formatting'
 
+            export const scopes = ${JSON.stringify(scopes)} as const
+            export type Scope = (typeof scopes)[number]
             `
           }
         }
