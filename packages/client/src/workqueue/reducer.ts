@@ -403,7 +403,6 @@ async function getWorkqueueData(
 
   return mergeWorkQueueData(
     state,
-    // @TODO: Test that this works with field agents still
     ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
     currentUserData && currentUserData.declarations,
     workqueue
