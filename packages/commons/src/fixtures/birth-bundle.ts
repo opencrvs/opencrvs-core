@@ -759,23 +759,7 @@ export const BIRTH_BUNDLE: SavedBundle<
             family: 'Mweene'
           }
         ],
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/employee-signature',
-            valueSignature: {
-              type: [
-                {
-                  system: 'urn:iso-astm:E1762-95:2013',
-                  code: '1.2.840.10065.1.12.1.13',
-                  display: 'Review Signature'
-                }
-              ],
-              when: '2023-09-19T06:47:48.225Z',
-              contentType: 'image/png',
-              blob: 'data:image/png;base64,'
-            }
-          }
-        ],
+        extension: [],
         id: '48455871-1636-46a1-8279-aaa76dec03d4' as UUID,
         meta: {
           lastUpdated: '2023-09-19T06:47:48.290+00:00',

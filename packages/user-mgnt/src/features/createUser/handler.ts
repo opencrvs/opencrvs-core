@@ -14,7 +14,8 @@ import {
   generateUsername,
   postFhir,
   rollbackCreateUser,
-  sendCredentialsNotification
+  sendCredentialsNotification,
+  uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -42,7 +43,12 @@ export default async function createUser(
   let password = null
 
   try {
-    const practitioner = createFhirPractitioner(user, false)
+    const signatureMinioUrl = await uploadSignatureToMinio(
+      token,
+      user.signature
+    )
+
+    const practitioner = createFhirPractitioner(user, false, signatureMinioUrl)
     practitionerId = await postFhir(token, practitioner)
     if (!practitionerId) {
       throw new Error(

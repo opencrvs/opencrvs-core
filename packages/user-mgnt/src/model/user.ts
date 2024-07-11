@@ -45,7 +45,7 @@ export interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string
 }
-interface ISignature {
+export interface ISignature {
   type: string
   data: string
 }

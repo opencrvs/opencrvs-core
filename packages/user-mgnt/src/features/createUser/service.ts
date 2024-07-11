@@ -8,14 +8,30 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FHIR_URL, NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
-import User, { IUser, IUserName, UserRole } from '@user-mgnt/model/user'
+import {
+  DOCUMENTS_URL,
+  FHIR_URL,
+  MINIO_BUCKET,
+  NOTIFICATION_SERVICE_URL
+} from '@user-mgnt/constants'
+import User, {
+  ISignature,
+  IUser,
+  IUserName,
+  UserRole
+} from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
+import {
+  Extension,
+  findExtension,
+  OPENCRVS_SPECIFICATION_URL
+} from '@opencrvs/commons/types'
 
 export const createFhirPractitioner = (
   user: IUser,
-  system: boolean
+  system: boolean,
+  signatureUrl: string
 ): fhir.Practitioner => {
   if (system) {
     return {
@@ -42,25 +58,43 @@ export const createFhirPractitioner = (
         { system: 'email', value: user.emailForNotification }
       ],
       name: user.name,
-      extension: user.signature && [
-        {
-          url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueSignature: {
-            type: [
-              {
-                system: 'urn:iso-astm:E1762-95:2013',
-                code: '1.2.840.10065.1.12.1.13',
-                display: 'Review Signature'
-              }
-            ],
-            when: new Date().toISOString(),
-            contentType: user.signature.type,
-            blob: user.signature.data
-          }
-        }
-      ]
+      extension: signatureUrl
+        ? [
+            {
+              url: 'http://opencrvs.org/specs/extension/employee-signature',
+              valueUri: signatureUrl
+            }
+          ]
+        : []
     }
   }
+}
+
+export const uploadSignatureToMinio = async (
+  token: string,
+  signature: ISignature
+) => {
+  const result = await fetch(`${DOCUMENTS_URL}/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: token,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fileData: signature.data })
+  })
+  const res = await result.json()
+  return res.refUrl
+}
+
+export const isMinioUrl = (uri: string | undefined) => {
+  return uri?.split('/')[3] === MINIO_BUCKET
+}
+
+export const getSignatureExtension = (extensions: Extension[] | undefined) => {
+  return findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
+    extensions || []
+  )
 }
 
 export const createFhirPractitionerRole = async (

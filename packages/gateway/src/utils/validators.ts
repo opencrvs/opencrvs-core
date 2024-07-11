@@ -17,16 +17,19 @@ import {
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
+export const isMinioUrl = (uri: string | undefined) => {
+  return uri?.split('/')[3] === MINIO_BUCKET
+}
+
 export async function validateAttachments(
   attachments: Array<{ data?: string; uri?: string }>
 ) {
   for (const file of attachments) {
-    const isMinioUrl =
-      file.uri &&
-      file.uri.split('/').length > 1 &&
-      file.uri.split('/')[1] === MINIO_BUCKET
+    if (isMinioUrl(file.data)) {
+      continue
+    }
 
-    if (isMinioUrl) {
+    if (isMinioUrl(file.uri)) {
       continue
     }
 

@@ -27,7 +27,7 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { fetchFHIR } from '@gateway/features/fhir/service'
-
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -221,32 +221,39 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature =
+      const presignedUrl =
         userModel.systemRole === 'FIELD_AGENT'
           ? null
-          : signatureExtension && signatureExtension.valueSignature
-
+          : signatureExtension &&
+            (await getPresignedUrlFromUri(
+              signatureExtension.valueUri,
+              authHeader
+            ))
       return {
         role: practitionerRole,
         name: practitioner.name,
-        signature: signature && {
-          type: signature.contentType,
-          data: signature.blob
-        }
+        signature: presignedUrl
       }
     },
-    async signature(userModel: IUserModelData, _, { dataSources }) {
+    async signature(
+      userModel: IUserModelData,
+      _,
+      { headers: authHeader, dataSources }
+    ) {
       const practitioner = await dataSources.fhirAPI.getPractitioner(
         userModel.practitionerId
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature = signatureExtension && signatureExtension.valueSignature
+      const presignedUrl =
+        signatureExtension &&
+        (await getPresignedUrlFromUri(signatureExtension.valueUri, authHeader))
+
       return (
-        signature && {
-          type: signature.contentType,
-          data: signature.blob
+        presignedUrl && {
+          type: 'minioUrl',
+          data: presignedUrl
         }
       )
     }

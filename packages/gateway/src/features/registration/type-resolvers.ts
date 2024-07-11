@@ -1587,11 +1587,11 @@ export const typeResolvers: GQLResolver = {
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
-      const signature = signatureExtension && signatureExtension.valueSignature
+      const signature = signatureExtension && signatureExtension.valueUri
       return (
         signature && {
-          type: signature.contentType,
-          data: signature.blob
+          type: 'minioUri',
+          data: signature
         }
       )
     },
