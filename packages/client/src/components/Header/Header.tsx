@@ -60,7 +60,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope } from '@client/utils/gateway'
 
 type IStateProps = {
   userDetails: UserDetails | null
