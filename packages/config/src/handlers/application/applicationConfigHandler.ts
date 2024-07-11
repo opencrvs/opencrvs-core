@@ -63,9 +63,7 @@ export default async function configHandler(
 async function getConfigFromCountry() {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
 
-  const res = await fetch(url, {
-    headers: {}
-  })
+  const res = await fetch(url)
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)
   }
