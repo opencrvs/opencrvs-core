@@ -23,7 +23,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -41,7 +41,6 @@ import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/commons/authentication'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -294,7 +293,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       practitionerId,
       status,
       isRetrieveableDeclarationsOfRegAgent,
-      // isNotFieldAgent,
+      scopes,
       hideModal,
       download,
       unassign
