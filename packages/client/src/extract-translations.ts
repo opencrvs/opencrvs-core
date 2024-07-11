@@ -51,6 +51,7 @@ type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
+const deleteOutdated = process.argv.includes('--deleteOutdated')
 
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
@@ -184,6 +185,27 @@ async function extractMessages() {
       '\n'
     )
     console.log(extraKeys.join('\n'))
+  }
+
+  if (deleteOutdated) {
+    // modify extraKeys logic for deleting custom messages
+    const extraKeys = translations
+      .map(({ id }) => id)
+      .filter((key) => !reactIntlDescriptions[key])
+
+    const filteredConfigTranslations = translations.filter((translation) => {
+      return !extraKeys.includes(translation.id)
+    })
+
+    const pathToCsv = `${process.argv[2]}/src/translations/client.csv`
+
+    try {
+      return await writeJSONToCSV(pathToCsv, filteredConfigTranslations)
+    } catch (e) {
+      console.log(
+        chalk.gray.bold('Could not delete outdated messages properly')
+      )
+    }
   }
 
   if (missingKeys.length > 0) {

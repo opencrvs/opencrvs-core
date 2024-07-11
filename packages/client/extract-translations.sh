@@ -13,6 +13,7 @@ get_abs_filename() {
 
 write=false
 outdated=false
+deleteOutdated=false
 
 for i in "$@"; do
   case $i in
@@ -22,6 +23,10 @@ for i in "$@"; do
       ;;
     --write)
       write=true
+      shift
+      ;;
+    --deleteOutdated)
+      deleteOutdated=true
       shift
       ;;
     -*|--*)
@@ -47,6 +52,11 @@ fi
 
 if $outdated; then
   yarn run ts-node -- --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --outdated
+  exit 0
+fi
+
+if $deleteOutdated; then
+  $(yarn bin)/ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH --deleteOutdated
   exit 0
 fi
 
