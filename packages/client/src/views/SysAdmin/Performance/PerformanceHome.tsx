@@ -697,12 +697,12 @@ function mapStateToProps(
   const {
     location: { search }
   } = props
-  let { timeStart, timeEnd, locationId, event } = parse(
+  const { timeStart, timeEnd, event, ...rest } = parse(
     search
   ) as unknown as ISearchParams
+  let { locationId } = rest
 
-  // @TODO: Test the performance first page works properly.
-  // defaults empty to your primary office if you don't have access to all locations via the scope
+  // Defaults empty URL locationId to your primary office if you don't have access to all locations via scopes
   if (
     userDetails &&
     !locationId &&
