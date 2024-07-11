@@ -15,19 +15,6 @@ import { TOKEN_EXPIRE_MILLIS } from './constants'
 import { authApi } from '@client/utils/authApi'
 import { Scope } from '@client/utils/gateway'
 
-export const USER_SCOPES = [
-  'demo',
-  'declare',
-  'register',
-  'certify',
-  'performance',
-  'sysadmin',
-  'validate',
-  'natlsysadmin',
-  'bypassratelimit',
-  'teams',
-  'config'
-]
 export interface ITokenPayload {
   sub: string
   exp: string
