@@ -76,8 +76,7 @@ describe('signature upload tests', () => {
       })
       testComponent.update()
       testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
+        .find('input[name="signature"][type="file"]')
         .simulate('change', {
           target: {
             files: []
@@ -95,8 +94,7 @@ describe('signature upload tests', () => {
       })
       testComponent.update()
       testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
+        .find('input[name="signature"][type="file"]')
         .simulate('change', {
           target: {
             files: [

@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Avatar } from '@client/components/Avatar'
-import { FixedNavigation } from '@client/components/interface/Navigation'
-import { getLanguage } from '@client/i18n/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { getIndividualNameObj } from '@client/utils/userUtils'
-import { Button } from '@opencrvs/components/lib/Button'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getLanguage } from '@client/i18n/selectors'
+import { getIndividualNameObj } from '@client/utils/userUtils'
+import { Avatar } from '@client/components/Avatar'
+import { FixedNavigation } from '@client/components/interface/Navigation'
+import { Button } from '@opencrvs/components/lib/Button'
+import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
+import { Icon } from '@opencrvs/components/lib/Icon'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)

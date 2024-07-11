@@ -18,6 +18,29 @@
 ## Breaking changes
 
 - Gateways searchEvents `operationHistories` only returns `operationType` & `operatedOn` due to the other fields being unused in OpenCRVS
+- Core used to provide review/preview section by default which are now removed and need to be provided from countryconfig. The signature field definitions (e.g. informant signature, bride signature etc.) were hard coded in core which also have now been removed. The signatures can now be added through the review/preview sections defined in countryconfig just like any other field. You can use the following section definition as the default which is without any additional fields. We highly recommend checking out our reference country repository which has the signature fields in it's review/preview sections
+```
+{
+  id: 'preview',
+  viewType: 'preview',
+  name: {
+    defaultMessage: 'Preview',
+    description: 'Form section name for Preview',
+    id: 'register.form.section.preview.name'
+  },
+  title: {
+    defaultMessage: 'Preview',
+    description: 'Form section title for Preview',
+    id: 'register.form.section.preview.title'
+  },
+  groups: [
+    {
+      id: 'preview-view-group',
+      fields: []
+    }
+  ]
+}
+```
 
 ## 1.5.0 (TBD)
 

@@ -154,7 +154,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           trackingId
         }
         informantsSignature
-        informantsSignatureURI
         attachments {
           data
           uri
@@ -453,7 +452,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         contactPhoneNumber
         contactEmail
         informantsSignature
-        informantsSignatureURI
         status {
           comments {
             comment
