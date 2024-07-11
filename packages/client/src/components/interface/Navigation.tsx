@@ -98,98 +98,6 @@ export const WORKQUEUE_TABS = {
   readyToIssue: 'readyToIssue'
 } as const
 
-const GROUP_ID = {
-  declarationGroup: 'declarationGroup',
-  analytics: 'analytics',
-  menuGroup: 'menuGroup'
-}
-
-interface IUSER_SCOPE {
-  [key: string]: string[]
-}
-
-const USER_SCOPE: IUSER_SCOPE = {
-  FIELD_AGENT: [
-    WORKQUEUE_TABS.inProgress,
-    WORKQUEUE_TABS.sentForReview,
-    WORKQUEUE_TABS.requiresUpdate,
-    WORKQUEUE_TABS.outbox,
-    GROUP_ID.declarationGroup
-  ],
-  REGISTRATION_AGENT: [
-    WORKQUEUE_TABS.inProgress,
-    WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdate,
-    WORKQUEUE_TABS.sentForApproval,
-    WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.organisation,
-    WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.readyToIssue,
-    GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup
-  ],
-  DISTRICT_REGISTRAR: [
-    WORKQUEUE_TABS.inProgress,
-    WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdate,
-    WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.organisation,
-    WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.readyToIssue,
-    GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup
-  ],
-  LOCAL_REGISTRAR: [
-    WORKQUEUE_TABS.inProgress,
-    WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdate,
-    WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.performance,
-    WORKQUEUE_TABS.organisation,
-    WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.readyToIssue,
-    GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup
-  ],
-  NATIONAL_REGISTRAR: [
-    WORKQUEUE_TABS.inProgress,
-    WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdate,
-    WORKQUEUE_TABS.readyToPrint,
-    WORKQUEUE_TABS.organisation,
-    WORKQUEUE_TABS.vsexports,
-    WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.outbox,
-    WORKQUEUE_TABS.readyToIssue,
-    GROUP_ID.declarationGroup,
-    GROUP_ID.menuGroup,
-    GROUP_ID.analytics
-  ],
-  LOCAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.organisation,
-    WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.performance,
-    GROUP_ID.menuGroup
-  ],
-  NATIONAL_SYSTEM_ADMIN: [
-    WORKQUEUE_TABS.team,
-    WORKQUEUE_TABS.config,
-    WORKQUEUE_TABS.organisation,
-    WORKQUEUE_TABS.vsexports,
-    WORKQUEUE_TABS.communications,
-    WORKQUEUE_TABS.userRoles,
-    WORKQUEUE_TABS.informantNotification,
-    GROUP_ID.menuGroup,
-    GROUP_ID.analytics
-  ],
-  PERFORMANCE_MANAGEMENT: [GROUP_ID.menuGroup, GROUP_ID.analytics]
-}
-
 interface ICount {
   inProgress?: number
   readyForReview?: number
@@ -615,7 +523,7 @@ const NavigationView = (props: IFullProps) => {
                 navigationMessages[WORKQUEUE_TABS.performance]
               )}
               onClick={() => {
-                props.goToPerformanceViewAction(userDetails)
+                props.goToPerformanceViewAction()
               }}
               isSelected={
                 enableMenuSelection &&
@@ -768,7 +676,7 @@ const NavigationView = (props: IFullProps) => {
                 <NavigationItem
                   icon={() => <Icon name="ChartBar" size="medium" />}
                   label={intl.formatMessage(navigationMessages['performance'])}
-                  onClick={() => props.goToPerformanceViewAction(userDetails)}
+                  onClick={() => props.goToPerformanceViewAction()}
                   id="navigation_report"
                   isSelected={
                     enableMenuSelection &&
