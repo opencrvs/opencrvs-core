@@ -102,6 +102,7 @@ export const scopes = [
   'user.read:my-office',
   'user.read',
   'user.create',
+  'user.create:my-jurisdiction',
   'user.update:my-office',
   'user.update'
 ] as const

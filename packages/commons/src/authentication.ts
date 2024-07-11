@@ -39,26 +39,12 @@ export const SYSTEM_INTEGRATION_SCOPES = {
   nationalId: 'nationalId'
 } as const
 
-export const DEFAULT_CORE_ROLE_SCOPES = {
-  FIELD_AGENT: ['declare'],
-  REGISTRATION_AGENT: ['validate', 'performance', 'certify'],
-  LOCAL_REGISTRAR: [
-    'register',
-    'performance',
-    'certify',
+export const SUPER_ADMIN_SCOPES = [
+  'natlsysadmin',
+  'bypassratelimit',
+  'sysadmin'
+] satisfies Scope[]
 
-    'record.register',
-    'record.declaration-review',
-    'record.print-issue-certified-copies'
-  ],
-  LOCAL_SYSTEM_ADMIN: ['sysadmin'],
-  NATIONAL_SYSTEM_ADMIN: ['sysadmin', 'natlsysadmin'],
-  PERFORMANCE_MANAGEMENT: ['performance'],
-  NATIONAL_REGISTRAR: ['register', 'performance', 'certify', 'config', 'teams'],
-  SUPER_ADMIN: ['natlsysadmin', 'bypassratelimit', 'sysadmin']
-} satisfies Record<string, Scope[]>
-
-// @TODO: What is the point of this, should we use this in `packages/auth/src/features/scopes/service.ts`?
 export const DEFAULT_ROLES_DEFINITION = [
   {
     id: 'FIELD_AGENT',
@@ -67,43 +53,23 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Field Agent',
       id: 'userRole.fieldAgent'
     },
-    scopes: ['declare']
-  },
-  {
-    id: 'POLICE_OFFICER',
-    label: {
-      defaultMessage: 'Police Officer',
-      description: 'Name for user role Police Officer',
-      id: 'userRole.policeOfficer'
-    },
-    scopes: ['declare']
-  },
-  {
-    id: 'SOCIAL_WORKER',
-    label: {
-      defaultMessage: 'Social Worker',
-      description: 'Name for user role Social Worker',
-      id: 'userRole.socialWorker'
-    },
-    scopes: ['declare']
-  },
-  {
-    id: 'HEALTHCARE_WORKER',
-    label: {
-      defaultMessage: 'Healthcare Worker',
-      description: 'Name for user role Healthcare Worker',
-      id: 'userRole.healthcareWorker'
-    },
-    scopes: ['declare']
-  },
-  {
-    id: 'LOCAL_LEADER',
-    label: {
-      defaultMessage: 'Local Leader',
-      description: 'Name for user role Local Leader',
-      id: 'userRole.localLeader'
-    },
-    scopes: ['declare']
+    scopes: [
+      // old scope for bw compability
+      'declare',
+
+      // new scopes
+      'record.declare-birth',
+      'record.declare-death',
+      'record.declare-marriage',
+      'record.submit-incomplete',
+      'record.submit-for-review',
+      'search.birth',
+      'search.death',
+      'search.marriage',
+      'record.read',
+      'record.read-audit',
+      'record.read-comments'
+    ]
   },
   {
     id: 'REGISTRATION_AGENT',
@@ -112,7 +78,37 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Registration Agent',
       id: 'userRole.registrationAgent'
     },
-    scopes: ['record.register', 'validate', 'performance', 'certify']
+    scopes: [
+      'validate',
+      'performance',
+      'certify',
+
+      'record.declare-birth',
+      'record.declare-death',
+      'record.declare-marriage',
+      'record.declaration-review',
+      'record.submit-for-approval',
+      'record.submit-for-updates',
+      'record.declaration-archive',
+      'record.declaration-reinstate',
+      'record.registration-request-correction',
+      'record.print-records',
+      'record.print-records-supporting-documents',
+      'record.export-records',
+      'record.print-issue-certified-copies',
+      'record.registration-verify-certified-copies',
+      'record.create-comments',
+      'performance.read',
+      'performance.read-dashboards',
+      'organisation.read',
+      'organisation.read-locations:my-office',
+      'search.birth',
+      'search.death',
+      'search.marriage',
+      'record.read',
+      'record.read-audit',
+      'record.read-comments'
+    ]
   },
   {
     id: 'LOCAL_REGISTRAR',
@@ -121,7 +117,38 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Local Registrar',
       id: 'userRole.localRegistrar'
     },
-    scopes: ['record.register', 'register', 'performance', 'certify']
+    scopes: [
+      'register',
+      'performance',
+      'certify',
+
+      'record.declare-birth',
+      'record.declare-death',
+      'record.declare-marriage',
+      'record.declaration-review',
+      'record.submit-for-updates',
+      'record.review-duplicates',
+      'record.declaration-archive',
+      'record.declaration-reinstate',
+      'record.register',
+      'record.registration-correct',
+      'record.print-records',
+      'record.print-records-supporting-documents',
+      'record.export-records',
+      'record.print-issue-certified-copies',
+      'record.registration-verify-certified-copies',
+      'record.create-comments',
+      'performance.read',
+      'performance.read-dashboards',
+      'organisation.read',
+      'organisation.read-locations:my-office',
+      'search.birth',
+      'search.death',
+      'search.marriage',
+      'record.read',
+      'record.read-audit',
+      'record.read-comments'
+    ]
   },
   {
     id: 'LOCAL_SYSTEM_ADMIN',
@@ -130,7 +157,19 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Local System Admin',
       id: 'userRole.localSystemAdmin'
     },
-    scopes: ['sysadmin']
+    scopes: [
+      'sysadmin',
+
+      'user.read:my-office',
+      'user.create:my-jurisdiction',
+      'user.update:my-office',
+      'organisation.read',
+      'organisation.read-locations',
+      // 'organisation.read-users' ?
+      'performance.read',
+      'performance.read-dashboards',
+      'performance.export-vital-statistics'
+    ]
   },
   {
     id: 'NATIONAL_SYSTEM_ADMIN',
@@ -139,7 +178,20 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role National System Admin',
       id: 'userRole.nationalSystemAdmin'
     },
-    scopes: ['sysadmin', 'natlsysadmin']
+    scopes: [
+      'sysadmin',
+      'natlsysadmin',
+
+      'user.create',
+      'user.read',
+      'user.update',
+      'organisation.read',
+      'organisation.read-locations',
+      // 'organisation.read-users' ?
+      'performance.read',
+      'performance.read-dashboards',
+      'performance.export-vital-statistics'
+    ]
   },
   {
     id: 'PERFORMANCE_MANAGER',
@@ -148,18 +200,18 @@ export const DEFAULT_ROLES_DEFINITION = [
       description: 'Name for user role Performance Manager',
       id: 'userRole.performanceManager'
     },
-    scopes: ['performance']
-  },
-  {
-    id: 'NATIONAL_REGISTRAR',
-    label: {
-      defaultMessage: 'National Registrar',
-      description: 'Name for user role National Registrar',
-      id: 'userRole.nationalRegistrar'
-    },
-    scopes: ['register', 'performance', 'certify', 'config', 'teams']
+    scopes: [
+      'performance',
+      'performance.read',
+      'performance.read-dashboards',
+      'performance.export-vital-statistics'
+    ]
   }
-]
+] satisfies Array<{
+  id: string
+  label: { defaultMessage: string; description: string; id: string }
+  scopes: Scope[]
+}>
 
 export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
   HEALTH: ['declare', 'notification-api'],

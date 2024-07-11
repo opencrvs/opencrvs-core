@@ -12,7 +12,7 @@
 import { COUNTRY_CONFIG_URL } from '@auth/constants'
 import { fetchJSON, joinURL, logger, Roles } from '@opencrvs/commons'
 import {
-  DEFAULT_CORE_ROLE_SCOPES,
+  DEFAULT_ROLES_DEFINITION,
   Scope
 } from '@opencrvs/commons/authentication'
 
@@ -23,6 +23,13 @@ export async function getUserRoleScopeMapping() {
     'Country config implements the new /roles response format. Custom scopes apply'
   )
 
+  const defaultRoleMappings = DEFAULT_ROLES_DEFINITION.reduce<
+    Record<string, Scope[]>
+  >((acc, { id, scopes }) => {
+    acc[id] = scopes
+    return acc
+  }, {})
+
   const userRoleMappings = roles.reduce<Record<string, Scope[]>>(
     (acc, { id, scopes }) => {
       acc[id] = scopes
@@ -32,7 +39,7 @@ export async function getUserRoleScopeMapping() {
   )
 
   return {
-    ...DEFAULT_CORE_ROLE_SCOPES,
+    ...defaultRoleMappings,
     ...userRoleMappings
   }
 }
