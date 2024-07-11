@@ -132,7 +132,6 @@ class OfficeHomeView extends React.Component<
   pageSize = 10
   showPaginated = false
   interval: any = undefined
-  isFieldAgent = true // @TODO: Important, handle these cases in OfficeHome.tsx similarly as in Navigation.tsx
 
   constructor(props: IOfficeHomeProps) {
     super(props)
@@ -284,7 +283,6 @@ class OfficeHomeView extends React.Component<
           <InProgress
             drafts={drafts}
             selectorId={selectorId}
-            isFieldAgent={this.isFieldAgent}
             queryData={{
               inProgressData: filteredData.inProgressTab,
               notificationData: filteredData.notificationTab
@@ -300,114 +298,92 @@ class OfficeHomeView extends React.Component<
             error={error}
           />
         )}
-        {!this.isFieldAgent ? (
-          <>
-            {tabId === WORKQUEUE_TABS.readyForReview && (
-              <ReadyForReview
-                queryData={{
-                  data: filteredData.reviewTab
-                }}
-                paginationId={reviewCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.requiresUpdate && (
-              <RequiresUpdate
-                queryData={{
-                  data: filteredData.rejectTab
-                }}
-                paginationId={requireUpdateCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-
-            {tabId === WORKQUEUE_TABS.externalValidation &&
-              window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
-                <InExternalValidationTab
-                  queryData={{
-                    data: filteredData.externalValidationTab
-                  }}
-                  paginationId={externalValidationCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
-                  loading={loading}
-                  error={error}
-                />
-              )}
-            {tabId === WORKQUEUE_TABS.sentForApproval && (
-              <SentForReview
-                queryData={{
-                  data: filteredData.approvalTab
-                }}
-                paginationId={approvalCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.readyToPrint && (
-              <ReadyToPrint
-                queryData={{
-                  data: filteredData.printTab
-                }}
-                paginationId={printCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {isOnePrintInAdvanceOn && tabId === WORKQUEUE_TABS.readyToIssue && (
-              <ReadyToIssue
-                queryData={{
-                  data: filteredData.issueTab
-                }}
-                pageSize={this.pageSize}
-                paginationId={issueCurrentPage}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-
-            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
-          </>
-        ) : (
-          <>
-            {tabId === WORKQUEUE_TABS.sentForReview && (
-              <SentForReview
-                queryData={{
-                  data: filteredData.reviewTab
-                }}
-                paginationId={reviewCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.requiresUpdate && (
-              <RequiresUpdate
-                queryData={{
-                  data: filteredData.rejectTab
-                }}
-                paginationId={requireUpdateCurrentPage}
-                pageSize={this.pageSize}
-                onPageChange={this.onPageChange}
-                loading={loading}
-                error={error}
-              />
-            )}
-            {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
-          </>
+        {tabId === WORKQUEUE_TABS.readyForReview && (
+          <ReadyForReview
+            queryData={{
+              data: filteredData.reviewTab
+            }}
+            paginationId={reviewCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
         )}
+        {tabId === WORKQUEUE_TABS.externalValidation &&
+          window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+            <InExternalValidationTab
+              queryData={{
+                data: filteredData.externalValidationTab
+              }}
+              paginationId={externalValidationCurrentPage}
+              pageSize={this.pageSize}
+              onPageChange={this.onPageChange}
+              loading={loading}
+              error={error}
+            />
+          )}
+        {tabId === WORKQUEUE_TABS.sentForApproval && (
+          <SentForReview
+            queryData={{
+              data: filteredData.approvalTab
+            }}
+            paginationId={approvalCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.readyToPrint && (
+          <ReadyToPrint
+            queryData={{
+              data: filteredData.printTab
+            }}
+            paginationId={printCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {isOnePrintInAdvanceOn && tabId === WORKQUEUE_TABS.readyToIssue && (
+          <ReadyToIssue
+            queryData={{
+              data: filteredData.issueTab
+            }}
+            pageSize={this.pageSize}
+            paginationId={issueCurrentPage}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.sentForReview && (
+          <SentForReview
+            queryData={{
+              data: filteredData.reviewTab
+            }}
+            paginationId={reviewCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.requiresUpdate && (
+          <RequiresUpdate
+            queryData={{
+              data: filteredData.rejectTab
+            }}
+            paginationId={requireUpdateCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+            loading={loading}
+            error={error}
+          />
+        )}
+        {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
       </>
     )
   }

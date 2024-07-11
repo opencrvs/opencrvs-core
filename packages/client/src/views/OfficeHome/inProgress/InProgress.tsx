@@ -84,6 +84,9 @@ import {
   isBirthEvent,
   isDeathEvent
 } from '@client/search/transformer'
+import { getScope } from '@client/profile/profileSelectors'
+import { Scope } from '@opencrvs/commons/authentication'
+import { compact } from 'lodash'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -99,7 +102,6 @@ interface IBaseRegistrarHomeProps {
   drafts: IDeclaration[]
   outboxDeclarations: IDeclaration[]
   queryData: IQueryData
-  isFieldAgent: boolean
   onPageChange: (newPageNumber: number) => void
   paginationId: {
     draftId: number
@@ -107,6 +109,7 @@ interface IBaseRegistrarHomeProps {
     healthSystemId: number
   }
   pageSize: number
+  scopes: Scope[] | null
 }
 
 interface IRegistrarHomeState {
@@ -532,44 +535,68 @@ class InProgressComponent extends React.Component<
     }
   }
 
+  hasDrafts() {
+    return (
+      this.props.scopes?.includes('record.declare-birth') ||
+      this.props.scopes?.includes('record.declare-death') ||
+      this.props.scopes?.includes('record.declare-marriage') ||
+      this.props.scopes?.includes('record.declare-birth:my-jurisdiction') ||
+      this.props.scopes?.includes('record.declare-death:my-jurisdiction') ||
+      this.props.scopes?.includes('record.declare-marriage:my-jurisdiction')
+    )
+  }
+
+  hasFieldAgents() {
+    return this.props.scopes?.includes('record.declaration-review')
+  }
+
+  hasHealthSystem() {
+    return this.props.scopes?.includes('record.declaration-review')
+  }
+
   getTabs(
     selectorId: string,
     drafts: IDeclaration[],
     fieldAgentCount: number,
     hospitalCount: number
   ) {
-    if (this.props.isFieldAgent) {
-      return undefined
-    }
     const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
       onTabClick: (tabId: string) => {
         this.props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
       },
-      sections: [
-        {
-          id: SELECTOR_ID.ownDrafts,
-          title: `${this.props.intl.formatMessage(
-            messages.inProgressOwnDrafts
-          )} (${drafts && drafts.length})`,
-          disabled: false
-        },
-        {
-          id: SELECTOR_ID.fieldAgentDrafts,
-          title: `${this.props.intl.formatMessage(
-            messages.inProgressFieldAgents
-          )} (${fieldAgentCount})`,
-          disabled: false
-        },
-        {
-          id: SELECTOR_ID.hospitalDrafts,
-          title: `${this.props.intl.formatMessage(
-            messages.hospitalDrafts
-          )} (${hospitalCount})`,
-          disabled: false
-        }
-      ]
+      sections: compact([
+        this.hasDrafts()
+          ? {
+              id: SELECTOR_ID.ownDrafts,
+              title: `${this.props.intl.formatMessage(
+                messages.inProgressOwnDrafts
+              )} (${drafts && drafts.length})`,
+              disabled: false
+            }
+          : null,
+        this.hasFieldAgents()
+          ? {
+              id: SELECTOR_ID.fieldAgentDrafts,
+              title: `${this.props.intl.formatMessage(
+                messages.inProgressFieldAgents
+              )} (${fieldAgentCount})`,
+              disabled: false
+            }
+          : null,
+        this.hasHealthSystem()
+          ? {
+              id: SELECTOR_ID.hospitalDrafts,
+              title: `${this.props.intl.formatMessage(
+                messages.hospitalDrafts
+              )} (${hospitalCount})`,
+              disabled: false
+            }
+          : null
+      ])
     }
+
+    if (tabs.sections.length === 0) return undefined
 
     return (
       <FormTabs
@@ -611,8 +638,7 @@ class InProgressComponent extends React.Component<
   }
 
   render() {
-    const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
-      this.props
+    const { intl, selectorId, drafts, queryData, onPageChange } = this.props
 
     const isShowPagination =
       !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
@@ -669,28 +695,27 @@ class InProgressComponent extends React.Component<
         ? intl.formatMessage(wqMessages.noRecordsFieldAgents)
         : intl.formatMessage(wqMessages.noRecordsHealthSystem)
 
+    const tabs = this.getTabs(
+      selectorId,
+      drafts,
+      (inProgressData && inProgressData.totalItems) || 0,
+      (notificationData && notificationData.totalItems) || 0
+    )
+
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
         isMobileSize={
           this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
         }
-        tabBarContent={
-          !isFieldAgent &&
-          this.getTabs(
-            selectorId,
-            drafts,
-            (inProgressData && inProgressData.totalItems) || 0,
-            (notificationData && notificationData.totalItems) || 0
-          )
-        }
+        tabBarContent={tabs}
         isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
-        loading={isFieldAgent ? false : this.props.loading}
+        loading={tabs ? this.props.loading : false}
         error={
-          !selectorId || selectorId === SELECTOR_ID.ownDrafts || isFieldAgent
+          !selectorId || selectorId === SELECTOR_ID.ownDrafts || !tabs
             ? false
             : this.props.error
         }
@@ -701,16 +726,14 @@ class InProgressComponent extends React.Component<
           <Workqueue
             content={this.transformDraftContent()}
             columns={this.getColumns()}
-            loading={isFieldAgent ? false : this.props.loading}
+            loading={tabs ? this.props.loading : false}
             sortOrder={this.state.sortOrder}
             hideLastBorder={!isShowPagination}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
-          !isFieldAgent &&
           this.renderFieldAgentTable(inProgressData, isShowPagination)}
         {selectorId === SELECTOR_ID.hospitalDrafts &&
-          !isFieldAgent &&
           this.renderHospitalTable(notificationData, isShowPagination)}
       </WQContentWrapper>
     )
@@ -720,7 +743,8 @@ class InProgressComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     outboxDeclarations: state.declarationsState.declarations,
-    offlineCountryConfig: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state),
+    scopes: getScope(state)
   }
 }
 
