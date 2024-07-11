@@ -1558,7 +1558,11 @@ export const typeResolvers: GQLResolver = {
     input: (task) => task.input || [],
     output: (task) => task.output || [],
     certificates: resolveCertificates,
-    signature: async (task: Task, _: any, context) => {
+    signature: async (
+      task: Task,
+      _: any,
+      { headers: authHeader, ...context }
+    ) => {
       const action = getActionFromTask(task)
       const status = getStatusFromTask(task)
       if (
@@ -1587,11 +1591,14 @@ export const typeResolvers: GQLResolver = {
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
-      const signature = signatureExtension && signatureExtension.valueUri
+      const presignedUrl =
+        signatureExtension &&
+        getPresignedUrlFromUri(signatureExtension.valueUri, authHeader)
+
       return (
-        signature && {
-          type: 'minioUri',
-          data: signature
+        presignedUrl && {
+          type: 'minioPresignedUrl',
+          data: presignedUrl
         }
       )
     },
