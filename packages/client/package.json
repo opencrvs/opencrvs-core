@@ -47,6 +47,7 @@
     "@types/pdfmake": "^0.2.0",
     "@types/react-redux": "^7.1.5",
     "@types/react-router": "^5.1.2",
+    "@types/react-router-dom": "5",
     "@types/react-tooltip": "^4.2.4",
     "@types/redux-sentry-middleware": "^0.2.0",
     "@types/styled-components": "^5.1.3",
