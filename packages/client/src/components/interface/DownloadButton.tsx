@@ -136,10 +136,7 @@ function getAssignModalOptions(
       actions: [cancelAction, unassignAction]
     }
   } else if (assignment) {
-    // userRole === SystemRoleType.LocalRegistrar ||
-    // userRole === SystemRoleType.NationalRegistrar
-    // @TODO: In DownloadButton, is it correct to assume that record.register can always unassign?
-    if (scopes.includes('record.register')) {
+    if (scopes.includes('record.unassign-others')) {
       return {
         title: conflictsMessages.unassignTitle,
         content: conflictsMessages.regUnassignDesc,
