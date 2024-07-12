@@ -37,7 +37,6 @@ import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Event } from '@client/utils/gateway'
 import { IAttachmentValue, IForm } from '@client/forms'
-import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { getDummyCertificateTemplateData } from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
@@ -134,7 +133,6 @@ interface State {
   notificationForPrinting: NOTIFICATION_STATUS
   showPrompt: boolean
   eventName: string
-  previewImage: IAttachmentValue | null
   imageFile: IAttachmentValue
   activeTabId: Event
 }
@@ -162,7 +160,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       notificationForPrinting: NOTIFICATION_STATUS.IDLE,
       showPrompt: false,
       eventName: '',
-      previewImage: null,
       imageFile: {
         name: EMPTY_STRING,
         type: EMPTY_STRING,
@@ -194,17 +191,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       this.props.state
     )
     const menuItems = [
-      {
-        label: intl.formatMessage(buttonMessages.preview),
-        handler: async () => {
-          const svg = await compiledSvgPromise
-          const linkSource = `data:${SVGFile.type};base64,${window.btoa(svg)}`
-          this.setState({
-            eventName: event,
-            previewImage: { type: SVGFile.type, data: linkSource }
-          })
-        }
-      },
       {
         label: intl.formatMessage(buttonMessages.print),
         handler: async () => {
@@ -280,14 +266,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         data: EMPTY_STRING
       }
     })
-  }
-
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
-  }
-
-  onDelete = () => {
-    this.closePreviewSection()
   }
 
   async updateCertificateTemplate(
@@ -750,21 +728,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               />
             </Field>
           </ResponsiveModal>
-          {this.state.previewImage && (
-            <DocumentPreview
-              previewImage={this.state.previewImage}
-              disableDelete={true}
-              title={
-                eventName === Event.Birth
-                  ? intl.formatMessage(messages.birthTemplate)
-                  : eventName === Event.Death
-                  ? intl.formatMessage(messages.deathTemplate)
-                  : intl.formatMessage(messages.marriageTemplate)
-              }
-              goBack={this.closePreviewSection}
-              onDelete={this.onDelete}
-            />
-          )}
         </SysAdminContentWrapper>
       </>
     )
