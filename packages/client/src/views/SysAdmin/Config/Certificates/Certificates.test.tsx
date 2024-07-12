@@ -21,7 +21,6 @@ import { configApplicationMutations } from '@client/views/SysAdmin/Config/Applic
 import * as imageUtils from '@client/utils/imageUtils'
 
 enum MENU_ITEM {
-  PREVIEW,
   PRINT,
   DOWNLOAD,
   UPLOAD
@@ -164,27 +163,6 @@ describe('ConfigHome page when already has uploaded certificate template', async
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
-    })
-
-    it('should render preview certificate template when clicked on preview', async () => {
-      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
-
-      await waitForElement(testComponent, '#preview_image_field')
-
-      expect(
-        testComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('should go back from preview page if click on back arrow', async () => {
-      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
-      await waitForElement(testComponent, '#preview_image_field')
-      testComponent.find('#preview_close').hostNodes().simulate('click')
-      testComponent.update()
-
-      expect(
-        testComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(0)
     })
 
     it('should call print certificate after clicking print', async () => {
