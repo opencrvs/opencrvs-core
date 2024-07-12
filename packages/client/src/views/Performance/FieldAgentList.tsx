@@ -40,8 +40,8 @@ import format from '@client/utils/date-formatting'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Avatar, Event } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
+import { getUserRole } from '@client/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;

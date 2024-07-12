@@ -20,8 +20,8 @@ import {
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getLanguage } from '@client/i18n/selectors'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getUserRole } from '@client/utils'
 
 export function Role() {
   const intl = useIntl()
