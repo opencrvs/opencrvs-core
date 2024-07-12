@@ -70,6 +70,16 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', 'packages/**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Remove other package directories
         if: steps.check-scripts.outputs.skip != 'true'
         run: |
@@ -83,16 +93,6 @@ jobs:
               fi
             fi
           done
-
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}',matrix.package,'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Verify every file has a license header
         if: steps.check-scripts.outputs.skip != 'true'
