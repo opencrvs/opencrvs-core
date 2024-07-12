@@ -16,8 +16,7 @@ import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
-  postFhir,
-  uploadSignatureToMinio
+  postFhir
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@opencrvs/commons'
 import System, {
@@ -107,14 +106,11 @@ export async function registerSystem(
     const sha_secret = uuid()
 
     const { hash, salt } = generateSaltedHash(clientSecret)
-    const signatureMinioUrl = await uploadSignatureToMinio(
-      request.headers.authorization,
-      systemAdminUser.signature
-    )
+
     const practitioner = createFhirPractitioner(
       systemAdminUser,
       true,
-      signatureMinioUrl
+      undefined
     )
     const practitionerId = await postFhir(
       request.headers.authorization,
