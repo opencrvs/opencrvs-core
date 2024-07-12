@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ApiResponse } from '@elastic/elasticsearch'
 import { getMetrics, postMetrics } from '@gateway/features/metrics/service'
 import {
   getSystem,
@@ -21,6 +20,12 @@ import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
 import { ApolloError } from 'apollo-server-hapi'
+
+// transportresults
+type ApiResponse<T> = {
+  body: T
+  statusCode: number
+}
 
 export class RateLimitError extends ApolloError {
   constructor(message: string) {

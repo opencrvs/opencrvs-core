@@ -27,7 +27,7 @@ export const updateComposition = async (
   try {
     response = await client.update({
       index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
+      // type: 'compositions', @todo: check whether this should work
       id,
       body: {
         doc: body
@@ -58,9 +58,7 @@ export const renameField = async (
             }
           }
         },
-        script: {
-          inline: `ctx._source.${newFieldName} = ctx._source.${oldFieldName}; ctx._source.remove("${oldFieldName}");`
-        }
+        script: `ctx._source.${newFieldName} = ctx._source.${oldFieldName}; ctx._source.remove("${oldFieldName}");`
       }
     })
     return response
@@ -72,16 +70,21 @@ export const renameField = async (
 
 export const searchByCompositionId = async (compositionId: string) => {
   try {
-    return await client.search({
-      index: ELASTICSEARCH_INDEX_NAME,
-      body: {
-        query: {
-          match: {
-            _id: compositionId
+    return await client.search(
+      {
+        index: ELASTICSEARCH_INDEX_NAME,
+        body: {
+          query: {
+            match: {
+              _id: compositionId
+            }
           }
         }
+      },
+      {
+        meta: true
       }
-    })
+    )
   } catch (err) {
     console.error(`searchByCompositionId: error: ${err}`)
     return null
@@ -93,14 +96,19 @@ export const searchCompositionByCriteria = async (
   extraConfigs?: Record<string, any>
 ) => {
   try {
-    return await client.search({
-      index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
-      body: {
-        query: criteriaObject,
-        ...extraConfigs
+    return await client.search(
+      {
+        index: ELASTICSEARCH_INDEX_NAME,
+        // type: 'compositions', @todo: check whether this should work
+        body: {
+          query: criteriaObject,
+          ...extraConfigs
+        }
+      },
+      {
+        meta: true
       }
-    })
+    )
   } catch (err) {
     console.error(`searchCompositionByCriteria: error: ${err}`)
     return null

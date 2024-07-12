@@ -197,12 +197,15 @@ export function isTaskOrTaskHistory<T extends Resource>(
 ): resource is (T & TaskHistory) | (T & Task) {
   return ['TaskHistory', 'Task'].includes(resource.resourceType)
 }
-export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
+export function getTaskFromSavedBundle<T extends SavedBundle>(
+  bundle: T
+): SavedTask {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
   if (!task || !isSaved(task)) {
     throw new Error('No task found in bundle')
   }
+
   return task
 }
 
