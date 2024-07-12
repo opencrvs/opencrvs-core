@@ -25,6 +25,7 @@ type NotificationEvent = Extract<
   | 'sent-notification-for-review'
   | 'registered'
   | 'sent-for-approval'
+  | 'sent-for-updates'
 >
 
 export async function sendNotification(
@@ -73,20 +74,23 @@ const MAPPING: Record<
     'sent-notification-for-review':
       InformantNotificationName.birthDeclarationSMS,
     'sent-for-approval': InformantNotificationName.birthDeclarationSMS,
-    registered: InformantNotificationName.birthRegistrationSMS
+    registered: InformantNotificationName.birthRegistrationSMS,
+    'sent-for-updates': InformantNotificationName.birthRejectionSMS
   },
   [EVENT_TYPE.DEATH]: {
     'sent-notification': InformantNotificationName.deathInProgressSMS,
     'sent-notification-for-review':
       InformantNotificationName.deathDeclarationSMS,
     'sent-for-approval': InformantNotificationName.deathDeclarationSMS,
-    registered: InformantNotificationName.deathRegistrationSMS
+    registered: InformantNotificationName.deathRegistrationSMS,
+    'sent-for-updates': InformantNotificationName.deathRejectionSMS
   },
   [EVENT_TYPE.MARRIAGE]: {
     'sent-notification': null,
     'sent-notification-for-review': null,
     'sent-for-approval': null,
-    registered: null
+    registered: null,
+    'sent-for-updates': null
   }
 }
 

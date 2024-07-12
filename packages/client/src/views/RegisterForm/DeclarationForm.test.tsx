@@ -229,9 +229,7 @@ describe('when user has starts a new declaration', () => {
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
             app
-              .find('#image_file_uploader_field')
-              .hostNodes()
-              .first()
+              .find('input[name="uploadDocForMother"][type="file"]')
               .simulate('change', {
                 target: {
                   files: [
@@ -246,17 +244,13 @@ describe('when user has starts a new declaration', () => {
             await flushPromises()
             app.update()
 
-            expect(app.find('#upload-error').hostNodes().first().text()).toBe(
-              ''
-            )
+            expect(app.find('#upload-error').exists()).toBe(false)
           })
           it('Error while uploading invalid file', async () => {
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
             app
-              .find('#image_file_uploader_field')
-              .hostNodes()
-              .first()
+              .find('input[name="uploadDocForMother"][type="file"]')
               .simulate('change', {
                 target: {
                   files: [
