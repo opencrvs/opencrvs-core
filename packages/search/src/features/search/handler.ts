@@ -72,10 +72,12 @@ export async function getAllDocumentsHandler(
         }
       },
       {
+        meta: true,
         ignore: [404]
       }
     )
-    const count: number = allDocumentsCountCheck.body.hits.total.value
+    // @ts-ignore
+    const count: number = allDocumentsCountCheck?.body?.hits?.total?.value
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
@@ -133,8 +135,9 @@ export async function getStatusWiseRegistrationCountHandler(
       })
     }
 
-    const response = await client.search<{
-      aggregations?: {
+    const response = await client.search<
+      any,
+      {
         statusCounts: {
           buckets: Array<{
             key: string
@@ -142,23 +145,28 @@ export async function getStatusWiseRegistrationCountHandler(
           }>
         }
       }
-    }>({
-      body: {
-        size: 0,
-        query: {
-          bool: {
-            must: matchRules
-          }
-        },
-        aggs: {
-          statusCounts: {
-            terms: {
-              field: 'type.keyword'
+    >(
+      {
+        body: {
+          size: 0,
+          query: {
+            bool: {
+              must: matchRules
+            }
+          },
+          aggs: {
+            statusCounts: {
+              terms: {
+                field: 'type.keyword'
+              }
             }
           }
         }
+      },
+      {
+        meta: true
       }
-    })
+    )
 
     if (!response.body.aggregations) {
       return payload.status.map((status) => ({

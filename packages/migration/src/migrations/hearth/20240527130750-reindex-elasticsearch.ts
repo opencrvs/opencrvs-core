@@ -18,12 +18,20 @@ const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
  * In case an index doesn't already exist via creating records, lets make it for reindexing to work consistently
  */
 const createEmptyIndex = async () => {
-  const { body: doesOcrvsAliasExist } = await client.indices.existsAlias({
-    name: ELASTICSEARCH_INDEX_NAME
-  })
-  const { body: doesOcrvsIndexExist } = await client.indices.exists({
-    index: ELASTICSEARCH_INDEX_NAME
-  })
+  const { body: doesOcrvsAliasExist } = await client.indices.existsAlias(
+    {
+      name: ELASTICSEARCH_INDEX_NAME
+    },
+    { meta: true }
+  )
+  const { body: doesOcrvsIndexExist } = await client.indices.exists(
+    {
+      index: ELASTICSEARCH_INDEX_NAME
+    },
+    {
+      meta: true
+    }
+  )
 
   if (doesOcrvsAliasExist || doesOcrvsIndexExist) {
     return
@@ -67,9 +75,14 @@ export const up = async (db: Db, _client: MongoClient) => {
 
 export const down = async (db: Db, _client: MongoClient) => {
   const BACKUP_INDEX = `${ELASTICSEARCH_INDEX_NAME}-20240514125702-old-format`
-  const { body: doesTargetIndexExist } = await client.indices.exists({
-    index: BACKUP_INDEX
-  })
+  const { body: doesTargetIndexExist } = await client.indices.exists(
+    {
+      index: BACKUP_INDEX
+    },
+    {
+      meta: true
+    }
+  )
 
   if (!doesTargetIndexExist) {
     throw new Error(

@@ -68,7 +68,7 @@ export const composeDocument = (
     createdAt:
       (existingDocument &&
         existingDocument.body.hits.hits.length > 0 &&
-        existingDocument.body.hits.hits[0]._source.createdAt) ||
+        existingDocument.body.hits.hits[0]?._source?.createdAt) ||
       Date.now().toString(),
     operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { OnDropDocument } from '@elastic/elasticsearch/lib/Helpers'
 import { EVENT_TYPE, ValidRecord } from '@opencrvs/commons/types'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
@@ -69,7 +68,7 @@ export const reindex = async () => {
         _id: doc.compositionId
       }
     }),
-    onDrop(doc: OnDropDocument<BirthDocument>) {
+    onDrop(doc) {
       throw new Error(
         `Document ${doc.document.compositionId} couldn't be inserted`
       )
@@ -89,10 +88,15 @@ export const reindex = async () => {
  * Points the latest index (for example: ocrvs-20240523000000) - to an alias (example: ocrvs)
  */
 export async function updateAliases() {
-  const { body: indices } = await client.cat.indices<Array<{ index: string }>>({
-    format: 'json',
-    index: `${OPENCRVS_INDEX_NAME}-*`
-  })
+  const { body: indices } = await client.cat.indices(
+    {
+      format: 'json',
+      index: `${OPENCRVS_INDEX_NAME}-*`
+    },
+    {
+      meta: true
+    }
+  )
 
   const sortedIndices = orderBy(indices, 'index')
   const { index: latestIndex } = sortedIndices.at(-1)!

@@ -57,6 +57,7 @@ export const up = async (db: Db, client: MongoClient) => {
   const compositionsWithoutLocationIdsResult =
     await searchCompositionByCriteria(searchCriteria)
   const totalCompositionsWithoutLocationIds =
+    // @ts-ignore
     compositionsWithoutLocationIdsResult?.body.hits.total.value || 0
 
   while (processedDocCount < totalCompositionsWithoutLocationIds) {
@@ -79,6 +80,7 @@ export const up = async (db: Db, client: MongoClient) => {
       } catch (error: any) {
         // eslint-disable-next-line no-console
         console.error(
+          // @ts-ignore
           `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds for ${elasticDoc.id} failed : ${error.stack}`
         )
       }
