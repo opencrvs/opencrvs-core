@@ -11,17 +11,43 @@
 
 import { countries as countryList, lookup } from 'country-data'
 import { orderBy, uniqBy } from 'lodash'
-import {
-  BirthActionId,
-  DeathActionId,
-  GeneralActionId,
-  MarriageActionId
-} from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
+
+export enum GeneralActionId {
+  APPLICATION_NAME = 'APPLICATION_NAME',
+  COUNTRY_LOGO = 'COUNTRY_LOGO',
+  NID_NUMBER_PATTERN = 'NID_NUMBER_PATTERN',
+  CURRENCY = 'CURRENCY',
+  PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN',
+  LOGIN_BACKGROUND = 'LOGIN_BACKGROUND'
+}
+
+export enum BirthActionId {
+  BIRTH_REGISTRATION_TARGET = 'BIRTH_REGISTRATION_TARGET',
+  BIRTH_LATE_REGISTRATION_TARGET = 'BIRTH_LATE_REGISTRATION_TARGET',
+  BIRTH_PERIOD_BETWEEN_LATE_DELAYED_TARGET = 'birthPeriodBetweenLateDelayedTarget',
+  BIRTH_ON_TIME_FEE = 'BIRTH_ON_TIME_FEE',
+  BIRTH_LATE_FEE = 'BIRTH_LATE_FEE',
+  BIRTH_DELAYED_FEE = 'BIRTH_DELAYED_FEE'
+}
+
+export enum DeathActionId {
+  DEATH_REGISTRATION_TARGET = 'DEATH_REGISTRATION_TARGET',
+  DEATH_REGISTRATION_DELAYED_TARGET = 'DEATH_REGISTRATION_DELAYED_TARGET',
+  DEATH_ON_TIME_FEE = 'DEATH_ON_TIME_FEE',
+  DEATH_DELAYED_FEE = 'DEATH_DELAYED_FEE'
+}
+
+export enum MarriageActionId {
+  MARRIAGE_REGISTRATION_TARGET = 'MARRIAGE_REGISTRATION_TARGET',
+  MARRIAGE_REGISTRATION_DELAYED_TARGET = 'MARRIAGE_REGISTRATION_DELAYED_TARGET',
+  MARRIAGE_ON_TIME_FEE = 'MARRIAGE_ON_TIME_FEE',
+  MARRIAGE_DELAYED_FEE = 'MARRIAGE_DELAYED_FEE'
+}
 
 type IActionType =
   | keyof typeof GeneralActionId
