@@ -75,49 +75,52 @@ export const searchForBirthDuplicates = async (
   ) {
     return []
   }
+
+  const motherMust: any = [
+    // If mother identifier is provided, it needs to match 100%
+    body.motherIdentifier && {
+      match_phrase: {
+        motherIdentifier: body.motherIdentifier
+      }
+    },
+    body.motherFirstNames && {
+      match: {
+        motherFirstNames: {
+          query: body.motherFirstNames,
+          fuzziness: FIRST_NAME_FUZZINESS
+        }
+      }
+    },
+    body.motherFamilyName && {
+      match: {
+        motherFamilyName: {
+          query: body.motherFamilyName,
+          fuzziness: FIRST_NAME_FUZZINESS,
+          minimum_should_match: '100%'
+        }
+      }
+    },
+    body.motherDoB && {
+      range: {
+        motherDoB: {
+          gte: subYears(new Date(body.motherDoB), 1).toISOString(),
+          lte: addYears(new Date(body.motherDoB), 1).toISOString()
+        }
+      }
+    },
+    body.motherDoB && {
+      distance_feature: {
+        field: 'motherDoB',
+        pivot: '365d',
+        origin: new Date(body.motherDoB).toISOString(),
+        boost: 1.5
+      }
+    }
+  ].filter(Boolean)
+
   const mothersDetailsMatch = {
     bool: {
-      must: [
-        // If mother identifier is provided, it needs to match 100%
-        body.motherIdentifier && {
-          match_phrase: {
-            motherIdentifier: body.motherIdentifier
-          }
-        },
-        body.motherFirstNames && {
-          match: {
-            motherFirstNames: {
-              query: body.motherFirstNames,
-              fuzziness: FIRST_NAME_FUZZINESS
-            }
-          }
-        },
-        body.motherFamilyName && {
-          match: {
-            motherFamilyName: {
-              query: body.motherFamilyName,
-              fuzziness: FIRST_NAME_FUZZINESS,
-              minimum_should_match: '100%'
-            }
-          }
-        },
-        body.motherDoB && {
-          range: {
-            motherDoB: {
-              gte: subYears(new Date(body.motherDoB), 1).toISOString(),
-              lte: addYears(new Date(body.motherDoB), 1).toISOString()
-            }
-          }
-        },
-        body.motherDoB && {
-          distance_feature: {
-            field: 'motherDoB',
-            pivot: '365d',
-            origin: new Date(body.motherDoB).toISOString(),
-            boost: 1.5
-          }
-        }
-      ].filter(Boolean)
+      must: motherMust
     }
   }
 
@@ -144,10 +147,60 @@ export const searchForBirthDuplicates = async (
     }
   }
 
+  const must1: any = [
+    body.childFirstNames && {
+      match: {
+        childFirstNames: {
+          query: body.childFirstNames,
+          fuzziness: FIRST_NAME_FUZZINESS
+        }
+      }
+    },
+    body.childFamilyName && {
+      match: {
+        childFamilyName: {
+          query: body.childFamilyName,
+          fuzziness: FIRST_NAME_FUZZINESS,
+          minimum_should_match: '100%'
+        }
+      }
+    }
+  ].filter(Boolean)
+
+  const bool1 = body.childDoB && {
+    bool: {
+      should: [
+        {
+          bool: {
+            must: [
+              {
+                range: {
+                  childDoB: {
+                    gte: subYears(new Date(body.childDoB), 3).toISOString(),
+                    lte: addYears(new Date(body.childDoB), 3).toISOString()
+                  }
+                }
+              },
+              {
+                distance_feature: {
+                  field: 'childDoB',
+                  pivot: '365d',
+                  origin: new Date(body.childDoB).toISOString(),
+                  boost: 1
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+
+  const must2: any = [bool1, mothersDetailsMatch].filter(Boolean)
   try {
-    const result = await client.search<ISearchResponse<BirthDocument>>({
-      index: OPENCRVS_INDEX_NAME,
-      body: {
+    const result = await client.search(
+      {
+        index: OPENCRVS_INDEX_NAME,
         query: {
           bool: {
             should: [
@@ -161,73 +214,25 @@ export const searchForBirthDuplicates = async (
                   must: [
                     {
                       bool: {
-                        must: [
-                          body.childFirstNames && {
-                            match: {
-                              childFirstNames: {
-                                query: body.childFirstNames,
-                                fuzziness: FIRST_NAME_FUZZINESS
-                              }
-                            }
-                          },
-                          body.childFamilyName && {
-                            match: {
-                              childFamilyName: {
-                                query: body.childFamilyName,
-                                fuzziness: FIRST_NAME_FUZZINESS,
-                                minimum_should_match: '100%'
-                              }
-                            }
-                          }
-                        ].filter(Boolean)
+                        must: must1
                       }
                     },
-                    body.childDoB && {
-                      bool: {
-                        should: [
-                          {
-                            bool: {
-                              must: [
-                                {
-                                  range: {
-                                    childDoB: {
-                                      gte: subYears(
-                                        new Date(body.childDoB),
-                                        3
-                                      ).toISOString(),
-                                      lte: addYears(
-                                        new Date(body.childDoB),
-                                        3
-                                      ).toISOString()
-                                    }
-                                  }
-                                },
-                                {
-                                  distance_feature: {
-                                    field: 'childDoB',
-                                    pivot: '365d',
-                                    origin: new Date(
-                                      body.childDoB
-                                    ).toISOString(),
-                                    boost: 1
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        ]
-                      }
-                    },
-                    mothersDetailsMatch
+                    ...must2
                   ].filter(Boolean)
                 }
               }
             ]
           }
         }
+      },
+      {
+        meta: true
       }
-    })
-    return result.body.hits.hits
+    )
+
+    return result.body.hits.hits as ISearchResponse<
+      BirthDocument | DeathDocument
+    >['hits']['hits']
   } catch (err) {
     logger.error(`searchBirthDuplicates error: ${err}`)
     throw err
@@ -247,60 +252,62 @@ export const searchForDeathDuplicates = async (
     return []
   }
 
+  const must1: any = [
+    body.deceasedFirstNames && {
+      match: {
+        deceasedFirstNames: {
+          query: body.deceasedFirstNames,
+          fuzziness: FIRST_NAME_FUZZINESS
+        }
+      }
+    },
+    body.deceasedFamilyName && {
+      match: {
+        deceasedFamilyName: {
+          query: body.deceasedFamilyName,
+          fuzziness: FIRST_NAME_FUZZINESS
+        }
+      }
+    },
+    body.deceasedIdentifier && {
+      match_phrase: {
+        deceasedIdentifier: body.deceasedIdentifier
+      }
+    }
+  ].filter((clause) => !!clause)
+
+  const must2 = body.deathDate
+    ? [
+        {
+          range: {
+            deathDate: {
+              gte: subDays(new Date(body.deathDate), 5).toISOString(),
+              lte: addDays(new Date(body.deathDate), 5).toISOString()
+            }
+          }
+        },
+        {
+          distance_feature: {
+            field: 'deathDate',
+            pivot: '5d', // 5 days
+            origin: new Date(body.deathDate).toISOString(),
+            boost: 1
+          }
+        }
+      ]
+    : []
+
   try {
-    const result = await client.search<ISearchResponse<DeathDocument>>({
-      index: OPENCRVS_INDEX_NAME,
-      body: {
+    const result = await client.search(
+      {
+        index: OPENCRVS_INDEX_NAME,
         query: {
           bool: {
             must: [
-              body.deceasedFirstNames && {
-                match: {
-                  deceasedFirstNames: {
-                    query: body.deceasedFirstNames,
-                    fuzziness: FIRST_NAME_FUZZINESS
-                  }
-                }
-              },
-              body.deceasedFamilyName && {
-                match: {
-                  deceasedFamilyName: {
-                    query: body.deceasedFamilyName,
-                    fuzziness: FIRST_NAME_FUZZINESS
-                  }
-                }
-              },
-              body.deceasedIdentifier && {
-                match_phrase: {
-                  deceasedIdentifier: body.deceasedIdentifier
-                }
-              },
+              ...must1,
               {
                 bool: {
-                  must: [
-                    body.deathDate && {
-                      range: {
-                        deathDate: {
-                          gte: subDays(
-                            new Date(body.deathDate),
-                            5
-                          ).toISOString(),
-                          lte: addDays(
-                            new Date(body.deathDate),
-                            5
-                          ).toISOString()
-                        }
-                      }
-                    },
-                    body.deathDate && {
-                      distance_feature: {
-                        field: 'deathDate',
-                        pivot: '5d', // 5 days
-                        origin: new Date(body.deathDate).toISOString(),
-                        boost: 1
-                      }
-                    }
-                  ].filter(Boolean)
+                  must: must2
                 }
               },
               {
@@ -334,9 +341,14 @@ export const searchForDeathDuplicates = async (
             ].filter(Boolean)
           }
         }
+      },
+      {
+        meta: true
       }
-    })
-    return result.body.hits.hits
+    )
+    return result.body.hits.hits as ISearchResponse<
+      BirthDocument | DeathDocument
+    >['hits']['hits']
   } catch (err) {
     logger.error(`searchDeathDuplicates error: ${err}`)
     throw err

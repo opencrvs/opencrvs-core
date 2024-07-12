@@ -292,7 +292,9 @@ export async function detectDeathDuplicates(
 
 export async function getCreatedBy(compositionId: string) {
   const results = await searchByCompositionId(compositionId, client)
-  const result = results?.body?.hits?.hits[0]?._source as SearchDocument
+
+  const result = results?.body?.hits?.hits[0]
+    ?._source as unknown as SearchDocument
   return result?.createdBy
 }
 
