@@ -17,7 +17,7 @@
     "build:clean": "rm -rf build"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.13",
+    "@elastic/elasticsearch": "8.14.0",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.3.0",
