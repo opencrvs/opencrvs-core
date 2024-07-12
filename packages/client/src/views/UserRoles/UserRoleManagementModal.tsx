@@ -23,10 +23,7 @@ import { getLanguages } from '@client/i18n/selectors'
 import { getUserSystemRole } from '@client/views/SysAdmin/Team/utils'
 import { messages } from '@client/i18n/messages/views/config'
 import _ from 'lodash'
-import {
-  ISystemRole,
-  RolesInput
-} from '@client/views/SysAdmin/Config/UserRoles/UserRoles'
+import { ISystemRole, RolesInput } from '@client/utils'
 
 const StyledTextInput = styled(TextInput)`
   ${({ theme }) => theme.fonts.reg14};

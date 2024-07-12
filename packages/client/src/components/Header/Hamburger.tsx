@@ -18,8 +18,8 @@ import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { Role } from '@client/utils/gateway'
+import { getUserRole } from '@client/utils'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)

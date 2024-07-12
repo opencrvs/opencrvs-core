@@ -35,12 +35,12 @@ import { v4 as uuid } from 'uuid'
 import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 import { useSelector } from 'react-redux'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { ILocation } from '@client/offline/reducer'
+import { getUserRole } from '@client/utils'
 
 const TableDiv = styled.div`
   overflow: auto;
