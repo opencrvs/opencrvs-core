@@ -31,7 +31,7 @@ import {
 export const createFhirPractitioner = (
   user: IUser,
   system: boolean,
-  signatureUrl: string
+  signatureUrl: string | undefined
 ): fhir.Practitioner => {
   if (system) {
     return {
@@ -65,7 +65,7 @@ export const createFhirPractitioner = (
               valueUri: signatureUrl
             }
           ]
-        : []
+        : undefined
     }
   }
 }

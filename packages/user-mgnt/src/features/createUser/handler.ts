@@ -43,10 +43,8 @@ export default async function createUser(
   let password = null
 
   try {
-    const signatureMinioUrl = await uploadSignatureToMinio(
-      token,
-      user.signature
-    )
+    const signatureMinioUrl =
+      user.signature && (await uploadSignatureToMinio(token, user.signature))
 
     const practitioner = createFhirPractitioner(user, false, signatureMinioUrl)
     practitionerId = await postFhir(token, practitioner)
