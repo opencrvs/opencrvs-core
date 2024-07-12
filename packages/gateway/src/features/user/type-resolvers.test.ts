@@ -226,36 +226,27 @@ describe('User type resolvers', () => {
     expect(response).toEqual({
       role: 'LOCAL_REGISTRAR',
       name: undefined,
-      signature: { type: 'image/png', data: signatureData }
+      signature: undefined
     })
   })
 
   it('return user signature as registrar', async () => {
-    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
+    const presignedURL = 'minio.com/ocrvs/sadasdasduqoweh'
 
     const practitioner = {
       resourceType: 'Practitioner',
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueSignature: {
-            type: [
-              {
-                system: 'urn:iso-astm:E1762-95:2013',
-                code: '1.2.840.10065.1.12.1.13',
-                display: 'Review Signature'
-              }
-            ],
-            when: '2019-08-22T08:43:43.461Z',
-            contentType: 'image/png',
-            blob: signatureData
-          }
+          valueUri: 'mock.minio/uri'
         }
       ],
       id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
     }
-
-    fetch.mockResponseOnce(JSON.stringify(practitioner), { status: 200 })
+    fetch.mockResponses(
+      [JSON.stringify({ presignedURL }), { status: 200 }],
+      [JSON.stringify(practitioner), { status: 200 }]
+    )
 
     const userResponse = mockResponse
     userResponse.scope!.push('register')
@@ -275,10 +266,7 @@ describe('User type resolvers', () => {
 
     expect(response).toEqual({
       role: 'REGISTRATION_AGENT',
-      signature: {
-        type: 'image/png',
-        data: signatureData
-      }
+      signature: presignedURL
     })
   })
 })

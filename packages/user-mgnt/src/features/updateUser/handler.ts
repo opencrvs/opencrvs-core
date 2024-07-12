@@ -96,9 +96,11 @@ export default async function updateUser(
       throw new Error('Location can be changed only by National System Admin')
     }
   }
-  const signatureMinioUrl = isMinioUrl(existingUser.signature.data)
-    ? getSignatureExtension(existingPractitioner.extension)?.valueUri
-    : await uploadSignatureToMinio(token, existingUser.signature)
+  const signatureMinioUrl = existingUser?.signature?.data
+    ? isMinioUrl(existingUser.signature.data)
+      ? getSignatureExtension(existingPractitioner.extension)?.valueUri
+      : await uploadSignatureToMinio(token, existingUser.signature)
+    : undefined
 
   const practitioner = createFhirPractitioner(
     existingUser,
