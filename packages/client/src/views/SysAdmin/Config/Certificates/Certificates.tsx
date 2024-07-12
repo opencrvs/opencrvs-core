@@ -37,7 +37,7 @@ import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Event } from '@client/utils/gateway'
 import { IAttachmentValue, IForm } from '@client/forms'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { getDummyCertificateTemplateData } from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
@@ -58,7 +58,7 @@ import {
   ApplyButton,
   Field
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadField/SimpleDocumentUploader'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { Link, Text, Toggle } from '@client/../../components/lib'
