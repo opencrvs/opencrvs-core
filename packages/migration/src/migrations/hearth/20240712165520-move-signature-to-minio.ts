@@ -24,7 +24,8 @@ export const up = async (db: Db, client: MongoClient) => {
   const practitioners = db.collection('Practitioner').find({})
 
   for await (const practitioner of practitioners) {
-    const extensions = practitioner.extension as any[]
+    const extensions = practitioner.extension
+
     if (extensions) {
       let signatureUrl = ''
       for (const extension of extensions) {
