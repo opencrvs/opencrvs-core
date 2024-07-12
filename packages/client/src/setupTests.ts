@@ -276,7 +276,7 @@ vi.mock('lodash/debounce', () => ({
 vi.mock('./utils', async () => ({
   useOnlineStatus: () => true,
   isNavigatorOnline: () => true,
-  getUserRole: vi.fn().mockImplementation((lang, role) => 'mocked role label')
+  getUserRole: vi.fn().mockImplementation((lang, role) => 'ENTREPENEUR')
 }))
 
 vi.mock('react-router', async () => ({
