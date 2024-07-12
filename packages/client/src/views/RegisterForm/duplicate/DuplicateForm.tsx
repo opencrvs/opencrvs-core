@@ -26,6 +26,7 @@ import {
   Text,
   TextArea
 } from '@opencrvs/components/lib'
+import { CancelButton } from '@client/views/SysAdmin/Config/Application/Components'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToHome } from '@client/navigation'
 
@@ -155,14 +156,9 @@ export const DuplicateForm = (props: IProps) => {
         titleHeightAuto={true}
         show={showModal}
         actions={[
-          <Button
-            key="cancel"
-            id="modal_cancel"
-            type="tertiary"
-            onClick={toggleModal}
-          >
+          <CancelButton key="cancel" id="modal_cancel" onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.cancel)}
-          </Button>,
+          </CancelButton>,
           <Button
             key="mark-as-duplicate-button"
             id="mark-as-duplicate-button"
