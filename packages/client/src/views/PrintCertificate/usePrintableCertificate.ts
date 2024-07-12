@@ -30,7 +30,6 @@ import {
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
 import { cloneDeep } from 'lodash'
-import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
@@ -114,7 +113,6 @@ export const usePrintableCertificate = (declarationId: string) => {
   )
 
   const state = useSelector((store: IStoreState) => store)
-  const [svg, setSvg] = useState<string>()
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const dispatch = useDispatch()
   const scope = useSelector(getScope)
@@ -122,23 +120,19 @@ export const usePrintableCertificate = (declarationId: string) => {
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
-  useEffect(() => {
-    const certificateTemplate =
-      declaration &&
-      offlineData.templates.certificates?.[declaration.event].definition
-    if (certificateTemplate)
-      compileSvg(
-        certificateTemplate,
-        { ...declaration.data.template, preview: true },
-        state
-      ).then((svg) => {
-        const svgWithFonts = addFontsToSvg(
-          svg,
-          offlineData.templates.fonts ?? {}
-        )
-        setSvg(svgWithFonts)
-      })
-  }, [offlineData, declaration, state])
+  let svg = ''
+
+  const certificateTemplate =
+    declaration &&
+    offlineData.templates.certificates?.[declaration.event].definition
+  if (certificateTemplate) {
+    const compiledSvg = compileSvg(
+      certificateTemplate,
+      { ...declaration.data.template, preview: true },
+      state
+    )
+    svg = addFontsToSvg(compiledSvg, offlineData.templates.fonts ?? {})
+  }
 
   const handleCertify = async () => {
     if (

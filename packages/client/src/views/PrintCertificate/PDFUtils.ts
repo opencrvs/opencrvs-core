@@ -84,7 +84,7 @@ export function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
-export function executeHandlebarsTemplate(
+export function compileSvg(
   templateString: string,
   data: Record<string, any> = {},
   state: IStoreState
@@ -225,31 +225,6 @@ src: url("${url}") format("truetype");
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
-
-export async function compileSvg(
-  svgTemplate: string,
-  templateValues: Record<string, unknown>,
-  state: IStoreState
-) {
-  const resolvedSignatures = await Promise.all(
-    MARRIAGE_SIGNATURE_KEYS.map((k) => ({
-      signatureKey: k,
-      url: templateValues[k]
-    }))
-      .filter(({ url }) => Boolean(url))
-      .map(({ signatureKey, url }) =>
-        fetchImageAsBase64(url as string).then((value) => ({
-          [signatureKey]: value
-        }))
-      )
-  ).then((res) => res.reduce((acc, cur) => ({ ...acc, ...cur }), {}))
-  templateValues = {
-    ...templateValues,
-    ...resolvedSignatures
-  }
-  return executeHandlebarsTemplate(svgTemplate, templateValues, state)
-}
-
 export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
   const pdfTemplate: IPDFTemplate = {
     ...certificateBaseTemplate,
