@@ -21,6 +21,10 @@ import {
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { Query } from '@client/components/Query'
 import { GET_TOTAL_VSEXPORT } from './queries'
+import {
+  Label,
+  Value
+} from '@client/views/SysAdmin/Config/Application/Components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { DynamicHeightLinkButton } from '@client/views/Settings/items/components'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
@@ -29,7 +33,6 @@ import { Link } from '@client/../../components/lib'
 import { chunk, sortBy } from 'lodash'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { Text } from '@opencrvs/components/lib/Text'
 
 const DEFAULT_LIST_SIZE = 12
 
@@ -111,23 +114,11 @@ const VSExport = () => {
                 <ListViewItemSimplified
                   compactLabel
                   label={
-                    <Text
-                      id={`${item.createdOn}_label`}
-                      variant="bold16"
-                      element="span"
-                    >
+                    <Label id={`${item.createdOn}_label`}>
                       {new Date(item.startDate).getFullYear()}
-                    </Text>
+                    </Label>
                   }
-                  value={
-                    <Text
-                      id={`${item.createdOn}_value`}
-                      variant="reg16"
-                      element="span"
-                    >
-                      {label}
-                    </Text>
-                  }
+                  value={<Value id={`${item.createdOn}_value`}>{label}</Value>}
                   actions={
                     <DynamicHeightLinkButton
                       id={`${item.createdOn}_export_button`}

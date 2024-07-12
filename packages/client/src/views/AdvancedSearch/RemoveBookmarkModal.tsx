@@ -27,7 +27,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { Message } from '@client/views/AdvancedSearch/SaveBookmarkModal'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { NOTIFICATION_STATUS } from '@client/utils/notificationUtils'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { useOnlineStatus } from '@client/utils'
 

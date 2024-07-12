@@ -24,7 +24,7 @@ import {
 } from '@client/components/ProtectedAccount'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { getUserName, UserDetails, getUserRole } from '@client/utils/userUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
@@ -39,6 +39,7 @@ import {
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/Content'
+import { getUserRole } from '@client/views/SysAdmin/Config/UserRoles/utils'
 import { getLanguage } from '@client/i18n/selectors'
 import { ErrorText } from '@opencrvs/components/lib/'
 
