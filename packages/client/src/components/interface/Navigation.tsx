@@ -19,8 +19,10 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
   goToAllUserEmail,
+  goToCertificateConfig,
   goToDashboardView,
   goToHomeTab,
+  goToInformantNotification,
   goToLeaderBoardsView,
   goToOrganisationView,
   goToPerformanceStatistics,
@@ -219,6 +221,7 @@ interface IProps {
 
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
+  goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -232,6 +235,7 @@ interface IDispatchProps {
   goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
+  goToInformantNotification: typeof goToInformantNotification
   goToAllUserEmail: typeof goToAllUserEmail
 }
 
@@ -295,6 +299,7 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
+    goToCertificateConfigAction,
     goToVSExportsAction,
     goToSystemViewAction,
     goToAdvancedSearchResultAction,
@@ -310,6 +315,7 @@ const NavigationView = (props: IFullProps) => {
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
+    goToInformantNotification,
     goToAllUserEmail,
     className
   } = props
@@ -709,17 +715,30 @@ const NavigationView = (props: IFullProps) => {
                       />
                       {(isConfigExpanded ||
                         configTab.includes(activeMenuItem)) && (
-                        <NavigationSubItem
-                          id={`navigation_${WORKQUEUE_TABS.systems}`}
-                          label={intl.formatMessage(
-                            navigationMessages[WORKQUEUE_TABS.systems]
-                          )}
-                          onClick={goToSystemViewAction}
-                          isSelected={
-                            enableMenuSelection &&
-                            activeMenuItem === WORKQUEUE_TABS.systems
-                          }
-                        />
+                        <>
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.certificate]
+                            )}
+                            id={`navigation_${WORKQUEUE_TABS.certificate}`}
+                            onClick={goToCertificateConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.certificate
+                            }
+                          />
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.systems}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.systems]
+                            )}
+                            onClick={goToSystemViewAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.systems
+                            }
+                          />
+                        </>
                       )}
                     </>
                   )}
@@ -753,17 +772,33 @@ const NavigationView = (props: IFullProps) => {
                       />
                       {(isCommunationExpanded ||
                         conmmunicationTab.includes(activeMenuItem)) && (
-                        <NavigationSubItem
-                          label={intl.formatMessage(
-                            navigationMessages[WORKQUEUE_TABS.emailAllUsers]
-                          )}
-                          id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
-                          onClick={goToAllUserEmail}
-                          isSelected={
-                            enableMenuSelection &&
-                            activeMenuItem === WORKQUEUE_TABS.emailAllUsers
-                          }
-                        />
+                        <>
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[
+                                WORKQUEUE_TABS.informantNotification
+                              ]
+                            )}
+                            id={`navigation_${WORKQUEUE_TABS.informantNotification}`}
+                            onClick={goToInformantNotification}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem ===
+                                WORKQUEUE_TABS.informantNotification
+                            }
+                          />
+                          <NavigationSubItem
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.emailAllUsers]
+                            )}
+                            id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
+                            onClick={goToAllUserEmail}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.emailAllUsers
+                            }
+                          />
+                        </>
                       )}
                     </>
                   )}
@@ -962,6 +997,7 @@ export const Navigation = connect<
   IStoreState
 >(mapStateToProps, {
   goToHomeTab,
+  goToCertificateConfigAction: goToCertificateConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
@@ -975,6 +1011,7 @@ export const Navigation = connect<
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,
+  goToInformantNotification,
   goToAllUserEmail
 })(injectIntl(withRouter(NavigationView)))
 

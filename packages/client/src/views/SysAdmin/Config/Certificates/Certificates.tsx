@@ -207,41 +207,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
   ) {
     const menuItems = [
       {
-        label: intl.formatMessage(buttonMessages.preview),
-        handler: async () => {
-          const dummyTemplateData = getDummyCertificateTemplateData(
-            event,
-            this.props.registerForm
-          )
-
-          svgCode = executeHandlebarsTemplate(
-            svgCode,
-            dummyTemplateData,
-            this.props.state
-          )
-          const linkSource = `data:${SVGFile.type};base64,${window.btoa(
-            svgCode
-          )}`
-          this.setState({
-            eventName: event,
-            previewImage: { type: SVGFile.type, data: linkSource }
-          })
-        }
-      },
-      {
-        label: intl.formatMessage(buttonMessages.print),
-        handler: async () => {
-          await printDummyCertificate(
-            event,
-            this.props.registerForm,
-            intl,
-            this.props.userDetails as UserDetails,
-            this.props.offlineResources,
-            this.props.state
-          )
-        }
-      },
-      {
         label: intl.formatMessage(messages.downloadTemplate),
         handler: () => {
           downloadFile(SVGFile.type, svgCode, svgFilename)
@@ -621,21 +586,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 />
               }
             >
-              <>
-                {intl.formatMessage(messages.listDetails)}
-                <Link
-                  id="certificate-instructions-link"
-                  onClick={() => {
-                    window.open(
-                      'https://documentation.opencrvs.org/setup/4.-functional-configuration/4.4-configure-a-certificate-template',
-                      '_blank',
-                      'noopener,noreferrer'
-                    )
-                  }}
-                >
-                  {intl.formatMessage(messages.listDetailsQsn)}
-                </Link>
-              </>
               <TabContent
                 item={
                   CertificateSection.items.find(

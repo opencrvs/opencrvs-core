@@ -31,8 +31,6 @@ const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
 enum MENU_ITEM {
-  PREVIEW,
-  PRINT,
   DOWNLOAD,
   UPLOAD
 }
@@ -229,37 +227,6 @@ describe('ConfigHome page when already has uploaded certificate template', async
         setTimeout(resolve, 200)
       })
       expect(updateCertificateMutationSpy).toBeCalledTimes(1)
-    })
-
-    it('should render preview certificate template when clicked on preview', async () => {
-      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
-
-      await waitForElement(testComponent, '#preview_image_field')
-
-      expect(
-        testComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(1)
-    })
-
-    it('should go back from preview page if click on back arrow', async () => {
-      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
-      await waitForElement(testComponent, '#preview_image_field')
-      testComponent.find('#preview_close').hostNodes().simulate('click')
-      testComponent.update()
-
-      expect(
-        testComponent.find('#preview_image_field').hostNodes()
-      ).toHaveLength(0)
-    })
-
-    it('should call print certificate after clicking print', async () => {
-      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PRINT)
-      testComponent.update()
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-
-      expect(printCertificateSpy).toBeCalledTimes(1)
     })
 
     it('should download preview certificate', async () => {
