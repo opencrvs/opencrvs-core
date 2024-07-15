@@ -60,6 +60,7 @@ export type IAdvancedSearchParamState = {
   informantDoBStart?: string
   informantDoBEnd?: string
   searchId?: string
+  bookmarkName?: string
 }
 
 export const advancedSearchInitialState: IAdvancedSearchParamState = {

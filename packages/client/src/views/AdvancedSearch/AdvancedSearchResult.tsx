@@ -124,7 +124,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const { width: windowWidth } = useWindowSize()
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
-  const { searchId, ...advancedSearchParams } = useSelector(
+  const { searchId, bookmarkName, ...advancedSearchParams } = useSelector(
     AdvancedSearchParamsState
   )
   const filteredAdvancedSearchParams = omitBy(
@@ -400,9 +400,10 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
             const total = loading ? -1 : data?.searchEvents?.totalItems || 0
             return (
               <WQContentWrapper
-                title={intl.formatMessage(
-                  advancedSearchResultMessages.searchResult
-                )}
+                title={`${
+                  bookmarkName ||
+                  intl.formatMessage(advancedSearchResultMessages.searchResult)
+                } ${loading ? '' : ' (' + total + ')'}`}
                 isMobileSize={false}
                 noResultText={intl.formatMessage(
                   advancedSearchResultMessages.noResult
