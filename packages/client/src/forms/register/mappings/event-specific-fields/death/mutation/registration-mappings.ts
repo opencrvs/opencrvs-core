@@ -60,13 +60,5 @@ export function setDeathRegistrationSectionTransformer(
     }
   }
 
-  if (draftData[sectionId].informantsSignatureURI) {
-    transformedData[sectionId].informantsSignature =
-      draftData[sectionId].informantsSignatureURI
-  } else if (draftData[sectionId].informantsSignature) {
-    transformedData[sectionId].informantsSignature =
-      draftData[sectionId].informantsSignature
-  }
-
   return transformedData
 }

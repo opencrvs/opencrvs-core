@@ -528,7 +528,6 @@ export function SystemList() {
                   value={newClientName}
                   onChange={onChangeClientName}
                   error={false}
-                  inputFieldWidth="100%"
                 />
               </InputField>
             </Field>

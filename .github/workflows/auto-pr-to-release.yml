@@ -73,11 +73,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for milestone and if release branch exists
+        continue-on-error: true
         id: check_release_branch
         run: |
           if [ -z "${{ env.MILESTONE }}" ]; then
             echo "No milestone set. Exiting."
-            exit 0
+            exit 1
           fi
 
           RELEASE_BRANCH="release-${{ env.MILESTONE }}"
@@ -87,10 +88,11 @@ jobs:
             echo "RELEASE_BRANCH=${RELEASE_BRANCH}" >> $GITHUB_ENV
           else
             echo "Release branch $RELEASE_BRANCH does not exist. Exiting."
-            exit 0
+            exit 1
           fi
 
       - name: Create and push the new branch for the PR
+        if: ${{ steps.check_release_branch.outcome == 'success' }}
         run: |
           SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
 
