@@ -20,19 +20,19 @@ import { searchForDeathDuplicates, searchForBirthDuplicates } from './service'
 const ELASTIC_SEARCH_HTTP_PORT = 9200
 
 const container: ElasticsearchContainer = new ElasticsearchContainer(
-  'elasticsearch:8.14.0'
+  'elasticsearch:8.14.3'
 )
 
 export const startContainer =
   async (): Promise<StartedElasticsearchContainer> => {
-    return (
-      container
-        .withExposedPorts(ELASTIC_SEARCH_HTTP_PORT)
-        .withStartupTimeout(120_000)
-        // @todo: check if this is necessary
-        .withEnvironment({ 'discovery.type': 'single-node' })
-        .start()
-    )
+    return container
+      .withExposedPorts(ELASTIC_SEARCH_HTTP_PORT)
+      .withStartupTimeout(120_000)
+      .withEnvironment({
+        'discovery.type': 'single-node',
+        'xpack.security.enabled': 'false'
+      })
+      .start()
   }
 
 export const stopContainer = async (
