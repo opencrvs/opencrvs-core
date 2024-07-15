@@ -59,7 +59,6 @@ import {
   ISelectFormFieldWithOptions,
   ITextFormField,
   Ii18nTextFormField,
-  Ii18nNumberFormField,
   LINK,
   BULLET_LIST,
   NUMBER,
@@ -78,7 +77,6 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
-  Ii18nTextareaFormField,
   TEXT,
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
@@ -88,14 +86,15 @@ import {
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
-  HIDDEN
+  HIDDEN,
+  SIGNATURE
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
 import { FetchButtonField } from '@client/components/form/FetchButton'
 
 import { InformativeRadioGroup } from '@client/views/PrintCertificate/InformativeRadioGroup'
-import { DocumentUploaderWithOption } from './DocumentUploadfield/DocumentUploaderWithOption'
+import { DocumentUploaderWithOption } from './DocumentUploadField/DocumentUploaderWithOption'
 import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor,
@@ -112,7 +111,7 @@ import {
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
 import { isEqual, flatten } from 'lodash'
-import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
+import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
 import { useDispatch, useSelector } from 'react-redux'
@@ -128,9 +127,13 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import { BulletList, Divider } from '@opencrvs/components'
+import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
+import { SignatureUploader } from './SignatureField/SignatureUploader'
 
+const SignatureField = styled(Stack)`
+  margin-top: 8px;
+`
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -438,7 +441,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InputField {...inputFieldProps}>
           <TextArea
             {...inputProps}
-            maxLength={(fieldDefinition as Ii18nTextareaFormField).maxLength}
+            maxLength={fieldDefinition.maxLength}
             value={value.toString()}
           />
         </InputField>
@@ -499,10 +502,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === NUMBER) {
-      let inputFieldWidth = fieldDefinition.inputFieldWidth
-      if (fieldDefinition?.inputWidth) {
-        inputFieldWidth = fieldDefinition.inputWidth + 'px'
-      }
       return (
         <InputField {...inputFieldProps}>
           <TextInput
@@ -514,18 +513,16 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
               if (e.key.match(REGEXP_NUMBER_INPUT_NON_NUMERIC)) {
                 e.preventDefault()
               }
-              const maxLength = (fieldDefinition as Ii18nNumberFormField)
-                .maxLength
+              const maxLength = fieldDefinition.maxLength
               if (maxLength && e.currentTarget.value.length >= maxLength) {
                 e.preventDefault()
               }
             }}
             value={inputProps.value as string}
-            maxLength={(fieldDefinition as Ii18nNumberFormField).maxLength}
+            maxLength={fieldDefinition.maxLength}
             onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
               event.currentTarget.blur()
             }}
-            inputFieldWidth={inputFieldWidth}
           />
         </InputField>
       )
@@ -631,6 +628,37 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         />
       )
     }
+    if (fieldDefinition.type === SIGNATURE) {
+      const {
+        name,
+        helperText,
+        required,
+        label,
+        maxSizeMb,
+        allowedFileFormats
+      } = fieldDefinition
+      return (
+        <SignatureField direction="column" gap={8} alignItems="start">
+          <InputLabel
+            {...inputFieldProps}
+            htmlFor={name}
+            inputDescriptor={helperText}
+          >
+            {label}
+          </InputLabel>
+          <SignatureUploader
+            {...inputProps}
+            name={name}
+            modalTitle={label}
+            value={value as string}
+            maxSizeMb={maxSizeMb}
+            allowedFileFormats={allowedFileFormats}
+            required={required}
+            onChange={(sig) => onSetFieldValue(name, sig)}
+          />
+        </SignatureField>
+      )
+    }
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -666,10 +694,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-const mapFieldsToValues = (
-  fields: IFormField[],
-  userDetails: UserDetails | null
-) =>
+const mapFieldsToValues = (fields: IFormField[]) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -1199,9 +1224,7 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
 
   return (
     <Formik<IFormSectionData>
-      initialValues={
-        props.initialValues ?? mapFieldsToValues(props.fields, userDetails)
-      }
+      initialValues={props.initialValues ?? mapFieldsToValues(props.fields)}
       onSubmit={() => {}}
       validate={(values) =>
         getValidationErrorsForForm(

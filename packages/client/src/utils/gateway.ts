@@ -1994,7 +1994,6 @@ export type Registration = {
   attachments?: Maybe<Array<Maybe<Attachment>>>
   book?: Maybe<Scalars['String']>
   brideSignature?: Maybe<Scalars['String']>
-  brideSignatureURI?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   contact?: Maybe<Scalars['String']>
   contactEmail?: Maybe<Scalars['String']>
@@ -2003,12 +2002,10 @@ export type Registration = {
   draftId?: Maybe<Scalars['String']>
   duplicates?: Maybe<Array<Maybe<DuplicatesInfo>>>
   groomSignature?: Maybe<Scalars['String']>
-  groomSignatureURI?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<Scalars['String']>
   informantsSignature?: Maybe<Scalars['String']>
-  informantsSignatureURI?: Maybe<Scalars['String']>
   mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
@@ -2018,9 +2015,7 @@ export type Registration = {
   trackingId?: Maybe<Scalars['String']>
   type?: Maybe<RegistrationType>
   witnessOneSignature?: Maybe<Scalars['String']>
-  witnessOneSignatureURI?: Maybe<Scalars['String']>
   witnessTwoSignature?: Maybe<Scalars['String']>
-  witnessTwoSignatureURI?: Maybe<Scalars['String']>
 }
 
 export type RegistrationCountResult = {
@@ -3577,7 +3572,6 @@ export type FetchBirthRegistrationForReviewQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3926,7 +3920,6 @@ export type FetchBirthRegistrationForCertificateQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
@@ -4380,7 +4373,6 @@ export type FetchDeathRegistrationForReviewQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4711,7 +4703,6 @@ export type FetchDeathRegistrationForCertificationQuery = {
       contactEmail?: string | null
       contactPhoneNumber?: string | null
       informantsSignature?: string | null
-      informantsSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -5105,13 +5096,9 @@ export type FetchMarriageRegistrationForReviewQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       groomSignature?: string | null
-      groomSignatureURI?: string | null
       brideSignature?: string | null
-      brideSignatureURI?: string | null
       witnessOneSignature?: string | null
-      witnessOneSignatureURI?: string | null
       witnessTwoSignature?: string | null
-      witnessTwoSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -5464,13 +5451,9 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       contactPhoneNumber?: string | null
       contactEmail?: string | null
       groomSignature?: string | null
-      groomSignatureURI?: string | null
       brideSignature?: string | null
-      brideSignatureURI?: string | null
       witnessOneSignature?: string | null
-      witnessOneSignatureURI?: string | null
       witnessTwoSignature?: string | null
-      witnessTwoSignatureURI?: string | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null

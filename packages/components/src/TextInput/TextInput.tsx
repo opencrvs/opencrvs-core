@@ -19,7 +19,6 @@ export interface ICustomProps {
   autocomplete?: boolean
   isSmallSized?: boolean // Deprecated
   isDisabled?: boolean
-  inputFieldWidth?: string // Deprecated
   hasPrefix?: boolean
   hasPostfix?: boolean
   prefix?: React.ReactNode | string
