@@ -65,8 +65,8 @@ import { advancedSearchInitialState } from '@client/search/advancedSearch/reduce
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getOfflineData } from '@client/offline/selectors'
-import { SearchCriterias } from '@client/utils/referenceApi'
 import { IOfflineData } from '@client/offline/reducer'
+import { SearchCriteria } from '@client/utils/referenceApi'
 
 type IStateProps = {
   userDetails: UserDetails | null
@@ -114,10 +114,6 @@ type IFullProps = IntlShapeProps &
   IProps &
   IDomProps
 
-interface IState {
-  defaultSearchBar: SearchCriterias
-}
-
 enum ACTIVE_MENU_ITEM {
   DECLARATIONS,
   CONFIG,
@@ -156,15 +152,7 @@ const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
   PERFORMANCE_MANAGEMENT_ROLES
 )
 
-class HeaderComp extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps) {
-    super(props)
-
-    this.state = {
-      defaultSearchBar: this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA
-    }
-  }
-
+class HeaderComp extends React.Component<IFullProps> {
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
     const locationId = new URLSearchParams(this.props.location.search).get(
       'locationId'
@@ -307,21 +295,21 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     const searchTypeList: ISearchType[] = [
       {
-        name: 'TRACKING_ID',
+        name: SearchCriteria.TRACKING_ID,
         label: intl.formatMessage(constantsMessages.trackingId),
         value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId)
       },
       {
-        name: 'REGISTRATION_NUMBER',
+        name: SearchCriteria.REGISTRATION_NUMBER,
         label: intl.formatMessage(messages.typeRN),
         value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
-        name: 'NAME',
+        name: SearchCriteria.NAME,
         label: intl.formatMessage(messages.typeName),
         value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
@@ -331,7 +319,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     if (fieldNames.includes('registrationPhone')) {
       searchTypeList.splice(3, 0, {
-        name: 'PHONE_NUMBER',
+        name: SearchCriteria.PHONE_NUMBER,
         label: intl.formatMessage(messages.typePhone),
         value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
@@ -345,7 +333,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       fieldNames.some((name) => name.endsWith('NationalId'))
     ) {
       searchTypeList.splice(2, 0, {
-        name: 'NATIONAL_ID',
+        name: SearchCriteria.NATIONAL_ID,
         label: intl.formatMessage(constantsMessages.id),
         value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
@@ -354,7 +342,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     }
     if (fieldNames.includes('registrationEmail')) {
       searchTypeList.push({
-        name: 'EMAIL',
+        name: SearchCriteria.EMAIL,
         label: intl.formatMessage(messages.email),
         value: EMAIL,
         icon: <Icon name="Envelope" size="small" />,
@@ -376,7 +364,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     const searchTypeListWithDefaultValues = searchTypeList.map((searchType) => {
       return {
         ...searchType,
-        isDefault: this.state.defaultSearchBar === searchType.name
+        isDefault:
+          this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA ===
+          searchType.name
       }
     })
 

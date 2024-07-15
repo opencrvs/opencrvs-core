@@ -29,13 +29,16 @@ export interface IFacilitiesDataResponse {
   [facilityId: string]: Facility
 }
 
-export type SearchCriterias =
-  | 'TRACKING_ID'
-  | 'REGISTRATION_NUMBER'
-  | 'NATIONAL_ID'
-  | 'NAME'
-  | 'PHONE_NUMBER'
-  | 'EMAIL'
+export const SearchCriteria = {
+  TRACKING_ID: 'TRACKING_ID',
+  REGISTRATION_NUMBER: 'REGISTRATION_NUMBER',
+  NATIONAL_ID: 'NATIONAL_ID',
+  NAME: 'NAME',
+  PHONE_NUMBER: 'PHONE_NUMBER',
+  EMAIL: 'EMAIL'
+} as const
+
+export type SearchCriteriaType = keyof typeof SearchCriteria
 
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
@@ -142,7 +145,7 @@ export interface IApplicationConfig {
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
-  SEARCH_DEFAULT_CRITERIA: SearchCriterias
+  SEARCH_DEFAULT_CRITERIA?: SearchCriteriaType
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
