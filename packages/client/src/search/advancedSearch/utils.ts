@@ -163,7 +163,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
       localState.registrationStatuses === RegStatus.Registered
         ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
-        ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
+        ? [RegStatus.WaitingValidation, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -297,11 +297,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
         ? reduxState.registrationStatuses[0]
         : isEqual(
             [...reduxState.registrationStatuses].sort(),
-            [
-              RegStatus.WaitingValidation,
-              RegStatus.Validated,
-              RegStatus.Declared
-            ].sort()
+            [RegStatus.WaitingValidation, RegStatus.Declared].sort()
           )
         ? 'IN_REVIEW'
         : isEqual(
@@ -554,11 +550,7 @@ const getLabelForRegistrationStatus = (
 ) => {
   const statusLabelMapping: Record<string, string[]> = {
     ALL: Object.values(RegStatus),
-    IN_REVIEW: [
-      RegStatus.WaitingValidation,
-      RegStatus.Validated,
-      RegStatus.Declared
-    ],
+    IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Declared],
     ARCHIVED: [RegStatus.Archived],
     CERTIFIED: [RegStatus.Certified],
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],

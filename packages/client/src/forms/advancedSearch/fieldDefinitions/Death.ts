@@ -79,6 +79,10 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
           {
             value: 'CORRECTION_REQUESTED',
             label: advancedSearchForm.recordStatusCorrectionRequested
+          },
+          {
+            value: 'VALIDATED',
+            label: advancedSearchForm.recordStatusValidated
           }
         ]
       }
