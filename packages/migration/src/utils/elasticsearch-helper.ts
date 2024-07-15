@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Client } from '@elastic/elasticsearch'
+import { Client, HttpConnection } from '@elastic/elasticsearch'
 
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
 const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
 
 export const client = new Client({
-  node: `http://${ES_HOST}`
+  node: `http://${ES_HOST}`,
+  Connection: HttpConnection
 })
 
 export const updateComposition = async (
