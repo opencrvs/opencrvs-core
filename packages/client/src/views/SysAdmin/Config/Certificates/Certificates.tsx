@@ -41,9 +41,7 @@ import { getDummyCertificateTemplateData } from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   executeHandlebarsTemplate,
-  downloadFile,
-  compileSvg,
-  svgToPdfTemplate
+  downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
 import {
@@ -60,7 +58,7 @@ import {
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadField/SimpleDocumentUploader'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
-import { Link, Text, Toggle } from '@client/../../components/lib'
+import { Text, Toggle } from '@opencrvs/components/lib'
 import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { UserDetails } from '@client/utils/userUtils'
@@ -68,7 +66,6 @@ import {
   bytesToMB,
   IMAGE_UPLOAD_MAX_SIZE_IN_BYTES
 } from '@client/utils/imageUtils'
-import { printPDF } from '@client/pdfRenderer'
 
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -181,24 +178,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     svgTemplate: string,
     svgFilename: string
   ) {
-    const dummyTemplateData = getDummyCertificateTemplateData(
-      event,
-      this.props.registerForm
-    )
-    const compiledSvgPromise = compileSvg(
-      svgTemplate,
-      { ...dummyTemplateData, preview: true },
-      this.props.state
-    )
     const menuItems = [
-      {
-        label: intl.formatMessage(buttonMessages.print),
-        handler: async () => {
-          const svg = await compiledSvgPromise
-          const pdfTemplate = svgToPdfTemplate(svg, this.props.offlineResources)
-          printPDF(pdfTemplate, 'dummy-declaration')
-        }
-      },
       {
         label: intl.formatMessage(messages.downloadTemplate),
         handler: () => {
@@ -571,21 +551,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 />
               }
             >
-              <>
-                {intl.formatMessage(messages.listDetails)}
-                <Link
-                  id="certificate-instructions-link"
-                  onClick={() => {
-                    window.open(
-                      'https://documentation.opencrvs.org/setup/4.-functional-configuration/4.4-configure-a-certificate-template',
-                      '_blank',
-                      'noopener,noreferrer'
-                    )
-                  }}
-                >
-                  {intl.formatMessage(messages.listDetailsQsn)}
-                </Link>
-              </>
               <TabContent
                 item={
                   CertificateSection.items.find(
