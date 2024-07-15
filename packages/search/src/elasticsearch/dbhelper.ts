@@ -20,12 +20,17 @@ export const indexComposition = async (
 ) => {
   let response: any
   try {
-    response = await client.index({
-      index: OPENCRVS_INDEX_NAME,
-      id: compositionIdentifier,
-      body,
-      refresh: 'wait_for' // makes the call wait until the change is available via search
-    })
+    response = await client.index(
+      {
+        index: OPENCRVS_INDEX_NAME,
+        id: compositionIdentifier,
+        body,
+        refresh: 'wait_for' // makes the call wait until the change is available via search
+      },
+      {
+        meta: true
+      }
+    )
   } catch (e) {
     logger.error(`indexComposition: error: ${e}`)
   }
@@ -39,14 +44,19 @@ export const updateComposition = async (
 ) => {
   let response: any
   try {
-    response = await client.update({
-      index: OPENCRVS_INDEX_NAME,
-      id,
-      body: {
-        doc: body
+    response = await client.update(
+      {
+        index: OPENCRVS_INDEX_NAME,
+        id,
+        body: {
+          doc: body
+        },
+        refresh: 'wait_for' // makes the call wait until the change is available via search
       },
-      refresh: 'wait_for' // makes the call wait until the change is available via search
-    })
+      {
+        meta: true
+      }
+    )
   } catch (e) {
     logger.error(`updateComposition: error: ${e}`)
   }

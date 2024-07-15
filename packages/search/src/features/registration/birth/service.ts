@@ -66,7 +66,7 @@ export const composeDocument = (
   record: SavedBundle,
   existingDocument?: Awaited<ReturnType<typeof searchByCompositionId>>
 ) => {
-  const task: any = getTaskFromSavedBundle(record)
+  const task = getTaskFromSavedBundle(record)
   const composition = getComposition(record)
 
   const body: BirthDocument = {
@@ -122,7 +122,7 @@ function createIndexBody(
   createFatherIndex(body, composition, bundle)
   createInformantIndex(body, composition, bundle)
   createDeclarationIndex(body, composition, bundle)
-  const task: any = getTaskFromSavedBundle(bundle)
+  const task = getTaskFromSavedBundle(bundle)
   createStatusHistory(body, task)
 
   const assignment = findAssignment(bundle)
@@ -254,7 +254,7 @@ function createDeclarationIndex(
   composition: SavedComposition,
   bundle: SavedBundle
 ) {
-  const task: any = getTaskFromSavedBundle(bundle)
+  const task = getTaskFromSavedBundle(bundle)
   const contactPersonExtention = findTaskExtension(
     task,
     'http://opencrvs.org/specs/extension/contact-person'
