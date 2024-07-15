@@ -1134,7 +1134,7 @@ function getSignatureUrls(queryResultData: Query) {
   const registrarSignatures =
     history
       ?.map((entry) => entry?.signature?.data)
-      .filter((entry) => typeof entry === 'string') || []
+      .filter((entry): entry is string => typeof entry === 'string') || []
 
   return [
     ...registrarSignatures,
