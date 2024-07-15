@@ -51,6 +51,5 @@ export interface ISearchResponse<T> {
 }
 
 export const client = new elasticsearch.Client({
-  node: `http://${ES_HOST}`,
-  Connection: elasticsearch.HttpConnection
+  node: `http://${ES_HOST}`
 })
