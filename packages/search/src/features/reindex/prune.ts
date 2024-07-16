@@ -40,7 +40,7 @@ export const prune = async () => {
 
     if (!isAliasPointedToIndex && !!index) {
       logger.info(`Deleting index: ${index}`)
-      await client.indices.delete({ index })
+      await client.indices.delete({ index }, { meta: true })
     }
   }
 }

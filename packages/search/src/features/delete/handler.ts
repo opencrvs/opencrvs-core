@@ -20,9 +20,12 @@ export async function deleteOCRVSIndexHandler(
 ) {
   let response: any
   try {
-    response = await client.indices.delete({
-      index: OPENCRVS_INDEX_NAME
-    })
+    response = await client.indices.delete(
+      {
+        index: OPENCRVS_INDEX_NAME
+      },
+      { meta: true }
+    )
     logger.info(`Successfully deleted ${OPENCRVS_INDEX_NAME} index`)
     return h.response(response).code(200)
   } catch (err) {

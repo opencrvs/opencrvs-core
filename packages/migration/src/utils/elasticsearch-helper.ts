@@ -25,15 +25,20 @@ export const updateComposition = async (
 ) => {
   let response
   try {
-    response = await client.update({
-      index: ELASTICSEARCH_INDEX_NAME,
-      // type: 'compositions', @todo: check whether this should work
-      id,
-      body: {
-        doc: body
+    response = await client.update(
+      {
+        index: ELASTICSEARCH_INDEX_NAME,
+        // type: 'compositions', @todo: check whether this should work
+        id,
+        body: {
+          doc: body
+        },
+        ...extraConfigs
       },
-      ...extraConfigs
-    })
+      {
+        meta: true
+      }
+    )
   } catch (e) {
     console.error(`updateComposition: error: ${e}`)
   }
@@ -46,21 +51,24 @@ export const renameField = async (
   newFieldName: string
 ) => {
   try {
-    const response = await client.updateByQuery({
-      index: ELASTICSEARCH_INDEX_NAME,
-      body: {
-        query: {
-          bool: {
-            must_not: {
-              exists: {
-                field: newFieldName
+    const response = await client.updateByQuery(
+      {
+        index: ELASTICSEARCH_INDEX_NAME,
+        body: {
+          query: {
+            bool: {
+              must_not: {
+                exists: {
+                  field: newFieldName
+                }
               }
             }
-          }
-        },
-        script: `ctx._source.${newFieldName} = ctx._source.${oldFieldName}; ctx._source.remove("${oldFieldName}");`
-      }
-    })
+          },
+          script: `ctx._source.${newFieldName} = ctx._source.${oldFieldName}; ctx._source.remove("${oldFieldName}");`
+        }
+      },
+      { meta: true }
+    )
     return response
   } catch (err) {
     console.error(`searchByCompositionId: error: ${err}`)

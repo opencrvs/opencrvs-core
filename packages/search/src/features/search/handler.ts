@@ -94,7 +94,8 @@ export async function getAllDocumentsHandler(
         }
       },
       {
-        ignore: [404]
+        ignore: [404],
+        meta: true
       }
     )
     return h.response(allDocuments).code(200)
