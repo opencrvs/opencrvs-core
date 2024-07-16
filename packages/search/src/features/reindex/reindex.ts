@@ -48,32 +48,42 @@ export const reindex = async () => {
     }
   })
 
-  await client.indices.create({
-    index,
-    body: {
-      settings: {
-        number_of_shards: 1,
-        number_of_replicas: 0
+  await client.indices.create(
+    {
+      index,
+      body: {
+        settings: {
+          number_of_shards: 1,
+          number_of_replicas: 0
+        }
       }
+    },
+    {
+      meta: true
     }
-  })
+  )
 
-  await client.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: BirthDocument) => ({
-      index: {
-        _index: index,
-        _id: doc.compositionId
+  await client.helpers.bulk(
+    {
+      retries: 3,
+      wait: 3000,
+      datasource: stream.pipe(transformedStreamData),
+      onDocument: (doc: BirthDocument) => ({
+        index: {
+          _index: index,
+          _id: doc.compositionId
+        }
+      }),
+      onDrop(doc) {
+        throw new Error(
+          `Document ${doc.document.compositionId} couldn't be inserted`
+        )
       }
-    }),
-    onDrop(doc) {
-      throw new Error(
-        `Document ${doc.document.compositionId} couldn't be inserted`
-      )
+    },
+    {
+      meta: true
     }
-  })
+  )
   const t2 = performance.now()
   logger.info(
     `Finished reindexing to ${index} in ${((t2 - t1) / 1000).toFixed(
@@ -101,17 +111,20 @@ export async function updateAliases() {
   const sortedIndices = orderBy(indices, 'index')
   const { index: latestIndex } = sortedIndices.at(-1)!
 
-  await client.indices.updateAliases({
-    body: {
-      actions: [
-        {
-          remove: {
-            alias: OPENCRVS_INDEX_NAME,
-            index: `${OPENCRVS_INDEX_NAME}-*`
-          }
-        },
-        { add: { alias: OPENCRVS_INDEX_NAME, index: latestIndex } }
-      ]
-    }
-  })
+  await client.indices.updateAliases(
+    {
+      body: {
+        actions: [
+          {
+            remove: {
+              alias: OPENCRVS_INDEX_NAME,
+              index: `${OPENCRVS_INDEX_NAME}-*`
+            }
+          },
+          { add: { alias: OPENCRVS_INDEX_NAME, index: latestIndex } }
+        ]
+      }
+    },
+    { meta: true }
+  )
 }

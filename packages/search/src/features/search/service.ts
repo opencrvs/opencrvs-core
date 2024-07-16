@@ -62,7 +62,8 @@ export const advancedSearch = async (
   let response
   try {
     response = await client.search(formattedParams, {
-      ignore: !isExternalSearch ? [404] : undefined
+      ignore: !isExternalSearch ? [404] : undefined,
+      meta: true
     })
   } catch (error) {
     if (error.statusCode === 400) {
