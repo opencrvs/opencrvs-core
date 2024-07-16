@@ -127,7 +127,7 @@ type IFullProps = ISearchInputProps &
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NAME)
-  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.DESCENDING)
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
 
   const { width: windowWidth } = useWindowSize()
   const intl = useIntl()
