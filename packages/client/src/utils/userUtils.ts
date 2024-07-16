@@ -60,9 +60,3 @@ export function useUserName() {
     return getUserName(userDetails)
   })
 }
-
-export function getUserRole(lang: string, role: Role) {
-  const defaultLabel = role?.labels?.find((label) => label.lang === LANG_EN)
-  const label = role?.labels?.find((label) => label.lang === lang)
-  return label?.label || defaultLabel?.label
-}
