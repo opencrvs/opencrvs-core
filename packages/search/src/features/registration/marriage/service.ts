@@ -14,12 +14,8 @@ import {
 } from '@search/elasticsearch/dbhelper'
 import {
   createStatusHistory,
-  EVENT,
-  SearchDocument,
   MarriageDocument,
-  IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS,
   composeOperationHistories,
   composeAssignment
 } from '@search/elasticsearch/utils'
@@ -45,7 +41,11 @@ import {
   SavedRelatedPerson,
   findFirstTaskHistory,
   getInformantType,
-  ValidRecord
+  ValidRecord,
+  EVENT,
+  SearchDocument,
+  IOperationHistory,
+  REJECTED_STATUS
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -66,9 +66,7 @@ export const composeDocument = (
     compositionId: composition.id,
     event: EVENT.MARRIAGE,
     createdAt:
-      (existingDocument &&
-        existingDocument.body.hits.hits.length > 0 &&
-        existingDocument.body.hits.hits[0]?._source?.createdAt) ||
+      existingDocument?.body?.hits?.hits?.[0]?._source?.createdAt ||
       Date.now().toString(),
     operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }
