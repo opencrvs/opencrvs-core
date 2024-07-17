@@ -42,9 +42,8 @@ export const updateComposition = async (
     )
   } catch (e) {
     console.error(`updateComposition: error: ${e}`)
+    return
   }
-
-  return
 }
 
 export const renameField = async (

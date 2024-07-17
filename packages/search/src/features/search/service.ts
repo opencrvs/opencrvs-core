@@ -59,9 +59,9 @@ export const advancedSearch = async (
   payload: ISearchCriteria
 ) => {
   const formattedParams = await formatSearchParams(payload, isExternalSearch)
-  let response
+
   try {
-    response = await client.search(formattedParams, {
+    return await client.search(formattedParams, {
       ignore: !isExternalSearch ? [404] : undefined,
       meta: true
     })
@@ -71,8 +71,6 @@ export const advancedSearch = async (
     } else {
       logger.error('Search error: ', error)
     }
-    return undefined
+    return
   }
-
-  return response
 }
