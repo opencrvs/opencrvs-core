@@ -140,7 +140,7 @@ export async function getStatusWiseRegistrationCountHandler(
     }
 
     const response = await client.search<
-      any,
+      SearchDocument,
       {
         statusCounts: {
           buckets: Array<{
