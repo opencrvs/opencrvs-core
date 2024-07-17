@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { SearchDocument } from '@search/elasticsearch/utils'
-import { logger } from '@opencrvs/commons'
+import { logger, SearchDocument } from '@opencrvs/commons'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (
@@ -42,9 +41,8 @@ export const updateComposition = async (
   body: SearchDocument,
   client: elasticsearch.Client
 ) => {
-  let response: any
   try {
-    response = await client.update(
+    return await client.update(
       {
         index: OPENCRVS_INDEX_NAME,
         id,
@@ -61,7 +59,7 @@ export const updateComposition = async (
     logger.error(`updateComposition: error: ${e}`)
   }
 
-  return response
+  return
 }
 
 export const searchByCompositionId = async (

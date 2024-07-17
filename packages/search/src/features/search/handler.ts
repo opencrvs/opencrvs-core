@@ -9,14 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
+import {
+  logger,
+  SearchDocument,
+  EVENT,
+  getSearchTotalCount
+} from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
 import {
-  SearchDocument,
-  EVENT,
   BirthDocument,
   DeathDocument,
   findDuplicateIds
@@ -76,8 +79,8 @@ export async function getAllDocumentsHandler(
         ignore: [404]
       }
     )
-    // @ts-ignore
-    const count: number = allDocumentsCountCheck?.body?.hits?.total?.value
+
+    const count = getSearchTotalCount(allDocumentsCountCheck?.body?.hits?.total)
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'

@@ -52,6 +52,13 @@
       "prettier --write"
     ]
   },
+  "modulePaths": [
+    "<rootDir>"
+  ],
+  "moduleNameMapper": {
+    "@migration/(.*)": "<rootDir>/src/$1",
+    "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
+  },
   "keywords": [
     "migration",
     "nodejs"

@@ -63,10 +63,10 @@ export const up = async (db: Db, client: MongoClient) => {
             const compositionId =
               taskDoc.focus?.reference?.replace('Composition/', '') || ''
             const searchResult = await searchByCompositionId(compositionId)
+
             const operationHistoriesData =
               searchResult &&
               searchResult.body.hits.hits.length > 0 &&
-              // @ts-ignore
               searchResult.body.hits.hits[0]._source?.operationHistories
             const lastOperationHistory =
               operationHistoriesData &&
