@@ -18,9 +18,8 @@ export async function deleteOCRVSIndexHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let response: any
   try {
-    response = await client.indices.delete(
+    const response = await client.indices.delete(
       {
         index: OPENCRVS_INDEX_NAME
       },
