@@ -28,6 +28,12 @@ import {
 } from 'date-fns'
 import * as elasticsearch from '@elastic/elasticsearch'
 
+const isNonEmptyCondition = <T>(
+  value: T | null | undefined | ''
+): value is T => {
+  return Boolean(value)
+}
+
 export const removeDuplicate = async (
   bundle: fhir.Composition & { id: string },
   client: elasticsearch.Client
@@ -76,51 +82,49 @@ export const searchForBirthDuplicates = async (
     return []
   }
 
-  const motherMust: any = [
-    // If mother identifier is provided, it needs to match 100%
-    body.motherIdentifier && {
-      match_phrase: {
-        motherIdentifier: body.motherIdentifier
-      }
-    },
-    body.motherFirstNames && {
-      match: {
-        motherFirstNames: {
-          query: body.motherFirstNames,
-          fuzziness: FIRST_NAME_FUZZINESS
-        }
-      }
-    },
-    body.motherFamilyName && {
-      match: {
-        motherFamilyName: {
-          query: body.motherFamilyName,
-          fuzziness: FIRST_NAME_FUZZINESS,
-          minimum_should_match: '100%'
-        }
-      }
-    },
-    body.motherDoB && {
-      range: {
-        motherDoB: {
-          gte: subYears(new Date(body.motherDoB), 1).toISOString(),
-          lte: addYears(new Date(body.motherDoB), 1).toISOString()
-        }
-      }
-    },
-    body.motherDoB && {
-      distance_feature: {
-        field: 'motherDoB',
-        pivot: '365d',
-        origin: new Date(body.motherDoB).toISOString(),
-        boost: 1.5
-      }
-    }
-  ].filter(Boolean)
-
   const mothersDetailsMatch = {
     bool: {
-      must: motherMust
+      must: [
+        // If mother identifier is provided, it needs to match 100%
+        body.motherIdentifier && {
+          match_phrase: {
+            motherIdentifier: body.motherIdentifier
+          }
+        },
+        body.motherFirstNames && {
+          match: {
+            motherFirstNames: {
+              query: body.motherFirstNames,
+              fuzziness: FIRST_NAME_FUZZINESS
+            }
+          }
+        },
+        body.motherFamilyName && {
+          match: {
+            motherFamilyName: {
+              query: body.motherFamilyName,
+              fuzziness: FIRST_NAME_FUZZINESS,
+              minimum_should_match: '100%'
+            }
+          }
+        },
+        body.motherDoB && {
+          range: {
+            motherDoB: {
+              gte: subYears(new Date(body.motherDoB), 1).toISOString(),
+              lte: addYears(new Date(body.motherDoB), 1).toISOString()
+            }
+          }
+        },
+        body.motherDoB && {
+          distance_feature: {
+            field: 'motherDoB',
+            pivot: '365d',
+            origin: new Date(body.motherDoB).toISOString(),
+            boost: 1.5
+          }
+        }
+      ].filter(isNonEmptyCondition)
     }
   }
 
@@ -143,31 +147,39 @@ export const searchForBirthDuplicates = async (
             boost: 1
           }
         }
-      ].filter(Boolean)
+      ].filter(isNonEmptyCondition)
     }
   }
 
-  const must1: any = [
-    body.childFirstNames && {
-      match: {
-        childFirstNames: {
-          query: body.childFirstNames,
-          fuzziness: FIRST_NAME_FUZZINESS
-        }
-      }
-    },
-    body.childFamilyName && {
-      match: {
-        childFamilyName: {
-          query: body.childFamilyName,
-          fuzziness: FIRST_NAME_FUZZINESS,
-          minimum_should_match: '100%'
+  const childsNameMatch = {
+    bool: {
+      must: {
+        bool: {
+          must: [
+            body.childFirstNames && {
+              match: {
+                childFirstNames: {
+                  query: body.childFirstNames,
+                  fuzziness: FIRST_NAME_FUZZINESS
+                }
+              }
+            },
+            body.childFamilyName && {
+              match: {
+                childFamilyName: {
+                  query: body.childFamilyName,
+                  fuzziness: FIRST_NAME_FUZZINESS,
+                  minimum_should_match: '100%'
+                }
+              }
+            }
+          ].filter(isNonEmptyCondition)
         }
       }
     }
-  ].filter(Boolean)
+  }
 
-  const bool1 = body.childDoB && {
+  const childsBirthWithinRange = body.childDoB && {
     bool: {
       should: [
         {
@@ -196,7 +208,6 @@ export const searchForBirthDuplicates = async (
     }
   }
 
-  const must2: any = [bool1, mothersDetailsMatch].filter(Boolean)
   try {
     const result = await client.search(
       {
@@ -212,13 +223,10 @@ export const searchForBirthDuplicates = async (
               {
                 bool: {
                   must: [
-                    {
-                      bool: {
-                        must: must1
-                      }
-                    },
-                    ...must2
-                  ].filter(Boolean)
+                    childsNameMatch,
+                    childsBirthWithinRange,
+                    mothersDetailsMatch
+                  ].filter(isNonEmptyCondition)
                 }
               }
             ]
@@ -252,7 +260,7 @@ export const searchForDeathDuplicates = async (
     return []
   }
 
-  const must1: any = [
+  const deceasedsDetailsMatch = [
     body.deceasedFirstNames && {
       match: {
         deceasedFirstNames: {
@@ -274,28 +282,45 @@ export const searchForDeathDuplicates = async (
         deceasedIdentifier: body.deceasedIdentifier
       }
     }
-  ].filter((clause) => !!clause)
+  ].filter(isNonEmptyCondition)
 
-  const must2 = body.deathDate
-    ? [
-        {
-          range: {
-            deathDate: {
-              gte: subDays(new Date(body.deathDate), 5).toISOString(),
-              lte: addDays(new Date(body.deathDate), 5).toISOString()
-            }
-          }
-        },
-        {
-          distance_feature: {
-            field: 'deathDate',
-            pivot: '5d', // 5 days
-            origin: new Date(body.deathDate).toISOString(),
-            boost: 1
-          }
+  const deathDateWithinRange = [
+    body.deathDate && {
+      range: {
+        deathDate: {
+          gte: subDays(new Date(body.deathDate), 5).toISOString(),
+          lte: addDays(new Date(body.deathDate), 5).toISOString()
         }
-      ]
-    : []
+      }
+    },
+    body.deathDate && {
+      distance_feature: {
+        field: 'deathDate',
+        pivot: '5d', // 5 days
+        origin: new Date(body.deathDate).toISOString(),
+        boost: 1
+      }
+    }
+  ].filter(isNonEmptyCondition)
+
+  const birthDateWithinRange = [
+    body.deceasedDoB && {
+      range: {
+        deceasedDoB: {
+          gte: subDays(new Date(body.deceasedDoB), 5).toISOString(),
+          lte: addDays(new Date(body.deceasedDoB), 5).toISOString()
+        }
+      }
+    },
+    body.deceasedDoB && {
+      distance_feature: {
+        field: 'deceasedDoB',
+        pivot: '5d', // 5 days
+        origin: new Date(body.deceasedDoB).toISOString(),
+        boost: 1
+      }
+    }
+  ].filter(isNonEmptyCondition)
 
   try {
     const result = await client.search(
@@ -304,41 +329,18 @@ export const searchForDeathDuplicates = async (
         query: {
           bool: {
             must: [
-              ...must1,
+              ...deceasedsDetailsMatch,
               {
                 bool: {
-                  must: must2
+                  must: deathDateWithinRange
                 }
               },
               {
                 bool: {
-                  must: [
-                    body.deceasedDoB && {
-                      range: {
-                        deceasedDoB: {
-                          gte: subDays(
-                            new Date(body.deceasedDoB),
-                            5
-                          ).toISOString(),
-                          lte: addDays(
-                            new Date(body.deceasedDoB),
-                            5
-                          ).toISOString()
-                        }
-                      }
-                    },
-                    body.deceasedDoB && {
-                      distance_feature: {
-                        field: 'deceasedDoB',
-                        pivot: '5d', // 5 days
-                        origin: new Date(body.deceasedDoB).toISOString(),
-                        boost: 1
-                      }
-                    }
-                  ].filter(Boolean)
+                  must: birthDateWithinRange
                 }
               }
-            ].filter(Boolean)
+            ]
           }
         }
       },
