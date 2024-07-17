@@ -57,9 +57,9 @@ export const updateComposition = async (
     )
   } catch (e) {
     logger.error(`updateComposition: error: ${e}`)
-  }
 
-  return
+    return
+  }
 }
 
 export const searchByCompositionId = async (

@@ -8,10 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EVENT_TYPE, ValidRecord } from '@opencrvs/commons/types'
+import {
+  EVENT_TYPE,
+  ValidRecord,
+  SearchDocument
+} from '@opencrvs/commons/types'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
-import { BirthDocument, SearchDocument } from '@search/elasticsearch/utils'
+import { BirthDocument } from '@search/elasticsearch/utils'
 import { streamAllRecords } from '@search/features/records/service'
 import { composeDocument as composeBirthDocument } from '@search/features/registration/birth/service'
 import { composeDocument as composeDeathDocument } from '@search/features/registration/death/service'
