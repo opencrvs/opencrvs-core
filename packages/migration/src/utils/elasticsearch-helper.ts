@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+// @TODO: Unify this file with @search/src/elasticsearch/dbhelper.ts
 import { Client } from '@elastic/elasticsearch'
+import { SearchDocument } from '@opencrvs/commons/types'
 
 const ES_HOST = process.env.ES_HOST || 'localhost:9200'
 const ELASTICSEARCH_INDEX_NAME = 'ocrvs'
@@ -23,9 +25,8 @@ export const updateComposition = async (
   body: any,
   extraConfigs?: Record<string, any>
 ) => {
-  let response
   try {
-    response = await client.update(
+    return await client.update(
       {
         index: ELASTICSEARCH_INDEX_NAME,
         // type: 'compositions', @todo: check whether this should work
@@ -43,7 +44,7 @@ export const updateComposition = async (
     console.error(`updateComposition: error: ${e}`)
   }
 
-  return response
+  return
 }
 
 export const renameField = async (
@@ -78,7 +79,7 @@ export const renameField = async (
 
 export const searchByCompositionId = async (compositionId: string) => {
   try {
-    return await client.search(
+    return await client.search<SearchDocument>(
       {
         index: ELASTICSEARCH_INDEX_NAME,
         body: {
@@ -104,7 +105,7 @@ export const searchCompositionByCriteria = async (
   extraConfigs?: Record<string, any>
 ) => {
   try {
-    return await client.search(
+    return await client.search<SearchDocument>(
       {
         index: ELASTICSEARCH_INDEX_NAME,
         // type: 'compositions', @todo: check whether this should work

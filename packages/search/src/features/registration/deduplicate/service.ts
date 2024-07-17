@@ -13,11 +13,7 @@ import {
   searchByCompositionId,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
-import {
-  BirthDocument,
-  SearchDocument,
-  DeathDocument
-} from '@search/elasticsearch/utils'
+import { BirthDocument, DeathDocument } from '@search/elasticsearch/utils'
 import { get } from 'lodash'
 import { ISearchResponse } from '@search/elasticsearch/client'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
@@ -41,11 +37,15 @@ export const removeDuplicate = async (
   if (!compositionId) {
     throw new Error('No Composition ID found')
   }
+
   const composition = await searchByCompositionId(compositionId, client)
-  const body = get(
-    composition,
-    'body.hits.hits[0]._source'
-  ) as unknown as SearchDocument
+
+  const body = composition?.body.hits.hits[0]._source
+
+  if (!body) {
+    throw new Error(`No composition found by ID ${compositionId}`)
+  }
+
   body.relatesTo = extractRelatesToIDs(bundle)
   await updateComposition(compositionId, body, client)
 }

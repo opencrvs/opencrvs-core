@@ -21,7 +21,6 @@ import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
 import { ApolloError } from 'apollo-server-hapi'
 
-// transportresults
 type ApiResponse<T> = {
   body: T
   statusCode: number
