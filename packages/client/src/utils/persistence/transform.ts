@@ -12,61 +12,6 @@
  * Taken from https://github.com/TallerWebSolutions/apollo-cache-instorage
  */
 import { visit } from 'graphql'
-import { checkDocument, cloneDeep } from '@apollo/client/utilities'
-
-const PERSIST_FIELD = {
-  kind: 'Field',
-  name: {
-    kind: 'Name',
-    value: '__persist'
-  }
-}
-
-const addPersistFieldToSelectionSet = (selectionSet: any, isRoot = false) => {
-  if (selectionSet.selections) {
-    if (!isRoot) {
-      const alreadyHasThisField = selectionSet.selections.some(
-        (selection: any) => {
-          return (
-            selection.kind === 'Field' && selection.name.value === '__typename'
-          )
-        }
-      )
-
-      if (!alreadyHasThisField) {
-        selectionSet.selections.push(PERSIST_FIELD)
-      }
-    }
-
-    selectionSet.selections.forEach((selection: any) => {
-      // Must not add __typename if we're inside an introspection query
-      if (selection.kind === 'Field') {
-        if (
-          selection.name.value.lastIndexOf('__', 0) !== 0 &&
-          selection.selectionSet
-        ) {
-          addPersistFieldToSelectionSet(selection.selectionSet)
-        }
-      } else if (selection.kind === 'InlineFragment') {
-        if (selection.selectionSet) {
-          addPersistFieldToSelectionSet(selection.selectionSet)
-        }
-      }
-    })
-  }
-}
-
-const addPersistFieldToDocument = (doc: any) => {
-  checkDocument(doc)
-  const docClone = cloneDeep(doc)
-
-  docClone.definitions.forEach((definition: any) => {
-    const isRoot = definition.kind === 'OperationDefinition'
-    addPersistFieldToSelectionSet(definition.selectionSet, isRoot)
-  })
-
-  return docClone
-}
 
 const extractPersistDirectivePaths = (
   originalQuery: any,

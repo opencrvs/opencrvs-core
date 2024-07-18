@@ -33,8 +33,6 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { isEmpty } from 'lodash'
 import { goToHome } from '@client/navigation'
-import { HOME } from '@client/navigation/routes'
-import { RouteComponentProps } from 'react-router'
 
 const Instruction = styled.div`
   margin-bottom: 28px;

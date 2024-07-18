@@ -696,7 +696,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     item: any,
     deathForm: IForm
   ) => {
-    const { declaration, intl, offlineResources, language } = this.props
     overriddenField.label =
       get(overriddenField, 'reviewOverrides.labelAs') || overriddenField.label
     const residingSectionId = get(
@@ -738,7 +737,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   }
 
   getChanges = (formSections: IFormSection[]) => {
-    const { declaration, offlineResources, language } = this.props
+    const { declaration, offlineResources } = this.props
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
       declaration,
