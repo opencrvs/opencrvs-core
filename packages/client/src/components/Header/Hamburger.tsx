@@ -12,13 +12,14 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
-import { getIndividualNameObj, getUserRole } from '@client/utils/userUtils'
+import { getIndividualNameObj } from '@client/utils/userUtils'
 import { Avatar } from '@client/components/Avatar'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Role } from '@client/utils/gateway'
+import { getUserRole } from '@client/utils'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)

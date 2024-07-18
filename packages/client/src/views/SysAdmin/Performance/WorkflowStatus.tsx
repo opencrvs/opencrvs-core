@@ -62,8 +62,8 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getUserRole } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
+import { getUserRole } from '@client/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;
