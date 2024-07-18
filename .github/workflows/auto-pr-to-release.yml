@@ -120,7 +120,8 @@ jobs:
 
           echo "First commit: ${{ env.FIRST_COMMIT_SHA }}"
           echo "Latest commit: ${{ env.LATEST_COMMIT_SHA }}"
-          COMMIT_RANGE="${{ env.FIRST_COMMIT_SHA }}..${{ env.LATEST_COMMIT_SHA }}"
+          # NOTE: git cherry-pick range needs ~ to include the FIRST_COMMIT_SHA (https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-them-into-another-branch)
+          COMMIT_RANGE="${{ env.FIRST_COMMIT_SHA }}~..${{ env.LATEST_COMMIT_SHA }}"
 
           if [ "${{ env.FIRST_COMMIT_SHA }}" == "${{ env.LATEST_COMMIT_SHA }}" ]; then
             COMMIT_RANGE=${{ env.FIRST_COMMIT_SHA }}
@@ -133,6 +134,9 @@ jobs:
             git cherry-pick --abort || true
             # If cherry-pick fails, create a placeholder commit
             echo "Cherry-pick failed. Creating placeholder commit."
+
+            GIT_LOG_ONELINE_OUTPUT=$(git log --oneline --no-decorate $COMMIT_RANGE)
+
             git reset --hard
             git commit --allow-empty -m "Placeholder commit for PR #${{ env.PR_ID }}"
 
@@ -154,6 +158,12 @@ jobs:
             git reset --hard HEAD~1  # Remove placeholder commit
             git cherry-pick $COMMIT_RANGE
             \`\`\`
+
+
+            **Individual commits:**
+            \`\`\`
+            $GIT_LOG_ONELINE_OUTPUT
+            \`\`\`
             "
           }
 
@@ -170,6 +180,6 @@ jobs:
               AUTHOR=${{ env.PR_MERGER }}
             fi
           fi
-          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --reviewer "$AUTHOR"
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --assignee "$AUTHOR" --reviewer "$AUTHOR"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
