@@ -120,8 +120,10 @@ jobs:
 
           echo "First commit: ${{ env.FIRST_COMMIT_SHA }}"
           echo "Latest commit: ${{ env.LATEST_COMMIT_SHA }}"
+          echo "Release branch: ${{ env.RELEASE_BRANCH }}"
+          echo "Head branch: ${{ env.HEAD_BRANCH }}"
           # NOTE: git cherry-pick range needs ~ to include the FIRST_COMMIT_SHA (https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-them-into-another-branch)
-          COMMIT_RANGE="${{ env.FIRST_COMMIT_SHA }}~..${{ env.LATEST_COMMIT_SHA }}"
+          COMMIT_RANGE="${{ env.RELEASE_BRANCH }}~..${{ env.HEAD_BRANCH }}"
 
           if [ "${{ env.FIRST_COMMIT_SHA }}" == "${{ env.LATEST_COMMIT_SHA }}" ]; then
             COMMIT_RANGE=${{ env.FIRST_COMMIT_SHA }}
