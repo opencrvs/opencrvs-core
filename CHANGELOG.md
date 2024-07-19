@@ -84,7 +84,7 @@ INSERT CSV ROWS IN ENGLISH ONLY
 
 - TBC
 
-## 1.5.0 (TBD)
+## 1.5.0 (https://github.com/opencrvs/opencrvs-core/compare/v1.4.1...v1.5.0)
 
 ### Breaking changes
 
