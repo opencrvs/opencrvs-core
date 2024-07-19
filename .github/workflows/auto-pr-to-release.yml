@@ -137,7 +137,8 @@ jobs:
             # If cherry-pick fails, create a placeholder commit
             echo "Cherry-pick failed. Creating placeholder commit."
 
-            GIT_LOG_ONELINE_OUTPUT=$(git log --oneline --no-decorate $COMMIT_RANGE)
+            # -- Is needed to make unambigious we are referring to branches rather than files. Happens when branch has "/"
+            GIT_LOG_ONELINE_OUTPUT=$(git log --oneline --no-decorate --no-merges $COMMIT_RANGE --)
 
             git reset --hard
             git commit --allow-empty -m "Placeholder commit for PR #${{ env.PR_ID }}"
@@ -162,7 +163,7 @@ jobs:
             \`\`\`
 
 
-            **Individual commits:**
+            **Individual commits without merges:**
             \`\`\`
             $GIT_LOG_ONELINE_OUTPUT
             \`\`\`
