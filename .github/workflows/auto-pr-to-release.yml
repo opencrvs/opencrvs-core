@@ -136,6 +136,10 @@ jobs:
             git cherry-pick --abort || true
             # If cherry-pick fails, create a placeholder commit
             echo "Cherry-pick failed. Creating placeholder commit."
+
+            # -- Is needed to make unambigious we are referring to branches rather than files. Happens when branch has "/"
+            GIT_LOG_ONELINE_OUTPUT=$(git log --oneline --no-decorate --no-merges $COMMIT_RANGE --)
+
             git reset --hard
             git commit --allow-empty -m "Placeholder commit for PR #${{ env.PR_ID }}"
 
@@ -156,6 +160,12 @@ jobs:
             git checkout $NEW_BRANCH
             git reset --hard HEAD~1  # Remove placeholder commit
             git cherry-pick $COMMIT_RANGE
+            \`\`\`
+
+
+            **Individual commits without merges:**
+            \`\`\`
+            $GIT_LOG_ONELINE_OUTPUT
             \`\`\`
             "
           }
