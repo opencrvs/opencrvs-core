@@ -42,6 +42,7 @@ export async function vsExportHandler(
   const script = fork(VS_EXPORT_SCRIPT_PATH, childArgv)
 
   script.on('close', async (code) => {
+    // eslint-disable-next-line no-console
     console.log(`child process exited with code ${code}`)
 
     if (isScheduler && isFirstDayOfMonth(new Date())) {
@@ -98,6 +99,7 @@ async function uploadVSExportFile(startDate: string, endDate: string) {
       }
     }
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(err)
   }
 }
