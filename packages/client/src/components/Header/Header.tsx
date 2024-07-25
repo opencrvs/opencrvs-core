@@ -34,17 +34,11 @@ import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
 import {
-  BRN_DRN_TEXT,
-  NATIONAL_ID_TEXT,
   FIELD_AGENT_ROLES,
-  NAME_TEXT,
   NATL_ADMIN_ROLES,
-  PHONE_TEXT,
   ADVANCED_SEARCH_TEXT,
   SYS_ADMIN_ROLES,
-  TRACKING_ID_TEXT,
-  PERFORMANCE_MANAGEMENT_ROLES,
-  EMAIL
+  PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -297,21 +291,18 @@ class HeaderComp extends React.Component<IFullProps> {
       {
         name: SearchCriteria.TRACKING_ID,
         label: intl.formatMessage(constantsMessages.trackingId),
-        value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderTrackingId)
       },
       {
         name: SearchCriteria.REGISTRATION_NUMBER,
         label: intl.formatMessage(messages.typeRN),
-        value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
         name: SearchCriteria.NAME,
         label: intl.formatMessage(messages.typeName),
-        value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
@@ -321,7 +312,6 @@ class HeaderComp extends React.Component<IFullProps> {
       searchTypeList.splice(3, 0, {
         name: SearchCriteria.PHONE_NUMBER,
         label: intl.formatMessage(messages.typePhone),
-        value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       })
@@ -335,7 +325,6 @@ class HeaderComp extends React.Component<IFullProps> {
       searchTypeList.splice(2, 0, {
         name: SearchCriteria.NATIONAL_ID,
         label: intl.formatMessage(constantsMessages.id),
-        value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderId)
       })
@@ -344,7 +333,6 @@ class HeaderComp extends React.Component<IFullProps> {
       searchTypeList.push({
         name: SearchCriteria.EMAIL,
         label: intl.formatMessage(messages.email),
-        value: EMAIL,
         icon: <Icon name="Envelope" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderEmail)
       })

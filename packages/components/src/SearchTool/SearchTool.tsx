@@ -176,7 +176,6 @@ const ClearTextIcon = styled((props) => <ClearText {...props} />)`
 export interface ISearchType {
   name: SearchCriterias // name is used to check default search field
   label: string
-  value: string
   icon: React.ReactNode
   isDefault?: boolean
   placeHolderText: string
@@ -213,7 +212,7 @@ export const SearchTool = ({
     if (initialSelectedSearchType) {
       return (
         searchTypeList.find(
-          (item: ISearchType) => item.value === initialSelectedSearchType
+          (item: ISearchType) => item.name === initialSelectedSearchType
         ) || searchTypeList[0]
       )
     }
@@ -233,16 +232,16 @@ export const SearchTool = ({
   useEffect(() => {
     if (language !== currentLanguage) {
       const newSelectedSearchType = searchTypeList.find(
-        (item) => item.value === selectedSearchType.value
+        (item) => item.name === selectedSearchType.name
       )
       setSelectedSearchType(newSelectedSearchType || searchTypeList[0])
       setCurrentLanguage(language)
     }
-  }, [language, searchTypeList, selectedSearchType.value, currentLanguage])
+  }, [language, searchTypeList, selectedSearchType.name, currentLanguage])
 
   const search = (e: React.FormEvent) => {
     e.preventDefault()
-    return searchParam && searchHandler(searchParam, selectedSearchType.value)
+    return searchParam && searchHandler(searchParam, selectedSearchType.name)
   }
   const dropdown = () => {
     return (
@@ -251,8 +250,8 @@ export const SearchTool = ({
           {searchTypeList.map((item) => {
             return (
               <DropDownItem
-                id={item.value}
-                key={item.value}
+                id={item.name}
+                key={item.name}
                 onClick={() => dropDownItemSelect(item)}
               >
                 {item.icon}
@@ -309,7 +308,7 @@ export const SearchTool = ({
     }
   }
 
-  const { placeHolderText, value } = selectedSearchType
+  const { placeHolderText, name } = selectedSearchType
   return (
     <SearchBox className={className}>
       <Wrapper onSubmit={search}>
@@ -324,7 +323,7 @@ export const SearchTool = ({
         </Button>
         <SearchInput
           id="searchText"
-          type={value === 'phone' ? 'tel' : 'text'}
+          type={name === 'PHONE_NUMBER' ? 'tel' : 'text'}
           autoComplete="off"
           placeholder={placeHolderText}
           onChange={onChangeHandler}

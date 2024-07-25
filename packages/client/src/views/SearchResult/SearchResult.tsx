@@ -45,15 +45,7 @@ import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
-import {
-  BRN_DRN_TEXT,
-  EMAIL,
-  NAME_TEXT,
-  NATIONAL_ID_TEXT,
-  PHONE_TEXT,
-  SEARCH_RESULT_SORT,
-  TRACKING_ID_TEXT
-} from '@client/utils/constants'
+import { SEARCH_RESULT_SORT } from '@client/utils/constants'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
 
@@ -81,6 +73,7 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { SearchCriteria } from '@client/utils/referenceApi'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -351,19 +344,26 @@ class SearchResultView extends React.Component<
                     variables: {
                       advancedSearchParameters: {
                         trackingId:
-                          searchType === TRACKING_ID_TEXT ? searchText : '',
+                          searchType === SearchCriteria.TRACKING_ID
+                            ? searchText
+                            : '',
                         nationalId:
-                          searchType === NATIONAL_ID_TEXT ? searchText : '',
+                          searchType === SearchCriteria.NATIONAL_ID
+                            ? searchText
+                            : '',
                         registrationNumber:
-                          searchType === BRN_DRN_TEXT ? searchText : '',
+                          searchType === SearchCriteria.REGISTRATION_NUMBER
+                            ? searchText
+                            : '',
                         contactNumber:
-                          searchType === PHONE_TEXT
+                          searchType === SearchCriteria.PHONE_NUMBER
                             ? convertToMSISDN(
                                 searchText!,
                                 window.config.COUNTRY
                               )
                             : '',
-                        name: searchType === NAME_TEXT ? searchText : '',
+                        name:
+                          searchType === SearchCriteria.NAME ? searchText : '',
                         declarationLocationId:
                           userDetails &&
                           ![
@@ -488,16 +488,21 @@ class SearchResultView extends React.Component<
                   ].includes(userDetails.systemRole)
                     ? getUserLocation(userDetails).id
                     : '',
-                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
-                nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
+                trackingId:
+                  searchType === SearchCriteria.TRACKING_ID ? searchText : '',
+                nationalId:
+                  searchType === SearchCriteria.NATIONAL_ID ? searchText : '',
                 registrationNumber:
-                  searchType === BRN_DRN_TEXT ? searchText : '',
+                  searchType === SearchCriteria.REGISTRATION_NUMBER
+                    ? searchText
+                    : '',
                 contactNumber:
-                  searchType === PHONE_TEXT
+                  searchType === SearchCriteria.PHONE_NUMBER
                     ? convertToMSISDN(searchText, window.config.COUNTRY)
                     : '',
-                contactEmail: searchType === EMAIL ? searchText : '',
-                name: searchType === NAME_TEXT ? searchText : ''
+                contactEmail:
+                  searchType === SearchCriteria.EMAIL ? searchText : '',
+                name: searchType === SearchCriteria.NAME ? searchText : ''
               },
               sort: SEARCH_RESULT_SORT
             }}

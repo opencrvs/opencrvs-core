@@ -98,22 +98,19 @@ Home.args = {
           name: 'TRACKING_ID',
           icon: <Icon name="Target" size="medium" color="grey600" />,
           label: 'Tracking ID',
-          placeHolderText: 'Search',
-          value: 'Tracking ID'
+          placeHolderText: 'Search'
         },
         {
           name: 'REGISTRATION_NUMBER',
           icon: <Icon name="Medal" size="medium" color="grey600" />,
           label: 'Registration No.',
-          placeHolderText: 'Search',
-          value: 'Registration No.'
+          placeHolderText: 'Search'
         },
         {
           name: 'PHONE_NUMBER',
           icon: <Icon name="Phone" size="medium" color="grey600" />,
           label: 'Phone no.',
-          placeHolderText: 'Search',
-          value: 'Phone no.'
+          placeHolderText: 'Search'
         }
       ]}
     />
