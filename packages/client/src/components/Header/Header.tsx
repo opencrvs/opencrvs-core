@@ -349,22 +349,16 @@ class HeaderComp extends React.Component<IFullProps> {
       }
     ]
 
-    const searchTypeListWithDefaultValues = searchTypeList.map((searchType) => {
-      return {
-        ...searchType,
-        isDefault:
-          this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA ===
-          searchType.name
-      }
-    })
-
     return (
       <Search
         key="searchMenu"
         language={language}
         searchText={searchText}
-        selectedSearchType={selectedSearchType}
-        searchTypeList={searchTypeListWithDefaultValues}
+        selectedSearchType={
+          selectedSearchType ??
+          this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA
+        }
+        searchTypeList={searchTypeList}
         navigationList={
           FIELD_AGENT_ROLES.includes(
             this.props.userDetails?.systemRole as string

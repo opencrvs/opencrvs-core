@@ -177,7 +177,6 @@ export interface ISearchType {
   name: SearchCriterias // name is used to check default search field
   label: string
   icon: React.ReactNode
-  isDefault?: boolean
   placeHolderText: string
 }
 export interface INavigationType {
@@ -216,10 +215,7 @@ export const SearchTool = ({
         ) || searchTypeList[0]
       )
     }
-    return (
-      searchTypeList.find((item: ISearchType) => item.isDefault === true) ||
-      searchTypeList[0]
-    )
+    return searchTypeList[0]
   }
 
   const [dropDownIsVisible, setDropDownIsVisible] = useState(false)
