@@ -29,7 +29,10 @@ import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
-import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
+import {
+  isInvalidDate,
+  TIME_PERIOD
+} from '@client/forms/advancedSearch/fieldDefinitions/utils'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -97,6 +100,7 @@ export interface IAdvancedSearchFormState {
   dateOfEvent?: IDateRangePickerValue
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  registrationByPeriod?: string
   registrationNumber?: string
   trackingId?: string
   dateOfRegistration?: IDateRangePickerValue
@@ -184,6 +188,16 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     ) {
       declarationJurisdictionId = localState.placeOfRegistration
     }
+  }
+
+  if (
+    localState.registrationByPeriod &&
+    localState.registrationByPeriod in TIME_PERIOD
+  ) {
+    transformedStoreState.timePeriodFrom = localState.registrationByPeriod
+    // transformedStoreState.timePeriodFrom = getFromDateFomTimePeriod(
+    //   localState.registrationByPeriod as TIME_PERIOD
+    // ) needs cleanup
   }
 
   if (localState.eventLocationType === 'HEALTH_FACILITY') {
@@ -287,6 +301,14 @@ export const transformStoreDataToAdvancedSearchLocalState = (
     },
     {}
   )
+
+  if (reduxState.timePeriodFrom) {
+    localState.registrationByPeriod = reduxState.timePeriodFrom
+    // localState.registrationByPeriod = getTimePeriodFromFromDate(
+    //   reduxState.timePeriodFrom
+    // ) needs cleanup
+  }
+
   localState.event = eventType
   if (
     reduxState.registrationStatuses &&
@@ -455,6 +477,54 @@ export const getAccordionActiveStateMap = (
         (storeState.informantDoBStart && storeState.informantDoBEnd)
     )
   }
+}
+// needs cleanup
+const getTimePeriodFromFromDate = (fromDate: string) => {
+  switch (fromDate) {
+    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_7_DAYS):
+      return TIME_PERIOD.LAST_7_DAYS
+    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_30_DAYS):
+      return TIME_PERIOD.LAST_30_DAYS
+    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_90_DAYS):
+      return TIME_PERIOD.LAST_90_DAYS
+    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_YEAR):
+      return TIME_PERIOD.LAST_YEAR
+  }
+}
+
+const getFromDateFomTimePeriod = (timePeriod: TIME_PERIOD) => {
+  return formatDate(timePeriodToFromDate(timePeriod), 'yyyy-MM-dd')
+}
+
+const timePeriodToFromDate = (timePeriod: TIME_PERIOD) => {
+  switch (timePeriod) {
+    case TIME_PERIOD.LAST_7_DAYS:
+      return new Date(Date.now() - 7 * 60 * 60 * 24 * 1000)
+
+    case TIME_PERIOD.LAST_30_DAYS:
+      return new Date(Date.now() - 30 * 60 * 60 * 24 * 1000)
+
+    case TIME_PERIOD.LAST_90_DAYS:
+      return new Date(Date.now() - 90 * 60 * 60 * 24 * 1000)
+
+    case TIME_PERIOD.LAST_YEAR:
+      const oneYearAgo = new Date(Date.now())
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+      return oneYearAgo
+  }
+}
+
+export const replacePeriodWithDate = (
+  advancedSearchParamState: IAdvancedSearchParamState
+) => {
+  if (
+    advancedSearchParamState.timePeriodFrom &&
+    advancedSearchParamState.timePeriodFrom in TIME_PERIOD
+  )
+    advancedSearchParamState.timePeriodFrom = getFromDateFomTimePeriod(
+      advancedSearchParamState.timePeriodFrom as TIME_PERIOD
+    )
+  return advancedSearchParamState
 }
 
 const determineDateFromDateRangePickerVal = (
@@ -672,6 +742,7 @@ export const getFormattedAdvanceSearchParamPills = (
           )
         : '',
 
+    timePeriodFrom: advancedSearchParamsState.timePeriodFrom,
     trackingId: advancedSearchParamsState.trackingId,
     regNumber: advancedSearchParamsState.registrationNumber,
     childFirstName: advancedSearchParamsState.childFirstNames,

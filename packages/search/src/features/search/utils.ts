@@ -152,6 +152,17 @@ export async function advancedQueryBuilder(
     })
   }
 
+  if (params.timePeriodFrom) {
+    must.push({
+      range: {
+        modifiedAt: {
+          gte: params.timePeriodFrom,
+          lte: Date.now().toString()
+        }
+      }
+    })
+  }
+
   if (params.declarationLocationId) {
     must.push({
       match: {

@@ -77,6 +77,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   advancedSearchPillKey,
   getFormattedAdvanceSearchParamPills,
+  replacePeriodWithDate,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
@@ -136,7 +137,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     AdvancedSearchParamsState
   )
   const filteredAdvancedSearchParams = omitBy(
-    advancedSearchParams,
+    replacePeriodWithDate(advancedSearchParams),
     (properties: string | null) =>
       properties === null || properties === EMPTY_STRING
   )

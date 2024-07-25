@@ -75,6 +75,7 @@ export interface ISearch {
     dateOfEvent?: string
     dateOfEventStart?: string
     dateOfEventEnd?: string
+    timePeriodFrom?: string
     registrationNumber?: string
     trackingId?: string
     dateOfRegistration?: string
@@ -227,6 +228,7 @@ const AdvanceSearchParameters = new Schema(
     dateOfEvent: { type: String },
     dateOfEventStart: { type: String },
     dateOfEventEnd: { type: String },
+    timePeriodFrom: { type: String },
     registrationNumber: { type: String },
     trackingId: { type: String },
     dateOfRegistration: { type: String },
