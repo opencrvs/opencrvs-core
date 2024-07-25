@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { AppStore, createStore, IStoreState } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import { createLocation, History } from 'history'
 import { ReactWrapper } from 'enzyme'
 import { IssueCollectorForm } from './IssueCollectorForm'

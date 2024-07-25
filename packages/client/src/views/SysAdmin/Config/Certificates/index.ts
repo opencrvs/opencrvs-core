@@ -8,9 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export enum NOTIFICATION_STATUS {
-  SUCCESS = 'success',
-  IDLE = 'idle',
-  IN_PROGRESS = 'inProgress',
-  ERROR = 'error'
-}
+export * from './Certificates'

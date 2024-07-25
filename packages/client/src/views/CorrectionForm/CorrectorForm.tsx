@@ -26,12 +26,7 @@ import {
   goToPageGroup,
   goToHomeTab
 } from '@client/navigation'
-import {
-  IFormSection,
-  IFormSectionData,
-  IRadioGroupWithNestedFieldsFormField,
-  ReviewSection
-} from '@client/forms'
+import { IFormSection, IFormSectionData, ReviewSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormFieldGenerator } from '@client/components/form'
