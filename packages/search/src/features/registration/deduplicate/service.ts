@@ -153,29 +153,25 @@ export const searchForBirthDuplicates = async (
 
   const childsNameMatch = {
     bool: {
-      must: {
-        bool: {
-          must: [
-            body.childFirstNames && {
-              match: {
-                childFirstNames: {
-                  query: body.childFirstNames,
-                  fuzziness: FIRST_NAME_FUZZINESS
-                }
-              }
-            },
-            body.childFamilyName && {
-              match: {
-                childFamilyName: {
-                  query: body.childFamilyName,
-                  fuzziness: FIRST_NAME_FUZZINESS,
-                  minimum_should_match: '100%'
-                }
-              }
+      must: [
+        body.childFirstNames && {
+          match: {
+            childFirstNames: {
+              query: body.childFirstNames,
+              fuzziness: FIRST_NAME_FUZZINESS
             }
-          ].filter(isNonEmptyCondition)
+          }
+        },
+        body.childFamilyName && {
+          match: {
+            childFamilyName: {
+              query: body.childFamilyName,
+              fuzziness: FIRST_NAME_FUZZINESS,
+              minimum_should_match: '100%'
+            }
+          }
         }
-      }
+      ].filter(isNonEmptyCondition)
     }
   }
 
