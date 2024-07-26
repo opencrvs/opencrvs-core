@@ -904,7 +904,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   getRenderableField(
     section: IFormSection,
     group: IFormSectionGroup,
-    fieldLabel: MessageDescriptor,
+    {
+      fieldLabel,
+      fieldLabelParams
+    }: {
+      fieldLabel: MessageDescriptor
+      fieldLabelParams?: Record<string, string>
+    },
     fieldName: string,
     value: IFormFieldValue | JSX.Element | undefined,
     ignoreAction = false
@@ -912,7 +918,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const { draft: declaration, intl } = this.props
 
     return {
-      label: intl.formatMessage(fieldLabel),
+      label: intl.formatMessage(fieldLabel, fieldLabelParams),
       type: group.fields.find((field) => field.name === fieldName)?.type,
       value,
       action: !ignoreAction && {
@@ -1171,7 +1177,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       return this.getRenderableField(
         section,
         group,
-        (tagDef[0] && tagDef[0].label) || field.label,
+        {
+          fieldLabel: (tagDef[0] && tagDef[0].label) || field.label,
+          fieldLabelParams: field.labelParam
+        },
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
         completeValue,
         field.readonly
@@ -1306,7 +1315,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return this.getRenderableField(
       section,
       group,
-      field.label,
+      { fieldLabel: field.label, fieldLabelParams: field.labelParam },
       field.name,
       value,
       field.readonly
@@ -1357,7 +1366,10 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           this.getRenderableField(
             section,
             group,
-            nestedField.label,
+            {
+              fieldLabel: nestedField.label,
+              fieldLabelParams: nestedField.labelParam
+            },
             nestedField.name,
             this.getNestedFieldValueOrError(
               section,
