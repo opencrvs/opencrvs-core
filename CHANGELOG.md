@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1
+
+## Bug fixes
+
+- Handle label params used in form inputs when rendering in review section view
+
 ## 1.5.0
 
 ## Breaking changes
