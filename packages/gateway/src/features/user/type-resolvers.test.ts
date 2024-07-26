@@ -148,7 +148,6 @@ describe('User type resolvers', () => {
     expect(res).toEqual(mockOffice)
   })
   it('return user signature as registration agent', async () => {
-    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
     const roleBundle = {
       resourceType: 'Bundle',
       id: 'e9b83485-0418-47a0-b62b-c9d80a89691b',
@@ -188,17 +187,10 @@ describe('User type resolvers', () => {
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueSignature: {
-            type: [
-              {
-                system: 'urn:iso-astm:E1762-95:2013',
-                code: '1.2.840.10065.1.12.1.13',
-                display: 'Review Signature'
-              }
-            ],
-            when: '2019-08-22T08:43:43.461Z',
-            contentType: 'image/png',
-            blob: signatureData
+          valueAttachment: {
+            contentType: 'img/png',
+            url: '/ocrvs/a1-b2-c3.png',
+            creation: '1721970080786'
           }
         }
       ],
@@ -238,7 +230,11 @@ describe('User type resolvers', () => {
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueUri: 'mock.minio/uri'
+          valueAttachment: {
+            contentType: 'img/png',
+            url: '/ocrvs/a1-b2-c3.png',
+            creation: '1721970080786'
+          }
         }
       ],
       id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'

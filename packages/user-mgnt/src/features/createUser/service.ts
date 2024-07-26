@@ -16,6 +16,7 @@ import {
 } from '@user-mgnt/constants'
 import User, {
   ISignature,
+  ISignatureAttachment,
   IUser,
   IUserName,
   UserRole
@@ -31,7 +32,7 @@ import {
 export const createFhirPractitioner = (
   user: IUser,
   system: boolean,
-  signatureUrl: string | undefined
+  signatureAttachment?: ISignatureAttachment
 ): fhir.Practitioner => {
   if (system) {
     return {
@@ -58,14 +59,12 @@ export const createFhirPractitioner = (
         { system: 'email', value: user.emailForNotification }
       ],
       name: user.name,
-      extension: signatureUrl
-        ? [
-            {
-              url: 'http://opencrvs.org/specs/extension/employee-signature',
-              valueUri: signatureUrl
-            }
-          ]
-        : undefined
+      extension: signatureAttachment && [
+        {
+          url: 'http://opencrvs.org/specs/extension/employee-signature',
+          valueAttachment: signatureAttachment
+        }
+      ]
     }
   }
 }

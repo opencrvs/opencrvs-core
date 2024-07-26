@@ -695,7 +695,16 @@ export const MARRIAGE_BUNDLE: Saved<
             family: 'Mweene'
           }
         ],
-        extension: [],
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/employee-signature',
+            valueAttachment: {
+              contentType: 'img/png',
+              url: '/ocrvs/a1-b2-c3.png',
+              creation: '1721970080786'
+            }
+          }
+        ],
         id: '48455871-1636-46a1-8279-aaa76dec03d4' as UUID,
         meta: {
           lastUpdated: '2023-09-19T06:47:48.290+00:00',

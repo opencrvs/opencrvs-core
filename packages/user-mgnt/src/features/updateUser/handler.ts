@@ -16,9 +16,7 @@ import {
   createFhirPractitionerRole,
   sendUpdateUsernameNotification,
   postFhir,
-  uploadSignatureToMinio,
-  isMinioUrl,
-  getSignatureExtension
+  uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -96,16 +94,16 @@ export default async function updateUser(
       throw new Error('Location can be changed only by National System Admin')
     }
   }
-  const signatureMinioUrl = existingUser?.signature?.data
-    ? isMinioUrl(existingUser.signature.data)
-      ? getSignatureExtension(existingPractitioner.extension)?.valueUri
-      : await uploadSignatureToMinio(token, existingUser.signature)
-    : undefined
+  const signatureAttachment = user.signature && {
+    contentType: user.signature.type,
+    url: await uploadSignatureToMinio(token, user.signature),
+    creation: new Date().getTime().toString()
+  }
 
   const practitioner = createFhirPractitioner(
     existingUser,
     false,
-    signatureMinioUrl
+    signatureAttachment
   )
   practitioner.id = existingPractitioner.id
 

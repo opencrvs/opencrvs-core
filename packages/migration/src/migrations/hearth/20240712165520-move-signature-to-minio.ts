@@ -28,12 +28,16 @@ export const up = async (db: Db, client: MongoClient) => {
 
     if (extensions) {
       let signatureUrl = ''
+      let type = ''
       for (const extension of extensions) {
         if (extension.url === employeeSignatureExtensionUrl) {
           const signature = extension.valueSignature?.blob
           if (signature && isBase64FileString(signature)) {
             const res = await uploadBase64ToMinio(signature)
-            if (typeof res == 'string') signatureUrl = res
+            if (typeof res == 'string') {
+              signatureUrl = res
+              type = extension.valueSignature?.contentType
+            }
             break
           }
         }
@@ -49,7 +53,11 @@ export const up = async (db: Db, client: MongoClient) => {
             $set: {
               'extension.$': {
                 url: 'http://opencrvs.org/specs/extension/employee-signature',
-                valueUri: signatureUrl
+                valueAttachment: {
+                  contentType: type,
+                  url: signatureUrl,
+                  creation: new Date().getTime().toString()
+                }
               }
             }
           }

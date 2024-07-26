@@ -191,7 +191,11 @@ export type KnownExtensionType = StringExtensionType & {
   }
   'http://opencrvs.org/specs/extension/employee-signature': {
     url: 'http://opencrvs.org/specs/extension/employee-signature'
-    valueUri: string
+    valueAttachment: {
+      contentType: string
+      url: string
+      creation: string
+    }
   }
   'http://opencrvs.org/specs/extension/regAssigned': {
     url: 'http://opencrvs.org/specs/extension/regAssigned'

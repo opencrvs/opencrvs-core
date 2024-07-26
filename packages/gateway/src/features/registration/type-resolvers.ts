@@ -1593,7 +1593,10 @@ export const typeResolvers: GQLResolver = {
       const signatureExtension = getSignatureExtension(practitioner.extension)
       const presignedUrl =
         signatureExtension &&
-        getPresignedUrlFromUri(signatureExtension.valueUri, authHeader)
+        getPresignedUrlFromUri(
+          signatureExtension.valueAttachment.url,
+          authHeader
+        )
 
       return (
         presignedUrl && {

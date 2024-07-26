@@ -107,11 +107,7 @@ export async function registerSystem(
 
     const { hash, salt } = generateSaltedHash(clientSecret)
 
-    const practitioner = createFhirPractitioner(
-      systemAdminUser,
-      true,
-      undefined
-    )
+    const practitioner = createFhirPractitioner(systemAdminUser, true)
     const practitionerId = await postFhir(
       request.headers.authorization,
       practitioner

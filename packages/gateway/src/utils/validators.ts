@@ -17,8 +17,13 @@ import {
 } from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
-export const isMinioUrl = (uri: string | undefined) => {
-  return uri?.split('/')[3] === MINIO_BUCKET
+const isMinioUrl = (url: string | undefined) => {
+  // "http://localhost:3535/ocrvs/cbf7c3cd-1b59-40b0-b8f9-2cd1310fe85b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240726%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20240726T094242Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=2eb6a0cdfb9d25f347771b3f10cba442946d09de035f3294d8edec49e09ec1a6"
+  return url?.split('/')[3] === MINIO_BUCKET
+}
+const isMinioUri = (uri: string | undefined) => {
+  // /ocrvs/a1-b2-c3.png
+  return uri?.split('/')[1] === MINIO_BUCKET
 }
 
 export async function validateAttachments(
@@ -29,7 +34,7 @@ export async function validateAttachments(
       continue
     }
 
-    if (isMinioUrl(file.uri)) {
+    if (isMinioUri(file.uri)) {
       continue
     }
 

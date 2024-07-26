@@ -226,7 +226,7 @@ export const userTypeResolvers: GQLResolver = {
           ? null
           : signatureExtension &&
             (await getPresignedUrlFromUri(
-              signatureExtension.valueUri,
+              signatureExtension.valueAttachment.url,
               authHeader
             ))
       return {
@@ -248,7 +248,10 @@ export const userTypeResolvers: GQLResolver = {
 
       const presignedUrl =
         signatureExtension &&
-        (await getPresignedUrlFromUri(signatureExtension.valueUri, authHeader))
+        (await getPresignedUrlFromUri(
+          signatureExtension.valueAttachment.url,
+          authHeader
+        ))
 
       return (
         presignedUrl && {
