@@ -44,8 +44,6 @@ export async function formatSearchParams(
     isExternalSearch
   )
 
-  console.log(JSON.stringify(query, null, 2))
-
   return {
     index: OPENCRVS_INDEX_NAME,
     from,
