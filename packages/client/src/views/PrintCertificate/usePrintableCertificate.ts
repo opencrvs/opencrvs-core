@@ -30,7 +30,6 @@ import {
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
 import { cloneDeep } from 'lodash'
-import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
