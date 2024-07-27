@@ -196,9 +196,12 @@ describe('User type resolvers', () => {
       ],
       id: 'dd78cad3-26dc-469a-bddb-0b45ae489491'
     }
+    const presignedURL =
+      'http://minio.farajaland-dev.opencrvs.org/ocrvs/cbf7c3cd-1b59-40b0-b8f9-2cd1310fe85b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240726%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20240726T094242Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=2eb6a0cdfb9d25f347771b3f10cba442946d09de035f3294d8edec49e09ec1a6'
 
     fetch.mockResponses(
       [JSON.stringify(roleBundle), { status: 200 }],
+      [JSON.stringify({ presignedURL }), { status: 200 }],
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
@@ -218,12 +221,13 @@ describe('User type resolvers', () => {
     expect(response).toEqual({
       role: 'LOCAL_REGISTRAR',
       name: undefined,
-      signature: undefined
+      signature: presignedURL
     })
   })
 
   it('return user signature as registrar', async () => {
-    const presignedURL = 'minio.com/ocrvs/sadasdasduqoweh'
+    const presignedURL =
+      'http://minio.farajaland-dev.opencrvs.org/ocrvs/cbf7c3cd-1b59-40b0-b8f9-2cd1310fe85b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240726%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20240726T094242Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=2eb6a0cdfb9d25f347771b3f10cba442946d09de035f3294d8edec49e09ec1a6'
 
     const practitioner = {
       resourceType: 'Practitioner',

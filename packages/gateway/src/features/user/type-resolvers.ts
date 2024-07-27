@@ -253,12 +253,12 @@ export const userTypeResolvers: GQLResolver = {
           authHeader
         ))
 
-      return (
-        presignedUrl && {
-          type: 'minioUrl',
-          data: presignedUrl
-        }
-      )
+      if (!presignedUrl) return null
+
+      return {
+        type: signatureExtension.valueAttachment.contentType,
+        data: presignedUrl
+      }
     }
   },
 
