@@ -114,7 +114,6 @@ export const usePrintableCertificate = (declarationId: string) => {
   )
 
   const state = useSelector((store: IStoreState) => store)
-  const [svg, setSvg] = useState<string>()
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const dispatch = useDispatch()
   const scope = useSelector(getScope)
@@ -122,23 +121,22 @@ export const usePrintableCertificate = (declarationId: string) => {
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
-  useEffect(() => {
-    const certificateTemplate =
-      declaration &&
-      offlineData.templates.certificates?.[declaration.event].definition
-    if (certificateTemplate) {
-      const svgWithoutFonts = compileSvg(
-        certificateTemplate,
-        { ...declaration.data.template, preview: true },
-        state
-      )
-      const svgWithFonts = addFontsToSvg(
-        svgWithoutFonts,
-        offlineData.templates.fonts ?? {}
-      )
-      setSvg(svgWithFonts)
-    }
-  }, [offlineData, declaration, state])
+  let svg = undefined
+  const certificateTemplate =
+    declaration &&
+    offlineData.templates.certificates?.[declaration.event].definition
+  if (certificateTemplate) {
+    const svgWithoutFonts = compileSvg(
+      certificateTemplate,
+      { ...declaration.data.template, preview: true },
+      state
+    )
+    const svgWithFonts = addFontsToSvg(
+      svgWithoutFonts,
+      offlineData.templates.fonts ?? {}
+    )
+    svg = svgWithFonts
+  }
 
   const handleCertify = async () => {
     if (
