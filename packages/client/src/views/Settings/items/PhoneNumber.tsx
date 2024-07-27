@@ -15,7 +15,7 @@ import {
   ValueContainer,
   DynamicHeightLinkButton
 } from '@client/views/Settings/items/components'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import {
   constantsMessages,
@@ -33,7 +33,6 @@ export function PhoneNumber() {
   const mobile = useSelector<IStoreState, string>(
     (state) => state.profile.userDetails?.mobile || ''
   )
-  const dispatch = useDispatch()
 
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)

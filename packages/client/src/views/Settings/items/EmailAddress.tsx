@@ -15,7 +15,7 @@ import {
   ValueContainer,
   DynamicHeightLinkButton
 } from '@client/views/Settings/items/components'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import {
   constantsMessages,
@@ -26,7 +26,6 @@ import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplif
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { useOnlineStatus } from '@client/utils'
 import { ChangeEmailModal } from '@client/views/Settings/ChangeEmailModal/ChangeEmailModal'
-import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function EmailAddress() {
   const intl = useIntl()
@@ -34,8 +33,6 @@ export function EmailAddress() {
   const email = useSelector<IStoreState, string>(
     (state) => state.profile.userDetails?.email || ''
   )
-
-  const dispatch = useDispatch()
 
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)

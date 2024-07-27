@@ -51,7 +51,7 @@ type IFullProps = {
   allowedDocType?: string[]
   error?: string
   disableDeleteInPreview?: boolean
-  onComplete: (files: IAttachmentValue | {}) => void
+  onComplete: (file: IAttachmentValue | {}) => void
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
