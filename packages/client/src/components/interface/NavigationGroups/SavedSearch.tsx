@@ -15,19 +15,20 @@ import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { omit } from 'lodash'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { goToAdvancedSearchResult } from '@client/navigation'
 import { UserDetails } from '@client/utils/userUtils'
 
 interface ISavedSearchProps {
   userDetails: UserDetails | null
   advancedSearchParams: IAdvancedSearchParamState
   pathname: string
+  goToAdvancedSearchResult: () => void
 }
 
 const SavedSearch = ({
   userDetails,
   advancedSearchParams,
-  pathname
+  pathname,
+  goToAdvancedSearchResult
 }: ISavedSearchProps) => {
   return (
     <NavigationGroup>

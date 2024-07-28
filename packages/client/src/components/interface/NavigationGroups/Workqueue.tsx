@@ -11,8 +11,10 @@
 import { Icon, NavigationGroup, NavigationItem } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import React from 'react'
-// eslint-disable-next-line import/no-relative-parent-imports
-import { WORKQUEUE_TABS } from '../Navigation'
+import {
+  IWORKQUEUE_TABS,
+  WORKQUEUE_TABS
+} from '@client/components/interface/Navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
@@ -26,7 +28,6 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { IntlShape } from 'react-intl'
-import { goToHomeTab } from '@client/navigation'
 
 interface IWorkqueueProps {
   workqueue: IWorkqueue
@@ -36,7 +37,7 @@ interface IWorkqueueProps {
   tabId: string
   menuCollapse?: () => void
   isOnePrintInAdvanceOn: boolean
-  //   goToHomeTab: typeof goToHomeTab
+  goToHomeTab: (tabId: IWORKQUEUE_TABS) => void
 }
 
 const Workqueue = ({
@@ -46,9 +47,9 @@ const Workqueue = ({
   intl,
   tabId,
   menuCollapse,
-  isOnePrintInAdvanceOn
-}: //   goToHomeTab
-IWorkqueueProps) => {
+  isOnePrintInAdvanceOn,
+  goToHomeTab
+}: IWorkqueueProps) => {
   const { hasScope, hasAnyScope } = usePermissions()
 
   const { data, initialSyncDone } = workqueue

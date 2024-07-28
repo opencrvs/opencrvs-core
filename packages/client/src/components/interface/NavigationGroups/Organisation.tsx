@@ -16,32 +16,34 @@ import {
   NavigationSubItem
 } from '@opencrvs/components'
 import React, { useState } from 'react'
-// eslint-disable-next-line import/no-relative-parent-imports
-import { WORKQUEUE_TABS } from '../Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { IntlShape } from 'react-intl'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  goToAllUserEmail,
-  goToOrganisationView,
-  goToPerformanceView,
-  goToSystemList,
-  goToTeamView
-} from '@client/navigation'
 
 interface IOrganisationProps {
   intl: IntlShape
   userDetails?: UserDetails
   enableMenuSelection: boolean
   activeMenuItem: string
+  goToAllUserEmail: () => void
+  goToOrganisationView: (userDetails: UserDetails) => void
+  goToPerformanceView: () => void
+  goToSystemList: () => void
+  goToTeamView: (userDetails: UserDetails) => void
 }
 
 const Organisation = ({
   intl,
   userDetails,
   enableMenuSelection,
-  activeMenuItem
+  activeMenuItem,
+  goToAllUserEmail,
+  goToOrganisationView,
+  goToPerformanceView,
+  goToSystemList,
+  goToTeamView
 }: IOrganisationProps) => {
   const [isConfigExpanded, setIsConfigExpanded] = useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] = useState(false)

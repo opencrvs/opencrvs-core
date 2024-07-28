@@ -25,7 +25,6 @@ import {
   goToTeamView,
   goToVSExport
 } from '@client/navigation'
-import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -40,13 +39,11 @@ import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -246,23 +243,35 @@ const NavigationView = (props: IFullProps) => {
         intl={intl}
         tabId={tabId}
         isOnePrintInAdvanceOn={isOnePrintInAdvanceOn}
+        goToHomeTab={props.goToHomeTab}
       />
 
       <OrganisationGroup
         intl={intl}
         enableMenuSelection={enableMenuSelection}
         activeMenuItem={activeMenuItem}
+        goToAllUserEmail={props.goToAllUserEmail}
+        goToOrganisationView={props.goToOrganisationViewAction}
+        goToPerformanceView={props.goToPerformanceViewAction}
+        goToSystemList={props.goToSystemViewAction}
+        goToTeamView={props.goToTeamViewAction}
       />
       <PerformanceGroup
         intl={intl}
         activeMenuItem={activeMenuItem}
         enableMenuSelection={enableMenuSelection}
+        goToDashboardView={props.goToDashboardView}
+        goToLeaderBoardsView={props.goToLeaderBoardsView}
+        goToPerformanceStatistics={props.goToPerformanceStatistics}
+        goToPerformanceView={props.goToPerformanceViewAction}
+        goToVSExport={props.goToVSExportsAction}
       />
 
       <SavedSearchGroup
         userDetails={userDetails}
         advancedSearchParams={advancedSearchParams}
         pathname={props.location.pathname}
+        goToAdvancedSearchResult={props.goToAdvancedSearchResultAction}
       />
       <NavigationGroup>
         {menuCollapse && getSettingsAndLogout(props)}

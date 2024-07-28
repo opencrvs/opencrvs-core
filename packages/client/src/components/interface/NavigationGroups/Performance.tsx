@@ -10,33 +10,35 @@
  */
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import {
-  goToDashboardView,
-  goToLeaderBoardsView,
-  goToPerformanceStatistics,
-  goToPerformanceView,
-  goToVSExport
-} from '@client/navigation'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 import { Icon, NavigationGroup, NavigationItem } from '@opencrvs/components'
 import React from 'react'
 import { IntlShape } from 'react-intl'
-// eslint-disable-next-line import/no-relative-parent-imports
-import { WORKQUEUE_TABS } from '../Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IPerformanceProps {
   intl: IntlShape
   activeMenuItem: string
   enableMenuSelection: boolean
   userDetails?: UserDetails
+  goToDashboardView: () => void
+  goToLeaderBoardsView: () => void
+  goToPerformanceStatistics: () => void
+  goToPerformanceView: () => void
+  goToVSExport: () => void
 }
 
 const Performance = ({
   intl,
   activeMenuItem,
   enableMenuSelection,
-  userDetails
+  userDetails,
+  goToDashboardView,
+  goToLeaderBoardsView,
+  goToPerformanceStatistics,
+  goToPerformanceView,
+  goToVSExport
 }: IPerformanceProps) => {
   const { hasScope, hasAnyScope } = usePermissions()
   const hasAnyPerformance = hasAnyScope([
