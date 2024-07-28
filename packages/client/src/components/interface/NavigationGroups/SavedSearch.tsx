@@ -22,13 +22,15 @@ interface ISavedSearchProps {
   advancedSearchParams: IAdvancedSearchParamState
   pathname: string
   goToAdvancedSearchResult: () => void
+  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 const SavedSearch = ({
   userDetails,
   advancedSearchParams,
   pathname,
-  goToAdvancedSearchResult
+  goToAdvancedSearchResult,
+  setAdvancedSearchParam
 }: ISavedSearchProps) => {
   return (
     <NavigationGroup>

@@ -191,6 +191,9 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
+    goToVSExportsAction,
+    goToSystemViewAction,
+    goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -199,6 +202,11 @@ const NavigationView = (props: IFullProps) => {
     userInfo,
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
+    setAdvancedSearchParam,
+    goToPerformanceStatistics,
+    goToDashboardView,
+    goToLeaderBoardsView,
+    goToAllUserEmail,
     className
   } = props
   const tabId = deselectAllTabs
@@ -250,28 +258,29 @@ const NavigationView = (props: IFullProps) => {
         intl={intl}
         enableMenuSelection={enableMenuSelection}
         activeMenuItem={activeMenuItem}
-        goToAllUserEmail={props.goToAllUserEmail}
+        goToAllUserEmail={goToAllUserEmail}
         goToOrganisationView={props.goToOrganisationViewAction}
         goToPerformanceView={props.goToPerformanceViewAction}
-        goToSystemList={props.goToSystemViewAction}
+        goToSystemList={goToSystemViewAction}
         goToTeamView={props.goToTeamViewAction}
       />
       <PerformanceGroup
         intl={intl}
         activeMenuItem={activeMenuItem}
         enableMenuSelection={enableMenuSelection}
-        goToDashboardView={props.goToDashboardView}
-        goToLeaderBoardsView={props.goToLeaderBoardsView}
-        goToPerformanceStatistics={props.goToPerformanceStatistics}
+        goToDashboardView={goToDashboardView}
+        goToLeaderBoardsView={goToLeaderBoardsView}
+        goToPerformanceStatistics={goToPerformanceStatistics}
         goToPerformanceView={props.goToPerformanceViewAction}
-        goToVSExport={props.goToVSExportsAction}
+        goToVSExport={goToVSExportsAction}
       />
 
       <SavedSearchGroup
         userDetails={userDetails}
         advancedSearchParams={advancedSearchParams}
         pathname={props.location.pathname}
-        goToAdvancedSearchResult={props.goToAdvancedSearchResultAction}
+        goToAdvancedSearchResult={goToAdvancedSearchResultAction}
+        setAdvancedSearchParam={setAdvancedSearchParam}
       />
       <NavigationGroup>
         {menuCollapse && getSettingsAndLogout(props)}
