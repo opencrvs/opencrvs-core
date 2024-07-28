@@ -1,0 +1,259 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { Icon, NavigationGroup, NavigationItem } from '@opencrvs/components'
+import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
+import React from 'react'
+// eslint-disable-next-line import/no-relative-parent-imports
+import { WORKQUEUE_TABS } from '../Navigation'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import {
+  filterProcessingDeclarationsFromQuery,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
+import { IWorkqueue } from '@client/workqueue'
+import {
+  ALLOWED_STATUS_FOR_RETRY,
+  INPROGRESS_STATUS
+} from '@client/SubmissionController'
+import { IntlShape } from 'react-intl'
+import { goToHomeTab } from '@client/navigation'
+
+interface IWorkqueueProps {
+  workqueue: IWorkqueue
+  storedDeclarations: IDeclaration[]
+  draftDeclarations: IDeclaration[]
+  intl: IntlShape
+  tabId: string
+  menuCollapse?: () => void
+  isOnePrintInAdvanceOn: boolean
+  //   goToHomeTab: typeof goToHomeTab
+}
+
+const Workqueue = ({
+  workqueue,
+  storedDeclarations,
+  draftDeclarations,
+  intl,
+  tabId,
+  menuCollapse,
+  isOnePrintInAdvanceOn
+}: //   goToHomeTab
+IWorkqueueProps) => {
+  const { hasScope, hasAnyScope } = usePermissions()
+
+  const { data, initialSyncDone } = workqueue
+  const filteredData = filterProcessingDeclarationsFromQuery(
+    data,
+    storedDeclarations
+  )
+
+  const declarationCount = {
+    inProgress: !initialSyncDone
+      ? 0
+      : draftDeclarations.filter(
+          (draft) =>
+            draft.submissionStatus ===
+            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+        ).length +
+        (filteredData.inProgressTab?.totalItems || 0) +
+        (filteredData.notificationTab?.totalItems || 0),
+    readyForReview: !initialSyncDone
+      ? 0
+      : filteredData.reviewTab?.totalItems || 0,
+    requiresUpdate: !initialSyncDone
+      ? 0
+      : filteredData.rejectTab?.totalItems || 0,
+    sentForApproval: !initialSyncDone
+      ? 0
+      : filteredData.approvalTab?.totalItems || 0,
+    externalValidation:
+      window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
+        ? 0
+        : filteredData.externalValidationTab?.totalItems || 0,
+    readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
+    readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
+    outbox: storedDeclarations.filter((draft) =>
+      (
+        [
+          ...ALLOWED_STATUS_FOR_RETRY,
+          ...INPROGRESS_STATUS,
+          SUBMISSION_STATUS.FAILED
+        ] as SUBMISSION_STATUS[]
+      ).includes(draft.submissionStatus as SUBMISSION_STATUS)
+    ).length
+  }
+
+  const hasInProgress = hasAnyScope([
+    'record.declare-birth',
+    'record.declare-birth:my-jurisdiction',
+    'record.declare-death',
+    'record.declare-death:my-jurisdiction',
+    'record.declare-marriage',
+    'record.declare-marriage:my-jurisdiction'
+  ])
+
+  const hasSentForReview = hasAnyScope([
+    'record.submit-for-review',
+    'record.declaration-review'
+  ])
+
+  const hasSentForApproval = hasScope('record.submit-for-approval')
+  const hasRequiresUpdates = hasScope('record.declaration-review')
+  const hasReadyForReview = hasScope('record.declaration-review')
+  const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
+  const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
+
+  const hasOutbox = !hasAnyScope(['sysadmin', 'natlsysadmin'])
+
+  return (
+    <NavigationGroup>
+      {hasInProgress && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'purple'} />}
+          id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.inProgress]
+          )}
+          count={draftDeclarations.length}
+          isSelected={tabId === WORKQUEUE_TABS.inProgress}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.inProgress)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+      {hasSentForReview && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'orange'} />}
+          id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.sentForReview]
+          )}
+          count={declarationCount.readyForReview}
+          isSelected={tabId === WORKQUEUE_TABS.sentForReview}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.sentForReview)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+      {hasSentForApproval && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'grey'} />}
+          id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.sentForApproval]
+          )}
+          count={declarationCount.sentForApproval}
+          isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+      {hasRequiresUpdates && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'red'} />}
+          id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+          )}
+          count={declarationCount.requiresUpdate}
+          isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+      {hasReadyForReview && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'orange'} />}
+          id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.readyForReview]
+          )}
+          count={declarationCount.readyForReview}
+          isSelected={tabId === WORKQUEUE_TABS.readyForReview}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.readyForReview)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+
+      {hasReadyToPrint && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'green'} />}
+          id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.readyToPrint]
+          )}
+          count={declarationCount.readyToPrint}
+          isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+      {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'teal'} />}
+          id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.externalValidation]
+          )}
+          count={declarationCount.externalValidation}
+          isSelected={tabId === WORKQUEUE_TABS.externalValidation}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.externalValidation)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+
+      {isOnePrintInAdvanceOn && hasReadyToIssue && (
+        <NavigationItem
+          icon={() => <DeclarationIconSmall color={'teal'} />}
+          id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
+          label={intl.formatMessage(
+            navigationMessages[WORKQUEUE_TABS.readyToIssue]
+          )}
+          count={declarationCount.readyToIssue}
+          isSelected={tabId === WORKQUEUE_TABS.readyToIssue}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+      {hasOutbox && (
+        <NavigationItem
+          icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
+          id={`navigation_${WORKQUEUE_TABS.outbox}`}
+          label={intl.formatMessage(navigationMessages[WORKQUEUE_TABS.outbox])}
+          count={declarationCount.outbox}
+          isSelected={tabId === WORKQUEUE_TABS.outbox}
+          onClick={() => {
+            goToHomeTab(WORKQUEUE_TABS.outbox)
+            menuCollapse && menuCollapse()
+          }}
+        />
+      )}
+    </NavigationGroup>
+  )
+}
+
+export default Workqueue
