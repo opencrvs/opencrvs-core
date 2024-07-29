@@ -40,7 +40,7 @@ import { IAttachmentValue, IForm } from '@client/forms'
 import { getDummyCertificateTemplateData } from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
-  executeHandlebarsTemplate,
+  compileSvg,
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -680,7 +680,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                     this.props.registerForm
                   )
                   let svgCode = atob(file.data.split(',')[1])
-                  svgCode = executeHandlebarsTemplate(
+                  svgCode = compileSvg(
                     svgCode,
                     dummyTemplateData,
                     this.props.state

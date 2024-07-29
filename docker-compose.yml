@@ -185,6 +185,7 @@ services:
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - DOCUMENTS_URL=http://documents:9050
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     #platform: linux/amd64

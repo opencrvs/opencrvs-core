@@ -15,7 +15,8 @@ import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   sendUpdateUsernameNotification,
-  postFhir
+  postFhir,
+  uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
@@ -25,6 +26,7 @@ import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import { userRoleScopes } from '@opencrvs/commons/authentication'
+import { Practitioner } from '@opencrvs/commons/types'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -37,10 +39,10 @@ export default async function updateUser(
   if (!existingUser) {
     throw new Error(`No user found by given id: ${user.id}`)
   }
-  const existingPractitioner = await getFromFhir(
+  const existingPractitioner = (await getFromFhir(
     token,
     `/Practitioner/${existingUser.practitionerId}`
-  )
+  )) satisfies Practitioner
   const existingPractitionerRoleBundle: fhir.Bundle = await getFromFhir(
     token,
     `/PractitionerRole?practitioner=${existingUser.practitionerId}`
@@ -92,7 +94,17 @@ export default async function updateUser(
       throw new Error('Location can be changed only by National System Admin')
     }
   }
-  const practitioner = createFhirPractitioner(existingUser, false)
+  const signatureAttachment = user.signature && {
+    contentType: user.signature.type,
+    url: await uploadSignatureToMinio(token, user.signature),
+    creation: new Date().getTime().toString()
+  }
+
+  const practitioner = createFhirPractitioner(
+    existingUser,
+    false,
+    signatureAttachment
+  )
   practitioner.id = existingPractitioner.id
 
   const practitionerId = await postFhir(token, practitioner)
