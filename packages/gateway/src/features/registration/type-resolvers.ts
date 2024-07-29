@@ -1597,13 +1597,12 @@ export const typeResolvers: GQLResolver = {
           signatureExtension.valueAttachment.url,
           authHeader
         )
+      if (!presignedUrl) return null
 
-      return (
-        presignedUrl && {
-          type: 'minioPresignedUrl',
-          data: presignedUrl
-        }
-      )
+      return {
+        type: signatureExtension.valueAttachment.contentType,
+        data: presignedUrl
+      }
     },
     duplicateOf: (task: Task) => {
       const extensions = task.extension || []
