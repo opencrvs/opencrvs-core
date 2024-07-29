@@ -753,4 +753,16 @@ export const findPatientPrimaryIdentifier = (patient: Patient) =>
           'BIRTH_CONFIGURABLE_IDENTIFIER_3'
         ].includes(code)
     )
+  ) ??
+  // return registration numbers with a lower priority
+  findPatientIdentifier(
+    patient,
+    SUPPORTED_PATIENT_IDENTIFIER_CODES.filter(
+      (code) =>
+        ![
+          'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+          'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+        ].includes(code)
+    )
   )
