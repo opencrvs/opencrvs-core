@@ -61,6 +61,7 @@
     "react-signature-canvas": "^1.0.6"
   },
   "resolutions": {
-    "@types/react": "18.3.1"
+    "@types/react": "18.3.1",
+    "fast-xml-parser": "4.4.1"
   }
 }
