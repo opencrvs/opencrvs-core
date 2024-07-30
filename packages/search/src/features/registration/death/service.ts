@@ -15,11 +15,8 @@ import {
 import {
   composeOperationHistories,
   createStatusHistory,
-  EVENT,
   DeathDocument,
-  IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS,
   composeAssignment
 } from '@search/elasticsearch/utils'
 import {
@@ -43,7 +40,10 @@ import {
   resourceIdentifierToUUID,
   findFirstTaskHistory,
   getInformantType,
-  ValidRecord
+  ValidRecord,
+  REJECTED_STATUS,
+  IOperationHistory,
+  EVENT
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -66,9 +66,7 @@ export const composeDocument = (
     compositionId: composition.id,
     event: EVENT.DEATH,
     createdAt:
-      (existingDocument &&
-        existingDocument.body.hits.hits.length > 0 &&
-        existingDocument.body.hits.hits[0]._source.createdAt) ||
+      existingDocument?.body?.hits?.hits?.[0]?._source?.createdAt ||
       Date.now().toString(),
     operationHistories: composeOperationHistories(bundle) as IOperationHistory[]
   }
