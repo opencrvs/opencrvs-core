@@ -8,11 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { OnDropDocument } from '@elastic/elasticsearch/lib/Helpers'
-import { EVENT_TYPE, ValidRecord } from '@opencrvs/commons/types'
+import {
+  EVENT_TYPE,
+  ValidRecord,
+  SearchDocument
+} from '@opencrvs/commons/types'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client } from '@search/elasticsearch/client'
-import { BirthDocument, SearchDocument } from '@search/elasticsearch/utils'
+import { BirthDocument } from '@search/elasticsearch/utils'
 import { streamAllRecords } from '@search/features/records/service'
 import { composeDocument as composeBirthDocument } from '@search/features/registration/birth/service'
 import { composeDocument as composeDeathDocument } from '@search/features/registration/death/service'
@@ -49,32 +52,42 @@ export const reindex = async () => {
     }
   })
 
-  await client.indices.create({
-    index,
-    body: {
-      settings: {
-        number_of_shards: 1,
-        number_of_replicas: 0
+  await client.indices.create(
+    {
+      index,
+      body: {
+        settings: {
+          number_of_shards: 1,
+          number_of_replicas: 0
+        }
       }
+    },
+    {
+      meta: true
     }
-  })
+  )
 
-  await client.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: BirthDocument) => ({
-      index: {
-        _index: index,
-        _id: doc.compositionId
+  await client.helpers.bulk(
+    {
+      retries: 3,
+      wait: 3000,
+      datasource: stream.pipe(transformedStreamData),
+      onDocument: (doc: BirthDocument) => ({
+        index: {
+          _index: index,
+          _id: doc.compositionId
+        }
+      }),
+      onDrop(doc) {
+        throw new Error(
+          `Document ${doc.document.compositionId} couldn't be inserted`
+        )
       }
-    }),
-    onDrop(doc: OnDropDocument<BirthDocument>) {
-      throw new Error(
-        `Document ${doc.document.compositionId} couldn't be inserted`
-      )
+    },
+    {
+      meta: true
     }
-  })
+  )
   const t2 = performance.now()
   logger.info(
     `Finished reindexing to ${index} in ${((t2 - t1) / 1000).toFixed(
@@ -89,25 +102,33 @@ export const reindex = async () => {
  * Points the latest index (for example: ocrvs-20240523000000) - to an alias (example: ocrvs)
  */
 export async function updateAliases() {
-  const { body: indices } = await client.cat.indices<Array<{ index: string }>>({
-    format: 'json',
-    index: `${OPENCRVS_INDEX_NAME}-*`
-  })
+  const { body: indices } = await client.cat.indices(
+    {
+      format: 'json',
+      index: `${OPENCRVS_INDEX_NAME}-*`
+    },
+    {
+      meta: true
+    }
+  )
 
   const sortedIndices = orderBy(indices, 'index')
   const { index: latestIndex } = sortedIndices.at(-1)!
 
-  await client.indices.updateAliases({
-    body: {
-      actions: [
-        {
-          remove: {
-            alias: OPENCRVS_INDEX_NAME,
-            index: `${OPENCRVS_INDEX_NAME}-*`
-          }
-        },
-        { add: { alias: OPENCRVS_INDEX_NAME, index: latestIndex } }
-      ]
-    }
-  })
+  await client.indices.updateAliases(
+    {
+      body: {
+        actions: [
+          {
+            remove: {
+              alias: OPENCRVS_INDEX_NAME,
+              index: `${OPENCRVS_INDEX_NAME}-*`
+            }
+          },
+          { add: { alias: OPENCRVS_INDEX_NAME, index: latestIndex } }
+        ]
+      }
+    },
+    { meta: true }
+  )
 }

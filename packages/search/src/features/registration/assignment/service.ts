@@ -12,7 +12,6 @@ import { updateComposition } from '@search/elasticsearch/dbhelper'
 import {
   getUser,
   IAssignment,
-  SearchDocument,
   IUserModelData,
   NAME_EN
 } from '@search/elasticsearch/utils'
@@ -25,7 +24,8 @@ import {
   getTaskFromSavedBundle,
   LAST_USER_EXTENSION_URL,
   resourceIdentifierToUUID,
-  SavedBundle
+  SavedBundle,
+  SearchDocument
 } from '@opencrvs/commons/types'
 
 export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {

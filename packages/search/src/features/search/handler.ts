@@ -9,14 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
+import {
+  logger,
+  SearchDocument,
+  EVENT,
+  getSearchTotalCount
+} from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
 import { client } from '@search/elasticsearch/client'
 import {
-  SearchDocument,
-  EVENT,
   BirthDocument,
   DeathDocument,
   findDuplicateIds
@@ -72,10 +75,12 @@ export async function getAllDocumentsHandler(
         }
       },
       {
+        meta: true,
         ignore: [404]
       }
     )
-    const count: number = allDocumentsCountCheck.body.hits.total.value
+
+    const count = getSearchTotalCount(allDocumentsCountCheck?.body?.hits?.total)
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
@@ -92,7 +97,8 @@ export async function getAllDocumentsHandler(
         }
       },
       {
-        ignore: [404]
+        ignore: [404],
+        meta: true
       }
     )
     return h.response(allDocuments).code(200)
@@ -133,8 +139,9 @@ export async function getStatusWiseRegistrationCountHandler(
       })
     }
 
-    const response = await client.search<{
-      aggregations?: {
+    const response = await client.search<
+      SearchDocument,
+      {
         statusCounts: {
           buckets: Array<{
             key: string
@@ -142,23 +149,28 @@ export async function getStatusWiseRegistrationCountHandler(
           }>
         }
       }
-    }>({
-      body: {
-        size: 0,
-        query: {
-          bool: {
-            must: matchRules
-          }
-        },
-        aggs: {
-          statusCounts: {
-            terms: {
-              field: 'type.keyword'
+    >(
+      {
+        body: {
+          size: 0,
+          query: {
+            bool: {
+              must: matchRules
+            }
+          },
+          aggs: {
+            statusCounts: {
+              terms: {
+                field: 'type.keyword'
+              }
             }
           }
         }
+      },
+      {
+        meta: true
       }
-    })
+    )
 
     if (!response.body.aggregations) {
       return payload.status.map((status) => ({
