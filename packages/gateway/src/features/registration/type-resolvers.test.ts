@@ -52,7 +52,6 @@ const MOCK_USER: IUserModelData = {
   device: 'Samsung Galaxy S9',
   emailForNotification: 'kalushabw.alya17@gmail.com',
   mobile: '0934343434',
-  systemRole: 'LOCAL_REGISTRAR',
   role: 'LOCAL_REGISTRAR',
   practitionerId: '48455871-1636-46a1-8279-aaa76dec03d4',
   primaryOfficeId: '5faf414c-99e8-47a7-b4d9-d07a02dbc97e',
