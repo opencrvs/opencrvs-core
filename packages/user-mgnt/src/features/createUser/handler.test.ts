@@ -39,7 +39,6 @@ const mockUser = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   role: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
   deviceId: 'D444',
@@ -94,7 +93,6 @@ describe('createUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'FIELD_AGENT',
         role: 'FIELD_AGENT',
         primaryOfficeId: '321',
         deviceId: 'D444',
@@ -118,16 +116,6 @@ describe('createUser handler', () => {
     const expectedPractitionerROle = {
       resourceType: 'PractitionerRole',
       practitioner: { reference: 'Practitioner/123' },
-      code: [
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/roles',
-              code: 'FIELD_AGENT'
-            }
-          ]
-        }
-      ],
       location: [{ reference: 'Location/321' }]
     }
 

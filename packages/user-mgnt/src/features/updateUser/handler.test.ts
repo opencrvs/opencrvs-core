@@ -40,7 +40,6 @@ const mockUser = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
   deviceId: 'D444',
   password: 'test',
@@ -195,7 +194,6 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'REGISTRATION_AGENT',
         role: '',
         primaryOfficeId: '322',
         deviceId: 'D444'
@@ -239,7 +237,6 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123111111',
-        systemRole: 'FIELD_AGENT',
         role: 'POLICE_OFFICER',
         primaryOfficeId: '323',
         deviceId: 'D444'
@@ -354,7 +351,6 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'FIELD_AGENT',
         role: 'SOCIAL_WORKER',
         primaryOfficeId: '322',
         deviceId: 'D444'
