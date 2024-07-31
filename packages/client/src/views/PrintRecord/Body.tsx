@@ -438,7 +438,13 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   function getRenderableField(
     _section: IFormSection,
     _group: IFormSectionGroup,
-    fieldLabel: MessageDescriptor,
+    {
+      fieldLabel,
+      fieldLabelParams
+    }: {
+      fieldLabel: MessageDescriptor
+      fieldLabelParams?: Record<string, string>
+    },
     _fieldName: string,
     value: IFormFieldValue | JSX.Element | undefined,
     _ignoreAction = false
@@ -446,7 +452,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     const { intls } = props
 
     return {
-      label: formatMessage(intls, fieldLabel),
+      label: formatMessage(intls, fieldLabel, fieldLabelParams),
       value
     }
   }
@@ -536,7 +542,10 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
       return getRenderableField(
         section,
         group,
-        (tagDef[0] && tagDef[0].label) || field.label,
+        {
+          fieldLabel: (tagDef[0] && tagDef[0].label) || field.label,
+          fieldLabelParams: field.labelParam
+        },
         (tagDef[0] && tagDef[0].fieldToRedirect) || field.name,
         completeValue,
         field.readonly
@@ -581,7 +590,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     return getRenderableField(
       section,
       group,
-      field.label,
+      { fieldLabel: field.label, fieldLabelParams: field.labelParam },
       field.name,
       value,
       field.readonly
@@ -618,7 +627,10 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
           getRenderableField(
             section,
             group,
-            nestedField.label,
+            {
+              fieldLabel: nestedField.label,
+              fieldLabelParams: nestedField.labelParam
+            },
             nestedField.name,
             getNestedFieldValue(
               draft.data[section.id][field.name] as IFormData,

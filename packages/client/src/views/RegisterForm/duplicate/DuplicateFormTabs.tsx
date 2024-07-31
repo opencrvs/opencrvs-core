@@ -244,11 +244,17 @@ export const DuplicateFormTabs = (props: IProps) => {
   }
 
   const getRenderableField = (
-    fieldLabel: MessageDescriptor,
+    {
+      fieldLabel,
+      fieldLabelParams
+    }: {
+      fieldLabel: MessageDescriptor
+      fieldLabelParams?: Record<string, string>
+    },
     value: IFormFieldValue | JSX.Element | undefined
   ) => {
     return {
-      label: intl.formatMessage(fieldLabel),
+      label: intl.formatMessage(fieldLabel, fieldLabelParams),
       value
     }
   }
@@ -270,7 +276,10 @@ export const DuplicateFormTabs = (props: IProps) => {
       ignoreNestedFieldWrapping
     )
 
-    return getRenderableField(field.label, value)
+    return getRenderableField(
+      { fieldLabel: field.label, fieldLabelParams: field.labelParam },
+      value
+    )
   }
 
   const getPreviewGroupsField = (
@@ -340,7 +349,10 @@ export const DuplicateFormTabs = (props: IProps) => {
       )
 
       return getRenderableField(
-        (tagDef[0] && tagDef[0].label) || field.label,
+        {
+          fieldLabel: (tagDef[0] && tagDef[0].label) || field.label,
+          fieldLabelParams: field.labelParam
+        },
         completeValue
       )
     }
@@ -414,7 +426,10 @@ export const DuplicateFormTabs = (props: IProps) => {
       } else {
         nestedItems.push(
           getRenderableField(
-            nestedField.label,
+            {
+              fieldLabel: nestedField.label,
+              fieldLabelParams: nestedField.labelParam
+            },
             getNestedFieldValueOrError(
               section,
               draft.data[section.id][field.name] as IFormData,
