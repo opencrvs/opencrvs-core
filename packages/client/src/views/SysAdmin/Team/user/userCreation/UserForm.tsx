@@ -125,9 +125,9 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     const { formData } = this.props
 
     if (values.role) {
-      values.systemRole = this.props.userRoles.find(
+      values.scopes = this.props.userRoles.find(
         (role) => role.id === values.role
-      )!.systemRole
+      )!.scopes
 
       this.props.modifyUserFormData({ ...formData, ...values })
     }

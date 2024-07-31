@@ -202,7 +202,6 @@ const transformSectionData = ({
                   <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
-                      // alert('clicked change')
                       userId
                         ? goToUserReviewForm(
                             userId,
@@ -313,6 +312,9 @@ const UserReviewFormComponent = ({
     offlineCountryConfiguration['locations'][`${locationId}`] ||
     offlineCountryConfiguration['facilities'][`${locationId}`] ||
     offlineCountryConfiguration['offices'][`${locationId}`]
+
+  const userRole = userRoles.find(({ id }) => id === formData.role)
+
   if (userId) {
     title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
 
@@ -320,10 +322,7 @@ const UserReviewFormComponent = ({
       <SuccessButton
         id="submit-edit-user-form"
         disabled={
-          Array.isArray(formData.scopes) &&
-          formData.scopes.every((scope) => typeof scope === 'string') &&
-          formData.scopes.includes('record.register') &&
-          !formData.signature
+          userRole?.scopes?.includes('profile.electronic-signature') && !formData.signature
         }
         onClick={() => submitForm(userFormSection)}
         icon={() => <Check />}
@@ -342,8 +341,7 @@ const UserReviewFormComponent = ({
         size="large"
         fullWidth
         disabled={
-          //@ToDo formData.scopes?.includes('record.register') &&
-          !formData.signature
+          userRole?.scopes?.includes('profile.electronic-signature') && !formData.signature
         }
         onClick={() => submitForm(userFormSection)}
       >
