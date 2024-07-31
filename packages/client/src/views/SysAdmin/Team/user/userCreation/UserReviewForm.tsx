@@ -322,7 +322,8 @@ const UserReviewFormComponent = ({
       <SuccessButton
         id="submit-edit-user-form"
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') && !formData.signature
+          userRole?.scopes?.includes('profile.electronic-signature') &&
+          !formData.signature
         }
         onClick={() => submitForm(userFormSection)}
         icon={() => <Check />}
@@ -341,7 +342,8 @@ const UserReviewFormComponent = ({
         size="large"
         fullWidth
         disabled={
-          userRole?.scopes?.includes('profile.electronic-signature') && !formData.signature
+          userRole?.scopes?.includes('profile.electronic-signature') &&
+          !formData.signature
         }
         onClick={() => submitForm(userFormSection)}
       >

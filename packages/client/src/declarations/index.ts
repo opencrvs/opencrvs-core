@@ -1042,8 +1042,7 @@ function requestWithStateWrapper(
     try {
       const data = await mainRequest
       const scopes = getScope(getState())
-      // @TODO: Check is record.register equal to `!FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)`
-      if (scopes?.includes('record.register')) {
+      if (scopes?.includes('record.review-duplicates')) {
         await fetchAllDuplicateDeclarations(data.data)
       }
       const duplicateDeclarations = await fetchAllDuplicateDeclarations(

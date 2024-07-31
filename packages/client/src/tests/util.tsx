@@ -1547,7 +1547,7 @@ export const mockUserGraphqlOperation = {
                     {
                       action: 'hide',
                       expression:
-                        'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
+                        "!values.scopes?.includes('profile.electronic-signature')"
                     }
                   ],
                   fields: [
