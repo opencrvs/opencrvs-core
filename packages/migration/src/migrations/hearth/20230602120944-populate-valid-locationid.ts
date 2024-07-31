@@ -17,8 +17,8 @@ import { Db, MongoClient } from 'mongodb'
 import {
   updateComposition,
   searchCompositionByCriteria
-  // eslint-disable-next-line import/no-relative-parent-imports
 } from '../../utils/elasticsearch-helper.js'
+import { getSearchTotalCount } from '@opencrvs/commons'
 
 // THIS MIGRATION POPULATES THE MISSING EVENTLOCATIONIDS OR EVENTJURISDICTIONS IDS DUE TO THE ISSUE - #5242
 
@@ -56,8 +56,9 @@ export const up = async (db: Db, client: MongoClient) => {
 
   const compositionsWithoutLocationIdsResult =
     await searchCompositionByCriteria(searchCriteria)
-  const totalCompositionsWithoutLocationIds =
-    compositionsWithoutLocationIdsResult?.body.hits.total.value || 0
+  const totalCompositionsWithoutLocationIds = getSearchTotalCount(
+    compositionsWithoutLocationIdsResult?.body?.hits.total
+  )
 
   while (processedDocCount < totalCompositionsWithoutLocationIds) {
     const elasticDocBatchResult = await searchCompositionByCriteria(
@@ -79,7 +80,7 @@ export const up = async (db: Db, client: MongoClient) => {
       } catch (error: any) {
         // eslint-disable-next-line no-console
         console.error(
-          `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds for ${elasticDoc.id} failed : ${error.stack}`
+          `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds for ${elasticDoc._id} failed: ${error.stack}`
         )
       }
     }
@@ -90,7 +91,7 @@ export const up = async (db: Db, client: MongoClient) => {
   await session.endSession()
   // eslint-disable-next-line no-console
   console.log(
-    `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds  completed successfully.`
+    `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds completed successfully.`
   )
 }
 

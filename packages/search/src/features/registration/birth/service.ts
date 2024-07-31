@@ -13,11 +13,8 @@ import {
   searchByCompositionId
 } from '@search/elasticsearch/dbhelper'
 import {
-  EVENT,
   BirthDocument,
   NAME_EN,
-  IOperationHistory,
-  REJECTED_STATUS,
   composeOperationHistories,
   createStatusHistory,
   composeAssignment
@@ -44,7 +41,10 @@ import {
   SavedBundle,
   getBusinessStatus,
   getInformantType,
-  ValidRecord
+  ValidRecord,
+  EVENT,
+  IOperationHistory,
+  REJECTED_STATUS
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -73,9 +73,7 @@ export const composeDocument = (
     compositionId: composition.id,
     event: EVENT.BIRTH,
     createdAt:
-      (existingDocument &&
-        existingDocument.body.hits.hits.length > 0 &&
-        existingDocument.body.hits.hits[0]._source.createdAt) ||
+      existingDocument?.body?.hits?.hits?.[0]?._source?.createdAt ||
       Date.now().toString(),
     modifiedAt: Date.now().toString(),
     operationHistories: composeOperationHistories(record) as IOperationHistory[]

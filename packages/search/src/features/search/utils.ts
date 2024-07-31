@@ -11,12 +11,10 @@
 import {
   findPatientIdentifier,
   Patient,
-  SUPPORTED_PATIENT_IDENTIFIER_CODES
-} from '@opencrvs/commons/types'
-import {
+  SUPPORTED_PATIENT_IDENTIFIER_CODES,
   CERTIFIED_STATUS,
   REGISTERED_STATUS
-} from '@search/elasticsearch/utils'
+} from '@opencrvs/commons/types'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 import { transformDeprecatedParamsToSupported } from './deprecation-support'
 import { resolveLocationChildren } from './location'
