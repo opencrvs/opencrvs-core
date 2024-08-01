@@ -28,6 +28,9 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { IntlShape } from 'react-intl'
+import { getOfflineData } from '@client/offline/selectors'
+import { useSelector } from 'react-redux'
+import { Event } from '@client/utils/gateway'
 
 interface IWorkqueueProps {
   workqueue: IWorkqueue
@@ -36,7 +39,6 @@ interface IWorkqueueProps {
   intl: IntlShape
   tabId: string
   menuCollapse?: () => void
-  isOnePrintInAdvanceOn: boolean
   goToHomeTab: (tabId: IWORKQUEUE_TABS) => void
 }
 
@@ -47,7 +49,6 @@ const Workqueue = ({
   intl,
   tabId,
   menuCollapse,
-  isOnePrintInAdvanceOn,
   goToHomeTab
 }: IWorkqueueProps) => {
   const { hasScope, hasAnyScope } = usePermissions()
@@ -57,6 +58,13 @@ const Workqueue = ({
     data,
     storedDeclarations
   )
+
+  const offlineCountryConfiguration = useSelector(getOfflineData)
+
+  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
+    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
+    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
+  })
 
   const declarationCount = {
     inProgress: !initialSyncDone
@@ -109,7 +117,6 @@ const Workqueue = ({
   ])
 
   const hasSentForApproval = hasScope('record.submit-for-approval')
-  const hasRequiresUpdates = hasScope('record.declaration-review')
   const hasReadyForReview = hasScope('record.declaration-review')
   const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
   const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
@@ -163,7 +170,7 @@ const Workqueue = ({
           }}
         />
       )}
-      {hasRequiresUpdates && (
+      {(hasSentForReview || hasSentForApproval) && (
         <NavigationItem
           icon={() => <DeclarationIconSmall color={'red'} />}
           id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
@@ -193,7 +200,6 @@ const Workqueue = ({
           }}
         />
       )}
-
       {hasReadyToPrint && (
         <NavigationItem
           icon={() => <DeclarationIconSmall color={'green'} />}
@@ -224,7 +230,6 @@ const Workqueue = ({
           }}
         />
       )}
-
       {isOnePrintInAdvanceOn && hasReadyToIssue && (
         <NavigationItem
           icon={() => <DeclarationIconSmall color={'teal'} />}

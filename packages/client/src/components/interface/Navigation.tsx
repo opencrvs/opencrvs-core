@@ -35,7 +35,6 @@ import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer
 import { storage } from '@client/storage'
 import styled from 'styled-components'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -218,11 +217,6 @@ const NavigationView = (props: IFullProps) => {
     : 'review'
   const runningVer = String(localStorage.getItem('running-version'))
 
-  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
-  })
-
   React.useEffect(() => {
     if (!userDetails || !loadWorkqueueStatuses) {
       return
@@ -250,7 +244,6 @@ const NavigationView = (props: IFullProps) => {
         draftDeclarations={draftDeclarations}
         intl={intl}
         tabId={tabId}
-        isOnePrintInAdvanceOn={isOnePrintInAdvanceOn}
         goToHomeTab={props.goToHomeTab}
       />
 
