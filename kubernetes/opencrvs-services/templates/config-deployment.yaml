@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: config
+  name: config
+spec:
+  ports:
+    - port: 2021
+      targetPort: 2021
+  selector:
+    app: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: config
+  name: config
+spec:
+  replicas: {{ .Values.config.replicas }}
+  selector:
+    matchLabels:
+      app: config
+  template:
+    metadata:
+      labels:
+        app: config
+    spec:
+      containers:
+        - name: config
+          image: "opencrvs/ocrvs-config:{{ .Values.image.tag }}"
+          env:
+            - name: AUTH_URL
+              value: http://auth:4040
+            - name: CHECK_INVALID_TOKEN
+              value: "true"
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig:3040
+            - name: DOCUMENTS_URL
+              value: http://documents:9050
+            - name: FHIR_URL
+              value: http://hearth:3447/fhir
+            - name: GATEWAY_URL
+              value: http://gateway:7070/
+            - name: HOST
+              value: 0.0.0.0
+            - name: METRICS_URL
+              value: http://metrics:1050
+            - name: MONGO_URL
+              value: mongodb://mongodb/application-config
+            - name: PORT
+              value: "2021"
+            - name: SEARCH_URL
+              value: http://search:9090/
+            - name: USER_MANAGEMENT_URL
+              value: http://user-mgnt:3030/
+          ports:
+            - containerPort: 2021
+              protocol: TCP
+      restartPolicy: Always
