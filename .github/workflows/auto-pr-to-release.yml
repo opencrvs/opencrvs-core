@@ -113,12 +113,6 @@ jobs:
 
           # Fetch and checkout the release branch
           git fetch --all --unshallow
-          git log ${{ env.HEAD_BRANCH }}
-          git fetch origin ${{ env.HEAD_BRANCH }} --unshallow
-          echo "New logs"
-          git log ${{ env.HEAD_BRANCH }}
-          git status
-
           git checkout ${{ env.RELEASE_BRANCH }}
 
           # Create a new branch for the PR
