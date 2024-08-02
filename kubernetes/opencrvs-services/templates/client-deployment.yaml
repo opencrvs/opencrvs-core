@@ -33,4 +33,8 @@ spec:
           ports:
             - containerPort: 80
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 80
       restartPolicy: Always

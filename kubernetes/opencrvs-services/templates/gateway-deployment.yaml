@@ -32,9 +32,9 @@ spec:
           image: "opencrvs/ocrvs-gateway:{{ .Values.image.tag }}"
           env:
             - name: APPLICATION_CONFIG_URL
-              value: http://config:2021/
+              value: http://config.opencrvs-services-dev.svc.cluster.local:2021 # FIXME: harcoded/
             - name: AUTH_URL
-              value: http://auth:4040
+              value: http://auth.opencrvs-services-dev.svc.cluster.local:4040 # FIXME: harcoded
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
             - name: CHECK_INVALID_TOKEN
@@ -44,29 +44,29 @@ spec:
             - name: CONFIG_TOKEN_EXPIRY_SECONDS
               value: "604800"
             - name: COUNTRY_CONFIG_URL
-              value: http://countryconfig:3040
+              value: http://countryconfig.opencrvs-services-dev.svc.cluster.local:3040 # FIXME: harcoded
             - name: DOCUMENTS_URL
-              value: http://documents:9050
+              value: http://documents.opencrvs-services-dev.svc.cluster.local:9050 # FIXME: harcoded
             - name: FHIR_URL
-              value: http://hearth:3447/fhir
+              value: http://hearth-1.hearth.opencrvs-deps-dev.svc.cluster.local:3447/fhir # FIXME: harcoded
             - name: METRICS_URL
-              value: http://metrics:1050
+              value: http://metrics.opencrvs-services-dev.svc.cluster.local:1050 # FIXME: harcoded
             - name: MINIO_BUCKET
               value: ocrvs
             - name: NODE_ENV
               value: development
             - name: NOTIFICATION_URL
-              value: http://notification:2020/
+              value: http://notification.opencrvs-services-dev.svc.cluster.local:2020/
             - name: REDIS_HOST
-              value: redis
+              value: redis.opencrvs-deps-dev.svc.cluster.local # FIXME: harcoded
             - name: SEARCH_URL
-              value: http://search:9090/
+              value: http://search.opencrvs-deps-dev.svc.cluster.local:9090/ # FIXME: harcoded
             - name: USER_MANAGEMENT_URL
-              value: http://user-mgnt:3030/
+              value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
             - name: WEBHOOKS_URL
-              value: http://webhooks:2525/
+              value: http://webhooks.opencrvs-services-dev.svc.cluster.local:2525/
             - name: WORKFLOW_URL
-              value: http://workflow:5050/
+              value: http://workflow.opencrvs-services-dev.svc.cluster.local:5050/
           ports:
             - containerPort: 7070
               protocol: TCP

@@ -32,21 +32,21 @@ spec:
           image: "opencrvs/ocrvs-webhooks:{{ .Values.image.tag }}"
           env:
             - name: AUTH_URL
-              value: http://auth:4040
+              value: http://auth.opencrvs-services-dev.svc.cluster.local:4040 # FIXME: harcoded
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
             - name: CHECK_INVALID_TOKEN
               value: "true"
             - name: FHIR_URL
-              value: http://hearth:3447/fhir
+              value: http://hearth-1.hearth.opencrvs-deps-dev.svc.cluster.local:3447/fhir # FIXME: harcoded
             - name: HOST
               value: 0.0.0.0
             - name: MONGO_URL
-              value: mongodb://mongo1/webhooks
+              value: mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/webhooks
             - name: REDIS_HOST
-              value: redis
+              value: redis.opencrvs-deps-dev.svc.cluster.local # FIXME: harcoded
             - name: USER_MANAGEMENT_URL
-              value: http://user-mgnt:3030/
+              value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
           ports:
             - containerPort: 2525
               protocol: TCP

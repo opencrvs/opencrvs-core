@@ -40,13 +40,17 @@ spec:
             - name: CONFIG_TOKEN_EXPIRY_SECONDS
               value: '604800'
             - name: METRICS_URL
-              value: http://metrics:1050
+              value: http://metrics.opencrvs-services-dev.svc.cluster.local:1050 # FIXME: harcoded
             - name: NOTIFICATION_SERVICE_URL
-              value: http://notification:2020/
+              value: http://notification.opencrvs-services-dev.svc.cluster.local:2020/
             - name: REDIS_HOST
-              value: redis
+              value: redis.opencrvs-deps-dev.svc.cluster.local # FIXME: harcoded
             - name: USER_MANAGEMENT_URL
-              value: http://user-mgnt:3030/
+              value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
+            - name: USER_MANAGEMENT_URL
+              value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
+            - name: AUTH_PORT
+              value: "4040"          
           ports:
             - containerPort: 4040
               protocol: TCP
@@ -55,8 +59,12 @@ spec:
               name: public-key
               subPath: public-key.pem
             - mountPath: /secrets/private-key.pem
-              name: auth-cm1
+              name: private-key
               subPath: private-key.pem
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 4040
       restartPolicy: Always
       volumes:
         - configMap:
@@ -66,8 +74,5 @@ spec:
             name: public-key
           name: public-key
         - secret:
-            items:
-              - key: private-key.pem
-                path: private-key.pem
-            name: auth-cm1
+            secretName: private-key
           name: private-key
