@@ -25,13 +25,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH
-        if: ${{ env.ACT }}
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY_PROD }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -122,7 +115,7 @@ jobs:
           echo "HEAD_BRANCH: ${{ env.HEAD_BRANCH }}"
           echo "BASE_SHA: ${{ env.BASE_SHA }}"
 
-          COMMIT_RANGE="${{ env.BASE_SHA }}..${{ env.HEAD_BRANCH }}"
+          COMMIT_RANGE="${{ env.BASE_SHA }}..origin/${{ env.HEAD_BRANCH }}"
 
           echo "Commit range: ${COMMIT_RANGE}"
 
