@@ -114,7 +114,7 @@ jobs:
           git checkout -b $NEW_BRANCH
 
           echo "HEAD_BRANCH: ${{ env.HEAD_BRANCH }}"
-          echo "BASE_SHA": ${{ env.BASE_SHA }}"
+          echo "BASE_SHA: ${{ env.BASE_SHA }}"
 
           COMMIT_RANGE="${{ env.BASE_SHA }}..${{ env.HEAD_BRANCH }}"
 
