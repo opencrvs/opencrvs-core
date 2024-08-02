@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: workflow
+  name: workflow
+spec:
+  ports:
+    - port: 5050
+      targetPort: 5050
+  selector:
+    app: workflow
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: workflow
+  name: workflow
+spec:
+  replicas: {{ .Values.workflow.replicas }}
+  selector:
+    matchLabels:
+      app: workflow
+  template:
+    metadata:
+      labels:
+        app: workflow
+    spec:
+      containers:
+        - name: workflow
+          image: "opencrvs/ocrvs-workflow:{{ .Values.image.tag }}"
+          env:
+            - name: APPLICATION_CONFIG_URL
+              value: http://config:2021/
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: COUNTRY
+              value: bgd
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig:3040
+            - name: DOCUMENTS_URL
+              value: http://documents:9050
+            - name: FHIR_URL
+              value: http://hearth:3447/fhir
+            - name: METRICS_URL
+              value: http://metrics:1050
+            - name: NODE_ENV
+              value: development
+            - name: NOTIFICATION_SERVICE_URL
+              value: http://notification:2020/
+            - name: SEARCH_URL
+              value: http://search:9090/
+            - name: USER_MANAGEMENT_URL
+              value: http://user-mgnt:3030/
+            - name: WEBHOOKS_URL
+              value: http://webhooks:2525/
+          ports:
+            - containerPort: 5050
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: public-key
+          name: public-key

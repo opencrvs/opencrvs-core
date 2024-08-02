@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: documents
+  name: documents
+spec:
+  replicas: {{ .Values.dashboards.replicas }}
+  selector:
+    matchLabels:
+      app: documents
+  template:
+    metadata:
+      labels:
+        app: documents
+    spec:
+      containers:
+        - name: documents
+          env:
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig:3040
+            - name: NODE_ENV
+              value: development
+          image: "opencrvs/ocrvs-documents:{{ .Values.image.tag }}"
+      restartPolicy: Always

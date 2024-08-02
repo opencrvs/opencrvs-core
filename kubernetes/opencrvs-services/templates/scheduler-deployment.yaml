@@ -1,0 +1,28 @@
+# FIXME: Refactor to k8s cronjobs, this is essentially a cron wrapper
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: scheduler
+  name: scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      containers:
+        - name: scheduler
+          image: "opencrvs/ocrvs-scheduler:{{ .Values.image.tag }}"
+          env:
+            - name: METRICS_URL
+              value: http://metrics:1050
+            - name: NODE_ENV
+              value: development
+            - name: OPENHIM_MONGO_URL
+              value: mongodb://mongo1/openhim-dev
+      restartPolicy: Always

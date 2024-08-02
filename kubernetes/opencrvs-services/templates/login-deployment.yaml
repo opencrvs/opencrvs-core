@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: login
+  name: login
+spec:
+  ports:
+    - port: 3020
+      targetPort: 80
+  selector:
+    app: login
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: login
+  name: login
+spec:
+  replicas: {{ .Values.login.replicas }}
+  selector:
+    matchLabels:
+      app: login
+  template:
+    metadata:
+      labels:
+        app: login
+    spec:
+      containers:
+        - name: login
+          image: "opencrvs/ocrvs-login:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 80 #FIXME: non-low end port
+              protocol: TCP
+      restartPolicy: Always

@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: auth
+  name: auth
+spec:
+  ports:
+    - port: 4040
+      targetPort: 4040
+  selector:
+    app: auth
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: auth
+  name: auth
+spec:
+  replicas: {{ .Values.auth.replicas }}
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - image: "opencrvs/ocrvs-auth:{{ .Values.image.tag }}"
+          name: auth
+          env:
+            - name: CERT_PRIVATE_KEY_PATH
+              value: /secrets/private-key.pem
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: CONFIG_SMS_CODE_EXPIRY_SECONDS
+              value: '600'
+            - name: CONFIG_TOKEN_EXPIRY_SECONDS
+              value: '604800'
+            - name: METRICS_URL
+              value: http://metrics:1050
+            - name: NOTIFICATION_SERVICE_URL
+              value: http://notification:2020/
+            - name: REDIS_HOST
+              value: redis
+            - name: USER_MANAGEMENT_URL
+              value: http://user-mgnt:3030/
+          ports:
+            - containerPort: 4040
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+            - mountPath: /secrets/private-key.pem
+              name: auth-cm1
+              subPath: private-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: public-key
+          name: public-key
+        - secret:
+            items:
+              - key: private-key.pem
+                path: private-key.pem
+            name: auth-cm1
+          name: private-key

@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: webhooks
+  name: webhooks
+spec:
+  ports:
+    - port: 2525
+      targetPort: 2525
+  selector:
+    app: webhooks
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webhooks
+  name: webhooks
+spec:
+  replicas: {{ .Values.webhooks.replicas }}
+  selector:
+    matchLabels:
+      app: webhooks
+  template:
+    metadata:
+      labels:
+        app: webhooks
+    spec:
+      containers:
+        - name: webhooks
+          image: "opencrvs/ocrvs-webhooks:{{ .Values.image.tag }}"
+          env:
+            - name: AUTH_URL
+              value: http://auth:4040
+            - name: CERT_PUBLIC_KEY_PATH
+              value: /secrets/public-key.pem
+            - name: CHECK_INVALID_TOKEN
+              value: "true"
+            - name: FHIR_URL
+              value: http://hearth:3447/fhir
+            - name: HOST
+              value: 0.0.0.0
+            - name: MONGO_URL
+              value: mongodb://mongo1/webhooks
+            - name: REDIS_HOST
+              value: redis
+            - name: USER_MANAGEMENT_URL
+              value: http://user-mgnt:3030/
+          ports:
+            - containerPort: 2525
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /secrets/public-key.pem
+              name: public-key
+              subPath: public-key.pem
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            items:
+              - key: public-key.pem
+                path: public-key.pem
+            name: public-key
+          name: public-key
