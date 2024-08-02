@@ -109,6 +109,7 @@ jobs:
 
           git fetch origin ${{ env.HEAD_BRANCH }}
 
+          git checkout ${{ env.HEAD_BRANCH }}
           git checkout ${{ env.RELEASE_BRANCH }}
 
           # Create a new branch for the PR
