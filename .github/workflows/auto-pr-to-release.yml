@@ -41,6 +41,7 @@ jobs:
           echo "BASE_BRANCH=$(echo $PR_DATA | jq -r '.baseRefName')" >> $GITHUB_ENV
           echo "HEAD_BRANCH=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_ENV
           echo "PR_TITLE=$(echo $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
+          echo "BASE_SHA=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
 
           LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
           FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
@@ -60,6 +61,7 @@ jobs:
           echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
           echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
           echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
+          echo "BASE_SHA=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
 
           LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
           FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
@@ -120,20 +122,19 @@ jobs:
           NEW_BRANCH="auto-pr-${{ env.RELEASE_BRANCH }}-${{ env.PR_ID }}-$RANDOM"
           git checkout -b $NEW_BRANCH
 
-          echo "First commit: ${{ env.FIRST_COMMIT_SHA }}"
-          echo "Latest commit: ${{ env.LATEST_COMMIT_SHA }}"
+          echo "HEAD_BRANCH: ${{ env.HEAD_BRANCH }}"
+          echo "BASE_SHA": ${{ env.BASE_SHA }}"
 
-          # NOTE: git cherry-pick range needs ~ to include the FIRST_COMMIT_SHA (https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-them-into-another-branch)
-          COMMIT_RANGE="$NEW_BRANCH~..${{ env.HEAD_BRANCH }}"
-
-          if [ "${{ env.FIRST_COMMIT_SHA }}" == "${{ env.LATEST_COMMIT_SHA }}" ]; then
-            COMMIT_RANGE=${{ env.FIRST_COMMIT_SHA }}
-          fi
+          COMMIT_RANGE="${{ env.BASE_SHA }}..${{ env.HEAD_BRANCH }}"
 
           echo "Commit range: $COMMIT_RANGE"
 
+          NON_MERGE_COMMITS=$(git log --reverse --no-merges --pretty=format:"%h" $COMMIT_RANGE -- | xargs)
+
+          echo "Ordered non-merge commits: $NON_MERGE_COMMITS"
+
           # Attempt to cherry-pick the commits from the original PR
-          CHERRY_PICK_OUTPUT=$(git cherry-pick $COMMIT_RANGE 2>&1) || {
+          CHERRY_PICK_OUTPUT=$(git cherry-pick $NON_MERGE_COMMITS 2>&1) || {
             git cherry-pick --abort || true
             # If cherry-pick fails, create a placeholder commit
             echo "Cherry-pick failed. Creating placeholder commit."
@@ -160,14 +161,9 @@ jobs:
 
             git checkout $NEW_BRANCH
             git reset --hard HEAD~1  # Remove placeholder commit
-            git cherry-pick $COMMIT_RANGE
+            git cherry-pick $NON_MERGE_COMMITS
             \`\`\`
 
-
-            **Individual commits without merges:**
-            \`\`\`
-            $GIT_LOG_ONELINE_OUTPUT
-            \`\`\`
             "
           }
 
