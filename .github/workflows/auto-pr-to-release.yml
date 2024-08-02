@@ -25,6 +25,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup SSH
+        if: ${{ env.ACT }}
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY_PROD }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
