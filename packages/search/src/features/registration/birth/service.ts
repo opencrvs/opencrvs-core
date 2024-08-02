@@ -149,7 +149,16 @@ function createChildIndex(
   body.childMiddleNameLocal = childNameLocal?.given?.at(1)
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
+  // what happens if country demands name like : familyName firstName
+  body.name =
+    (body.childFirstNames || '') +
+    ' ' +
+    (body.childMiddleName || '') +
+    ' ' +
+    (body.childFamilyName || '')
+
   body.childDoB = child.birthDate
+  body.dateOfEvent = child.birthDate
   body.gender = child.gender
 }
 

@@ -182,6 +182,7 @@ function createGroomIndex(
 
   if (marriageExtension) {
     body.marriageDate = marriageExtension.valueDateTime
+    body.dateOfEvent = marriageExtension.valueDateTime
   }
 
   body.groomIdentifier = groom && findPatientPrimaryIdentifier(groom)?.value

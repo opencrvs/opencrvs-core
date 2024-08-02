@@ -145,6 +145,14 @@ function createDeceasedIndex(
   body.gender = deceased.gender
   body.deceasedIdentifier = findPatientPrimaryIdentifier(deceased)?.value
   body.deceasedDoB = deceased.birthDate
+  // what happens if country demands name like : familyName firstName
+  body.name =
+    (body.deceasedFirstNames || '') +
+    ' ' +
+    (body.deceasedMiddleName || '') +
+    ' ' +
+    (body.deceasedFamilyName || '')
+  body.dateOfEvent = deceased.deceasedDateTime
 }
 
 function createMotherIndex(

@@ -127,7 +127,7 @@ type IFullProps = ISearchInputProps &
   RouteComponentProps<IMatchParams>
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
-  const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NAME)
+  const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NONE)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
 
   const { width: windowWidth } = useWindowSize()
@@ -149,7 +149,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const searchEventsQueryVariables = {
     advancedSearchParameters: filteredAdvancedSearchParams,
     count: DEFAULT_PAGE_SIZE,
-    skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
+    skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1),
+    sort: sortOrder,
+    sortColumn: sortedCol
   }
 
   const isEnoughParams = () => {
@@ -238,14 +240,11 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
       props.outboxDeclarations
     )
 
-    const sortedItems = getSortedItems(
-      transformedData.filter(
-        ({ id }) => !processingDeclarationIds.includes(id)
-      ),
-      sortedCol,
-      sortOrder
+    const dataExcludingOutbox = transformedData.filter(
+      ({ id }) => !processingDeclarationIds.includes(id)
     )
-
+    const sortedItems = dataExcludingOutbox
+    // ToDo sort by assignment
     return sortedItems.map((reg, index) => {
       const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
