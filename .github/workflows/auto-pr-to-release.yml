@@ -33,19 +33,17 @@ jobs:
         id: get_pr_details_dispatch
         run: |
           PR_NUMBER=${{ github.event.inputs.pr_number }}
-          PR_DATA=$(gh pr view $PR_NUMBER --json number,headRefName,baseRefName,mergedBy,mergeCommit,author,milestone,title --jq '{number: .number, headRefName: .headRefName, baseRefName: .baseRefName, merger: .mergedBy.login, author: .author.login, milestone: .milestone.title, title: .title}')
-          echo "PR_ID=$(echo $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
-          echo "PR_AUTHOR=$(echo $PR_DATA | jq -r '.author')" >> $GITHUB_ENV
-          echo "PR_MERGER=$(echo $PR_DATA | jq -r '.merger')" >> $GITHUB_ENV
-          echo "MILESTONE=$(echo $PR_DATA | jq -r '.milestone')" >> $GITHUB_ENV
-          echo "BASE_BRANCH=$(echo $PR_DATA | jq -r '.baseRefName')" >> $GITHUB_ENV
-          echo "HEAD_BRANCH=$(echo $PR_DATA | jq -r '.headRefName')" >> $GITHUB_ENV
-          echo "PR_TITLE=$(echo $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
-
-          LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
-          FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
-          echo "LATEST_COMMIT_SHA=${LATEST_COMMIT_SHA}" >> $GITHUB_ENV
-          echo "FIRST_COMMIT_SHA=${FIRST_COMMIT_SHA}" >> $GITHUB_ENV
+          PR_DATA=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/opencrvs/opencrvs-core/pulls/$PR_NUMBER)
+          # printf escapes the newlines in the JSON, so we can use jq to parse output such as:
+          # "body": "![image](https://github.com/user-attachments/assets/8eee5bcf-7692-490f-a19f-576623e09961)\r\n",
+          echo "PR_ID=$(printf '%s' $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
+          echo "PR_AUTHOR=$(printf '%s' $PR_DATA | jq -r '.user.login')" >> $GITHUB_ENV
+          echo "PR_MERGER=$(printf '%s' $PR_DATA | jq -r '.merged_by.login')" >> $GITHUB_ENV
+          echo "MILESTONE=$(printf '%s' $PR_DATA | jq -r '.milestone.title')" >> $GITHUB_ENV
+          echo "BASE_BRANCH=$(printf '%s' $PR_DATA | jq -r '.base.ref')" >> $GITHUB_ENV
+          echo "HEAD_BRANCH=$(printf '%s' $PR_DATA | jq -r '.head.ref')" >> $GITHUB_ENV
+          echo "PR_TITLE=$(printf '%s' $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
+          echo "BASE_SHA=$(printf '%s' $PR_DATA | jq -r '.base.sha')" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,11 +58,7 @@ jobs:
           echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
           echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
           echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
-
-          LATEST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[-1].oid')
-          FIRST_COMMIT_SHA=$(gh pr view $PR_NUMBER --json commits --jq '.commits[0].oid')
-          echo "LATEST_COMMIT_SHA=${LATEST_COMMIT_SHA}" >> $GITHUB_ENV
-          echo "FIRST_COMMIT_SHA=${FIRST_COMMIT_SHA}" >> $GITHUB_ENV
+          echo "BASE_SHA=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
 
           PR_DETAILS=$(gh pr view $PR_NUMBER --json mergedBy)
           MERGED_BY_LOGIN=$(echo "$PR_DETAILS" | jq -r '.mergedBy.login')
@@ -111,31 +105,29 @@ jobs:
           git config advice.mergeConflict false
 
           # Fetch and checkout the release branch
-          git fetch --all
+          git fetch --all --unshallow
           git checkout ${{ env.RELEASE_BRANCH }}
 
           # Create a new branch for the PR
           NEW_BRANCH="auto-pr-${{ env.RELEASE_BRANCH }}-${{ env.PR_ID }}-$RANDOM"
           git checkout -b $NEW_BRANCH
 
-          echo "First commit: ${{ env.FIRST_COMMIT_SHA }}"
-          echo "Latest commit: ${{ env.LATEST_COMMIT_SHA }}"
-          # NOTE: git cherry-pick range needs ~ to include the FIRST_COMMIT_SHA (https://stackoverflow.com/questions/1994463/how-to-cherry-pick-a-range-of-commits-and-merge-them-into-another-branch)
-          COMMIT_RANGE="${{ env.FIRST_COMMIT_SHA }}~..${{ env.LATEST_COMMIT_SHA }}"
+          echo "HEAD_BRANCH: ${{ env.HEAD_BRANCH }}"
+          echo "BASE_SHA: ${{ env.BASE_SHA }}"
 
-          if [ "${{ env.FIRST_COMMIT_SHA }}" == "${{ env.LATEST_COMMIT_SHA }}" ]; then
-            COMMIT_RANGE=${{ env.FIRST_COMMIT_SHA }}
-          fi
+          COMMIT_RANGE="${{ env.BASE_SHA }}..origin/${{ env.HEAD_BRANCH }}"
 
-          echo "Commit range: $COMMIT_RANGE"
+          echo "Commit range: ${COMMIT_RANGE}"
+
+          NON_MERGE_COMMITS=$(git log ${COMMIT_RANGE} --reverse --no-merges --pretty=format:"%h" -- | xargs)
+
+          echo "Ordered non-merge commits: $NON_MERGE_COMMITS"
 
           # Attempt to cherry-pick the commits from the original PR
-          CHERRY_PICK_OUTPUT=$(git cherry-pick $COMMIT_RANGE 2>&1) || {
+          CHERRY_PICK_OUTPUT=$(git cherry-pick ${NON_MERGE_COMMITS} 2>&1) || {
             git cherry-pick --abort || true
             # If cherry-pick fails, create a placeholder commit
             echo "Cherry-pick failed. Creating placeholder commit."
-
-            GIT_LOG_ONELINE_OUTPUT=$(git log --oneline --no-decorate $COMMIT_RANGE)
 
             git reset --hard
             git commit --allow-empty -m "Placeholder commit for PR #${{ env.PR_ID }}"
@@ -156,14 +148,9 @@ jobs:
 
             git checkout $NEW_BRANCH
             git reset --hard HEAD~1  # Remove placeholder commit
-            git cherry-pick $COMMIT_RANGE
+            git cherry-pick $NON_MERGE_COMMITS
             \`\`\`
 
-
-            **Individual commits:**
-            \`\`\`
-            $GIT_LOG_ONELINE_OUTPUT
-            \`\`\`
             "
           }
 
