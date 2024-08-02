@@ -32,19 +32,19 @@ spec:
           image: "opencrvs/ocrvs-search:{{ .Values.image.tag }}"
           env:
             - name: APPLICATION_CONFIG_URL
-              value: http://config:2021/
+              value: http://config.opencrvs-services-dev.svc.cluster.local:2021 # FIXME: harcoded/
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
             - name: ES_HOST
-              value: elasticsearch:9200
+              value: elasticsearch.opencrvs-deps-dev.svc.cluster.local:9200
             - name: FHIR_URL
-              value: http://hearth:3447/fhir
+              value: http://hearth-1.hearth.opencrvs-deps-dev.svc.cluster.local:3447/fhir # FIXME: harcoded
             - name: HEARTH_MONGO_URL
-              value: mongodb://mongo1/hearth-dev
+              value: mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/hearth-dev
             - name: NODE_ENV
               value: development
             - name: USER_MANAGEMENT_URL
-              value: http://user-mgnt:3030/
+              value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
           ports:
             - containerPort: 9090
               protocol: TCP

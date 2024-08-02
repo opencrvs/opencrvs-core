@@ -18,6 +18,7 @@ metadata:
     app: minio
   name: minio
 spec:
+  clusterIP: None
   ports:
     - name: '3535'
       port: 3535

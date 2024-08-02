@@ -31,6 +31,3 @@ webhooks:
   replicas: 1
 workflow:
   replicas: 1
-
-image:
-  tag: dev

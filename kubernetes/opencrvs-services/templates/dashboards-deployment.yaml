@@ -17,4 +17,5 @@ spec:
       containers:
         - name: dashboards
           image: "opencrvs/ocrvs-dashboards:{{ .Values.image.tag }}"
+          command: ["/bin/sh", "/run.sh"] # FIXME: make generic and provide run-dev.sh as args, not overwriting entrypoint
       restartPolicy: Always
