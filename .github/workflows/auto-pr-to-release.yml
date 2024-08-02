@@ -107,6 +107,8 @@ jobs:
           # Fetch and checkout the release branch
           git fetch --all
 
+          git fetch origin ${{ env.HEAD_BRANCH }}
+
           git checkout ${{ env.RELEASE_BRANCH }}
 
           # Create a new branch for the PR
