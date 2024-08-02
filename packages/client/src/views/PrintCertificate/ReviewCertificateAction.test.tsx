@@ -71,10 +71,6 @@ describe('when user wants to review death certificate', () => {
       history
     })
 
-    await flushPromises()
-
-    component.update()
-
     const confirmBtn = component.find('#confirm-print')
     const confirmBtnExist = !!confirmBtn.hostNodes().length
     expect(confirmBtnExist).toBe(true)

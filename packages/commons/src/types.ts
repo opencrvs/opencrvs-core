@@ -13,5 +13,6 @@ export * from './fhir/transformers/input'
 export * from './record'
 export * from './test-resources'
 export * from './nominal'
+export * from './search'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

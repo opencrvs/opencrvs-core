@@ -48,6 +48,7 @@ module.exports = {
     'import/no-named-as-default': 'off',
     'import/no-relative-parent-imports': 2,
     'import/named': 0,
+    'import/no-duplicates': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
