@@ -77,7 +77,7 @@ const messagesToDefine: IAdvancedSearchResultMessages = {
   },
   timePeriodFrom: {
     defaultMessage: 'Time period',
-    description: 'The label for time period advancedSearchParams',
+    description: 'The label for time period in active advancedSearchParams',
     id: 'advancedSearchResult.pill.timePeriod'
   },
   eventLocation: {
