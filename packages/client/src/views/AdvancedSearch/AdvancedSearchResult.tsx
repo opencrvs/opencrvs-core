@@ -84,10 +84,7 @@ import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { UserDetails } from '@client/utils/userUtils'
-import {
-  changeSortedColumn,
-  getSortedItems
-} from '@client/views/OfficeHome/utils'
+import { changeSortedColumn } from '@client/views/OfficeHome/utils'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -243,8 +240,18 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     const dataExcludingOutbox = transformedData.filter(
       ({ id }) => !processingDeclarationIds.includes(id)
     )
-    const sortedItems = dataExcludingOutbox
-    // ToDo sort by assignment
+
+    const sortedItems = [
+      ...dataExcludingOutbox.filter(
+        (data) =>
+          data.assignment?.practitionerId === props.userDetails?.practitionerId
+      ),
+      ...dataExcludingOutbox.filter(
+        (data) =>
+          data.assignment?.practitionerId !== props.userDetails?.practitionerId
+      )
+    ]
+
     return sortedItems.map((reg, index) => {
       const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
