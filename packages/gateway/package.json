@@ -17,11 +17,11 @@
     "gen:schema:watch": "nodemon --quiet --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --quiet --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0",
+    "lint": "eslint -c .eslintrc.js --fix ./src",
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.13",
+    "@elastic/elasticsearch": "8.13.1",
     "@graphql-tools/graphql-file-loader": "^7.5.16",
     "@graphql-tools/load": "^7.8.13",
     "@graphql-tools/schema": "^9.0.17",
@@ -82,6 +82,7 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
     "@types/node-fetch": "^2.5.12",
+    "@types/node": "18.11.18",
     "@types/redis": "^2.8.6",
     "@types/uuid": "^3.4.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",

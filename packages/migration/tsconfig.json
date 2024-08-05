@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
+    "paths": {
+      "@migration/*": ["./*"]
+    },
     "allowJs": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "target": "esnext",
     "module": "esnext",
     "esModuleInterop": true,
