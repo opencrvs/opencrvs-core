@@ -148,7 +148,6 @@ describe('User type resolvers', () => {
     expect(res).toEqual(mockOffice)
   })
   it('return user signature as registration agent', async () => {
-    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
     const roleBundle = {
       resourceType: 'Bundle',
       id: 'e9b83485-0418-47a0-b62b-c9d80a89691b',
@@ -188,25 +187,21 @@ describe('User type resolvers', () => {
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueSignature: {
-            type: [
-              {
-                system: 'urn:iso-astm:E1762-95:2013',
-                code: '1.2.840.10065.1.12.1.13',
-                display: 'Review Signature'
-              }
-            ],
-            when: '2019-08-22T08:43:43.461Z',
-            contentType: 'image/png',
-            blob: signatureData
+          valueAttachment: {
+            contentType: 'img/png',
+            url: '/ocrvs/a1-b2-c3.png',
+            creation: '1721970080786'
           }
         }
       ],
       id: 'dd78cad3-26dc-469a-bddb-0b45ae489491'
     }
+    const presignedURL =
+      'http://minio.farajaland-dev.opencrvs.org/ocrvs/cbf7c3cd-1b59-40b0-b8f9-2cd1310fe85b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240726%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20240726T094242Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=2eb6a0cdfb9d25f347771b3f10cba442946d09de035f3294d8edec49e09ec1a6'
 
     fetch.mockResponses(
       [JSON.stringify(roleBundle), { status: 200 }],
+      [JSON.stringify({ presignedURL }), { status: 200 }],
       [JSON.stringify(practitioner), { status: 200 }]
     )
 
@@ -226,36 +221,32 @@ describe('User type resolvers', () => {
     expect(response).toEqual({
       role: 'LOCAL_REGISTRAR',
       name: undefined,
-      signature: { type: 'image/png', data: signatureData }
+      signature: presignedURL
     })
   })
 
   it('return user signature as registrar', async () => {
-    const signatureData = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAo`
+    const presignedURL =
+      'http://minio.farajaland-dev.opencrvs.org/ocrvs/cbf7c3cd-1b59-40b0-b8f9-2cd1310fe85b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240726%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20240726T094242Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=2eb6a0cdfb9d25f347771b3f10cba442946d09de035f3294d8edec49e09ec1a6'
 
     const practitioner = {
       resourceType: 'Practitioner',
       extension: [
         {
           url: 'http://opencrvs.org/specs/extension/employee-signature',
-          valueSignature: {
-            type: [
-              {
-                system: 'urn:iso-astm:E1762-95:2013',
-                code: '1.2.840.10065.1.12.1.13',
-                display: 'Review Signature'
-              }
-            ],
-            when: '2019-08-22T08:43:43.461Z',
-            contentType: 'image/png',
-            blob: signatureData
+          valueAttachment: {
+            contentType: 'img/png',
+            url: '/ocrvs/a1-b2-c3.png',
+            creation: '1721970080786'
           }
         }
       ],
       id: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de'
     }
-
-    fetch.mockResponseOnce(JSON.stringify(practitioner), { status: 200 })
+    fetch.mockResponses(
+      [JSON.stringify({ presignedURL }), { status: 200 }],
+      [JSON.stringify(practitioner), { status: 200 }]
+    )
 
     const userResponse = mockResponse
     userResponse.scope!.push('register')
@@ -275,10 +266,7 @@ describe('User type resolvers', () => {
 
     expect(response).toEqual({
       role: 'REGISTRATION_AGENT',
-      signature: {
-        type: 'image/png',
-        data: signatureData
-      }
+      signature: presignedURL
     })
   })
 })

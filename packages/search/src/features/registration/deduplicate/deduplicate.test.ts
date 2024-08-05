@@ -54,7 +54,7 @@ afterAll(async () => {
 
 describe('deduplication tests', () => {
   it('checks elasticsearch is up', async () => {
-    await client.ping()
+    await client.ping(undefined, { meta: true })
   })
 
   describe('standard check', () => {
@@ -224,7 +224,7 @@ describe('deduplication tests', () => {
 
 describe('deduplication tests for death', () => {
   it('death:checks elasticsearch is up', async () => {
-    await client.ping()
+    await client.ping(undefined, { meta: true })
   })
 
   describe('standard check for death duplication', () => {
