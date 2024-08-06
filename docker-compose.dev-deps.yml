@@ -6,7 +6,6 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-version: '3.3'
 services:
   # For dependencies, expose ports locally for dev
   mongo1:
@@ -28,10 +27,11 @@ services:
       - './data/backups/elasticsearch:/data/backups/elasticsearch'
     environment:
       - 'discovery.type=single-node'
+      - 'cluster.routing.allocation.disk.watermark.enable_for_single_data_node=true'
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
       - path.repo=/data/backups/elasticsearch
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
-      - bootstrap.system_call_filter=false
+      - xpack.security.enabled=false # elasticsearch >8.x defaults to true
       # - http.port=9200
       # - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
       # - http.cors.enabled=true

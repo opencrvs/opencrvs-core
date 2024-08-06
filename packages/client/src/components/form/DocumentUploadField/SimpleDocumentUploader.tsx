@@ -10,7 +10,7 @@
  */
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { IFormFieldValue, IAttachmentValue } from '@client/forms'
 import React, { useState } from 'react'
 import {
@@ -51,7 +51,7 @@ type IFullProps = {
   allowedDocType?: string[]
   error?: string
   disableDeleteInPreview?: boolean
-  onComplete: (files: IAttachmentValue | {}) => void
+  onComplete: (file: IAttachmentValue | {}) => void
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
@@ -60,6 +60,7 @@ type IFullProps = {
 
 const SimpleDocumentUploaderComponent = ({
   allowedDocType,
+  name,
   onUploadingStateChanged,
   intl,
   previewTransformer,
@@ -167,9 +168,11 @@ const SimpleDocumentUploaderComponent = ({
       {(!files || !files.data) && (
         <DocumentUploader
           id="upload_document"
-          title={intl.formatMessage(messages.uploadFile)}
-          handleFileChange={handleFileChange}
-        />
+          name={name}
+          onChange={handleFileChange}
+        >
+          {intl.formatMessage(messages.uploadFile)}
+        </DocumentUploader>
       )}
     </>
   )

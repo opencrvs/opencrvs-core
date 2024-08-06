@@ -31,10 +31,10 @@ import {
 import { Event } from '@client/utils/gateway'
 import { isArray } from 'lodash'
 import { ZeroDocument } from '@client/views/RegisterForm/review/ReviewSection'
-import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
+import { DocumentListPreview } from '@client/components/form/DocumentUploadField/DocumentListPreview'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/review'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import styled from 'styled-components'
 

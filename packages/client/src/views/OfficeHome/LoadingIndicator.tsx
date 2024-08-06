@@ -14,7 +14,7 @@ import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
 import { errorMessages, constantsMessages } from '@client/i18n/messages'
-import { isNavigatorOnline, useOnlineStatus } from '@client/utils'
+import { useOnlineStatus } from '@client/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};

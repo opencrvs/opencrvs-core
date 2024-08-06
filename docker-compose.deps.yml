@@ -6,7 +6,6 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-version: '3.3'
 volumes:
   metricbeat:
 services:
@@ -19,7 +18,7 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.19
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
     restart: unless-stopped
     environment:
       - discovery.type=single-node

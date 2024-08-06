@@ -858,13 +858,6 @@ export const typeResolvers: GQLResolver = {
       }
       return null
     },
-    informantsSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
-    },
     groomSignature: async (
       task,
       _,
@@ -886,13 +879,6 @@ export const typeResolvers: GQLResolver = {
         )
       }
       return null
-    },
-    groomSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/groom-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
     },
     brideSignature: async (
       task,
@@ -916,13 +902,6 @@ export const typeResolvers: GQLResolver = {
       }
       return null
     },
-    brideSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/bride-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
-    },
     witnessOneSignature: async (
       task,
       _,
@@ -945,13 +924,6 @@ export const typeResolvers: GQLResolver = {
       }
       return null
     },
-    witnessOneSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/witness-one-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
-    },
     witnessTwoSignature: async (
       task,
       _,
@@ -973,13 +945,6 @@ export const typeResolvers: GQLResolver = {
         )
       }
       return null
-    },
-    witnessTwoSignatureURI: (task) => {
-      const contact = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/witness-two-signature`,
-        task.extension
-      )
-      return (contact && contact.valueString) || null
     },
     contactRelationship: (task) => {
       const contact = findExtension(
@@ -1593,7 +1558,11 @@ export const typeResolvers: GQLResolver = {
     input: (task) => task.input || [],
     output: (task) => task.output || [],
     certificates: resolveCertificates,
-    signature: async (task: Task, _: any, context) => {
+    signature: async (
+      task: Task,
+      _: any,
+      { headers: authHeader, ...context }
+    ) => {
       const action = getActionFromTask(task)
       const status = getStatusFromTask(task)
       if (
@@ -1622,13 +1591,18 @@ export const typeResolvers: GQLResolver = {
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
-      const signature = signatureExtension && signatureExtension.valueSignature
-      return (
-        signature && {
-          type: signature.contentType,
-          data: signature.blob
-        }
-      )
+      const presignedUrl =
+        signatureExtension &&
+        getPresignedUrlFromUri(
+          signatureExtension.valueAttachment.url,
+          authHeader
+        )
+      if (!presignedUrl) return null
+
+      return {
+        type: signatureExtension.valueAttachment.contentType,
+        data: presignedUrl
+      }
     },
     duplicateOf: (task: Task) => {
       const extensions = task.extension || []

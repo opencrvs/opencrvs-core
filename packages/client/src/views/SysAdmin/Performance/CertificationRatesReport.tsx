@@ -26,10 +26,6 @@ import { GET_TOTAL_CERTIFICATIONS } from './queries'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import type { GQLCertificationMetric } from '@client/utils/gateway-deprecated-do-not-use.d'
-interface ICertificationRateData {
-  label: string
-  value: number
-}
 
 interface ICertificationRateProps {
   timeStart: string

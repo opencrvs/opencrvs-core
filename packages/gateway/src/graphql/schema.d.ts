@@ -811,11 +811,6 @@ export interface GQLRegistration {
   brideSignature?: string
   witnessOneSignature?: string
   witnessTwoSignature?: string
-  informantsSignatureURI?: string
-  groomSignatureURI?: string
-  brideSignatureURI?: string
-  witnessOneSignatureURI?: string
-  witnessTwoSignatureURI?: string
   contactPhoneNumber?: string
   contactEmail?: string
   status?: Array<GQLRegWorkflow | null>
@@ -6511,11 +6506,6 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   brideSignature?: RegistrationToBrideSignatureResolver<TParent>
   witnessOneSignature?: RegistrationToWitnessOneSignatureResolver<TParent>
   witnessTwoSignature?: RegistrationToWitnessTwoSignatureResolver<TParent>
-  informantsSignatureURI?: RegistrationToInformantsSignatureURIResolver<TParent>
-  groomSignatureURI?: RegistrationToGroomSignatureURIResolver<TParent>
-  brideSignatureURI?: RegistrationToBrideSignatureURIResolver<TParent>
-  witnessOneSignatureURI?: RegistrationToWitnessOneSignatureURIResolver<TParent>
-  witnessTwoSignatureURI?: RegistrationToWitnessTwoSignatureURIResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
   contactEmail?: RegistrationToContactEmailResolver<TParent>
   status?: RegistrationToStatusResolver<TParent>
@@ -6722,66 +6712,6 @@ export interface RegistrationToWitnessOneSignatureResolver<
 }
 
 export interface RegistrationToWitnessTwoSignatureResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToInformantsSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToGroomSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToBrideSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToWitnessOneSignatureURIResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToWitnessTwoSignatureURIResolver<
   TParent = any,
   TResult = any
 > {

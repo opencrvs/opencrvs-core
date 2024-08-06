@@ -14,7 +14,6 @@ import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Role } from '@client/utils/gateway'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -60,10 +59,4 @@ export function useUserName() {
     const { userDetails } = state.profile
     return getUserName(userDetails)
   })
-}
-
-export function getUserRole(lang: string, role: Role) {
-  const defaultLabel = role?.labels?.find((label) => label.lang === LANG_EN)
-  const label = role?.labels?.find((label) => label.lang === lang)
-  return label?.label || defaultLabel?.label
 }

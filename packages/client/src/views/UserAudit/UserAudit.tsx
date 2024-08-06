@@ -52,7 +52,6 @@ import { useQuery } from '@apollo/client'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { UserDetails } from '@client/utils/userUtils'
 import { Scope } from '@client/utils/authUtils'
 
 const UserAvatar = styled(AvatarSmall)`

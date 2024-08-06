@@ -63,9 +63,7 @@ export const REGISTRAR_HOME_TAB_PAGE =
 
 export const SETTINGS = '/settings'
 export const CERTIFICATE_CONFIG = '/config/certificate'
-export const APPLICATION_CONFIG = '/config/application'
 export const SYSTEM_LIST = '/config/integration'
-export const USER_ROLES_CONFIG = '/config/userroles'
 
 export const INFORMANT_NOTIFICATION = '/communications/informantnotification'
 export const ALL_USER_EMAIL = '/communications/emailAllUsers'

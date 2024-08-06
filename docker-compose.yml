@@ -6,7 +6,6 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-version: '3.3'
 services:
   base:
     image: opencrvs/ocrvs-base:${VERSION}
@@ -186,6 +185,7 @@ services:
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - DOCUMENTS_URL=http://documents:9050
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     #platform: linux/amd64
@@ -253,6 +253,7 @@ services:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - DASHBOARD_MONGO_URL=mongodb://mongo1/performance
       - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
+      - SEARCH_URL=http://search:9090/
       - ES_HOST=elasticsearch:9200
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086

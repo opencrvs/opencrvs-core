@@ -11,7 +11,7 @@
 import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
 import React, { useState } from 'react'
@@ -274,15 +274,15 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
 
   return (
     <UploadWrapper>
-      <div id="upload-error">
-        {errorMessage && (
+      {errorMessage && (
+        <div id="upload-error">
           <ErrorText>
             {(requiredErrorMessage &&
               intl.formatMessage(requiredErrorMessage)) ||
               errorMessage}
           </ErrorText>
-        )}
-      </div>
+        </div>
+      )}
 
       <DocumentListPreview
         processingDocuments={filesBeingProcessed}
@@ -295,11 +295,13 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
           .options.length === 1 ? (
         <FullWidthImageUploader
           id="upload_document"
-          title={intl.formatMessage(formMessages.addFile)}
+          name={props.name}
           onClick={(e) => !isValid() && e.preventDefault()}
-          handleFileChange={handleFileChange}
+          onChange={handleFileChange}
           disabled={filesBeingProcessed.length > 0}
-        />
+        >
+          {intl.formatMessage(formMessages.addFile)}
+        </FullWidthImageUploader>
       ) : (
         <Flex>
           <Select
@@ -314,11 +316,13 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
           />
           <DocumentUploadButton
             id="upload_document"
-            title={intl.formatMessage(formMessages.addFile)}
+            name={props.name}
             onClick={(e) => !isValid() && e.preventDefault()}
-            handleFileChange={handleFileChange}
+            onChange={handleFileChange}
             disabled={filesBeingProcessed.length > 0}
-          />
+          >
+            {intl.formatMessage(formMessages.addFile)}
+          </DocumentUploadButton>
         </Flex>
       )}
 

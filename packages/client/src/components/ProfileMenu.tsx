@@ -29,7 +29,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { goToSettings } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
-import { getUserRole } from '@client/utils/userUtils'
+import { getUserRole } from '@client/utils'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
