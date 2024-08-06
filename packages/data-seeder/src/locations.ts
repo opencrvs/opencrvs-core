@@ -248,22 +248,28 @@ const createLocations = async (token: string, locations: any[]) => {
     const url = `${GATEWAY_HOST}/location?`
     console.log(`Creating locations on ${url}`)
 
+    const body = JSON.stringify(
+      locations
+        // statisticalID & code are legacy properties
+        .map(({ id, locationType, ...loc }) => ({
+          statisticalID: id,
+          code: locationType,
+          ...loc
+        }))
+    )
+
+    console.log(body)
+
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/fhir+json'
       },
-      body: JSON.stringify(
-        locations
-          // statisticalID & code are legacy properties
-          .map(({ id, locationType, ...loc }) => ({
-            statisticalID: id,
-            code: locationType,
-            ...loc
-          }))
-      )
+      body: body
     })
+
+    console.log(JSON.stringify(res))
 
     if (!res.ok) {
       raise(await res.json())
@@ -279,6 +285,7 @@ const createLocations = async (token: string, locations: any[]) => {
     })
   } catch (error) {
     console.log(`Failed to create locations: ${JSON.stringify(error)}`)
+    throw error
   }
 }
 
