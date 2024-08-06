@@ -157,33 +157,38 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
 
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
-  if (!res.ok) {
-    raise(`Expected to get the locations from ${url}`)
-  }
-  const parsedLocations = LocationSchema.safeParse(await res.json())
-  if (!parsedLocations.success) {
-    raise(
-      `Error when getting locations from country-config: ${inspect(
-        parsedLocations.error.issues
-      )}`
+
+  try {
+    console.log(`Fetching locations from ${url}`)
+    const res = await fetch(url)
+
+    const parsedLocations = LocationSchema.safeParse(await res.json())
+    if (!parsedLocations.success) {
+      raise(
+        `Error when getting locations from country-config: ${inspect(
+          parsedLocations.error.issues
+        )}`
+      )
+    }
+    const adminStructureMap = validateAdminStructure(
+      parsedLocations.data.filter(
+        ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
+      )
     )
+    parsedLocations.data
+      .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
+      .forEach((facilityOrOffice) => {
+        if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
+          raise(
+            `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
+          )
+        }
+      })
+    return parsedLocations.data
+  } catch (error) {
+    console.log(JSON.stringify(error))
+    raise(`Failed when fetching ${url}`)
   }
-  const adminStructureMap = validateAdminStructure(
-    parsedLocations.data.filter(
-      ({ locationType }) => locationType === 'ADMIN_STRUCTURE'
-    )
-  )
-  parsedLocations.data
-    .filter(({ locationType }) => locationType !== 'ADMIN_STRUCTURE')
-    .forEach((facilityOrOffice) => {
-      if (!adminStructureMap.get(facilityOrOffice.partOf.split('/')[1])) {
-        raise(
-          `Parent location "${facilityOrOffice.partOf}" not found for ${facilityOrOffice.name}`
-        )
-      }
-    })
-  return parsedLocations.data
 }
 
 function locationBundleToIdentifier(
@@ -207,51 +212,83 @@ function locationBundleToIdentifier(
     .filter((maybeId): maybeId is string => Boolean(maybeId))
 }
 
-export async function seedLocations(token: string) {
-  const savedLocations = (
-    await Promise.all(
-      ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
-        fetch(`${GATEWAY_HOST}/location?type=${type}&_count=0`, {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        })
-          .then((res) => res.json())
-          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
-            locationBundleToIdentifier(bundle)
-          )
+const getSavedLocations = async () => {
+  const locationTypes = ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY']
+
+  const savedLocations: string[] = []
+
+  for (const type of locationTypes) {
+    try {
+      const url = `${GATEWAY_HOST}/location?type=${type}&_count=0`
+      console.log(`Fetching locations of type ${type} from ${url}`)
+
+      const locationsByType = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/fhir+json'
+        }
+      })
+
+      const bundle = await locationsByType.json()
+      const identifier = locationBundleToIdentifier(bundle)
+      savedLocations.push(...identifier)
+    } catch (error) {
+      console.log(
+        `Failed to fetch and parse locations of type ${type}: ${JSON.stringify(
+          error
+        )}`
       )
-    )
-  ).flat()
+    }
+  }
+
+  return savedLocations
+}
+
+const createLocations = async (token: string, locations: any[]) => {
+  try {
+    const url = `${GATEWAY_HOST}/location?`
+    console.log(`Creating locations on ${url}`)
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/fhir+json'
+      },
+      body: JSON.stringify(
+        locations
+          // statisticalID & code are legacy properties
+          .map(({ id, locationType, ...loc }) => ({
+            statisticalID: id,
+            code: locationType,
+            ...loc
+          }))
+      )
+    })
+
+    if (!res.ok) {
+      raise(await res.json())
+    }
+
+    const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
+    response.entry?.forEach((res, index) => {
+      if (res.response?.status !== '201') {
+        console.log(
+          `Failed to create location resource for: "${locations[index].name}"`
+        )
+      }
+    })
+  } catch (error) {
+    console.log(`Failed to create locations: ${JSON.stringify(error)}`)
+  }
+}
+
+export async function seedLocations(token: string) {
+  const savedLocations = await getSavedLocations()
   const savedLocationsSet = new Set(savedLocations)
+
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)
   })
-  const res = await fetch(`${GATEWAY_HOST}/location?`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    },
-    body: JSON.stringify(
-      locations
-        // statisticalID & code are legacy properties
-        .map(({ id, locationType, ...loc }) => ({
-          statisticalID: id,
-          code: locationType,
-          ...loc
-        }))
-    )
-  })
-  if (!res.ok) {
-    raise(await res.json())
-  }
-  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
-  response.entry?.forEach((res, index) => {
-    if (res.response?.status !== '201') {
-      console.log(
-        `Failed to create location resource for: "${locations[index].name}"`
-      )
-    }
-  })
+
+  await createLocations(token, locations)
 }

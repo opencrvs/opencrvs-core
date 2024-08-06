@@ -203,14 +203,17 @@ function createLocationSegments(locations: Location[]): Location[][] {
     const jurisdictionLocations = locations.filter(
       (loc) => loc.jurisdictionType === jurisdictionType
     )
+
     if (jurisdictionLocations.length) {
       segments.push(...createChunks(jurisdictionLocations, LOCATION_CHUNK_SIZE))
     }
   }
+
   const facilitiesOrOffices = locations.filter((loc) => !loc.jurisdictionType)
   if (facilitiesOrOffices.length) {
     segments.push(...createChunks(facilitiesOrOffices, LOCATION_CHUNK_SIZE))
   }
+
   return segments
 }
 
@@ -219,11 +222,13 @@ async function batchLocationsHandler(
 ): Promise<fhir3.Bundle> {
   let statisticalToFhirIDMapOfParentLocations: Map<string, string> = new Map()
   const locationSegments = createLocationSegments(locations)
+
   const cumulativeResponse = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [] as fhir3.BundleEntry[]
   } satisfies fhir3.Bundle
+
   for (const each of locationSegments) {
     const locationsBundle = {
       resourceType: 'Bundle',
@@ -249,11 +254,13 @@ async function batchLocationsHandler(
           })
         )
     }
+
     const res = await fetchFromHearth(
       '',
       'POST',
       JSON.stringify(locationsBundle)
     )
+
     statisticalToFhirIDMapOfParentLocations = new Map(
       Array.from(statisticalToFhirIDMapOfParentLocations.entries()).concat(
         each.map((loc, i) => [
@@ -262,8 +269,10 @@ async function batchLocationsHandler(
         ])
       )
     )
+
     cumulativeResponse.entry = cumulativeResponse.entry.concat(res.entry)
   }
+
   return cumulativeResponse
 }
 
@@ -271,26 +280,35 @@ export async function createLocationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  console.log('Creating location')
   if (Array.isArray(request.payload)) {
+    console.log('Handling location creation in batches')
     return batchLocationsHandler(request.payload as Location[])
   }
+
   const payload = request.payload as Location | Facility
   const newLocation = composeFhirLocation(payload)
   const partOfLocation = payload.partOf.split('/')[1]
 
-  const locations = [
-    ...(await Promise.all([
-      getLocationsByIdentifier(
-        `${Code.ADMIN_STRUCTURE}_${String(payload.statisticalID)}`
-      ),
-      getLocationsByIdentifier(
-        `${Code.CRVS_OFFICE}_${String(payload.statisticalID)}`
-      ),
-      getLocationsByIdentifier(
-        `${Code.HEALTH_FACILITY}_${String(payload.statisticalID)}`
-      )
-    ]).then((results) => results.flat()))
-  ]
+  const locations = []
+
+  const identifiers = [
+    Code.ADMIN_STRUCTURE,
+    Code.CRVS_OFFICE,
+    Code.HEALTH_FACILITY
+  ].map((Code) => `${Code}_${String(payload.statisticalID)}`)
+
+  for (const identifier of identifiers) {
+    try {
+      console.log('Fetching locations by identifier', identifier)
+      const locationsByIdentifier = await getLocationsByIdentifier(identifier)
+
+      locations.push(...locationsByIdentifier)
+    } catch (error) {
+      console.log(JSON.stringify(error))
+      console.log(`Failed to fetch locations by identifier ${identifier}`)
+    }
+  }
 
   if (locations.length !== 0) {
     throw conflict(`statisticalID ${payload.statisticalID} already exists`)

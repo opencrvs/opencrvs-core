@@ -42,26 +42,29 @@ export const fetchFHIR = <T = any>(
     })
 }
 
-export const fetchFromHearth = <T = any>(
+export const fetchFromHearth = async <T = any>(
   suffix: string,
   method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
-  return fetch(`${FHIR_URL}${suffix}`, {
-    method,
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    },
-    body
-  })
-    .then((response) => {
-      return response.json()
+  try {
+    const url = `${FHIR_URL}${suffix}`
+
+    console.log(`Fetching from Hearth ${url}`)
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      },
+      body
     })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`FHIR with Hearth request failed: ${error.message}`)
-      )
-    })
+
+    return response.json()
+  } catch (error) {
+    console.log(JSON.stringify(error))
+    throw new Error(`FHIR with Hearth request failed: ${error.message}`)
+  }
 }
 
 export async function getCompositionIdFromResponse(
