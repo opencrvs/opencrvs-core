@@ -195,9 +195,6 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     localState.registrationByPeriod in TIME_PERIOD
   ) {
     transformedStoreState.timePeriodFrom = localState.registrationByPeriod
-    // transformedStoreState.timePeriodFrom = getFromDateFomTimePeriod(
-    //   localState.registrationByPeriod as TIME_PERIOD
-    // ) needs cleanup
   }
 
   if (localState.eventLocationType === 'HEALTH_FACILITY') {
@@ -304,9 +301,6 @@ export const transformStoreDataToAdvancedSearchLocalState = (
 
   if (reduxState.timePeriodFrom) {
     localState.registrationByPeriod = reduxState.timePeriodFrom
-    // localState.registrationByPeriod = getTimePeriodFromFromDate(
-    //   reduxState.timePeriodFrom
-    // ) needs cleanup
   }
 
   localState.event = eventType
@@ -476,19 +470,6 @@ export const getAccordionActiveStateMap = (
         storeState.informantDoB ||
         (storeState.informantDoBStart && storeState.informantDoBEnd)
     )
-  }
-}
-// needs cleanup
-const getTimePeriodFromFromDate = (fromDate: string) => {
-  switch (fromDate) {
-    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_7_DAYS):
-      return TIME_PERIOD.LAST_7_DAYS
-    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_30_DAYS):
-      return TIME_PERIOD.LAST_30_DAYS
-    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_90_DAYS):
-      return TIME_PERIOD.LAST_90_DAYS
-    case getFromDateFomTimePeriod(TIME_PERIOD.LAST_YEAR):
-      return TIME_PERIOD.LAST_YEAR
   }
 }
 
