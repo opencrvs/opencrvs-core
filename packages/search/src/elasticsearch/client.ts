@@ -53,3 +53,13 @@ export interface ISearchResponse<T> {
 export const client = new elasticsearch.Client({
   node: `http://${ES_HOST}`
 })
+
+export const getOrCreateClient = () => {
+  if (!client) {
+    return new elasticsearch.Client({
+      node: `http://${ES_HOST}`
+    })
+  }
+
+  return client
+}
