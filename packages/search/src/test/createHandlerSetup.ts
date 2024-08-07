@@ -32,7 +32,7 @@ export type SetupFn = () => Promise<{
 /**
  * Creates a setup for testing search handlers with elasticsearch
  *
- * @returns setup and cleanup functions
+ * @returns helpers for setting up, cleaning up and shutting down the test environment
  */
 export const createHandlerSetup = () => {
   let elasticContainer: StartedElasticsearchContainer
@@ -43,6 +43,7 @@ export const createHandlerSetup = () => {
       return elasticContainer
     }
 
+    // eslint-disable-next-line no-console
     console.log('Building elastic container...')
 
     return new ElasticsearchContainer('elasticsearch:8.14.3')
@@ -68,7 +69,6 @@ export const createHandlerSetup = () => {
     })
 
     jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue(elasticClient)
-    // jest.spyOn(esClient, 'client').
 
     return {
       server,
