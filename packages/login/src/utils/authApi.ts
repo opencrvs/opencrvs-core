@@ -82,7 +82,7 @@ export function request<T>(options: AxiosRequestConfig) {
 
     if (gatewayVersion && gatewayVersion !== loginClientVersion) {
       console.log(
-        `Version Mismatch: Frontend is running on ${loginClientVersion}, whereas backend is running on ${gatewayVersion}`
+        `Version Mismatch: Frontend is running on ${loginClientVersion}, whereas backend is running on ${gatewayVersion}. Please Reload to get the latest client`
       )
       throw new AxiosError('Version_MisMatch')
     }
@@ -93,7 +93,7 @@ export function request<T>(options: AxiosRequestConfig) {
     const gatewayVersion = error.response?.headers['x-version']
     if (gatewayVersion && gatewayVersion !== loginClientVersion) {
       console.log(
-        `Version Mismatch: Frontend is running on ${loginClientVersion}, whereas backend is running on ${gatewayVersion}`
+        `Version Mismatch: Frontend is running on ${loginClientVersion}, whereas backend is running on ${gatewayVersion}. Please Reload to get the latest client`
       )
       throw new AxiosError('Version_MisMatch')
     }
