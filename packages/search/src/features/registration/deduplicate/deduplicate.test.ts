@@ -209,78 +209,74 @@ describe('deduplication tests', () => {
       ).resolves.toHaveLength(1)
     })
   })
-})
 
-describe('deduplication tests for death', () => {
-  const { setup, cleanup, shutdown } = createHandlerSetup()
-  afterEach(cleanup)
-  afterAll(shutdown)
+  describe('deduplication tests for death', () => {
+    describe('standard check for death duplication', () => {
+      it('finds a duplicate with very similar details', async () => {
+        const t = await setupTestCases(setup)
 
-  describe('standard check for death duplication', () => {
-    it('finds a duplicate with very similar details', async () => {
-      const t = await setupTestCases(setup)
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', 'jhon'],
+              deceasedFamilyName: ['koly', 'koly'],
+              deceasedIdentifier: ['23412387', '23412387'],
+              deathDate: ['2000-11-12', '2000-11-17'],
+              deceasedDoB: ['2020-11-12', '2020-11-10']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(1)
+      })
 
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', 'jhon'],
-            deceasedFamilyName: ['koly', 'koly'],
-            deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17'],
-            deceasedDoB: ['2020-11-12', '2020-11-10']
-          },
-          t.elasticClient
-        )
-      ).resolves.toHaveLength(1)
-    })
+      it('finds no duplicate if a required field is missing', async () => {
+        const t = await setupTestCases(setup)
 
-    it('finds no duplicate if a required field is missing', async () => {
-      const t = await setupTestCases(setup)
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', 'Jhon'],
+              deceasedFamilyName: ['koly', 'koly'],
+              deathDate: ['2000-11-12', '2000-11-12'],
+              deceasedDoB: ['2020-11-12', '']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(0)
+      })
 
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', 'Jhon'],
-            deceasedFamilyName: ['koly', 'koly'],
-            deathDate: ['2000-11-12', '2000-11-12'],
-            deceasedDoB: ['2020-11-12', '']
-          },
-          t.elasticClient
-        )
-      ).resolves.toHaveLength(0)
-    })
+      it('finds no duplicate if both the firstName & familyName of deceased is not given', async () => {
+        const t = await setupTestCases(setup)
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', ''],
+              deceasedFamilyName: ['koly', ''],
+              deceasedIdentifier: ['23412387', '23412387'],
+              deathDate: ['2000-11-12', '2000-11-17'],
+              deceasedDoB: ['2020-11-12', '2020-11-10']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(0)
+      })
 
-    it('finds no duplicate if both the firstName & familyName of deceased is not given', async () => {
-      const t = await setupTestCases(setup)
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', ''],
-            deceasedFamilyName: ['koly', ''],
-            deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17'],
-            deceasedDoB: ['2020-11-12', '2020-11-10']
-          },
-          t.elasticClient
-        )
-      ).resolves.toHaveLength(0)
-    })
+      it('finds duplicate even if the familyName of deceased is not given', async () => {
+        const t = await setupTestCases(setup)
 
-    it('finds duplicate even if the familyName of deceased is not given', async () => {
-      const t = await setupTestCases(setup)
-
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', 'Jonh'],
-            deceasedFamilyName: ['koly', ''],
-            deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17'],
-            deceasedDoB: ['2020-11-12', '2020-11-10']
-          },
-          t.elasticClient
-        )
-      ).resolves.toHaveLength(1)
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', 'Jonh'],
+              deceasedFamilyName: ['koly', ''],
+              deceasedIdentifier: ['23412387', '23412387'],
+              deathDate: ['2000-11-12', '2000-11-17'],
+              deceasedDoB: ['2020-11-12', '2020-11-10']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(1)
+      })
     })
   })
 })
