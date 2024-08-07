@@ -299,5 +299,8 @@ const applicationConfigResponseValidation = Joi.object({
   SIGNATURE_REQUIRED_FOR_ROLES: Joi.array().items(
     Joi.string().valid(...SystemRoleType)
   ),
-  SEARCH_DEFAULT_CRITERIA: Joi.string().valid(...searchCriteria)
+  SEARCH_DEFAULT_CRITERIA: Joi.string()
+    .valid(...searchCriteria)
+    .optional()
+    .default('TRACKING_ID')
 })
