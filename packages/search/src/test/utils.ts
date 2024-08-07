@@ -17,6 +17,9 @@ import {
   URLReference
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+import { isNil } from 'lodash'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,6 +31,27 @@ import { UUID } from '@opencrvs/commons'
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+export const getOrThrow = <T>(value: T | undefined, message: string): T => {
+  if (isNil(value)) {
+    throw new Error(message ?? 'Tried to access a nil value')
+  }
+
+  return value
+}
+
+export const generateBearerTokenHeader = () => {
+  const token = jwt.sign({}, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:search-user'
+  })
+
+  return {
+    Authorization: `Bearer ${token}`
+  }
+}
+
 export const mockBirthFhirBundle: SavedBundle<
   | Composition
   | Encounter
