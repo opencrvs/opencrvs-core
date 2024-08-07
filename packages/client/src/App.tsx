@@ -72,6 +72,7 @@ import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAct
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import InformantNotification from './views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
+import { ReloadModal } from './views/Modals/ReloadModal'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -110,6 +111,7 @@ export function App(props: IAppProps) {
                     <NotificationComponent>
                       <Switch>
                         <Route>
+                          <ReloadModal />
                           <Page>
                             <MainSection>
                               <ProtectedPage

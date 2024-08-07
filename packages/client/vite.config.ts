@@ -49,6 +49,7 @@ export default defineConfig(({ mode }) => {
 
   const VitePWAPlugin = () => {
     return VitePWA({
+      registerType: 'autoUpdate',
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
@@ -76,7 +77,10 @@ export default defineConfig(({ mode }) => {
      * in that case because possibly storybook is getting
      * included in components bundle
      */
-    define: { 'process.env': {} },
+    define: {
+      'process.env': {},
+      APP_VERSION: JSON.stringify(process.env.npm_package_version)
+    },
     // This changes the output dir from dist to build
     build: {
       outDir: 'build',
