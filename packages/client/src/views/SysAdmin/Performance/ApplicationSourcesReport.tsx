@@ -26,8 +26,7 @@ import type { GQLTotalMetricsResult } from '@client/utils/gateway-deprecated-do-
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToFieldAgentList } from '@client/navigation'
-import { connect, useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { connect } from 'react-redux'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult

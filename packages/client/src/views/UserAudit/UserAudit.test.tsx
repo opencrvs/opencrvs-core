@@ -59,7 +59,6 @@ const mockAuditedUserGqlResponse = {
           system: 'NATIONAL_ID',
           value: '1014881922'
         },
-        systemRole: SystemRoleType.FieldAgent,
         role: {
           id: 'SOCIAL_WORKER',
           label: {
@@ -149,7 +148,6 @@ describe('User audit list tests for sys admin', () => {
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
-    userDetails.systemRole = SystemRoleType.LocalSystemAdmin
     userDetails.primaryOffice = {
       id: '895cc945-94a9-4195-9a29-22e9310f3385',
       status: 'active',

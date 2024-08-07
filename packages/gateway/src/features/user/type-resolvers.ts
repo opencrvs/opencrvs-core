@@ -11,15 +11,16 @@
 
 import {
   IAuthHeader,
+  Roles,
   UUID,
   fetchJSON,
   joinURL,
-  logger,
-  Roles
+  logger
 } from '@opencrvs/commons'
 
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import {
   GQLIdentifier,
   GQLResolver,
@@ -35,7 +36,8 @@ import {
   findExtension,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-
+import { scopesInclude } from './utils'
+import { UserScope } from '@opencrvs/commons/authentication'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -57,7 +59,7 @@ export interface IUserModelData {
     family: string
     given: string[]
   }[]
-  scope?: string[]
+  scope?: UserScope[]
   email: string
   emailForNotification?: string
   mobile?: string
@@ -226,31 +228,47 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature = signatureExtension && signatureExtension?.valueSignature
+      const presignedUrl = scopesInclude(
+        userModel.scope,
+        'profile.electronic-signature'
+      )
+        ? signatureExtension &&
+          (await getPresignedUrlFromUri(
+            signatureExtension.valueAttachment.url,
+            authHeader
+          ))
+        : null
 
       return {
         role: practitionerRole,
         name: practitioner.name,
-        signature: signature && {
-          type: signature.contentType,
-          data: signature.blob
-        }
+        signature: presignedUrl
       }
     },
-    async signature(userModel: IUserModelData, _, { dataSources }) {
+    async signature(
+      userModel: IUserModelData,
+      _,
+      { headers: authHeader, dataSources }
+    ) {
       const practitioner = await dataSources.fhirAPI.getPractitioner(
         userModel.practitionerId
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature = signatureExtension && signatureExtension.valueSignature
-      return (
-        signature && {
-          type: signature.contentType,
-          data: signature.blob
-        }
-      )
+      const presignedUrl =
+        signatureExtension &&
+        (await getPresignedUrlFromUri(
+          signatureExtension.valueAttachment.url,
+          authHeader
+        ))
+
+      if (!presignedUrl) return null
+
+      return {
+        type: signatureExtension.valueAttachment.contentType,
+        data: presignedUrl
+      }
     }
   },
 

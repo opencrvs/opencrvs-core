@@ -34,12 +34,15 @@ describe('elasticsearch db helper', () => {
       indexComposition('testId', mockCompositionBody, client)
 
       expect(indexSpy).toBeCalled()
-      expect(indexSpy).toBeCalledWith({
-        body: mockCompositionBody,
-        id: 'testId',
-        index: 'ocrvs',
-        refresh: 'wait_for'
-      })
+      expect(indexSpy).toBeCalledWith(
+        {
+          body: mockCompositionBody,
+          id: 'testId',
+          index: 'ocrvs',
+          refresh: 'wait_for'
+        },
+        { meta: true }
+      )
     })
 
     it('should update a composition with proper configuration', async () => {
@@ -50,25 +53,28 @@ describe('elasticsearch db helper', () => {
       updateSpy = jest.spyOn(client, 'update')
       updateComposition('testId', body, client)
       expect(updateSpy).toBeCalled()
-      expect(updateSpy).toBeCalledWith({
-        index: 'ocrvs',
-        id: 'testId',
-        body: {
-          doc: body
+      expect(updateSpy).toBeCalledWith(
+        {
+          index: 'ocrvs',
+          id: 'testId',
+          body: {
+            doc: body
+          },
+          refresh: 'wait_for'
         },
-        refresh: 'wait_for'
-      })
+        { meta: true }
+      )
     })
 
     it('should perform search for composition', async () => {
       searchSpy = jest.spyOn(client, 'search')
-      searchForBirthDuplicates(mockCompositionBody, client)
+      await searchForBirthDuplicates(mockCompositionBody, client)
       if (
         searchSpy.mock &&
         searchSpy.mock.calls[0] &&
         searchSpy.mock.calls[0][0]
       ) {
-        expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
+        expect(searchSpy.mock.calls[0][0].query).toBeDefined()
       } else {
         throw new Error('Failed')
       }
@@ -77,7 +83,7 @@ describe('elasticsearch db helper', () => {
 
     it('should perform search by composition id', async () => {
       searchByCompositionId('r1324-sd6k2-12121-1212', client)
-      expect(searchSpy.mock.calls[0][0].body.query).toBeDefined()
+      expect(searchSpy.mock.calls[0][0].query).toBeDefined()
       expect(searchSpy).toBeCalled()
     })
   })

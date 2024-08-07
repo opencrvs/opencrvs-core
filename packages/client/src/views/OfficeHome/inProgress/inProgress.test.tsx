@@ -99,7 +99,6 @@ describe('In Progress tab', () => {
       <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
-        isFieldAgent={false}
         queryData={{
           inProgressData: {},
           notificationData: {}
@@ -172,7 +171,6 @@ describe('In Progress tab', () => {
           inProgressData: { totalItems: 5 },
           notificationData: { totalItems: 3 }
         }}
-        isFieldAgent={false}
         paginationId={{
           draftId: 1,
           fieldAgentId: 1,
@@ -274,7 +272,6 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -317,7 +314,6 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -424,7 +420,6 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -526,7 +521,6 @@ describe('In Progress tab', () => {
             },
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -565,7 +559,6 @@ describe('In Progress tab', () => {
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -666,7 +659,6 @@ describe('In Progress tab', () => {
               ]
             }
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -889,7 +881,6 @@ describe('In Progress tab', () => {
             },
             inProgressData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -968,7 +959,6 @@ describe('In Progress tab', () => {
             },
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,

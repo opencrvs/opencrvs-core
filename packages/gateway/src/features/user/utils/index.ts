@@ -16,7 +16,7 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import * as decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope, UserScope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string
@@ -80,6 +80,18 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   } catch (err) {
     logger.error(`Unable to retrieve mobile for error : ${err}`)
   }
+}
+
+export function scopesInclude(
+  scopes:
+    | UserScope[]
+    | undefined /* @todo remove undefined variant and make scope a required field for users */,
+  scope: UserScope
+) {
+  if (!scopes) {
+    return false
+  }
+  return scopes.includes(scope)
 }
 
 export function hasScope(authHeader: IAuthHeader, scope: Scope) {

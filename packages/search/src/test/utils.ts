@@ -4570,13 +4570,13 @@ export const dummyUser = {
   salt: '12345',
   scope: ['register'],
   role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'Field Agent'
-      }
-    ]
+    label: {
+      id: 'userRole.fieldAgent',
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      __typename: 'I18nMessage'
+    },
+    __typename: 'UserRole'
   },
   status: 'active',
   avatar: {

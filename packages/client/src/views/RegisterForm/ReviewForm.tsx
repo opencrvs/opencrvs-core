@@ -23,8 +23,7 @@ import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
 import { IDeclaration } from '@opencrvs/client/src/declarations'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@opencrvs/client/src/utils/authUtils'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope } from '@client/utils/gateway'
 
 import {
   REGISTRAR_HOME_TAB,

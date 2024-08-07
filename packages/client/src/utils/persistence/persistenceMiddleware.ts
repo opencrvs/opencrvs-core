@@ -103,7 +103,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
     }
   }
 }
-*/
+
         const defaultPerformanceLocationId = getDefaultPerformanceLocationId(
           userDetails!
         )
@@ -117,6 +117,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
         for (const query of queriesToPrefetch) {
           client.query(query)
         }
+        */
       }
     }
   }

@@ -41,9 +41,14 @@ export interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string
 }
-interface ISignature {
+export interface ISignature {
   type: string
   data: string
+}
+export interface ISignatureAttachment {
+  contentType: string
+  url: string
+  creation: string
 }
 interface ILocalRegistrar {
   name: IUserName[]

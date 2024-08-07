@@ -16,7 +16,7 @@ import { BookmarkAdvancedSearchModal } from '@client/views/AdvancedSearch/SaveBo
 import { RemoveBookmarkAdvancedSearchModal } from './RemoveBookmarkModal'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { NOTIFICATION_STATUS } from '@client/utils/notificationUtils'
+import { NOTIFICATION_STATUS } from '@client/views/SysAdmin/Config/Application/utils'
 
 export function BookmarkAdvancedSearchResult() {
   const advancedSearchState = useSelector(getAdvancedSearchParamsState)

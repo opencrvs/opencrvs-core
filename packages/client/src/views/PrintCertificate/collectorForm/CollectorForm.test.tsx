@@ -27,7 +27,6 @@ import { createLocation, History } from 'history'
 import { merge } from 'lodash'
 import { Event } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
-import { lateBirthCertificationResponseWithFather } from '@client/tests/mock-graphql-responses'
 import { vi } from 'vitest'
 
 let store: AppStore
@@ -495,7 +494,6 @@ describe('Certificate collector test for a birth registration without father det
 describe('Certificate collector test for a birth registration with father details', () => {
   const { store, history } = createStore()
   const mockLocation: any = vi.fn()
-  const graphqlMock = lateBirthCertificationResponseWithFather
 
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>

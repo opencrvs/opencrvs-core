@@ -60,6 +60,7 @@ import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutation
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
+import * as actions from '@client/profile/profileActions'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -219,8 +220,6 @@ export const selectOption = (
   return input.find('.react-select__control')
 }
 
-const currentUserId = '123'
-
 export const eventAddressData = {
   country: 'FAR',
   state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -303,7 +302,6 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: SystemRoleType.FieldAgent,
   role: {
     label: {
       defaultMessage: 'Field Agent',
@@ -371,7 +369,6 @@ export const mockUserResponse = {
           }
         ]
       },
-      systemRole: 'LOCAL_REGISTRAR',
       role: {
         label: {
           id: 'userRoles.localRegistar',
@@ -394,7 +391,6 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_SYSTEM_ADMIN',
       role: {
         label: {
           id: 'userRoles.localSystemAdmin',
@@ -435,7 +431,6 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_REGISTRAR',
       label: {
         defaultMessage: 'Local Registrar',
         description: 'Name for user role Local Registrar',
@@ -1018,7 +1013,6 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: SystemRoleType.FieldAgent,
           role: {
             label: {
               id: 'userRoles.CHA',
@@ -1112,7 +1106,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.hospitalFieldAgent'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1122,7 +1115,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.fieldAgent'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1132,7 +1124,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Police Officer',
             id: 'userRole.policeOfficer'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1142,7 +1133,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Social Worker',
             id: 'userRole.socialWorker'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1152,7 +1142,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Healthcare Worker',
             id: 'userRole.healthcareWorker'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1162,7 +1151,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Leader',
             id: 'userRole.localLeader'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1172,7 +1160,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Registration Agent',
             id: 'userRole.registrationAgent'
           },
-          systemRole: 'REGISTRATION_AGENT',
           scopes: ['validate', 'performance', 'certify']
         },
         {
@@ -1182,7 +1169,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Registrar',
             id: 'userRole.localRegistrar'
           },
-          systemRole: 'LOCAL_REGISTRAR',
           scopes: ['register', 'performance', 'certify']
         },
         {
@@ -1192,7 +1178,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local System Admin',
             id: 'userRole.localSystemAdmin'
           },
-          systemRole: 'LOCAL_SYSTEM_ADMIN',
           scopes: ['sysadmin']
         },
         {
@@ -1202,7 +1187,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National System Admin',
             id: 'userRole.nationalSystemAdmin'
           },
-          systemRole: 'NATIONAL_SYSTEM_ADMIN',
           scopes: ['sysadmin', 'natlsysadmin']
         },
         {
@@ -1212,7 +1196,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Performance Manager',
             id: 'userRole.performanceManager'
           },
-          systemRole: 'PERFORMANCE_MANAGEMENT',
           scopes: ['performance']
         },
         {
@@ -1222,7 +1205,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National Registrar',
             id: 'userRole.nationalRegistrar'
           },
-          systemRole: 'NATIONAL_REGISTRAR',
           scopes: ['register', 'performance', 'certify', 'config', 'teams']
         }
       ]
@@ -1242,7 +1224,6 @@ export const mockCompleteFormData = {
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'FIELD_AGENT',
   role: 'HOSPITAL',
   userDetails: '',
   username: ''
@@ -1615,7 +1596,6 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'LOCAL_REGISTRAR',
   role: 'SECRETARY',
   userDetails: '',
   username: '',
@@ -1629,3 +1609,16 @@ export {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
+
+export function setScopes(scope: string[], store: AppStore) {
+  const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+  window.history.replaceState({}, '', '?token=' + token)
+
+  return store.dispatch({
+    type: actions.CHECK_AUTH
+  })
+}

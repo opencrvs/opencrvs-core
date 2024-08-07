@@ -64,10 +64,11 @@ export const getRoutes = () => {
         console.trace()
 
         try {
-          const res = await client.ping()
+          const res = await client.ping(undefined, { meta: true })
+
           logger.info(res)
           return {
-            success: res.meta.connection.status === 'alive'
+            success: res?.meta?.connection?.status === 'alive'
           }
         } catch (error) {
           logger.error(error)
