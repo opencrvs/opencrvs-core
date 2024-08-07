@@ -118,9 +118,10 @@ const setupTestCases = async (setupFn: SetupFn) => {
 }
 
 describe('Verify handlers', () => {
-  const { setup, cleanup } = createHandlerSetup()
+  const { setup, cleanup, shutdown } = createHandlerSetup()
 
   afterEach(cleanup)
+  afterAll(shutdown)
 
   it('Reindexes on clear environment', async () => {
     const t = await setupTestCases(setup)

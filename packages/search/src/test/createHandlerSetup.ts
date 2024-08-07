@@ -1,4 +1,4 @@
-/**
+/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,9 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { readFileSync } from 'fs'
-import { Readable } from 'stream'
-import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
 import * as esClient from '@search/elasticsearch/client'
 import * as elasticsearch from '@elastic/elasticsearch'
@@ -46,6 +43,8 @@ export const createHandlerSetup = () => {
       return elasticContainer
     }
 
+    console.log('Building elastic container...')
+
     return new ElasticsearchContainer('elasticsearch:8.14.3')
       .withExposedPorts(ELASTIC_SEARCH_HTTP_PORT)
       .withStartupTimeout(120_000)
@@ -59,7 +58,6 @@ export const createHandlerSetup = () => {
   const setup = async () => {
     const server = await createServer()
 
-    console.log('Building elastic container...')
     elasticContainer = await getOrCreateContainer()
 
     const esHost = elasticContainer.getHost()
@@ -70,6 +68,7 @@ export const createHandlerSetup = () => {
     })
 
     jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue(elasticClient)
+    // jest.spyOn(esClient, 'client').
 
     return {
       server,
@@ -95,8 +94,20 @@ export const createHandlerSetup = () => {
     }
   }
 
+  const shutdown = async () => {
+    try {
+      await elasticClient.close()
+    } catch (error) {
+    } finally {
+      if (elasticContainer) {
+        await elasticContainer.stop()
+      }
+    }
+  }
+
   return {
     setup,
-    cleanup
+    cleanup,
+    shutdown
   }
 }
