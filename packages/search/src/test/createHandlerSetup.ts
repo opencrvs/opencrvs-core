@@ -95,6 +95,7 @@ export const createHandlerSetup = () => {
   }
 
   const shutdown = async () => {
+    jest.clearAllMocks()
     try {
       await elasticClient.close()
     } catch (error) {
