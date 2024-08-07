@@ -33,6 +33,7 @@ import {
   persistenceMapper,
   clearOldCacheEntries
 } from '@client/utils/persistence'
+import { storeReloadModalVisibility } from '@client/reload/reducer'
 
 export let client: ApolloClient<NormalizedCacheObject>
 
@@ -71,12 +72,37 @@ export const createClient = (
     }
   })
 
+  const responseLink = new ApolloLink((operation, forward) => {
+    return forward(operation).map((response) => {
+      const context = operation.getContext()
+      const {
+        response: { headers }
+      } = context
+
+      const gatewayVersion = headers.get('X-version')
+      if (gatewayVersion !== APP_VERSION) {
+        console.error(
+          `Version Mismatch: Register Client is running on ${APP_VERSION}, whereas gateway is running on ${gatewayVersion}. Please reload to get the latest client`
+        )
+        store.dispatch(storeReloadModalVisibility(true))
+      }
+
+      return response
+    })
+  })
   const timeoutLink = new TimeoutLink() as ApolloLink
   const persistLink = createPersistLink()
   const cache = restoredCache || new InMemoryCache()
 
   client = new ApolloClient({
-    link: from([errorLink, timeoutLink, authLink, persistLink, httpLink]),
+    link: from([
+      errorLink,
+      timeoutLink,
+      authLink,
+      persistLink,
+      responseLink,
+      httpLink
+    ]),
     cache
   })
   return client
