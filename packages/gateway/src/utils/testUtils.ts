@@ -209,7 +209,6 @@ export const mockDocumentReference = {
 }
 
 export const mockUser = {
-  systemRole: 'CHAIRMAN',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [

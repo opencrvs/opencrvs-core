@@ -74,10 +74,24 @@ describe('authenticate handler receives a request', () => {
 
       const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.scope).toEqual(['sysadmin', 'natlsysadmin'])
+      expect(body.scope).toEqual([
+        'sysadmin',
+        'natlsysadmin',
+        'user.create',
+        'user.read',
+        'user.update',
+        'organisation.read',
+        'organisation.read-locations',
+        'performance.read',
+        'performance.read-dashboards',
+        'performance.export-vital-statistics'
+      ])
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       // eslint-disable-next-line
       const codeService = require('../verifyCode/service')
       // eslint-disable-next-line
@@ -85,7 +99,8 @@ describe('authenticate handler receives a request', () => {
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         id: '1',
-        scope: ['admin'],
+        role: 'NATIONAL_SYSTEM_ADMIN',
+        scope: ['natlsysadmin'],
         username: '+345345343'
       })
 

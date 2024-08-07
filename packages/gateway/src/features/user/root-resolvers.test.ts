@@ -81,7 +81,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -101,7 +100,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -121,7 +119,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'LOCAL_REGISTRAR',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -181,7 +178,6 @@ describe('User root resolvers', () => {
           username: 'mohammad.ashraful',
           mobile: '+8801733333333',
           email: 'test@test.org',
-          systemRole: 'LOCAL_REGISTRAR',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
@@ -245,7 +241,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         role: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
@@ -267,7 +262,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'pending',
         practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -321,8 +315,20 @@ describe('User root resolvers', () => {
               description: 'Name for user role Field Agent',
               id: 'userRole.fieldAgent'
             },
-            scopes: ['declare'],
-            systemRole: 'FIELD_AGENT'
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
           },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -342,8 +348,20 @@ describe('User root resolvers', () => {
               description: 'Name for user role Field Agent',
               id: 'userRole.fieldAgent'
             },
-            scopes: ['declare'],
-            systemRole: 'FIELD_AGENT'
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
           },
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -402,8 +420,20 @@ describe('User root resolvers', () => {
               description: 'Name for user role Field Agent',
               id: 'userRole.fieldAgent'
             },
-            scopes: ['declare'],
-            systemRole: 'FIELD_AGENT'
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
           },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -423,8 +453,20 @@ describe('User root resolvers', () => {
               description: 'Name for user role Field Agent',
               id: 'userRole.fieldAgent'
             },
-            scopes: ['declare'],
-            systemRole: 'FIELD_AGENT'
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
           },
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -507,8 +549,20 @@ describe('User root resolvers', () => {
               description: 'Name for user role Field Agent',
               id: 'userRole.fieldAgent'
             },
-            scopes: ['declare'],
-            systemRole: 'FIELD_AGENT'
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
           },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -1005,7 +1059,6 @@ describe('User root resolvers', () => {
       username: 'mohammad.ashraful',
       mobile: '+8801733333333',
       email: 'test@test.org',
-      systemRole: 'LOCAL_REGISTRAR',
       role: 'LOCAL_REGISTRAR',
       status: 'active',
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'

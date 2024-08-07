@@ -17,7 +17,10 @@ export const up = async (db: Db, client: MongoClient) => {
     await session.withTransaction(async () => {
       await db
         .collection('users')
-        .updateMany({ username: 'o.admin' }, { $set: { role: 'SUPER_ADMIN' } })
+        .updateMany(
+          { username: 'o.admin' },
+          { $set: { role: 'SUPER_ADMIN' }, $unset: { systemRole: '' } }
+        )
       await db
         .collection('users')
         .aggregate([
@@ -59,6 +62,9 @@ export const up = async (db: Db, client: MongoClient) => {
           }
         ])
         .toArray()
+      await db
+        .collection('users')
+        .updateMany({}, { $unset: { scope: '', systemRoles: '' } })
       const collections = await db
         .listCollections({ name: 'userroles' })
         .toArray()
