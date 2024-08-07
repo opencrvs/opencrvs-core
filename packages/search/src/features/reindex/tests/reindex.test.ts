@@ -117,7 +117,7 @@ const setupTestCases = async (setupFn: SetupFn) => {
   }
 }
 
-describe('Verify handlers', () => {
+describe('Search reindex flow', () => {
   const { setup, cleanup, shutdown } = createHandlerSetup()
 
   afterEach(cleanup)
