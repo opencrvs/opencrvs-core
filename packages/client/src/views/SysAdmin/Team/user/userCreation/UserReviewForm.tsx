@@ -298,10 +298,9 @@ const UserReviewFormComponent = ({
   submitForm,
   userRoles,
   goToCreateUserSection,
-  goToUserReviewForm,
-  ...props
+  goToUserReviewForm
 }: IFullProps & IDispatchProps & IStateProps) => {
-  const { hasScope, hasAnyScope } = usePermissions()
+  const { hasScope } = usePermissions()
   const hasCreateUserScope = hasScope('user.create')
   const hasUpdateUserScope = hasScope('user.update')
 

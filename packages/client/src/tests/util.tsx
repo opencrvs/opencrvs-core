@@ -219,8 +219,6 @@ export const selectOption = (
   return input.find('.react-select__control')
 }
 
-const currentUserId = '123'
-
 export const eventAddressData = {
   country: 'FAR',
   state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -303,7 +301,6 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: SystemRoleType.FieldAgent,
   role: {
     label: {
       defaultMessage: 'Field Agent',
@@ -1018,7 +1015,6 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: SystemRoleType.FieldAgent,
           role: {
             label: {
               id: 'userRoles.CHA',
