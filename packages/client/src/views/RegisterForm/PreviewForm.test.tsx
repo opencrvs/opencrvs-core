@@ -14,8 +14,6 @@ import {
   mockDeclarationData,
   goToEndOfForm,
   waitForReady,
-  validateScopeToken,
-  registerScopeToken,
   flushPromises,
   setScopes,
   REGISTRAR_DEFAULT_SCOPES,
