@@ -49,7 +49,6 @@ export default defineConfig(({ mode }) => {
 
   const VitePWAPlugin = () => {
     return VitePWA({
-      registerType: 'autoUpdate',
       strategies: 'injectManifest',
       injectManifest: {
         globDirectory: 'build/',
