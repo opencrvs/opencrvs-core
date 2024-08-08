@@ -120,6 +120,10 @@ const Workqueue = ({
   const hasReadyForReview = hasScope('record.declaration-review')
   const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
   const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
+  const hasSentForUpdates = hasAnyScope([
+    'record.declaration-submit-for-approval',
+    'record.register'
+  ])
 
   const hasOutbox = !hasAnyScope(['sysadmin', 'natlsysadmin'])
 
@@ -170,7 +174,7 @@ const Workqueue = ({
           }}
         />
       )}
-      {(hasSentForReview || hasSentForApproval) && (
+      {hasSentForUpdates && (
         <NavigationItem
           icon={() => <DeclarationIconSmall color={'red'} />}
           id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}

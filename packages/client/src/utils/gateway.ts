@@ -69,6 +69,7 @@ export const scopes = [
   'record.read-audit',
   'record.read-comments',
   'record.create-comments',
+  'record.declaration-submit-for-approval',
   'profile.update-signature',
   'profile.update-phone-number',
   'profile.update-name',
