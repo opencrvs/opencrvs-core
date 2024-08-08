@@ -11,9 +11,11 @@
 
 import { ResponsiveModal } from '@opencrvs/components'
 import { PrimaryButton } from '@opencrvs/components/src/buttons'
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { storeReloadModalVisibility } from '@client/reload/reducer'
+import { useRegisterSW } from 'virtual:pwa-register/react'
+import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 
 export const ReloadModal = () => {
   const dispatch = useDispatch()
@@ -21,27 +23,57 @@ export const ReloadModal = () => {
     (state) => state.reloadModalVisibility.isReloadModalVisible
   )
 
+  const [suppressUntill, setSupressUntill] = useState(0)
+
+  const {
+    needRefresh: [needRefresh, setNeedRefresh],
+    updateServiceWorker
+  } = useRegisterSW({
+    onRegisteredSW(swUrl, r) {
+      r &&
+        setInterval(() => {
+          r.update()
+        }, 30 * 1000)
+    },
+    onRegisterError(error) {
+      console.error('SW registration error', error)
+    }
+  })
+
+  const closeModal = () => {
+    dispatch(storeReloadModalVisibility(false))
+    setSupressUntill(Date.now() + 30 * 1000)
+  }
+
   return (
     <ResponsiveModal
-      title="Version does not match. please reload!!"
+      title={
+        needRefresh
+          ? 'New content available. Please reload to get the latest client'
+          : 'Version does not match. please refer to the log for more details'
+      }
       contentHeight={96}
       responsive={false}
-      handleClose={() => {
-        dispatch(storeReloadModalVisibility(false))
-      }}
-      actions={[
-        <PrimaryButton
-          key="reload"
-          id="reload"
-          onClick={() => {
-            dispatch(storeReloadModalVisibility(false))
-            document.location.reload()
-          }}
-        >
-          Reload
-        </PrimaryButton>
-      ]}
-      show={visibility}
+      handleClose={closeModal}
+      actions={
+        needRefresh
+          ? [
+              <SecondaryButton key="cancel" id="cancel" onClick={closeModal}>
+                Not Now
+              </SecondaryButton>,
+              <PrimaryButton
+                key="reload"
+                id="reload"
+                onClick={() => {
+                  updateServiceWorker(true)
+                }}
+              >
+                Reload
+              </PrimaryButton>
+            ]
+          : []
+      }
+      show={visibility || (needRefresh && Date.now() > suppressUntill)}
     />
   )
 }
