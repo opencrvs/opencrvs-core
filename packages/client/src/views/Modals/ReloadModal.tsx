@@ -16,11 +16,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { storeReloadModalVisibility } from '@client/reload/reducer'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
+import { IStoreState } from '@client/store'
 
 export const ReloadModal = () => {
   const dispatch = useDispatch()
   const visibility = useSelector(
-    (state) => state.reloadModalVisibility.isReloadModalVisible
+    (state: IStoreState) => state.reloadModalVisibility.isReloadModalVisible
   )
 
   const [suppressUntill, setSupressUntill] = useState(0)
