@@ -14,27 +14,33 @@ import { logger } from '@opencrvs/commons'
 
 /** Prunes all the indices that don't have an alias pointing to it */
 export const prune = async () => {
-  const { body: indicesWithAlias } = await client.cat.aliases<
-    Array<{ index: `${typeof OPENCRVS_INDEX_NAME}-${string}` }>
-  >({
-    format: 'json',
-    name: OPENCRVS_INDEX_NAME
-  })
-  const { body: allIndices } = await client.cat.indices<
-    Array<{ index: `${typeof OPENCRVS_INDEX_NAME}-${string}` }>
-  >({
-    format: 'json',
-    index: `${OPENCRVS_INDEX_NAME}-*`
-  })
+  const { body: indicesWithAlias } = await client.cat.aliases(
+    {
+      format: 'json',
+      name: OPENCRVS_INDEX_NAME
+    },
+    {
+      meta: true
+    }
+  )
+  const { body: allIndices } = await client.cat.indices(
+    {
+      format: 'json',
+      index: `${OPENCRVS_INDEX_NAME}-*`
+    },
+    {
+      meta: true
+    }
+  )
 
   for (const { index } of allIndices) {
     const isAliasPointedToIndex = indicesWithAlias.some(
       ({ index: aliasIndex }) => aliasIndex === index
     )
 
-    if (!isAliasPointedToIndex) {
+    if (!isAliasPointedToIndex && !!index) {
       logger.info(`Deleting index: ${index}`)
-      await client.indices.delete({ index })
+      await client.indices.delete({ index }, { meta: true })
     }
   }
 }

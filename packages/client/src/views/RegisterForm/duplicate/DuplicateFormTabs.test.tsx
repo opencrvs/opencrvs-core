@@ -27,7 +27,6 @@ import { Event } from '@client/utils/gateway'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { vi } from 'vitest'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
-import { waitForElement } from '@client/tests/wait-for-element'
 
 const viewRecordMock = {
   data: {

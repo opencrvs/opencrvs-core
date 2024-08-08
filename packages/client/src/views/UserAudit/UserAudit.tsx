@@ -15,6 +15,7 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { Navigation } from '@client/components/interface/Navigation'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
@@ -50,7 +51,6 @@ import { IntlShape, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import styled from 'styled-components'
-import { usePermissions } from '@client/hooks/useAuthorization'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

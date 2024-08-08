@@ -20,19 +20,19 @@ import {
   errorMessages,
   userMessages
 } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/userSetup'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
-import { UserDetails, getUserName } from '@client/utils/userUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
-import { messages } from '@client/i18n/messages/views/userSetup'
-import { Content } from '@opencrvs/components/lib/Content'
 import { ErrorText } from '@opencrvs/components/lib/'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
+import { Content } from '@opencrvs/components/lib/Content'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'

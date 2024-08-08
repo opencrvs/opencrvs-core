@@ -14,13 +14,16 @@ import {
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
   goToAllUserEmail,
+  goToCertificateConfig,
   goToDashboardView,
   goToHomeTab,
+  goToInformantNotification,
   goToLeaderBoardsView,
   goToOrganisationView,
   goToPerformanceStatistics,
@@ -39,11 +42,11 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { storage } from '@client/storage'
-import styled from 'styled-components'
 import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
+import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -63,8 +66,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
-import { usePermissions } from '@client/hooks/useAuthorization'
+import styled from 'styled-components'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -128,6 +130,7 @@ interface IProps {
 
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
+  goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -141,6 +144,7 @@ interface IDispatchProps {
   goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
+  goToInformantNotification: typeof goToInformantNotification
   goToAllUserEmail: typeof goToAllUserEmail
 }
 
@@ -204,6 +208,7 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
+    goToCertificateConfigAction,
     goToVSExportsAction,
     goToSystemViewAction,
     goToAdvancedSearchResultAction,
@@ -219,6 +224,7 @@ const NavigationView = (props: IFullProps) => {
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
+    goToInformantNotification,
     goToAllUserEmail,
     className
   } = props
@@ -320,14 +326,11 @@ const NavigationView = (props: IFullProps) => {
     'record.declare-marriage:my-jurisdiction'
   ])
 
-  const hasSentForReview = hasAnyScope([
-    'record.submit-for-review',
-    'record.declaration-review'
-  ])
+  const hasSentForReview = hasAnyScope(['record.submit-for-review'])
 
+  const hasReadyForReview = hasScope('record.declaration-review')
   const hasSentForApproval = hasScope('record.submit-for-approval')
   const hasRequiresUpdates = hasScope('record.declaration-review')
-  const hasReadyForReview = hasScope('record.declaration-review')
   const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
   const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
 
@@ -349,6 +352,7 @@ const NavigationView = (props: IFullProps) => {
     'performance.export-vital-statistics',
     'performance.read-dashboards'
   ])
+  const canRegister = hasScope('record.register')
   const hasPerformanceDashboards = hasScope('performance.read-dashboards')
   const hasPerformanceStatistics = hasScope('performance.read')
   const hasPerformanceLeaderboards = hasScope('performance.read')
@@ -374,19 +378,21 @@ const NavigationView = (props: IFullProps) => {
       <>
         <NavigationGroup>
           {hasInProgress && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              id={`navigation_${WORKQUEUE_TABS.inProgress}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.inProgress]
-              )}
-              count={props.draftDeclarations.length}
-              isSelected={tabId === WORKQUEUE_TABS.inProgress}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-                menuCollapse && menuCollapse()
-              }}
-            />
+            <>
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'purple'} />}
+                id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+                label={intl.formatMessage(
+                  navigationMessages[WORKQUEUE_TABS.inProgress]
+                )}
+                count={declarationCount.inProgress}
+                isSelected={tabId === WORKQUEUE_TABS.inProgress}
+                onClick={() => {
+                  props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                  menuCollapse && menuCollapse()
+                }}
+              />
+            </>
           )}
           {hasSentForReview && (
             <NavigationItem
@@ -464,21 +470,22 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'teal'} />}
-              id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.externalValidation]
-              )}
-              count={declarationCount.externalValidation}
-              isSelected={tabId === WORKQUEUE_TABS.externalValidation}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
+          {canRegister &&
+            window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'teal'} />}
+                id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
+                label={intl.formatMessage(
+                  navigationMessages[WORKQUEUE_TABS.externalValidation]
+                )}
+                count={declarationCount.externalValidation}
+                isSelected={tabId === WORKQUEUE_TABS.externalValidation}
+                onClick={() => {
+                  props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
+                  menuCollapse && menuCollapse()
+                }}
+              />
+            )}
 
           {isOnePrintInAdvanceOn && hasReadyToIssue && (
             <NavigationItem
@@ -808,6 +815,7 @@ export const Navigation = connect<
   IStoreState
 >(mapStateToProps, {
   goToHomeTab,
+  goToCertificateConfigAction: goToCertificateConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
@@ -821,6 +829,7 @@ export const Navigation = connect<
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,
+  goToInformantNotification,
   goToAllUserEmail
 })(injectIntl(withRouter(NavigationView)))
 

@@ -13,6 +13,7 @@ import {
   mockLocalSysAdminUserResponse,
   createTestComponent,
   flushPromises,
+  setScopes,
   mockOfflineDataDispatch,
   mockUserResponse
 } from '@client/tests/util'
@@ -26,8 +27,9 @@ import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
+
 import { vi, Mock } from 'vitest'
-import { SearchUsersQuery, Status, SystemRoleType } from '@client/utils/gateway'
+import { SearchUsersQuery, Status } from '@client/utils/gateway'
 
 describe('user list without admin scope', () => {
   let store: AppStore
@@ -86,6 +88,7 @@ describe('User list tests', () => {
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createStore())
+    setScopes(['user.update', 'user.create'], store)
 
     const action = {
       type: actions.SET_USER_DETAILS,
@@ -254,7 +257,6 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'r.tagore',
-                    systemRole: SystemRoleType.RegistrationAgent,
                     role: {
                       id: 'REGISTRATION_AGENT',
                       label: {
@@ -276,7 +278,6 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'm.ashraful',
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -298,7 +299,6 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'ma.muidkhan',
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'DISTRICT_REGISTRAR',
                       label: {
@@ -320,7 +320,6 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'np.huq',
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'STATE_REGISTRAR',
                       label: {
@@ -342,7 +341,6 @@ describe('User list tests', () => {
                       }
                     ],
                     username: 'ma.islam',
-                    systemRole: SystemRoleType.FieldAgent,
                     role: {
                       id: 'FIELD_AGENT',
                       label: {

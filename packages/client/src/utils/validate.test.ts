@@ -24,7 +24,6 @@ import {
   maxLength,
   isValidBirthDate,
   checkBirthDate,
-  checkMarriageDate,
   isValidDeathOccurrenceDate,
   greaterThanZero,
   dateGreaterThan,

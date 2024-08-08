@@ -60,7 +60,6 @@ describe('when user logs in', () => {
       }
     ],
     mobile: '+260921111111',
-    systemRole: SystemRoleType.NationalSystemAdmin,
     role: {
       label: {
         id: 'userRoles.nationalSystemAdmin',

@@ -8,16 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, logger } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   ISystemModelData,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import { logger } from '@opencrvs/commons'
 import * as decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope, UserScope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string
@@ -81,6 +80,18 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   } catch (err) {
     logger.error(`Unable to retrieve mobile for error : ${err}`)
   }
+}
+
+export function scopesInclude(
+  scopes:
+    | UserScope[]
+    | undefined /* @todo remove undefined variant and make scope a required field for users */,
+  scope: UserScope
+) {
+  if (!scopes) {
+    return false
+  }
+  return scopes.includes(scope)
 }
 
 export function hasScope(authHeader: IAuthHeader, scope: Scope) {

@@ -8,10 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { MessageDescriptor } from 'react-intl'
 
 export enum UserStatus {
   ACTIVE,

@@ -12,7 +12,6 @@ import { ApolloClient, ApolloError, ApolloQueryResult } from '@apollo/client'
 import {
   IForm,
   IFormField,
-  IFormSection,
   IFormSectionData,
   UserSection,
   modifyFormField

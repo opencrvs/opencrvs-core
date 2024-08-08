@@ -16,7 +16,9 @@ import {
   mockDeathDeclarationData,
   validToken,
   mockUserResponse,
-  flushPromises
+  flushPromises,
+  setScopes,
+  REGISTRATION_AGENT_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
@@ -67,8 +69,7 @@ describe('verify collector tests', () => {
 
   describe('in case of birth declaration', () => {
     beforeAll(async () => {
-      getItem.mockReturnValue(validToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
       await flushPromises()
       // @ts-ignore
       store.dispatch(storeDeclaration(birthDeclaration))

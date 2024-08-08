@@ -70,7 +70,18 @@ describe('authenticate handler receives a request', () => {
       expect(res.result.token.split('.')).toHaveLength(3)
       const [, payload] = res.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.scope).toEqual(['sysadmin', 'natlsysadmin'])
+      expect(body.scope).toEqual([
+        'sysadmin',
+        'natlsysadmin',
+        'user.create',
+        'user.read',
+        'user.update',
+        'organisation.read',
+        'organisation.read-locations',
+        'performance.read',
+        'performance.read-dashboards',
+        'performance.export-vital-statistics'
+      ])
       expect(body.sub).toBe('1')
     })
   })

@@ -8,29 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { checkAuth } from '@client/profile/profileActions'
+
+import {
+  Navigation,
+  WORKQUEUE_TABS
+} from '@client/components/interface/Navigation'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
-  mockUserResponse,
   flushPromises,
-  natlSysAdminToken,
-  registerScopeToken
+  mockUserResponse,
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  setScopes,
+  SYSTEM_ADMIN_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
+import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import {
-  WORKQUEUE_TABS,
-  Navigation
-} from '@client/components/interface/Navigation'
-import { ReactWrapper } from 'enzyme'
-import { Mock, vi } from 'vitest'
+import { vi } from 'vitest'
 
-const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
@@ -82,8 +82,8 @@ describe('Navigation for national system admin related tests', () => {
     queries.fetchUserDetails = mockFetchUserDetails
     ;({ store, history } = createStore())
     client = createClient(store)
-    getItem.mockReturnValue(natlSysAdminToken)
-    await store.dispatch(checkAuth())
+
+    setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
     await flushPromises()
 
     testComponent = await createTestComponent(
@@ -130,8 +130,9 @@ describe('Navigation for Registration agent related tests', () => {
     queries.fetchUserDetails = mockFetchUserDetails
     ;({ store, history } = createStore())
     client = createClient(store)
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
+
     await flushPromises()
 
     testComponent = await createTestComponent(
@@ -177,7 +178,7 @@ describe('Navigation for Registration agent related tests', () => {
     expect(testComponent.exists('#navigation_readyForReview')).toBeTruthy()
     expect(testComponent.exists('#navigation_requiresUpdate')).toBeTruthy()
     expect(testComponent.exists('#navigation_print')).toBeTruthy()
-    expect(testComponent.exists('#navigation_waitingValidation')).toBeTruthy()
+    expect(testComponent.exists('#navigation_waitingValidation')).toBeFalsy()
     expect(testComponent.exists('#navigation_approvals')).toBeTruthy()
   })
 
@@ -211,9 +212,6 @@ describe('Navigation for District Registrar related tests', () => {
     queries.fetchUserDetails = mockFetchUserDetails
     ;({ store, history } = createStore())
     client = createClient(store)
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
-    await flushPromises()
 
     testComponent = await createTestComponent(
       <Navigation menuCollapse={() => {}} />,

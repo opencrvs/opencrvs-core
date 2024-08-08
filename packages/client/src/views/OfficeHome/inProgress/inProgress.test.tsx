@@ -33,7 +33,9 @@ import {
   createTestComponent,
   mockUserResponse,
   resizeWindow,
-  flushPromises
+  flushPromises,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -44,11 +46,7 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { vi, Mock } from 'vitest'
-
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
-const getItem = window.localStorage.getItem as Mock
+import { vi } from 'vitest'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -68,6 +66,7 @@ const nameObj = {
     }
   }
 }
+
 merge(mockUserResponse, nameObj)
 mockFetchUserDetails.mockReturnValue(mockUserResponse)
 queries.fetchUserDetails = mockFetchUserDetails
@@ -77,8 +76,7 @@ storage.setItem = vi.fn()
 
 const { store, history } = createStore()
 beforeAll(async () => {
-  getItem.mockReturnValue(registerScopeToken)
-  await store.dispatch(checkAuth())
+  setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 })
 
 describe('In Progress tab', () => {
@@ -99,7 +97,6 @@ describe('In Progress tab', () => {
       <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
-        isFieldAgent={false}
         queryData={{
           inProgressData: {},
           notificationData: {}
@@ -172,7 +169,6 @@ describe('In Progress tab', () => {
           inProgressData: { totalItems: 5 },
           notificationData: { totalItems: 3 }
         }}
-        isFieldAgent={false}
         paginationId={{
           draftId: 1,
           fieldAgentId: 1,
@@ -274,7 +270,6 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -317,7 +312,6 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -424,7 +418,6 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -526,7 +519,6 @@ describe('In Progress tab', () => {
             },
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -565,7 +557,6 @@ describe('In Progress tab', () => {
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -666,7 +657,6 @@ describe('In Progress tab', () => {
               ]
             }
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -889,7 +879,6 @@ describe('In Progress tab', () => {
             },
             inProgressData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -924,8 +913,7 @@ describe('In Progress tab', () => {
     const { store } = createStore()
 
     beforeAll(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
       resizeWindow(800, 1280)
     })
 
@@ -968,7 +956,6 @@ describe('In Progress tab', () => {
             },
             notificationData: {}
           }}
-          isFieldAgent={false}
           paginationId={{
             draftId: 1,
             fieldAgentId: 1,
@@ -980,8 +967,7 @@ describe('In Progress tab', () => {
         { store, history }
       )
 
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {

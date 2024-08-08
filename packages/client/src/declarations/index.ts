@@ -1059,10 +1059,12 @@ function requestWithStateWrapper(
         .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 
       const allfetchableURLs = [
-        ...getAttachmentUrls(data.data),
-        ...getSignatureUrls(data.data),
-        ...getProfileIconUrls(data.data),
-        ...allduplicateDeclarationsAttachments
+        ...new Set([
+          ...getAttachmentUrls(data.data),
+          ...getSignatureUrls(data.data),
+          ...getProfileIconUrls(data.data),
+          ...allduplicateDeclarationsAttachments
+        ])
       ]
 
       await Promise.all(
@@ -1103,14 +1105,25 @@ function getAttachmentUrls(queryResultData: Query) {
 }
 
 function getSignatureUrls(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration ||
-    queryResultData.fetchMarriageRegistration?.registration
+  const data =
+    queryResultData.fetchBirthRegistration ||
+    queryResultData.fetchDeathRegistration ||
+    queryResultData.fetchMarriageRegistration
 
-  return SIGNATURE_KEYS.map(
-    (propertyKey) => registration?.[propertyKey]
-  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+  if (!data) return []
+  const { registration, history } = data
+
+  const registrarSignatures =
+    history
+      ?.map((entry) => entry?.signature?.data)
+      .filter((entry): entry is string => Boolean(entry)) || []
+
+  return [
+    ...registrarSignatures,
+    ...SIGNATURE_KEYS.map((propertyKey) => registration?.[propertyKey]).filter(
+      (maybeUrl): maybeUrl is string => Boolean(maybeUrl)
+    )
+  ]
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {

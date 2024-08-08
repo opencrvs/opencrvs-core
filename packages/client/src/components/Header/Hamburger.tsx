@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
@@ -19,6 +18,7 @@ import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { useIntl } from 'react-intl'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)

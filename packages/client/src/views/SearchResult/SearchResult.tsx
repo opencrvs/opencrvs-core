@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Header } from '@client/components/Header/Header'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Query } from '@client/components/Query'
 import {
   DOWNLOAD_STATUS,
+  getProcessingDeclarationIds,
   IDeclaration,
-  SUBMISSION_STATUS,
-  getProcessingDeclarationIds
+  SUBMISSION_STATUS
 } from '@client/declarations'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { Header } from '@client/components/Header/Header'
-import { Query } from '@client/components/Query'
 import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
@@ -42,44 +42,37 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import styled, { withTheme } from 'styled-components'
-import { ITheme } from '@opencrvs/components/lib/theme'
+import { SEARCH_RESULT_SORT } from '@client/utils/constants'
 import { Scope, SearchEventsQuery } from '@client/utils/gateway'
-import {
-  BRN_DRN_TEXT,
-  EMAIL,
-  NAME_TEXT,
-  NATIONAL_ID_TEXT,
-  PHONE_TEXT,
-  SEARCH_RESULT_SORT,
-  TRACKING_ID_TEXT
-} from '@client/utils/constants'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { ITheme } from '@opencrvs/components/lib/theme'
+import styled, { withTheme } from 'styled-components'
 
+import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   ColumnContentAlignment,
-  Workqueue,
+  COLUMNS,
   IAction,
-  COLUMNS
+  Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Frame } from '@opencrvs/components/lib/Frame'
 
+import { Navigation } from '@client/components/interface/Navigation'
+import { convertToMSISDN } from '@client/forms/utils'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { SearchCriteria } from '@client/utils/referenceApi'
+import {
+  IconWithName,
+  IconWithNameEvent,
+  NameContainer,
+  NoNameContainer
+} from '@client/views/OfficeHome/components'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
-import { convertToMSISDN } from '@client/forms/utils'
-import { formattedDuration } from '@client/utils/date-formatting'
-import { Navigation } from '@client/components/interface/Navigation'
-import {
-  IconWithName,
-  IconWithNameEvent,
-  NoNameContainer,
-  NameContainer
-} from '@client/views/OfficeHome/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -359,19 +352,26 @@ class SearchResultView extends React.Component<
                     variables: {
                       advancedSearchParameters: {
                         trackingId:
-                          searchType === TRACKING_ID_TEXT ? searchText : '',
+                          searchType === SearchCriteria.TRACKING_ID
+                            ? searchText
+                            : '',
                         nationalId:
-                          searchType === NATIONAL_ID_TEXT ? searchText : '',
+                          searchType === SearchCriteria.NATIONAL_ID
+                            ? searchText
+                            : '',
                         registrationNumber:
-                          searchType === BRN_DRN_TEXT ? searchText : '',
+                          searchType === SearchCriteria.REGISTRATION_NUMBER
+                            ? searchText
+                            : '',
                         contactNumber:
-                          searchType === PHONE_TEXT
+                          searchType === SearchCriteria.PHONE_NUMBER
                             ? convertToMSISDN(
                                 searchText!,
                                 window.config.COUNTRY
                               )
                             : '',
-                        name: searchType === NAME_TEXT ? searchText : '',
+                        name:
+                          searchType === SearchCriteria.NAME ? searchText : '',
                         declarationLocationId:
                           this.canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
@@ -486,16 +486,21 @@ class SearchResultView extends React.Component<
                   this.canSearchAnywhere() && userDetails
                     ? getUserLocation(userDetails).id
                     : '',
-                trackingId: searchType === TRACKING_ID_TEXT ? searchText : '',
-                nationalId: searchType === NATIONAL_ID_TEXT ? searchText : '',
+                trackingId:
+                  searchType === SearchCriteria.TRACKING_ID ? searchText : '',
+                nationalId:
+                  searchType === SearchCriteria.NATIONAL_ID ? searchText : '',
                 registrationNumber:
-                  searchType === BRN_DRN_TEXT ? searchText : '',
+                  searchType === SearchCriteria.REGISTRATION_NUMBER
+                    ? searchText
+                    : '',
                 contactNumber:
-                  searchType === PHONE_TEXT
+                  searchType === SearchCriteria.PHONE_NUMBER
                     ? convertToMSISDN(searchText, window.config.COUNTRY)
                     : '',
-                contactEmail: searchType === EMAIL ? searchText : '',
-                name: searchType === NAME_TEXT ? searchText : ''
+                contactEmail:
+                  searchType === SearchCriteria.EMAIL ? searchText : '',
+                name: searchType === SearchCriteria.NAME ? searchText : ''
               },
               sort: SEARCH_RESULT_SORT
             }}

@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IUserData } from '@client/declarations'
 import { storage } from '@client/storage'
 import { APPLICATION_VERSION } from '@client/utils/constants'
-import { IUserData } from '@client/declarations'
 import React from 'react'
 
 export async function validateApplicationVersion() {

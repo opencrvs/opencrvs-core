@@ -37,7 +37,6 @@ const mockUser: IUser & { _id: string } = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+8801234567890',
-  systemRole: 'LOCAL_REGISTRAR',
   role: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',

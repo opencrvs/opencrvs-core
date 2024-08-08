@@ -97,7 +97,6 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -152,7 +151,6 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -206,7 +204,6 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {

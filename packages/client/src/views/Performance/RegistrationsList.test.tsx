@@ -17,7 +17,6 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_REGISTRATIONS } from '@client/views/SysAdmin/Performance/queries'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import * as React from 'react'
 import { vi } from 'vitest'
 import { RegistrationList } from './RegistrationsList'
@@ -25,11 +24,10 @@ import { RegistrationList } from './RegistrationsList'
 describe('Registrations List test', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1667806908949)
-    ;({ store, history } = await createTestStore())
+    ;({ store } = await createTestStore())
   })
 
   beforeEach(async () => {

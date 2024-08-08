@@ -14,9 +14,10 @@ import {
   mockDeclarationData,
   goToEndOfForm,
   waitForReady,
-  validateScopeToken,
-  registerScopeToken,
-  flushPromises
+  flushPromises,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES,
+  REGISTRATION_AGENT_DEFAULT_SCOPES
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -45,10 +46,6 @@ import {
   marriageReviewDraftData
 } from '@client/tests/mock-drafts'
 import { vi } from 'vitest'
-
-interface IPersonDetails {
-  [key: string]: any
-}
 
 describe('when user is previewing the form data', () => {
   let app: ReactWrapper
@@ -176,8 +173,7 @@ describe('when user is previewing the form data', () => {
     let customDraft: IDeclaration
 
     beforeEach(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
       await flushPromises()
       const data = birthReviewDraftData
 
@@ -264,8 +260,8 @@ describe('when user is previewing the form data', () => {
 
   describe('when user has validate scope', () => {
     beforeEach(async () => {
-      getItem.mockReturnValue(validateScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
+
       await flushPromises()
       const data = {
         _fhirIDMap: {

@@ -33,15 +33,7 @@ import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
-import {
-  BRN_DRN_TEXT,
-  NATIONAL_ID_TEXT,
-  NAME_TEXT,
-  PHONE_TEXT,
-  ADVANCED_SEARCH_TEXT,
-  TRACKING_ID_TEXT,
-  EMAIL
-} from '@client/utils/constants'
+
 import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
 
@@ -61,12 +53,17 @@ import { advancedSearchInitialState } from '@client/search/advancedSearch/reduce
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { Scope } from '@client/utils/gateway'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { SearchCriteria } from '@client/utils/referenceApi'
+import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
 
 type IStateProps = {
   userDetails: UserDetails | null
   scopes: Scope[] | null
   fieldNames: string[]
   language: string
+  offlineData: IOfflineData
 }
 
 type IDispatchProps = {
@@ -108,10 +105,6 @@ type IFullProps = IntlShapeProps &
   IProps &
   IDomProps
 
-interface IState {
-  showLogoutModal: boolean
-}
-
 enum ACTIVE_MENU_ITEM {
   DECLARATIONS,
   CONFIG,
@@ -145,15 +138,7 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-class HeaderComp extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps) {
-    super(props)
-
-    this.state = {
-      showLogoutModal: false
-    }
-  }
-
+class HeaderComp extends React.Component<IFullProps> {
   hasSearch() {
     // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
     return this.props.scopes?.some((scope) =>
@@ -306,21 +291,20 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     const searchTypeList: ISearchType[] = [
       {
+        name: SearchCriteria.TRACKING_ID,
         label: intl.formatMessage(constantsMessages.trackingId),
-        value: TRACKING_ID_TEXT,
         icon: <Icon name="Target" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderTrackingId),
-        isDefault: true
+        placeHolderText: intl.formatMessage(messages.placeHolderTrackingId)
       },
       {
+        name: SearchCriteria.REGISTRATION_NUMBER,
         label: intl.formatMessage(messages.typeRN),
-        value: BRN_DRN_TEXT,
         icon: <Icon name="Medal" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderBrnDrn)
       },
       {
+        name: SearchCriteria.NAME,
         label: intl.formatMessage(messages.typeName),
-        value: NAME_TEXT,
         icon: <Icon name="User" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderName)
       }
@@ -328,8 +312,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
     if (fieldNames.includes('registrationPhone')) {
       searchTypeList.splice(3, 0, {
+        name: SearchCriteria.PHONE_NUMBER,
         label: intl.formatMessage(messages.typePhone),
-        value: PHONE_TEXT,
         icon: <Icon name="Phone" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderPhone)
       })
@@ -341,16 +325,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       fieldNames.some((name) => name.endsWith('NationalId'))
     ) {
       searchTypeList.splice(2, 0, {
+        name: SearchCriteria.NATIONAL_ID,
         label: intl.formatMessage(constantsMessages.id),
-        value: NATIONAL_ID_TEXT,
         icon: <Icon name="IdentificationCard" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeholderId)
       })
     }
     if (fieldNames.includes('registrationEmail')) {
       searchTypeList.push({
+        name: SearchCriteria.EMAIL,
         label: intl.formatMessage(messages.email),
-        value: EMAIL,
         icon: <Icon name="Envelope" size="small" />,
         placeHolderText: intl.formatMessage(messages.placeHolderEmail)
       })
@@ -372,7 +356,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         key="searchMenu"
         language={language}
         searchText={searchText}
-        selectedSearchType={selectedSearchType}
+        selectedSearchType={
+          selectedSearchType ??
+          this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA
+        }
         searchTypeList={searchTypeList}
         // @TODO: How to hide the navigation list from field agents? Ask JPF
         navigationList={navigationList}
@@ -508,6 +495,7 @@ export const Header = connect(
     language: store.i18n.language,
     userDetails: getUserDetails(store),
     scopes: getScope(store),
+    offlineData: getOfflineData(store),
     fieldNames: Object.values(getRegisterForm(store))
       .flatMap((form) => form.sections)
       .flatMap((section) => section.groups)

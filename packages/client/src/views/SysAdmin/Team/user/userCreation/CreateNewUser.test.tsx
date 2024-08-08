@@ -345,7 +345,6 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            systemRole: SystemRoleType.NationalRegistrar,
             role: {
               id: 'NATIONAL_REGISTRAR',
               label: {

@@ -50,11 +50,10 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { RegStatus } from '@client/utils/gateway'
+import { RegStatus, Scope } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;
 `

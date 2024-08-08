@@ -8,18 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { useIntl } from 'react-intl'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import {
-  LabelContainer,
-  ValueContainer,
-  DynamicHeightLinkButton
-} from '@client/views/Settings/items/components'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import {
+  DynamicHeightLinkButton,
+  LabelContainer,
+  ValueContainer
+} from '@client/views/Settings/items/components'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 export function Role() {
   const intl = useIntl()
