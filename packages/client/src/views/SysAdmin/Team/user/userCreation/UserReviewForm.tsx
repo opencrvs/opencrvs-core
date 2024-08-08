@@ -52,7 +52,11 @@ import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ApolloClient } from '@apollo/client'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { RouteComponentProps } from 'react-router'
@@ -69,6 +73,7 @@ import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
 import { UserRole } from '@client/utils/gateway'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -120,18 +125,36 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
-class UserReviewFormComponent extends React.Component<
-  IFullProps & IDispatchProps & IStateProps
-> {
-  transformSectionData = () => {
-    const { intl, userFormSection } = this.props
-    let nameJoined = false,
-      fieldValue
-    const sections: ISectionData[] = []
-    getVisibleSectionGroupsBasedOnConditions(
-      userFormSection,
-      this.props.formData
-    ).forEach((group) => {
+interface ICommonProps {
+  offlineCountryConfiguration: IOfflineData
+  formData: IFormSectionData
+  userRoles: UserRole[]
+  intl: IntlShape
+}
+interface ISectionDataProps {
+  userFormSection: IFormSection
+  userId: string | undefined
+  hasUpdateUserScope: boolean
+  hasCreateUserScope: boolean
+  goToUserReviewForm: typeof goToUserReviewForm
+  goToCreateUserSection: typeof goToCreateUserSection
+}
+
+const transformSectionData = ({
+  userFormSection,
+  userId,
+  hasUpdateUserScope,
+  hasCreateUserScope,
+  goToCreateUserSection,
+  goToUserReviewForm,
+  ...props
+}: ISectionDataProps & ICommonProps) => {
+  const { formData, intl } = props
+  let nameJoined = false,
+    fieldValue
+  const sections: ISectionData[] = []
+  getVisibleSectionGroupsBasedOnConditions(userFormSection, formData).forEach(
+    (group) => {
       group.fields.forEach((field: IFormField, idx) => {
         if (field.hideValueInPreview) {
           return
@@ -140,19 +163,18 @@ class UserReviewFormComponent extends React.Component<
         } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
-          if (field.name === 'username' && !this.getValue(field)) return
+          if (field.name === 'username' && !getValue({ ...props, field }))
+            return
           let label = intl.formatMessage(field.label)
           if (
-            !getConditionalActionsForField(field, this.props.formData).includes(
-              'hide'
-            )
+            !getConditionalActionsForField(field, formData).includes('hide')
           ) {
-            fieldValue = this.getValue(field)
+            fieldValue = getValue({ ...props, field })
 
             if (['firstNamesEng', 'familyNameEng'].includes(field.name)) {
               if (nameJoined) return
               label = intl.formatMessage(constantsMessages.name)
-              fieldValue = this.getName(group.fields)
+              fieldValue = getName({ ...props, fields: group.fields })
               nameJoined = true
             }
 
@@ -160,11 +182,7 @@ class UserReviewFormComponent extends React.Component<
               fieldValue = (
                 <SignatureImage
                   src={
-                    (
-                      this.props.formData[field.name] as
-                        | IAttachmentValue
-                        | undefined
-                    )?.data
+                    (formData[field.name] as IAttachmentValue | undefined)?.data
                   }
                 />
               )
@@ -175,21 +193,23 @@ class UserReviewFormComponent extends React.Component<
               value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
               actions:
                 !(
-                  (field.name === 'registrationOffice') //&&
-                  // @TODO: Convert this component to a functional one to allow using `usePermissions`
-                  //this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
+                  field.name === 'registrationOffice' &&
+                  !(
+                    (userId && hasUpdateUserScope) ||
+                    (!userId && hasCreateUserScope)
+                  )
                 ) && !field.readonly ? (
                   <Link
                     id={`btn_change_${field.name}`}
                     onClick={() => {
-                      this.props.userId
-                        ? this.props.goToUserReviewForm(
-                            this.props.userId,
+                      userId
+                        ? goToUserReviewForm(
+                            userId,
                             userFormSection.id,
                             group.id,
                             field.name
                           )
-                        : this.props.goToCreateUserSection(
+                        : goToCreateUserSection(
                             userFormSection.id,
                             group.id,
                             field.name
@@ -205,150 +225,180 @@ class UserReviewFormComponent extends React.Component<
           }
         }
       })
-    })
-
-    return sections
-  }
-
-  getValue = (field: IFormField) => {
-    const { intl, formData, userRoles } = this.props
-
-    if (field.type === LOCATION_SEARCH_INPUT) {
-      const offlineLocations = field.searchableResource.reduce(
-        (locations, resource) => {
-          return {
-            ...locations,
-            ...getListOfLocations(
-              this.props.offlineCountryConfiguration,
-              resource
-            )
-          }
-        },
-        {}
-      ) as { [key: string]: ILocation }
-
-      const locationId = formData[field.name] as string
-      return offlineLocations[locationId] && offlineLocations[locationId].name
     }
+  )
 
-    const role = userRoles.find(({ id }) => id === formData.role)
+  return sections
+}
 
-    return formData[field.name]
-      ? typeof formData[field.name] !== 'object'
-        ? field.name === 'role' && role
-          ? intl.formatMessage(role.label)
-          : String(formData[field.name])
-        : (formData[field.name] as IDynamicValues).label
-      : ''
-  }
-
-  getName = (fields: IFormField[]) => {
-    const firstNamesEngField = fields.find(
-      (field) => field.name === 'firstNamesEng'
-    ) as IFormField
-    const familyNameEngField = fields.find(
-      (field) => field.name === 'familyNameEng'
-    ) as IFormField
-
-    return `${this.getValue(firstNamesEngField)} ${this.getValue(
-      familyNameEngField
-    )}`
-  }
-
-  render() {
-    const {
-      intl,
-      section,
-      userId,
-      userFormSection,
-      formData,
-      goToTeamUserList,
-      userDetails,
-      offlineCountryConfiguration
-    } = this.props
-    let title: string | undefined
-    let actionComponent: JSX.Element
-    const locationId = formData['registrationOffice']
-    const locationDetails =
-      offlineCountryConfiguration['locations'][`${locationId}`] ||
-      offlineCountryConfiguration['facilities'][`${locationId}`] ||
-      offlineCountryConfiguration['offices'][`${locationId}`]
-    if (userId) {
-      title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-      actionComponent = (
-        <SuccessButton
-          id="submit-edit-user-form"
-          disabled={
-            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
-              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
-            !this.props.formData.signature
-          }
-          onClick={() => this.props.submitForm(userFormSection)}
-          icon={() => <Check />}
-          align={ICON_ALIGNMENT.LEFT}
-        >
-          {intl.formatMessage(buttonMessages.confirm)}
-        </SuccessButton>
-      )
-    } else {
-      title = section.title && intl.formatMessage(section.title)
-
-      actionComponent = (
-        <Button
-          id="submit_user_form"
-          type="positive"
-          size="large"
-          fullWidth
-          disabled={
-            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
-              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
-            !this.props.formData.signature
-          }
-          onClick={() => this.props.submitForm(userFormSection)}
-        >
-          {intl.formatMessage(messages.createUser)}
-        </Button>
-      )
-    }
-
-    return (
-      <ActionPageLight
-        title={title}
-        goBack={this.props.goBack}
-        goHome={() =>
-          locationDetails
-            ? goToTeamUserList(locationDetails.id)
-            : userDetails?.primaryOffice?.id &&
-              goToTeamUserList(userDetails.primaryOffice.id)
+const getValue = ({
+  offlineCountryConfiguration,
+  formData,
+  userRoles,
+  intl,
+  field
+}: ICommonProps & { field: IFormField }) => {
+  if (field.type === LOCATION_SEARCH_INPUT) {
+    const offlineLocations = field.searchableResource.reduce(
+      (locations, resource) => {
+        return {
+          ...locations,
+          ...getListOfLocations(offlineCountryConfiguration, resource)
         }
-        hideBackground={true}
+      },
+      {}
+    ) as { [key: string]: ILocation }
+
+    const locationId = formData[field.name] as string
+    return offlineLocations[locationId] && offlineLocations[locationId].name
+  }
+
+  const role = userRoles.find(({ id }) => id === formData.role)
+
+  return formData[field.name]
+    ? typeof formData[field.name] !== 'object'
+      ? field.name === 'systemRole'
+        ? intl.formatMessage(userMessages[formData.systemRole as string])
+        : field.name === 'role' && role
+        ? intl.formatMessage(role.label)
+        : String(formData[field.name])
+      : (formData[field.name] as IDynamicValues).label
+    : ''
+}
+
+const getName = ({
+  fields,
+  ...props
+}: ICommonProps & { fields: IFormField[] }) => {
+  const firstNamesEngField = fields.find(
+    (field) => field.name === 'firstNamesEng'
+  ) as IFormField
+  const familyNameEngField = fields.find(
+    (field) => field.name === 'familyNameEng'
+  ) as IFormField
+
+  return `${getValue({
+    ...props,
+    field: firstNamesEngField
+  })} ${getValue({
+    ...props,
+    field: familyNameEngField
+  })}`
+}
+
+const UserReviewFormComponent = ({
+  intl,
+  section,
+  userId,
+  userFormSection,
+  formData,
+  goToTeamUserList,
+  userDetails,
+  offlineCountryConfiguration,
+  submitForm,
+  userRoles,
+  goToCreateUserSection,
+  goToUserReviewForm
+}: IFullProps & IDispatchProps & IStateProps) => {
+  const { hasScope } = usePermissions()
+  const hasCreateUserScope = hasScope('user.create')
+  const hasUpdateUserScope = hasScope('user.update')
+
+  let title: string | undefined
+  let actionComponent: JSX.Element
+  const locationId = formData['registrationOffice']
+  const locationDetails =
+    offlineCountryConfiguration['locations'][`${locationId}`] ||
+    offlineCountryConfiguration['facilities'][`${locationId}`] ||
+    offlineCountryConfiguration['offices'][`${locationId}`]
+
+  const userRole = userRoles.find(({ id }) => id === formData.role)
+
+  if (userId) {
+    title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+
+    actionComponent = (
+      <SuccessButton
+        id="submit-edit-user-form"
+        disabled={
+          userRole?.scopes?.includes('profile.electronic-signature') &&
+          !formData.signature
+        }
+        onClick={() => submitForm(userFormSection)}
+        icon={() => <Check />}
+        align={ICON_ALIGNMENT.LEFT}
       >
-        <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
-          <Container>
-            {this.transformSectionData().map((sec, index) => {
-              return (
-                <React.Fragment key={index}>
-                  <ListViewSimplified bottomBorder>
-                    {sec.items.map((item, index) => {
-                      return (
-                        <ListViewItemSimplified
-                          key={index}
-                          label={item.label}
-                          value={item.value}
-                          actions={item.actions}
-                        />
-                      )
-                    })}
-                  </ListViewSimplified>
-                </React.Fragment>
-              )
-            })}
-            <Action>{actionComponent}</Action>
-          </Container>
-        </Content>
-      </ActionPageLight>
+        {intl.formatMessage(buttonMessages.confirm)}
+      </SuccessButton>
+    )
+  } else {
+    title = section.title && intl.formatMessage(section.title)
+
+    actionComponent = (
+      <Button
+        id="submit_user_form"
+        type="positive"
+        size="large"
+        fullWidth
+        disabled={
+          userRole?.scopes?.includes('profile.electronic-signature') &&
+          !formData.signature
+        }
+        onClick={() => submitForm(userFormSection)}
+      >
+        {intl.formatMessage(messages.createUser)}
+      </Button>
     )
   }
+
+  return (
+    <ActionPageLight
+      title={title}
+      goBack={goBack}
+      goHome={() =>
+        locationDetails
+          ? goToTeamUserList(locationDetails.id)
+          : userDetails?.primaryOffice?.id &&
+            goToTeamUserList(userDetails.primaryOffice.id)
+      }
+      hideBackground={true}
+    >
+      <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
+        <Container>
+          {transformSectionData({
+            userFormSection,
+            formData,
+            intl,
+            userId,
+            hasUpdateUserScope,
+            hasCreateUserScope,
+            userRoles,
+            offlineCountryConfiguration,
+            goToCreateUserSection,
+            goToUserReviewForm
+          }).map((sec, index) => {
+            return (
+              <React.Fragment key={index}>
+                <ListViewSimplified bottomBorder>
+                  {sec.items.map((item, index) => {
+                    return (
+                      <ListViewItemSimplified
+                        key={index}
+                        label={item.label}
+                        value={item.value}
+                        actions={item.actions}
+                      />
+                    )
+                  })}
+                </ListViewSimplified>
+              </React.Fragment>
+            )
+          })}
+          <Action>{actionComponent}</Action>
+        </Container>
+      </Content>
+    </ActionPageLight>
+  )
 }
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
