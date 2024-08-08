@@ -378,19 +378,21 @@ const NavigationView = (props: IFullProps) => {
       <>
         <NavigationGroup>
           {hasInProgress && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              id={`navigation_${WORKQUEUE_TABS.inProgress}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.inProgress]
-              )}
-              count={props.draftDeclarations.length}
-              isSelected={tabId === WORKQUEUE_TABS.inProgress}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-                menuCollapse && menuCollapse()
-              }}
-            />
+            <>
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'purple'} />}
+                id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+                label={intl.formatMessage(
+                  navigationMessages[WORKQUEUE_TABS.inProgress]
+                )}
+                count={declarationCount.inProgress}
+                isSelected={tabId === WORKQUEUE_TABS.inProgress}
+                onClick={() => {
+                  props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                  menuCollapse && menuCollapse()
+                }}
+              />
+            </>
           )}
           {hasSentForReview && (
             <NavigationItem

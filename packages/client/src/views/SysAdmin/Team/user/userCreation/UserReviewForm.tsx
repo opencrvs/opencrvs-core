@@ -235,9 +235,7 @@ class UserReviewFormComponent extends React.Component<
 
     return formData[field.name]
       ? typeof formData[field.name] !== 'object'
-        ? field.name === 'systemRole'
-          ? intl.formatMessage(userMessages[formData.systemRole as string])
-          : field.name === 'role' && role
+        ? field.name === 'role' && role
           ? intl.formatMessage(role.label)
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label

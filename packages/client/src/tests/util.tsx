@@ -62,8 +62,6 @@ import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 import * as actions from '@client/profile/profileActions'
 
-export const registrationClerkScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ2YWxpZGF0ZSIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU3ODMwNzgzOSwiZXhwIjoxNTc4OTEyNjM5LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6cmVzb3VyY2VzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNWRmYmE5NDYxMTEyNTliZDBjMzhhY2JhIn0.CFUy-L414-8MLf6pjA8EapK6qN1yYN6Y0ywcg1GtWhRxSWnT0Kw9d2OOK_IVFBAqTXLROQcwHYnXC2r6Ka53MB14HUZ39H7HrOTFURCYknYGIeGmyFpBjoXUj4yc95_f1FCpW6fQReBMnSIzUwlUGcxK-ttitSLfQebPFaVosM6kQpKd-n5g6cg6eS9hsYzxVme9kKkrxy5HRkxjNe8VfXEheKGqpRHxLGP7bo1bIhw8BWto9kT2kxm0NLkWzbqhxKyVrk8cEdcFiIAbUt6Fzjcx_uVPvLnJPNQAkZEO3AdqbZDFuvmBQWCf2Z6l9c8fYuWRD4SA5tBCcIKzUcalEg'
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 export const validImageB64String =
@@ -87,7 +85,44 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   'performance.read-dashboards',
   'performance.export-vital-statistics'
 ] satisfies Scope[]
-export const REGISTRATION_AGENT_SCOPES = [
+
+export const REGISTRAR_DEFAULT_SCOPES = [
+  /*
+   * @deprecated
+   */
+  'register',
+  'performance',
+  'certify',
+
+  'record.declare-birth',
+  'record.declare-death',
+  'record.declare-marriage',
+  'record.declaration-review',
+  'record.submit-for-updates',
+  'record.review-duplicates',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
+  'record.register',
+  'record.registration-correct',
+  'record.print-records',
+  'record.print-records-supporting-documents',
+  'record.export-records',
+  'record.print-issue-certified-copies',
+  'record.registration-verify-certified-copies',
+  'record.create-comments',
+  'performance.read',
+  'performance.read-dashboards',
+  'organisation.read',
+  'organisation.read-locations:my-office',
+  'search.birth',
+  'search.death',
+  'search.marriage',
+  'record.read',
+  'record.read-audit',
+  'record.read-comments'
+] satisfies Scope[]
+
+export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
   'record.declare-birth',
   'record.declare-death',
   'record.declare-marriage',
@@ -1514,19 +1549,6 @@ export const mockUserGraphqlOperation = {
                       validator: []
                     },
                     {
-                      name: 'systemRole',
-                      type: 'SELECT_WITH_OPTIONS',
-                      label: {
-                        defaultMessage: 'Role',
-                        description: 'Role label',
-                        id: 'constants.role'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [],
-                      options: []
-                    },
-                    {
                       name: 'role',
                       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                       label: {
@@ -1538,10 +1560,7 @@ export const mockUserGraphqlOperation = {
                       required: true,
                       initialValue: '',
                       validator: [],
-                      dynamicOptions: {
-                        dependency: 'systemRole',
-                        options: {}
-                      }
+                      dynamicOptions: {}
                     },
                     {
                       name: 'device',
@@ -1636,7 +1655,7 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  role: 'SECRETARY',
+  role: 'LOCAL_REGISTRAR',
   userDetails: '',
   username: '',
   signature: {

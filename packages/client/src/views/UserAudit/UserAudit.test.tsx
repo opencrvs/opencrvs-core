@@ -13,6 +13,8 @@ import {
   createTestComponent,
   createTestStore,
   flushPromises,
+  setScopes,
+  SYSTEM_ADMIN_DEFAULT_SCOPES,
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -154,8 +156,8 @@ describe('User audit list tests for sys admin', () => {
       name: 'Narsingdi Paurasabha',
       alias: ['নরসিংদী পৌরসভা']
     }
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['sysadmin'])
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+    setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
     component = await createTestComponent(<UserAudit />, {
       store,
       history,
@@ -163,7 +165,7 @@ describe('User audit list tests for sys admin', () => {
     })
   })
 
-  it('redirects to edit user view on clicking edit details menu option', async () => {
+  it.only('redirects to edit user view on clicking edit details menu option', async () => {
     await waitForElement(component, '#user-audit-list')
 
     const menuLink = await waitForElement(

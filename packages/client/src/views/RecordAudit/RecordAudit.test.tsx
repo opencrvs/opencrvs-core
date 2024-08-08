@@ -14,12 +14,13 @@ import {
   createTestComponent,
   mockDeclarationData,
   createRouterProps,
-  registerScopeToken,
   getItem,
   flushPromises,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
-  userDetails
+  userDetails,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
@@ -346,9 +347,7 @@ describe('Record audit for a draft declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
 
-    getItem.mockReturnValue(registerScopeToken)
-
-    store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
     await flushPromises()
 
@@ -550,9 +549,7 @@ describe('Record audit for a reinstate declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
 
-    getItem.mockReturnValue(registerScopeToken)
-
-    store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
     await flushPromises()
 

@@ -20,7 +20,7 @@ import {
   createTestComponent,
   flushPromises,
   mockUserResponse,
-  REGISTRATION_AGENT_SCOPES,
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
   setScopes,
   SYSTEM_ADMIN_DEFAULT_SCOPES
 } from '@client/tests/util'
@@ -131,7 +131,7 @@ describe('Navigation for Registration agent related tests', () => {
     ;({ store, history } = createStore())
     client = createClient(store)
 
-    setScopes(REGISTRATION_AGENT_SCOPES, store)
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
 
     await flushPromises()
 
