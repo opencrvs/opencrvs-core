@@ -25,6 +25,8 @@ self.addEventListener('message', async (event) => {
     return
   }
 
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
+
   if (
     typeof event.data === 'object' &&
     event.data.hasOwnProperty('minioUrls')
@@ -80,8 +82,8 @@ registerRoute(
   })
 )
 
-self.skipWaiting()
-clientsClaim()
+//self.skipWaiting()
+//clientsClaim()
 
 const removeCache = async (minioUrls: string) => {
   const runTimeCacheKey = (await caches.keys()).find((e) =>
