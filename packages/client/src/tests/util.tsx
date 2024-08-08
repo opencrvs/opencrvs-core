@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { App } from '@client/App'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status, Scope } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -62,8 +62,6 @@ import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
 import * as actions from '@client/profile/profileActions'
 
-export const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 export const registrationClerkScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ2YWxpZGF0ZSIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU3ODMwNzgzOSwiZXhwIjoxNTc4OTEyNjM5LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6cmVzb3VyY2VzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNWRmYmE5NDYxMTEyNTliZDBjMzhhY2JhIn0.CFUy-L414-8MLf6pjA8EapK6qN1yYN6Y0ywcg1GtWhRxSWnT0Kw9d2OOK_IVFBAqTXLROQcwHYnXC2r6Ka53MB14HUZ39H7HrOTFURCYknYGIeGmyFpBjoXUj4yc95_f1FCpW6fQReBMnSIzUwlUGcxK-ttitSLfQebPFaVosM6kQpKd-n5g6cg6eS9hsYzxVme9kKkrxy5HRkxjNe8VfXEheKGqpRHxLGP7bo1bIhw8BWto9kT2kxm0NLkWzbqhxKyVrk8cEdcFiIAbUt6Fzjcx_uVPvLnJPNQAkZEO3AdqbZDFuvmBQWCf2Z6l9c8fYuWRD4SA5tBCcIKzUcalEg'
 export const validToken =
@@ -72,8 +70,50 @@ export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-export const natlSysAdminToken =
-  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsIm5hdGxzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNjQ5NjU3MTM4LCJleHAiOjE2NTAyNjE5MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjIyZjgxYjQyY2Q1MzdiZjkxZGFhMTBiIn0.MojnxjSVja4VkS5ufVtpJHmiqQqngW3Zb6rHv4MqKwqSgHptjta1A-1xdpkfadxr0pVIYTh-rhKP93LPCTfThkA01oW8qgkUr0t_02cgJ5KLe1B3R5QFJ9i1IzLye9yOeakfpbtnk67cwJ2r4KTJMxj5BWucdPGK8ifZRBdDrt9HsTtcDOutgLmEp2VnxLvc2eAEmoBBp6mRZ8lOYIRei5UHfaROCk0vdwjLchiqQWH9GE8hxU3RIA1jpzshd3_TC4G0rvuIXnBGf9VQaH-gkNW7a44xLVHhdENxAsGTdyeSHRC83wbeoUZkuOFQpF8Iz-8SbLEQfmipdzeBAsBgWg'
+
+export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
+  /*
+   * @deprecated
+   */
+  'sysadmin',
+  'natlsysadmin',
+
+  'user.create',
+  'user.read',
+  'user.update',
+  'organisation.read',
+  'organisation.read-locations',
+  'performance.read',
+  'performance.read-dashboards',
+  'performance.export-vital-statistics'
+] satisfies Scope[]
+export const REGISTRATION_AGENT_SCOPES = [
+  'record.declare-birth',
+  'record.declare-death',
+  'record.declare-marriage',
+  'record.declaration-review',
+  'record.submit-for-approval',
+  'record.submit-for-updates',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
+  'record.registration-request-correction',
+  'record.print-records',
+  'record.print-records-supporting-documents',
+  'record.export-records',
+  'record.print-issue-certified-copies',
+  'record.registration-verify-certified-copies',
+  'record.create-comments',
+  'performance.read',
+  'performance.read-dashboards',
+  'organisation.read',
+  'organisation.read-locations:my-office',
+  'search.birth',
+  'search.death',
+  'search.marriage',
+  'record.read',
+  'record.read-audit',
+  'record.read-comments'
+] satisfies Scope[]
 
 export const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -1610,7 +1650,7 @@ export {
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
 
-export function setScopes(scope: string[], store: AppStore) {
+export function setScopes(scope: Scope[], store: AppStore) {
   const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',

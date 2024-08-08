@@ -88,18 +88,18 @@ describe('User list tests', () => {
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createStore())
+    setScopes(['user.update', 'user.create'], store)
 
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockLocalSysAdminUserResponse
     }
     await store.dispatch(action)
-    setScopes(['user.create'], store)
     await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('Header test', () => {
-    it.only('add user button redirects to user form', async () => {
+    it('add user button redirects to user form', async () => {
       const userListMock = [
         {
           request: {

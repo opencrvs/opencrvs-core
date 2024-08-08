@@ -326,14 +326,11 @@ const NavigationView = (props: IFullProps) => {
     'record.declare-marriage:my-jurisdiction'
   ])
 
-  const hasSentForReview = hasAnyScope([
-    'record.submit-for-review',
-    'record.declaration-review'
-  ])
+  const hasSentForReview = hasAnyScope(['record.submit-for-review'])
 
+  const hasReadyForReview = hasScope('record.declaration-review')
   const hasSentForApproval = hasScope('record.submit-for-approval')
   const hasRequiresUpdates = hasScope('record.declaration-review')
-  const hasReadyForReview = hasScope('record.declaration-review')
   const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
   const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
 
@@ -355,6 +352,7 @@ const NavigationView = (props: IFullProps) => {
     'performance.export-vital-statistics',
     'performance.read-dashboards'
   ])
+  const canRegister = hasScope('record.register')
   const hasPerformanceDashboards = hasScope('performance.read-dashboards')
   const hasPerformanceStatistics = hasScope('performance.read')
   const hasPerformanceLeaderboards = hasScope('performance.read')
@@ -470,21 +468,22 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'teal'} />}
-              id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.externalValidation]
-              )}
-              count={declarationCount.externalValidation}
-              isSelected={tabId === WORKQUEUE_TABS.externalValidation}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
+          {canRegister &&
+            window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'teal'} />}
+                id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
+                label={intl.formatMessage(
+                  navigationMessages[WORKQUEUE_TABS.externalValidation]
+                )}
+                count={declarationCount.externalValidation}
+                isSelected={tabId === WORKQUEUE_TABS.externalValidation}
+                onClick={() => {
+                  props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
+                  menuCollapse && menuCollapse()
+                }}
+              />
+            )}
 
           {isOnePrintInAdvanceOn && hasReadyToIssue && (
             <NavigationItem
