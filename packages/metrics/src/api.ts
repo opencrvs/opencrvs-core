@@ -119,6 +119,7 @@ export function fetchFromResource(
   return fetch(url, {
     method,
     headers: {
+      'X-Version': String(process.env.npm_package_version),
       ...authHeader
     },
     body

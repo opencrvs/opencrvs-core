@@ -157,8 +157,16 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
 
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: {
+      'X-Version': String(process.env.npm_package_version)
+    }
+  })
   if (!res.ok) {
+    if (res.status === 426)
+      raise(
+        `Version mismatch: Core is running on a different version than country config. Please refer to country config log for more details`
+      )
     raise(`Expected to get the locations from ${url}`)
   }
   const parsedLocations = LocationSchema.safeParse(await res.json())

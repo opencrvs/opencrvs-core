@@ -34,7 +34,8 @@ export default async function getForm(
   const token = request.headers.authorization
   const response = await fetch(`${COUNTRY_CONFIG_URL}/forms`, {
     headers: {
-      Authorization: token
+      Authorization: token,
+      'X-Version': String(process.env.npm_package_version)
     }
   })
 

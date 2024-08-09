@@ -53,6 +53,7 @@ export async function invokeRegistrationValidation(
       body: JSON.stringify(bundle),
       headers: {
         'Content-Type': 'application/json',
+        'X-Version': String(process.env.npm_package_version),
         ...headers
       }
     }
