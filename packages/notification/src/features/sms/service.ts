@@ -50,7 +50,8 @@ ${recipient.bcc ? `Amount of recipients: ${recipient.bcc.length}` : ''}`
         convertUnicode
       }),
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Version': String(process.env.npm_package_version)
       }
     })
   } catch (error) {

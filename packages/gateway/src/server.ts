@@ -106,7 +106,7 @@ export async function createServer() {
       })
       request.response.header(
         'X-Version',
-        process.env.npm_package_version || '1.5.0'
+        String(process.env.npm_package_version)
       )
     }
 

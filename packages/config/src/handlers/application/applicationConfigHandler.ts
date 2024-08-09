@@ -69,9 +69,10 @@ async function getConfigFromCountry(authToken?: string) {
   const res = await fetch(url, {
     headers: authToken
       ? {
-          Authorization: `Bearer ${authToken}`
+          Authorization: `Bearer ${authToken}`,
+          'X-Version': String(process.env.npm_package_version)
         }
-      : {}
+      : { 'X-Version': String(process.env.npm_package_version) }
   })
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)

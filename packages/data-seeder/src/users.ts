@@ -71,10 +71,15 @@ async function getUsers(token: string) {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
+      'X-Version': String(process.env.npm_package_version)
     }
   })
   if (!res.ok) {
+    if (res.status === 426)
+      raise(
+        `Version mismatch: Core is running on a different version than country config. Please refer to country config log for more details`
+      )
     raise(`Expected to get the users from ${url}`)
   }
   const parsedUsers = UserSchema.safeParse(await res.json())
