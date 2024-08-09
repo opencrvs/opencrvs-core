@@ -20,6 +20,7 @@ export const getUserRolesQuery = gql`
         defaultMessage
         description
       }
+      scopes
     }
   }
 `

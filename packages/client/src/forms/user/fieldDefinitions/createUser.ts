@@ -215,8 +215,7 @@ export function userSectionFormType(): ISerializedFormSection {
           {
             action: 'hide',
             expression:
-              /* @todo the expression should be based on the role scopes*/
-              '!window.config.SIGNATURE_REQUIRED_FOR_ROLES.includes(values.role)'
+              "!values.scopes?.includes('profile.electronic-signature')"
           }
         ],
         fields: [
