@@ -215,7 +215,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const pageSize = 10
-  const language = useSelector(getLanguage)
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())

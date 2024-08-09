@@ -14,7 +14,6 @@ import {
   createTestComponent,
   mockDeclarationData,
   mockDeathDeclarationData,
-  validToken,
   mockUserResponse,
   flushPromises,
   setScopes,
@@ -24,13 +23,10 @@ import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
-import { checkAuth } from '@client/profile/profileActions'
 import { vi, Mock } from 'vitest'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-
-const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
 
 describe('verify collector tests', () => {

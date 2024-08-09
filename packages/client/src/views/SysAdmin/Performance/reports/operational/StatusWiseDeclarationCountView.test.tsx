@@ -17,7 +17,6 @@ import {
   setScopes
 } from '@client/tests/util'
 import { queries } from '@client/profile/queries'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { StatusWiseDeclarationCountView } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { AppStore } from '@client/store'
 import * as React from 'react'

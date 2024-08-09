@@ -27,8 +27,7 @@ import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
 import * as Router from 'react-router'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
-import { GetUserQuery, Status, SystemRoleType } from '@client/utils/gateway'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { GetUserQuery, Status } from '@client/utils/gateway'
 
 const useParams = Router.useParams as Mock
 

@@ -36,12 +36,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import {
-  FetchUserQuery,
-  GetUserQuery,
-  Status,
-  SystemRoleType
-} from '@client/utils/gateway'
+import { GetUserQuery, Status } from '@client/utils/gateway'
 
 const mockUsers = {
   data: {

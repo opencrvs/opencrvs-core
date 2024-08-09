@@ -208,7 +208,6 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
-    goToCertificateConfigAction,
     goToVSExportsAction,
     goToSystemViewAction,
     goToAdvancedSearchResultAction,
@@ -224,7 +223,6 @@ const NavigationView = (props: IFullProps) => {
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
-    goToInformantNotification,
     goToAllUserEmail,
     className
   } = props

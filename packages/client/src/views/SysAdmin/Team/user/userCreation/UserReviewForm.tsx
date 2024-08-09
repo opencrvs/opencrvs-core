@@ -27,7 +27,6 @@ import {
 } from '@client/forms/utils'
 import {
   buttonMessages as messages,
-  userMessages,
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'

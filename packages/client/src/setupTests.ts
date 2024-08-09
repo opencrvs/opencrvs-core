@@ -12,7 +12,6 @@ import { storage } from '@client/storage'
 import { IUserData } from './declarations'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
-import { authApi } from './utils/authApi'
 // eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import

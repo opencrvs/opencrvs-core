@@ -25,7 +25,6 @@ import {
   REGISTRAR_HOME_TAB,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
