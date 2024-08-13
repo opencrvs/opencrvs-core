@@ -27,11 +27,8 @@ sequenceDiagram
 
     Workflow->>User management: Fetch user/system information
     Workflow->>Hearth: Get practitioner resource
-
-    loop PractitionerRole Locations
-      Workflow->>Hearth: Get location by user's practitionerId
-    end
-    Note over Workflow,Hearth: Update bundle with practitioner details
+    Workflow->>Config: Get practitioner location hierarchy
+    Note over Workflow,Config: Update bundle with practitioner details
 
     Workflow->>Hearth: Save bundle
     Note over Workflow,Hearth: Get hearth response for all entries

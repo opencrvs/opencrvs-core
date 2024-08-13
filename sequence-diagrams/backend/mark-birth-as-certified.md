@@ -59,20 +59,7 @@ sequenceDiagram
 
     Workflow--)Metrics: POST bundle /events/{event}/certified
 
-    Metrics->>Influx DB: Write audit point
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate certification point
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate payment point
-
-    Metrics->>Hearth: Get previous task of Task History
-    Note over Metrics,Hearth: Generate event duration point
-
-    Metrics->>Influx DB: Write points
+    Metrics->>Influx DB: Write user audit point "CERTIFIED"
+    Metrics->>Hearth: Fetch task history to find previous task
+    Metrics->>Influx DB: Write event duration point
 ```
