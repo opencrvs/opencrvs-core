@@ -60,6 +60,7 @@ export async function invokeRegistrationValidation(
   )
   if (!res.ok) {
     const errorData = await res.json()
+    if (res.status === 426) throw errorData.message
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
   return bundle

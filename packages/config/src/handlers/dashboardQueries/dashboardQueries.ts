@@ -29,7 +29,10 @@ export default async function getDashboardQueries(
   if (response.status === 404) {
     return defaultQueries()
   }
-
+  if (response.status === 426) {
+    const { message } = await response.json()
+    throw new Error(message)
+  }
   if (!response.ok) {
     throw new Error(
       `Error fetching dashboard queries: ${JSON.stringify(

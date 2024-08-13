@@ -38,7 +38,10 @@ export default async function getForm(
       'X-Version': String(process.env.npm_package_version)
     }
   })
-
+  if (response.status === 426) {
+    const { message } = await response.json()
+    logger.error(message)
+  }
   if (response.status !== 200) {
     logger.error(
       `Core failed to fetch form definition from ${COUNTRY_CONFIG_URL}/forms. Check country config logs for more details`

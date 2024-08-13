@@ -74,6 +74,10 @@ async function getConfigFromCountry(authToken?: string) {
         }
       : { 'X-Version': String(process.env.npm_package_version) }
   })
+  if (res.status === 426) {
+    const { message } = await res.json()
+    throw new Error(message)
+  }
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)
   }
@@ -102,29 +106,30 @@ export async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
-  const configFromCountryConfig = await getConfigFromCountry(
-    request?.headers?.authorization
-  )
-  const stripApplicationConfig = stripIdFromApplicationConfig(
-    configFromCountryConfig
-  )
-  const { error, value } = applicationConfigResponseValidation.validate(
-    stripApplicationConfig,
-    { allowUnknown: true }
-  )
-  if (error) {
-    throw badData(error.details[0].message)
-  }
-  const updatedConfigFromCountryConfig = value
-
   try {
+    const configFromCountryConfig = await getConfigFromCountry(
+      request?.headers?.authorization
+    )
+    const stripApplicationConfig = stripIdFromApplicationConfig(
+      configFromCountryConfig
+    )
+    const { error, value } = applicationConfigResponseValidation.validate(
+      stripApplicationConfig,
+      { allowUnknown: true }
+    )
+    if (error) {
+      throw badData(error.details[0].message)
+    }
+    const updatedConfigFromCountryConfig = value
+
     const configFromDB = await ApplicationConfig.findOne({})
     const finalConfig = merge(
       updatedConfigFromCountryConfig,
       configFromDB?.toObject()
     )
     return finalConfig
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message.includes('Version mismatch')) throw error
     throw internal('Error when fetching application config from Mongo', error)
   }
 }
@@ -133,15 +138,27 @@ export async function getLoginConfigHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const refineConfigResponse = pick(await getApplicationConfig(), [
-    'APPLICATION_NAME',
-    'COUNTRY_LOGO',
-    'PHONE_NUMBER_PATTERN',
-    'LOGIN_BACKGROUND',
-    'USER_NOTIFICATION_DELIVERY_METHOD',
-    'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
-  ])
-  return { config: refineConfigResponse }
+  try {
+    const refineConfigResponse = pick(await getApplicationConfig(), [
+      'APPLICATION_NAME',
+      'COUNTRY_LOGO',
+      'PHONE_NUMBER_PATTERN',
+      'LOGIN_BACKGROUND',
+      'USER_NOTIFICATION_DELIVERY_METHOD',
+      'INFORMANT_NOTIFICATION_DELIVERY_METHOD'
+    ])
+    return { config: refineConfigResponse }
+  } catch (error: any) {
+    const { message } = error
+    if (message.includes('Version mismatch')) {
+      return h.response({ message: message }).code(426)
+    }
+    return h
+      .response({
+        message: 'An error occurred while getting the login configuration'
+      })
+      .code(500)
+  }
 }
 
 export async function updateApplicationConfigHandler(
