@@ -160,10 +160,10 @@ async function fetchCountryRoles(token: string) {
     }
   })
   if (!res.ok) {
-    if (res.status === 426)
-      raise(
-        `Version mismatch: Core is running on a different version than country config. Please refer to country config log for more details`
-      )
+    if (res.status === 426) {
+      const { message } = await res.json()
+      raise(message)
+    }
     raise(`Expected to get the roles from ${url}`)
   }
   const parsedRoles = CountryRoleSchema.safeParse(await res.json())

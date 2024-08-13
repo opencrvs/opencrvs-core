@@ -268,7 +268,7 @@ async function loadCertificateConfiguration(): Promise<CertificateConfiguration>
   const res = await fetch(url, {
     method: 'GET',
     headers: {
-      'X-Version': String(process.env.npm_package_version)
+      'X-Version': APP_VERSION
     }
   })
 
@@ -300,7 +300,7 @@ async function loadContent(): Promise<IContentResponse> {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${getToken()}`,
-      'X-Version': String(process.env.npm_package_version)
+      'X-Version': APP_VERSION
     }
   })
 
