@@ -666,9 +666,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       }
 
       const actualRegData = {
-        status: (props.declaration.data.history as unknown as History[]).find(
-          (data) => data.action === null
-        )?.regStatus,
+        status: props.declaration.registrationStatus,
         type: capitalize(String(props.declaration.data.registration.type)),
         trackingId: props.declaration.data.registration.trackingId,
         registrationNumber:
@@ -702,7 +700,11 @@ export const DuplicateFormTabs = (props: IProps) => {
           leftValue: (
             <Text variant="reg16" element="span" color="grey600">
               {actualRegData.status
-                ? intl.formatMessage(regStatusMessages[actualRegData.status])
+                ? intl.formatMessage(
+                    regStatusMessages[
+                      actualRegData.status as unknown as RegStatus
+                    ]
+                  )
                 : EMPTY_STRING}
             </Text>
           ),
