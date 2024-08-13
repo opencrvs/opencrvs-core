@@ -11,14 +11,14 @@ sequenceDiagram
     participant Client(submissionMiddleware)
     participant GraphQL gateway
     participant OpenCRVS auth
+    participant Workflow
+    participant Hearth
     participant OpenCRVS countryconfig
+    participant OpenCRVS MOSIP mediator
     participant E-Signet (OIDP)
     participant MOSIP (OpenCRVS Proxy)
     participant MOSIP Keycloak
     participant MOSIP Kafka
-    participant Workflow
-    participant OpenCRVS MOSIP mediator
-    participant Hearth
 
     Client(form NID_VERIFICATION_BUTTON)->>E-Signet (OIDP): authorize parent/informant uses E-Signet to consent
     E-Signet (OIDP)->>Client(OIDPVerificationCallback): return code

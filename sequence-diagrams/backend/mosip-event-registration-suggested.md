@@ -12,15 +12,15 @@ sequenceDiagram
     participant Client(submissionMiddleware)
     participant GraphQL gateway
     participant OpenCRVS auth
+    participant Workflow
+    participant Hearth
     participant OpenCRVS countryconfig
+    participant OpenCRVS MOSIP mediator
     participant E-Signet (OIDP)
     participant MOSIP (OpenCRVS Proxy)
     participant MOSIP Keycloak
     participant MOSIP Token Seeder
     participant MOSIP Kafka
-    participant Workflow
-    participant OpenCRVS MOSIP mediator
-    participant Hearth
 
     Client(form NID_VERIFICATION_BUTTON)->>OpenCRVS config: Is OpenCRVS configured to use E-Signet?
     alt OpenCRVS config E-Signet configured
