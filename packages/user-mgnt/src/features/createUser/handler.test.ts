@@ -116,7 +116,17 @@ describe('createUser handler', () => {
     const expectedPractitionerROle = {
       resourceType: 'PractitionerRole',
       practitioner: { reference: 'Practitioner/123' },
-      location: [{ reference: 'Location/321' }]
+      location: [{ reference: 'Location/321' }],
+      code: [
+        {
+          coding: [
+            {
+              code: 'FIELD_AGENT',
+              system: 'http://opencrvs.org/specs/roles'
+            }
+          ]
+        }
+      ]
     }
 
     expect(fetch.mock.calls.length).toBe(4)

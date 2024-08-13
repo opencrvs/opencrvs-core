@@ -1507,7 +1507,7 @@ export const typeResolvers: GQLResolver = {
       )
 
       const targetCode = result?.code?.find((element) => {
-        return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
       })
 
       const roleId = targetCode?.coding?.[0].code
@@ -1517,7 +1517,7 @@ export const typeResolvers: GQLResolver = {
       )
 
       const allRoles = await dataSources.countryConfigAPI.getRoles()
-      const role = allRoles.find((role) => role.id === roleId)
+      const role = allRoles.find((role) => role.id === roleId)?.id
 
       return { ...userResponse, role }
     },
