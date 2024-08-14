@@ -24,9 +24,6 @@ interface IContentResponse {
 export async function loadContent(): Promise<IContentResponse> {
   return await request<IContentResponse>({
     url: new URL('/content/login', window.config.COUNTRY_CONFIG_URL).toString(),
-    method: 'GET',
-    headers: {
-      'X-Version': APP_VERSION
-    }
+    method: 'GET'
   })
 }
