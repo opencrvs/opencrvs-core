@@ -280,6 +280,13 @@ export const notificationReducer: LoopReducer<
           ...action.payload
         }
       }
+    case actions.SET_VERSION_MISMATCH_ERROR:
+      return {
+        ...state,
+        versionMismatchError: {
+          ...action.payload
+        }
+      }
     default:
       return state
   }

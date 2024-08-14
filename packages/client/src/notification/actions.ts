@@ -400,3 +400,4 @@ export type Action =
   | ShowUnassignedDeclarations
   | HideUnassignedDeclarationsToast
   | ToggleEmailAllUsersFeedbackAction
+  | SetVersionMismatchError
