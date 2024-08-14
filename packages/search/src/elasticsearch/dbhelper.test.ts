@@ -27,15 +27,15 @@ const setupTestCases = async (setup: SetupFn) => {
   return { elasticClient }
 }
 
-const { setup, cleanup, shutdown } = createHandlerSetup()
-
-afterEach(cleanup)
-afterAll(shutdown)
-
 describe('elasticsearch db helper', () => {
   beforeAll(() => {
     logger.error = jest.fn()
   })
+
+  const { setup, cleanup, shutdown } = createHandlerSetup()
+
+  afterEach(cleanup)
+  afterAll(shutdown)
 
   const identifier = 'testId'
 
