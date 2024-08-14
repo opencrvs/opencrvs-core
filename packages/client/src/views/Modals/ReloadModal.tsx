@@ -11,74 +11,63 @@
 
 import { ResponsiveModal } from '@opencrvs/components'
 import { PrimaryButton } from '@opencrvs/components/src/buttons'
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { storeReloadModalVisibility } from '@client/reload/reducer'
-import { useRegisterSW } from 'virtual:pwa-register/react'
-import { SecondaryButton } from '@opencrvs/components/lib/buttons'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/reloadModal'
 
 export const ReloadModal = () => {
-  const dispatch = useDispatch()
   const intl = useIntl()
 
   const visibility = useSelector(
     (state: IStoreState) => state.reloadModalVisibility.isReloadModalVisible
   )
 
-  const [suppressUntill, setSupressUntill] = useState(0)
-
-  const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker
-  } = useRegisterSW({
-    onRegisteredSW(swUrl, r) {
-      r &&
-        setInterval(() => {
-          r.update()
-        }, 30 * 1000)
-    },
-    onRegisterError(error) {
-      console.error('SW registration error', error)
+  const handleReload = () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .getRegistration()
+        .then((registration) => {
+          if (registration) {
+            registration.update()
+            registration.onupdatefound = () => {
+              const installingWorker = registration.installing
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (
+                    installingWorker.state === 'installed' &&
+                    navigator.serviceWorker.controller
+                  )
+                    window.location.reload()
+                }
+              }
+            }
+          } else {
+            console.log('No service worker registration found.')
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get service worker registration:', error)
+        })
     }
-  })
-
-  const closeModal = () => {
-    dispatch(storeReloadModalVisibility(false))
-    setSupressUntill(Date.now() + 30 * 1000)
+    window.location.reload()
   }
 
   return (
     <ResponsiveModal
-      title={
-        needRefresh
-          ? intl.formatMessage(messages.newContent)
-          : intl.formatMessage(messages.versionDoesNotMatch)
-      }
+      title={intl.formatMessage(messages.title)}
       contentHeight={96}
       responsive={false}
-      handleClose={closeModal}
-      actions={
-        needRefresh
-          ? [
-              <SecondaryButton key="cancel" id="cancel" onClick={closeModal}>
-                {intl.formatMessage(messages.notNow)}
-              </SecondaryButton>,
-              <PrimaryButton
-                key="reload"
-                id="reload"
-                onClick={() => {
-                  updateServiceWorker(true)
-                }}
-              >
-                {intl.formatMessage(messages.reload)}
-              </PrimaryButton>
-            ]
-          : []
-      }
-      show={visibility || (needRefresh && Date.now() > suppressUntill)}
-    />
+      showCloseButton={false}
+      actions={[
+        <PrimaryButton key="reload" id="reload" onClick={handleReload}>
+          {intl.formatMessage(messages.update)}
+        </PrimaryButton>
+      ]}
+      show={visibility}
+    >
+      {intl.formatMessage(messages.body)}
+    </ResponsiveModal>
   )
 }

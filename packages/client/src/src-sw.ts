@@ -20,12 +20,26 @@ import { clientsClaim } from 'workbox-core'
 
 declare let self: ServiceWorkerGlobalScope
 
+self.addEventListener('install', (event) => {
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          return caches.delete(cacheName)
+        })
+      )
+    })
+  )
+})
+
 self.addEventListener('message', async (event) => {
   if (!event.data) {
     return
   }
-
-  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
 
   if (
     typeof event.data === 'object' &&
@@ -82,8 +96,8 @@ registerRoute(
   })
 )
 
-//self.skipWaiting()
-//clientsClaim()
+self.skipWaiting()
+clientsClaim()
 
 const removeCache = async (minioUrls: string) => {
   const runTimeCacheKey = (await caches.keys()).find((e) =>
