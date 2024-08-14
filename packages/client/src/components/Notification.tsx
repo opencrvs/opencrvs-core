@@ -294,7 +294,7 @@ const Component = ({
       )}
       {showVersionMismatchError && (
         <Toast
-          id="emailAllUsersFeedback"
+          id="versionMismatchErrorToast"
           type="error"
           onClose={hideVersionMismatchToast}
         >
