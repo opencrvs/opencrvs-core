@@ -29,30 +29,23 @@ export const ReloadModal = () => {
 
   const handleReload = () => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .getRegistration()
-        .then((registration) => {
-          if (registration) {
-            registration.update()
-            registration.onupdatefound = () => {
-              const installingWorker = registration.installing
-              if (installingWorker) {
-                installingWorker.onstatechange = () => {
-                  if (
-                    installingWorker.state === 'installed' &&
-                    navigator.serviceWorker.controller
-                  )
-                    window.location.reload()
-                }
+      navigator.serviceWorker.getRegistration().then((registration) => {
+        if (registration) {
+          registration.update()
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing
+            if (installingWorker) {
+              installingWorker.onstatechange = () => {
+                if (
+                  installingWorker.state === 'installed' &&
+                  navigator.serviceWorker.controller
+                )
+                  window.location.reload()
               }
             }
-          } else {
-            console.log('No service worker registration found.')
           }
-        })
-        .catch((error) => {
-          console.error('Failed to get service worker registration:', error)
-        })
+        }
+      })
     }
     window.location.reload()
   }
