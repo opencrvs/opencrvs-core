@@ -12,32 +12,64 @@
 import { ResponsiveModal } from '@opencrvs/components'
 import { PrimaryButton } from '@opencrvs/components/src/buttons'
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import * as actions from '@login/login/actions'
+import { useSelector } from 'react-redux'
 import { getReloadModalVisibility } from '@login/login/selectors'
+import { useIntl } from 'react-intl'
+import { IStoreState } from '@login/store'
+import { messages } from '@login/i18n/messages/views/reloadModal'
 
 export const ReloadModal = () => {
-  const dispatch = useDispatch()
+  const intl = useIntl()
+
   const visibility = useSelector(getReloadModalVisibility)
+  const app_name = useSelector(
+    (state: IStoreState) => state.login.config.APPLICATION_NAME
+  )
+
+  const handleReload = () => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .getRegistration()
+        .then((registration) => {
+          if (registration) {
+            registration.update()
+            registration.onupdatefound = () => {
+              const installingWorker = registration.installing
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (
+                    installingWorker.state === 'installed' &&
+                    navigator.serviceWorker.controller
+                  )
+                    window.location.reload()
+                }
+              }
+            }
+          } else {
+            console.log('No service worker registration found.')
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get service worker registration:', error)
+        })
+    }
+    window.location.reload()
+  }
 
   return (
     <ResponsiveModal
-      title="Version does not match. please reload"
+      title={intl.formatMessage(messages.title)}
       contentHeight={96}
       responsive={false}
+      showCloseButton={false}
       actions={[
-        <PrimaryButton
-          key="reload"
-          id="reload"
-          onClick={() => {
-            document.location.reload()
-            dispatch(actions.storeReloadModalVisibility(false))
-          }}
-        >
-          Reload
+        <PrimaryButton key="reload" id="reload" onClick={handleReload}>
+          {intl.formatMessage(messages.update)}
         </PrimaryButton>
       ]}
       show={visibility}
-    />
+    >
+      {intl.formatMessage(messages.body, { app_name: app_name })}
+    </ResponsiveModal>
   )
 }
