@@ -12,34 +12,27 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IReloadModalMessages
   extends Record<string | number | symbol, MessageDescriptor> {
-  reload: MessageDescriptor
-  notNow: MessageDescriptor
-  newContent: MessageDescriptor
-  versionDoesNotMatch: MessageDescriptor
+  title: MessageDescriptor
+  body: MessageDescriptor
+  update: MessageDescriptor
 }
 
 const messagesToDefine: IReloadModalMessages = {
-  reload: {
-    id: 'reloadmodal.button.reload',
-    defaultMessage: 'Relaod',
-    description: 'Label for reload button'
+  title: {
+    id: 'reloadmodal.title',
+    defaultMessage: 'Update available',
+    description: 'Title when update is available'
   },
-  notNow: {
-    id: 'reloadmodal.button.notnow',
-    defaultMessage: 'Not now',
-    description: 'Label for not now button'
-  },
-  newContent: {
-    id: 'reloadmodal.title.newcontent',
+  body: {
+    id: 'reloadmodal.body',
     defaultMessage:
-      'New content available. Please reload to get the latest client',
-    description: 'Title when new content is available'
+      'There’s a new version of {app name} available. Please update to continue.',
+    description: 'Body of reload modal'
   },
-  versionDoesNotMatch: {
-    id: 'reloadmodal.title.versionMismatch',
-    defaultMessage:
-      'Version does not match. please refer to the log for more details',
-    description: 'Title when versions does not match'
+  update: {
+    id: 'reloadmodal.button.update',
+    defaultMessage: 'Update',
+    description: 'Label of update button'
   }
 }
 export const messages: IReloadModalMessages = defineMessages(messagesToDefine)
