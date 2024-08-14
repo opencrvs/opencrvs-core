@@ -239,18 +239,6 @@ export const getRoutes = () => {
       }
     },
     {
-      method: 'DELETE',
-      path: '/elasticIndex',
-      handler: deleteOCRVSIndexHandler,
-      config: {
-        tags: ['api'],
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        description: 'Delete ocrvs index from elasticsearch'
-      }
-    },
-    {
       method: 'POST',
       path: '/search/duplicates/birth',
       handler: searchForBirthDeDuplication,
