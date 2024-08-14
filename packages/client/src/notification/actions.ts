@@ -53,6 +53,7 @@ export const HIDE_UNASSIGNED_DECLARATIONS_TOAST =
   'HIDE_UNASSIGNED_DECLARATIONS_TOAST'
 export const TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST =
   'TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST'
+export const SET_VERSION_MISMATCH_ERROR = 'SET_VERSION_MISMATCH_ERROR'
 
 type ConfigurationErrorAction = {
   type: typeof CONFIGURATION_ERROR
@@ -350,6 +351,23 @@ export const toggleEmailAllUsersFeedbackToast = (
   data: ToggleEmailAllUsersFeedbackPayload
 ): ToggleEmailAllUsersFeedbackAction => ({
   type: TOGGLE_EMAIL_ALL_USERS_FEEDBACK_TOAST,
+  payload: data
+})
+
+type VersionMismatchError = {
+  show: boolean
+  gatewayVersion?: string
+  clientVersion?: string
+}
+type SetVersionMismatchError = {
+  type: typeof SET_VERSION_MISMATCH_ERROR
+  payload: VersionMismatchError
+}
+
+export const setVersionMismatchToast = (
+  data: VersionMismatchError
+): SetVersionMismatchError => ({
+  type: SET_VERSION_MISMATCH_ERROR,
   payload: data
 })
 

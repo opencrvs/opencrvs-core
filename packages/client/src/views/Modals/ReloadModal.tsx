@@ -17,9 +17,13 @@ import { storeReloadModalVisibility } from '@client/reload/reducer'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@client/store'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/reloadModal'
 
 export const ReloadModal = () => {
   const dispatch = useDispatch()
+  const intl = useIntl()
+
   const visibility = useSelector(
     (state: IStoreState) => state.reloadModalVisibility.isReloadModalVisible
   )
@@ -50,8 +54,8 @@ export const ReloadModal = () => {
     <ResponsiveModal
       title={
         needRefresh
-          ? 'New content available. Please reload to get the latest client'
-          : 'Version does not match. please refer to the log for more details'
+          ? intl.formatMessage(messages.newContent)
+          : intl.formatMessage(messages.versionDoesNotMatch)
       }
       contentHeight={96}
       responsive={false}
@@ -60,7 +64,7 @@ export const ReloadModal = () => {
         needRefresh
           ? [
               <SecondaryButton key="cancel" id="cancel" onClick={closeModal}>
-                Not Now
+                {intl.formatMessage(messages.notNow)}
               </SecondaryButton>,
               <PrimaryButton
                 key="reload"
@@ -69,7 +73,7 @@ export const ReloadModal = () => {
                   updateServiceWorker(true)
                 }}
               >
-                Reload
+                {intl.formatMessage(messages.reload)}
               </PrimaryButton>
             ]
           : []

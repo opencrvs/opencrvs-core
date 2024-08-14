@@ -206,6 +206,12 @@ const messagesToDefine = {
     id: 'misc.notif.emailAllUsersError',
     defaultMessage: 'Only one email can be sent per day',
     description: 'Label for Email all users error toast'
+  },
+  versionMismatch: {
+    defaultMessage:
+      'Version Mismatch: Register Client is running on {clientVersion}, whereas gateway is running on {gatewayVersion}. Please reload to get the latest client',
+    id: 'misc.notif.versionMismatchError',
+    description: 'Label for when client version does not match countryConfig'
   }
 }
 
