@@ -222,7 +222,6 @@ export async function advancedRecordSearch(
     return h.response(result).code(200)
   } catch (err) {
     logger.error(`Search/searchDeclarationHandler: error: ${err}`)
-    console.log(err)
     return badRequest(err.message)
   }
 }
