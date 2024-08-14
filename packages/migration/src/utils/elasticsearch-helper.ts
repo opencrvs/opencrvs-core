@@ -27,7 +27,6 @@ export const updateComposition = async (
   try {
     response = await client.update({
       index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
       id,
       body: {
         doc: body
@@ -95,7 +94,6 @@ export const searchCompositionByCriteria = async (
   try {
     return await client.search({
       index: ELASTICSEARCH_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: criteriaObject,
         ...extraConfigs
