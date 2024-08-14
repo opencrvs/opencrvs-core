@@ -23,6 +23,9 @@ export const ReloadModal = () => {
   const visibility = useSelector(
     (state: IStoreState) => state.reloadModalVisibility.isReloadModalVisible
   )
+  const app_name = useSelector(
+    (state: IStoreState) => state.offline.offlineData.config?.APPLICATION_NAME
+  )
 
   const handleReload = () => {
     if ('serviceWorker' in navigator) {
@@ -67,7 +70,7 @@ export const ReloadModal = () => {
       ]}
       show={visibility}
     >
-      {intl.formatMessage(messages.body)}
+      {intl.formatMessage(messages.body, { app_name: app_name })}
     </ResponsiveModal>
   )
 }
