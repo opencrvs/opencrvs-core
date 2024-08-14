@@ -40,8 +40,8 @@ export const getOrThrow = <T>(value: T | undefined, message: string): T => {
   return value
 }
 
-export const generateBearerTokenHeader = () => {
-  const token = jwt.sign({}, readFileSync('./test/cert.key'), {
+export const generateBearerTokenHeader = (scope: { scope?: string[] } = {}) => {
+  const token = jwt.sign(scope, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:search-user'
