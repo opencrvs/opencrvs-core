@@ -26,7 +26,7 @@ const messagesToDefine: IReloadModalMessages = {
   body: {
     id: 'reloadmodal.body',
     defaultMessage:
-      'There’s a new version of {app name} available. Please update to continue.',
+      'There’s a new version of {app_name} available. Please update to continue.',
     description: 'Body of reload modal'
   },
   update: {
