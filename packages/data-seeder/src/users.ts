@@ -71,15 +71,10 @@ async function getUsers(token: string) {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'X-Version': String(process.env.npm_package_version)
+      Authorization: `Bearer ${token}`
     }
   })
   if (!res.ok) {
-    if (res.status === 426) {
-      const { message } = await res.json()
-      raise(message)
-    }
     raise(`Expected to get the users from ${url}`)
   }
   const parsedUsers = UserSchema.safeParse(await res.json())

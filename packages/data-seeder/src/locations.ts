@@ -157,16 +157,8 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
 
 async function getLocations() {
   const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
-  const res = await fetch(url, {
-    headers: {
-      'X-Version': String(process.env.npm_package_version)
-    }
-  })
+  const res = await fetch(url)
   if (!res.ok) {
-    if (res.status === 426) {
-      const { message } = await res.json()
-      raise(message)
-    }
     raise(`Expected to get the locations from ${url}`)
   }
   const parsedLocations = LocationSchema.safeParse(await res.json())

@@ -53,14 +53,12 @@ export async function invokeRegistrationValidation(
       body: JSON.stringify(bundle),
       headers: {
         'Content-Type': 'application/json',
-        'X-Version': String(process.env.npm_package_version),
         ...headers
       }
     }
   )
   if (!res.ok) {
     const errorData = await res.json()
-    if (res.status === 426) throw errorData.message
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
   return bundle

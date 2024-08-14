@@ -266,10 +266,7 @@ async function loadCertificateConfiguration(): Promise<CertificateConfiguration>
   const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
 
   const res = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'X-Version': APP_VERSION
-    }
+    method: 'GET'
   })
 
   // for backward compatibility, if the endpoint is unimplemented
@@ -299,8 +296,7 @@ async function loadContent(): Promise<IContentResponse> {
   const res = await fetch(url, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${getToken()}`,
-      'X-Version': APP_VERSION
+      Authorization: `Bearer ${getToken()}`
     }
   })
 

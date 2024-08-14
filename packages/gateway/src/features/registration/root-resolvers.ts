@@ -265,7 +265,6 @@ export const resolvers: GQLResolver = {
             body: JSON.stringify({ dob, nid }),
             headers: {
               'Content-Type': 'application/json',
-              'X-Version': String(process.env.npm_package_version),
               ...authHeader
             }
           }

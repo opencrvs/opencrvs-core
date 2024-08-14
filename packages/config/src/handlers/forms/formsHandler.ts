@@ -34,14 +34,10 @@ export default async function getForm(
   const token = request.headers.authorization
   const response = await fetch(`${COUNTRY_CONFIG_URL}/forms`, {
     headers: {
-      Authorization: token,
-      'X-Version': String(process.env.npm_package_version)
+      Authorization: token
     }
   })
-  if (response.status === 426) {
-    const { message } = await response.json()
-    logger.error(message)
-  }
+
   if (response.status !== 200) {
     logger.error(
       `Core failed to fetch form definition from ${COUNTRY_CONFIG_URL}/forms. Check country config logs for more details`

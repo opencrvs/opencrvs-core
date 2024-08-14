@@ -17,22 +17,12 @@ export default async function getDashboardQueries(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const response = await fetch(
-    `${COUNTRY_CONFIG_URL}/dashboards/queries.json`,
-    {
-      headers: {
-        'X-Version': String(process.env.npm_package_version)
-      }
-    }
-  )
+  const response = await fetch(`${COUNTRY_CONFIG_URL}/dashboards/queries.json`)
 
   if (response.status === 404) {
     return defaultQueries()
   }
-  if (response.status === 426) {
-    const { message } = await response.json()
-    throw new Error(message)
-  }
+
   if (!response.ok) {
     throw new Error(
       `Error fetching dashboard queries: ${JSON.stringify(

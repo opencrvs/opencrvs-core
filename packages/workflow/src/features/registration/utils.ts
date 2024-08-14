@@ -52,8 +52,7 @@ async function getTrackingIdFromCountryConfig(
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-type': 'application/json',
-      'X-Version': String(process.env.npm_package_version)
+      'Content-type': 'application/json'
     },
     body: JSON.stringify(bundle)
   }).then((res) => {

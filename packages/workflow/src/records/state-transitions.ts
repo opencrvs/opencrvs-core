@@ -451,9 +451,6 @@ export async function initiateRegistration(
   try {
     await invokeRegistrationValidation(record, headers)
   } catch (error) {
-    if (error.message.includes('Version mismatch')) {
-      return toRejected(record, token, { text: error.message })
-    }
     const statusReason: fhir3.CodeableConcept = {
       text: REG_NUMBER_GENERATION_FAILED
     }
