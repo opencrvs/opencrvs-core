@@ -22,7 +22,6 @@ import {
   assignEventHandler,
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
-import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 import { getOrCreateClient } from '@search/elasticsearch/client'
 import { logger } from '@opencrvs/commons'
 import { recordHandler } from '@search/features/registration/record/handler'
