@@ -12,19 +12,19 @@ import { Readable } from 'stream'
 import * as recordsService from '@search/features/records/service'
 import { IndexingStatus } from '@search/features/reindex/handler'
 import { formatIndexName } from '@search/features/reindex/reindex'
-import mockRecord from './mock-record-to-migrate'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { createHandlerSetup, SetupFn } from '@search/test/createHandlerSetup'
 import { generateBearerTokenHeader, getOrThrow } from '@search/test/utils'
+import { BIRTH_BUNDLE } from '@opencrvs/commons/fixtures'
 
 jest.setTimeout(100000)
 
-const setupTestCases = async (setupFn: SetupFn) => {
-  const { server, elasticClient } = await setupFn()
+const setupTestCases = async (setup: SetupFn) => {
+  const { server, elasticClient } = await setup()
 
   jest
     .spyOn(recordsService, 'streamAllRecords')
-    .mockReturnValue(Promise.resolve(Readable.from([mockRecord])))
+    .mockReturnValue(Promise.resolve(Readable.from([BIRTH_BUNDLE])))
 
   const tokenHeader = generateBearerTokenHeader()
 
