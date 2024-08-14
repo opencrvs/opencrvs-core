@@ -32,7 +32,8 @@ import {
   hideUserReconnectedToast,
   hideDuplicateRecordsToast,
   hideUnassignedDeclarationsToast,
-  toggleEmailAllUsersFeedbackToast
+  toggleEmailAllUsersFeedbackToast,
+  setVersionMismatchToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { goToDeclarationRecordAudit } from '@client/navigation'
@@ -58,6 +59,7 @@ type DispatchProps = {
   hideUserReconnectedToast: typeof hideUserReconnectedToast
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   toggleEmailAllUsersFeedbackToast: typeof toggleEmailAllUsersFeedbackToast
+  setVersionMismatchToast: typeof setVersionMismatchToast
 }
 
 type Props = NotificationProps &
@@ -81,6 +83,7 @@ const Component = ({
   hideUserReconnectedToast,
   goToDeclarationRecordAudit,
   toggleEmailAllUsersFeedbackToast,
+  setVersionMismatchToast,
   children,
   configurationError,
   configurationErrorVisible,
@@ -100,10 +103,17 @@ const Component = ({
   userReconnectedToast,
   isOnline,
   unassignedDeclarations,
-  emailAllUsers
+  emailAllUsers,
+  versionMismatchError
 }: Props) => {
   const hideEmailAllUsersFeedbackToast = () => {
     toggleEmailAllUsersFeedbackToast({ visible: false })
+  }
+
+  const { show: showVersionMismatchError, ...versions } = versionMismatchError
+
+  const hideVersionMismatchToast = () => {
+    setVersionMismatchToast({ show: false })
   }
 
   const userFormSubmitErrorMessage = isOnline
@@ -282,6 +292,15 @@ const Component = ({
             : intl.formatMessage(messages.emailAllUsersError)}
         </Toast>
       )}
+      {showVersionMismatchError && (
+        <Toast
+          id="emailAllUsersFeedback"
+          type="error"
+          onClose={hideVersionMismatchToast}
+        >
+          {intl.formatMessage(messages.versionMismatch, versions)}
+        </Toast>
+      )}
       {/* More notification types can be added here */}
     </div>
   )
@@ -311,7 +330,8 @@ const mapStateToProps = (store: IStoreState) => {
     userCreateDuplicateEmailFailedToast:
       store.notification.userCreateDuplicateEmailFailedToast,
     userReconnectedToast: store.notification.userReconnectedToast,
-    emailAllUsers: store.notification.emailAllUsers
+    emailAllUsers: store.notification.emailAllUsers,
+    versionMismatchError: store.notification.versionMismatchError
   }
 }
 

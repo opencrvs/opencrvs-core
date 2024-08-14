@@ -40,6 +40,12 @@ type EmailAllUsers =
       visible: true
     }
 
+type VersionMismatchError = {
+  show: boolean
+  gatewayVersion?: string
+  clientVersion?: string
+}
+
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
   configurationError: string | null
@@ -61,6 +67,7 @@ export type NotificationState = {
   userCreateDuplicateEmailFailedToast: userCreateDuplicateEmailFailedToastState
   userReconnectedToast: boolean
   emailAllUsers: EmailAllUsers
+  versionMismatchError: VersionMismatchError
 }
 
 const initialState: NotificationState = {
@@ -89,7 +96,8 @@ const initialState: NotificationState = {
   },
   userReconnectedToast: false,
   unassignedDeclarations: [],
-  emailAllUsers: { visible: false }
+  emailAllUsers: { visible: false },
+  versionMismatchError: { show: false }
 }
 
 export const notificationReducer: LoopReducer<
