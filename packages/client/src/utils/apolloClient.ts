@@ -18,10 +18,7 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import {
-  setVersionMismatchToast,
-  showSessionExpireConfirmation
-} from '@client/notification/actions'
+import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
@@ -85,13 +82,6 @@ export const createClient = (
       const gatewayVersion = headers.get('X-version')
       if (gatewayVersion !== APP_VERSION) {
         // const errorMsg = `Version Mismatch: Register Client is running on ${APP_VERSION}, whereas gateway is running on ${gatewayVersion}. Please reload to get the latest client`
-        store.dispatch(
-          setVersionMismatchToast({
-            show: true,
-            gatewayVersion: gatewayVersion,
-            clientVersion: APP_VERSION
-          })
-        )
         store.dispatch(storeReloadModalVisibility(true))
       }
 
