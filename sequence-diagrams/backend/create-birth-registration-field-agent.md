@@ -47,17 +47,7 @@ sequenceDiagram
 
     Workflow--)Metrics: POST bundle to /events/{event}/sent-notification
     Metrics->>Influx DB: Write user audit point "IN_PROGRESS"
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate time logged point
-
-    loop location levels 4, 3, 2
-        Metrics->>Hearth: Get parent of Location
-    end
-    Note over Metrics,Hearth: Generate declaration started point
-    Metrics->>Influx DB: Write audit points
+    Metrics->>Influx DB: Write time logged point & declaration started point
 
     Note over Workflow,Search: For duplicate declarations, starts here
     Workflow--)Search: Index bundle
