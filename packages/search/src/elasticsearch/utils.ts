@@ -10,7 +10,10 @@
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import { client, ISearchResponse } from '@search/elasticsearch/client'
+import {
+  getOrCreateClient,
+  ISearchResponse
+} from '@search/elasticsearch/client'
 
 import fetch from 'node-fetch'
 import {
@@ -29,6 +32,8 @@ import {
   IOperationHistory
 } from '@opencrvs/commons/types'
 import { findName } from '@search/features/fhir/fhir-utils'
+
+const client = getOrCreateClient()
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
