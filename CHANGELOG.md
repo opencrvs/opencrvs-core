@@ -2,6 +2,10 @@
 
 ## 1.5.1
 
+## Improvements
+
+- Fetch child identifier in view record
+
 ## Bug fixes
 
 - Handle label params used in form inputs when rendering in review section view
