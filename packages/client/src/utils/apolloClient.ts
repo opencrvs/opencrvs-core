@@ -81,7 +81,6 @@ export const createClient = (
 
       const gatewayVersion = headers.get('X-version')
       if (gatewayVersion !== APP_VERSION) {
-        // const errorMsg = `Version Mismatch: Register Client is running on ${APP_VERSION}, whereas gateway is running on ${gatewayVersion}. Please reload to get the latest client`
         store.dispatch(storeReloadModalVisibility(true))
       }
 
