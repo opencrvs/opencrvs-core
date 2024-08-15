@@ -12,7 +12,6 @@
 /// <reference types="vite-plugin-pwa/react" />
 
 interface ImportMetaEnv {
-  readonly VITE_APP_VERSION?: string
   readonly COUNTRY_CONFIG_URL?: string
   // more env variables...
 }
