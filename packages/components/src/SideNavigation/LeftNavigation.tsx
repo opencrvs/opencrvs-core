@@ -22,7 +22,6 @@ export interface ILeftNavigationProps {
   warning?: JSX.Element | null
   className?: string
   applicationVersion: string
-  buildVersion: string
 }
 
 const LeftNavigationContainer = styled.div<{
@@ -130,7 +129,6 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
         <Version>
           {props.warning}
           <span>OpenCRVS {props.applicationVersion}</span>
-          <span>: {props.buildVersion}</span>
         </Version>
       </Container>
     </LeftNavigationContainer>
