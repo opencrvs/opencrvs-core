@@ -104,7 +104,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         submissionError: false
       }
     case actions.AUTHENTICATION_FAILED:
-      if (action.payload.message === 'Version_MisMatch')
+      if (action.payload.message === 'VERSION_MISMATCH')
         return {
           ...state,
           reloadModalVisibility: true
@@ -160,7 +160,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.RESEND_AUTHENTICATION_CODE_FAILED:
-      if (action.payload.message === 'Version_MisMatch')
+      if (action.payload.message === 'VERSION_MISMATCH')
         return {
           ...state,
           reloadModalVisibility: true
@@ -205,7 +205,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.VERIFY_CODE_FAILED:
-      if (action.payload.message === 'Version_MisMatch')
+      if (action.payload.message === 'VERSION_MISMATCH')
         return {
           ...state,
           reloadModalVisibility: true
