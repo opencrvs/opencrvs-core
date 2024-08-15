@@ -18,7 +18,7 @@ import {
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import {
   BirthDocument,
   DeathDocument,
@@ -42,6 +42,8 @@ export async function searchAssignment(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const client = getOrCreateClient()
+
   const payload = request.payload as IAssignmentPayload
   try {
     const results = await searchByCompositionId(payload.compositionId, client)
@@ -62,6 +64,8 @@ export async function getAllDocumentsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const client = getOrCreateClient()
+
   try {
     // Before retrieving all documents, we need to check the total count to make sure that the query will no tbe too large
     // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
@@ -107,7 +111,7 @@ export async function getAllDocumentsHandler(
   }
 }
 
-interface ICountQueryParam {
+export interface ICountQueryParam {
   declarationJurisdictionId: string
   status: string[]
   event?: string
@@ -117,6 +121,8 @@ export async function getStatusWiseRegistrationCountHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const client = getOrCreateClient()
+
   try {
     const payload = request.payload as ICountQueryParam
     const matchRules: Record<string, any>[] = [
@@ -208,6 +214,7 @@ export async function advancedRecordSearch(
       isExternalSearch,
       request.payload as ISearchCriteria
     )
+
     if (!result) {
       return h.response({}).code(404)
     }
@@ -223,6 +230,8 @@ export async function searchForBirthDeDuplication(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const client = getOrCreateClient()
+
   try {
     const result = await searchForBirthDuplicates(
       request.payload as BirthDocument,
@@ -240,6 +249,8 @@ export async function searchForDeathDeDuplication(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const client = getOrCreateClient()
+
   try {
     const result = await searchForDeathDuplicates(
       request.payload as DeathDocument,
