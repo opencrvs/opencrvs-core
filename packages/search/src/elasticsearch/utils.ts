@@ -21,7 +21,6 @@ import {
   searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
 import {
-  findTaskHistories,
   getBusinessStatus,
   SavedBundle,
   SavedOffice,
@@ -29,7 +28,8 @@ import {
   SavedTask,
   SearchDocument,
   validStatusMapping,
-  IOperationHistory
+  IOperationHistory,
+  findAllTasks
 } from '@opencrvs/commons/types'
 import { findName } from '@search/features/fhir/fhir-utils'
 
@@ -199,11 +199,17 @@ export async function getCreatedBy(compositionId: string) {
   return results?.body?.hits?.hits[0]?._source?.createdBy
 }
 
+/**
+ * Compose operation histories from a bundle.
+ *
+ * Include both the latest Task and TaskHistory. Otherwise the latest task will be missing.
+ * e.g. When field agent sends a declaration for review, and registrar approves it with changes.
+ */
 export const composeOperationHistories = (bundle: SavedBundle) => {
-  const taskHistories = findTaskHistories(bundle)
-  return taskHistories.map((taskHistory) => ({
-    operationType: getBusinessStatus(taskHistory),
-    operatedOn: taskHistory.lastModified
+  const tasks = findAllTasks(bundle)
+  return tasks.map((task) => ({
+    operationType: getBusinessStatus(task),
+    operatedOn: task.lastModified
   }))
 }
 
