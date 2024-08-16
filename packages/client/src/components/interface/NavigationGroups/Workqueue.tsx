@@ -107,16 +107,13 @@ const Workqueue = ({
     'record.declare-marriage:my-jurisdiction'
   ])
 
+  const canRegister = hasScope('record.register')
   const hasSentForReview = hasAnyScope(['record.submit-for-review'])
-
   const hasSentForApproval = hasScope('record.submit-for-approval')
   const hasReadyForReview = hasScope('record.declaration-review')
   const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
   const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
-  const hasSentForUpdates = hasAnyScope([
-    'record.declaration-submit-for-approval',
-    'record.register'
-  ])
+  const hasRequiresUpdates = hasScope('record.declaration-review')
 
   const hasOutbox = !hasAnyScope(['sysadmin', 'natlsysadmin'])
 
@@ -167,7 +164,7 @@ const Workqueue = ({
           }}
         />
       )}
-      {hasSentForUpdates && (
+      {hasRequiresUpdates && (
         <NavigationItem
           icon={() => <DeclarationIconSmall color={'red'} />}
           id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
@@ -212,7 +209,7 @@ const Workqueue = ({
           }}
         />
       )}
-      {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+      {canRegister && window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
         <NavigationItem
           icon={() => <DeclarationIconSmall color={'teal'} />}
           id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
