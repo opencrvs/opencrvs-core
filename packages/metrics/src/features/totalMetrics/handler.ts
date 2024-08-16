@@ -226,16 +226,18 @@ export async function totalMetricsByTime(
   const event = request.query[EVENT]
   const skip = request.query[SKIP]
   const size = request.query[SIZE]
+
   const registrationsByGroup = await fetchRegistrationsGroupByTime(
     timeStart,
     timeEnd,
     event,
     locationId
   )
+
   const registrations = registrationsByGroup
 
   registrations.forEach((registration) => {
-    registration.month = format(new Date(registration.time), 'MMMM yyyy')
+    registration.month = format(new Date(registration.time), 'yyyy-MM-dd')
   })
 
   const months = uniqBy(registrations, 'month').map((item) => item.month)
@@ -292,6 +294,7 @@ export async function totalMetricsByTime(
     })
   })
 
+  console.log(results)
   return {
     total: results.length,
     results: results.splice(skip, size)
