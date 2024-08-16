@@ -88,7 +88,8 @@ import {
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
-  HIDDEN
+  HIDDEN,
+  BETTER_FETCH_BUTTON
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -111,7 +112,7 @@ import {
   Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
-import { isEqual, flatten } from 'lodash'
+import { isEqual, flatten, get } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
@@ -130,6 +131,7 @@ import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
 import { BulletList, Divider } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
+import { BetterFetchButtonField } from './BetterFetchButton'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -599,6 +601,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
+    if (fieldDefinition.type === BETTER_FETCH_BUTTON) {
+      return (
+        <InputField {...inputFieldProps}>
+          <BetterFetchButtonField
+            {...inputProps}
+            onChange={(val: any) => {
+              onSetFieldValue(fieldDefinition.name, val)
+              setTimeout(() => {
+                resetDependentSelectValues(fieldDefinition.name)
+              }, 100)
+            }}
+            label={fieldDefinition.label}
+          />
+        </InputField>
+      )
+    }
     if (fieldDefinition.type === FETCH_BUTTON) {
       return (
         <FetchButtonField
@@ -833,7 +851,13 @@ class FormSectionComponent extends React.Component<Props> {
     )
 
     fieldsToReset.forEach((fieldToReset) => {
-      this.props.setFieldValue(fieldToReset.name, '')
+      this.props.setFieldValue(
+        fieldToReset.name,
+        fieldToReset.initialValueKey
+          ? get({ values: this.props.values }, fieldToReset.initialValueKey) ||
+              ''
+          : ''
+      )
       this.resetDependentSelectValues(fieldToReset.name)
     })
   }

@@ -66,6 +66,7 @@ export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
+export const BETTER_FETCH_BUTTON = 'BETTER_FETCH_BUTTON'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
@@ -1186,6 +1187,9 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   errorText: string
   networkErrorText: string
 }
+export interface Ii18nBetterFetchButtonField extends Ii18nFormFieldBase {
+  type: typeof BETTER_FETCH_BUTTON
+}
 export interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
   type: typeof NID_VERIFICATION_BUTTON
   onClick: () => void
@@ -1230,6 +1234,7 @@ export type Ii18nFormField =
   | Ii18nWarningField
   | Ii18nLinkField
   | Ii18nLoaderButtonField
+  | Ii18nBetterFetchButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField

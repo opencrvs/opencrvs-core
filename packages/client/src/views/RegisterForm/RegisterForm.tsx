@@ -760,7 +760,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         const initialValue =
           isUndefined(sectionValues[field.name]) ||
           isNull(sectionValues[field.name])
-            ? getInitialValue(field, this.props.declaration.data || {})
+            ? field.initialValue
             : sectionValues[field.name]
         sectionValues[field.name] = initialValue as IFormFieldValue
       })
@@ -1355,20 +1355,6 @@ function getValidSectionGroup(
   }
 }
 
-function getInitialValue(
-  field: IFormField,
-  data: IFormData,
-  userDetails?: UserDetails | null
-) {
-  let fieldInitialValue = field.initialValue
-  if (field.initialValueKey) {
-    fieldInitialValue =
-      getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
-  }
-
-  return fieldInitialValue
-}
-
 export function replaceInitialValues(
   fields: IFormField[],
   sectionValues: any,
@@ -1380,7 +1366,7 @@ export function replaceInitialValues(
     initialValue:
       isUndefined(sectionValues[field.name]) ||
       isNull(sectionValues[field.name])
-        ? getInitialValue(field, data || {}, userDetails)
+        ? field.initialValue
         : sectionValues[field.name]
   }))
 }
