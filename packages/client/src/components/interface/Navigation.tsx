@@ -182,7 +182,6 @@ const getSettingsAndLogout = (props: IFullProps) => {
 
 const NavigationView = (props: IFullProps) => {
   const {
-    intl,
     match,
     userDetails,
     advancedSearchParams,
@@ -190,9 +189,6 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
-    goToVSExportsAction,
-    goToSystemViewAction,
-    goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -201,11 +197,6 @@ const NavigationView = (props: IFullProps) => {
     userInfo,
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
-    setAdvancedSearchParam,
-    goToPerformanceStatistics,
-    goToDashboardView,
-    goToLeaderBoardsView,
-    goToAllUserEmail,
     className
   } = props
   const tabId = deselectAllTabs
