@@ -20,7 +20,6 @@ import {
   goToFieldAgentList,
   goToPerformanceHome,
   goToRegistrationsList,
-  IDynamicValues,
   goToUserProfile,
   goToTeamUserList
 } from '@client/navigation'
@@ -53,8 +52,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import type { GQLMixedTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
-import { get, orderBy } from 'lodash'
+import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -64,7 +62,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
 import { useAuthorization } from '@client/hooks/useAuthorization'
-import formatDate, { formatLongDate } from '@client/utils/date-formatting'
+import formatDate from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
