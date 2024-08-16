@@ -13,7 +13,6 @@ import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import { createTestComponent, mockUserResponse } from '@client/tests/util'
-import { createClient } from '@client/utils/apolloClient'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
@@ -117,10 +116,10 @@ const graphqlMocks = [
 ]
 
 let { store, history } = createStore()
-let client = createClient(store)
+
 beforeEach(async () => {
   ;({ store, history } = createStore())
-  client = createClient(store)
+
   getItem.mockReturnValue(registerScopeToken)
   getItem.mockReturnValue('ea02388')
   ;(useExtractCallBackState as Mock).mockImplementation(() => ({

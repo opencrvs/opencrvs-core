@@ -301,7 +301,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
       const testComponent = await createTestComponent(
         <ReviewSection
           form={form}

@@ -4569,15 +4569,14 @@ export const dummyUser = {
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
   salt: '12345',
   scope: ['register'],
-  systemRole: 'FIELD_AGENT',
   role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'Field Agent'
-      }
-    ]
+    label: {
+      id: 'userRole.fieldAgent',
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      __typename: 'I18nMessage'
+    },
+    __typename: 'UserRole'
   },
   status: 'active',
   avatar: {
@@ -4620,7 +4619,6 @@ export const mockUserModelResponse = {
   mobile: '+8801733333333',
   passwordHash: 'hash',
   salt: '78e7e7a1-9e21-42d7-b535-ca3d982fcbaf',
-  systemRole: 'LOCAL_REGISTRAR',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [

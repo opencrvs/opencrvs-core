@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { App } from '@client/App'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { Event, SystemRoleType, Status, Scope } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -60,19 +60,95 @@ import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutation
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
+import * as actions from '@client/profile/profileActions'
 
-export const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-export const registrationClerkScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ2YWxpZGF0ZSIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU3ODMwNzgzOSwiZXhwIjoxNTc4OTEyNjM5LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6cmVzb3VyY2VzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNWRmYmE5NDYxMTEyNTliZDBjMzhhY2JhIn0.CFUy-L414-8MLf6pjA8EapK6qN1yYN6Y0ywcg1GtWhRxSWnT0Kw9d2OOK_IVFBAqTXLROQcwHYnXC2r6Ka53MB14HUZ39H7HrOTFURCYknYGIeGmyFpBjoXUj4yc95_f1FCpW6fQReBMnSIzUwlUGcxK-ttitSLfQebPFaVosM6kQpKd-n5g6cg6eS9hsYzxVme9kKkrxy5HRkxjNe8VfXEheKGqpRHxLGP7bo1bIhw8BWto9kT2kxm0NLkWzbqhxKyVrk8cEdcFiIAbUt6Fzjcx_uVPvLnJPNQAkZEO3AdqbZDFuvmBQWCf2Z6l9c8fYuWRD4SA5tBCcIKzUcalEg'
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-export const natlSysAdminToken =
-  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsIm5hdGxzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNjQ5NjU3MTM4LCJleHAiOjE2NTAyNjE5MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjIyZjgxYjQyY2Q1MzdiZjkxZGFhMTBiIn0.MojnxjSVja4VkS5ufVtpJHmiqQqngW3Zb6rHv4MqKwqSgHptjta1A-1xdpkfadxr0pVIYTh-rhKP93LPCTfThkA01oW8qgkUr0t_02cgJ5KLe1B3R5QFJ9i1IzLye9yOeakfpbtnk67cwJ2r4KTJMxj5BWucdPGK8ifZRBdDrt9HsTtcDOutgLmEp2VnxLvc2eAEmoBBp6mRZ8lOYIRei5UHfaROCk0vdwjLchiqQWH9GE8hxU3RIA1jpzshd3_TC4G0rvuIXnBGf9VQaH-gkNW7a44xLVHhdENxAsGTdyeSHRC83wbeoUZkuOFQpF8Iz-8SbLEQfmipdzeBAsBgWg'
+
+export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
+  /*
+   * @deprecated
+   */
+  'sysadmin',
+  'natlsysadmin',
+
+  'user.create',
+  'user.read',
+  'user.update',
+  'organisation.read',
+  'organisation.read-locations',
+  'performance.read',
+  'performance.read-dashboards',
+  'performance.export-vital-statistics'
+] satisfies Scope[]
+
+export const REGISTRAR_DEFAULT_SCOPES = [
+  /*
+   * @deprecated
+   */
+  'register',
+  'performance',
+  'certify',
+
+  'record.declare-birth',
+  'record.declare-death',
+  'record.declare-marriage',
+  'record.declaration-review',
+  'record.submit-for-updates',
+  'record.review-duplicates',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
+  'record.register',
+  'record.registration-correct',
+  'record.print-records',
+  'record.print-records-supporting-documents',
+  'record.export-records',
+  'record.print-issue-certified-copies',
+  'record.registration-verify-certified-copies',
+  'record.create-comments',
+  'performance.read',
+  'performance.read-dashboards',
+  'organisation.read',
+  'organisation.read-locations:my-office',
+  'search.birth',
+  'search.death',
+  'search.marriage',
+  'record.read',
+  'record.read-audit',
+  'record.read-comments'
+] satisfies Scope[]
+
+export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
+  'record.declare-birth',
+  'record.declare-death',
+  'record.declare-marriage',
+  'record.declaration-review',
+  'record.submit-for-approval',
+  'record.submit-for-updates',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
+  'record.registration-request-correction',
+  'record.print-records',
+  'record.print-records-supporting-documents',
+  'record.export-records',
+  'record.print-issue-certified-copies',
+  'record.registration-verify-certified-copies',
+  'record.create-comments',
+  'performance.read',
+  'performance.read-dashboards',
+  'organisation.read',
+  'organisation.read-locations:my-office',
+  'search.birth',
+  'search.death',
+  'search.marriage',
+  'record.read',
+  'record.read-audit',
+  'record.read-comments'
+] satisfies Scope[]
 
 export const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -219,8 +295,6 @@ export const selectOption = (
   return input.find('.react-select__control')
 }
 
-const currentUserId = '123'
-
 export const eventAddressData = {
   country: 'FAR',
   state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -303,7 +377,6 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: SystemRoleType.FieldAgent,
   role: {
     label: {
       defaultMessage: 'Field Agent',
@@ -371,7 +444,6 @@ export const mockUserResponse = {
           }
         ]
       },
-      systemRole: 'LOCAL_REGISTRAR',
       role: {
         label: {
           id: 'userRoles.localRegistar',
@@ -394,7 +466,6 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_SYSTEM_ADMIN',
       role: {
         label: {
           id: 'userRoles.localSystemAdmin',
@@ -435,7 +506,6 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_REGISTRAR',
       label: {
         defaultMessage: 'Local Registrar',
         description: 'Name for user role Local Registrar',
@@ -1018,7 +1088,6 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: SystemRoleType.FieldAgent,
           role: {
             label: {
               id: 'userRoles.CHA',
@@ -1112,7 +1181,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.hospitalFieldAgent'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1122,7 +1190,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.fieldAgent'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1132,7 +1199,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Police Officer',
             id: 'userRole.policeOfficer'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1142,7 +1208,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Social Worker',
             id: 'userRole.socialWorker'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1152,7 +1217,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Healthcare Worker',
             id: 'userRole.healthcareWorker'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1162,7 +1226,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Leader',
             id: 'userRole.localLeader'
           },
-          systemRole: 'FIELD_AGENT',
           scopes: ['declare']
         },
         {
@@ -1172,7 +1235,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Registration Agent',
             id: 'userRole.registrationAgent'
           },
-          systemRole: 'REGISTRATION_AGENT',
           scopes: ['validate', 'performance', 'certify']
         },
         {
@@ -1182,7 +1244,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Registrar',
             id: 'userRole.localRegistrar'
           },
-          systemRole: 'LOCAL_REGISTRAR',
           scopes: ['register', 'performance', 'certify']
         },
         {
@@ -1192,7 +1253,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local System Admin',
             id: 'userRole.localSystemAdmin'
           },
-          systemRole: 'LOCAL_SYSTEM_ADMIN',
           scopes: ['sysadmin']
         },
         {
@@ -1202,7 +1262,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National System Admin',
             id: 'userRole.nationalSystemAdmin'
           },
-          systemRole: 'NATIONAL_SYSTEM_ADMIN',
           scopes: ['sysadmin', 'natlsysadmin']
         },
         {
@@ -1212,7 +1271,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Performance Manager',
             id: 'userRole.performanceManager'
           },
-          systemRole: 'PERFORMANCE_MANAGEMENT',
           scopes: ['performance']
         },
         {
@@ -1222,7 +1280,6 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National Registrar',
             id: 'userRole.nationalRegistrar'
           },
-          systemRole: 'NATIONAL_REGISTRAR',
           scopes: ['register', 'performance', 'certify', 'config', 'teams']
         }
       ]
@@ -1242,7 +1299,6 @@ export const mockCompleteFormData = {
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'FIELD_AGENT',
   role: 'HOSPITAL',
   userDetails: '',
   username: ''
@@ -1493,19 +1549,6 @@ export const mockUserGraphqlOperation = {
                       validator: []
                     },
                     {
-                      name: 'systemRole',
-                      type: 'SELECT_WITH_OPTIONS',
-                      label: {
-                        defaultMessage: 'Role',
-                        description: 'Role label',
-                        id: 'constants.role'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [],
-                      options: []
-                    },
-                    {
                       name: 'role',
                       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
                       label: {
@@ -1517,10 +1560,7 @@ export const mockUserGraphqlOperation = {
                       required: true,
                       initialValue: '',
                       validator: [],
-                      dynamicOptions: {
-                        dependency: 'systemRole',
-                        options: {}
-                      }
+                      dynamicOptions: {}
                     },
                     {
                       name: 'device',
@@ -1547,7 +1587,7 @@ export const mockUserGraphqlOperation = {
                     {
                       action: 'hide',
                       expression:
-                        'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
+                        "!values.scopes?.includes('profile.electronic-signature')"
                     }
                   ],
                   fields: [
@@ -1615,8 +1655,7 @@ export const mockDataWithRegistarRoleSelected = {
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'LOCAL_REGISTRAR',
-  role: 'SECRETARY',
+  role: 'LOCAL_REGISTRAR',
   userDetails: '',
   username: '',
   signature: {
@@ -1629,3 +1668,16 @@ export {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
+
+export function setScopes(scope: Scope[], store: AppStore) {
+  const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+  window.history.replaceState({}, '', '?token=' + token)
+
+  return store.dispatch({
+    type: actions.CHECK_AUTH
+  })
+}

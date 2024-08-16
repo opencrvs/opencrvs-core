@@ -12,7 +12,6 @@ import { storage } from '@client/storage'
 import { IUserData } from './declarations'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
-import { authApi } from './utils/authApi'
 // eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
 // eslint-disable-next-line import/no-unassigned-import
@@ -271,7 +270,8 @@ vi.mock('lodash/debounce', () => ({
 
 vi.mock('./utils', async () => ({
   useOnlineStatus: () => true,
-  isNavigatorOnline: () => true
+  isNavigatorOnline: () => true,
+  getUserRole: vi.fn().mockImplementation((lang, role) => 'ENTREPENEUR')
 }))
 
 vi.mock('react-router', async () => ({

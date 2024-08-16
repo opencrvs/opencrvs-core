@@ -14,12 +14,12 @@ import {
   createTestComponent,
   mockDeclarationData,
   createRouterProps,
-  registerScopeToken,
-  getItem,
   flushPromises,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
-  userDetails
+  userDetails,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
@@ -35,7 +35,6 @@ import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
-import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 import {
@@ -65,7 +64,6 @@ declaration.data.history = [
     user: {
       id: userDetails.userMgntUserID,
       name: userDetails.name,
-      systemRole: userDetails.systemRole,
       role: userDetails.role
     },
     office: userDetails.primaryOffice,
@@ -347,9 +345,7 @@ describe('Record audit for a draft declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
 
-    getItem.mockReturnValue(registerScopeToken)
-
-    store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
     await flushPromises()
 
@@ -551,9 +547,7 @@ describe('Record audit for a reinstate declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
 
-    getItem.mockReturnValue(registerScopeToken)
-
-    store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
     await flushPromises()
 

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { ErrorBoundary } from '@client/components/ErrorBoundary'
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
@@ -19,10 +20,19 @@ import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
 import TransitionWrapper from '@client/components/TransitionWrapper'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { useApolloClient } from '@client/utils/apolloClient'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
+import { Home } from '@client/views/OfficeHome/Home'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
+import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
+import { Leaderboards } from '@client/views/Performance/Leaderboards'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -31,45 +41,36 @@ import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
+import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
+import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { RecordAudit } from './views/RecordAudit/RecordAudit'
-import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
-import VSExport from './views/SysAdmin/Vsexports/VSExport'
-import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
-import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
-import { UserAudit } from './views/UserAudit/UserAudit'
-import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
-import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
-import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
-import { SystemRoleType } from '@client/utils/gateway'
-import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
-import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
-import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
 import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
-import { Home } from '@client/views/OfficeHome/Home'
-import { PrintRecord } from './views/PrintRecord/PrintRecord'
-import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
+import { PrintRecord } from './views/PrintRecord/PrintRecord'
+import { RecordAudit } from './views/RecordAudit/RecordAudit'
+import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
+import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import InformantNotification from './views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
+import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
+import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
+import { UserList } from './views/SysAdmin/Team/user/UserList'
+import VSExport from './views/SysAdmin/Vsexports/VSExport'
+import { UserAudit } from './views/UserAudit/UserAudit'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -252,6 +253,24 @@ export function App(props: IAppProps) {
                                                 routes.REGISTRAR_HOME_TAB_PAGE
                                               }
                                               component={OfficeHome}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              // roles={[
+                                              //   SystemRoleType.NationalSystemAdmin
+                                              // ]}
+                                              path={routes.CERTIFICATE_CONFIG}
+                                              component={CertificatesConfig}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              // roles={[
+                                              //   SystemRoleType.NationalSystemAdmin
+                                              // ]}
+                                              path={
+                                                routes.INFORMANT_NOTIFICATION
+                                              }
+                                              component={InformantNotification}
                                             />
                                             <ProtectedRoute
                                               exact

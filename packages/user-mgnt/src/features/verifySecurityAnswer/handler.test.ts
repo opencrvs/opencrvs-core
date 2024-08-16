@@ -30,7 +30,6 @@ const mockUser: Partial<IUser & { _id: string }> = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
   securityQuestionAnswers: [

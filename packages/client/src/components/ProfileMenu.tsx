@@ -23,11 +23,7 @@ import {
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { AvatarSmall } from '@client/components/Avatar'
 import { IStoreState } from '@client/store'
-import {
-  UserDetails,
-  getIndividualNameObj,
-  getUserRole
-} from '@client/utils/userUtils'
+import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'

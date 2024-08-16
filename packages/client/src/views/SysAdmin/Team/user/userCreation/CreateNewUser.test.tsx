@@ -36,12 +36,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import {
-  FetchUserQuery,
-  GetUserQuery,
-  Status,
-  SystemRoleType
-} from '@client/utils/gateway'
+import { GetUserQuery, Status } from '@client/utils/gateway'
 
 const mockUsers = {
   data: {
@@ -345,7 +340,6 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            systemRole: SystemRoleType.NationalRegistrar,
             role: {
               id: 'NATIONAL_REGISTRAR',
               label: {

@@ -15,22 +15,6 @@ import * as decode from 'jwt-decode'
 import { Scope } from './scopes'
 export { scopes, Scope } from './scopes'
 
-/** All the scopes user can be assigned to */
-export const SCOPES = {
-  demo: 'demo',
-  declare: 'declare',
-  register: 'register',
-  certify: 'certify',
-  performance: 'performance',
-  systemAdmin: 'sysadmin',
-  validate: 'validate',
-  nationalSystemAdmin: 'natlsysadmin',
-  /** Bypasses the rate limiting in gateway. Useful for data seeder. */
-  bypassRateLimit: 'bypassratelimit',
-  teams: 'teams',
-  config: 'config'
-} as const
-
 /** All the scopes system/integration can be assigned to */
 export const SYSTEM_INTEGRATION_SCOPES = {
   recordsearch: 'recordsearch',
@@ -225,7 +209,26 @@ export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-export type UserScope = (typeof SCOPES)[keyof typeof SCOPES]
+export const SCOPES = {
+  demo: 'demo',
+  declare: 'declare',
+  register: 'register',
+  certify: 'certify',
+  performance: 'performance',
+  systemAdmin: 'sysadmin',
+  validate: 'validate',
+  nationalSystemAdmin: 'natlsysadmin',
+  /** Bypasses the rate limiting in gateway. Useful for data seeder. */
+  bypassRateLimit: 'bypassratelimit',
+  teams: 'teams',
+  config: 'config'
+} as const
+
+/** All the scopes user can be assigned to – old & new */
+export type UserScope =
+  | (typeof SCOPES)[keyof typeof SCOPES]
+  | 'profile.electronic-signature'
+
 export type SystemScope =
   (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES][number]
 

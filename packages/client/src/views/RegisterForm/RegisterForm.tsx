@@ -58,7 +58,7 @@ import {
   IFormFieldValue,
   SubmissionAction
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -72,7 +72,6 @@ import { HOME } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { Scope } from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
   getVisibleSectionGroupsBasedOnConditions,

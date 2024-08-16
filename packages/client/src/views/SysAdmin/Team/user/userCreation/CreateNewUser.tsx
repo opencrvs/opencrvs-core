@@ -19,7 +19,6 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,
   fetchAndStoreUserData

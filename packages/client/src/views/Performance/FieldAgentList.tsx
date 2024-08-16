@@ -15,7 +15,6 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { messages } from '@client/i18n/messages/views/performance'
-import { getLanguage } from '@client/i18n/selectors'
 import { goToFieldAgentList, goToPerformanceHome } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -37,7 +36,7 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { WrappedComponentProps, injectIntl } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -174,7 +173,6 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
   const offices = generateLocations(offlineOffices, intl)
-  const language = useSelector(getLanguage)
 
   const isOfficeSelected = offices.some((office) => office.id === locationId)
 

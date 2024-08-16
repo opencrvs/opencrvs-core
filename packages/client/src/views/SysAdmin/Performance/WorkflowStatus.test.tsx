@@ -23,10 +23,7 @@ import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { GraphQLError } from 'graphql'
 import { match } from 'react-router'
 import { vi } from 'vitest'
-import {
-  GetEventsWithProgressQuery,
-  SystemRoleType
-} from '@client/utils/gateway'
+import { GetEventsWithProgressQuery } from '@client/utils/gateway'
 import { PlainDate } from '@client/utils/date-formatting'
 
 describe('Workflow status tests', () => {
@@ -97,7 +94,6 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -152,7 +148,6 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -206,7 +201,6 @@ describe('Workflow status tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    systemRole: SystemRoleType.LocalRegistrar,
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {

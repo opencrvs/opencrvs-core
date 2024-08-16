@@ -47,7 +47,6 @@ describe('ForgotPIN tests', () => {
             userMgntUserID: '5eba726866458970cf2e23c2',
             practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             mobile: '+8801711111111',
-            systemRole: SystemRoleType.FieldAgent,
             role: {
               label: {
                 id: 'userRoles.cha',
@@ -63,7 +62,11 @@ describe('ForgotPIN tests', () => {
                 familyName: 'Al Hasan'
               }
             ],
-            primaryOffice: undefined,
+            primaryOffice: {
+              id: '895cc945-94a9-4195-9a29-22e9310f3385',
+              name: 'Narsingdi Paurasabha',
+              alias: ['নরসিংদী পৌরসভা']
+            },
             localRegistrar: {
               name: [
                 {

@@ -14,7 +14,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope } from '@client/utils/authUtils'
+
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -53,7 +53,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { RegStatus } from '@client/utils/gateway'
+import { RegStatus, Scope } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {
   theme: ITheme

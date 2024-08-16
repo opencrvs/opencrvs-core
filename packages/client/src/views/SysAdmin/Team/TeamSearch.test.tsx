@@ -17,7 +17,8 @@ import {
   createTestStore,
   flushPromises,
   mockUserResponse,
-  registerScopeToken
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -25,8 +26,7 @@ import { parse } from 'query-string'
 import * as React from 'react'
 import { TeamSearch } from './TeamSearch'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { checkAuth } from '@client/profile/profileActions'
-import { Mock, vi } from 'vitest'
+import { vi } from 'vitest'
 import { merge } from 'lodash'
 import { queries } from '@client/profile/queries'
 
@@ -94,7 +94,6 @@ describe('Team search test', () => {
   describe('Team search with location in props', () => {
     let app: ReactWrapper
     let history: History
-    const getItem = window.localStorage.getItem as Mock
     const mockFetchUserDetails = vi.fn()
     const nameObj = {
       data: {
@@ -136,8 +135,7 @@ describe('Team search test', () => {
     })
 
     beforeAll(async () => {
-      getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth())
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     })
 
     beforeEach(async () => {

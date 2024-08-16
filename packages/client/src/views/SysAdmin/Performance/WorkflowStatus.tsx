@@ -13,7 +13,6 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { Event, RegStatus } from '@client/utils/gateway'
-import { getStatusWiseWQTab } from '@client/views/OfficeHome/utils'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -216,7 +215,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const pageSize = 10
-  const language = useSelector(getLanguage)
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())

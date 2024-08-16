@@ -39,7 +39,6 @@ const mockUser = {
   identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   role: 'LOCAL_REGISTRAR',
   primaryOfficeId: '321',
   deviceId: 'D444',
@@ -94,7 +93,6 @@ describe('createUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        systemRole: 'FIELD_AGENT',
         role: 'FIELD_AGENT',
         primaryOfficeId: '321',
         deviceId: 'D444',
@@ -118,17 +116,17 @@ describe('createUser handler', () => {
     const expectedPractitionerROle = {
       resourceType: 'PractitionerRole',
       practitioner: { reference: 'Practitioner/123' },
+      location: [{ reference: 'Location/321' }],
       code: [
         {
           coding: [
             {
-              system: 'http://opencrvs.org/specs/roles',
-              code: 'FIELD_AGENT'
+              code: 'FIELD_AGENT',
+              system: 'http://opencrvs.org/specs/roles'
             }
           ]
         }
-      ],
-      location: [{ reference: 'Location/321' }]
+      ]
     }
 
     expect(fetch.mock.calls.length).toBe(4)
@@ -192,6 +190,7 @@ describe('createUser handler', () => {
 
   it('return an error and rollsback if a practitionerRole Id isnt returned', async () => {
     fetch.mockResponses(
+      [JSON.stringify({ refUrl: 'mock.minio.com' }), { status: 200 }],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201 }],
       ['', { status: 200 }]
@@ -205,12 +204,11 @@ describe('createUser handler', () => {
         Authorization: `Bearer ${token}`
       }
     })
-
-    expect(fetch.mock.calls.length).toBe(3)
-    expect(fetch.mock.calls[2][0]).toEqual(
+    expect(fetch.mock.calls.length).toBe(4)
+    expect(fetch.mock.calls[3][0]).toEqual(
       'http://localhost:3447/fhir/Practitioner/123'
     )
-    expect(fetch.mock.calls[2][1].method).toEqual('DELETE')
+    expect(fetch.mock.calls[3][1].method).toEqual('DELETE')
     expect(res.statusCode).toBe(500)
   })
 

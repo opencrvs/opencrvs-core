@@ -1042,8 +1042,7 @@ function requestWithStateWrapper(
     try {
       const data = await mainRequest
       const scopes = getScope(getState())
-      // @TODO: Check is record.register equal to `!FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)`
-      if (scopes?.includes('record.register')) {
+      if (scopes?.includes('record.review-duplicates')) {
         await fetchAllDuplicateDeclarations(data.data)
       }
       const duplicateDeclarations = await fetchAllDuplicateDeclarations(
@@ -1060,10 +1059,12 @@ function requestWithStateWrapper(
         .filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
 
       const allfetchableURLs = [
-        ...getAttachmentUrls(data.data),
-        ...getSignatureUrls(data.data),
-        ...getProfileIconUrls(data.data),
-        ...allduplicateDeclarationsAttachments
+        ...new Set([
+          ...getAttachmentUrls(data.data),
+          ...getSignatureUrls(data.data),
+          ...getProfileIconUrls(data.data),
+          ...allduplicateDeclarationsAttachments
+        ])
       ]
 
       await Promise.all(
@@ -1104,14 +1105,25 @@ function getAttachmentUrls(queryResultData: Query) {
 }
 
 function getSignatureUrls(queryResultData: Query) {
-  const registration =
-    queryResultData.fetchBirthRegistration?.registration ||
-    queryResultData.fetchDeathRegistration?.registration ||
-    queryResultData.fetchMarriageRegistration?.registration
+  const data =
+    queryResultData.fetchBirthRegistration ||
+    queryResultData.fetchDeathRegistration ||
+    queryResultData.fetchMarriageRegistration
 
-  return SIGNATURE_KEYS.map(
-    (propertyKey) => registration?.[propertyKey]
-  ).filter((maybeUrl): maybeUrl is string => Boolean(maybeUrl))
+  if (!data) return []
+  const { registration, history } = data
+
+  const registrarSignatures =
+    history
+      ?.map((entry) => entry?.signature?.data)
+      .filter((entry): entry is string => Boolean(entry)) || []
+
+  return [
+    ...registrarSignatures,
+    ...SIGNATURE_KEYS.map((propertyKey) => registration?.[propertyKey]).filter(
+      (maybeUrl): maybeUrl is string => Boolean(maybeUrl)
+    )
+  ]
 }
 
 async function fetchAllDuplicateDeclarations(queryResultData: Query) {

@@ -31,7 +31,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope } from '@client/utils/authUtils'
+
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   buttonMessages,
@@ -40,7 +40,7 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { SearchEventsQuery } from '@client/utils/gateway'
+import { Scope, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
