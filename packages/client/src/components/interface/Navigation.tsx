@@ -242,38 +242,24 @@ const NavigationView = (props: IFullProps) => {
         workqueue={workqueue}
         storedDeclarations={storedDeclarations}
         draftDeclarations={draftDeclarations}
-        intl={intl}
         tabId={tabId}
-        goToHomeTab={props.goToHomeTab}
       />
 
       <OrganisationGroup
-        intl={intl}
         enableMenuSelection={enableMenuSelection}
         activeMenuItem={activeMenuItem}
-        goToAllUserEmail={goToAllUserEmail}
-        goToOrganisationView={props.goToOrganisationViewAction}
-        goToPerformanceView={props.goToPerformanceViewAction}
-        goToSystemList={goToSystemViewAction}
-        goToTeamView={props.goToTeamViewAction}
+        userDetails={userDetails}
       />
       <PerformanceGroup
-        intl={intl}
+        userDetails={userDetails}
         activeMenuItem={activeMenuItem}
         enableMenuSelection={enableMenuSelection}
-        goToDashboardView={goToDashboardView}
-        goToLeaderBoardsView={goToLeaderBoardsView}
-        goToPerformanceStatistics={goToPerformanceStatistics}
-        goToPerformanceView={props.goToPerformanceViewAction}
-        goToVSExport={goToVSExportsAction}
       />
 
       <SavedSearchGroup
         userDetails={userDetails}
         advancedSearchParams={advancedSearchParams}
         pathname={props.location.pathname}
-        goToAdvancedSearchResult={goToAdvancedSearchResultAction}
-        setAdvancedSearchParam={setAdvancedSearchParam}
       />
       <NavigationGroup>
         {menuCollapse && getSettingsAndLogout(props)}

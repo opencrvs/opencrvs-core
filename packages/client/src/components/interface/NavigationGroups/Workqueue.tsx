@@ -11,10 +11,7 @@
 import { Icon, NavigationGroup, NavigationItem } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import React from 'react'
-import {
-  IWORKQUEUE_TABS,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import {
@@ -27,31 +24,30 @@ import {
   ALLOWED_STATUS_FOR_RETRY,
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
-import { IntlShape } from 'react-intl'
 import { getOfflineData } from '@client/offline/selectors'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Event } from '@client/utils/gateway'
+import { useIntl } from 'react-intl'
+import { goToHomeTab } from '@client/navigation'
 
 interface IWorkqueueProps {
   workqueue: IWorkqueue
   storedDeclarations: IDeclaration[]
   draftDeclarations: IDeclaration[]
-  intl: IntlShape
   tabId: string
   menuCollapse?: () => void
-  goToHomeTab: (tabId: IWORKQUEUE_TABS) => void
 }
 
 const Workqueue = ({
   workqueue,
   storedDeclarations,
   draftDeclarations,
-  intl,
   tabId,
-  menuCollapse,
-  goToHomeTab
+  menuCollapse
 }: IWorkqueueProps) => {
   const { hasScope, hasAnyScope } = usePermissions()
+  const intl = useIntl()
+  const dispatch = useDispatch()
 
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -111,10 +107,7 @@ const Workqueue = ({
     'record.declare-marriage:my-jurisdiction'
   ])
 
-  const hasSentForReview = hasAnyScope([
-    'record.submit-for-review',
-    'record.declaration-review'
-  ])
+  const hasSentForReview = hasAnyScope(['record.submit-for-review'])
 
   const hasSentForApproval = hasScope('record.submit-for-approval')
   const hasReadyForReview = hasScope('record.declaration-review')
@@ -139,7 +132,7 @@ const Workqueue = ({
           count={draftDeclarations.length}
           isSelected={tabId === WORKQUEUE_TABS.inProgress}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.inProgress)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.inProgress))
             menuCollapse && menuCollapse()
           }}
         />
@@ -154,7 +147,7 @@ const Workqueue = ({
           count={declarationCount.readyForReview}
           isSelected={tabId === WORKQUEUE_TABS.sentForReview}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.sentForReview)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.sentForReview))
             menuCollapse && menuCollapse()
           }}
         />
@@ -169,7 +162,7 @@ const Workqueue = ({
           count={declarationCount.sentForApproval}
           isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.sentForApproval))
             menuCollapse && menuCollapse()
           }}
         />
@@ -184,7 +177,7 @@ const Workqueue = ({
           count={declarationCount.requiresUpdate}
           isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.requiresUpdate))
             menuCollapse && menuCollapse()
           }}
         />
@@ -199,7 +192,7 @@ const Workqueue = ({
           count={declarationCount.readyForReview}
           isSelected={tabId === WORKQUEUE_TABS.readyForReview}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.readyForReview)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.readyForReview))
             menuCollapse && menuCollapse()
           }}
         />
@@ -214,7 +207,7 @@ const Workqueue = ({
           count={declarationCount.readyToPrint}
           isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
             menuCollapse && menuCollapse()
           }}
         />
@@ -229,7 +222,7 @@ const Workqueue = ({
           count={declarationCount.externalValidation}
           isSelected={tabId === WORKQUEUE_TABS.externalValidation}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.externalValidation)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.externalValidation))
             menuCollapse && menuCollapse()
           }}
         />
@@ -244,7 +237,7 @@ const Workqueue = ({
           count={declarationCount.readyToIssue}
           isSelected={tabId === WORKQUEUE_TABS.readyToIssue}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.readyToIssue))
             menuCollapse && menuCollapse()
           }}
         />
@@ -257,7 +250,7 @@ const Workqueue = ({
           count={declarationCount.outbox}
           isSelected={tabId === WORKQUEUE_TABS.outbox}
           onClick={() => {
-            goToHomeTab(WORKQUEUE_TABS.outbox)
+            dispatch(goToHomeTab(WORKQUEUE_TABS.outbox))
             menuCollapse && menuCollapse()
           }}
         />

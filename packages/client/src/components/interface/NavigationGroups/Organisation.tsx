@@ -19,35 +19,34 @@ import React, { useState } from 'react'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
-import { IntlShape } from 'react-intl'
 import { UserDetails } from '@client/utils/userUtils'
-
-interface IOrganisationProps {
-  intl: IntlShape
-  userDetails?: UserDetails
-  enableMenuSelection: boolean
-  activeMenuItem: string
-  goToAllUserEmail: () => void
-  goToOrganisationView: (userDetails: UserDetails) => void
-  goToPerformanceView: () => void
-  goToSystemList: () => void
-  goToTeamView: (userDetails: UserDetails) => void
-}
-
-const Organisation = ({
-  intl,
-  userDetails,
-  enableMenuSelection,
-  activeMenuItem,
+import { useDispatch } from 'react-redux'
+import { useIntl } from 'react-intl'
+import {
   goToAllUserEmail,
   goToOrganisationView,
   goToPerformanceView,
   goToSystemList,
   goToTeamView
+} from '@client/navigation'
+
+interface IOrganisationProps {
+  userDetails: UserDetails | null
+  enableMenuSelection: boolean
+  activeMenuItem: string
+}
+
+const Organisation = ({
+  userDetails,
+  enableMenuSelection,
+  activeMenuItem
 }: IOrganisationProps) => {
   const [isConfigExpanded, setIsConfigExpanded] = useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] = useState(false)
   const { hasScope, hasAnyScope } = usePermissions()
+
+  const dispatch = useDispatch()
+  const intl = useIntl()
 
   const hasAnyOrganisation = hasAnyScope([
     'organisation.read',
@@ -87,7 +86,7 @@ const Organisation = ({
                 navigationMessages[WORKQUEUE_TABS.performance]
               )}
               onClick={() => {
-                goToPerformanceView()
+                dispatch(goToPerformanceView())
               }}
               isSelected={
                 enableMenuSelection &&
@@ -102,7 +101,7 @@ const Organisation = ({
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.organisation]
               )}
-              onClick={() => goToOrganisationView(userDetails)}
+              onClick={() => dispatch(goToOrganisationView(userDetails))}
               isSelected={
                 enableMenuSelection &&
                 activeMenuItem === WORKQUEUE_TABS.organisation
@@ -116,7 +115,7 @@ const Organisation = ({
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.team]
               )}
-              onClick={() => goToTeamView(userDetails)}
+              onClick={() => dispatch(goToTeamView(userDetails))}
               isSelected={
                 enableMenuSelection && activeMenuItem === WORKQUEUE_TABS.team
               }
@@ -149,7 +148,9 @@ const Organisation = ({
                   label={intl.formatMessage(
                     navigationMessages[WORKQUEUE_TABS.systems]
                   )}
-                  onClick={goToSystemList}
+                  onClick={() => {
+                    dispatch(goToSystemList)
+                  }}
                   isSelected={
                     enableMenuSelection &&
                     activeMenuItem === WORKQUEUE_TABS.systems
@@ -188,7 +189,9 @@ const Organisation = ({
                     navigationMessages[WORKQUEUE_TABS.emailAllUsers]
                   )}
                   id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
-                  onClick={goToAllUserEmail}
+                  onClick={() => {
+                    goToAllUserEmail()
+                  }}
                   isSelected={
                     enableMenuSelection &&
                     activeMenuItem === WORKQUEUE_TABS.emailAllUsers

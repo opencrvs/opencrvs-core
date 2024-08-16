@@ -14,24 +14,23 @@ import { Icon, NavigationGroup, NavigationItem } from '@opencrvs/components'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
 import { omit } from 'lodash'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { UserDetails } from '@client/utils/userUtils'
+import { useDispatch } from 'react-redux'
+import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
+import { goToAdvancedSearchResult } from '@client/navigation'
 
 interface ISavedSearchProps {
   userDetails: UserDetails | null
   advancedSearchParams: IAdvancedSearchParamState
   pathname: string
-  goToAdvancedSearchResult: () => void
-  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 const SavedSearch = ({
   userDetails,
   advancedSearchParams,
-  pathname,
-  goToAdvancedSearchResult,
-  setAdvancedSearchParam
+  pathname
 }: ISavedSearchProps) => {
+  const dispatch = useDispatch()
   return (
     <NavigationGroup>
       {userDetails?.searches && userDetails.searches.length > 0 ? (
@@ -58,11 +57,13 @@ const SavedSearch = ({
                   bookmarkResult.parameters,
                   '__typename'
                 ) as IAdvancedSearchParamState
-                setAdvancedSearchParam({
-                  ...filteredParam,
-                  searchId: bookmarkResult?.searchId
-                })
-                goToAdvancedSearchResult()
+                dispatch(
+                  setAdvancedSearchParam({
+                    ...filteredParam,
+                    searchId: bookmarkResult?.searchId
+                  })
+                )
+                dispatch(goToAdvancedSearchResult())
               }}
               isSelected={
                 advancedSearchParams.searchId === bookmarkResult.searchId &&

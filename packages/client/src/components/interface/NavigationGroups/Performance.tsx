@@ -14,32 +14,30 @@ import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { UserDetails } from '@client/utils/userUtils'
 import { Icon, NavigationGroup, NavigationItem } from '@opencrvs/components'
 import React from 'react'
-import { IntlShape } from 'react-intl'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-
-interface IPerformanceProps {
-  intl: IntlShape
-  activeMenuItem: string
-  enableMenuSelection: boolean
-  userDetails?: UserDetails
-  goToDashboardView: () => void
-  goToLeaderBoardsView: () => void
-  goToPerformanceStatistics: () => void
-  goToPerformanceView: () => void
-  goToVSExport: () => void
-}
-
-const Performance = ({
-  intl,
-  activeMenuItem,
-  enableMenuSelection,
-  userDetails,
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
+import {
   goToDashboardView,
   goToLeaderBoardsView,
   goToPerformanceStatistics,
   goToPerformanceView,
   goToVSExport
+} from '@client/navigation'
+
+interface IPerformanceProps {
+  activeMenuItem: string
+  enableMenuSelection: boolean
+  userDetails: UserDetails | null
+}
+
+const Performance = ({
+  activeMenuItem,
+  enableMenuSelection,
+  userDetails
 }: IPerformanceProps) => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
   const { hasScope, hasAnyScope } = usePermissions()
   const hasAnyPerformance = hasAnyScope([
     'performance.read',
@@ -74,7 +72,7 @@ const Performance = ({
                 <NavigationItem
                   icon={() => <Icon name="ChartLine" size="medium" />}
                   label={intl.formatMessage(navigationMessages['dashboard'])}
-                  onClick={goToDashboardView}
+                  onClick={() => dispatch(goToDashboardView())}
                   id="navigation_dashboard"
                   isSelected={
                     enableMenuSelection && activeMenuItem === 'dashboard'
@@ -85,7 +83,7 @@ const Performance = ({
                 <NavigationItem
                   icon={() => <Icon name="Activity" size="medium" />}
                   label={intl.formatMessage(navigationMessages['statistics'])}
-                  onClick={goToPerformanceStatistics}
+                  onClick={() => dispatch(goToPerformanceStatistics())}
                   id="navigation_statistics"
                   isSelected={
                     enableMenuSelection && activeMenuItem === 'statistics'
@@ -96,7 +94,7 @@ const Performance = ({
                 <NavigationItem
                   icon={() => <Icon name="Medal" size="medium" />}
                   label={intl.formatMessage(navigationMessages['leaderboards'])}
-                  onClick={goToLeaderBoardsView}
+                  onClick={() => dispatch(goToLeaderBoardsView())}
                   id="navigation_leaderboards"
                   isSelected={
                     enableMenuSelection && activeMenuItem === 'leaderboards'
@@ -107,7 +105,7 @@ const Performance = ({
                 <NavigationItem
                   icon={() => <Icon name="ChartBar" size="medium" />}
                   label={intl.formatMessage(navigationMessages['performance'])}
-                  onClick={() => goToPerformanceView()}
+                  onClick={() => dispatch(goToPerformanceView())}
                   id="navigation_report"
                   isSelected={
                     enableMenuSelection &&
@@ -124,7 +122,7 @@ const Performance = ({
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.vsexports]
               )}
-              onClick={goToVSExport}
+              onClick={() => dispatch(goToVSExport())}
               isSelected={
                 enableMenuSelection &&
                 activeMenuItem === WORKQUEUE_TABS.vsexports
