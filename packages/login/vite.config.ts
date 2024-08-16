@@ -81,6 +81,9 @@ export default defineConfig(({ mode }) => {
       coverage: {
         reporter: ['text', 'json', 'html']
       }
+    },
+    define: {
+      APP_VERSION: JSON.stringify(process.env.npm_package_version)
     }
   }
 })
