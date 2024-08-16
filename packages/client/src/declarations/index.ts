@@ -24,6 +24,7 @@ import {
   Event,
   History,
   Query,
+  RegStatus,
   SystemRoleType
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -224,7 +225,7 @@ export interface IDeclaration {
   eventType?: string
   review?: boolean
   event: Event
-  registrationStatus?: string
+  registrationStatus?: RegStatus
   submissionStatus?: string
   downloadStatus?: DOWNLOAD_STATUS
   downloadRetryAttempt?: number

@@ -700,11 +700,7 @@ export const DuplicateFormTabs = (props: IProps) => {
           leftValue: (
             <Text variant="reg16" element="span" color="grey600">
               {actualRegData.status
-                ? intl.formatMessage(
-                    regStatusMessages[
-                      actualRegData.status as unknown as RegStatus
-                    ]
-                  )
+                ? intl.formatMessage(regStatusMessages[actualRegData.status])
                 : EMPTY_STRING}
             </Text>
           ),
