@@ -53,9 +53,10 @@ export const ReloadModal = () => {
   return (
     <ResponsiveModal
       title={intl.formatMessage(messages.title)}
-      contentHeight={96}
       responsive={false}
       showCloseButton={false}
+      autoHeight={true}
+      titleHeightAuto={true}
       actions={[
         <PrimaryButton key="reload" id="reload" onClick={handleReload}>
           {intl.formatMessage(messages.update)}
