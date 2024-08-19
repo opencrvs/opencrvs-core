@@ -294,7 +294,6 @@ export async function totalMetricsByTime(
     })
   })
 
-  console.log(results)
   return {
     total: results.length,
     results: results.splice(skip, size)
