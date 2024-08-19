@@ -40,7 +40,7 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
 import { IFormData } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
@@ -48,7 +48,6 @@ import * as profileSelectors from '@client/profile/profileSelectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
-import { DECLARED } from '@client/utils/constants'
 import { vi } from 'vitest'
 import { createClient } from '@client/utils/apolloClient'
 import { ApolloClient } from '@apollo/client'
@@ -495,7 +494,7 @@ describe('when user is in the register form from sent for review edit', () => {
       uuid(),
       mockDeclarationData,
       Event.Birth,
-      DECLARED
+      RegStatus.Declared
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
