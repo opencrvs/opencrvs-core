@@ -16,7 +16,6 @@ import { logger } from '@opencrvs/commons'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export const DEFAULT_SIZE = 10
-const DEFAULT_SEARCH_TYPE = 'compositions'
 
 export function formatSearchParams(
   searchPayload: ISearchCriteria,
@@ -35,7 +34,6 @@ export function formatSearchParams(
 
   return {
     index: OPENCRVS_INDEX_NAME,
-    type: DEFAULT_SEARCH_TYPE,
     from,
     size,
     body: {

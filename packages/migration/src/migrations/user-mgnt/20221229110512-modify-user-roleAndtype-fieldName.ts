@@ -355,7 +355,7 @@ export async function getUserCursor(db: Db, limit = 50, skip = 0) {
 }
 
 async function createCollectionIfDoesNotExist(db: Db, collectionName: string) {
-  const collectionExists = checkIfCollectionExists(db, collectionName)
+  const collectionExists = await checkIfCollectionExists(db, collectionName)
 
   if (!collectionExists) {
     await db.createCollection(collectionName)
