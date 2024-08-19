@@ -195,12 +195,9 @@ const getGroomName = (source: ISearchDataTemplate) => {
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
     __resolveType(obj: ISearchEventDataTemplate) {
-      if (obj._type === 'compositions' && obj._source.event === 'Birth') {
+      if (obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'
-      } else if (
-        obj._type === 'compositions' &&
-        obj._source.event === 'Death'
-      ) {
+      } else if (obj._source.event === 'Death') {
         return 'DeathEventSearchSet'
       } else {
         return 'MarriageEventSearchSet'

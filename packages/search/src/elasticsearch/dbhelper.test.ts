@@ -38,7 +38,6 @@ describe('elasticsearch db helper', () => {
         body: mockCompositionBody,
         id: 'testId',
         index: 'ocrvs',
-        type: 'compositions',
         refresh: 'wait_for'
       })
     })
@@ -52,7 +51,6 @@ describe('elasticsearch db helper', () => {
       expect(updateSpy).toBeCalled()
       expect(updateSpy).toBeCalledWith({
         index: 'ocrvs',
-        type: 'compositions',
         id: 'testId',
         body: {
           doc: body

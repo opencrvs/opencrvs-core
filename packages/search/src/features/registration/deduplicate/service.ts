@@ -147,7 +147,6 @@ export const searchForBirthDuplicates = async (
   try {
     const result = await client.search<ISearchResponse<IBirthCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: {
           bool: {
@@ -251,7 +250,6 @@ export const searchForDeathDuplicates = async (
   try {
     const result = await client.search<ISearchResponse<IDeathCompositionBody>>({
       index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
       body: {
         query: {
           bool: {
