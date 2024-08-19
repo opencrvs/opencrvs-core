@@ -314,7 +314,7 @@ function FormAppBar({
     }
     const [exitModalTitle, exitModalDescription] =
       isCorrection(declaration) ||
-      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+      declaration.submissionStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
         ? [
             intl.formatMessage(
               messages.exitWithoutSavingModalForCorrectionRecordTitle
@@ -451,7 +451,7 @@ function FormAppBar({
               <>
                 {!duplicate &&
                   !isCorrection(declaration) &&
-                  declaration.registrationStatus !==
+                  declaration.submissionStatus !==
                     SUBMISSION_STATUS.CORRECTION_REQUESTED && (
                     <>
                       <Button

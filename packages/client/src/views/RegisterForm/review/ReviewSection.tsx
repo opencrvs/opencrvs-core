@@ -1804,8 +1804,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             label={sec.title}
                             action={
                               sec.action &&
-                              declaration.registrationStatus !==
-                                SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                              (declaration.registrationStatus as string) !==
+                                (SUBMISSION_STATUS.CORRECTION_REQUESTED as string) && (
                                 <Link font="reg16" onClick={sec.action.handler}>
                                   {sec.action.label}
                                 </Link>
@@ -1828,8 +1828,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                   value={item.value}
                                   actions={
                                     !item?.action?.disabled &&
-                                    declaration.registrationStatus !==
-                                      SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                    (declaration.registrationStatus as string) !==
+                                      (SUBMISSION_STATUS.CORRECTION_REQUESTED as string) && (
                                       <Link
                                         key={item.action.id}
                                         id={item.action.id}
@@ -1857,8 +1857,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     action={
                       viewRecord ||
                       isDuplicate ||
-                      declaration.registrationStatus ===
-                        SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                      (declaration.registrationStatus as string) ===
+                        (SUBMISSION_STATUS.CORRECTION_REQUESTED as string) ? null : (
                         <Link
                           font="reg16"
                           element="button"
@@ -1960,8 +1960,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </ReviewContainter>
                 {viewRecord ||
                 isDuplicate ||
-                declaration.registrationStatus ===
-                  SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                (declaration.registrationStatus as string) ===
+                  (SUBMISSION_STATUS.CORRECTION_REQUESTED as string) ? null : (
                   <>
                     {!isCorrection(declaration) ? (
                       <>
@@ -2018,8 +2018,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     {viewRecord ||
                     isDuplicate ||
                     !isUploadButtonVisible ||
-                    declaration.registrationStatus ===
-                      SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                    (declaration.registrationStatus as string) ===
+                      (SUBMISSION_STATUS.CORRECTION_REQUESTED as string) ? null : (
                       <LinkButton
                         id="edit-document"
                         disabled={isCorrection(declaration)}

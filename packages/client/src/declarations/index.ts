@@ -527,7 +527,7 @@ export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
   event: Event,
-  status?: string,
+  status?: RegStatus,
   duplicates?: IDuplicates[]
 ): IDeclaration {
   return {
@@ -1556,12 +1556,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         offlineData,
         userDetails
       )
-      const downloadedAppStatus: string =
-        (eventData &&
-          eventData.registration &&
-          eventData.registration.status &&
-          eventData.registration.status[0].type) ||
-        ''
+      const downloadedAppStatus =
+        eventData &&
+        eventData.registration &&
+        eventData.registration.status &&
+        eventData.registration.status[0].type
       const updateWorkqueue = () =>
         updateRegistrarWorkqueue(
           userDetails?.practitionerId,
