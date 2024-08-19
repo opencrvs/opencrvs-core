@@ -26,6 +26,7 @@ export type LoginState = {
   config: Partial<IApplicationConfig>
   redirectToURL?: string
   errorCode?: number
+  reloadModalVisibility: boolean
 }
 
 export const initialState: LoginState = {
@@ -40,7 +41,8 @@ export const initialState: LoginState = {
   submissionError: false,
   resentAuthenticationCode: false,
   stepOneDetails: { username: '' },
-  redirectToURL: ''
+  redirectToURL: '',
+  reloadModalVisibility: false
 }
 
 const CONFIG_CMD = Cmd.run<
@@ -102,6 +104,11 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         submissionError: false
       }
     case actions.AUTHENTICATION_FAILED:
+      if (action.payload.message === 'VERSION_MISMATCH')
+        return {
+          ...state,
+          reloadModalVisibility: true
+        }
       return {
         ...state,
         submitting: false,
@@ -153,6 +160,11 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.RESEND_AUTHENTICATION_CODE_FAILED:
+      if (action.payload.message === 'VERSION_MISMATCH')
+        return {
+          ...state,
+          reloadModalVisibility: true
+        }
       return {
         ...state,
         resentAuthenticationCode: false,
@@ -193,6 +205,11 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         })
       )
     case actions.VERIFY_CODE_FAILED:
+      if (action.payload.message === 'VERSION_MISMATCH')
+        return {
+          ...state,
+          reloadModalVisibility: true
+        }
       return { ...state, submitting: false, submissionError: true }
     case actions.VERIFY_CODE_COMPLETED:
       return loop(
@@ -234,6 +251,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           )
         })
       )
+    case actions.RELOAD_MODAL_VISIBILITY:
+      return { ...state, reloadModalVisibility: action.payload.visibility }
     default:
       return state
   }

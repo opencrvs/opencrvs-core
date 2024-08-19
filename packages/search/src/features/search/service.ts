@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { client, ISearchResponse } from '@search/elasticsearch/client'
-import { ApiResponse } from '@elastic/elasticsearch'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
 import { logger } from '@opencrvs/commons'
@@ -60,10 +59,11 @@ export const advancedSearch = async (
   payload: ISearchCriteria
 ) => {
   const formattedParams = await formatSearchParams(payload, isExternalSearch)
-  let response: ApiResponse<ISearchResponse<any>>
+  const client = getOrCreateClient()
   try {
-    response = await client.search(formattedParams, {
-      ignore: !isExternalSearch ? [404] : undefined
+    return await client.search(formattedParams, {
+      ignore: !isExternalSearch ? [404] : undefined,
+      meta: true
     })
   } catch (error) {
     if (error.statusCode === 400) {
@@ -71,8 +71,6 @@ export const advancedSearch = async (
     } else {
       logger.error('Search error: ', error)
     }
-    return undefined
+    return
   }
-
-  return response
 }

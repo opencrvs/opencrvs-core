@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { ISearchResponse } from '@search/elasticsearch/client'
-import { SearchDocument } from '@search/elasticsearch/utils'
-import { logger } from '@opencrvs/commons'
+import { logger, SearchDocument } from '@opencrvs/commons'
 import * as elasticsearch from '@elastic/elasticsearch'
 
 export const indexComposition = async (
@@ -19,18 +17,22 @@ export const indexComposition = async (
   body: SearchDocument,
   client: elasticsearch.Client
 ) => {
-  let response: any
   try {
-    response = await client.index({
-      index: OPENCRVS_INDEX_NAME,
-      id: compositionIdentifier,
-      body,
-      refresh: 'wait_for' // makes the call wait until the change is available via search
-    })
+    return await client.index(
+      {
+        index: OPENCRVS_INDEX_NAME,
+        id: compositionIdentifier,
+        body,
+        refresh: 'wait_for' // makes the call wait until the change is available via search
+      },
+      {
+        meta: true
+      }
+    )
   } catch (e) {
     logger.error(`indexComposition: error: ${e}`)
   }
-  return response
+  return
 }
 
 export const updateComposition = async (
@@ -38,21 +40,25 @@ export const updateComposition = async (
   body: SearchDocument,
   client: elasticsearch.Client
 ) => {
-  let response: any
   try {
-    response = await client.update({
-      index: OPENCRVS_INDEX_NAME,
-      id,
-      body: {
-        doc: body
+    return await client.update(
+      {
+        index: OPENCRVS_INDEX_NAME,
+        id,
+        body: {
+          doc: body
+        },
+        refresh: 'wait_for' // makes the call wait until the change is available via search
       },
-      refresh: 'wait_for' // makes the call wait until the change is available via search
-    })
+      {
+        meta: true
+      }
+    )
   } catch (e) {
     logger.error(`updateComposition: error: ${e}`)
-  }
 
-  return response
+    return
+  }
 }
 
 export const searchByCompositionId = async (
@@ -60,16 +66,19 @@ export const searchByCompositionId = async (
   client: elasticsearch.Client
 ) => {
   try {
-    return await client.search<ISearchResponse<SearchDocument>>({
-      index: OPENCRVS_INDEX_NAME,
-      body: {
-        query: {
-          match: {
-            _id: compositionId
+    return await client.search<SearchDocument>(
+      {
+        index: OPENCRVS_INDEX_NAME,
+        body: {
+          query: {
+            match: {
+              _id: compositionId
+            }
           }
         }
-      }
-    })
+      },
+      { meta: true }
+    )
   } catch (err) {
     logger.error(`searchByCompositionId: error: ${err}`)
     return null

@@ -8,180 +8,139 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import { createServer } from '@search/server'
-import { advancedSearch } from '@search/features/search/service'
-import {
-  mockSearchResult,
-  mockAggregationSearchResult
-} from '@search/test/utils'
-import { client } from '@search/elasticsearch/client'
+import * as esClient from '@search/elasticsearch/client'
+import { createHandlerSetup, SetupFn } from '@search/test/createHandlerSetup'
+import { generateBearerTokenHeader } from '@search/test/utils'
+import { ISearchCriteria } from './types'
+import { ICountQueryParam } from './handler'
+import { SearchDocument } from '@opencrvs/commons'
+import * as searchService from './service'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
-jest.mock('./service.ts')
+jest.setTimeout(100000)
+
+const setupTestCases = async (
+  setup: SetupFn,
+  apiScope: { scope?: string[] } = {}
+) => {
+  const { server, elasticClient } = await setup()
+
+  const tokenHeader = generateBearerTokenHeader(apiScope)
+
+  const callAdvancedRecordSearch = (payload: ISearchCriteria) =>
+    server.server.inject<{
+      body: any
+    }>({
+      method: 'POST',
+      url: '/advancedRecordSearch',
+      payload,
+      headers: tokenHeader
+    })
+
+  const callStatusWiseRegistrationCount = (payload: ICountQueryParam) =>
+    server.server.inject<SearchDocument>({
+      method: 'POST',
+      url: '/statusWiseRegistrationCount',
+      payload,
+      headers: tokenHeader
+    })
+
+  const createTestIndex = () =>
+    elasticClient.indices.create({
+      index: 'ocrvs-test',
+      aliases: {
+        [OPENCRVS_INDEX_NAME]: {}
+      }
+    })
+
+  return {
+    callAdvancedRecordSearch,
+    callStatusWiseRegistrationCount,
+    server,
+    elasticClient,
+    createTestIndex
+  }
+}
 
 describe('Verify handlers', () => {
-  let server: any
+  const { setup, cleanup, shutdown } = createHandlerSetup()
 
-  describe('Check Access role', () => {
-    beforeEach(async () => {
-      server = await createServer()
-    })
+  afterEach(cleanup)
+  afterAll(shutdown)
+
+  describe('Advanced search', () => {
     it('should return status code 403 if the token does not hold any of the Register, Validate or Declare scope', async () => {
-      const token = jwt.sign(
-        {
-          scope: ['anonymous']
-        },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:search-user'
-        }
-      )
+      const t = await setupTestCases(setup, { scope: ['anonymous'] })
 
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/advancedRecordSearch',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      const res = await t.callAdvancedRecordSearch({
+        parameters: {}
       })
-
       expect(res.statusCode).toBe(403)
     })
-    it('should return status code 400', async () => {
-      ;(advancedSearch as jest.Mock).mockImplementation(() => {
-        throw new Error('dead')
-      })
-      const token = jwt.sign(
-        {
-          scope: ['register']
-        },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:search-user'
-        }
-      )
 
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/advancedRecordSearch',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+    // @todo: fix this to use proper http codes if these are not relie on anywhere
+    it('should return status code 400 on error', async () => {
+      const t = await setupTestCases(setup, { scope: ['register'] })
+
+      jest.spyOn(searchService, 'advancedSearch').mockImplementationOnce(() => {
+        throw new Error('error')
       })
+
+      const res = await t.callAdvancedRecordSearch({
+        parameters: {}
+      })
+
       expect(res.statusCode).toBe(400)
     })
 
-    afterAll(async () => {
-      jest.clearAllMocks()
-    })
-  })
+    it('advanced search should return a valid response as expected', async () => {
+      const t = await setupTestCases(setup, { scope: ['register'] })
 
-  describe('When the request is made', () => {
-    let token: string
-    beforeEach(async () => {
-      ;(advancedSearch as jest.Mock).mockReturnValue(mockSearchResult)
-      server = await createServer()
-      token = jwt.sign(
-        {
-          scope: ['register']
-        },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:search-user'
-        }
-      )
-    })
+      await t.createTestIndex()
+      const res = await t.callAdvancedRecordSearch({ parameters: {} })
 
-    it('/search should return a valid response as expected', async () => {
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/advancedRecordSearch',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      expect(JSON.parse(res.payload).body).toHaveProperty('_shards')
-    })
-    describe('/statusWiseRegistrationCount', () => {
-      it('Should return 200 for valid payload', async () => {
-        jest
-          .spyOn(client, 'search')
-          // @ts-ignore
-          .mockResolvedValueOnce(mockAggregationSearchResult)
-        const res = await server.server.inject({
-          method: 'POST',
-          url: '/statusWiseRegistrationCount',
-          payload: {
-            declarationJurisdictionId: '123',
-            status: ['REGISTED']
-          },
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        expect(res.statusCode).toBe(200)
-      })
-      it('Should return 500 for an error', async () => {
-        jest.spyOn(client, 'search').mockImplementation(() => {
-          throw new Error('error')
-        })
-        const res = await server.server.inject({
-          method: 'POST',
-          url: '/statusWiseRegistrationCount',
-          payload: {
-            declarationJurisdictionId: '123',
-            status: ['REGISTED']
-          },
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-
-        expect(res.statusCode).toBe(500)
-      })
-    })
-    afterAll(async () => {
-      jest.clearAllMocks()
-    })
-  })
-
-  describe('Check with token', function () {
-    let token: string
-    beforeEach(async () => {
-      ;(advancedSearch as jest.Mock).mockReturnValue(mockSearchResult)
-      server = await createServer()
-      token = jwt.sign(
-        {
-          scope: ['register', 'validate', 'declare']
-        },
-        readFileSync('./test/cert.key'),
-        {
-          algorithm: 'RS256',
-          issuer: 'opencrvs:auth-service',
-          audience: 'opencrvs:search-user'
-        }
-      )
-    })
-    it('should return status code 200 when the token hold any or some of Register, Validate or Declare', async () => {
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/advancedRecordSearch',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
       expect(res.statusCode).toBe(200)
+      expect(res?.result?.body).toHaveProperty('_shards')
+    })
+
+    it('should return status code 200 when the token hold any or some of Register, Validate or Declare', async () => {
+      const t = await setupTestCases(setup, {
+        scope: ['register', 'validate', 'declare']
+      })
+
+      const res = await t.callAdvancedRecordSearch({ parameters: {} })
+
+      expect(res.statusCode).toBe(200)
+    })
+  })
+
+  describe('/statusWiseRegistrationCount', () => {
+    it('Should return 200 for valid payload', async () => {
+      const t = await setupTestCases(setup, { scope: ['register'] })
+
+      const res = await t.callStatusWiseRegistrationCount({
+        declarationJurisdictionId: '123',
+        status: ['REGISTERED']
+      })
+
+      expect(res.statusCode).toBe(200)
+    })
+
+    it('Should return 500 for an error', async () => {
+      const t = await setupTestCases(setup, { scope: ['register'] })
+
+      jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue({
+        search: async () => {
+          throw new Error('error')
+        }
+      } as any)
+
+      const res = await t.callStatusWiseRegistrationCount({
+        declarationJurisdictionId: '123',
+        status: ['REGISTERED']
+      })
+
+      expect(res.statusCode).toBe(500)
     })
   })
 })

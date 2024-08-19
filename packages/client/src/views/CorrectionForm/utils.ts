@@ -618,12 +618,18 @@ function hasNestedDataChanged(
 
 export function getRenderableField(
   section: IFormSection,
-  fieldLabel: MessageDescriptor,
+  {
+    fieldLabel,
+    fieldLabelParams
+  }: {
+    fieldLabel: MessageDescriptor
+    fieldLabelParams?: Record<string, string>
+  },
   original: IFormFieldValue | JSX.Element | undefined,
   changed: IFormFieldValue | JSX.Element | undefined,
   intl: IntlShape
 ) {
-  let item = intl.formatMessage(fieldLabel)
+  let item = intl.formatMessage(fieldLabel, fieldLabelParams)
   if (section && section.name) {
     item = `${item} (${intl.formatMessage(section.name)})`
   }

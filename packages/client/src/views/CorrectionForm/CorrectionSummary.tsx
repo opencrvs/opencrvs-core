@@ -509,7 +509,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         true
       )
 
-      return getRenderableField(section, field.label, original, changed, intl)
+      return getRenderableField(
+        section,
+        { fieldLabel: field.label, fieldLabelParams: field.labelParam },
+        original,
+        changed,
+        intl
+      )
     }
   }
 
@@ -622,7 +628,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
         return getRenderableField(
           section,
-          (tagDef[0] && tagDef[0].label) || field.label,
+          {
+            fieldLabel: (tagDef[0] && tagDef[0].label) || field.label,
+            fieldLabelParams: field.labelParam
+          },
           previousCompleteValue,
           completeValue,
           intl

@@ -6,10 +6,19 @@
 
 - **Title** Description
 
+## Improvements
+
+- Fetch child identifier in view record
+
 ### New features
 
-- **Major new feature** Description
 - Misc new feature
+- Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
+- Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
+- Supporting document fields can now be made required
+- If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
+- Allow configuring the default search criteria for record search [#6924](https://github.com/opencrvs/opencrvs-core/issues/6924)
+- Add checks to validate client and server are always on the same version. This prevents browsers with a cached or outdated client versions from making potentially invalid requests to the backend [#6695](https://github.com/opencrvs/opencrvs-core/issues/6695)
 
 ## Bug fixes
 
@@ -46,6 +55,13 @@
 ```
 
 - **Title** Description
+## 1.5.1
+
+## Improvements
+
+- Fetch child identifier in view record
+
+## 1.5.0 (TBD)
 
 ### New features
 

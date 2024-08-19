@@ -64,7 +64,7 @@ describe('SearchResult tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
+          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
         }}
       />,
       { store, history }
@@ -300,7 +300,7 @@ describe('SearchResult tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=01622688232&searchType=phone'
+          search: '?searchText=01622688232&searchType=PHONE_NUMBER'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -340,7 +340,7 @@ describe('SearchResult tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=+8801622688232&searchType=phone'
+          search: '?searchText=+8801622688232&searchType=PHONE_NUMBER'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -384,7 +384,7 @@ describe('SearchResult tests', () => {
       .simulate('click')
 
     expect(window.location.search).toBe(
-      '?searchText=DW0UTHR&searchType=tracking-id'
+      '?searchText=DW0UTHR&searchType=TRACKING_ID'
     )
   })
 
@@ -455,7 +455,7 @@ describe('SearchResult tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
+          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -554,7 +554,7 @@ describe('SearchResult tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
+          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -651,7 +651,7 @@ describe('SearchResult tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
+          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -758,7 +758,7 @@ describe('SearchResult downloadButton tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
+          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }
@@ -855,7 +855,7 @@ describe('SearchResult downloadButton tests', () => {
       <SearchResult
         // @ts-ignore
         location={{
-          search: '?searchText=DW0UTHR&searchType=tracking-id'
+          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
         }}
       />,
       { store, history, graphqlMocks: graphqlMock as any }

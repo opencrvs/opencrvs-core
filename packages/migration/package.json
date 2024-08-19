@@ -18,13 +18,13 @@
     "status:openhim": "migrate-mongo status -f ./src/migrate-mongo-config-openhim.js",
     "status:user-mgnt": "migrate-mongo status -f ./src/migrate-mongo-config-user-mgnt.js",
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
-    "reindex-search": "tsx src/reindex-search.ts",
+    "reindex-search": "NODE_OPTIONS=--dns-result-order=ipv4first tsx src/reindex-search.ts",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "rimraf build && tsc"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.13",
+    "@elastic/elasticsearch": "8.13.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.0",
     "@types/uuid": "^3.4.3",
@@ -51,6 +51,13 @@
     "src/**/*.{ts}": [
       "prettier --write"
     ]
+  },
+  "modulePaths": [
+    "<rootDir>"
+  ],
+  "moduleNameMapper": {
+    "@migration/(.*)": "<rootDir>/src/$1",
+    "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
   },
   "keywords": [
     "migration",
