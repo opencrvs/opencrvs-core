@@ -1,12 +1,8 @@
 # Changelog
 
-## 1.7.0 (TBD)
+## 1.7.0 Release candidate
 
 ### Breaking changes
-
-- **Title** Description
-
-### Infrastructure breaking changes
 
 - **Title** Description
 
@@ -15,17 +11,11 @@
 - **Major new feature** Description
 - Misc new feature
 
-### New content keys requiring translation
-
-```
-INSERT CSV ROWS IN ENGLISH ONLY
-```
-
 ## Bug fixes
 
 - TBC
 
-## 1.6.0 (TBD)
+## 1.6.0 Release candidate
 
 ### Breaking changes
 
@@ -57,10 +47,6 @@ INSERT CSV ROWS IN ENGLISH ONLY
 
 - **Title** Description
 
-### Infrastructure breaking changes
-
-- **Title** Description
-
 ### New features
 
 - Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
@@ -74,11 +60,6 @@ Allows reindexing ElasticSearch via a new search-service endpoint `reindex`. We'
 
 - Introduce a new certificate handlebar "preview" which can be used to conditionally render some svg element when previewing the certificate e.g. background image similar to security paper
 
-### New content keys requiring translation
-
-```
-INSERT CSV ROWS IN ENGLISH ONLY
-```
 
 ## Bug fixes
 
@@ -106,7 +87,7 @@ INSERT CSV ROWS IN ENGLISH ONLY
 
 - **Update the certificate preview mechanism** In effort of minimizing JavaScript-bundle size, we have streamlined the way how review certificate -page renders certificates. In case the images in your certificates are previewing blurry, you need to update your SVG-certificates to print QR-codes and other images directly with `<image width="36" height="36" xlink:href="{{qrCode}}" x="500" y="770"></image>` instead of the more complicated `<rect fill="url(#pattern)"></rect>` -paradigm. This doesn't affect printed certificates as they are still created as previously.
 - **Generate default address according to logged-in user's location** We have dropped support for the 'agentDefault' prop which was used as initial value for SELECT_WITH_DYNAMIC_OPTIONS fields. If you have not made any changes to address generation, then this should not affect you. If you have, you can refer to this PR to see how agentDefault has been deprecated in an example country: [https://github.com/opencrvs/opencrvs-farajaland/pull/978](https://github.com/opencrvs/opencrvs-farajaland/pull/978)
-- **Remove system admin UI items: Application, Certificates, User roles, Informant notifications** We have now moved to configuring these items away from the UI in favour of directly editing these from country configuration repository in code - specifically in application-config-default.ts.
+- **Remove system admin UI items: Application, User roles** We have now moved to configuring these items away from the UI in favour of directly editing these from country configuration repository in code - specifically in application-config-default.ts.
 - **Set Metabase default credentials.** These must be configured via countryconfig repository environment variables and secrets otherwise the dashboard service won't start: OPENCRVS_METABASE_ADMIN_EMAIL & OPENCRVS_METABASE_ADMIN_PASSWORD
 - **Check your Metabase map file.** For Metabase configuration, we renamed `farajaland-map.geojson` to `map.geojson` to not tie implementations into example country naming conventions.
 - **Feature flags** In order to make application config settings more readable, we re-organised `src/api/application/application-config-default.ts` with a clear feature flag block like so. These are then used across the front and back end of the application to control configurable functionality. New feature flags DEATH_REGISTRATION allow you to optionally run off death registration if your country doesnt want to run its first pilot including death and PRINT_DECLARATION (see New Features) have been added.
@@ -157,75 +138,10 @@ Follow the descriptions in the migration notes to re-provision all servers safel
 - In the certificate, the 'Place of Certification' now accurately reflects the correct location.
 - Groom's and Bride's name, printIssue translation variables updated [#124](https://github.com/opencrvs/opencrvs-countryconfig/pull/124)
 - Add query mapper for International Postal Code field
-- Add support for image compression configuration
 - Provide env variables for metabase admin credentials
 - Improved formatting of informant name for inProgress declaration emails
 - There is now an option to print the review page of an event declaration form. The PRINT_DECLARATION feature flag in application config settings can enable this on or off.
 
-### New content keys requiring translation
-
-```
-advancedSearch.form.recordStatusCorrectionRequested,Option for form field: status of record,Correction requested
-config.emailAllUsers.modal.supportingCopy,Label for send email all users confirmation supporting copy,User will receive emails over the next 24 hours
-config.emailAllUsers.modal.title,Label for send email all users confirmation title,Send email to all users?
-config.emailAllUsers.subtitle,Subtitle for email all users,This email will be sent to all users you are active. Emails will be sent over the next 24 hours. Only one email can be sent per day
-config.emailAllUsers.title,Title for email all users,Email all users
-config.userRoles.language,Language name,"{language, select, en {English} fr {French} other {{language}}}"
-constants.emailBody,Label for email body input,Message
-constants.emailSubject,Label for email subject input,Subject
-correction.correctionForApprovalDialog.actions.cancel,The cancel button for the dialog when record correction sent by registration agent for approval,Cancel
-correction.correctionForApprovalDialog.actions.send,The send button for the dialog when record correction sent by registration agent for approval,Confirm
-correction.correctionForApprovalDialog.description,The description for the dialog when record correction sent by registration agent for approval,The Registrar will be notified of this correction request and a record of this request will be recorded
-correction.correctionForApprovalDialog.title,The title for the dialog when record correction sent by registration agent for approval,Send record correction for approval ?
-correction.correctRecordDialog.description,The description for the dialog when record correction sent by a registrar,The informant will be notified of this correction and a record of this decision will be recorded
-correction.correctRecordDialog.title,The title for the dialog when record correction sent by a registrar,Correct record ?
-correction.summary.office,Office where certificate correction summary was submitted,Office
-correction.summary.requestedOn,Date when certificate correction summary was submitted,Requested on
-correction.summary.submitter,Submitter of certificate correction summary,Submitter
-form.customField.label.numberOfDependants,,No. of dependants
-form.customField.label.reasonForLateRegistrationBirth,,Reason for delayed registration
-form.customField.label.reasonForLateRegistrationDeath,,Reason for late registration
-form.field.helpertext.nid,Helper text for nid input field,The National ID can only be numeric and must be 10 digits long
-form.field.label.addressLine1RuralOption,,Village
-form.field.label.addressLine1UrbanOption,,Residential Area
-form.field.label.addressLine2UrbanOption,,Street
-form.field.label.app.certifyRecordTo.bride,,Print and issue to bride
-form.field.label.app.certifyRecordTo.groom,,Print and issue to groom
-form.field.label.attendantAtBirthLayperson,,Layperson
-form.field.label.cityUrbanOption,Label for City,Town
-form.field.label.empty,empty string,
-form.field.label.informantsRelationWithChild,,Relationship to child
-form.field.label.maritalStatusSeparated,,Separated
-form.field.label.relationOtherFamilyMember,Label for other family member relation,Other family member
-form.field.label.totalFees,Label for input Reason for Change,
-form.field.nidVerificationOngoing,Label for indicating offline status for the user. NID verification is not currently available offline.,National ID authentication is currently not available offline.
-form.section.deceased.relationship,,Relationship to deceased
-form.section.witnessOne.name,Form section name for Witness one,Witness 1
-form.section.witnessTwo.name,Form section name for Witness two,Witness 2
-home.header.placeHolderId,,Search for an ID
-misc.notif.emailAllUsersError,Label for Email all users error toast,Only one email can be sent per day
-misc.notif.emailAllUsersSuccess,Label for Email all users success toast,Email sent to all users
-navigation.emailAllUsers,Email all users label in navigation,Email all users
-number.twelve,Minimum length password,12
-phone.digit,,10
-phone.start,Should starts with,0(4|5)
-recordAudit.regAction.markedAsNotDuplicate,Marked not a duplicate status message for record audit,Marked not a duplicate
-recordAudit.regAction.verified,Verified action,Certificate verified
-recordAudit.regStatus.correctionRequested,Label for when someone requested correction,Correction requested
-regHome.outbox.failed,Label for declaration status failed,Failed to send
-regHome.outbox.retry,Label for Retry button in Outbox shown for records that failed to send,Retry
-register.form.modal.desc.saveCorrectionConfirm,Description for save correction confirmation modal,The declarant will be notified of this correction and a record of this decision will be recorded
-register.form.modal.desc.saveCorrectionReject,Description for reject correction modal,The declarant will be notified of this decision and a record of this decision will be recorded
-register.form.modal.title.saveCorrectionConfirm,Title for save correction confirmation modal,Approve correction?
-register.form.modal.title.saveCorrectionReject,Title for reject correction modal,Reject correction?
-register.selectInformant.birthInformantTitle,Who is applying for birth registration,Informant type
-system.user.settings.language,Language name,"{language, select, en {English} fr {Français} other {{language}}}"
-user.profile.auditList.approvedCorrectionAuditAction,Description for record correction being approved,Approved correction request
-user.profile.auditList.rejectedCorrectedAuditAction,Description for record correction being rejected,Rejected correction request
-user.profile.auditList.requestedCorrectionAuditAction,Description for record correction being requested,Requested correction
-validations.invalidDate,The error message that appears when a date field is invalid,Invalid date field
-verifyCertificate.certifiedAt,Label for date of certification,Date of certification
-```
 
 ## Bug fixes
 
