@@ -81,20 +81,6 @@ const Version = styled.div`
   ${({ theme }) => theme.fonts.reg14};
   height: auto;
   padding: 16px;
-
-  span:last-child {
-    display: none;
-  }
-
-  :hover {
-    span:first-child {
-      display: none;
-    }
-
-    span:last-child {
-      display: inline;
-    }
-  }
 `
 
 const Container = styled.div`
@@ -128,7 +114,7 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       <Container>
         <Version>
           {props.warning}
-          <span>OpenCRVS {props.applicationVersion}</span>
+          <span>OpenCRVS v{props.applicationVersion}</span>
         </Version>
       </Container>
     </LeftNavigationContainer>

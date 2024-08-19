@@ -34,6 +34,7 @@ import {
   clearOldCacheEntries
 } from '@client/utils/persistence'
 import { storeReloadModalVisibility } from '@client/reload/reducer'
+import { APPLICATION_VERSION } from './constants'
 
 export let client: ApolloClient<NormalizedCacheObject>
 
@@ -80,7 +81,8 @@ export const createClient = (
       } = context
 
       const gatewayVersion = headers.get('X-version')
-      if (gatewayVersion !== APP_VERSION) {
+
+      if (gatewayVersion !== APPLICATION_VERSION) {
         store.dispatch(storeReloadModalVisibility(true))
       }
 
