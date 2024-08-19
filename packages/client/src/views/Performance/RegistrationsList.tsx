@@ -491,7 +491,7 @@ function RegistrationListComponent(props: IProps) {
     return {
       ...result,
       // Time is epoch but returned as a string
-      month: formatDate(+result.time, 'MMMM yyyy', intl.locale),
+      month: formatDate(new Date(result.month), 'MMMM yyyy', intl.locale),
       total: String(result.total),
       delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
       delayed_num: getPercentage(result.total, result.delayed),
