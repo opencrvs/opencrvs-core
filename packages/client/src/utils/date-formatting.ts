@@ -106,11 +106,15 @@ export const convertAgeToDate = (age: string): string => {
   return format(subYears(new Date(), Number(age)), 'yyyy-MM-dd')
 }
 
-export default function formatDate(date: Date | number, formatStr = 'PP') {
+export default function formatDate(
+  date: Date | number,
+  formatStr = 'PP',
+  locale?: string
+) {
   if (!isValid(date)) {
     return ''
   }
   return format(date, formatStr, {
-    locale: locales[window.__localeId__]
+    locale: locales[locale ?? window.__localeId__]
   })
 }
