@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { APPLICATION_CONFIG_URL, AUTH_URL } from '@gateway/constants'
+import {
+  APPLICATION_CONFIG_URL,
+  AUTH_URL,
+  COUNTRY_CONFIG_URL
+} from '@gateway/constants'
 import { rateLimitedRoute } from '@gateway/rate-limit'
 import { ServerRoute } from '@hapi/hapi'
 
@@ -86,6 +90,22 @@ export const catchAllProxy = {
     handler: (_, h) =>
       h.proxy({
         uri: `${APPLICATION_CONFIG_URL}locations/{suffix}`,
+        passThrough: true
+      }),
+    options: {
+      auth: false,
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  },
+  certificates: {
+    method: '*',
+    path: '/certificates/{event}.svg',
+    handler: (_, h) =>
+      h.proxy({
+        uri: `${COUNTRY_CONFIG_URL}/certificates/{event}.svg`,
         passThrough: true
       }),
     options: {
