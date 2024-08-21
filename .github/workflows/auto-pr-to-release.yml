@@ -44,7 +44,7 @@ jobs:
           PR_DATA=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/opencrvs/opencrvs-core/pulls/$PR_NUMBER)
           echo "MILESTONE=$(printf '%s' $PR_DATA | jq -r '.milestone.title')" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Get PR details from event
         if: ${{ github.event_name == 'pull_request' }}
@@ -52,7 +52,7 @@ jobs:
         run: |
           echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Check for milestone and if release branch exists
         continue-on-error: true
@@ -134,7 +134,7 @@ jobs:
           echo "PR_TITLE=$(printf '%s' $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
           echo "BASE_SHA=$(printf '%s' $PR_DATA | jq -r '.base.sha')" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Get PR details from event
         if: ${{ github.event_name == 'pull_request' }}
@@ -153,11 +153,11 @@ jobs:
           MERGED_BY_LOGIN=$(echo "$PR_DETAILS" | jq -r '.mergedBy.login')
           echo "PR_MERGER=$MERGED_BY_LOGIN" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Create and push the new branch for the PR
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
           RELEASE_BRANCH="release-${{ matrix.version }}"
