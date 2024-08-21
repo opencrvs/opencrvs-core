@@ -45,7 +45,7 @@ jobs:
           echo "PR_TITLE=$(printf '%s' $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
           echo "BASE_SHA=$(printf '%s' $PR_DATA | jq -r '.base.sha')" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Get PR details from event
         if: ${{ github.event_name == 'pull_request' }}
@@ -64,7 +64,7 @@ jobs:
           MERGED_BY_LOGIN=$(echo "$PR_DETAILS" | jq -r '.mergedBy.login')
           echo "PR_MERGER=$MERGED_BY_LOGIN" >> $GITHUB_ENV
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Check for milestone and if release branch exists
         continue-on-error: true
@@ -169,4 +169,4 @@ jobs:
           fi
           gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --assignee "$AUTHOR" --reviewer "$AUTHOR"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
