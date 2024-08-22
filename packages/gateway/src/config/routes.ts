@@ -61,7 +61,6 @@ export const getRoutes = () => {
 
     catchAllProxy.location,
     catchAllProxy.locationId,
-    catchAllProxy.certificates,
 
     catchAllProxy.auth,
     rateLimitedAuthProxy.authenticate,
