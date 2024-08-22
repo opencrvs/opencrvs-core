@@ -20,7 +20,6 @@ import {
   goToFieldAgentList,
   goToPerformanceHome,
   goToRegistrationsList,
-  IDynamicValues,
   goToUserProfile,
   goToTeamUserList
 } from '@client/navigation'
@@ -29,7 +28,11 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import {
+  GetRegistrationsListByFilterQuery,
   QueryGetRegistrationsListByFilterArgs,
+  RegistrationsListByLocationFilter,
+  RegistrationsListByRegistrarFilter,
+  RegistrationsListByTimeFilter,
   RegistrationType
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -49,8 +52,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import type { GQLMixedTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
-import { get, orderBy } from 'lodash'
+import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -60,7 +62,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
 import { useAuthorization } from '@client/hooks/useAuthorization'
-import { formatLongDate } from '@client/utils/date-formatting'
+import formatDate from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -395,139 +397,145 @@ function RegistrationListComponent(props: IProps) {
     )
   }
 
-  function getContent(data?: GQLMixedTotalMetricsResult) {
-    const content = { ...data } as IDynamicValues
-    let finalContent: IDynamicValues[] = []
+  const getTableContentByRegistrar = (
+    result: RegistrationsListByRegistrarFilter['results'][0],
+    index: number
+  ) => ({
+    ...result,
+    name: (
+      <Stack>
+        <AvatarSmall
+          name={
+            result.registrarPractitioner?.name
+              ? getName(result.registrarPractitioner.name, 'en')
+              : ''
+          }
+          avatar={result.registrarPractitioner?.avatar}
+        />
+        <>
+          {!isPerformanceManager ? (
+            <Link
+              font="bold14"
+              onClick={() => {
+                props.goToUserProfile(String(result.registrarPractitioner?.id))
+              }}
+            >
+              {result.registrarPractitioner?.name
+                ? getName(result.registrarPractitioner.name, 'en')
+                : ''}
+            </Link>
+          ) : (
+            String(
+              result.registrarPractitioner?.name
+                ? getName(result.registrarPractitioner.name, 'en')
+                : ''
+            )
+          )}
+        </>
+      </Stack>
+    ),
+    location: (
+      <>
+        {!isPerformanceManager ? (
+          <Link
+            font="bold14"
+            onClick={() => {
+              props.goToTeamUserList(
+                result.registrarPractitioner?.primaryOffice?.id as string
+              )
+            }}
+          >
+            {result.registrarPractitioner?.primaryOffice?.name}
+          </Link>
+        ) : (
+          String(result.registrarPractitioner?.primaryOffice?.name)
+        )}
+      </>
+    ),
+    systemRole: getFieldAgentTypeLabel(
+      result.registrarPractitioner?.systemRole as string
+    ),
+    total: String(result.total),
+    delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
+    delayed_num: getPercentage(result.total, result.delayed),
+    late: showWithTooltip(result.total, result.late, 'late', index),
+    late_num: getPercentage(result.total, result.late)
+  })
 
-    if (content.__typename === RESULT_TYPE.by_registrar) {
-      finalContent = content.results.map(
-        (result: IDynamicValues, index: number) => ({
-          ...result,
-          name: (
-            <Stack>
-              <AvatarSmall
-                name={
-                  result.registrarPractitioner.name
-                    ? getName(result.registrarPractitioner.name, 'en')
-                    : ''
-                }
-                avatar={result.registrarPractitioner.avatar}
-              />
-              <>
-                {!isPerformanceManager ? (
-                  <Link
-                    font="bold14"
-                    onClick={() => {
-                      props.goToUserProfile(
-                        String(result.registrarPractitioner.id)
-                      )
-                    }}
-                  >
-                    {result.registrarPractitioner.name
-                      ? getName(result.registrarPractitioner.name, 'en')
-                      : ''}
-                  </Link>
-                ) : (
-                  String(
-                    result.registrarPractitioner.name
-                      ? getName(result.registrarPractitioner.name, 'en')
-                      : ''
-                  )
-                )}
-              </>
-            </Stack>
-          ),
-          location: (
-            <>
-              {!isPerformanceManager ? (
-                <Link
-                  font="bold14"
-                  onClick={() => {
-                    props.goToTeamUserList(
-                      result.registrarPractitioner.primaryOffice?.id as string
-                    )
-                  }}
-                >
-                  {result.registrarPractitioner.primaryOffice.name}
-                </Link>
-              ) : (
-                String(result.registrarPractitioner.primaryOffice.name)
-              )}
-            </>
-          ),
-          systemRole: getFieldAgentTypeLabel(
-            result.registrarPractitioner.systemRole
-          ),
-          total: String(result.total),
-          delayed: showWithTooltip(
-            result.total,
-            result.delayed,
-            'delayed',
-            index
-          ),
-          delayed_num: getPercentage(result.total, result.delayed),
-          late: showWithTooltip(result.total, result.late, 'late', index),
-          late_num: getPercentage(result.total, result.late)
-        })
-      )
-    } else if (content.__typename === RESULT_TYPE.by_location) {
-      finalContent = content.results.map(
-        (result: IDynamicValues, index: number) => ({
-          ...result,
-          location: result.location.name,
-          total: String(result.total),
-          delayed: showWithTooltip(
-            result.total,
-            result.delayed,
-            'delayed',
-            index
-          ),
-          delayed_num: getPercentage(result.total, result.delayed),
-          late: showWithTooltip(result.total, result.late, 'late', index),
-          late_num: getPercentage(result.total, result.late),
-          home: showWithTooltip(result.total, result.home, 'home', index),
-          home_num: getPercentage(result.total, result.home),
-          healthFacility: showWithTooltip(
-            result.total,
-            result.healthFacility,
-            'healthFacility',
-            index
-          ),
-          healthFacility_num: getPercentage(result.total, result.healthFacility)
-        })
-      )
-    } else if (content.__typename === RESULT_TYPE.by_time) {
-      finalContent = content.results.map(
-        (result: IDynamicValues, index: number) => ({
-          ...result,
-          month: formatLongDate(
-            new Date(result.month).toISOString(),
-            intl.locale,
-            'MMMM yyyy'
-          ),
-          total: String(result.total),
-          delayed: showWithTooltip(
-            result.total,
-            result.delayed,
-            'delayed',
-            index
-          ),
-          delayed_num: getPercentage(result.total, result.delayed),
-          late: showWithTooltip(result.total, result.late, 'late', index),
-          late_num: getPercentage(result.total, result.late),
-          home: showWithTooltip(result.total, result.home, 'home', index),
-          home_num: getPercentage(result.total, result.home),
-          healthFacility: showWithTooltip(
-            result.total,
-            result.healthFacility,
-            'healthFacility',
-            index
-          ),
-          healthFacility_num: getPercentage(result.total, result.healthFacility)
-        })
-      )
+  const getTableContentByLocation = (
+    result: RegistrationsListByLocationFilter['results'][0],
+    index: number
+  ) => ({
+    ...result,
+    location: result.location.name,
+    total: String(result.total),
+    delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
+    delayed_num: getPercentage(result.total, result.delayed),
+    late: showWithTooltip(result.total, result.late, 'late', index),
+    late_num: getPercentage(result.total, result.late),
+    home: showWithTooltip(result.total, result.home, 'home', index),
+    home_num: getPercentage(result.total, result.home),
+    healthFacility: showWithTooltip(
+      result.total,
+      result.healthFacility,
+      'healthFacility',
+      index
+    ),
+    healthFacility_num: getPercentage(result.total, result.healthFacility)
+  })
+
+  const getTableContentByTime = (
+    result: RegistrationsListByTimeFilter['results'][0],
+    index: number
+  ) => {
+    return {
+      ...result,
+      // Time is epoch but returned as a string
+      month: formatDate(new Date(result.month), 'MMMM yyyy', intl.locale),
+      total: String(result.total),
+      delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
+      delayed_num: getPercentage(result.total, result.delayed),
+      late: showWithTooltip(result.total, result.late, 'late', index),
+      late_num: getPercentage(result.total, result.late),
+      home: showWithTooltip(result.total, result.home, 'home', index),
+      home_num: getPercentage(result.total, result.home),
+      healthFacility: showWithTooltip(
+        result.total,
+        result.healthFacility,
+        'healthFacility',
+        index
+      ),
+      healthFacility_num: getPercentage(result.total, result.healthFacility)
     }
-    return orderBy(finalContent, [columnToBeSort], [sortOrder[columnToBeSort]])
+  }
+
+  function getContent(
+    content?: GetRegistrationsListByFilterQuery['getRegistrationsListByFilter']
+  ) {
+    if (!content) {
+      return []
+    }
+
+    const orderRows = (
+      rows: Array<
+        ReturnType<
+          | typeof getTableContentByTime
+          | typeof getTableContentByLocation
+          | typeof getTableContentByRegistrar
+        >
+      >
+    ) => orderBy(rows, [columnToBeSort], [sortOrder[columnToBeSort]])
+
+    switch (content.__typename) {
+      case RESULT_TYPE.by_registrar:
+        return orderRows(content.results.map(getTableContentByRegistrar))
+      case RESULT_TYPE.by_location:
+        return orderRows(content.results.map(getTableContentByLocation))
+      case RESULT_TYPE.by_time:
+        return orderRows(content.results.map(getTableContentByTime))
+      default:
+        return []
+    }
   }
 
   const options: (IPerformanceSelectOption & { disabled?: boolean })[] = [
@@ -668,7 +676,7 @@ function RegistrationListComponent(props: IProps) {
           </>
         }
       >
-        <Query
+        <Query<GetRegistrationsListByFilterQuery>
           query={FETCH_REGISTRATIONS}
           variables={queryVariables}
           fetchPolicy={'no-cache'}
@@ -684,15 +692,15 @@ function RegistrationListComponent(props: IProps) {
                     )}
                     isLoading={true}
                     columns={getColumns()}
-                    content={getContent(
-                      data && data.getRegistrationsListByFilter
-                    )}
+                    content={getContent(data?.getRegistrationsListByFilter)}
                   />
                   <GenericErrorToast />
                 </>
               )
             } else {
-              const totalData = get(data, 'getRegistrationsListByFilter.total')
+              const registrationCount =
+                data?.getRegistrationsListByFilter?.total ?? 0
+
               return (
                 <>
                   <TableDiv>
@@ -705,20 +713,20 @@ function RegistrationListComponent(props: IProps) {
                       isLoading={loading}
                       disableScrollOnOverflow={true}
                       columns={getColumns()}
-                      content={getContent(
-                        data && data.getRegistrationsListByFilter
-                      )}
-                      totalItems={totalData}
+                      content={getContent(data?.getRegistrationsListByFilter)}
+                      totalItems={registrationCount}
                       currentPage={currentPage}
                       pageSize={recordCount}
                       highlightRowOnMouseOver
                       noPagination={true}
                     />
                   </TableDiv>
-                  {totalData > DEFAULT_PAGE_SIZE && (
+                  {registrationCount > DEFAULT_PAGE_SIZE && (
                     <Pagination
                       currentPage={currentPage}
-                      totalPages={Math.ceil(totalData / DEFAULT_PAGE_SIZE)}
+                      totalPages={Math.ceil(
+                        registrationCount / DEFAULT_PAGE_SIZE
+                      )}
                       onPageChange={(cp: number) => {
                         props.goToRegistrationsList(
                           timeStart,
