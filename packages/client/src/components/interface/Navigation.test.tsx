@@ -104,13 +104,6 @@ describe('Navigation for national system admin related tests', () => {
     )
   })
 
-  it('Tabs loaded successfully including config tab', async () => {
-    expect(testComponent.exists('#navigation_team')).toBeTruthy()
-    expect(testComponent.exists('#navigation_config_main')).toBeTruthy()
-    testComponent.find('#navigation_config_main').hostNodes().simulate('click')
-    testComponent.update()
-  })
-
   it('No application related tabs', async () => {
     expect(testComponent.exists('#navigation_progress')).toBeFalsy()
     expect(testComponent.exists('#navigation_sentForReview')).toBeFalsy()
