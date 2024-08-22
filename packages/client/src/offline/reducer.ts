@@ -39,7 +39,6 @@ import { ISVGTemplate } from '@client/pdfRenderer'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
-import { getToken } from '@client/utils/authUtils'
 import { initConditionals } from '@client/forms/conditionals'
 import { initValidators } from '@client/forms/validators'
 import {
@@ -140,47 +139,19 @@ async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
 }
 
-export type CertificatePayload = Awaited<ReturnType<typeof loadCertificate>>
+export type CertificatePayload = Awaited<
+  Promise<{
+    svgCode: string
+    event: Event
+  }>
+>
 
-async function loadCertificate(
-  savedCertificate: ISVGTemplate | undefined,
-  certificate: ICertificateTemplateData
-) {
-  const { svgCode: url, event } = certificate
-  const res = await fetch(url, {
-    headers: {
-      Authorization: getToken(),
-      'If-None-Match': savedCertificate?.hash ?? ''
-    }
-  })
-  if (res.status === 304) {
-    return {
-      ...certificate,
-      svgCode: savedCertificate!.definition,
-      hash: savedCertificate!.hash!
-    }
-  }
-  if (!res.ok) {
-    return Promise.reject(
-      new Error(`Fetching certificate for "${event}" failed`)
-    )
-  }
-  return res.text().then((svgCode) => ({
-    ...certificate,
-    svgCode,
-    hash: res.headers.get('etag')!
-  }))
+function loadCertificate(certificate: ICertificateTemplateData) {
+  return certificate
 }
 
-async function loadCertificates(
-  savedCertificates: IOfflineData['templates']['certificates'],
-  fetchedCertificates: ICertificateTemplateData[]
-) {
-  return await Promise.all(
-    fetchedCertificates.map((cert) =>
-      loadCertificate(savedCertificates?.[cert.event], cert)
-    )
-  )
+function loadCertificates(fetchedCertificates: ICertificateTemplateData[]) {
+  return fetchedCertificates
 }
 
 function checkIfDone(
@@ -387,7 +358,7 @@ function reducer(
         Cmd.run(loadCertificate, {
           successActionCreator: actions.certificateLoaded,
           failActionCreator: actions.certificateLoadFailed,
-          args: [templates.certificates[certificate.event], certificate]
+          args: [certificate]
         })
       )
     }
@@ -407,10 +378,7 @@ function reducer(
               ...templates.certificates,
               [certificate.event]: {
                 ...templates.certificates[certificate.event],
-                definition: certificate.svgCode,
-                fileName: certificate.svgFilename,
-                lastModifiedDate: certificate.svgDateUpdated,
-                hash: certificate.hash
+                definition: certificate.svgCode
               }
             }
           }
@@ -455,15 +423,15 @@ function reducer(
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
-        ({ event, status }) => event === Event.Birth && status === 'ACTIVE'
+        ({ event }) => event === Event.Birth
       )
 
       const deathCertificateTemplate = certificates.find(
-        ({ event, status }) => event === Event.Death && status === 'ACTIVE'
+        ({ event }) => event === Event.Death
       )
 
       const marriageCertificateTemplate = certificates.find(
-        ({ event, status }) => event === Event.Marriage && status === 'ACTIVE'
+        ({ event }) => event === Event.Marriage
       )
 
       if (
@@ -482,7 +450,7 @@ function reducer(
           },
           Cmd.run(loadCertificates, {
             successActionCreator: actions.certificatesLoaded,
-            args: [state.offlineData.templates?.certificates, certificates]
+            args: [certificates]
           })
         )
       } else {
@@ -528,27 +496,16 @@ function reducer(
       ) {
         const certificatesTemplates = {
           birth: {
-            id: birthCertificateTemplate.id,
-            definition: birthCertificateTemplate.svgCode,
-            fileName: birthCertificateTemplate.svgFilename,
-            lastModifiedDate: birthCertificateTemplate.svgDateUpdated,
-            hash: birthCertificateTemplate.hash
+            definition: birthCertificateTemplate.svgCode
           },
           death: {
-            id: deathCertificateTemplate.id,
-            definition: deathCertificateTemplate.svgCode,
-            fileName: deathCertificateTemplate.svgFilename,
-            lastModifiedDate: deathCertificateTemplate.svgDateUpdated,
-            hash: birthCertificateTemplate.hash
+            definition: deathCertificateTemplate.svgCode
           },
           marriage: {
-            id: marriageCertificateTemplate.id,
-            definition: marriageCertificateTemplate.svgCode,
-            fileName: marriageCertificateTemplate.svgFilename,
-            lastModifiedDate: marriageCertificateTemplate.svgDateUpdated,
-            hash: birthCertificateTemplate.hash
+            definition: marriageCertificateTemplate.svgCode
           }
         }
+
         const newOfflineData = {
           ...state.offlineData,
           templates: {

@@ -19,7 +19,6 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
   goToAllUserEmail,
-  goToCertificateConfig,
   goToDashboardView,
   goToHomeTab,
   goToInformantNotification,
@@ -221,7 +220,6 @@ interface IProps {
 
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
-  goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -299,9 +297,7 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
-    goToCertificateConfigAction,
     goToVSExportsAction,
-    goToSystemViewAction,
     goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
@@ -326,17 +322,11 @@ const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab: string[] = [
-    WORKQUEUE_TABS.application,
-    WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.systems,
-    WORKQUEUE_TABS.userRoles
-  ]
+
   const conmmunicationTab: string[] = [
     WORKQUEUE_TABS.informantNotification,
     WORKQUEUE_TABS.emailAllUsers
   ]
-  const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
 
@@ -689,62 +679,6 @@ const NavigationView = (props: IFullProps) => {
 
                 {userDetails?.systemRole &&
                   USER_SCOPE[userDetails.systemRole].includes(
-                    WORKQUEUE_TABS.config
-                  ) && (
-                    <>
-                      <NavigationItem
-                        icon={() => <Icon name="Compass" size="medium" />}
-                        id={`navigation_${WORKQUEUE_TABS.config}_main`}
-                        label={intl.formatMessage(
-                          navigationMessages[WORKQUEUE_TABS.config]
-                        )}
-                        onClick={() => setIsConfigExpanded(!isConfigExpanded)}
-                        isSelected={
-                          enableMenuSelection &&
-                          configTab.includes(activeMenuItem)
-                        }
-                        expandableIcon={() =>
-                          isConfigExpanded ||
-                          configTab.includes(activeMenuItem) ? (
-                            <Expandable selected={true} />
-                          ) : (
-                            <Expandable />
-                          )
-                        }
-                      />
-                      {(isConfigExpanded ||
-                        configTab.includes(activeMenuItem)) && (
-                        <>
-                          <NavigationSubItem
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.certificate]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.certificate}`}
-                            onClick={goToCertificateConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.certificate
-                            }
-                          />
-
-                          <NavigationSubItem
-                            id={`navigation_${WORKQUEUE_TABS.systems}`}
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.systems]
-                            )}
-                            onClick={goToSystemViewAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.systems
-                            }
-                          />
-                        </>
-                      )}
-                    </>
-                  )}
-
-                {userDetails?.systemRole &&
-                  USER_SCOPE[userDetails.systemRole].includes(
                     WORKQUEUE_TABS.communications
                   ) && (
                     <>
@@ -997,7 +931,6 @@ export const Navigation = connect<
   IStoreState
 >(mapStateToProps, {
   goToHomeTab,
-  goToCertificateConfigAction: goToCertificateConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,

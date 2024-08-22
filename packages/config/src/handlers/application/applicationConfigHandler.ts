@@ -16,9 +16,7 @@ import { logger } from '@opencrvs/commons'
 import { badData, internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
-import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getSystems from '@config/handlers/system/systemHandler'
-import { getDocumentUrl } from '@config/services/documents'
 import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
 
@@ -36,15 +34,11 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      getActiveCertificatesHandler(request, h).then((certs) =>
-        Promise.all(
-          certs.map(async (cert) => ({
-            ...cert,
-            svgCode: await getDocumentUrl(cert.svgCode, {
-              Authorization: request.headers.authorization
-            })
-          }))
-        )
+      Promise.all(
+        (['birth', 'death', 'marriage'] as const).map(async (event) => {
+          const response = await getEventCertificates(event)
+          return response
+        })
       ),
       getApplicationConfig(request, h),
       getSystems(request, h)
@@ -95,6 +89,22 @@ function stripIdFromApplicationConfig(config: Record<string, unknown>) {
       return [key, rest]
     })
   )
+}
+
+async function getEventCertificates(event: 'birth' | 'death' | 'marriage') {
+  const url = new URL(
+    `/certificates/${event}.svg`,
+    COUNTRY_CONFIG_URL
+  ).toString()
+
+  const res = await fetch(url)
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch certificate: ${res.statusText}`)
+  }
+  const responseText = await res.text()
+
+  return { svgCode: responseText, event }
 }
 
 export async function getApplicationConfig(
