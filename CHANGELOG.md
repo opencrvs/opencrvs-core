@@ -9,6 +9,7 @@
 ## Improvements
 
 - Fetch child identifier in view record
+- Auth token, ip address, remote address redacted from server log
 
 ### New features
 
@@ -55,6 +56,7 @@
 ```
 
 - **Title** Description
+
 ## 1.5.1
 
 ## Improvements
@@ -75,7 +77,6 @@
 Allows reindexing ElasticSearch via a new search-service endpoint `reindex`. We're replacing the original `ocrvs` index with timestamped ones. This is done automatically when upgrading and migrating, but this is an important architectural change that should be noted. More details in [#7033](https://github.com/opencrvs/opencrvs-core/pull/7033).
 
 - Introduce a new certificate handlebar "preview" which can be used to conditionally render some svg element when previewing the certificate e.g. background image similar to security paper
-
 
 ## Bug fixes
 
@@ -157,7 +158,6 @@ Follow the descriptions in the migration notes to re-provision all servers safel
 - Provide env variables for metabase admin credentials
 - Improved formatting of informant name for inProgress declaration emails
 - There is now an option to print the review page of an event declaration form. The PRINT_DECLARATION feature flag in application config settings can enable this on or off.
-
 
 ## Bug fixes
 
