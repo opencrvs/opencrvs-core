@@ -19,6 +19,7 @@ import { merge, pick } from 'lodash'
 import getSystems from '@config/handlers/system/systemHandler'
 import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
+import { getToken } from '@config/utils/auth'
 
 export const SystemRoleType = [
   'FIELD_AGENT',
@@ -36,7 +37,7 @@ export default async function configHandler(
     const [certificates, config, systems] = await Promise.all([
       Promise.all(
         (['birth', 'death', 'marriage'] as const).map(async (event) => {
-          const response = await getEventCertificates(event)
+          const response = await getEventCertificates(event, getToken(request))
           return response
         })
       ),
@@ -91,13 +92,18 @@ function stripIdFromApplicationConfig(config: Record<string, unknown>) {
   )
 }
 
-async function getEventCertificates(event: 'birth' | 'death' | 'marriage') {
+async function getEventCertificates(
+  event: 'birth' | 'death' | 'marriage',
+  authToken: string
+) {
   const url = new URL(
     `/certificates/${event}.svg`,
     COUNTRY_CONFIG_URL
   ).toString()
 
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${authToken}` }
+  })
 
   if (!res.ok) {
     throw new Error(`Failed to fetch certificate: ${res.statusText}`)
