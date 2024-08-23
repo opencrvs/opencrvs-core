@@ -477,16 +477,18 @@ const getFromDateFomTimePeriod = (timePeriod: TIME_PERIOD) => {
   return formatDate(timePeriodToFromDate(timePeriod), 'yyyy-MM-dd')
 }
 
+const MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
+
 const timePeriodToFromDate = (timePeriod: TIME_PERIOD) => {
   switch (timePeriod) {
     case TIME_PERIOD.LAST_7_DAYS:
-      return new Date(Date.now() - 7 * 60 * 60 * 24 * 1000)
+      return new Date(Date.now() - 7 * MILLISECONDS_IN_A_DAY)
 
     case TIME_PERIOD.LAST_30_DAYS:
-      return new Date(Date.now() - 30 * 60 * 60 * 24 * 1000)
+      return new Date(Date.now() - 30 * MILLISECONDS_IN_A_DAY)
 
     case TIME_PERIOD.LAST_90_DAYS:
-      return new Date(Date.now() - 90 * 60 * 60 * 24 * 1000)
+      return new Date(Date.now() - 90 * MILLISECONDS_IN_A_DAY)
 
     case TIME_PERIOD.LAST_YEAR:
       const oneYearAgo = new Date(Date.now())
