@@ -7504,7 +7504,6 @@ export type GetEventsWithProgressQuery = {
         status?: string | null
         contactNumber?: string | null
         contactRelationship?: string | null
-        contactEmail?: string | null
         dateOfDeclaration?: any | null
         trackingId?: string | null
         registrationNumber?: string | null
