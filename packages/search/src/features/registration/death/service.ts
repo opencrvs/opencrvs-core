@@ -152,7 +152,6 @@ function createDeceasedIndex(
     (body.deceasedMiddleName || '') +
     ' ' +
     (body.deceasedFamilyName || '')
-  body.dateOfEvent = deceased.deceasedDateTime
 }
 
 function createMotherIndex(

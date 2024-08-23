@@ -158,7 +158,6 @@ function createChildIndex(
     (body.childFamilyName || '')
 
   body.childDoB = child.birthDate
-  body.dateOfEvent = child.birthDate
   body.gender = child.gender
 }
 

@@ -77,6 +77,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   advancedSearchPillKey,
   getFormattedAdvanceSearchParamPills,
+  getSortColumn,
   replacePeriodWithDate,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
@@ -148,7 +149,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     count: DEFAULT_PAGE_SIZE,
     skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1),
     sort: sortOrder,
-    sortColumn: sortedCol
+    sortColumn: getSortColumn(sortedCol, advancedSearchParamsState.event)
   }
 
   const isEnoughParams = () => {

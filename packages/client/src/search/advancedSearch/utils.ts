@@ -27,7 +27,7 @@ import { IntlShape } from 'react-intl'
 import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
-import { ISearchLocation } from '@opencrvs/components'
+import { COLUMNS, ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
 import {
   isInvalidDate,
@@ -856,4 +856,16 @@ export const getFormattedAdvanceSearchParamPills = (
         }
       }
     }, {} as pillKeyValueMap)
+}
+
+const eventDateMapping: Record<string, string> = {
+  birth: 'childDoB',
+  death: 'deathDate',
+  marriage: 'marriageDate'
+}
+
+export const getSortColumn = (sortCol: COLUMNS, event: string) => {
+  return sortCol === 'dateOfEvent'
+    ? eventDateMapping[event] || sortCol
+    : sortCol
 }
