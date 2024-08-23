@@ -22,8 +22,7 @@ import {
   assignEventHandler,
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
-import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import { logger } from '@opencrvs/commons'
 import { recordHandler } from '@search/features/registration/record/handler'
 import { getRecordByIdHandler } from '@search/features/records/handler'
@@ -44,6 +43,7 @@ export const enum RouteScope {
 }
 
 export const getRoutes = () => {
+  const client = getOrCreateClient()
   const routes = [
     // used for tests to check JWT auth
     {
@@ -235,18 +235,6 @@ export const getRoutes = () => {
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/elasticIndex',
-      handler: deleteOCRVSIndexHandler,
-      config: {
-        tags: ['api'],
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        description: 'Delete ocrvs index from elasticsearch'
       }
     },
     {

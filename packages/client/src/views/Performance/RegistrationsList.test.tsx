@@ -71,7 +71,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'November-2022',
+                  month: '2022-11-01',
                   time: '1667239200000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -81,7 +81,7 @@ describe('Registrations List test', () => {
                   late: 2,
                   home: 1,
                   healthFacility: 12,
-                  month: 'October-2022',
+                  month: '2022-10-01',
                   time: '1664560800000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -91,7 +91,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 2,
-                  month: 'September-2022',
+                  month: '2022-09-01',
                   time: '1661968800000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -101,7 +101,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'August-2022',
+                  month: '2022-08-01',
                   time: '1659290400000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -111,7 +111,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'July-2022',
+                  month: '2022-07-01',
                   time: '1656612000000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -121,7 +121,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'June-2022',
+                  month: '2022-06-01',
                   time: '1654020000000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -131,7 +131,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'May-2022',
+                  month: '2022-05-01',
                   time: '1651341600000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -141,7 +141,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'April-2022',
+                  month: '2022-04-01',
                   time: '1648749600000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -151,7 +151,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'March-2022',
+                  month: '2022-03-01',
                   time: '1646071200000',
                   __typename: 'EventMetricsByTime'
                 },
@@ -161,7 +161,7 @@ describe('Registrations List test', () => {
                   late: 0,
                   home: 0,
                   healthFacility: 0,
-                  month: 'February-2022',
+                  month: '2022-02-01',
                   time: '1643652000000',
                   __typename: 'EventMetricsByTime'
                 }
