@@ -647,8 +647,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       )
 
       const duplicateRegData = {
-        status: eventData.history.find((data: History) => data.action === null)
-          .regStatus as RegStatus,
+        status: props.declaration.registrationStatus,
         type: capitalize(eventData.registration.type),
         trackingId: eventData.registration.trackingId,
         registrationNumber: eventData.registration?.registrationNumber,
@@ -693,6 +692,7 @@ export const DuplicateFormTabs = (props: IProps) => {
               {intl.formatMessage(constantsMessages.status)}
             </Text>
           ),
+
           heading: {
             right: String(duplicateRegData.trackingId),
             left: String(actualRegData.trackingId)
