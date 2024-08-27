@@ -46,17 +46,18 @@ sequenceDiagram
     GraphQL gateway->>Workflow: POST /create-record
     Note over Workflow: Registration flow as far as call to opencrvs-countryconfig
     Workflow->>OpenCRVS countryconfig: /event-registration - dont create BRN yet
-    Note over OpenCRVS countryconfig: Either countryconfig imports `@opencrvs-mosip/id` -repository or we forward the call to that microservice.<br>For simplicity, lets consider country-config acts with imported `@opencrvs-mosip/id` functions.
-    OpenCRVS countryconfig->>MOSIP Keycloak: POST get MOSIP auth token to http://keycloak.keycloak/auth/realms/mosip/protocol/openid-connect/token
-    MOSIP Keycloak->>OpenCRVS countryconfig: return auth token
-    OpenCRVS countryconfig->>MOSIP (OpenCRVS Proxy): GET /generateAid
+    Note over OpenCRVS countryconfig: Either countryconfig imports functions from `OpenCRVS-MOSIP mediator` -repository or we forward the call to that microservice.<br>This is TBD. For clarity, let's separate the imported `OpenCRVS-MOSIP mediator` functions.
+
+    OpenCRVS countryconfig->>OpenCRVS-MOSIP mediator: Forward the event registration to the mediator
+    OpenCRVS-MOSIP mediator->>MOSIP Keycloak: POST get MOSIP auth token to http://keycloak.keycloak/auth/realms/mosip/protocol/openid-connect/token
+    MOSIP Keycloak->>OpenCRVS-MOSIP mediator: return auth token
+    OpenCRVS-MOSIP mediator->>MOSIP (OpenCRVS Proxy): GET /generateAid
     MOSIP (OpenCRVS Proxy)->>MOSIP Keycloak: validate auth token
     MOSIP Keycloak->>MOSIP (OpenCRVS Proxy): token validated
     Note over MOSIP (OpenCRVS Proxy): RIDGENERATION - create and log AID
-    MOSIP (OpenCRVS Proxy)->>OpenCRVS countryconfig: return application id (AID)
-    OpenCRVS countryconfig->>Workflow: Return AID
-    Note over Workflow: Retain record in WAITING_VALIDATION status as BRN will not be created yet
-    OpenCRVS countryconfig->>GraphQL gateway: Amend FHIR patient with AID, gateway eventually connects to MongoDB (Hearth)
+    MOSIP (OpenCRVS Proxy)->>OpenCRVS-MOSIP mediator: return application id (AID)
+    OpenCRVS-MOSIP mediator->>GraphQL gateway: Amend FHIR patient with AID, gateway eventually connects to MongoDB (Hearth)
+    Note over GraphQL gateway: Retain record in WAITING_VALIDATION status as BRN will not be created yet
     GraphQL gateway->>Workflow: success
 
     MOSIP (OpenCRVS Proxy)->>GraphQL gateway: GET /locations generate textual address from FHIR IDs
@@ -68,8 +69,6 @@ sequenceDiagram
     OpenCRVS auth->>OpenCRVS-MOSIP mediator: return JWT
     OpenCRVS-MOSIP mediator->>GraphQL gateway: POST (NID)VID & uinToken & BRN to (new) registrationValidated API
     GraphQL gateway->>Workflow: continue current /confirm/registration flow with (NID)VID & UIN_TOKEN as child identifiers.  UIN_TOKEN should never be returned in a GraphQL query to client (PRIVATE)
-    Hearth->>OpenCRVS countryconfig: success
-
 ```
 
 ## OpenCRVS MOSIP mediator - NodeJS - Hosted at OpenCRVS: https://github.com/opencrvs/mosip-mediator
