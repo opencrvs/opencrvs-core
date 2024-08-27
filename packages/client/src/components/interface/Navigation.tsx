@@ -298,6 +298,7 @@ const NavigationView = (props: IFullProps) => {
     loadWorkqueueStatuses = true,
     activeMenuItem,
     goToVSExportsAction,
+    goToSystemViewAction,
     goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
@@ -323,10 +324,12 @@ const NavigationView = (props: IFullProps) => {
     ? activeMenuItem
     : 'review'
 
+  const configTab: string[] = [WORKQUEUE_TABS.systems]
   const conmmunicationTab: string[] = [
     WORKQUEUE_TABS.informantNotification,
     WORKQUEUE_TABS.emailAllUsers
   ]
+  const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
 
@@ -675,6 +678,50 @@ const NavigationView = (props: IFullProps) => {
                         activeMenuItem === WORKQUEUE_TABS.team
                       }
                     />
+                  )}
+
+                {userDetails?.systemRole &&
+                  USER_SCOPE[userDetails.systemRole].includes(
+                    WORKQUEUE_TABS.config
+                  ) && (
+                    <>
+                      <NavigationItem
+                        icon={() => <Icon name="Compass" size="medium" />}
+                        id={`navigation_${WORKQUEUE_TABS.config}_main`}
+                        label={intl.formatMessage(
+                          navigationMessages[WORKQUEUE_TABS.config]
+                        )}
+                        onClick={() => setIsConfigExpanded(!isConfigExpanded)}
+                        isSelected={
+                          enableMenuSelection &&
+                          configTab.includes(activeMenuItem)
+                        }
+                        expandableIcon={() =>
+                          isConfigExpanded ||
+                          configTab.includes(activeMenuItem) ? (
+                            <Expandable selected={true} />
+                          ) : (
+                            <Expandable />
+                          )
+                        }
+                      />
+                      {(isConfigExpanded ||
+                        configTab.includes(activeMenuItem)) && (
+                        <>
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.systems}`}
+                            label={intl.formatMessage(
+                              navigationMessages[WORKQUEUE_TABS.systems]
+                            )}
+                            onClick={goToSystemViewAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.systems
+                            }
+                          />
+                        </>
+                      )}
+                    </>
                   )}
 
                 {userDetails?.systemRole &&
