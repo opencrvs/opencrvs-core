@@ -22,7 +22,7 @@ sequenceDiagram
     participant MOSIP Token Seeder
     participant MOSIP Kafka
 
-    Client(form REDIRECT_BUTTON)->>OpenCRVS config: Is OpenCRVS configured to use E-Signet?
+    Client(form REDIRECT_BUTTON)->>OpenCRVS countryconfig: Are the forms configured to use a REDIRECT_BUTTON (E-Signet)?
     alt OpenCRVS config E-Signet configured
         Client(form REDIRECT_BUTTON)->>E-Signet (OIDP): Click button and redirect to authorize parent/informant uses E-Signet to consent
         E-Signet (OIDP)->>OpenCRVS-MOSIP mediator: Return with JWT token, create a temporary id corresponding to the JWT token
