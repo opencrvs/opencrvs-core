@@ -13,6 +13,7 @@ sequenceDiagram
     participant OpenCRVS auth
     participant Workflow
     participant Hearth
+    participant OpenCRVS webhooks
     participant OpenCRVS countryconfig
     participant OpenCRVS MOSIP mediator
     participant E-Signet (OIDP)
@@ -34,8 +35,8 @@ sequenceDiagram
     Client(submissionMiddleware)->>GraphQL gateway: markBirthAsRegistered
     GraphQL gateway->>Workflow: POST /create-record
     Note over Workflow: Registration flow as usual / BRN generated in countryconfig
-    Workflow->>Webhook: POST to /events/birth/mark-registered
-    Webhook->>OpenCRVS MOSIP mediator: POST Full birth composition payload (contains FHIR IDs for Locations) to /webhooks
+    Workflow->>OpenCRVS webhooks: POST to /events/birth/mark-registered
+    OpenCRVS webhooks->>OpenCRVS MOSIP mediator: POST Full birth composition payload (contains FHIR IDs for Locations) to /webhooks
     OpenCRVS MOSIP mediator->>MOSIP Keycloak: POST get MOSIP auth token to http://keycloak.keycloak/auth/realms/mosip/protocol/openid-connect/token
     MOSIP Keycloak->>OpenCRVS MOSIP mediator: return auth token
     OpenCRVS MOSIP mediator->>MOSIP (OpenCRVS Proxy): GET /generateAid
