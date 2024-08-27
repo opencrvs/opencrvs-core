@@ -24,7 +24,6 @@ import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
   ILocationDataResponse,
-  ICertificateTemplateData,
   referenceApi,
   CertificateConfiguration,
   IFacilitiesDataResponse,
@@ -139,19 +138,9 @@ async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
 }
 
-export type CertificatePayload = Awaited<
-  Promise<{
-    svgCode: string
-    event: Event
-  }>
->
-
-function loadCertificate(certificate: ICertificateTemplateData) {
-  return certificate
-}
-
-function loadCertificates(fetchedCertificates: ICertificateTemplateData[]) {
-  return fetchedCertificates
+export type CertificatePayload = {
+  svgCode: string
+  event: Event
 }
 
 function checkIfDone(
@@ -347,21 +336,7 @@ function reducer(
       }
       return loop(state, dataLoadingCmds)
     }
-    case actions.UPDATE_OFFLINE_CERTIFICATE: {
-      const { templates } = state.offlineData
-      const { certificate } = action.payload
-      if (!templates || !templates.certificates) {
-        return state
-      }
-      return loop(
-        state,
-        Cmd.run(loadCertificate, {
-          successActionCreator: actions.certificateLoaded,
-          failActionCreator: actions.certificateLoadFailed,
-          args: [certificate]
-        })
-      )
-    }
+
     case actions.CERTIFICATE_LOADED: {
       const { templates } = state.offlineData
       const certificate = action.payload
@@ -421,7 +396,6 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, systems } = action.payload
       merge(window.config, config)
-      let newOfflineData
       const birthCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Birth
       )
@@ -435,36 +409,55 @@ function reducer(
       )
 
       if (
-        birthCertificateTemplate &&
-        deathCertificateTemplate &&
-        marriageCertificateTemplate
+        !birthCertificateTemplate ||
+        !deathCertificateTemplate ||
+        !marriageCertificateTemplate
       ) {
-        return loop(
-          {
-            ...state,
-            offlineData: {
-              ...state.offlineData,
-              config,
-              systems
-            }
+        const certificatesTemplates = {
+          birth: {
+            definition: birthCertificateTemplate.svgCode
           },
-          Cmd.run(loadCertificates, {
-            successActionCreator: actions.certificatesLoaded,
-            args: [certificates]
-          })
-        )
-      } else {
-        newOfflineData = {
+          death: {
+            definition: deathCertificateTemplate.svgCode
+          },
+          marriage: {
+            definition: marriageCertificateTemplate.svgCode
+          }
+        }
+        const newOfflineData = {
           ...state.offlineData,
-          config,
-          systems,
+          templates: {
+            ...state.offlineData.templates,
+            certificates: certificatesTemplates,
+            systems
+          }
+        }
 
-          // Field agents do not get certificate templates from the config service.
-          // Our loading logic depends on certificates being present and the app would load infinitely
-          // without a value here.
-          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
-          // to not expect certificate templates when a field agent is logged in.
-          templates: {}
+        return {
+          ...state,
+          offlineDataLoaded: false,
+          offlineData: newOfflineData
+        }
+      }
+
+      const certificatesTemplates = {
+        birth: {
+          definition: birthCertificateTemplate.svgCode
+        },
+        death: {
+          definition: deathCertificateTemplate.svgCode
+        },
+        marriage: {
+          definition: marriageCertificateTemplate.svgCode
+        }
+      }
+
+      const newOfflineData = {
+        ...state.offlineData,
+        templates: {
+          ...state.offlineData.templates,
+          certificates: certificatesTemplates,
+          systems
         }
       }
 

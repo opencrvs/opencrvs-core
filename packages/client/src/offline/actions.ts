@@ -23,7 +23,6 @@ import {
   IContentResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData,
   IApplicationConfigAnonymous,
   LoadFormsResponse,
   LoadValidatorsResponse,
@@ -331,23 +330,6 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
-export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
-type UpdateOfflineCertificateAction = {
-  type: typeof UPDATE_OFFLINE_CERTIFICATE
-  payload: {
-    certificate: ICertificateTemplateData
-  }
-}
-
-export const updateOfflineCertificate = (
-  certificate: ICertificateTemplateData
-): UpdateOfflineCertificateAction => ({
-  type: UPDATE_OFFLINE_CERTIFICATE,
-  payload: {
-    certificate
-  }
-})
-
 export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
   type: 'OFFLINE/VALIDATORS_LOADED' as const,
   payload: payload
@@ -404,7 +386,6 @@ export type Action =
   | CertificateConfigurationLoadedAction
   | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
-  | UpdateOfflineCertificateAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
