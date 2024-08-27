@@ -14,7 +14,6 @@ sequenceDiagram
     participant OpenCRVS auth
     participant Workflow
     participant Hearth
-    participant OpenCRVS webhooks
     participant OpenCRVS countryconfig
     participant OpenCRVS-MOSIP mediator
     participant E-Signet (OIDP)
