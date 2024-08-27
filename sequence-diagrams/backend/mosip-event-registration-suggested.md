@@ -6,42 +6,41 @@ title: MOSIP Event Registration - design for OpenCRVS v1.7.0
 ---
 sequenceDiagram
     autonumber
-    participant Client(form NID_VERIFICATION_BUTTON)
+    participant Client(form REDIRECT_BUTTON)
+    participant Client(form FETCH)
     participant OpenCRVS config
-    participant Client(OIDPVerificationCallback)
     participant Client(submissionMiddleware)
     participant GraphQL gateway
     participant OpenCRVS auth
     participant Workflow
     participant Hearth
+    participant OpenCRVS webhooks
     participant OpenCRVS countryconfig
-    participant OpenCRVS MOSIP mediator
+    participant OpenCRVS-MOSIP mediator
     participant E-Signet (OIDP)
     participant MOSIP (OpenCRVS Proxy)
     participant MOSIP Keycloak
     participant MOSIP Token Seeder
     participant MOSIP Kafka
 
-    Client(form NID_VERIFICATION_BUTTON)->>OpenCRVS config: Is OpenCRVS configured to use E-Signet?
+    Client(form REDIRECT_BUTTON)->>OpenCRVS config: Is OpenCRVS configured to use E-Signet?
     alt OpenCRVS config E-Signet configured
-        OpenCRVS config->>Client(form NID_VERIFICATION_BUTTON): Use E-Signet
-        Client(form NID_VERIFICATION_BUTTON)->>E-Signet (OIDP): authorize parent/informant uses E-Signet to consent
-        E-Signet (OIDP)->>Client(OIDPVerificationCallback): return code
-        Client(OIDPVerificationCallback)->>GraphQL gateway: getOIDPUserInfo
-        GraphQL gateway->>E-Signet (OIDP): oauth/token use code to retrieve token
-        E-Signet (OIDP)->>GraphQL gateway: return token
-        GraphQL gateway->>E-Signet (OIDP): oidc/userinfo request parent/informant details
-        E-Signet (OIDP)->>GraphQL gateway: parent/informant details returned as encrypted JWT. Decode
-        GraphQL gateway->>Hearth: Get Location IDs based on textual representation of parent/informant address
-        Hearth->>GraphQL gateway: Return FHIR IDs for address if found
-        GraphQL gateway->>Client(OIDPVerificationCallback): return parent/informant details and pre-pop draft, e.g. set motherNidVerification to value of sub
+        Client(form REDIRECT_BUTTON)->>E-Signet (OIDP): Click button and redirect to authorize parent/informant uses E-Signet to consent
+        E-Signet (OIDP)->>OpenCRVS-MOSIP mediator: Return with JWT token, create a temporary id corresponding to the JWT token
+        OpenCRVS-MOSIP mediator->>Client(form REDIRECT_BUTTON): return the temporary id to frontend
+        Client(form FETCH)->>OpenCRVS-MOSIP mediator: Fetch the informant's details
+        OpenCRVS-MOSIP mediator->>E-Signet (OIDP): oauth/token use code to retrieve token
+        E-Signet (OIDP)->>OpenCRVS-MOSIP mediator: return token
+        OpenCRVS-MOSIP mediator->>E-Signet (OIDP): oidc/userinfo request parent/informant details
+        E-Signet (OIDP)->>OpenCRVS-MOSIP mediator: parent/informant details returned as encrypted JWT. Decode
+        OpenCRVS-MOSIP mediator->>GraphQL gateway: Get Location IDs based on textual representation of parent/informant address
+        GraphQL gateway->>OpenCRVS-MOSIP mediator: Return FHIR IDs for address if found
+        OpenCRVS-MOSIP mediator->>Client(form FETCH): Populate the form with the informant's details 
     else OpenCRVS config E-Signet not configured
-        OpenCRVS config->>Client(form NID_VERIFICATION_BUTTON): Use MOSIP Token Seeder
-        Note over Client(form NID_VERIFICATION_BUTTON): Might need to disable button until more data entered as Token Seeder will require full name, gender & d.o.b to authenticate a parent's NID(VID)
-        Client(form NID_VERIFICATION_BUTTON)->>GraphQL gateway: (new) authenticateNIDWithMOSIPTokenSeeder
-        GraphQL gateway->>MOSIP Token Seeder: /authtoken/json
-        MOSIP Token Seeder->>GraphQL gateway: authenticated if authStatus returned with authToken as MOSIP_PSUT_TOKEN_ID
-        GraphQL gateway->>Client(form NID_VERIFICATION_BUTTON): set motherNidVerification to value of authStatus
+        Client(form FETCH)->>OpenCRVS-MOSIP mediator: authenticateNIDWithMOSIPTokenSeeder
+        OpenCRVS-MOSIP mediator->>MOSIP Token Seeder: /authtoken/json
+        MOSIP Token Seeder->>OpenCRVS-MOSIP mediator: authenticated if authStatus returned with authToken as MOSIP_PSUT_TOKEN_ID
+        OpenCRVS-MOSIP mediator->>Client(form FETCH): set motherNidVerification to value of authStatus
     end
     Client(submissionMiddleware)->>GraphQL gateway: markBirthAsRegistered
     Note over Client(submissionMiddleware): Record will stay in WAITING_VALIDATION status and appear in EXTERNAL_VALIDATION_WORKQUEUE work-queue
@@ -64,10 +63,10 @@ sequenceDiagram
     GraphQL gateway->>MOSIP (OpenCRVS Proxy): Locations
     MOSIP (OpenCRVS Proxy)->>MOSIP Kafka: Build and send ID JSON
     Note over MOSIP (OpenCRVS Proxy): Will keep polling Kafka until VID & UIN_TOKEN generated
-    (OpenCRVS Proxy)->>OpenCRVS MOSIP mediator: POST (NID)VID & uinToken to /birthReceiveNid
-    OpenCRVS MOSIP mediator->>OpenCRVS auth: POST authenticate systen client
-    OpenCRVS auth->>OpenCRVS MOSIP mediator: return JWT
-    OpenCRVS MOSIP mediator->>GraphQL gateway: POST (NID)VID & uinToken & BRN to (new) registrationValidated API
+    (OpenCRVS Proxy)->>OpenCRVS-MOSIP mediator: POST (NID)VID & uinToken to /birthReceiveNid
+    OpenCRVS-MOSIP mediator->>OpenCRVS auth: POST authenticate systen client
+    OpenCRVS auth->>OpenCRVS-MOSIP mediator: return JWT
+    OpenCRVS-MOSIP mediator->>GraphQL gateway: POST (NID)VID & uinToken & BRN to (new) registrationValidated API
     GraphQL gateway->>Workflow: continue current /confirm/registration flow with (NID)VID & UIN_TOKEN as child identifiers.  UIN_TOKEN should never be returned in a GraphQL query to client (PRIVATE)
     Hearth->>OpenCRVS countryconfig: success
 
