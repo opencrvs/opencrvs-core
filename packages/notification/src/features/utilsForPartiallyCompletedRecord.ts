@@ -48,7 +48,7 @@ export function getInformantName(record: InProgressRecord | RejectedRecord) {
   if (!name) {
     return
   }
-  return [name.given?.join(' '), name.family.join(' ')].join(' ').trim()
+  return [name.given?.join(' '), name.family?.join(' ')].join(' ').trim()
 }
 
 export function getContactPhoneNo(record: InProgressRecord | RejectedRecord) {
