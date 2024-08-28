@@ -15,7 +15,11 @@
 
 - Introduce a new certificate handlebar "preview" which can be used to conditionally render some svg element when previewing the certificate e.g. background image similar to security paper
 
-## Breaking changes
+###  Improvements
+
+- Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
+
+### Breaking changes
 
 - Remove `DEL /elasticIndex` endpoint due reindexing changes.
 - Gateways searchEvents `operationHistories` only returns `operationType` & `operatedOn` due to the other fields being unused in OpenCRVS
