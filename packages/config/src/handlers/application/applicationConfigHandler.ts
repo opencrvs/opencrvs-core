@@ -38,12 +38,7 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      Promise.all(
-        (['birth', 'death', 'marriage'] as const).map(async (event) => {
-          const response = await getEventCertificates(event, getToken(request))
-          return response
-        })
-      ),
+      getCertificates(request, h),
       getApplicationConfig(request, h),
       getSystems(request, h)
     ])
@@ -61,6 +56,29 @@ export default async function configHandler(
   }
 }
 
+async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+  const authToken = getToken(request)
+  const decodedOrError = pipe(authToken, verifyToken)
+  if (decodedOrError._tag === 'Left') {
+    return []
+  }
+  const { scope } = decodedOrError.right
+
+  if (
+    scope &&
+    (scope.includes(RouteScope.CERTIFY) ||
+      scope.includes(RouteScope.VALIDATE) ||
+      scope.includes(RouteScope.NATLSYSADMIN))
+  ) {
+    return Promise.all(
+      (['birth', 'death', 'marriage'] as const).map(async (event) => {
+        const response = await getEventCertificate(event, getToken(request))
+        return response
+      })
+    )
+  }
+  return []
+}
 async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
 
@@ -95,39 +113,25 @@ function stripIdFromApplicationConfig(config: Record<string, unknown>) {
   )
 }
 
-async function getEventCertificates(
+async function getEventCertificate(
   event: 'birth' | 'death' | 'marriage',
   authToken: string
 ) {
-  const decodedOrError = pipe(authToken, verifyToken)
-  if (decodedOrError._tag === 'Left') {
-    return []
+  const url = new URL(
+    `/certificates/${event}.svg`,
+    COUNTRY_CONFIG_URL
+  ).toString()
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${authToken}` }
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
   }
-  const { scope } = decodedOrError.right
+  const responseText = await res.text()
 
-  if (
-    scope &&
-    (scope.includes(RouteScope.CERTIFY) ||
-      scope.includes(RouteScope.VALIDATE) ||
-      scope.includes(RouteScope.NATLSYSADMIN))
-  ) {
-    const url = new URL(
-      `/certificates/${event}.svg`,
-      COUNTRY_CONFIG_URL
-    ).toString()
-
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${authToken}` }
-    })
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
-    }
-    const responseText = await res.text()
-
-    return { svgCode: responseText, event }
-  }
-  return {}
+  return { svgCode: responseText, event }
 }
 
 export async function getApplicationConfig(
