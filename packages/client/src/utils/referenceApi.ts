@@ -68,13 +68,7 @@ interface ILoginBackground {
 }
 export interface ICertificateTemplateData {
   event: Event
-  status: string
   svgCode: string
-  svgDateCreated: string
-  svgDateUpdated: string
-  svgFilename: string
-  user: string
-  id: string
 }
 export interface ICurrency {
   isoCode: string
@@ -161,12 +155,6 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
     throw Error(res.statusText)
   }
   const response = await res.json()
-  response.certificates = response.certificates.map(
-    ({ _id, ...rest }: { _id: string }) => {
-      return { ...rest, id: _id }
-    }
-  )
-
   return response
 }
 
