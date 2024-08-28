@@ -26,6 +26,10 @@
 
 ## 1.6.0 Release candidate
 
+## Improvements
+
+- Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
+
 ### Breaking changes
 
 - **Gateways searchEvents API updated** `operationHistories` only returns `operationType` & `operatedOn` due to the other fields being unused in OpenCRVS
