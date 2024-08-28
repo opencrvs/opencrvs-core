@@ -20,6 +20,9 @@ import getSystems from '@config/handlers/system/systemHandler'
 import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
+import { pipe } from 'fp-ts/lib/function'
+import { verifyToken } from '@config/utils/verifyToken'
+import { RouteScope } from '@config/config/routes'
 
 export const SystemRoleType = [
   'FIELD_AGENT',
@@ -96,21 +99,35 @@ async function getEventCertificates(
   event: 'birth' | 'death' | 'marriage',
   authToken: string
 ) {
-  const url = new URL(
-    `/certificates/${event}.svg`,
-    COUNTRY_CONFIG_URL
-  ).toString()
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${authToken}` }
-  })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
+  const decodedOrError = pipe(authToken, verifyToken)
+  if (decodedOrError._tag === 'Left') {
+    return []
   }
-  const responseText = await res.text()
+  const { scope } = decodedOrError.right
 
-  return { svgCode: responseText, event }
+  if (
+    scope &&
+    (scope.includes(RouteScope.CERTIFY) ||
+      scope.includes(RouteScope.VALIDATE) ||
+      scope.includes(RouteScope.NATLSYSADMIN))
+  ) {
+    const url = new URL(
+      `/certificates/${event}.svg`,
+      COUNTRY_CONFIG_URL
+    ).toString()
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${authToken}` }
+    })
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
+    }
+    const responseText = await res.text()
+
+    return { svgCode: responseText, event }
+  }
+  return {}
 }
 
 export async function getApplicationConfig(

@@ -375,46 +375,64 @@ function reducer(
       merge(window.config, config)
       const birthCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Birth
-      )!
+      )
 
       const deathCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Death
-      )!
+      )
 
       const marriageCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Marriage
-      )!
-
-      const certificatesTemplates = {
-        birth: {
-          definition: birthCertificateTemplate.svgCode
-        },
-        death: {
-          definition: deathCertificateTemplate.svgCode
-        },
-        marriage: {
-          definition: marriageCertificateTemplate.svgCode
-        }
-      }
-
-      const newOfflineData: Partial<IOfflineData> = {
-        ...state.offlineData,
-        config,
-        systems,
-        templates: {
-          ...state.offlineData.templates,
-          certificates: certificatesTemplates
-        }
-      }
-
-      return loop(
-        {
-          ...state,
-          offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
-          offlineData: newOfflineData
-        },
-        Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
+
+      let newOfflineData: Partial<IOfflineData>
+
+      if (
+        birthCertificateTemplate &&
+        deathCertificateTemplate &&
+        marriageCertificateTemplate
+      ) {
+        const certificatesTemplates = {
+          birth: {
+            definition: birthCertificateTemplate.svgCode
+          },
+          death: {
+            definition: deathCertificateTemplate.svgCode
+          },
+          marriage: {
+            definition: marriageCertificateTemplate.svgCode
+          }
+        }
+
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          systems,
+          templates: {
+            ...state.offlineData.templates,
+            certificates: certificatesTemplates
+          }
+        }
+      } else {
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          systems,
+
+          // Field agents do not get certificate templates from the config service.
+          // Our loading logic depends on certificates being present and the app would load infinitely
+          // without a value here.
+          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
+          // to not expect certificate templates when a field agent is logged in.
+          templates: {}
+        }
+      }
+
+      return {
+        ...state,
+        offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
+        offlineData: newOfflineData
+      }
     }
 
     case actions.APPLICATION_CONFIG_FAILED: {
