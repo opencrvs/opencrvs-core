@@ -29,7 +29,7 @@ import {
   findExtension
 } from '@search/features/fhir/fhir-utils'
 import { OPENCRVS_SPECIFICATION_URL } from '@search/constants'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import {
   getComposition,
   SavedComposition,
@@ -103,6 +103,8 @@ export const composeDocument = (
 }
 
 export async function indexRecord(bundle: SavedBundle) {
+  const client = getOrCreateClient()
+
   const { id: compositionId } = getComposition(bundle)
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(bundle, existingDocument)

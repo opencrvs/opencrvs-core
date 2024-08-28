@@ -20,6 +20,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - uses: mskelton/changelog-reminder-action@v3
+        with:
+          message: >
+            Oops! Looks like you forgot to update the changelog.
+            When updating CHANGELOG.md, please consider the following:
+              - Changelog is read by country implementors who might not always be familiar with all technical details of OpenCRVS. Keep language high-level, user friendly and avoid technical references to internals.
+              - Answer "What's new?", "Why was the change made?" and "Why should I care?" for each change.
+              - If it's a breaking change, include a migration guide answering "What do I need to do to upgrade?".
 
       - name: Get list of packages
         id: set-matrix

@@ -28,7 +28,7 @@ import {
   findTaskIdentifier,
   updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import {
   getComposition,
   SavedComposition,
@@ -93,6 +93,8 @@ export const composeDocument = (
 }
 
 export async function indexRecord(record: SavedBundle) {
+  const client = getOrCreateClient()
+
   const composition = getComposition(record)
   const compositionId = composition.id
   const result = await searchByCompositionId(compositionId, client)

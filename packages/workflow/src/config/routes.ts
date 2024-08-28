@@ -84,7 +84,7 @@ export const getRoutes = () => {
       handler: downloadRecordHandler,
       config: {
         tags: ['api'],
-        description: 'Create record endpoint'
+        description: 'Download record endpoint'
       }
     },
     {
