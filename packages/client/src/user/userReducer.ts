@@ -16,7 +16,7 @@ import {
   ISelectOption,
   UserSection
 } from '@client/forms'
-import { AnyFn, deserializeForm } from '@client/forms/deserializer/deserializer'
+import { deserializeForm } from '@client/forms/deserializer/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
@@ -41,7 +41,7 @@ import { Role, SystemRole } from '@client/utils/gateway'
 import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
-import { validators, Validator } from '@client/forms/validators'
+import { validators } from '@client/forms/validators'
 
 export const ROLES_LOADED = 'USER_FORM/ROLES_LOADED'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'

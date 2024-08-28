@@ -78,12 +78,12 @@ import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import { SystemRoleType } from '@client/utils/gateway'
-import { getCurrencySymbol } from '@client/utils/currencyUtils'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -509,7 +509,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         true
       )
 
-      return getRenderableField(section, field.label, original, changed, intl)
+      return getRenderableField(
+        section,
+        { fieldLabel: field.label, fieldLabelParams: field.labelParam },
+        original,
+        changed,
+        intl
+      )
     }
   }
 
@@ -622,7 +628,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
         return getRenderableField(
           section,
-          (tagDef[0] && tagDef[0].label) || field.label,
+          {
+            fieldLabel: (tagDef[0] && tagDef[0].label) || field.label,
+            fieldLabelParams: field.labelParam
+          },
           previousCompleteValue,
           completeValue,
           intl
@@ -696,7 +705,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     item: any,
     deathForm: IForm
   ) => {
-    const { declaration, intl, offlineResources, language } = this.props
     overriddenField.label =
       get(overriddenField, 'reviewOverrides.labelAs') || overriddenField.label
     const residingSectionId = get(
@@ -738,7 +746,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   }
 
   getChanges = (formSections: IFormSection[]) => {
-    const { declaration, offlineResources, language } = this.props
+    const { declaration, offlineResources } = this.props
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
       declaration,

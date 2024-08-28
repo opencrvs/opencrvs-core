@@ -698,17 +698,10 @@ export const MARRIAGE_BUNDLE: Saved<
         extension: [
           {
             url: 'http://opencrvs.org/specs/extension/employee-signature',
-            valueSignature: {
-              type: [
-                {
-                  system: 'urn:iso-astm:E1762-95:2013',
-                  code: '1.2.840.10065.1.12.1.13',
-                  display: 'Review Signature'
-                }
-              ],
-              when: '2023-09-19T06:47:48.225Z',
-              contentType: 'image/png',
-              blob: 'data:image/png;base64,'
+            valueAttachment: {
+              contentType: 'img/png',
+              url: '/ocrvs/a1-b2-c3.png',
+              creation: '1721970080786'
             }
           }
         ],

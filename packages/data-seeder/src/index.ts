@@ -10,7 +10,6 @@
  */
 import { AUTH_HOST, GATEWAY_HOST, SUPER_USER_PASSWORD } from './constants'
 import fetch from 'node-fetch'
-import { seedCertificate } from './certificates'
 import { seedLocations } from './locations'
 import { seedRoles } from './roles'
 import { seedUsers } from './users'
@@ -97,8 +96,6 @@ async function main() {
   await seedLocations(token)
   console.log('Seeding users')
   await seedUsers(token, roleIdMap)
-  console.log('Seeding certificates')
-  await seedCertificate(token)
   await deactivateSuperuser(token)
 }
 

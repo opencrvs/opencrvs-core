@@ -46,10 +46,6 @@ import {
 } from '@client/tests/mock-drafts'
 import { vi } from 'vitest'
 
-interface IPersonDetails {
-  [key: string]: any
-}
-
 describe('when user is previewing the form data', () => {
   let app: ReactWrapper
   let history: History

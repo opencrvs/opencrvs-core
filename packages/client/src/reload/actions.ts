@@ -8,9 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export enum NOTIFICATION_STATUS {
-  SUCCESS = 'success',
-  IDLE = 'idle',
-  IN_PROGRESS = 'inProgress',
-  ERROR = 'error'
+export const RELOAD_MODAL_VISIBILITY = 'RELOAD_MODAL_VISIBILITY'
+export type StoreReloadModalVisibilityAction = {
+  type: typeof RELOAD_MODAL_VISIBILITY
+  payload: { visibility: boolean }
+}
+
+export const storeReloadModalVisibility = (
+  visibility: boolean
+): StoreReloadModalVisibilityAction => {
+  return {
+    type: RELOAD_MODAL_VISIBILITY,
+    payload: { visibility }
+  }
 }

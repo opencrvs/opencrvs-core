@@ -197,12 +197,15 @@ export function isTaskOrTaskHistory<T extends Resource>(
 ): resource is (T & TaskHistory) | (T & Task) {
   return ['TaskHistory', 'Task'].includes(resource.resourceType)
 }
-export function getTaskFromSavedBundle<T extends SavedBundle>(bundle: T) {
+export function getTaskFromSavedBundle<T extends SavedBundle>(
+  bundle: T
+): SavedTask {
   const task = bundle.entry.map(({ resource }) => resource).find(isTask)
 
   if (!task || !isSaved(task)) {
     throw new Error('No task found in bundle')
   }
+
   return task
 }
 
@@ -224,6 +227,7 @@ export function sortTasksDescending<T extends { lastModified: string }>(
     )
   })
 }
+
 export const findTaskHistories = (
   bundle: Bundle,
   sort = sortTasksAscending
@@ -236,6 +240,15 @@ export const findTaskHistories = (
       .map(({ resource }) => resource)
   )
 }
+
+export const findAllTasks = (bundle: Bundle, sort = sortTasksAscending) =>
+  sort(
+    bundle.entry
+      .filter((entry): entry is BundleEntry<Task | TaskHistory> =>
+        isTaskOrTaskHistory(entry.resource)
+      )
+      .map(({ resource }) => resource)
+  )
 
 export const findFirstTaskHistory = (bundle: Bundle) =>
   findTaskHistories(bundle).at(0)

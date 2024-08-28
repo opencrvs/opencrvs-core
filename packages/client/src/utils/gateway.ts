@@ -7193,6 +7193,106 @@ export type EmailAllUsersQuery = {
   } | null
 }
 
+export type ToggleInformantSmsNotificationMutationVariables = Exact<{
+  smsNotifications?: InputMaybe<
+    Array<SmsNotificationInput> | SmsNotificationInput
+  >
+}>
+
+export type ToggleInformantSmsNotificationMutation = {
+  __typename?: 'Mutation'
+  toggleInformantSMSNotification?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
+export type GetInformantSmsNotificationsQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetInformantSmsNotificationsQuery = {
+  __typename?: 'Query'
+  informantSMSNotifications?: Array<{
+    __typename?: 'SMSNotification'
+    id?: string | null
+    name: string
+    enabled: boolean
+    updatedAt: string
+    createdAt: string
+  }> | null
+}
+
+export type UpdateApplicationConfigMutationVariables = Exact<{
+  applicationConfig?: InputMaybe<ApplicationConfigurationInput>
+}>
+
+export type UpdateApplicationConfigMutation = {
+  __typename?: 'Mutation'
+  updateApplicationConfig?: {
+    __typename?: 'ApplicationConfiguration'
+    APPLICATION_NAME?: string | null
+    NID_NUMBER_PATTERN?: string | null
+    PHONE_NUMBER_PATTERN?: string | null
+    DATE_OF_BIRTH_UNKNOWN?: boolean | null
+    INFORMANT_SIGNATURE_REQUIRED?: boolean | null
+    USER_NOTIFICATION_DELIVERY_METHOD?: string | null
+    INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string | null
+    LOGIN_BACKGROUND?: {
+      __typename?: 'LoginBackground'
+      backgroundColor?: string | null
+      backgroundImage?: string | null
+      imageFit?: ImageFit | null
+    } | null
+    COUNTRY_LOGO?: {
+      __typename?: 'CountryLogo'
+      fileName?: string | null
+      file?: string | null
+    } | null
+    CURRENCY?: {
+      __typename?: 'Currency'
+      languagesAndCountry?: Array<string | null> | null
+      isoCode?: string | null
+    } | null
+    BIRTH?: {
+      __typename?: 'Birth'
+      REGISTRATION_TARGET?: number | null
+      LATE_REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
+      FEE?: {
+        __typename?: 'BirthFee'
+        ON_TIME?: number | null
+        LATE?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+    DEATH?: {
+      __typename?: 'Death'
+      REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
+      FEE?: {
+        __typename?: 'DeathFee'
+        ON_TIME?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+    MARRIAGE?: {
+      __typename?: 'Marriage'
+      REGISTRATION_TARGET?: number | null
+      PRINT_IN_ADVANCE?: boolean | null
+      FEE?: {
+        __typename?: 'MarriageFee'
+        ON_TIME?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+  } | null
+}
+
 export type RegisterSystemMutationVariables = Exact<{
   system?: InputMaybe<SystemInput>
 }>
@@ -7504,6 +7604,7 @@ export type GetEventsWithProgressQuery = {
         status?: string | null
         contactNumber?: string | null
         contactRelationship?: string | null
+        contactEmail?: string | null
         dateOfDeclaration?: any | null
         trackingId?: string | null
         registrationNumber?: string | null
@@ -7552,76 +7653,82 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
+export type RegistrationsListByLocationFilter = {
+  __typename: 'TotalMetricsByLocation'
+  total?: number | null
+  results: Array<{
+    __typename?: 'EventMetricsByLocation'
+    total: number
+    late: number
+    delayed: number
+    home: number
+    healthFacility: number
+    location: { __typename?: 'Location'; name?: string | null }
+  }>
+}
+
+export type RegistrationsListByRegistrarFilter = {
+  __typename: 'TotalMetricsByRegistrar'
+  total?: number | null
+  results: Array<{
+    __typename?: 'EventMetricsByRegistrar'
+    total: number
+    late: number
+    delayed: number
+    registrarPractitioner?: {
+      __typename?: 'User'
+      id: string
+      systemRole: SystemRoleType
+      role: {
+        __typename?: 'Role'
+        _id: string
+        labels: Array<{
+          __typename?: 'RoleLabel'
+          lang: string
+          label: string
+        }>
+      }
+      primaryOffice?: {
+        __typename?: 'Location'
+        name?: string | null
+        id: string
+      } | null
+      name: Array<{
+        __typename?: 'HumanName'
+        firstNames?: string | null
+        familyName?: string | null
+        use?: string | null
+      }>
+      avatar?: {
+        __typename?: 'Avatar'
+        type: string
+        data: string
+      } | null
+    } | null
+  }>
+}
+
+export type RegistrationsListByTimeFilter = {
+  __typename: 'TotalMetricsByTime'
+  total?: number | null
+  results: Array<{
+    __typename?: 'EventMetricsByTime'
+    total: number
+    delayed: number
+    late: number
+    home: number
+    healthFacility: number
+    month: string
+    time: string
+  }>
+}
+
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | {
-        __typename: 'TotalMetricsByLocation'
-        total?: number | null
-        results: Array<{
-          __typename?: 'EventMetricsByLocation'
-          total: number
-          late: number
-          delayed: number
-          home: number
-          healthFacility: number
-          location: { __typename?: 'Location'; name?: string | null }
-        }>
-      }
-    | {
-        __typename: 'TotalMetricsByRegistrar'
-        total?: number | null
-        results: Array<{
-          __typename?: 'EventMetricsByRegistrar'
-          total: number
-          late: number
-          delayed: number
-          registrarPractitioner?: {
-            __typename?: 'User'
-            id: string
-            systemRole: SystemRoleType
-            role: {
-              __typename?: 'Role'
-              _id: string
-              labels: Array<{
-                __typename?: 'RoleLabel'
-                lang: string
-                label: string
-              }>
-            }
-            primaryOffice?: {
-              __typename?: 'Location'
-              name?: string | null
-              id: string
-            } | null
-            name: Array<{
-              __typename?: 'HumanName'
-              firstNames?: string | null
-              familyName?: string | null
-              use?: string | null
-            }>
-            avatar?: {
-              __typename?: 'Avatar'
-              type: string
-              data: string
-            } | null
-          } | null
-        }>
-      }
-    | {
-        __typename: 'TotalMetricsByTime'
-        total?: number | null
-        results: Array<{
-          __typename?: 'EventMetricsByTime'
-          total: number
-          delayed: number
-          late: number
-          home: number
-          healthFacility: number
-          month: string
-          time: string
-        }>
-      }
+    | RegistrationsListByLocationFilter
+    | RegistrationsListByRegistrarFilter
+    | RegistrationsListByTimeFilter
     | null
 }
 

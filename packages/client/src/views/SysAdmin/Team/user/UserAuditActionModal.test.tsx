@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { UserAuditActionModal, AUDIT_ACTION } from './UserAuditActionModal'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import { createTestComponent } from '@client/tests/util'
 import { AppStore, createStore } from '@client/store'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
@@ -256,7 +256,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed deactivate audit action', () => {
     beforeEach(async () => {
-      const [_, errorMock] = graphqlMocksOfDeactivate
+      const [, errorMock] = graphqlMocksOfDeactivate
       component = await createTestComponent(
         <UserAuditActionModal
           show={true}
@@ -338,7 +338,7 @@ describe('user audit action modal tests', () => {
 
   describe('in case of failed reactivate audit action', () => {
     beforeEach(async () => {
-      const [_, errorMock] = graphqlMocksOfReactivate
+      const [, errorMock] = graphqlMocksOfReactivate
       component = await createTestComponent(
         <UserAuditActionModal
           show={true}

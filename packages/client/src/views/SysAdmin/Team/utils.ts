@@ -8,12 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  IFormField,
-  IFormSectionData,
-  ISelectFormFieldWithDynamicOptions,
-  ISelectFormFieldWithOptions
-} from '@client/forms'
 import { userMessages } from '@client/i18n/messages'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'

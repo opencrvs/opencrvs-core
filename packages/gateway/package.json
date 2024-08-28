@@ -21,7 +21,7 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "7.17.13",
+    "@elastic/elasticsearch": "8.13.1",
     "@graphql-tools/graphql-file-loader": "^7.5.16",
     "@graphql-tools/load": "^7.8.13",
     "@graphql-tools/schema": "^9.0.17",
@@ -82,6 +82,7 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
     "@types/node-fetch": "^2.5.12",
+    "@types/node": "18.11.18",
     "@types/redis": "^2.8.6",
     "@types/uuid": "^3.4.3",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
@@ -96,7 +97,7 @@
     "jest": "27.5.1",
     "jest-fetch-mock": "^2.1.2",
     "lab-transform-typescript": "^3.0.1",
-    "lint-staged": "^7.1.0",
+    "lint-staged": "^15.0.0",
     "nodemon": "^3.0.0",
     "opener": "^1.5.1",
     "prettier": "2.8.8",

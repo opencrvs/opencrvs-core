@@ -11,12 +11,10 @@
 import {
   findPatientIdentifier,
   Patient,
-  SUPPORTED_PATIENT_IDENTIFIER_CODES
-} from '@opencrvs/commons/types'
-import {
+  SUPPORTED_PATIENT_IDENTIFIER_CODES,
   CERTIFIED_STATUS,
   REGISTERED_STATUS
-} from '@search/elasticsearch/utils'
+} from '@opencrvs/commons/types'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 import { transformDeprecatedParamsToSupported } from './deprecation-support'
 import { resolveLocationChildren } from './location'
@@ -744,15 +742,29 @@ export async function advancedQueryBuilder(
 export const findPatientPrimaryIdentifier = (patient: Patient) =>
   findPatientIdentifier(
     patient,
-    SUPPORTED_PATIENT_IDENTIFIER_CODES.filter(
-      (code) =>
-        ![
-          'BIRTH_REGISTRATION_NUMBER',
-          'DEATH_REGISTRATION_NUMBER',
-          'MARRIAGE_REGISTRATION_NUMBER',
-          'BIRTH_CONFIGURABLE_IDENTIFIER_1',
-          'BIRTH_CONFIGURABLE_IDENTIFIER_2',
-          'BIRTH_CONFIGURABLE_IDENTIFIER_3'
-        ].includes(code)
+    SUPPORTED_PATIENT_IDENTIFIER_CODES.filter((code) =>
+      [
+        'PASSPORT',
+        'NATIONAL_ID',
+        'MOSIP_PSUT_TOKEN_ID',
+        'DECEASED_PATIENT_ENTRY',
+        'BIRTH_PATIENT_ENTRY',
+        'DRIVING_LICENSE',
+        'REFUGEE_NUMBER',
+        'ALIEN_NUMBER',
+        'OTHER',
+        'SOCIAL_SECURITY_NO'
+      ].includes(code)
+    )
+  ) ??
+  // return registration numbers with a lower priority
+  findPatientIdentifier(
+    patient,
+    SUPPORTED_PATIENT_IDENTIFIER_CODES.filter((code) =>
+      [
+        'BIRTH_REGISTRATION_NUMBER',
+        'DEATH_REGISTRATION_NUMBER',
+        'MARRIAGE_REGISTRATION_NUMBER'
+      ].includes(code)
     )
   )

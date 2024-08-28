@@ -8,57 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import {
   compareForBirthDuplication,
-  compareForDeathDuplication,
-  startContainer,
-  stopContainer
+  compareForDeathDuplication
 } from './test-util'
-import * as elasticsearch from '@elastic/elasticsearch'
-
-import { StartedElasticsearchContainer } from 'testcontainers'
+import { createHandlerSetup, SetupFn } from '@search/test/createHandlerSetup'
 
 // Test timeout is increased due to the fact that testcontainers can take a while to pull Docker images
 jest.setTimeout(10 * 60 * 1000)
 
-let container: StartedElasticsearchContainer
-let client: elasticsearch.Client
+const setupTestCases = async (setupFn: SetupFn) => {
+  const { elasticClient } = await setupFn()
 
-beforeAll(async () => {
-  container = await startContainer()
-  const host = container.getHost()
-  const port = container.getMappedPort(9200)
-
-  client = new elasticsearch.Client({
-    node: `http://${host}:${port}`
-  })
-})
-
-afterEach(async () => {
-  try {
-    await client.indices.delete({
-      index: OPENCRVS_INDEX_NAME
-    })
-  } catch (error) {}
-})
-
-afterAll(async () => {
-  try {
-    await client.close()
-  } catch (error) {
-  } finally {
-    await stopContainer(container)
+  return {
+    elasticClient
   }
-})
+}
 
 describe('deduplication tests', () => {
-  it('checks elasticsearch is up', async () => {
-    await client.ping()
-  })
+  const { setup, cleanup, shutdown } = createHandlerSetup()
+  afterEach(cleanup)
+  afterAll(shutdown)
 
   describe('standard check', () => {
     it('finds a duplicate with very similar details', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -77,12 +52,14 @@ describe('deduplication tests', () => {
             // Same mother’s NID
             motherIdentifier: ['23412387', '23412387']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(1)
     })
 
     it('finds no duplicate with different mother nid', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -95,12 +72,14 @@ describe('deduplication tests', () => {
             // Different mother’s NID
             motherIdentifier: ['23412387', '23412388']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(0)
     })
 
     it('finds no duplicates with very different details', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -112,12 +91,14 @@ describe('deduplication tests', () => {
             motherDoB: ['2000-11-12', '1992-11-12'],
             motherIdentifier: ['23412387', '123123']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(0)
     })
 
     it('finds no duplicate if both the firstName & familyName for child is not given', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -128,12 +109,13 @@ describe('deduplication tests', () => {
             motherFamilyName: ['Smith', 'Smith'],
             motherDoB: ['2000-11-12', '2000-11-12']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(0)
     })
 
     it('finds a duplicate even if the firstName of child is not given', async () => {
+      const t = await setupTestCases(setup)
       await expect(
         compareForBirthDuplication(
           {
@@ -144,12 +126,14 @@ describe('deduplication tests', () => {
             motherFamilyName: ['Smith', 'Smith'],
             motherDoB: ['2000-11-12', '2000-11-12']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(1)
     })
 
     it('finds no duplicate if a required field is missing', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -160,7 +144,7 @@ describe('deduplication tests', () => {
             motherFirstNames: ['Mother', 'Mother'],
             motherFamilyName: ['Smith', 'Smith']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(0)
     })
@@ -168,6 +152,8 @@ describe('deduplication tests', () => {
 
   describe('same mother two births within 9 months of each other', () => {
     it('finds a duplicate with same mother two births within 9 months', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -179,12 +165,14 @@ describe('deduplication tests', () => {
             motherDoB: ['2000-11-12', '2000-11-12'],
             motherIdentifier: ['23412387', '23412387']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(1)
     })
 
     it('finds no duplicate with the same mother details if two births more than 9 months apart', async () => {
+      const t = await setupTestCases(setup)
+
       await expect(
         compareForBirthDuplication(
           {
@@ -196,7 +184,7 @@ describe('deduplication tests', () => {
             motherDoB: ['2000-11-12', '2000-11-12'],
             motherIdentifier: ['23412387', '23412387']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(0)
     })
@@ -204,6 +192,7 @@ describe('deduplication tests', () => {
 
   describe('child age increase/decrease', () => {
     it('performs a duplicate check child increase and decrease. finds a duplicate for fraudulent records', async () => {
+      const t = await setupTestCases(setup)
       await expect(
         compareForBirthDuplication(
           {
@@ -215,76 +204,79 @@ describe('deduplication tests', () => {
             motherDoB: ['2000-11-12', '2000-11-12'],
             motherIdentifier: ['23412387', '23412387']
           },
-          client
+          t.elasticClient
         )
       ).resolves.toHaveLength(1)
     })
   })
-})
 
-describe('deduplication tests for death', () => {
-  it('death:checks elasticsearch is up', async () => {
-    await client.ping()
-  })
+  describe('deduplication tests for death', () => {
+    describe('standard check for death duplication', () => {
+      it('finds a duplicate with very similar details', async () => {
+        const t = await setupTestCases(setup)
 
-  describe('standard check for death duplication', () => {
-    it('finds a duplicate with very similar details', async () => {
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', 'jhon'],
-            deceasedFamilyName: ['koly', 'koly'],
-            deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17'],
-            deceasedDoB: ['2020-11-12', '2020-11-10']
-          },
-          client
-        )
-      ).resolves.toHaveLength(1)
-    })
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', 'jhon'],
+              deceasedFamilyName: ['koly', 'koly'],
+              deceasedIdentifier: ['23412387', '23412387'],
+              deathDate: ['2000-11-12', '2000-11-17'],
+              deceasedDoB: ['2020-11-12', '2020-11-10']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(1)
+      })
 
-    it('finds no duplicate if a required field is missing', async () => {
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', 'Jhon'],
-            deceasedFamilyName: ['koly', 'koly'],
-            deathDate: ['2000-11-12', '2000-11-12'],
-            deceasedDoB: ['2020-11-12', '']
-          },
-          client
-        )
-      ).resolves.toHaveLength(0)
-    })
+      it('finds no duplicate if a required field is missing', async () => {
+        const t = await setupTestCases(setup)
 
-    it('finds no duplicate if both the firstName & familyName of deceased is not given', async () => {
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', ''],
-            deceasedFamilyName: ['koly', ''],
-            deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17'],
-            deceasedDoB: ['2020-11-12', '2020-11-10']
-          },
-          client
-        )
-      ).resolves.toHaveLength(0)
-    })
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', 'Jhon'],
+              deceasedFamilyName: ['koly', 'koly'],
+              deathDate: ['2000-11-12', '2000-11-12'],
+              deceasedDoB: ['2020-11-12', '']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(0)
+      })
 
-    it('finds duplicate even if the familyName of deceased is not given', async () => {
-      await expect(
-        compareForDeathDuplication(
-          {
-            deceasedFirstNames: ['John', 'Jonh'],
-            deceasedFamilyName: ['koly', ''],
-            deceasedIdentifier: ['23412387', '23412387'],
-            deathDate: ['2000-11-12', '2000-11-17'],
-            deceasedDoB: ['2020-11-12', '2020-11-10']
-          },
-          client
-        )
-      ).resolves.toHaveLength(1)
+      it('finds no duplicate if both the firstName & familyName of deceased is not given', async () => {
+        const t = await setupTestCases(setup)
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', ''],
+              deceasedFamilyName: ['koly', ''],
+              deceasedIdentifier: ['23412387', '23412387'],
+              deathDate: ['2000-11-12', '2000-11-17'],
+              deceasedDoB: ['2020-11-12', '2020-11-10']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(0)
+      })
+
+      it('finds duplicate even if the familyName of deceased is not given', async () => {
+        const t = await setupTestCases(setup)
+
+        await expect(
+          compareForDeathDuplication(
+            {
+              deceasedFirstNames: ['John', 'Jonh'],
+              deceasedFamilyName: ['koly', ''],
+              deceasedIdentifier: ['23412387', '23412387'],
+              deathDate: ['2000-11-12', '2000-11-17'],
+              deceasedDoB: ['2020-11-12', '2020-11-10']
+            },
+            t.elasticClient
+          )
+        ).resolves.toHaveLength(1)
+      })
     })
   })
 })

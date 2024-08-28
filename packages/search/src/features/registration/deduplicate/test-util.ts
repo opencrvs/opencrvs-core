@@ -8,35 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  ElasticsearchContainer,
-  StartedElasticsearchContainer
-} from 'testcontainers'
+
 import { indexComposition } from '@search/elasticsearch/dbhelper'
 import { BirthDocument, DeathDocument } from '@search/elasticsearch/utils'
 import * as elasticsearch from '@elastic/elasticsearch'
 import { searchForDeathDuplicates, searchForBirthDuplicates } from './service'
-
-const ELASTIC_SEARCH_HTTP_PORT = 9200
-
-const container: ElasticsearchContainer = new ElasticsearchContainer(
-  'elasticsearch:7.17.7'
-)
-
-export const startContainer =
-  async (): Promise<StartedElasticsearchContainer> => {
-    return container
-      .withExposedPorts(ELASTIC_SEARCH_HTTP_PORT)
-      .withStartupTimeout(120_000)
-      .withEnvironment({ 'discovery.type': 'single-node' })
-      .start()
-  }
-
-export const stopContainer = async (
-  container: StartedElasticsearchContainer
-): Promise<void> => {
-  await container.stop()
-}
 
 type ComparisonObject<T> = {
   [Key in keyof T]: [T[Key], T[Key]]

@@ -59,13 +59,15 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push base image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           file: packages/Dockerfile.base
           context: .
           push: true
-          tags: 'opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}'
-          cache-from: type=registry,ref=opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
+          tags: |
+            opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
+            opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
+          cache-from: type=registry,ref=opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
           cache-to: type=inline
 
     outputs:
@@ -96,16 +98,19 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           file: packages/${{ matrix.service }}/Dockerfile
           build-args: |
             VERSION=${{ needs.base.outputs.version }}
+            BRANCH=${{ needs.base.outputs.branch }}
           push: true
           context: .
           tags: |
             opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}
             opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
+          cache-from: type=registry,ref=opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
+          cache-to: type=inline
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.23.0

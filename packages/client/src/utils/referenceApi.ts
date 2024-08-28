@@ -29,6 +29,17 @@ export interface IFacilitiesDataResponse {
   [facilityId: string]: Facility
 }
 
+export const SearchCriteria = {
+  TRACKING_ID: 'TRACKING_ID',
+  REGISTRATION_NUMBER: 'REGISTRATION_NUMBER',
+  NATIONAL_ID: 'NATIONAL_ID',
+  NAME: 'NAME',
+  PHONE_NUMBER: 'PHONE_NUMBER',
+  EMAIL: 'EMAIL'
+} as const
+
+export type SearchCriteriaType = keyof typeof SearchCriteria
+
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
 }
@@ -68,13 +79,7 @@ interface ILoginBackground {
 }
 export interface ICertificateTemplateData {
   event: Event
-  status: string
   svgCode: string
-  svgDateCreated: string
-  svgDateUpdated: string
-  svgFilename: string
-  user: string
-  id: string
 }
 export interface ICurrency {
   isoCode: string
@@ -134,6 +139,7 @@ export interface IApplicationConfig {
   LOGIN_BACKGROUND: ILoginBackground
   USER_NOTIFICATION_DELIVERY_METHOD: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD: string
+  SEARCH_DEFAULT_CRITERIA?: SearchCriteriaType
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
@@ -161,12 +167,6 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
     throw Error(res.statusText)
   }
   const response = await res.json()
-  response.certificates = response.certificates.map(
-    ({ _id, ...rest }: { _id: string }) => {
-      return { ...rest, id: _id }
-    }
-  )
-
   return response
 }
 
