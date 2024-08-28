@@ -106,7 +106,7 @@ async function getEventCertificates(
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch certificate: ${res.statusText}`)
+    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
   }
   const responseText = await res.text()
 
