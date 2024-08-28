@@ -337,29 +337,6 @@ function reducer(
       return loop(state, dataLoadingCmds)
     }
 
-    case actions.CERTIFICATE_LOADED: {
-      const { templates } = state.offlineData
-      const certificate = action.payload
-      if (!templates || !templates.certificates) {
-        return state
-      }
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          templates: {
-            ...templates,
-            certificates: {
-              ...templates.certificates,
-              [certificate.event]: {
-                ...templates.certificates[certificate.event],
-                definition: certificate.svgCode
-              }
-            }
-          }
-        }
-      }
-    }
     case actions.UPDATE_OFFLINE_CONFIG: {
       merge(window.config, action.payload.config)
       const newOfflineData = {
@@ -398,47 +375,15 @@ function reducer(
       merge(window.config, config)
       const birthCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Birth
-      )
+      )!
 
       const deathCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Death
-      )
+      )!
 
       const marriageCertificateTemplate = certificates.find(
         ({ event }) => event === Event.Marriage
-      )
-
-      if (
-        !birthCertificateTemplate ||
-        !deathCertificateTemplate ||
-        !marriageCertificateTemplate
-      ) {
-        const certificatesTemplates = {
-          birth: {
-            definition: birthCertificateTemplate.svgCode
-          },
-          death: {
-            definition: deathCertificateTemplate.svgCode
-          },
-          marriage: {
-            definition: marriageCertificateTemplate.svgCode
-          }
-        }
-        const newOfflineData = {
-          ...state.offlineData,
-          templates: {
-            ...state.offlineData.templates,
-            certificates: certificatesTemplates,
-            systems
-          }
-        }
-
-        return {
-          ...state,
-          offlineDataLoaded: false,
-          offlineData: newOfflineData
-        }
-      }
+      )!
 
       const certificatesTemplates = {
         birth: {
@@ -461,62 +406,16 @@ function reducer(
         }
       }
 
-      return {
-        ...state,
-        offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
-        offlineData: newOfflineData
-      }
-    }
-
-    case actions.CERTIFICATES_LOADED: {
-      const certificates = action.payload
-      const birthCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Birth
-      )
-
-      const deathCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Death
-      )
-
-      const marriageCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Marriage
-      )
-
-      if (
-        birthCertificateTemplate &&
-        deathCertificateTemplate &&
-        marriageCertificateTemplate
-      ) {
-        const certificatesTemplates = {
-          birth: {
-            definition: birthCertificateTemplate.svgCode
-          },
-          death: {
-            definition: deathCertificateTemplate.svgCode
-          },
-          marriage: {
-            definition: marriageCertificateTemplate.svgCode
-          }
-        }
-
-        const newOfflineData = {
-          ...state.offlineData,
-          templates: {
-            ...state.offlineData.templates,
-            certificates: certificatesTemplates
-          }
-        }
-
-        return {
+      return loop(
+        {
           ...state,
           offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
           offlineData: newOfflineData
-        }
-      }
-      return state
+        },
+        Cmd.run(saveOfflineData, { args: [newOfflineData] })
+      )
     }
 
-    case actions.CERTIFICATES_LOAD_FAILED:
     case actions.APPLICATION_CONFIG_FAILED: {
       const payload = action.payload
       if (payload.cause === 'VALIDATION_ERROR') {
