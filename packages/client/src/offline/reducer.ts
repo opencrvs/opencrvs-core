@@ -397,12 +397,13 @@ function reducer(
         }
       }
 
-      const newOfflineData = {
+      const newOfflineData: Partial<IOfflineData> = {
         ...state.offlineData,
+        config,
+        systems,
         templates: {
           ...state.offlineData.templates,
-          certificates: certificatesTemplates,
-          systems
+          certificates: certificatesTemplates
         }
       }
 
