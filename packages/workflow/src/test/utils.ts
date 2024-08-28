@@ -197,7 +197,7 @@ export const testFhirBundle: StrictBundle<
         active: true,
         name: [
           {
-            family: ['অনিক'],
+            family: 'অনিক',
             given: ['অনিক'],
             use: 'bn'
           }
@@ -213,7 +213,7 @@ export const testFhirBundle: StrictBundle<
         name: [
           {
             given: ['Jane'],
-            family: ['Doe'],
+            family: 'Doe',
             use: 'bn'
           }
         ],
@@ -234,7 +234,7 @@ export const testFhirBundle: StrictBundle<
         name: [
           {
             given: ['Jack'],
-            family: ['Doe'],
+            family: 'Doe',
             use: 'en'
           }
         ],
@@ -420,7 +420,7 @@ export const mosipDeceasedPatientMock: Saved<Patient> = {
     {
       use: 'en',
       given: ['Sakib Al'],
-      family: ['Hasan']
+      family: 'Hasan'
     }
   ],
   gender: 'male',

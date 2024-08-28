@@ -254,7 +254,7 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Salam'],
-            family: ['Ahmed']
+            family: 'Ahmed'
           }
         ],
         gender: 'male',
@@ -321,7 +321,7 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Sufiana'],
-            family: ['Khatum']
+            family: 'Khatum'
           }
         ],
         identifier: [
@@ -1209,7 +1209,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -1265,7 +1265,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Zack'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         gender: 'female',
@@ -1345,7 +1345,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -1530,7 +1530,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Frank'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         birthDate: '2003-08-16',

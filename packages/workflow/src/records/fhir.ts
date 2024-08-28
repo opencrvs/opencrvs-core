@@ -340,7 +340,7 @@ export function createRelatedPersonEntries(
             ({ use, firstNames, familyName }) => ({
               use,
               given: firstNames.split(' '),
-              family: [familyName]
+              family: familyName
             })
           ),
           identifier: collectorDetails.identifier.map(({ id, type }) => ({

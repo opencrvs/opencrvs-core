@@ -227,7 +227,7 @@ export const READY_FOR_REVIEW_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Salam'],
-            family: ['Ahmed']
+            family: 'Ahmed'
           }
         ],
         gender: 'male',
@@ -294,7 +294,7 @@ export const READY_FOR_REVIEW_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Sufiana'],
-            family: ['Khatum']
+            family: 'Khatum'
           }
         ],
         identifier: [

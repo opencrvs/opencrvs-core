@@ -182,7 +182,7 @@ function createNameBuilder<T extends CompositionSectionCode>(
       setObjectPropInResourceArray(
         person,
         'name',
-        [fieldValue],
+        fieldValue,
         'family',
         context
       )
@@ -1931,7 +1931,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          [fieldValue],
+          fieldValue,
           'family',
           context
         )
@@ -2310,7 +2310,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          [fieldValue],
+          fieldValue,
           'family',
           context
         )
@@ -2423,7 +2423,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          [fieldValue],
+          fieldValue,
           'family',
           context
         )
