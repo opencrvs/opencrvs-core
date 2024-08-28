@@ -45,7 +45,8 @@ import {
   EVENT,
   SearchDocument,
   IOperationHistory,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  getLastStatusChangedAt
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -359,4 +360,6 @@ function createDeclarationIndex(
 
   body.createdBy = firstRegLastUser || regLastUser
   body.updatedBy = regLastUser
+
+  body.lastStatusChangedAt = getLastStatusChangedAt(bundle, task)
 }

@@ -153,7 +153,7 @@ export async function advancedQueryBuilder(
   if (params.timePeriodFrom) {
     must.push({
       range: {
-        modifiedAt: {
+        lastStatusChangedAt: {
           gte: new Date(params.timePeriodFrom).getTime(),
           lte: Date.now().toString()
         }

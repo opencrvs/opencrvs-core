@@ -44,7 +44,8 @@ import {
   ValidRecord,
   EVENT,
   IOperationHistory,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  getLastStatusChangedAt
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -334,6 +335,9 @@ function createDeclarationIndex(
     (compositionTypeCode && compositionTypeCode.code) || 'birth-declaration'
 
   const firstTaskHistory = findFirstTaskHistory(bundle)
+
+  body.lastStatusChangedAt = getLastStatusChangedAt(bundle, task)
+
   const firstRegLastUserExtension =
     firstTaskHistory &&
     findTaskExtension(
