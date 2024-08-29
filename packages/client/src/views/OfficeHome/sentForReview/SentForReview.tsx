@@ -202,7 +202,7 @@ class SentForReviewComponent extends React.Component<
                 compositionId: reg.id,
                 action: DownloadAction.LOAD_REVIEW_DECLARATION,
                 declarationStatus: reg.declarationStatus,
-                assignment: reg.assignment
+                assignment: reg.assignment ?? undefined
               }}
               key={`DownloadButton-${index}`}
               status={downloadStatus as DOWNLOAD_STATUS}

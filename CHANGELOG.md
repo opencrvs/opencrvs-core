@@ -19,12 +19,18 @@
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
 - Allow configuring the default search criteria for record search [#6924](https://github.com/opencrvs/opencrvs-core/issues/6924)
 - Add checks to validate client and server are always on the same version. This prevents browsers with a cached or outdated client versions from making potentially invalid requests to the backend [#6695](https://github.com/opencrvs/opencrvs-core/issues/6695)
+- Two new statuses of record are added: `Validated` and `Correction Requested` for advanced search parameters [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
+- A new field: `Time Period` is added to advanced search [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
 
 ## Bug fixes
 
 - TBC
 
 ## 1.6.0 Release candidate
+
+## Improvements
+
+- Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
 
 ### Breaking changes
 
@@ -80,7 +86,6 @@
 Allows reindexing ElasticSearch via a new search-service endpoint `reindex`. We're replacing the original `ocrvs` index with timestamped ones. This is done automatically when upgrading and migrating, but this is an important architectural change that should be noted. More details in [#7033](https://github.com/opencrvs/opencrvs-core/pull/7033).
 
 - Introduce a new certificate handlebar "preview" which can be used to conditionally render some svg element when previewing the certificate e.g. background image similar to security paper
-
 
 ## Bug fixes
 
@@ -162,7 +167,6 @@ Follow the descriptions in the migration notes to re-provision all servers safel
 - Provide env variables for metabase admin credentials
 - Improved formatting of informant name for inProgress declaration emails
 - There is now an option to print the review page of an event declaration form. The PRINT_DECLARATION feature flag in application config settings can enable this on or off.
-
 
 ## Bug fixes
 

@@ -513,3 +513,26 @@ export function notCorrectedHistory(
   }
   return true
 }
+
+export const getLastStatusChangedAt = (bundle: Bundle, task: Task) => {
+  const taskHistories = findTaskHistories(bundle)
+
+  if (taskHistories.length === 0)
+    return new Date(task.lastModified).getTime().toString()
+
+  if (
+    task.businessStatus.coding[0].code !==
+    taskHistories.at(-1)?.businessStatus.coding[0].code
+  )
+    return new Date(task.lastModified).getTime().toString()
+
+  for (let i = taskHistories.length - 1; i > 0; i--) {
+    if (
+      taskHistories[i].businessStatus.coding[0].code !==
+      taskHistories[i - 1].businessStatus.coding[0].code
+    )
+      return new Date(taskHistories[i].lastModified).getTime().toString()
+  }
+
+  return new Date(taskHistories[0].lastModified).getTime().toString()
+}

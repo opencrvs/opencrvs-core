@@ -16,12 +16,14 @@ export const SEARCH_EVENTS = gql`
     $sort: String
     $count: Int
     $skip: Int
+    $sortColumn: String
   ) {
     searchEvents(
       advancedSearchParameters: $advancedSearchParameters
       sort: $sort
       count: $count
       skip: $skip
+      sortColumn: $sortColumn
     ) {
       totalItems
       results {

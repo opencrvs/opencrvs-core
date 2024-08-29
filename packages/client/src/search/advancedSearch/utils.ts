@@ -27,9 +27,12 @@ import { IntlShape } from 'react-intl'
 import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
-import { ISearchLocation } from '@opencrvs/components'
+import { COLUMNS, ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
-import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
+import {
+  isInvalidDate,
+  TIME_PERIOD
+} from '@client/forms/advancedSearch/fieldDefinitions/utils'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -97,6 +100,7 @@ export interface IAdvancedSearchFormState {
   dateOfEvent?: IDateRangePickerValue
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  registrationByPeriod?: string
   registrationNumber?: string
   trackingId?: string
   dateOfRegistration?: IDateRangePickerValue
@@ -163,7 +167,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
       localState.registrationStatuses === RegStatus.Registered
         ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
-        ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
+        ? [RegStatus.WaitingValidation, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -184,6 +188,13 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     ) {
       declarationJurisdictionId = localState.placeOfRegistration
     }
+  }
+
+  if (
+    localState.registrationByPeriod &&
+    localState.registrationByPeriod in TIME_PERIOD
+  ) {
+    transformedStoreState.timePeriodFrom = localState.registrationByPeriod
   }
 
   if (localState.eventLocationType === 'HEALTH_FACILITY') {
@@ -287,6 +298,11 @@ export const transformStoreDataToAdvancedSearchLocalState = (
     },
     {}
   )
+
+  if (reduxState.timePeriodFrom) {
+    localState.registrationByPeriod = reduxState.timePeriodFrom
+  }
+
   localState.event = eventType
   if (
     reduxState.registrationStatuses &&
@@ -297,11 +313,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
         ? reduxState.registrationStatuses[0]
         : isEqual(
             [...reduxState.registrationStatuses].sort(),
-            [
-              RegStatus.WaitingValidation,
-              RegStatus.Validated,
-              RegStatus.Declared
-            ].sort()
+            [RegStatus.WaitingValidation, RegStatus.Declared].sort()
           )
         ? 'IN_REVIEW'
         : isEqual(
@@ -461,6 +473,43 @@ export const getAccordionActiveStateMap = (
   }
 }
 
+const getFromDateFomTimePeriod = (timePeriod: TIME_PERIOD) => {
+  return formatDate(timePeriodToFromDate(timePeriod), 'yyyy-MM-dd')
+}
+
+const MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
+
+const timePeriodToFromDate = (timePeriod: TIME_PERIOD) => {
+  switch (timePeriod) {
+    case TIME_PERIOD.LAST_7_DAYS:
+      return new Date(Date.now() - 7 * MILLISECONDS_IN_A_DAY)
+
+    case TIME_PERIOD.LAST_30_DAYS:
+      return new Date(Date.now() - 30 * MILLISECONDS_IN_A_DAY)
+
+    case TIME_PERIOD.LAST_90_DAYS:
+      return new Date(Date.now() - 90 * MILLISECONDS_IN_A_DAY)
+
+    case TIME_PERIOD.LAST_YEAR:
+      const oneYearAgo = new Date(Date.now())
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+      return oneYearAgo
+  }
+}
+
+export const replacePeriodWithDate = (
+  advancedSearchParamState: IAdvancedSearchParamState
+) => {
+  if (
+    advancedSearchParamState.timePeriodFrom &&
+    advancedSearchParamState.timePeriodFrom in TIME_PERIOD
+  )
+    advancedSearchParamState.timePeriodFrom = getFromDateFomTimePeriod(
+      advancedSearchParamState.timePeriodFrom as TIME_PERIOD
+    )
+  return advancedSearchParamState
+}
+
 const determineDateFromDateRangePickerVal = (
   dateRangePickerValue?: IDateRangePickerValue
 ): Omit<IDateRangePickerValue, 'isDateRangeActive'> => {
@@ -554,11 +603,7 @@ const getLabelForRegistrationStatus = (
 ) => {
   const statusLabelMapping: Record<string, string[]> = {
     ALL: Object.values(RegStatus),
-    IN_REVIEW: [
-      RegStatus.WaitingValidation,
-      RegStatus.Validated,
-      RegStatus.Declared
-    ],
+    IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Declared],
     ARCHIVED: [RegStatus.Archived],
     CERTIFIED: [RegStatus.Certified],
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
@@ -680,6 +725,7 @@ export const getFormattedAdvanceSearchParamPills = (
           )
         : '',
 
+    timePeriodFrom: advancedSearchParamsState.timePeriodFrom,
     trackingId: advancedSearchParamsState.trackingId,
     regNumber: advancedSearchParamsState.registrationNumber,
     childFirstName: advancedSearchParamsState.childFirstNames,
@@ -810,4 +856,16 @@ export const getFormattedAdvanceSearchParamPills = (
         }
       }
     }, {} as pillKeyValueMap)
+}
+
+const eventDateMapping: Record<string, string> = {
+  birth: 'childDoB',
+  death: 'deathDate',
+  marriage: 'marriageDate'
+}
+
+export const getSortColumn = (sortCol: COLUMNS, event: string) => {
+  return sortCol === 'dateOfEvent'
+    ? eventDateMapping[event] || sortCol
+    : sortCol
 }
