@@ -150,6 +150,17 @@ export async function advancedQueryBuilder(
     })
   }
 
+  if (params.timePeriodFrom) {
+    must.push({
+      range: {
+        lastStatusChangedAt: {
+          gte: new Date(params.timePeriodFrom).getTime(),
+          lte: Date.now().toString()
+        }
+      }
+    })
+  }
+
   if (params.declarationLocationId) {
     must.push({
       match: {

@@ -18,6 +18,7 @@ export const ADVANCED_SEARCH_PARAM_FIELDS = gql`
     dateOfEvent
     dateOfEventStart
     dateOfEventEnd
+    timePeriodFrom
     contactNumber
     nationalId
     registrationNumber
