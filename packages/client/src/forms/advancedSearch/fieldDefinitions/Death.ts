@@ -13,6 +13,7 @@ import { IFormSectionGroup } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { isValidDate } from '@client/search/advancedSearch/validators'
+import { TIME_PERIOD } from './utils'
 
 export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
   {
@@ -79,6 +80,38 @@ export const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup =
           {
             value: 'CORRECTION_REQUESTED',
             label: advancedSearchForm.recordStatusCorrectionRequested
+          },
+          {
+            value: 'VALIDATED',
+            label: advancedSearchForm.recordStatusValidated
+          }
+        ]
+      },
+      {
+        name: 'registrationByPeriod',
+        type: 'SELECT_WITH_OPTIONS',
+        label: advancedSearchForm.timePeriodLabel,
+        required: false,
+        initialValue: '',
+        validator: [],
+        helperText: advancedSearchForm.timePeriodHelperText,
+        placeholder: formMessageDescriptors.formSelectPlaceholder,
+        options: [
+          {
+            value: TIME_PERIOD.LAST_7_DAYS,
+            label: advancedSearchForm.timePeriodLast7Days
+          },
+          {
+            value: TIME_PERIOD.LAST_30_DAYS,
+            label: advancedSearchForm.timePeriodLast30Days
+          },
+          {
+            value: TIME_PERIOD.LAST_90_DAYS,
+            label: advancedSearchForm.timePeriodLast90Days
+          },
+          {
+            value: TIME_PERIOD.LAST_YEAR,
+            label: advancedSearchForm.timePeriodLastYear
           }
         ]
       }

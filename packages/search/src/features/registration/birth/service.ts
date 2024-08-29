@@ -44,7 +44,8 @@ import {
   ValidRecord,
   EVENT,
   IOperationHistory,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  getLastStatusChangedAt
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -151,6 +152,14 @@ function createChildIndex(
   body.childMiddleNameLocal = childNameLocal?.given?.at(1)
   body.childFamilyNameLocal =
     childNameLocal && childNameLocal.family && childNameLocal.family[0]
+  // what happens if country demands name like : familyName firstName
+  body.name =
+    (body.childFirstNames || '') +
+    ' ' +
+    (body.childMiddleName || '') +
+    ' ' +
+    (body.childFamilyName || '')
+
   body.childDoB = child.birthDate
   body.gender = child.gender
 }
@@ -328,6 +337,9 @@ function createDeclarationIndex(
     (compositionTypeCode && compositionTypeCode.code) || 'birth-declaration'
 
   const firstTaskHistory = findFirstTaskHistory(bundle)
+
+  body.lastStatusChangedAt = getLastStatusChangedAt(bundle, task)
+
   const firstRegLastUserExtension =
     firstTaskHistory &&
     findTaskExtension(

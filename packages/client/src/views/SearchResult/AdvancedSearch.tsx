@@ -151,7 +151,8 @@ const BirthSection = () => {
           initialValues={pick(formState, [
             'placeOfRegistration',
             'dateOfRegistration',
-            'registrationStatuses'
+            'registrationStatuses',
+            'registrationByPeriod'
           ])}
         />
       </Accordion>
@@ -354,7 +355,8 @@ const DeathSection = () => {
           initialValues={pick(formState, [
             'placeOfRegistration',
             'dateOfRegistration',
-            'registrationStatuses'
+            'registrationStatuses',
+            'registrationByPeriod'
           ])}
         />
       </Accordion>
