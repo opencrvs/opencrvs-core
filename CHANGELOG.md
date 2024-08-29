@@ -15,7 +15,7 @@
 
 - Introduce a new certificate handlebar "preview" which can be used to conditionally render some svg element when previewing the certificate e.g. background image similar to security paper
 
-###  Improvements
+### Improvements
 
 - Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
 
@@ -47,6 +47,16 @@
   ]
 }
 ```
+
+## 1.5.1
+
+## Improvements
+
+- Fetch child identifier in view record
+
+## Bug fixes
+
+- On slow connections or in rare corner cases, it was possible that the same record got saved to the database twice. This was caused by a bug in how the unique technical identifier we generate were stored as FHIR. The backend now ensures every record is submitted only once. [#7477](https://github.com/opencrvs/opencrvs-core/issues/7477)
 
 ## 1.5.0 (TBD)
 
