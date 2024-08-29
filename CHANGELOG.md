@@ -19,7 +19,7 @@
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
 - Allow configuring the default search criteria for record search [#6924](https://github.com/opencrvs/opencrvs-core/issues/6924)
 - Add checks to validate client and server are always on the same version. This prevents browsers with a cached or outdated client versions from making potentially invalid requests to the backend [#6695](https://github.com/opencrvs/opencrvs-core/issues/6695)
-- Two new statuses of record are added: `Validated` and `Correction Requested` [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
+- Two new statuses of record are added: `Validated` and `Correction Requested` for advanced search parameters [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
 - A new field: `Time Period` is added to advanced search [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
 
 ## Bug fixes
