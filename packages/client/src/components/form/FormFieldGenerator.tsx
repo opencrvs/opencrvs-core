@@ -87,7 +87,11 @@ import {
   HEADING3,
   SUBSECTION_HEADER,
   HIDDEN,
-  SIGNATURE
+  SIGNATURE,
+  BUTTON,
+  Ii18nHttpFormField,
+  HTTP,
+  IHttpFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -127,7 +131,13 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
+import {
+  BulletList,
+  Button,
+  Divider,
+  InputLabel,
+  Stack
+} from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 
@@ -161,6 +171,8 @@ function handleSelectFocus(id: string, isSearchable: boolean) {
   }
 }
 
+type DependepentFormFieldDefinition = Ii18nHttpFormField
+
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
@@ -177,6 +189,7 @@ type GeneratedInputFieldProps = {
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched?: (name: string, isTouched?: boolean) => void
+  dependentFieldDefinition?: DependepentFormFieldDefinition
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
 const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
@@ -196,7 +209,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     dynamicDispatch,
     onUploadingStateChanged,
     setFieldTouched,
-    requiredErrorMessage
+    requiredErrorMessage,
+    dependentFieldDefinition
   }) => {
     const inputFieldProps = {
       id: fieldDefinition.name,
@@ -617,7 +631,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === HIDDEN) {
+    if (fieldDefinition.type === HIDDEN || fieldDefinition.type === HTTP) {
       const { error, touched, ...allowedInputProps } = inputProps
 
       return (
@@ -659,6 +673,28 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </SignatureField>
       )
     }
+
+    if (fieldDefinition.type === BUTTON) {
+      let trigger = () => {
+        // eslint-disable-next-line no-console
+        console.error(
+          'please define a trigger for button',
+          fieldDefinition.name
+        )
+      }
+
+      if (dependentFieldDefinition) {
+        trigger = () => fetch(dependentFieldDefinition.options)
+      }
+      return (
+        <InputField {...inputFieldProps} hideInputHeader={true}>
+          <Button type="primary" onClick={trigger}>
+            {fieldDefinition.label}
+          </Button>
+        </InputField>
+      )
+    }
+
     return (
       <InputField {...inputFieldProps}>
         <TextInput
@@ -1052,8 +1088,23 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_BUTTON
+            field.type === NID_VERIFICATION_BUTTON ||
+            field.type === BUTTON
           ) {
+            let dependentFieldDefinition: IHttpFormField | undefined
+            let i18nDependentFieldDefinition: Ii18nHttpFormField | undefined
+            if (field.type === 'BUTTON') {
+              dependentFieldDefinition = fields.find(
+                ({ name, type }) =>
+                  name === field.options.trigger && type === HTTP
+              ) as IHttpFormField | undefined
+              if (dependentFieldDefinition) {
+                i18nDependentFieldDefinition = internationaliseFieldObject(
+                  intl,
+                  dependentFieldDefinition
+                ) as Ii18nHttpFormField
+              }
+            }
             return (
               <FormItem
                 key={`${field.name}`}
@@ -1076,6 +1127,7 @@ class FormSectionComponent extends React.Component<Props> {
                       draftData={draftData}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
+                      dependentFieldDefinition={i18nDependentFieldDefinition}
                     />
                   )}
                 </Field>

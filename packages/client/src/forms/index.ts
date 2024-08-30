@@ -72,6 +72,9 @@ export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 export const DIVIDER = 'DIVIDER'
 export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
+export const HTTP = 'HTTP'
+export const BUTTON = 'BUTTON'
+export const REDIRECT_BUTTON = 'BUTTON'
 
 export enum Sort {
   ASC = 'asc',
@@ -718,6 +721,25 @@ export interface ISignatureFormField extends IFormFieldBase {
   allowedFileFormats?: ('png' | 'jpg' | 'jpeg' | 'svg')[]
 }
 
+export interface IHttpFormField extends IFormFieldBase {
+  type: typeof HTTP
+  options: Request
+}
+export interface IButtonFormField extends IFormFieldBase {
+  type: typeof BUTTON
+  options: {
+    trigger: string
+  }
+}
+
+export interface IRedirectButtonFormField extends IFormFieldBase {
+  type: typeof REDIRECT_BUTTON
+  options: {
+    trigger: string
+    url: string
+  }
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -752,6 +774,9 @@ export type IFormField =
   | INidVerificationButton
   | IDividerFormField
   | ISignatureFormField
+  | IHttpFormField
+  | IButtonFormField
+  | IRedirectButtonFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1212,6 +1237,26 @@ export interface Ii18nSignatureField extends Ii18nFormFieldBase {
   allowedFileFormats?: ('png' | 'jpg' | 'jpeg' | 'svg')[]
 }
 
+export interface Ii18nHttpFormField extends Ii18nFormFieldBase {
+  type: typeof HTTP
+  options: Request
+}
+
+export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
+  type: typeof BUTTON
+  options: {
+    trigger: string
+  }
+}
+
+export interface Ii18nRedirectButtonFormField extends Ii18nFormFieldBase {
+  type: typeof REDIRECT_BUTTON
+  options: {
+    trigger: string
+    url: string
+  }
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1244,6 +1289,9 @@ export type Ii18nFormField =
   | I18nDividerField
   | I18nHeading3Field
   | Ii18nSignatureField
+  | Ii18nHttpFormField
+  | Ii18nButtonFormField
+  | Ii18nRedirectButtonFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
