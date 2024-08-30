@@ -31,7 +31,7 @@ export async function formatSearchParams(
 
   const sort = sortBy ?? [
     {
-      [sortColumn]: {
+      [sortColumn === 'name' ? 'name.keyword' : sortColumn]: {
         order: searchPayload.sort ?? SortOrder.ASC,
         unmapped_type: 'keyword'
       }

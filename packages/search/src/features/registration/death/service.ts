@@ -43,7 +43,8 @@ import {
   ValidRecord,
   REJECTED_STATUS,
   IOperationHistory,
-  EVENT
+  EVENT,
+  getLastStatusChangedAt
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -147,6 +148,13 @@ function createDeceasedIndex(
   body.gender = deceased.gender
   body.deceasedIdentifier = findPatientPrimaryIdentifier(deceased)?.value
   body.deceasedDoB = deceased.birthDate
+  // what happens if country demands name like : familyName firstName
+  body.name =
+    (body.deceasedFirstNames || '') +
+    ' ' +
+    (body.deceasedMiddleName || '') +
+    ' ' +
+    (body.deceasedFamilyName || '')
 }
 
 function createMotherIndex(
@@ -349,6 +357,8 @@ function createDeclarationIndex(
     (compositionTypeCode && compositionTypeCode.code) || 'death-declaration'
 
   const firstTaskHistory = findFirstTaskHistory(bundle)
+  body.lastStatusChangedAt = getLastStatusChangedAt(bundle, task)
+
   const firstRegLastUserExtension =
     firstTaskHistory &&
     findTaskExtension(
