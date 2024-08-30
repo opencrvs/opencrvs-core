@@ -128,7 +128,6 @@ jobs:
           echo "PR_ID=$(printf '%s' $PR_DATA | jq -r '.number')" >> $GITHUB_ENV
           echo "PR_AUTHOR=$(printf '%s' $PR_DATA | jq -r '.user.login')" >> $GITHUB_ENV
           echo "PR_MERGER=$(printf '%s' $PR_DATA | jq -r '.merged_by.login')" >> $GITHUB_ENV
-          echo "MILESTONE=$(printf '%s' $PR_DATA | jq -r '.milestone.title')" >> $GITHUB_ENV
           echo "BASE_BRANCH=$(printf '%s' $PR_DATA | jq -r '.base.ref')" >> $GITHUB_ENV
           echo "HEAD_BRANCH=$(printf '%s' $PR_DATA | jq -r '.head.ref')" >> $GITHUB_ENV
           echo "PR_TITLE=$(printf '%s' $PR_DATA | jq -r '.title')" >> $GITHUB_ENV
@@ -143,7 +142,6 @@ jobs:
           PR_NUMBER=${{ github.event.pull_request.number }}
           echo "PR_ID=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           echo "PR_AUTHOR=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
-          echo "MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
           echo "BASE_BRANCH=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
           echo "HEAD_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
           echo "PR_TITLE=${{ github.event.pull_request.title }}" >> $GITHUB_ENV
@@ -161,6 +159,7 @@ jobs:
         run: |
           SEMANTIC_PR_TITLE="${{ env.PR_TITLE }}"
           RELEASE_BRANCH="release-${{ matrix.version }}"
+          MILESTONE="${{ matrix.version }}"
 
           # Check for semantic prefix
           if [[ $SEMANTIC_PR_TITLE =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert|wip|merge)\: ]]; then
@@ -248,4 +247,4 @@ jobs:
               AUTHOR=${{ env.PR_MERGER }}
             fi
           fi
-          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "${{ env.RELEASE_BRANCH }}" --assignee "$AUTHOR" --reviewer "$AUTHOR"
+          gh pr create --title "$SEMANTIC_PR_TITLE" --body "$PR_BODY" --head "$NEW_BRANCH" --base "$RELEASE_BRANCH" --assignee "$AUTHOR" --reviewer "$AUTHOR"

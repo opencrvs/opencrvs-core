@@ -50,7 +50,8 @@ import {
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
   getResourceFromBundleById,
-  TransactionResponse
+  TransactionResponse,
+  TaskIdentifierSystem
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -1413,8 +1414,11 @@ export function mergeBundles<T extends Bundle, R extends Bundle>(
 export async function findTaskFromIdentifier(
   identifier: string
 ): Promise<Bundle<SavedTask>> {
+  const system =
+    'http://opencrvs.org/specs/id/draft-id' satisfies TaskIdentifierSystem
+
   const res = await fetch(
-    new URL(`/fhir/Task?identifier=${identifier}`, FHIR_URL).href,
+    new URL(`/fhir/Task?identifier=${system}|${identifier}`, FHIR_URL).href,
     {
       method: 'GET',
       headers: {
