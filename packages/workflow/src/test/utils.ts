@@ -437,7 +437,7 @@ export const mosipUpdatedDeceasedPatientMock = {
     {
       use: 'en',
       given: ['Sakib Al'],
-      family: ['Hasan']
+      family: 'Hasan'
     }
   ],
   gender: 'male',
