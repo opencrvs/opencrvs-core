@@ -21,7 +21,7 @@ import {
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { logger } from '@opencrvs/commons'
 import { PRODUCTION } from '@auth/constants'
-import { postUserActionToMetrics } from '@auth/features/authenticate/service'
+import { postUserActionToMetrics } from '@auth/metrics'
 
 interface IPayload {
   nonce: string

@@ -239,26 +239,3 @@ export function verifyToken(token: string) {
 export function getPublicKey() {
   return publicCert
 }
-
-export async function postUserActionToMetrics(
-  action: string,
-  token: string,
-  remoteAddress: string,
-  userAgent: string,
-  practitionerId?: string
-) {
-  const url = resolve(METRICS_URL, '/audit/events')
-  const body = { action: action, practitionerId }
-  const authentication = 'Bearer ' + token
-
-  await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authentication,
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
-    }
-  })
-}
