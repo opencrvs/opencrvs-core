@@ -2800,7 +2800,6 @@ export const mockSearchResponse = {
       hits: [
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
           _score: 2.7509375,
           _source: {
@@ -2833,7 +2832,6 @@ export const mockSearchResponseWithoutCreatedBy = {
       hits: [
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
           _score: 2.7509375,
           _source: {
@@ -3387,7 +3385,6 @@ export const mockSearchResult = {
       hits: [
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'BGM9CA2',
           _score: 1,
           _source: {
@@ -3404,7 +3401,6 @@ export const mockSearchResult = {
         },
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'DGM9CA2',
           _score: 1,
           _source: {
