@@ -1497,8 +1497,24 @@ export const typeResolvers: GQLResolver = {
 
       const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
 
-      const practitionerRoleHistory =
+      const practitionerRoleHistory = (
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
+      ).sort((a, b) => {
+        if (a.meta?.lastUpdated === b.meta?.lastUpdated) {
+          return 0
+        }
+        if (a.meta?.lastUpdated === undefined) {
+          return 1
+        }
+        if (b.meta?.lastUpdated === undefined) {
+          return -1
+        }
+        return (
+          new Date(b.meta?.lastUpdated).valueOf() -
+          new Date(a.meta?.lastUpdated).valueOf()
+        )
+      })
+
       const result = practitionerRoleHistory.find(
         (it) =>
           it?.meta?.lastUpdated &&
@@ -1511,13 +1527,21 @@ export const typeResolvers: GQLResolver = {
       })
 
       const role = targetCode?.coding?.[0].code
+      const systemRole = result?.code?.[0].coding?.[0].code
 
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
 
-      if (role) {
-        userResponse.role.labels = JSON.parse(role)
+      if (role && systemRole) {
+        return {
+          ...userResponse,
+          role: {
+            ...userResponse.role,
+            labels: JSON.parse(role)
+          },
+          systemRole
+        }
       }
 
       return userResponse
