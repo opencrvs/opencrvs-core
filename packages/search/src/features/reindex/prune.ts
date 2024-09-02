@@ -9,29 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import { logger } from '@opencrvs/commons'
 
 /** Prunes all the indices that don't have an alias pointing to it */
 export const prune = async () => {
-  const { body: indicesWithAlias } = await client.cat.aliases(
-    {
-      format: 'json',
-      name: OPENCRVS_INDEX_NAME
-    },
-    {
-      meta: true
-    }
-  )
-  const { body: allIndices } = await client.cat.indices(
-    {
-      format: 'json',
-      index: `${OPENCRVS_INDEX_NAME}-*`
-    },
-    {
-      meta: true
-    }
-  )
+  const client = getOrCreateClient()
+  const indicesWithAlias = await client.cat.aliases({
+    format: 'json',
+    name: OPENCRVS_INDEX_NAME
+  })
+
+  const allIndices = await client.cat.indices({
+    format: 'json',
+    index: `${OPENCRVS_INDEX_NAME}-*`
+  })
 
   for (const { index } of allIndices) {
     const isAliasPointedToIndex = indicesWithAlias.some(

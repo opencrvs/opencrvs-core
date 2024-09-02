@@ -28,7 +28,7 @@ import {
   addEventLocation,
   updateCompositionBodyWithDuplicateIds
 } from '@search/features/fhir/fhir-utils'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import {
   getComposition,
   SavedComposition,
@@ -56,6 +56,8 @@ const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
 export async function indexRecord(record: SavedBundle) {
+  const client = getOrCreateClient()
+
   const { id: compositionId } = getComposition(record)
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(record, existingDocument)

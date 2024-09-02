@@ -12,12 +12,19 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import * as uuid from 'uuid'
 import { prune } from './prune'
-import { reindex, updateAliases } from './reindex'
+import { backupLegacyIndex, reindex, updateAliases } from './reindex'
 
-const indexingStatuses: Record<
-  string,
-  'accepted' | 'started' | 'completed' | 'error'
-> = {}
+export const IndexingStatus = {
+  accepted: 'accepted',
+  started: 'started',
+  completed: 'completed',
+  error: 'error'
+} as const
+
+export type IndexingStatus =
+  (typeof IndexingStatus)[keyof typeof IndexingStatus]
+
+const indexingStatuses: Record<string, IndexingStatus> = {}
 
 export async function reindexHandler(
   _request: Hapi.Request,
@@ -27,21 +34,23 @@ export async function reindexHandler(
 
   process.nextTick(async () => {
     try {
-      indexingStatuses[jobId] = 'started'
+      indexingStatuses[jobId] = IndexingStatus.started
+
+      await backupLegacyIndex()
       await reindex()
       await updateAliases()
       await prune()
-      indexingStatuses[jobId] = 'completed'
+      indexingStatuses[jobId] = IndexingStatus.completed
     } catch (error) {
       logger.error(error)
-      indexingStatuses[jobId] = 'error'
+      indexingStatuses[jobId] = IndexingStatus.error
     }
   })
 
   return h
     .response({
       message: `ElasticSearch reindexing started for job ${jobId}`,
-      status: indexingStatuses[jobId] ?? 'accepted',
+      status: indexingStatuses[jobId] ?? IndexingStatus.accepted,
       jobId
     })
     .code(202)

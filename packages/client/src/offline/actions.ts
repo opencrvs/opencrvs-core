@@ -10,7 +10,6 @@
  */
 import {
   AdminStructure,
-  CertificatePayload,
   CRVSOffice,
   Facility,
   ILocation,
@@ -23,7 +22,6 @@ import {
   IContentResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData,
   IApplicationConfigAnonymous,
   LoadFormsResponse,
   LoadValidatorsResponse,
@@ -106,27 +104,9 @@ type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
-export const CERTIFICATE_LOADED = 'OFFLINE/CERTIFICATE_LOADED'
-type CertificateLoadedAction = {
-  type: typeof CERTIFICATE_LOADED
-  payload: CertificatePayload
-}
-
 const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
 type CertificateLoadFailedAction = {
   type: typeof CERTIFICATE_LOAD_FAILED
-  payload: Error
-}
-
-export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
-type CertificatesLoadedAction = {
-  type: typeof CERTIFICATES_LOADED
-  payload: CertificatePayload[]
-}
-
-export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
-type CertificatesLoadFailedAction = {
-  type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
 
@@ -273,24 +253,10 @@ export const configLoaded = (
   payload: payload
 })
 
-export const certificateLoaded = (
-  payload: CertificatePayload
-): CertificateLoadedAction => ({
-  type: CERTIFICATE_LOADED,
-  payload
-})
-
 export const certificateLoadFailed = (
   payload: CertificateLoadFailedAction['payload']
 ): CertificateLoadFailedAction => ({
   type: CERTIFICATE_LOAD_FAILED,
-  payload
-})
-
-export const certificatesLoaded = (
-  payload: CertificatePayload[]
-): CertificatesLoadedAction => ({
-  type: CERTIFICATES_LOADED,
   payload
 })
 
@@ -329,23 +295,6 @@ export const updateOfflineSystems = (payload: {
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
-})
-
-export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
-type UpdateOfflineCertificateAction = {
-  type: typeof UPDATE_OFFLINE_CERTIFICATE
-  payload: {
-    certificate: ICertificateTemplateData
-  }
-}
-
-export const updateOfflineCertificate = (
-  certificate: ICertificateTemplateData
-): UpdateOfflineCertificateAction => ({
-  type: UPDATE_OFFLINE_CERTIFICATE,
-  payload: {
-    certificate
-  }
 })
 
 export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
@@ -397,14 +346,10 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | CertificateLoadedAction
   | CertificateLoadFailedAction
-  | CertificatesLoadedAction
-  | CertificatesLoadFailedAction
   | CertificateConfigurationLoadedAction
   | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
-  | UpdateOfflineCertificateAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
