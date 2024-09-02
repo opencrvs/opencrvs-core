@@ -967,7 +967,6 @@ export type Mutation = {
   requestRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
   resetPasswordInvite?: Maybe<Scalars['String']>
-  updateBirthRegistration: Scalars['ID']
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
   updateRole: Response
@@ -1204,11 +1203,6 @@ export type MutationResendInviteArgs = {
 
 export type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
-}
-
-export type MutationUpdateBirthRegistrationArgs = {
-  details: BirthRegistrationInput
-  id: Scalars['ID']
 }
 
 export type MutationUpdateDeathRegistrationArgs = {

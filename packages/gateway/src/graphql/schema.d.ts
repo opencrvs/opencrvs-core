@@ -63,7 +63,6 @@ export interface GQLMutation {
   createDeathRegistrationCorrection: string
   createMarriageRegistrationCorrection: string
   createBirthRegistration: GQLCreatedIds
-  updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsValidated?: string
   markBirthAsRegistered: string
@@ -2483,7 +2482,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createDeathRegistrationCorrection?: MutationToCreateDeathRegistrationCorrectionResolver<TParent>
   createMarriageRegistrationCorrection?: MutationToCreateMarriageRegistrationCorrectionResolver<TParent>
   createBirthRegistration?: MutationToCreateBirthRegistrationResolver<TParent>
-  updateBirthRegistration?: MutationToUpdateBirthRegistrationResolver<TParent>
   markBirthAsVerified?: MutationToMarkBirthAsVerifiedResolver<TParent>
   markBirthAsValidated?: MutationToMarkBirthAsValidatedResolver<TParent>
   markBirthAsRegistered?: MutationToMarkBirthAsRegisteredResolver<TParent>
@@ -2666,22 +2664,6 @@ export interface MutationToCreateBirthRegistrationResolver<
   (
     parent: TParent,
     args: MutationToCreateBirthRegistrationArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToUpdateBirthRegistrationArgs {
-  id: string
-  details: GQLBirthRegistrationInput
-}
-export interface MutationToUpdateBirthRegistrationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToUpdateBirthRegistrationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

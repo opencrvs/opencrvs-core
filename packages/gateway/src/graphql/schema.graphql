@@ -183,7 +183,6 @@ type Mutation {
     details: MarriageRegistrationInput!
   ): ID!
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
-  updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
     id: ID!
     details: BirthRegistrationInput
