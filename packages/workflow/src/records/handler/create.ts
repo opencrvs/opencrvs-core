@@ -33,7 +33,8 @@ import {
   getTaskFromSavedBundle,
   Encounter,
   Location,
-  findEncounterFromRecord
+  findEncounterFromRecord,
+  Saved
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -154,6 +155,18 @@ async function resolveLocationsForEncounter(
   return getLocationsById(locationIds)
 }
 
+function bundleIncludesLocationResources(record: Saved<Bundle>) {
+  const encounter = findEncounterFromRecord(record)
+  const locationIds =
+    encounter?.location?.map(
+      ({ location }) => location.reference.split('/')[1]
+    ) || []
+
+  return record.entry
+    .filter(({ resource }) => resource.resourceType == 'Location')
+    .every(({ resource }) => locationIds?.includes(resource.id))
+}
+
 async function createRecord(
   recordDetails: z.TypeOf<typeof requestSchema>['record'],
   event: z.TypeOf<typeof requestSchema>['event'],
@@ -215,6 +228,11 @@ async function createRecord(
   if (encounter == null) {
     return mergedBundle
   }
+
+  if (bundleIncludesLocationResources(record)) {
+    return mergedBundle
+  }
+
   const locationResourcesBundle = await resolveLocationsForEncounter(encounter)
 
   if (locationResourcesBundle == null) {
