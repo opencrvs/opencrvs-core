@@ -1,11 +1,4 @@
 type Query {
-  listNotifications(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [Notification]
   sendNotificationToAllUsers(
     subject: String!
     body: String!
@@ -163,8 +156,6 @@ type Query {
 }
 
 type Mutation {
-  createNotification(details: NotificationInput!): Notification!
-  voidNotification(id: ID!): Notification
   requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
   rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
   approveBirthRegistrationCorrection(
@@ -284,19 +275,6 @@ type Dummy {
   dummy: String!
 }
 
-type Notification {
-  id: ID!
-  child: Person
-  mother: Person
-  father: Person
-  informant: Person
-  location: Location
-  createdAt: Date
-  updatedAt: Date
-}
-
-scalar Date
-
 type NotificationResult {
   success: Boolean!
 }
@@ -327,6 +305,8 @@ type BirthRegistration implements EventRegistration {
   updatedAt: Date
   history: [History]
 }
+
+scalar Date
 
 type DeathRegistration implements EventRegistration {
   id: ID!
@@ -659,16 +639,6 @@ type UserInfo {
   districtFhirId: String
   stateFhirId: String
   locationLevel3FhirId: String
-}
-
-input NotificationInput {
-  child: PersonInput
-  mother: PersonInput
-  father: PersonInput
-  informant: PersonInput
-  location: LocationInput
-  createdAt: Date
-  updatedAt: Date
 }
 
 input CorrectionInput {

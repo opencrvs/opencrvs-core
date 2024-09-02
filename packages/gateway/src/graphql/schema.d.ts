@@ -13,7 +13,6 @@ import { GraphQLResolveInfo, GraphQLScalarType } from 'graphql'
  *                             *
  *******************************/
 export interface GQLQuery {
-  listNotifications?: Array<GQLNotification | null>
   sendNotificationToAllUsers?: GQLNotificationResult
   fetchBirthRegistration?: GQLBirthRegistration
   searchBirthRegistrations?: Array<GQLBirthRegistration | null>
@@ -55,8 +54,6 @@ export interface GQLQuery {
 }
 
 export interface GQLMutation {
-  createNotification: GQLNotification
-  voidNotification?: GQLNotification
   requestRegistrationCorrection: string
   rejectRegistrationCorrection: string
   approveBirthRegistrationCorrection: string
@@ -115,19 +112,6 @@ export interface GQLDummy {
   dummy: string
 }
 
-export interface GQLNotification {
-  id: string
-  child?: GQLPerson
-  mother?: GQLPerson
-  father?: GQLPerson
-  informant?: GQLPerson
-  location?: GQLLocation
-  createdAt?: GQLDate
-  updatedAt?: GQLDate
-}
-
-export type GQLDate = any
-
 export interface GQLNotificationResult {
   success: boolean
 }
@@ -158,6 +142,8 @@ export interface GQLBirthRegistration extends GQLEventRegistration {
   updatedAt?: GQLDate
   history?: Array<GQLHistory | null>
 }
+
+export type GQLDate = any
 
 export interface GQLDeathRegistration extends GQLEventRegistration {
   id: string
@@ -527,16 +513,6 @@ export interface GQLUserInfo {
   districtFhirId?: string
   stateFhirId?: string
   locationLevel3FhirId?: string
-}
-
-export interface GQLNotificationInput {
-  child?: GQLPersonInput
-  mother?: GQLPersonInput
-  father?: GQLPersonInput
-  informant?: GQLPersonInput
-  location?: GQLLocationInput
-  createdAt?: GQLDate
-  updatedAt?: GQLDate
 }
 
 export interface GQLCorrectionInput {
@@ -1731,10 +1707,9 @@ export interface GQLResolver {
   Query?: GQLQueryTypeResolver
   Mutation?: GQLMutationTypeResolver
   Dummy?: GQLDummyTypeResolver
-  Notification?: GQLNotificationTypeResolver
-  Date?: GraphQLScalarType
   NotificationResult?: GQLNotificationResultTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
+  Date?: GraphQLScalarType
   DeathRegistration?: GQLDeathRegistrationTypeResolver
   Person?: GQLPersonTypeResolver
   BirthRegResultSet?: GQLBirthRegResultSetTypeResolver
@@ -1847,7 +1822,6 @@ export interface GQLResolver {
   AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
-  listNotifications?: QueryToListNotificationsResolver<TParent>
   sendNotificationToAllUsers?: QueryToSendNotificationToAllUsersResolver<TParent>
   fetchBirthRegistration?: QueryToFetchBirthRegistrationResolver<TParent>
   searchBirthRegistrations?: QueryToSearchBirthRegistrationsResolver<TParent>
@@ -1886,25 +1860,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
-}
-
-export interface QueryToListNotificationsArgs {
-  locationIds?: Array<string | null>
-  status?: string
-  userId?: string
-  from?: GQLDate
-  to?: GQLDate
-}
-export interface QueryToListNotificationsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToListNotificationsArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
 }
 
 export interface QueryToSendNotificationToAllUsersArgs {
@@ -2519,8 +2474,6 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLMutationTypeResolver<TParent = any> {
-  createNotification?: MutationToCreateNotificationResolver<TParent>
-  voidNotification?: MutationToVoidNotificationResolver<TParent>
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
   approveBirthRegistrationCorrection?: MutationToApproveBirthRegistrationCorrectionResolver<TParent>
@@ -2573,36 +2526,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
-}
-
-export interface MutationToCreateNotificationArgs {
-  details: GQLNotificationInput
-}
-export interface MutationToCreateNotificationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToCreateNotificationArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToVoidNotificationArgs {
-  id: string
-}
-export interface MutationToVoidNotificationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToVoidNotificationArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
 }
 
 export interface MutationToRequestRegistrationCorrectionArgs {
@@ -3412,89 +3335,6 @@ export interface GQLDummyTypeResolver<TParent = any> {
 }
 
 export interface DummyToDummyResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLNotificationTypeResolver<TParent = any> {
-  id?: NotificationToIdResolver<TParent>
-  child?: NotificationToChildResolver<TParent>
-  mother?: NotificationToMotherResolver<TParent>
-  father?: NotificationToFatherResolver<TParent>
-  informant?: NotificationToInformantResolver<TParent>
-  location?: NotificationToLocationResolver<TParent>
-  createdAt?: NotificationToCreatedAtResolver<TParent>
-  updatedAt?: NotificationToUpdatedAtResolver<TParent>
-}
-
-export interface NotificationToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToChildResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToMotherResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToFatherResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToInformantResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToLocationResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToCreatedAtResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface NotificationToUpdatedAtResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
