@@ -50,8 +50,6 @@ export interface GQLQuery {
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
-  getCertificateSVG?: GQLCertificateSVG
-  getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   fetchSystem?: GQLSystem
   getOIDPUserInfo?: GQLUserInfo
 }
@@ -103,7 +101,6 @@ export interface GQLMutation {
   usernameReminder?: string
   resetPasswordInvite?: string
   updateRole: GQLResponse
-  createOrUpdateCertificateSVG?: GQLCertificateSVG
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
@@ -514,28 +511,6 @@ export interface GQLComparisonInput {
   nin?: Array<string>
 }
 
-export interface GQLCertificateSVG {
-  id: string
-  svgCode: string
-  svgFilename: string
-  svgDateUpdated: string
-  svgDateCreated: string
-  user: string
-  event: GQLEvent
-  status: GQLCertificateStatus
-}
-
-export const enum GQLCertificateStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE'
-}
-
-export const enum GQLEvent {
-  birth = 'birth',
-  death = 'death',
-  marriage = 'marriage'
-}
-
 export interface GQLSystem {
   _id: string
   clientId: string
@@ -691,17 +666,6 @@ export interface GQLSystemRoleInput {
   value?: string
   active?: boolean
   roles?: Array<GQLRoleInput>
-}
-
-export interface GQLCertificateSVGInput {
-  id?: string
-  svgCode: string
-  svgFilename: string
-  svgDateUpdated?: number
-  svgDateCreated?: number
-  user: string
-  event: GQLEvent
-  status: GQLCertificateStatus
 }
 
 export interface GQLSystemSecret {
@@ -1033,6 +997,12 @@ export interface GQLEventSearchSetNameMap {
   BirthEventSearchSet: GQLBirthEventSearchSet
   DeathEventSearchSet: GQLDeathEventSearchSet
   MarriageEventSearchSet: GQLMarriageEventSearchSet
+}
+
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death',
+  marriage = 'marriage'
 }
 
 export interface GQLEventProgressSet {
@@ -1800,7 +1770,6 @@ export interface GQLResolver {
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   SystemRole?: GQLSystemRoleTypeResolver
-  CertificateSVG?: GQLCertificateSVGTypeResolver
   System?: GQLSystemTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
@@ -1915,8 +1884,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
-  getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
-  getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
 }
@@ -2524,34 +2491,6 @@ export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface QueryToGetCertificateSVGArgs {
-  status: GQLCertificateStatus
-  event: GQLEvent
-}
-export interface QueryToGetCertificateSVGResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: QueryToGetCertificateSVGArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToGetActiveCertificatesSVGResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface QueryToFetchSystemArgs {
   clientId: string
 }
@@ -2626,7 +2565,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
   updateRole?: MutationToUpdateRoleResolver<TParent>
-  createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
@@ -3347,21 +3285,6 @@ export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: MutationToUpdateRoleArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToCreateOrUpdateCertificateSVGArgs {
-  certificateSVG: GQLCertificateSVGInput
-}
-export interface MutationToCreateOrUpdateCertificateSVGResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: MutationToCreateOrUpdateCertificateSVGArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5612,98 +5535,6 @@ export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
 }
 
 export interface SystemRoleToActiveResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCertificateSVGTypeResolver<TParent = any> {
-  id?: CertificateSVGToIdResolver<TParent>
-  svgCode?: CertificateSVGToSvgCodeResolver<TParent>
-  svgFilename?: CertificateSVGToSvgFilenameResolver<TParent>
-  svgDateUpdated?: CertificateSVGToSvgDateUpdatedResolver<TParent>
-  svgDateCreated?: CertificateSVGToSvgDateCreatedResolver<TParent>
-  user?: CertificateSVGToUserResolver<TParent>
-  event?: CertificateSVGToEventResolver<TParent>
-  status?: CertificateSVGToStatusResolver<TParent>
-}
-
-export interface CertificateSVGToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToSvgCodeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToSvgFilenameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToSvgDateUpdatedResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToSvgDateCreatedResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToUserResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToEventResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateSVGToStatusResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
