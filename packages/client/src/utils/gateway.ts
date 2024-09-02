@@ -150,6 +150,7 @@ export type AdvancedSeachParameters = {
   nationalId?: Maybe<Scalars['String']>
   registrationNumber?: Maybe<Scalars['String']>
   registrationStatuses?: Maybe<Array<Maybe<Scalars['String']>>>
+  timePeriodFrom?: Maybe<Scalars['String']>
   trackingId?: Maybe<Scalars['String']>
 }
 
@@ -223,6 +224,7 @@ export type AdvancedSearchParametersInput = {
   recordId?: InputMaybe<Scalars['ID']>
   registrationNumber?: InputMaybe<Scalars['String']>
   registrationStatuses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
+  timePeriodFrom?: InputMaybe<Scalars['String']>
   trackingId?: InputMaybe<Scalars['String']>
 }
 
@@ -2559,6 +2561,7 @@ export type BookmarkAdvancedSearchMutation = {
         dateOfEvent?: string | null
         dateOfEventStart?: string | null
         dateOfEventEnd?: string | null
+        timePeriodFrom?: string | null
         contactNumber?: string | null
         nationalId?: string | null
         registrationNumber?: string | null
@@ -2748,6 +2751,7 @@ export type FetchUserQuery = {
         dateOfEvent?: string | null
         dateOfEventStart?: string | null
         dateOfEventEnd?: string | null
+        timePeriodFrom?: string | null
         contactNumber?: string | null
         nationalId?: string | null
         registrationNumber?: string | null

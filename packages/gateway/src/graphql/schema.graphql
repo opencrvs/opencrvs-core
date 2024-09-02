@@ -554,6 +554,7 @@ input AdvancedSearchParametersInput {
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  timePeriodFrom: String
   contactNumber: String
   contactEmail: String
   nationalId: String
@@ -1495,6 +1496,7 @@ type AdvancedSeachParameters {
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
+  timePeriodFrom: String
   contactNumber: String
   contactEmail: String
   nationalId: String

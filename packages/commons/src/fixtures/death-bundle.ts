@@ -261,7 +261,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -317,7 +317,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Zack'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         gender: 'female',
@@ -397,7 +397,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -582,7 +582,7 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Frank'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         birthDate: '2003-08-16',
