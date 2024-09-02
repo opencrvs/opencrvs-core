@@ -16,11 +16,13 @@ import { logger } from '@opencrvs/commons'
 import { badData, internal } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
-import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getSystems from '@config/handlers/system/systemHandler'
-import { getDocumentUrl } from '@config/services/documents'
 import { COUNTRY_CONFIG_URL } from '@config/config/constants'
 import fetch from 'node-fetch'
+import { getToken } from '@config/utils/auth'
+import { pipe } from 'fp-ts/lib/function'
+import { verifyToken } from '@config/utils/verifyToken'
+import { RouteScope } from '@config/config/routes'
 
 export const SystemRoleType = [
   'FIELD_AGENT',
@@ -36,16 +38,7 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      getActiveCertificatesHandler(request, h).then((certs) =>
-        Promise.all(
-          certs.map(async (cert) => ({
-            ...cert,
-            svgCode: await getDocumentUrl(cert.svgCode, {
-              Authorization: request.headers.authorization
-            })
-          }))
-        )
-      ),
+      getCertificates(request, h),
       getApplicationConfig(request, h),
       getSystems(request, h)
     ])
@@ -63,6 +56,29 @@ export default async function configHandler(
   }
 }
 
+async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+  const authToken = getToken(request)
+  const decodedOrError = pipe(authToken, verifyToken)
+  if (decodedOrError._tag === 'Left') {
+    return []
+  }
+  const { scope } = decodedOrError.right
+
+  if (
+    scope &&
+    (scope.includes(RouteScope.CERTIFY) ||
+      scope.includes(RouteScope.VALIDATE) ||
+      scope.includes(RouteScope.NATLSYSADMIN))
+  ) {
+    return Promise.all(
+      (['birth', 'death', 'marriage'] as const).map(async (event) => {
+        const response = await getEventCertificate(event, getToken(request))
+        return response
+      })
+    )
+  }
+  return []
+}
 async function getConfigFromCountry(authToken?: string) {
   const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
 
@@ -95,6 +111,27 @@ function stripIdFromApplicationConfig(config: Record<string, unknown>) {
       return [key, rest]
     })
   )
+}
+
+async function getEventCertificate(
+  event: 'birth' | 'death' | 'marriage',
+  authToken: string
+) {
+  const url = new URL(
+    `/certificates/${event}.svg`,
+    COUNTRY_CONFIG_URL
+  ).toString()
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${authToken}` }
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
+  }
+  const responseText = await res.text()
+
+  return { svgCode: responseText, event }
 }
 
 export async function getApplicationConfig(
