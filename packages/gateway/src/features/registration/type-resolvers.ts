@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import {
+  getPresignedUrlFromUri,
+  getUserRoleFromHistory
+} from '@gateway/features/registration/utils'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 import {
@@ -1532,40 +1535,16 @@ export const typeResolvers: GQLResolver = {
 
       const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
 
-      const practitionerRoleHistory = (
+      const practitionerRoleHistory =
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
-      ).sort((a, b) => {
-        if (a.meta?.lastUpdated === b.meta?.lastUpdated) {
-          return 0
-        }
-        if (a.meta?.lastUpdated === undefined) {
-          return 1
-        }
-        if (b.meta?.lastUpdated === undefined) {
-          return -1
-        }
-        return (
-          new Date(b.meta?.lastUpdated).valueOf() -
-          new Date(a.meta?.lastUpdated).valueOf()
-        )
-      })
-
-      const result = practitionerRoleHistory.find(
-        (it) =>
-          it?.meta?.lastUpdated &&
-          task.lastModified &&
-          it?.meta?.lastUpdated <= task.lastModified!
-      )
-
-      const targetCode = result?.code?.find((element) => {
-        return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
-      })
-
-      const role = targetCode?.coding?.[0].code
-      const systemRole = result?.code?.[0].coding?.[0].code
 
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
+      )
+
+      const { role, systemRole } = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
       )
 
       if (role && systemRole) {
