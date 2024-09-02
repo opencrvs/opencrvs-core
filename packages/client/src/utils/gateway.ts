@@ -938,7 +938,6 @@ export type Mutation = {
   createDeathRegistrationCorrection: Scalars['ID']
   createMarriageRegistration: CreatedIds
   createMarriageRegistrationCorrection: Scalars['ID']
-  createNotification: Notification
   createOrUpdateUser: User
   deactivateSystem?: Maybe<System>
   deleteSystem?: Maybe<System>
@@ -975,7 +974,6 @@ export type Mutation = {
   updatePermissions?: Maybe<System>
   updateRole: Response
   usernameReminder?: Maybe<Scalars['String']>
-  voidNotification?: Maybe<Notification>
 }
 
 export type MutationActivateUserArgs = {
@@ -1060,10 +1058,6 @@ export type MutationCreateMarriageRegistrationArgs = {
 export type MutationCreateMarriageRegistrationCorrectionArgs = {
   details: MarriageRegistrationInput
   id: Scalars['ID']
-}
-
-export type MutationCreateNotificationArgs = {
-  details: NotificationInput
 }
 
 export type MutationCreateOrUpdateUserArgs = {
@@ -1234,32 +1228,6 @@ export type MutationUpdateRoleArgs = {
 
 export type MutationUsernameReminderArgs = {
   userId: Scalars['String']
-}
-
-export type MutationVoidNotificationArgs = {
-  id: Scalars['ID']
-}
-
-export type Notification = {
-  __typename?: 'Notification'
-  child?: Maybe<Person>
-  createdAt?: Maybe<Scalars['Date']>
-  father?: Maybe<Person>
-  id: Scalars['ID']
-  informant?: Maybe<Person>
-  location?: Maybe<Location>
-  mother?: Maybe<Person>
-  updatedAt?: Maybe<Scalars['Date']>
-}
-
-export type NotificationInput = {
-  child?: InputMaybe<PersonInput>
-  createdAt?: InputMaybe<Scalars['Date']>
-  father?: InputMaybe<PersonInput>
-  informant?: InputMaybe<PersonInput>
-  location?: InputMaybe<LocationInput>
-  mother?: InputMaybe<PersonInput>
-  updatedAt?: InputMaybe<Scalars['Date']>
 }
 
 export type NotificationResult = {
@@ -1450,7 +1418,6 @@ export type Query = {
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
-  listNotifications?: Maybe<Array<Maybe<Notification>>>
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
   queryRegistrationByIdentifier?: Maybe<BirthRegistration>
@@ -1617,14 +1584,6 @@ export type QueryListBirthRegistrationsArgs = {
   from?: InputMaybe<Scalars['Date']>
   locationIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   skip?: InputMaybe<Scalars['Int']>
-  status?: InputMaybe<Scalars['String']>
-  to?: InputMaybe<Scalars['Date']>
-  userId?: InputMaybe<Scalars['String']>
-}
-
-export type QueryListNotificationsArgs = {
-  from?: InputMaybe<Scalars['Date']>
-  locationIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   status?: InputMaybe<Scalars['String']>
   to?: InputMaybe<Scalars['Date']>
   userId?: InputMaybe<Scalars['String']>

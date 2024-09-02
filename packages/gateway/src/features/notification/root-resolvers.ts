@@ -15,10 +15,6 @@ import { unauthorized } from '@hapi/boom'
  */
 export const resolvers: GQLResolver = {
   Query: {
-    listNotifications(_: any, { locations, status }: any) {
-      // query composition
-      return [{ id: '123' }, { id: '321' }]
-    },
     async sendNotificationToAllUsers(
       _: any,
       { subject, body, type, locale },
@@ -35,14 +31,5 @@ export const resolvers: GQLResolver = {
         throw new Error('Unsupported notification type')
       }
     }
-  },
-  Mutation: {
-    async createNotification(_: any, { details }: { details: any }) {
-      // create bundle of resources - some sort of mapping
-      // put resources in a composition
-      // save composition
-      return { details }
-    }
-  },
-  Notification: {}
+  }
 }
