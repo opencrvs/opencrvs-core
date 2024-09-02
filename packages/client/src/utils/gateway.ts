@@ -395,34 +395,6 @@ export type CertificateInput = {
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
 }
 
-export type CertificateSvg = {
-  __typename?: 'CertificateSVG'
-  event: Event
-  id: Scalars['ID']
-  status: CertificateStatus
-  svgCode: Scalars['String']
-  svgDateCreated: Scalars['String']
-  svgDateUpdated: Scalars['String']
-  svgFilename: Scalars['String']
-  user: Scalars['String']
-}
-
-export type CertificateSvgInput = {
-  event: Event
-  id?: InputMaybe<Scalars['ID']>
-  status: CertificateStatus
-  svgCode: Scalars['String']
-  svgDateCreated?: InputMaybe<Scalars['Int']>
-  svgDateUpdated?: InputMaybe<Scalars['Int']>
-  svgFilename: Scalars['String']
-  user: Scalars['String']
-}
-
-export enum CertificateStatus {
-  Active = 'ACTIVE',
-  Inactive = 'INACTIVE'
-}
-
 export type CertificationMetric = {
   __typename?: 'CertificationMetric'
   eventType: Scalars['String']
@@ -967,7 +939,6 @@ export type Mutation = {
   createMarriageRegistration: CreatedIds
   createMarriageRegistrationCorrection: Scalars['ID']
   createNotification: Notification
-  createOrUpdateCertificateSVG?: Maybe<CertificateSvg>
   createOrUpdateUser: User
   deactivateSystem?: Maybe<System>
   deleteSystem?: Maybe<System>
@@ -1093,10 +1064,6 @@ export type MutationCreateMarriageRegistrationCorrectionArgs = {
 
 export type MutationCreateNotificationArgs = {
   details: NotificationInput
-}
-
-export type MutationCreateOrUpdateCertificateSvgArgs = {
-  certificateSVG: CertificateSvgInput
 }
 
 export type MutationCreateOrUpdateUserArgs = {
@@ -1466,8 +1433,6 @@ export type Query = {
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
   fetchSystem?: Maybe<System>
-  getActiveCertificatesSVG?: Maybe<Array<CertificateSvg>>
-  getCertificateSVG?: Maybe<CertificateSvg>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
@@ -1548,11 +1513,6 @@ export type QueryFetchRegistrationForViewingArgs = {
 
 export type QueryFetchSystemArgs = {
   clientId: Scalars['ID']
-}
-
-export type QueryGetCertificateSvgArgs = {
-  event: Event
-  status: CertificateStatus
 }
 
 export type QueryGetDeclarationsStartedMetricsArgs = {
@@ -2292,25 +2252,6 @@ export type WebhookPermission = {
   __typename?: 'WebhookPermission'
   event: Scalars['String']
   permissions: Array<Scalars['String']>
-}
-
-export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{
-  certificateSVG: CertificateSvgInput
-}>
-
-export type CreateOrUpdateCertificateSvgMutation = {
-  __typename?: 'Mutation'
-  createOrUpdateCertificateSVG?: {
-    __typename?: 'CertificateSVG'
-    id: string
-    svgCode: string
-    svgFilename: string
-    user: string
-    status: CertificateStatus
-    event: Event
-    svgDateCreated: string
-    svgDateUpdated: string
-  } | null
 }
 
 export type CreateBirthRegistrationCorrectionMutationVariables = Exact<{

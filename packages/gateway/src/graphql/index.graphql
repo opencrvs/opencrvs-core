@@ -17,8 +17,6 @@
 # import Query.* from '../features/search/schema.graphql'
 # import Query.* from '../features/role/schema.graphql'
 # import Mutation.* from '../features/role/schema.graphql'
-# import Query.* from '../features/certificate/schema.graphql'
-# import Mutation.* from '../features/certificate/schema.graphql'
 # import Mutation.* from '../features/systems/schema.graphql'
 # import Query.* from '../features/systems/schema.graphql'
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'

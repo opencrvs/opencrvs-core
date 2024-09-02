@@ -153,8 +153,6 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
-  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   getOIDPUserInfo(
     code: String!
@@ -268,9 +266,6 @@ type Mutation {
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
   updateRole(systemRole: SystemRoleInput): Response!
-  createOrUpdateCertificateSVG(
-    certificateSVG: CertificateSVGInput!
-  ): CertificateSVG
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -649,28 +644,6 @@ input ComparisonInput {
   nin: [String!]
 }
 
-type CertificateSVG {
-  id: ID!
-  svgCode: String!
-  svgFilename: String!
-  svgDateUpdated: String!
-  svgDateCreated: String!
-  user: String!
-  event: Event!
-  status: CertificateStatus!
-}
-
-enum CertificateStatus {
-  ACTIVE
-  INACTIVE
-}
-
-enum Event {
-  birth
-  death
-  marriage
-}
-
 type System {
   _id: ID!
   clientId: ID!
@@ -826,17 +799,6 @@ input SystemRoleInput {
   value: String
   active: Boolean
   roles: [RoleInput!]
-}
-
-input CertificateSVGInput {
-  id: ID
-  svgCode: String!
-  svgFilename: String!
-  svgDateUpdated: Int
-  svgDateCreated: Int
-  user: String!
-  event: Event!
-  status: CertificateStatus!
 }
 
 type SystemSecret {
@@ -1144,6 +1106,12 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+}
+
+enum Event {
+  birth
+  death
+  marriage
 }
 
 type EventProgressSet {
