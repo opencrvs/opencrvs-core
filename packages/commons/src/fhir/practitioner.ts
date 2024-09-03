@@ -99,3 +99,40 @@ export function getPractitionerContactDetails(practitioner: Practitioner) {
 
   throw new Error('No contact details found for practitioner')
 }
+
+export const getUserRoleFromHistory = (
+  practitionerRoleHistory: PractitionerRoleHistory[],
+  lastModified: string
+) => {
+  const practitionerRoleHistorySorted = practitionerRoleHistory.sort((a, b) => {
+    if (a.meta?.lastUpdated === b.meta?.lastUpdated) {
+      return 0
+    }
+    if (a.meta?.lastUpdated === undefined) {
+      return 1
+    }
+    if (b.meta?.lastUpdated === undefined) {
+      return -1
+    }
+    return (
+      new Date(b.meta?.lastUpdated).valueOf() -
+      new Date(a.meta?.lastUpdated).valueOf()
+    )
+  })
+
+  const result = practitionerRoleHistorySorted.find(
+    (it) =>
+      it?.meta?.lastUpdated &&
+      lastModified &&
+      it?.meta?.lastUpdated <= lastModified!
+  )
+
+  const targetCode = result?.code?.find((element) => {
+    return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+  })
+
+  const role = targetCode?.coding?.[0].code
+  const systemRole = result?.code?.[0].coding?.[0].code
+
+  return { role, systemRole }
+}

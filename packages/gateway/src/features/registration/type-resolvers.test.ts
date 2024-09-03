@@ -25,7 +25,10 @@ import {
 } from '@opencrvs/commons/fixtures'
 import { Context } from '@gateway/graphql/context'
 import { getAuthHeader } from '@opencrvs/commons/http'
-import { getUserRoleFromHistory, IPractitionerRoleHistory } from './utils'
+import {
+  getUserRoleFromHistory,
+  PractitionerRoleHistory
+} from '@opencrvs/commons/types'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
@@ -527,7 +530,7 @@ test('getting role at a specific time from roleHistory', async () => {
       _transforms: { meta: { lastUpdated: '2024-09-02T08:12:52.860Z' } },
       _request: { method: 'PUT' }
     }
-  ] as unknown as IPractitionerRoleHistory
+  ] as unknown as PractitionerRoleHistory[]
 
   /*
     2024-09-02T08:13:50.173+00:00 NATIONAL_REGISTRAR
