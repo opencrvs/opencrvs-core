@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  getPresignedUrlFromUri,
-  getUserRoleFromHistory
-} from '@gateway/features/registration/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 import {
@@ -90,7 +87,8 @@ import {
   findLastOfficeFromSavedBundle,
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
-  findResourceFromBundleById
+  findResourceFromBundleById,
+  getUserRoleFromHistory
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
