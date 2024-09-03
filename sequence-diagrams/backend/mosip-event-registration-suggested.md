@@ -45,7 +45,7 @@ sequenceDiagram
     Note over Client(submissionMiddleware): Record will stay in WAITING_VALIDATION status and appear in EXTERNAL_VALIDATION_WORKQUEUE workqueue
     GraphQL gateway->>Workflow: POST /create-record
     Note over Workflow: Registration flow as far as call to opencrvs-countryconfig
-    Workflow->>OpenCRVS countryconfig: /event-registration - dont create BRN yet
+    Workflow->>OpenCRVS countryconfig: /event/waiting-for-validation - dont create BRN yet
     Note over OpenCRVS countryconfig: Either countryconfig imports functions from `OpenCRVS-MOSIP mediator` -repository or we forward the call to that microservice.<br>This is TBD. For clarity, let's separate the imported `OpenCRVS-MOSIP mediator` functions.
 
     OpenCRVS countryconfig->>OpenCRVS-MOSIP mediator: Forward the event registration to the mediator
@@ -57,6 +57,9 @@ sequenceDiagram
     Note over MOSIP (OpenCRVS Proxy): RIDGENERATION - create and log AID
     MOSIP (OpenCRVS Proxy)->>OpenCRVS-MOSIP mediator: return application id (AID)
     OpenCRVS-MOSIP mediator->>GraphQL gateway: Amend FHIR patient with AID, gateway eventually connects to MongoDB (Hearth)
+
+    %% Comment: open question to Pyry, how do we save the AID before getting the NID?
+
     Note over GraphQL gateway: Retain record in WAITING_VALIDATION status as BRN will not be created yet
     GraphQL gateway->>Workflow: success
 
@@ -67,7 +70,7 @@ sequenceDiagram
     (OpenCRVS Proxy)->>OpenCRVS-MOSIP mediator: POST (NID)VID & uinToken to /birthReceiveNid
     OpenCRVS-MOSIP mediator->>OpenCRVS auth: POST authenticate systen client
     OpenCRVS auth->>OpenCRVS-MOSIP mediator: return JWT
-    OpenCRVS-MOSIP mediator->>GraphQL gateway: POST (NID)VID & uinToken & BRN to (new) registrationValidated API
+    OpenCRVS-MOSIP mediator->>GraphQL gateway: POST (NID)VID & uinToken & BRN to (new) confirmRegistration Gateway API
     GraphQL gateway->>Workflow: continue current /confirm/registration flow with (NID)VID & UIN_TOKEN as child identifiers.  UIN_TOKEN should never be returned in a GraphQL query to client (PRIVATE)
 ```
 
