@@ -1919,19 +1919,21 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </Accordion>
                   )}
 
-                  <FormFieldGenerator
-                    id={reviewSection.id}
-                    key={reviewSection.id}
-                    onChange={(values) => {
-                      modifyDeclaration(values, reviewSection, declaration)
-                    }}
-                    setAllFieldsDirty={false}
-                    fields={reviewSection.groups[0].fields}
-                    draftData={declaration.data}
-                    initialValues={
-                      declaration.data.preview ?? declaration.data.review
-                    }
-                  />
+                  {!(isCorrection(declaration) || viewRecord) && (
+                    <FormFieldGenerator
+                      id={reviewSection.id}
+                      key={reviewSection.id}
+                      onChange={(values) => {
+                        modifyDeclaration(values, reviewSection, declaration)
+                      }}
+                      setAllFieldsDirty={false}
+                      fields={reviewSection.groups[0].fields}
+                      draftData={declaration.data}
+                      initialValues={
+                        declaration.data.preview ?? declaration.data.review
+                      }
+                    />
+                  )}
 
                   {totalFileSizeExceeded && (
                     <StyledAlert type="warning">
