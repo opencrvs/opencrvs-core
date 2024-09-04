@@ -12,6 +12,7 @@ on:
   push:
     branches:
       - master
+      - develop
       - release-v*
 
 jobs:
