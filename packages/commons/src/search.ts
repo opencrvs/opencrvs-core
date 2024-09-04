@@ -96,6 +96,8 @@ export interface SearchDocument {
   compositionId: string
   compositionType?: string
   event?: EVENT
+  name?: string
+  lastStatusChangedAt?: string
   type?: string
   informantType?: string
   contactNumber?: string

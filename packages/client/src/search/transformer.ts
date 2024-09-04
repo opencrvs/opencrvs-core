@@ -11,7 +11,6 @@
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLEventSearchSet,
   GQLHumanName,
   GQLMarriageEventSearchSet,
   GQLRegStatus
@@ -19,24 +18,28 @@ import type {
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
+import {
+  HumanName,
+  EventSearchSet,
+  SearchEventsQuery
+} from '@client/utils/gateway'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
 
 export const isBirthEvent = (
-  req: GQLEventSearchSet
+  req: EventSearchSet
 ): req is GQLBirthEventSearchSet => {
   return req.type === 'Birth'
 }
 
 export const isDeathEvent = (
-  req: GQLEventSearchSet
+  req: EventSearchSet
 ): req is GQLDeathEventSearchSet => {
   return req.type === 'Death'
 }
 
 export const isMarriageEvent = (
-  reg: GQLEventSearchSet
+  reg: EventSearchSet
 ): reg is GQLMarriageEventSearchSet => {
   return reg.type === 'Marriage'
 }
@@ -51,8 +54,8 @@ export const transformData = (
   }
 
   return data.results
-    .filter((req): req is GQLEventSearchSet => req !== null)
-    .map((reg: GQLEventSearchSet) => {
+    .filter((req): req is EventSearchSet => req !== null)
+    .map((reg: EventSearchSet) => {
       let birthReg
       let deathReg
       let marriageReg

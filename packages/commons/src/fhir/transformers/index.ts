@@ -182,7 +182,7 @@ function createNameBuilder<T extends CompositionSectionCode>(
       setObjectPropInResourceArray(
         person,
         'name',
-        [fieldValue],
+        fieldValue,
         'family',
         context
       )
@@ -974,9 +974,9 @@ function setResourceIdentifier(
     value: fieldValue
   } as TaskIdentifier
 
-  resource.identifier
+  resource.identifier = resource.identifier
     .filter((obj) => obj.system !== identifier.system)
-    .push(identifier)
+    .concat(identifier)
 }
 
 function createRegStatusComment(
@@ -1931,7 +1931,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          [fieldValue],
+          fieldValue,
           'family',
           context
         )
@@ -2310,7 +2310,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          [fieldValue],
+          fieldValue,
           'family',
           context
         )
@@ -2423,7 +2423,7 @@ const builders: IFieldBuilders = {
         setObjectPropInResourceArray(
           person,
           'name',
-          [fieldValue],
+          fieldValue,
           'family',
           context
         )
