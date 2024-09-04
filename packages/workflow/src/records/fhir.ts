@@ -51,7 +51,8 @@ import {
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
   getResourceFromBundleById,
-  TaskIdentifierSystem
+  TaskIdentifierSystem,
+  Location
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -1493,4 +1494,25 @@ export function sortTasksDescending(tasks: Task[]) {
       new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
     )
   })
+}
+
+export async function getLocationsById(
+  locationIds: Array<string>
+): Promise<Bundle<Location>> {
+  const res = await fetch(
+    new URL(`/fhir/Location?_id=${locationIds.join(',')}`, FHIR_URL).href,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Fetching locations from Hearth failed with [${res.status}] body: ${res.statusText}`
+    )
+  }
+
+  return res.json()
 }
