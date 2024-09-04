@@ -103,6 +103,19 @@ export default defineConfig(({ mode }) => {
       coverage: {
         reporter: ['text', 'json', 'html']
       }
+    },
+    server: {
+      // to get the manifest.json and images from country-config during development time
+      proxy: {
+        '/manifest.json': {
+          target: 'http://localhost:3040/static/',
+          changeOrigin: true
+        },
+        '/images/': {
+          target: 'http://localhost:3040/static/',
+          changeOrigin: true
+        }
+      }
     }
   }
 })
