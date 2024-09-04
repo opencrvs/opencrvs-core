@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { LoopReducer, Loop } from 'redux-loop'
+import { LoopReducer, Loop, Cmd, loop } from 'redux-loop'
 import { IForm } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/deserializer/deserializer'
-import { validators } from '@client/forms/validators'
+import { initValidators, validators } from '@client/forms/validators'
+import { LoadFormsResponse } from '@client/utils/referenceApi'
 
 export type IRegisterFormState =
   | {
@@ -46,6 +47,19 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
   switch (action.type) {
     case offlineActions.READY:
     case offlineActions.FORMS_LOADED:
+      return loop(
+        state,
+        Cmd.run(
+          async () => {
+            await initValidators()
+            return action.payload
+          },
+          {
+            successActionCreator: offlineActions.CustomValidatorsSuccess
+          }
+        )
+      )
+    case offlineActions.CUSTOM_VALIDATORS_LOADED:
       const { forms } = action.payload
 
       const birth = deserializeForm(forms.birth, validators)
