@@ -47,10 +47,11 @@ import {
   HIDDEN,
   Ii18nHiddenFormField,
   HTTP,
-  Ii18nHttpFormField,
   InitialValue,
   DependencyInfo,
-  IHttpFormField
+  IHttpFormField,
+  IButtonFormField,
+  BUTTON
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -725,6 +726,10 @@ export function getSelectedOption(
   return null
 }
 
+export function isFieldButton(field: IFormField): field is IButtonFormField {
+  return field.type === BUTTON
+}
+
 export function isFieldHttp(field: IFormField): field is IHttpFormField {
   return field.type === HTTP
 }
@@ -747,10 +752,10 @@ export function getDependentFields(
     return fields.filter(({ name }) => name === field.options.trigger)
   } else {
     return fields.filter(
-      (field) =>
-        field.initialValue &&
-        isInitialValueDependencyInfo(field.initialValue) &&
-        field.initialValue.dependsOn.includes(field.name)
+      ({ initialValue }) =>
+        initialValue &&
+        isInitialValueDependencyInfo(initialValue) &&
+        initialValue.dependsOn.includes(field.name)
     )
   }
 }

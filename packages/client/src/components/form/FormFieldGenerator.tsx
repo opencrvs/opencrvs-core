@@ -33,7 +33,8 @@ import {
   getFieldHelperText,
   isFieldHttp,
   getDependentFields,
-  isInitialValueDependencyInfo
+  isInitialValueDependencyInfo,
+  isFieldButton
 } from '@client/forms/utils'
 
 import styled, { keyframes } from 'styled-components'
@@ -93,7 +94,8 @@ import {
   SIGNATURE,
   BUTTON,
   HTTP,
-  InitialValue
+  InitialValue,
+  IButtonFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -190,7 +192,6 @@ type GeneratedInputFieldProps = {
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched?: (name: string, isTouched?: boolean) => void
-  dependentFields?: Ii18nFormField[]
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
 const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
@@ -211,8 +212,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     dynamicDispatch,
     onUploadingStateChanged,
     setFieldTouched,
-    requiredErrorMessage,
-    dependentFields
+    requiredErrorMessage
   }) => {
     const inputFieldProps = {
       id: fieldDefinition.name,
@@ -678,12 +678,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
     if (fieldDefinition.type === BUTTON) {
       const handleClick = () => {
-        if (!dependentFields?.length) {
-          console.error(
+        if (!onClick) {
+          // eslint-disable-next-line no-console
+          console.warn(
             `trigger "${fieldDefinition.options.trigger}" not found in form definitions for button "${fieldDefinition.name}"`
           )
           return
         }
+        onClick()
       }
       return (
         <InputField {...inputFieldProps} hideInputHeader={true}>
@@ -914,33 +916,34 @@ class FormSectionComponent extends React.Component<Props> {
 
   getOnClickHandle = (
     fields: IFormField[],
-    field: IFormField,
+    field: IButtonFormField,
     setFieldValue: (fieldName: string, value: any) => void,
     setFieldError: (fieldName: string, message: string) => void
   ) => {
-    if (isFieldHttp(field)) {
-      return async () => {
+    const trigger = fields.find((f) => f.name === field.options.trigger)
+    if (trigger && isFieldHttp(trigger)) {
+      return () => {
         const {
           options: { url, ...requestOptions }
-        } = field
+        } = trigger
+        const fieldsDependentOnTrigger = getDependentFields(fields, trigger)
         fetch(url, requestOptions)
           .then((res) => res.text())
           .then((data) => {
             setFieldValue(`${field.name}.data`, data)
-            // if (dependentFields?.length) {
-            //   dependentFields.forEach((field) => {
-            //     console.log('setting', field.name, data)
-            //     setFieldValue(field.name, data)
-            //   })
-            // }
+            if (fieldsDependentOnTrigger.length) {
+              fieldsDependentOnTrigger.forEach((field) => {
+                setFieldValue(field.name, data)
+              })
+            }
           })
           .catch((error) => {
             setFieldValue(`${field.name}.error`, error.message)
-            // if (dependentFields?.length && onSetFieldError) {
-            //   dependentFields.forEach((field) =>
-            //     setFieldError(field.name, error.message)
-            //   )
-            // }
+            if (fieldsDependentOnTrigger.length) {
+              fieldsDependentOnTrigger.forEach((field) => {
+                setFieldError(field.name, error.message)
+              })
+            }
           })
       }
     }
@@ -1135,7 +1138,7 @@ class FormSectionComponent extends React.Component<Props> {
           ) {
             let onClick: (() => void) | undefined
             const dependentFields = getDependentFields(fields, field)
-            if (field.type === BUTTON && dependentFields.length > 0) {
+            if (isFieldButton(field) && dependentFields.length > 0) {
               onClick = this.getOnClickHandle(
                 fields,
                 field,
@@ -1167,9 +1170,6 @@ class FormSectionComponent extends React.Component<Props> {
                       draftData={draftData}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
-                      dependentFields={dependentFields.map((field) =>
-                        internationaliseFieldObject(intl, field)
-                      )}
                     />
                   )}
                 </Field>
