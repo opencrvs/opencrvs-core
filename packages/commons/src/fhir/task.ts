@@ -95,12 +95,12 @@ export type TaskIdentifier =
 export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
 
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
-type AllSystems = ExtractSystem<TaskIdentifier>
+export type TaskIdentifierSystem = ExtractSystem<TaskIdentifier>
 
 type AfterLastSlash<S extends string> =
   S extends `${infer _Start}/${infer Rest}` ? AfterLastSlash<Rest> : S
 
-export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
+export type TaskIdentifierSystemType = AfterLastSlash<TaskIdentifierSystem>
 
 export type Task = Omit<
   fhir3.Task,
