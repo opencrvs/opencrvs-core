@@ -465,6 +465,12 @@ export enum REVIEW_OVERRIDE_POSITION {
   AFTER = 'after'
 }
 
+export type DependencyInfo = {
+  expression: string
+  dependsOn: string[]
+}
+export type InitialValue = IFormFieldValue | DependencyInfo
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -483,7 +489,7 @@ export interface IFormFieldBase {
   disabled?: boolean
   enabled?: string
   custom?: boolean
-  initialValue?: IFormFieldValue
+  initialValue?: InitialValue
   initialValueKey?: string
   extraValue?: IFormFieldValue
   conditionals?: Conditional[]
@@ -1047,6 +1053,7 @@ export interface Ii18nFormFieldBase {
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
   ignoreBottomMargin?: boolean
+  dependsOn?: string[]
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

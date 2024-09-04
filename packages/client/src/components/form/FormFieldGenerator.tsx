@@ -30,7 +30,10 @@ import {
   getQueryData,
   getVisibleOptions,
   getListOfLocations,
-  getFieldHelperText
+  getFieldHelperText,
+  isFieldHttp,
+  getDependentFields,
+  isInitialValueDependencyInfo
 } from '@client/forms/utils'
 
 import styled, { keyframes } from 'styled-components'
@@ -89,9 +92,8 @@ import {
   HIDDEN,
   SIGNATURE,
   BUTTON,
-  Ii18nHttpFormField,
   HTTP,
-  IHttpFormField
+  InitialValue
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -171,11 +173,10 @@ function handleSelectFocus(id: string, isSearchable: boolean) {
   }
 }
 
-type DependepentFormFieldDefinition = Ii18nHttpFormField
-
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
+  onClick?: () => void
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
@@ -189,13 +190,14 @@ type GeneratedInputFieldProps = {
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched?: (name: string, isTouched?: boolean) => void
-  dependentFieldDefinition?: DependepentFormFieldDefinition
+  dependentFields?: Ii18nFormField[]
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
 const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
   ({
     fieldDefinition,
     onChange,
+    onClick,
     onBlur,
     onSetFieldValue,
     resetDependentSelectValues,
@@ -210,7 +212,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     onUploadingStateChanged,
     setFieldTouched,
     requiredErrorMessage,
-    dependentFieldDefinition
+    dependentFields
   }) => {
     const inputFieldProps = {
       id: fieldDefinition.name,
@@ -675,20 +677,17 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === BUTTON) {
-      let trigger = () => {
-        // eslint-disable-next-line no-console
-        console.error(
-          'please define a trigger for button',
-          fieldDefinition.name
-        )
-      }
-
-      if (dependentFieldDefinition) {
-        trigger = () => fetch(dependentFieldDefinition.options)
+      const handleClick = () => {
+        if (!dependentFields?.length) {
+          console.error(
+            `trigger "${fieldDefinition.options.trigger}" not found in form definitions for button "${fieldDefinition.name}"`
+          )
+          return
+        }
       }
       return (
         <InputField {...inputFieldProps} hideInputHeader={true}>
-          <Button type="primary" onClick={trigger}>
+          <Button type="primary" onClick={handleClick}>
             {fieldDefinition.label}
           </Button>
         </InputField>
@@ -730,9 +729,15 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
+function handleInitialValue(initialValue: InitialValue): IFormFieldValue {
+  return isInitialValueDependencyInfo(initialValue) ? '' : initialValue
+}
+
 const mapFieldsToValues = (fields: IFormField[]) =>
   fields.reduce((memo, field) => {
-    let fieldInitialValue = field.initialValue as IFormFieldValue
+    let fieldInitialValue = handleInitialValue(
+      field.initialValue as InitialValue
+    )
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
@@ -740,13 +745,15 @@ const mapFieldsToValues = (fields: IFormField[]) =>
       const nestedInitialValues = nestedFieldsFlatted.reduce(
         (nestedValues, nestedField) => ({
           ...nestedValues,
-          [nestedField.name]: nestedField.initialValue
+          [nestedField.name]: handleInitialValue(
+            nestedField.initialValue as InitialValue
+          )
         }),
         {}
       )
 
       fieldInitialValue = {
-        value: field.initialValue as IFormFieldValue,
+        value: handleInitialValue(field.initialValue as InitialValue),
         nestedFields: nestedInitialValues
       }
     }
@@ -905,11 +912,46 @@ class FormSectionComponent extends React.Component<Props> {
     })
   }
 
+  getOnClickHandle = (
+    fields: IFormField[],
+    field: IFormField,
+    setFieldValue: (fieldName: string, value: any) => void,
+    setFieldError: (fieldName: string, message: string) => void
+  ) => {
+    if (isFieldHttp(field)) {
+      return async () => {
+        const {
+          options: { url, ...requestOptions }
+        } = field
+        fetch(url, requestOptions)
+          .then((res) => res.text())
+          .then((data) => {
+            setFieldValue(`${field.name}.data`, data)
+            // if (dependentFields?.length) {
+            //   dependentFields.forEach((field) => {
+            //     console.log('setting', field.name, data)
+            //     setFieldValue(field.name, data)
+            //   })
+            // }
+          })
+          .catch((error) => {
+            setFieldValue(`${field.name}.error`, error.message)
+            // if (dependentFields?.length && onSetFieldError) {
+            //   dependentFields.forEach((field) =>
+            //     setFieldError(field.name, error.message)
+            //   )
+            // }
+          })
+      }
+    }
+  }
+
   render() {
     const {
       values,
       fields,
       setFieldValue,
+      setFieldError,
       setFieldTouched,
       touched,
       offlineCountryConfig,
@@ -1091,20 +1133,17 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === NID_VERIFICATION_BUTTON ||
             field.type === BUTTON
           ) {
-            let dependentFieldDefinition: IHttpFormField | undefined
-            let i18nDependentFieldDefinition: Ii18nHttpFormField | undefined
-            if (field.type === 'BUTTON') {
-              dependentFieldDefinition = fields.find(
-                ({ name, type }) =>
-                  name === field.options.trigger && type === HTTP
-              ) as IHttpFormField | undefined
-              if (dependentFieldDefinition) {
-                i18nDependentFieldDefinition = internationaliseFieldObject(
-                  intl,
-                  dependentFieldDefinition
-                ) as Ii18nHttpFormField
-              }
+            let onClick: (() => void) | undefined
+            const dependentFields = getDependentFields(fields, field)
+            if (field.type === BUTTON && dependentFields.length > 0) {
+              onClick = this.getOnClickHandle(
+                fields,
+                field,
+                setFieldValue,
+                setFieldError
+              )
             }
+
             return (
               <FormItem
                 key={`${field.name}`}
@@ -1122,12 +1161,15 @@ class FormSectionComponent extends React.Component<Props> {
                         this.resetDependentSelectValues
                       }
                       {...formikFieldProps.field}
+                      onClick={onClick}
                       touched={touched[field.name] || false}
                       error={error}
                       draftData={draftData}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
-                      dependentFieldDefinition={i18nDependentFieldDefinition}
+                      dependentFields={dependentFields.map((field) =>
+                        internationaliseFieldObject(intl, field)
+                      )}
                     />
                   )}
                 </Field>

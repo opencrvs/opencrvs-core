@@ -45,7 +45,12 @@ import {
   INidVerificationButton,
   BULLET_LIST,
   HIDDEN,
-  Ii18nHiddenFormField
+  Ii18nHiddenFormField,
+  HTTP,
+  Ii18nHttpFormField,
+  InitialValue,
+  DependencyInfo,
+  IHttpFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -718,4 +723,34 @@ export function getSelectedOption(
   }
 
   return null
+}
+
+export function isFieldHttp(field: IFormField): field is IHttpFormField {
+  return field.type === HTTP
+}
+
+export function isInitialValueDependencyInfo(
+  value: InitialValue
+): value is DependencyInfo {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    Boolean((value as DependencyInfo).dependsOn)
+  )
+}
+
+export function getDependentFields(
+  fields: IFormField[],
+  field: IFormField
+): IFormField[] {
+  if (field.type === 'BUTTON') {
+    return fields.filter(({ name }) => name === field.options.trigger)
+  } else {
+    return fields.filter(
+      (field) =>
+        field.initialValue &&
+        isInitialValueDependencyInfo(field.initialValue) &&
+        field.initialValue.dependsOn.includes(field.name)
+    )
+  }
 }
