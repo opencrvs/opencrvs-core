@@ -61,13 +61,12 @@
 }
 ```
 
-- **Title** Description
-
 ## 1.5.1
 
 ## Improvements
 
 - Fetch child identifier in view record
+- Home screen application’s name and icons are to be configured from country configuration package as manifest.json and app icon files are moved from core to country config (check `opencrvs-countryconfig/src/client-static` folder)
 
 ## Bug fixes
 
