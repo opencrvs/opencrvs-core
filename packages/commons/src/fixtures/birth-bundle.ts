@@ -244,7 +244,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Baumbach'],
-            family: ['Neil']
+            family: 'Neil'
           }
         ],
         birthDate: '2003-07-11',
@@ -349,7 +349,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Sophia'],
-            family: ['Baumbach']
+            family: 'Baumbach'
           }
         ],
         telecom: [
@@ -479,7 +479,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             use: 'en',
             given: ['Isadore'],
-            family: ['Baumbach']
+            family: 'Baumbach'
           }
         ],
         gender: 'female',

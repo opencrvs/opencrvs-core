@@ -228,7 +228,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Jara'],
-            family: ['Akhtar']
+            family: 'Akhtar'
           }
         ],
         gender: 'female',
@@ -321,7 +321,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Wonder'],
-            family: ['Woman']
+            family: 'Woman'
           }
         ],
         identifier: [
