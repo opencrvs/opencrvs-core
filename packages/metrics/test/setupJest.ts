@@ -391,7 +391,6 @@ beforeEach(() => {
         hits: [
           {
             _index: 'ocrvs',
-            _type: 'compositions',
             _id: '0299daa0-fa97-439b-92ed-652d7db186c7',
             _score: null,
             _source: {
@@ -458,7 +457,6 @@ beforeEach(() => {
           },
           {
             _index: 'ocrvs',
-            _type: 'compositions',
             _id: 'ca09dfa9-9e31-40ed-8aa6-9446b4ceb71a',
             _score: null,
             _source: {
@@ -537,7 +535,6 @@ beforeEach(() => {
           },
           {
             _index: 'ocrvs',
-            _type: 'compositions',
             _id: '1a0dbdfd-550f-4113-ac23-e650596c7bea',
             _score: null,
             _source: {
@@ -598,7 +595,6 @@ beforeEach(() => {
           },
           {
             _index: 'ocrvs',
-            _type: 'compositions',
             _id: '9867aaef-b994-4744-b5b3-abdd3f520793',
             _score: null,
             _source: {
@@ -671,7 +667,6 @@ beforeEach(() => {
           },
           {
             _index: 'ocrvs',
-            _type: 'compositions',
             _id: 'b25ca75b-af0a-4cf4-94a8-359d1a7e190f',
             _score: null,
             _source: {
@@ -740,7 +735,6 @@ beforeEach(() => {
           },
           {
             _index: 'ocrvs',
-            _type: 'compositions',
             _id: 'b8779830-49ca-48ed-8a21-fd43121e65ce',
             _score: null,
             _source: {

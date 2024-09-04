@@ -1931,7 +1931,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </Accordion>
                   )}
 
-                  {!viewRecord && (
+                  {!(isCorrection(declaration) || viewRecord) && (
                     <FormFieldGenerator
                       id={reviewSection.id}
                       key={reviewSection.id}
