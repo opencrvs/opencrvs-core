@@ -9,6 +9,7 @@
 ## Improvements
 
 - Fetch child identifier in view record
+- Auth token, ip address, remote address redacted from server log
 - **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
 
 ### New features
