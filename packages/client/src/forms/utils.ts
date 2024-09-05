@@ -746,16 +746,12 @@ export function isInitialValueDependencyInfo(
 
 export function getDependentFields(
   fields: IFormField[],
-  field: IFormField
+  fieldName: string
 ): IFormField[] {
-  if (field.type === 'BUTTON') {
-    return fields.filter(({ name }) => name === field.options.trigger)
-  } else {
-    return fields.filter(
-      ({ initialValue }) =>
-        initialValue &&
-        isInitialValueDependencyInfo(initialValue) &&
-        initialValue.dependsOn.includes(field.name)
-    )
-  }
+  return fields.filter(
+    ({ initialValue }) =>
+      initialValue &&
+      isInitialValueDependencyInfo(initialValue) &&
+      initialValue.dependsOn.includes(fieldName)
+  )
 }

@@ -31,12 +31,9 @@ import {
   getVisibleOptions,
   getListOfLocations,
   getFieldHelperText,
-  isFieldHttp,
-  getDependentFields,
   isInitialValueDependencyInfo,
-  isFieldButton
+  getDependentFields
 } from '@client/forms/utils'
-
 import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
 import {
@@ -95,7 +92,7 @@ import {
   BUTTON,
   HTTP,
   InitialValue,
-  IButtonFormField
+  DependencyInfo
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -118,7 +115,7 @@ import {
   Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
-import { isEqual, flatten } from 'lodash'
+import { isEqual, flatten, get } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
@@ -135,15 +132,10 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import {
-  BulletList,
-  Button,
-  Divider,
-  InputLabel,
-  Stack
-} from '@opencrvs/components'
+import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
+import { ButtonField } from '@client/components/form/Button'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -177,6 +169,7 @@ function handleSelectFocus(id: string, isSearchable: boolean) {
 
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
+  fields: IFormField[]
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent<any>) => void
@@ -198,7 +191,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
   ({
     fieldDefinition,
     onChange,
-    onClick,
     onBlur,
     onSetFieldValue,
     resetDependentSelectValues,
@@ -212,7 +204,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     dynamicDispatch,
     onUploadingStateChanged,
     setFieldTouched,
-    requiredErrorMessage
+    requiredErrorMessage,
+    fields
   }) => {
     const inputFieldProps = {
       id: fieldDefinition.name,
@@ -633,7 +626,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === HIDDEN || fieldDefinition.type === HTTP) {
+    if (fieldDefinition.type === HIDDEN) {
       const { error, touched, ...allowedInputProps } = inputProps
 
       return (
@@ -676,22 +669,20 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
+    if (fieldDefinition.type === HTTP) {
+      return null
+    }
+
     if (fieldDefinition.type === BUTTON) {
-      const handleClick = () => {
-        if (!onClick) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `trigger "${fieldDefinition.options.trigger}" not found in form definitions for button "${fieldDefinition.name}"`
-          )
-          return
-        }
-        onClick()
-      }
       return (
         <InputField {...inputFieldProps} hideInputHeader={true}>
-          <Button type="primary" onClick={handleClick}>
-            {fieldDefinition.label}
-          </Button>
+          <ButtonField
+            fields={fields}
+            fieldDefinition={fieldDefinition}
+            setFieldValue={onSetFieldValue}
+          >
+            {inputFieldProps.label}
+          </ButtonField>
         </InputField>
       )
     }
@@ -883,6 +874,19 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setFieldTouched(e.target.name)
   }
 
+  updateDependentFieldsValues = async (fieldName: string) => {
+    const dependentFields = getDependentFields(this.props.fields, fieldName)
+    for (const field of dependentFields) {
+      this.props.setFieldValue(
+        field.name,
+        get(
+          this.props.values,
+          (field.initialValue as DependencyInfo).expression
+        )
+      )
+    }
+  }
+
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
     const fieldsToReset = fields.filter(
@@ -914,47 +918,11 @@ class FormSectionComponent extends React.Component<Props> {
     })
   }
 
-  getOnClickHandle = (
-    fields: IFormField[],
-    field: IButtonFormField,
-    setFieldValue: (fieldName: string, value: any) => void,
-    setFieldError: (fieldName: string, message: string) => void
-  ) => {
-    const trigger = fields.find((f) => f.name === field.options.trigger)
-    if (trigger && isFieldHttp(trigger)) {
-      return () => {
-        const {
-          options: { url, ...requestOptions }
-        } = trigger
-        const fieldsDependentOnTrigger = getDependentFields(fields, trigger)
-        fetch(url, requestOptions)
-          .then((res) => res.text())
-          .then((data) => {
-            setFieldValue(`${field.name}.data`, data)
-            if (fieldsDependentOnTrigger.length) {
-              fieldsDependentOnTrigger.forEach((field) => {
-                setFieldValue(field.name, data)
-              })
-            }
-          })
-          .catch((error) => {
-            setFieldValue(`${field.name}.error`, error.message)
-            if (fieldsDependentOnTrigger.length) {
-              fieldsDependentOnTrigger.forEach((field) => {
-                setFieldError(field.name, error.message)
-              })
-            }
-          })
-      }
-    }
-  }
-
   render() {
     const {
       values,
       fields,
       setFieldValue,
-      setFieldError,
       setFieldTouched,
       touched,
       offlineCountryConfig,
@@ -1136,17 +1104,6 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === NID_VERIFICATION_BUTTON ||
             field.type === BUTTON
           ) {
-            let onClick: (() => void) | undefined
-            const dependentFields = getDependentFields(fields, field)
-            if (isFieldButton(field) && dependentFields.length > 0) {
-              onClick = this.getOnClickHandle(
-                fields,
-                field,
-                setFieldValue,
-                setFieldError
-              )
-            }
-
             return (
               <FormItem
                 key={`${field.name}`}
@@ -1159,14 +1116,20 @@ class FormSectionComponent extends React.Component<Props> {
                         intl,
                         withDynamicallyGeneratedFields
                       )}
-                      onSetFieldValue={setFieldValue}
+                      onSetFieldValue={(
+                        fieldName: string,
+                        value: IFormFieldValue
+                      ) => {
+                        setFieldValue(fieldName, value)
+                        this.updateDependentFieldsValues(fieldName)
+                      }}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
                       {...formikFieldProps.field}
-                      onClick={onClick}
                       touched={touched[field.name] || false}
                       error={error}
+                      fields={fields}
                       draftData={draftData}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
@@ -1224,6 +1187,7 @@ class FormSectionComponent extends React.Component<Props> {
                               this.resetDependentSelectValues
                             }
                             {...formikFieldProps.field}
+                            fields={fields}
                             touched={nestedFieldTouched || false}
                             error={nestedError}
                             draftData={draftData}
@@ -1262,6 +1226,7 @@ class FormSectionComponent extends React.Component<Props> {
                       nestedFields={nestedFieldElements}
                       touched={Boolean(touched[field.name]) || false}
                       error={error}
+                      fields={fields}
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
                     />
@@ -1291,6 +1256,7 @@ class FormSectionComponent extends React.Component<Props> {
                         touched={touched[field.name] || false}
                         error={isFieldDisabled ? '' : error}
                         draftData={draftData}
+                        fields={fields}
                         dynamicDispatch={dynamicDispatch}
                         disabled={isFieldDisabled}
                         onUploadingStateChanged={
