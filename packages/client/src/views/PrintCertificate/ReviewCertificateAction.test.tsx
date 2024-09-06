@@ -63,13 +63,14 @@ describe('when user wants to review death certificate', () => {
 
     loginAsFieldAgent(store)
 
-    // @ts-ignore
-    store.dispatch(storeDeclaration(deathDeclaration))
-
     const component = await createTestComponent(<ReviewCertificate />, {
       store,
       history
     })
+
+    // @ts-ignore
+    store.dispatch(storeDeclaration(deathDeclaration))
+    component.update()
 
     const confirmBtn = component.find('#confirm-print')
     const confirmBtnExist = !!confirmBtn.hostNodes().length
