@@ -20,10 +20,7 @@ import {
   InProgressRecord,
   ReadyForReviewRecord,
   getComposition,
-  getInformantType,
-  getTaskFromSavedBundle,
-  findExtension,
-  SavedTask
+  getInformantType
 } from '@opencrvs/commons/types'
 import { z } from 'zod'
 import { indexBundle } from '@workflow/records/search'
@@ -84,7 +81,6 @@ export const updateRoute = createRoute({
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(requestSchema, request.payload)
-    const oldRecord = JSON.parse(JSON.stringify(record)) // to deep copy later mutated record object
 
     const informantTypeOfBundle = getInformantType(record)
     const payloadInformantType = payload.details.registration.informantType
@@ -118,71 +114,9 @@ export const updateRoute = createRoute({
       recordInputWithUploadedAttachments,
       event
     )
-
-    const updatedBundleWithSignaturesUri = keepPreviousSignatureUris(
-      oldRecord,
-      updatedBundle
-    )
-
-    const updatedRecord = await toUpdated(
-      updatedBundleWithSignaturesUri,
-      token,
-      updatedDetails
-    )
+    const updatedRecord = await toUpdated(updatedBundle, token, updatedDetails)
 
     await indexBundle(updatedRecord, token)
     return updatedRecord
   }
 })
-
-const signatureExtensions = [
-  'http://opencrvs.org/specs/extension/informants-signature',
-  'http://opencrvs.org/specs/extension/groom-signature',
-  'http://opencrvs.org/specs/extension/bride-signature',
-  'http://opencrvs.org/specs/extension/witness-one-signature',
-  'http://opencrvs.org/specs/extension/witness-two-signature'
-] as const
-
-function keepPreviousSignatureUris(
-  previousBundle: InProgressRecord | ReadyForReviewRecord,
-  updatedBundle: InProgressRecord | ReadyForReviewRecord
-) {
-  const oldTask = getTaskFromSavedBundle(previousBundle)
-  const newTask = getTaskFromSavedBundle(updatedBundle)
-
-  let updatedExtensions = [...newTask.extension]
-
-  for (const ext of signatureExtensions) {
-    if (
-      findExtension(ext, newTask.extension) &&
-      findExtension(ext, oldTask.extension)
-    ) {
-      const replacingTaskExtension = oldTask.extension.find(
-        (e) => e.url === ext
-      )!
-
-      updatedExtensions = updatedExtensions.filter((e) => e.url !== ext)
-      updatedExtensions.push(replacingTaskExtension)
-    }
-  }
-
-  const replacingTask: SavedTask = {
-    ...newTask,
-    extension: updatedExtensions
-  }
-
-  const updatedEntry = [
-    ...updatedBundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
-    {
-      fullUrl: previousBundle.entry.find(
-        (e) => e.resource.resourceType === 'Task'
-      )!.fullUrl,
-      resource: replacingTask
-    }
-  ]
-
-  return {
-    ...updatedBundle,
-    entry: updatedEntry
-  }
-}
