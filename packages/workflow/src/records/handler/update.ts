@@ -85,7 +85,7 @@ export const updateRoute = createRoute({
   handler: async (request, record) => {
     const token = getToken(request)
     const payload = validateRequest(requestSchema, request.payload)
-    const oldRecord = JSON.parse(JSON.stringify(record))
+    const oldRecord = JSON.parse(JSON.stringify(record)) // to deep copy later mutated record object
 
     const informantTypeOfBundle = getInformantType(record)
     const payloadInformantType = payload.details.registration.informantType
@@ -150,40 +150,40 @@ function keepPreviousSignatureUris(
 ) {
   const oldTask = getTaskFromSavedBundle(previousBundle)
   const newTask = getTaskFromSavedBundle(updatedBundle)
-  let newBundle: InProgressRecord | ReadyForReviewRecord = updatedBundle
+
+  let updatedExtensions = [...newTask.extension]
 
   for (const ext of signatureExtensions) {
     if (
       findExtension(ext, newTask.extension) &&
       findExtension(ext, oldTask.extension)
     ) {
-      const taskFromTheUpdatedBundle = getTaskFromSavedBundle(newBundle)
       const replacingTaskExtension = oldTask.extension.find(
         (e) => e.url === ext
       )!
 
-      const replacingTask: SavedTask = {
-        ...taskFromTheUpdatedBundle,
-        extension: [
-          ...taskFromTheUpdatedBundle.extension.filter((e) => e.url !== ext),
-          replacingTaskExtension
-        ]
-      }
-
-      newBundle = {
-        ...newBundle,
-        entry: [
-          ...newBundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
-          {
-            fullUrl: previousBundle.entry.find(
-              (e) => e.resource.resourceType === 'Task'
-            )!.fullUrl,
-            resource: replacingTask
-          }
-        ]
-      }
+      updatedExtensions = updatedExtensions.filter((e) => e.url !== ext)
+      updatedExtensions.push(replacingTaskExtension)
     }
   }
 
-  return newBundle
+  const replacingTask: SavedTask = {
+    ...newTask,
+    extension: updatedExtensions
+  }
+
+  const updatedEntry = [
+    ...updatedBundle.entry.filter((e) => e.resource.resourceType !== 'Task'),
+    {
+      fullUrl: previousBundle.entry.find(
+        (e) => e.resource.resourceType === 'Task'
+      )!.fullUrl,
+      resource: replacingTask
+    }
+  ]
+
+  return {
+    ...updatedBundle,
+    entry: updatedEntry
+  }
 }
