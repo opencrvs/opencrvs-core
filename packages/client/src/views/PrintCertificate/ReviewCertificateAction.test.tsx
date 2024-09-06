@@ -70,6 +70,7 @@ describe('when user wants to review death certificate', () => {
 
     // @ts-ignore
     store.dispatch(storeDeclaration(deathDeclaration))
+    await flushPromises()
     component.update()
 
     const confirmBtn = component.find('#confirm-print')
