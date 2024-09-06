@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Button } from '@opencrvs/components/lib'
+import { Button, ButtonProps } from '@opencrvs/components/lib'
 import {
   Ii18nButtonFormField,
   IFormField,
@@ -17,38 +17,35 @@ import {
 } from '@client/forms'
 import { isFieldHttp } from '@client/forms/utils'
 
-interface ButtonProps {
+interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   fieldDefinition: Ii18nButtonFormField
-  children: React.ReactNode
   fields: IFormField[]
   setFieldValue: (name: string, value: IFormFieldValue) => void
 }
 
-export function ButtonField(props: ButtonProps) {
-  const getOnClickHandle = () => {
-    const trigger = props.fields.find(
-      (f) => f.name === props.fieldDefinition.options.trigger
+export function ButtonField(props: ButtonFieldProps) {
+  const { fieldDefinition, fields, setFieldValue, ...buttonProps } = props
+  const onClick = () => {
+    const trigger = fields.find(
+      (f) => f.name === fieldDefinition.options.trigger
     )
     if (trigger && isFieldHttp(trigger)) {
-      return () => {
-        const {
-          options: { url, ...requestOptions }
-        } = trigger
-        props.setFieldValue(trigger.name, { loading: true })
-        fetch(url, requestOptions)
-          .then((res) => res.json())
-          .then((data) => {
-            props.setFieldValue(trigger.name, { loading: false, data })
-          })
-          .catch((error) => {
-            props.setFieldValue(trigger.name, { loading: false, error })
-          })
-      }
+      const {
+        options: { url, ...requestOptions }
+      } = trigger
+      setFieldValue(trigger.name, { loading: true })
+      fetch(url, requestOptions)
+        .then((res) => res.json())
+        .then((data) => {
+          setFieldValue(trigger.name, { loading: false, data })
+        })
+        .catch((error) => {
+          setFieldValue(trigger.name, { loading: false, error })
+        })
     }
   }
-  const onClick = getOnClickHandle()
   return (
-    <Button type="secondary" onClick={onClick}>
+    <Button {...buttonProps} type="secondary" onClick={onClick}>
       {props.children}
     </Button>
   )

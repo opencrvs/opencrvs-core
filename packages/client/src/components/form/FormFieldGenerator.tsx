@@ -680,6 +680,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             fields={fields}
             fieldDefinition={fieldDefinition}
             setFieldValue={onSetFieldValue}
+            disabled={disabled}
           >
             {inputFieldProps.label}
           </ButtonField>
