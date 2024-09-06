@@ -122,6 +122,12 @@ export const getVisibleSections = (
   )
 }
 
+function getStatusFromHistory(history: ReadonlyArray<History>) {
+  return [...history]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .find((entry) => entry.action == null)?.regStatus as RegStatus
+}
+
 const getViewableSection = (
   registerForm: IForm,
   declaration: IDeclaration
@@ -632,7 +638,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       )
 
       const duplicateRegData = {
-        status: props.declaration.registrationStatus,
+        status: getStatusFromHistory(eventData.history),
         type: capitalize(eventData.registration.type),
         trackingId: eventData.registration.trackingId,
         registrationNumber: eventData.registration?.registrationNumber,
