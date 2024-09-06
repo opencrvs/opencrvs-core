@@ -115,7 +115,7 @@ import {
   Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
-import { isEqual, flatten, get } from 'lodash'
+import { isEqual, flatten, get, cloneDeep } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
@@ -874,17 +874,20 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setFieldTouched(e.target.name)
   }
 
-  updateDependentFieldsValues = async (fieldName: string) => {
+  setFieldValuesWithDependency = (
+    fieldName: string,
+    value: IFormFieldValue
+  ) => {
+    const updatedValues = cloneDeep(this.props.values)
+    updatedValues[fieldName] = value
     const dependentFields = getDependentFields(this.props.fields, fieldName)
     for (const field of dependentFields) {
-      this.props.setFieldValue(
-        field.name,
-        get(
-          this.props.values,
-          (field.initialValue as DependencyInfo).expression
-        )
+      updatedValues[field.name] = get(
+        updatedValues,
+        (field.initialValue as DependencyInfo).expression
       )
     }
+    this.props.setValues(updatedValues)
   }
 
   resetDependentSelectValues = (fieldName: string) => {
@@ -1116,13 +1119,7 @@ class FormSectionComponent extends React.Component<Props> {
                         intl,
                         withDynamicallyGeneratedFields
                       )}
-                      onSetFieldValue={(
-                        fieldName: string,
-                        value: IFormFieldValue
-                      ) => {
-                        setFieldValue(fieldName, value)
-                        this.updateDependentFieldsValues(fieldName)
-                      }}
+                      onSetFieldValue={this.setFieldValuesWithDependency}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
