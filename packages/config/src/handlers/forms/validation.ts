@@ -46,6 +46,8 @@ const field = z
     type: z.string(),
     custom: z.boolean().optional(),
     label: messageDescriptor,
+    // TODO: The below "any" should be removed when we will make stricter types
+    options: z.any().optional(),
     conditionals: z.array(conditional).optional(),
     mapping: z
       .object({ template: handlebarTemplate.optional() })
@@ -397,6 +399,38 @@ const form = z.object({
               message: `Missing required fields "${notIncludedRequiredFields.join(
                 ', '
               )}" found`
+            }
+          }
+        )
+        .refine(
+          (sec) => {
+            const fieldsInSection = sec.groups.flatMap((group) => group.fields)
+            const buttonFields = fieldsInSection.filter(
+              ({ type }) => type === 'BUTTON'
+            )
+            return buttonFields.every((button) =>
+              fieldsInSection.some(
+                (field) => button.options.trigger === field.name
+              )
+            )
+          },
+          (sec) => {
+            const fieldsInSection = sec.groups.flatMap((group) => group.fields)
+            const buttonFields = fieldsInSection.filter(
+              ({ type }) => type === 'BUTTON'
+            )
+            const buttonFieldsMissingTrigger = buttonFields
+              .filter(
+                (button) =>
+                  !fieldsInSection.some(
+                    (field) => button.options?.trigger === field.name
+                  )
+              )
+              .map(({ name }) => name)
+            return {
+              message: `Missing trigger for button fields ${buttonFieldsMissingTrigger.join(
+                ','
+              )}`
             }
           }
         )
