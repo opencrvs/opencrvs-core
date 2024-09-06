@@ -26,10 +26,11 @@ interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
 export function ButtonField(props: ButtonFieldProps) {
   const { fieldDefinition, fields, setFieldValue, ...buttonProps } = props
   const onClick = () => {
+    // safe to assume that the trigger is always there because of the form validation in config
     const trigger = fields.find(
       (f) => f.name === fieldDefinition.options.trigger
-    )
-    if (trigger && isFieldHttp(trigger)) {
+    )!
+    if (isFieldHttp(trigger)) {
       const {
         options: { url, ...requestOptions }
       } = trigger
