@@ -170,8 +170,9 @@ const { store, history } = createStore()
 describe('Correction summary', () => {
   describe('for a birth declaration', () => {
     beforeEach(async () => {
-      store.dispatch(storeDeclaration(birthDeclaration))
       store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+      await flushPromises()
+      store.dispatch(storeDeclaration(birthDeclaration))
       const form = await getRegisterFormFromStore(store, Event.Birth)
       wrapper = await createTestComponent(
         <CorrectionForm
