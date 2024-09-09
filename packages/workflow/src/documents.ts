@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { DOCUMENTS_URL, MINIO_URL } from './constants'
+import { DOCUMENTS_URL } from './constants'
 import { IAuthHeader, isBase64FileString } from '@opencrvs/commons'
 import {
   BirthRegistration,
@@ -71,10 +71,10 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
 }
 
 function isPresignedUrl(url: string) {
-  return url.includes(MINIO_URL)
+  return url.startsWith('http')
 }
 
-function getMinioUri(url: string) {
+function getCanonicalAttachmentURL(url: string) {
   const parsedUrl = new URL(url)
   const filePath = parsedUrl.pathname
 
@@ -90,7 +90,7 @@ function uploadOrNormaliseSignatureData(
   }
 
   if (isPresignedUrl(signature)) {
-    return getMinioUri(signature)
+    return getCanonicalAttachmentURL(signature)
   }
   return signature
 }
