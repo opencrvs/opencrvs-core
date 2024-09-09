@@ -52,7 +52,8 @@ import {
   RegistrationStatus,
   getResourceFromBundleById,
   TaskIdentifierSystem,
-  Location
+  Location,
+  UNASSIGNED_EXTENSION_URL
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -635,6 +636,9 @@ export function createCorrectedTask(
       {
         url: MAKE_CORRECTION_EXTENSION_URL,
         valueString: 'REGISTERED'
+      },
+      {
+        url: UNASSIGNED_EXTENSION_URL
       }
     ],
     input: correctionDetails.values.map((update) => ({
