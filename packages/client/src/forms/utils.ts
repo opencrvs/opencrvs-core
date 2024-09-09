@@ -78,6 +78,7 @@ import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
+import { getToken } from '@client/utils/authUtils'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -549,9 +550,6 @@ export function getQueryData(
 
 export const getConditionalActionsForField = (
   field: IFormField,
-  /*
-   * These are used in the eval expression
-   */
   values: IFormSectionData,
   offlineCountryConfig?: IOfflineData,
   draftData?: IFormData,
@@ -563,9 +561,31 @@ export const getConditionalActionsForField = (
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
-      .filter((conditional) => eval(conditional.expression))
+      .filter((conditional) =>
+        evalExpressionInFieldDefinition(
+          conditional.expression,
+          values,
+          offlineCountryConfig,
+          draftData,
+          userDetails
+        )
+      )
       .map((conditional: Conditional) => conditional.action)
   )
+}
+
+export const evalExpressionInFieldDefinition = (
+  expression: string,
+  /*
+   * These are used in the eval expression
+   */
+  values: IFormSectionData,
+  offlineCountryConfig?: IOfflineData,
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
+) => {
+  // eslint-disable-next-line no-eval
+  return eval(expression)
 }
 
 export const getVisibleSectionGroupsBasedOnConditions = (
@@ -754,4 +774,57 @@ export function getDependentFields(
       isInitialValueDependencyInfo(initialValue) &&
       initialValue.dependsOn.includes(fieldName)
   )
+}
+
+function transformRequestBody(
+  body: Record<string, any>,
+  values: IFormSectionData,
+  offlineCountryConfig?: IOfflineData,
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
+) {
+  return Object.fromEntries(
+    Object.entries(body).map(([key, value]) => [
+      key,
+      evalExpressionInFieldDefinition(
+        value,
+        values,
+        offlineCountryConfig,
+        draftData,
+        userDetails
+      )
+    ])
+  )
+}
+export function transformHttpFieldIntoRequest(
+  field: IHttpFormField,
+  values: IFormSectionData,
+  offlineCountryConfig?: IOfflineData,
+  draftData?: IFormData,
+  userDetails?: UserDetails | null
+) {
+  const { options: request } = field
+  const authHeader = request.headers.authorization
+  // this variable is used when evaluating the authHeader
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const token = getToken()
+
+  return fetch(request.url, {
+    headers: {
+      ...request.headers,
+      // eslint-disable-next-line no-eval
+      authorization: authHeader !== null ? eval(authHeader) : null
+    },
+    body: request.body
+      ? JSON.stringify(
+          transformRequestBody(
+            request.body,
+            values,
+            offlineCountryConfig,
+            draftData,
+            userDetails
+          )
+        )
+      : null
+  })
 }

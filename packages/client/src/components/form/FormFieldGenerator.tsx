@@ -32,7 +32,8 @@ import {
   getListOfLocations,
   getFieldHelperText,
   isInitialValueDependencyInfo,
-  getDependentFields
+  getDependentFields,
+  evalExpressionInFieldDefinition
 } from '@client/forms/utils'
 import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -115,7 +116,7 @@ import {
   Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
-import { isEqual, flatten, get, cloneDeep } from 'lodash'
+import { isEqual, flatten, cloneDeep } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
@@ -170,6 +171,7 @@ function handleSelectFocus(id: string, isSearchable: boolean) {
 type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
   fields: IFormField[]
+  values: IFormSectionData
   onSetFieldValue: (name: string, value: IFormFieldValue) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent<any>) => void
@@ -205,7 +207,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     onUploadingStateChanged,
     setFieldTouched,
     requiredErrorMessage,
-    fields
+    fields,
+    values
   }) => {
     const inputFieldProps = {
       id: fieldDefinition.name,
@@ -679,6 +682,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           <ButtonField
             fields={fields}
             fieldDefinition={fieldDefinition}
+            values={values}
+            draftData={draftData}
             setFieldValue={onSetFieldValue}
             disabled={disabled}
           >
@@ -883,9 +888,12 @@ class FormSectionComponent extends React.Component<Props> {
     updatedValues[fieldName] = value
     const dependentFields = getDependentFields(this.props.fields, fieldName)
     for (const field of dependentFields) {
-      updatedValues[field.name] = get(
+      updatedValues[field.name] = evalExpressionInFieldDefinition(
+        (field.initialValue as DependencyInfo).expression,
         updatedValues,
-        (field.initialValue as DependencyInfo).expression
+        this.props.offlineCountryConfig,
+        this.props.draftData,
+        this.props.userDetails
       )
     }
     this.props.setValues(updatedValues)
@@ -1128,6 +1136,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={touched[field.name] || false}
                       error={error}
                       fields={fields}
+                      values={values}
                       draftData={draftData}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
@@ -1186,6 +1195,7 @@ class FormSectionComponent extends React.Component<Props> {
                             }
                             {...formikFieldProps.field}
                             fields={fields}
+                            values={values}
                             touched={nestedFieldTouched || false}
                             error={nestedError}
                             draftData={draftData}
@@ -1225,6 +1235,7 @@ class FormSectionComponent extends React.Component<Props> {
                       touched={Boolean(touched[field.name]) || false}
                       error={error}
                       fields={fields}
+                      values={values}
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
                     />
@@ -1255,6 +1266,7 @@ class FormSectionComponent extends React.Component<Props> {
                         error={isFieldDisabled ? '' : error}
                         draftData={draftData}
                         fields={fields}
+                        values={values}
                         dynamicDispatch={dynamicDispatch}
                         disabled={isFieldDisabled}
                         onUploadingStateChanged={

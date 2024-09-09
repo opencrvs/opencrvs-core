@@ -729,7 +729,10 @@ export interface ISignatureFormField extends IFormFieldBase {
 
 export interface IHttpFormField extends IFormFieldBase {
   type: typeof HTTP
-  options: Request
+  options: {
+    headers: Record<string, string>
+    body: Record<string, any>
+  } & Omit<Request, 'body' | 'headers'>
 }
 export interface IButtonFormField extends IFormFieldBase {
   type: typeof BUTTON
@@ -1246,7 +1249,10 @@ export interface Ii18nSignatureField extends Ii18nFormFieldBase {
 
 export interface Ii18nHttpFormField extends Ii18nFormFieldBase {
   type: typeof HTTP
-  options: Request
+  options: {
+    headers: Record<string, string>
+    body: Record<string, any>
+  } & Omit<Request, 'body' | 'headers'>
 }
 
 export interface Ii18nButtonFormField extends Ii18nFormFieldBase {

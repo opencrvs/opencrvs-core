@@ -13,35 +13,55 @@ import { Button, ButtonProps } from '@opencrvs/components/lib'
 import {
   Ii18nButtonFormField,
   IFormField,
-  IFormFieldValue
+  IFormFieldValue,
+  IFormSectionData,
+  IFormData
 } from '@client/forms'
-import { isFieldHttp } from '@client/forms/utils'
+import { isFieldHttp, transformHttpFieldIntoRequest } from '@client/forms/utils'
+import { useSelector } from 'react-redux'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   fieldDefinition: Ii18nButtonFormField
   fields: IFormField[]
+  values: IFormSectionData
+  draftData?: IFormData
   setFieldValue: (name: string, value: IFormFieldValue) => void
 }
 
 export function ButtonField(props: ButtonFieldProps) {
-  const { fieldDefinition, fields, setFieldValue, ...buttonProps } = props
+  const {
+    fieldDefinition,
+    fields,
+    setFieldValue,
+    values,
+    draftData,
+    ...buttonProps
+  } = props
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const userDetails = useSelector(getUserDetails)
   const onClick = () => {
     // safe to assume that the trigger is always there because of the form validation in config
     const trigger = fields.find(
       (f) => f.name === fieldDefinition.options.trigger
     )!
     if (isFieldHttp(trigger)) {
-      const {
-        options: { url, ...requestOptions }
-      } = trigger
+      const httpRequest = transformHttpFieldIntoRequest(
+        trigger,
+        values,
+        offlineCountryConfig,
+        draftData,
+        userDetails
+      )
       setFieldValue(trigger.name, { loading: true })
-      fetch(url, requestOptions)
+      httpRequest
         .then((res) => res.json())
         .then((data) => {
           setFieldValue(trigger.name, { loading: false, data })
         })
         .catch((error) => {
-          setFieldValue(trigger.name, { loading: false, error })
+          setFieldValue(trigger.name, { loading: false, error: error.message })
         })
     }
   }
