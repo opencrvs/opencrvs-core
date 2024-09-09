@@ -25,6 +25,10 @@ import {
 } from '@opencrvs/commons/fixtures'
 import { Context } from '@gateway/graphql/context'
 import { getAuthHeader } from '@opencrvs/commons/http'
+import {
+  getUserRoleFromHistory,
+  PractitionerRoleHistory
+} from '@opencrvs/commons/types'
 
 const MOCK_TOKEN = jwt.sign(
   { scope: ['validate'] },
@@ -386,4 +390,165 @@ test('running a full aggregated marriage FHIR bundle through resolvers produces 
     }
   )
   expect(response.data).toMatchSnapshot()
+})
+
+test('getting role at a specific time from roleHistory', async () => {
+  const practitionerRoleHistory = [
+    {
+      resourceType: 'PractitionerRole',
+      practitioner: {
+        reference: 'Practitioner/f28e6b7e-30ee-460a-8851-7e71b46c97cd'
+      },
+      code: [
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/roles',
+              code: 'NATIONAL_REGISTRAR'
+            }
+          ]
+        },
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
+            }
+          ]
+        }
+      ],
+      location: [
+        { reference: 'Location/1e73d8a7-964d-4ea1-be77-0de1d2ced0a9' }
+      ],
+      id: 'ef518d5e-28a5-4c6f-9152-da2c28815e9b',
+      meta: {
+        lastUpdated: '2024-09-02T08:13:50.173+00:00',
+        versionId: '4dfc703b-a5f2-4f56-a11e-5827b3160e0f'
+      },
+      _transforms: { meta: { lastUpdated: '2024-09-02T08:13:50.173Z' } },
+      _request: { method: 'PUT' }
+    },
+    {
+      resourceType: 'PractitionerRoleHistory',
+      practitioner: {
+        reference: 'Practitioner/f28e6b7e-30ee-460a-8851-7e71b46c97cd'
+      },
+      code: [
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/roles',
+              code: 'LOCAL_REGISTRAR'
+            }
+          ]
+        },
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
+            }
+          ]
+        }
+      ],
+      location: [
+        { reference: 'Location/1e73d8a7-964d-4ea1-be77-0de1d2ced0a9' }
+      ],
+      meta: {
+        lastUpdated: '2024-08-30T13:10:48.262+00:00',
+        versionId: '95d3b84c-a77c-4634-8033-7802ba4bf5f1'
+      },
+      _transforms: { meta: { lastUpdated: '2024-08-30T13:10:48.262Z' } },
+      _request: { method: 'POST' },
+      id: 'ef518d5e-28a5-4c6f-9152-da2c28815e9b'
+    },
+    {
+      resourceType: 'PractitionerRoleHistory',
+      practitioner: {
+        reference: 'Practitioner/f28e6b7e-30ee-460a-8851-7e71b46c97cd'
+      },
+      code: [
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/roles',
+              code: 'NATIONAL_REGISTRAR'
+            }
+          ]
+        },
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
+            }
+          ]
+        }
+      ],
+      location: [
+        { reference: 'Location/1e73d8a7-964d-4ea1-be77-0de1d2ced0a9' }
+      ],
+      id: 'ef518d5e-28a5-4c6f-9152-da2c28815e9b',
+      meta: {
+        lastUpdated: '2024-08-30T13:14:16.965+00:00',
+        versionId: '05e67e48-9774-43c4-9136-53653d8577b4'
+      },
+      _transforms: { meta: { lastUpdated: '2024-08-30T13:14:16.965Z' } },
+      _request: { method: 'PUT' }
+    },
+    {
+      resourceType: 'PractitionerRoleHistory',
+      practitioner: {
+        reference: 'Practitioner/f28e6b7e-30ee-460a-8851-7e71b46c97cd'
+      },
+      code: [
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/roles',
+              code: 'LOCAL_SYSTEM_ADMIN'
+            }
+          ]
+        },
+        {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: '[{"lang":"en","label":"Local System Admin"},{"lang":"fr","label":"Administrateur système local"}]'
+            }
+          ]
+        }
+      ],
+      location: [
+        { reference: 'Location/1e73d8a7-964d-4ea1-be77-0de1d2ced0a9' }
+      ],
+      id: 'ef518d5e-28a5-4c6f-9152-da2c28815e9b',
+      meta: {
+        lastUpdated: '2024-09-02T08:12:52.860+00:00',
+        versionId: '70690251-e1cf-4196-ae9a-9b579edd6e10'
+      },
+      _transforms: { meta: { lastUpdated: '2024-09-02T08:12:52.860Z' } },
+      _request: { method: 'PUT' }
+    }
+  ] as unknown as PractitionerRoleHistory[]
+
+  /*
+    2024-09-02T08:13:50.173+00:00 NATIONAL_REGISTRAR
+    2024-08-30T13:10:48.262+00:00 LOCAL_REGISTRAR
+    2024-08-30T13:14:16.965+00:00 NATIONAL_REGISTRAR *
+    2024-09-02T08:12:52.860+00:00 LOCAL_SYSTEM_ADMIN
+  */
+
+  const lastModified = '2024-08-30T13:14:33.704Z'
+  const expectedRole =
+    '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
+  const expectedSystemRole = 'NATIONAL_REGISTRAR'
+
+  const { role, systemRole } = getUserRoleFromHistory(
+    practitionerRoleHistory,
+    lastModified
+  )
+
+  expect(role).toEqual(expectedRole)
+  expect(systemRole).toEqual(expectedSystemRole)
 })
