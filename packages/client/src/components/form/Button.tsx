@@ -18,17 +18,18 @@ import {
   IFormData,
   Ii18nRedirectButtonFormField
 } from '@client/forms'
-import { isFieldHttp, transformHttpFieldIntoRequest } from '@client/forms/utils'
+import { isFieldHttp } from '@client/forms/utils'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useHistory } from 'react-router'
+import { transformHttpFieldIntoRequest } from '@client/components/form/http'
 
 interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   fieldDefinition: Ii18nButtonFormField | Ii18nRedirectButtonFormField
   fields: IFormField[]
   values: IFormSectionData
-  draftData?: IFormData
+  draftData: IFormData
   setFieldValue: (name: string, value: IFormFieldValue) => void
 }
 

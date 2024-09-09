@@ -551,9 +551,9 @@ export function getQueryData(
 export const getConditionalActionsForField = (
   field: IFormField,
   values: IFormSectionData,
-  offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData,
-  userDetails?: UserDetails | null
+  offlineCountryConfig: IOfflineData,
+  draftData: IFormData,
+  userDetails: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -579,11 +579,20 @@ export const evalExpressionInFieldDefinition = (
   /*
    * These are used in the eval expression
    */
-  values: IFormSectionData,
-  offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData,
-  userDetails?: UserDetails | null
+  $form: IFormSectionData,
+  $config: IOfflineData,
+  $draft: IFormData,
+  $user: (UserDetails & { token?: string }) | null
 ) => {
+  $user = $user !== null ? { ...$user, token: getToken() } : $user
+  // For backwards compatibility
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const values = $form
+  const offlineCountryConfig = $config
+  const draftData = $draft
+  const userDetails = $user
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
   // eslint-disable-next-line no-eval
   return eval(expression)
 }
@@ -774,57 +783,4 @@ export function getDependentFields(
       isInitialValueDependencyInfo(initialValue) &&
       initialValue.dependsOn.includes(fieldName)
   )
-}
-
-function transformRequestBody(
-  body: Record<string, any>,
-  values: IFormSectionData,
-  offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData,
-  userDetails?: UserDetails | null
-) {
-  return Object.fromEntries(
-    Object.entries(body).map(([key, value]) => [
-      key,
-      evalExpressionInFieldDefinition(
-        value,
-        values,
-        offlineCountryConfig,
-        draftData,
-        userDetails
-      )
-    ])
-  )
-}
-export function transformHttpFieldIntoRequest(
-  field: IHttpFormField,
-  values: IFormSectionData,
-  offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData,
-  userDetails?: UserDetails | null
-) {
-  const { options: request } = field
-  const authHeader = request.headers.authorization
-  // this variable is used when evaluating the authHeader
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const token = getToken()
-
-  return fetch(request.url, {
-    headers: {
-      ...request.headers,
-      // eslint-disable-next-line no-eval
-      authorization: authHeader !== null ? eval(authHeader) : null
-    },
-    body: request.body
-      ? JSON.stringify(
-          transformRequestBody(
-            request.body,
-            values,
-            offlineCountryConfig,
-            draftData,
-            userDetails
-          )
-        )
-      : null
-  })
 }

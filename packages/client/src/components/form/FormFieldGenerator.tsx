@@ -183,7 +183,7 @@ type GeneratedInputFieldProps = {
   value: IFormFieldValue
   touched: boolean
   error: string
-  draftData?: IFormData
+  draftData: IFormData
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
@@ -771,7 +771,7 @@ interface IFormSectionProps {
   fieldsToShowValidationErrors?: IFormField[]
   setAllFieldsDirty: boolean
   onChange: (values: IFormSectionData) => void
-  draftData?: IFormData
+  draftData: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
