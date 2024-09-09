@@ -13,6 +13,7 @@ import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
+  flushPromises,
   mockOfflineData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
@@ -28,7 +29,8 @@ const { store, history } = createStore()
 describe('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserForm

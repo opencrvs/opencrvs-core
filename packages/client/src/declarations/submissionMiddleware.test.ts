@@ -12,8 +12,8 @@ import { ApolloError } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
 import {
   ACTION_STATUS_MAP,
-  createTestStore,
-  mockDeclarationData
+  mockDeclarationData,
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { Event } from '@client/utils/gateway'
@@ -24,6 +24,8 @@ import {
   declarationReadyForStatusChange,
   submissionMiddleware
 } from './submissionMiddleware'
+import { createStore } from '@client/store'
+import { offlineDataReady } from '@client/offline/actions'
 
 describe('Submission middleware', () => {
   const dispatch = vi.fn()
@@ -37,7 +39,8 @@ describe('Submission middleware', () => {
   })(next)
 
   beforeEach(async () => {
-    const { store } = await createTestStore()
+    const { store } = createStore()
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     const client = createClient(store)
     getState.mockImplementation(() => store.getState())
     mutateSpy = vi
