@@ -83,7 +83,8 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
-  notCorrectedHistory
+  notCorrectedHistory,
+  getUserRoleFromHistory
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1534,25 +1535,25 @@ export const typeResolvers: GQLResolver = {
 
       const practitionerRoleHistory =
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
-      const result = practitionerRoleHistory.find(
-        (it) =>
-          it?.meta?.lastUpdated &&
-          task.lastModified &&
-          it?.meta?.lastUpdated <= task.lastModified!
-      )
-
-      const targetCode = result?.code?.find((element) => {
-        return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
-      })
-
-      const role = targetCode?.coding?.[0].code
 
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
 
-      if (role) {
-        userResponse.role.labels = JSON.parse(role)
+      const { role, systemRole } = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
+      )
+
+      if (role && systemRole) {
+        return {
+          ...userResponse,
+          role: {
+            ...userResponse.role,
+            labels: JSON.parse(role)
+          },
+          systemRole
+        }
       }
 
       return userResponse
