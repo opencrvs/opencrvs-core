@@ -22,7 +22,8 @@ import {
   resourceIdentifierToUUID,
   findResourceFromBundleById,
   SavedPractitioner,
-  SavedBundle
+  SavedBundle,
+  MAKE_CORRECTION_EXTENSION_URL
 } from './fhir'
 import { SavedOffice } from './fhir/location'
 
@@ -34,8 +35,10 @@ export const findAssignment = <T extends SavedBundle>(bundle: T) => {
   const latestStatus = getStatusFromTask(task)
 
   for (const task of allTasks) {
-    // if the first task found is unassignment, it's sure that the bundle is unassigned
-    const isUnassigned = findExtension(UNASSIGNED_EXTENSION_URL, task.extension)
+    // if the first task found is unassignment or makeCorrection, it's sure that the bundle is unassigned
+    const isUnassigned =
+      findExtension(UNASSIGNED_EXTENSION_URL, task.extension) ||
+      findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
 
     if (isUnassigned) {
       return null
