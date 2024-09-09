@@ -20,6 +20,7 @@ export interface IAdvancedSearchParam {
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  timePeriodFrom?: string
   contactNumber?: string
   contactEmail?: string
   nationalId?: string

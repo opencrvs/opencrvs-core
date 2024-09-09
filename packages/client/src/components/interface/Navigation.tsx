@@ -900,7 +900,8 @@ const NavigationView = (props: IFullProps) => {
                   ) as IAdvancedSearchParamState
                   setAdvancedSearchParam({
                     ...filteredParam,
-                    searchId: bookmarkResult?.searchId
+                    searchId: bookmarkResult?.searchId,
+                    bookmarkName: bookmarkResult?.name
                   })
                   goToAdvancedSearchResultAction()
                 }}

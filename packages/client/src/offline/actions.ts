@@ -68,6 +68,12 @@ export type FormsLoadedAction = {
   payload: LoadFormsResponse
 }
 
+export const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
+export type CustomValidatorsLoadedLoadedAction = {
+  type: typeof CUSTOM_VALIDATORS_LOADED
+  payload: LoadFormsResponse
+}
+
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
 export type FormsFailedAction = {
   type: typeof FORMS_FAILED
@@ -188,6 +194,14 @@ export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
   payload: payload
 })
 
+export const CustomValidatorsSuccess = (
+  forms: LoadFormsResponse
+): CustomValidatorsLoadedLoadedAction => {
+  return {
+    type: CUSTOM_VALIDATORS_LOADED,
+    payload: forms
+  }
+}
 export const formsFailed = (error: Error): FormsFailedAction => ({
   type: FORMS_FAILED,
   payload: error
@@ -333,6 +347,7 @@ export type Action =
   | LocationsLoadedAction
   | FormsFailedAction
   | FormsLoadedAction
+  | CustomValidatorsLoadedLoadedAction
   | SetOfflineData
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction

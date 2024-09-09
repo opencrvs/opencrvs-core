@@ -423,6 +423,7 @@ export interface GQLAdvancedSearchParametersInput {
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  timePeriodFrom?: string
   contactNumber?: string
   contactEmail?: string
   nationalId?: string
@@ -1524,6 +1525,7 @@ export interface GQLAdvancedSeachParameters {
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  timePeriodFrom?: string
   contactNumber?: string
   contactEmail?: string
   nationalId?: string
@@ -9651,6 +9653,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   dateOfEvent?: AdvancedSeachParametersToDateOfEventResolver<TParent>
   dateOfEventStart?: AdvancedSeachParametersToDateOfEventStartResolver<TParent>
   dateOfEventEnd?: AdvancedSeachParametersToDateOfEventEndResolver<TParent>
+  timePeriodFrom?: AdvancedSeachParametersToTimePeriodFromResolver<TParent>
   contactNumber?: AdvancedSeachParametersToContactNumberResolver<TParent>
   contactEmail?: AdvancedSeachParametersToContactEmailResolver<TParent>
   nationalId?: AdvancedSeachParametersToNationalIdResolver<TParent>
@@ -9764,6 +9767,18 @@ export interface AdvancedSeachParametersToDateOfEventStartResolver<
 }
 
 export interface AdvancedSeachParametersToDateOfEventEndResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToTimePeriodFromResolver<
   TParent = any,
   TResult = any
 > {

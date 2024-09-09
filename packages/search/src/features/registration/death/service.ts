@@ -43,7 +43,8 @@ import {
   ValidRecord,
   REJECTED_STATUS,
   IOperationHistory,
-  EVENT
+  EVENT,
+  getLastStatusChangedAt
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -137,16 +138,21 @@ function createDeceasedIndex(
 
   body.deceasedFirstNames = deceasedName?.given?.at(0)
   body.deceasedMiddleName = deceasedName?.given?.at(1)
-  body.deceasedFamilyName =
-    deceasedName && deceasedName.family && deceasedName.family[0]
+  body.deceasedFamilyName = deceasedName?.family
   body.deceasedFirstNamesLocal = deceasedNameLocal?.given?.at(0)
   body.deceasedMiddleNameLocal = deceasedNameLocal?.given?.at(1)
-  body.deceasedFamilyNameLocal =
-    deceasedNameLocal && deceasedNameLocal.family && deceasedNameLocal.family[0]
+  body.deceasedFamilyNameLocal = deceasedNameLocal?.family
   body.deathDate = deceased.deceasedDateTime
   body.gender = deceased.gender
   body.deceasedIdentifier = findPatientPrimaryIdentifier(deceased)?.value
   body.deceasedDoB = deceased.birthDate
+  // what happens if country demands name like : familyName firstName
+  body.name =
+    (body.deceasedFirstNames || '') +
+    ' ' +
+    (body.deceasedMiddleName || '') +
+    ' ' +
+    (body.deceasedFamilyName || '')
 }
 
 function createMotherIndex(
@@ -165,12 +171,10 @@ function createMotherIndex(
 
   body.motherFirstNames = motherName?.given?.at(0)
   body.motherMiddleName = motherName?.given?.at(1)
-  body.motherFamilyName =
-    motherName && motherName.family && motherName.family[0]
+  body.motherFamilyName = motherName?.family
   body.motherFirstNamesLocal = motherNameLocal?.given?.at(0)
   body.motherMiddleNameLocal = motherNameLocal?.given?.at(1)
-  body.motherFamilyNameLocal =
-    motherNameLocal && motherNameLocal.family && motherNameLocal.family[0]
+  body.motherFamilyNameLocal = motherNameLocal?.family
 }
 
 function createFatherIndex(
@@ -189,12 +193,10 @@ function createFatherIndex(
 
   body.fatherFirstNames = fatherName?.given?.at(0)
   body.fatherMiddleName = fatherName?.given?.at(1)
-  body.fatherFamilyName =
-    fatherName && fatherName.family && fatherName.family[0]
+  body.fatherFamilyName = fatherName?.family
   body.fatherFirstNamesLocal = fatherNameLocal?.given?.at(0)
   body.fatherMiddleNameLocal = fatherNameLocal?.given?.at(1)
-  body.fatherFamilyNameLocal =
-    fatherNameLocal && fatherNameLocal.family && fatherNameLocal.family[0]
+  body.fatherFamilyNameLocal = fatherNameLocal?.family
 }
 
 function createSpouseIndex(
@@ -213,12 +215,10 @@ function createSpouseIndex(
 
   body.spouseFirstNames = spouseName?.given?.at(0)
   body.spouseMiddleName = spouseName?.given?.at(1)
-  body.spouseFamilyName =
-    spouseName && spouseName.family && spouseName.family[0]
+  body.spouseFamilyName = spouseName?.family
   body.spouseFirstNamesLocal = spouseNameLocal?.given?.at(0)
   body.spouseMiddleNameLocal = spouseNameLocal?.given?.at(1)
-  body.spouseFamilyNameLocal =
-    spouseNameLocal && spouseNameLocal.family && spouseNameLocal.family[0]
+  body.spouseFamilyNameLocal = spouseNameLocal?.family
   body.spouseIdentifier = findPatientPrimaryIdentifier(spouse)?.value
 }
 
@@ -251,14 +251,10 @@ function createInformantIndex(
 
   body.informantFirstNames = informantName?.given?.at(0)
   body.informantMiddleName = informantName?.given?.at(1)
-  body.informantFamilyName =
-    informantName && informantName.family && informantName.family[0]
+  body.informantFamilyName = informantName?.family
   body.informantFirstNamesLocal = informantNameLocal?.given?.at(0)
   body.informantMiddleNameLocal = informantNameLocal?.given?.at(1)
-  body.informantFamilyNameLocal =
-    informantNameLocal &&
-    informantNameLocal.family &&
-    informantNameLocal.family[0]
+  body.informantFamilyNameLocal = informantNameLocal?.family
   body.informantDoB = informant.birthDate
   body.informantIdentifier = findPatientPrimaryIdentifier(informant)?.value
 }
@@ -349,6 +345,8 @@ function createDeclarationIndex(
     (compositionTypeCode && compositionTypeCode.code) || 'death-declaration'
 
   const firstTaskHistory = findFirstTaskHistory(bundle)
+  body.lastStatusChangedAt = getLastStatusChangedAt(bundle, task)
+
   const firstRegLastUserExtension =
     firstTaskHistory &&
     findTaskExtension(
