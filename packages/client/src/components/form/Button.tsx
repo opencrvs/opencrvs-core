@@ -15,18 +15,15 @@ import {
   IFormField,
   IFormFieldValue,
   IFormSectionData,
-  IFormData,
-  Ii18nRedirectButtonFormField
+  IFormData
 } from '@client/forms'
 import { isFieldHttp } from '@client/forms/utils'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { useHistory } from 'react-router'
-import { transformHttpFieldIntoRequest } from '@client/components/form/http'
 
 interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
-  fieldDefinition: Ii18nButtonFormField | Ii18nRedirectButtonFormField
+  fieldDefinition: Ii18nButtonFormField
   fields: IFormField[]
   values: IFormSectionData
   draftData: IFormData
@@ -44,7 +41,6 @@ export function ButtonField(props: ButtonFieldProps) {
   } = props
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
-  const navigate = useHistory()
   const onClick = () => {
     // safe to assume that the trigger is always there because of the form validation in config
     const trigger = fields.find(
@@ -63,9 +59,6 @@ export function ButtonField(props: ButtonFieldProps) {
         .then((res) => res.json())
         .then((data) => {
           setFieldValue(trigger.name, { loading: false, data })
-          if (fieldDefinition.type === 'REDIRECT_BUTTON') {
-            navigate.push(fieldDefinition.options.url)
-          }
         })
         .catch((error) => {
           setFieldValue(trigger.name, { loading: false, error: error.message })

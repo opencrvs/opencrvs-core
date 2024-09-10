@@ -74,7 +74,7 @@ export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
-export const REDIRECT_BUTTON = 'REDIRECT_BUTTON'
+export const REDIRECT_BUTTON = 'BUTTON'
 
 export enum Sort {
   ASC = 'asc',

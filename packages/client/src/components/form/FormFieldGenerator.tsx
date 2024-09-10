@@ -93,8 +93,7 @@ import {
   BUTTON,
   HTTP,
   InitialValue,
-  DependencyInfo,
-  REDIRECT_BUTTON
+  DependencyInfo
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -677,10 +676,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return null
     }
 
-    if (
-      fieldDefinition.type === BUTTON ||
-      fieldDefinition.type === REDIRECT_BUTTON
-    ) {
+    if (fieldDefinition.type === BUTTON) {
       return (
         <InputField {...inputFieldProps} hideInputHeader={true}>
           <ButtonField
@@ -1118,8 +1114,7 @@ class FormSectionComponent extends React.Component<Props> {
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
             field.type === NID_VERIFICATION_BUTTON ||
-            field.type === BUTTON ||
-            field.type === REDIRECT_BUTTON
+            field.type === BUTTON
           ) {
             return (
               <FormItem
