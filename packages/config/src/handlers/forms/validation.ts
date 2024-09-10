@@ -40,14 +40,12 @@ const conditional = z.object({
 /*
  * TODO: The field validation needs to be made stricter
  */
-const field = z
+const base = z
   .object({
     name: z.string(),
     type: z.string(),
     custom: z.boolean().optional(),
     label: messageDescriptor,
-    // TODO: The below "any" should be removed when we will make stricter types
-    options: z.any().optional(),
     conditionals: z.array(conditional).optional(),
     mapping: z
       .object({ template: handlebarTemplate.optional() })
@@ -56,6 +54,14 @@ const field = z
   })
   .passthrough()
 
+const button = base.extend({
+  type: z.literal('BUTTON'),
+  options: z.object({
+    trigger: z.string()
+  })
+})
+
+const field = z.discriminatedUnion('type', [base, button])
 const group = z.object({
   id: z.string(),
   title: messageDescriptor.optional(),
@@ -89,6 +95,13 @@ function findDuplicates(arr: string[]): string[] {
   return [...freqCount.entries()]
     .filter(([_, count]) => count > 1)
     .map(([name, _]) => name)
+}
+
+type Field = z.infer<typeof field>
+type Button = z.infer<typeof button>
+
+function isButtonField(field: Field): field is Button {
+  return field.type === 'BUTTON'
 }
 
 const DECORATIVE_TYPES = ['DIVIDER', 'HEADING3', 'SUBSECTION_HEADER']
@@ -405,9 +418,7 @@ const form = z.object({
         .refine(
           (sec) => {
             const fieldsInSection = sec.groups.flatMap((group) => group.fields)
-            const buttonFields = fieldsInSection.filter(
-              ({ type }) => type === 'BUTTON'
-            )
+            const buttonFields = fieldsInSection.filter(isButtonField)
             return buttonFields.every((button) =>
               fieldsInSection.some(
                 (field) => button.options.trigger === field.name
@@ -416,9 +427,7 @@ const form = z.object({
           },
           (sec) => {
             const fieldsInSection = sec.groups.flatMap((group) => group.fields)
-            const buttonFields = fieldsInSection.filter(
-              ({ type }) => type === 'BUTTON'
-            )
+            const buttonFields = fieldsInSection.filter(isButtonField)
             const buttonFieldsMissingTrigger = buttonFields
               .filter(
                 (button) =>
