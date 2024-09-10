@@ -8,19 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, ButtonProps } from '@opencrvs/components/lib'
 import {
   Ii18nButtonFormField,
   IFormField,
   IFormFieldValue,
   IFormSectionData,
-  IFormData
+  IFormData,
+  IHttpFormField
 } from '@client/forms'
-import { isFieldHttp } from '@client/forms/utils'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { useHttp } from './http'
 
 interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   fieldDefinition: Ii18nButtonFormField
@@ -41,29 +42,22 @@ export function ButtonField(props: ButtonFieldProps) {
   } = props
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
+  // safe to assume that the trigger is always there because of the form validation in config
+  const trigger = fields.find(
+    (f) => f.name === fieldDefinition.options.trigger
+  )!
+  const { call, loading, data, error } = useHttp<string>(
+    trigger as IHttpFormField,
+    values,
+    offlineCountryConfig,
+    draftData,
+    userDetails
+  )
+  useEffect(() => {
+    setFieldValue(trigger.name, { loading, data, error })
+  }, [loading, data, error, setFieldValue, trigger.name])
   const onClick = () => {
-    // safe to assume that the trigger is always there because of the form validation in config
-    const trigger = fields.find(
-      (f) => f.name === fieldDefinition.options.trigger
-    )!
-    if (isFieldHttp(trigger)) {
-      const httpRequest = transformHttpFieldIntoRequest(
-        trigger,
-        values,
-        offlineCountryConfig,
-        draftData,
-        userDetails
-      )
-      setFieldValue(trigger.name, { loading: true })
-      httpRequest
-        .then((res) => res.json())
-        .then((data) => {
-          setFieldValue(trigger.name, { loading: false, data })
-        })
-        .catch((error) => {
-          setFieldValue(trigger.name, { loading: false, error: error.message })
-        })
-    }
+    call()
   }
   return (
     <Button {...buttonProps} type="secondary" onClick={onClick}>

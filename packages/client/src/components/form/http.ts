@@ -12,6 +12,7 @@ import { IFormSectionData, IFormData, IHttpFormField } from '@client/forms'
 import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
+import { useState } from 'react'
 
 function transformRequestBody(
   body: Record<string, any>,
@@ -44,4 +45,32 @@ export function transformHttpFieldIntoRequest(
       ? JSON.stringify(transformRequestBody(request.body, ...evalParams))
       : null
   })
+}
+
+export function useHttp<T>(
+  field: IHttpFormField,
+  ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
+) {
+  const [loading, setLoading] = useState<boolean>(false)
+  const [data, setData] = useState<T | undefined>(undefined)
+  const [error, setError] = useState<string | undefined>(undefined)
+  const call = () => {
+    setLoading(true)
+    transformHttpFieldIntoRequest(field, ...evalParams)
+      .then((res) => res.json())
+      .then((data) => {
+        setLoading(false)
+        setData(data)
+      })
+      .catch((error) => {
+        setLoading(false)
+        setError(error.message)
+      })
+  }
+  return {
+    call,
+    loading,
+    data,
+    error
+  }
 }
