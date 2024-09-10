@@ -117,8 +117,8 @@ export function SignatureUploader({
                   return
                 }
                 if (
-                  !allowedFileFormats.includes(
-                    file.type as (typeof allowedFileFormats)[0]
+                  !allowedFileFormats.some((format) =>
+                    file.type.includes(format)
                   )
                 ) {
                   setSignatureError(
