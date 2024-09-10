@@ -11,6 +11,7 @@
 import {
   createTestComponent,
   createTestStore,
+  flushPromises,
   mockOfflineDataDispatch,
   mockRegistrarUserResponse
 } from '@client/tests/util'
@@ -49,6 +50,7 @@ describe('Status wise registration count', () => {
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
     vi.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
     vi.spyOn(performanceUtils, 'isUnderJurisdictionOfUser').mockReturnValue(
       true

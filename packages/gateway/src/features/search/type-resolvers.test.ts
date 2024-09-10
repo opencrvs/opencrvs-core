@@ -70,12 +70,12 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Bishal', 'Bashak'],
-          family: ['Papon']
+          family: 'Papon'
         },
         {
           use: 'bn',
           given: ['বিশাল', 'বসাক'],
-          family: ['পাপন']
+          family: 'পাপন'
         }
       ])
     })
@@ -258,12 +258,12 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Bishal', 'Bashak'],
-          family: ['Papon']
+          family: 'Papon'
         },
         {
           use: 'bn',
           given: ['বিশাল', 'বসাক'],
-          family: ['পাপন']
+          family: 'পাপন'
         }
       ])
     })
@@ -503,12 +503,12 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Jon', 'C.'],
-          family: ['Doe']
+          family: 'Doe'
         },
         {
           use: 'bn',
           given: ['জন', 'সি.'],
-          family: ['ডো']
+          family: 'ডো'
         }
       ])
     })
@@ -528,12 +528,12 @@ describe('Search type resolvers', () => {
         {
           use: 'en',
           given: ['Jon', 'C.'],
-          family: ['Doe']
+          family: 'Doe'
         },
         {
           use: 'bn',
           given: ['জন', 'সি.'],
-          family: ['ডো']
+          family: 'ডো'
         }
       ])
     })

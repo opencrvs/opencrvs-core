@@ -68,7 +68,7 @@ const getChildName = (source: ISearchDataTemplate) => {
           source.childMiddleName
         ]) ||
         null,
-      family: (source.childFamilyName && [source.childFamilyName]) || null
+      family: source.childFamilyName || null
     }
   ]
 
@@ -81,8 +81,7 @@ const getChildName = (source: ISearchDataTemplate) => {
           source.childMiddleNameLocal
         ]) ||
         null,
-      family:
-        (source.childFamilyNameLocal && [source.childFamilyNameLocal]) || null
+      family: source.childFamilyNameLocal || null
     })
   }
 
@@ -103,7 +102,7 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
           source.deceasedMiddleName
         ]) ||
         null,
-      family: (source.deceasedFamilyName && [source.deceasedFamilyName]) || null
+      family: source.deceasedFamilyName || null
     }
   ]
 
@@ -116,9 +115,7 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
           source.deceasedMiddleNameLocal
         ]) ||
         null,
-      family:
-        (source.deceasedFamilyNameLocal && [source.deceasedFamilyNameLocal]) ||
-        null
+      family: source.deceasedFamilyNameLocal || null
     })
   }
 
@@ -138,7 +135,7 @@ const getBrideName = (source: ISearchDataTemplate) => {
           source.brideMiddleName
         ]) ||
         null,
-      family: (source.brideFamilyName && [source.brideFamilyName]) || null
+      family: source.brideFamilyName || null
     }
   ]
 
@@ -151,8 +148,7 @@ const getBrideName = (source: ISearchDataTemplate) => {
           source.brideMiddleNameLocal
         ]) ||
         null,
-      family:
-        (source.brideFamilyNameLocal && [source.brideFamilyNameLocal]) || null
+      family: source.brideFamilyNameLocal || null
     })
   }
 
@@ -172,7 +168,7 @@ const getGroomName = (source: ISearchDataTemplate) => {
           source.groomMiddleName
         ]) ||
         null,
-      family: (source.groomFamilyName && [source.groomFamilyName]) || null
+      family: source.groomFamilyName || null
     }
   ]
 
@@ -185,8 +181,7 @@ const getGroomName = (source: ISearchDataTemplate) => {
           source.groomMiddleNameLocal
         ]) ||
         null,
-      family:
-        (source.groomFamilyNameLocal && [source.groomFamilyNameLocal]) || null
+      family: source.groomFamilyNameLocal || null
     })
   }
 

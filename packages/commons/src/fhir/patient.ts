@@ -39,9 +39,8 @@ export type Patient = WithStrictExtensions<
   }
 >
 
-export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use' | 'family'> & {
+export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use'> & {
   use: string
-  family?: string[]
 }
 
 export const SUPPORTED_PATIENT_IDENTIFIER_CODES = [

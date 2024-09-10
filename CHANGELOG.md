@@ -9,6 +9,8 @@
 ## Improvements
 
 - Fetch child identifier in view record
+- Auth token, ip address, remote address redacted from server log
+- **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
 
 ### New features
 
@@ -21,6 +23,7 @@
 - Add checks to validate client and server are always on the same version. This prevents browsers with a cached or outdated client versions from making potentially invalid requests to the backend [#6695](https://github.com/opencrvs/opencrvs-core/issues/6695)
 - Two new statuses of record are added: `Validated` and `Correction Requested` for advanced search parameters [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
 - A new field: `Time Period` is added to advanced search [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
+- Deploy UI-Kit Storybook to [opencrvs.pages.dev](https://opencrvs.pages.dev) to allow extending OpenCRVS using the component library
 
 ## Bug fixes
 
@@ -31,6 +34,10 @@
 ## Improvements
 
 - Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
+
+## Bug fixes
+
+- Custom form field validators from country config will work offline. [#7478](https://github.com/opencrvs/opencrvs-core/issues/7478)
 
 ### Breaking changes
 
@@ -60,17 +67,21 @@
 }
 ```
 
-- **Title** Description
-
 ## 1.5.1
 
 ## Improvements
 
 - Fetch child identifier in view record
+- Home screen application’s name and icons are to be configured from country configuration package as manifest.json and app icon files are moved from core to country config (check `opencrvs-countryconfig/src/client-static` folder)
 
 ## Bug fixes
 
 - On slow connections or in rare corner cases, it was possible that the same record got saved to the database twice. This was caused by a bug in how the unique technical identifier we generate were stored as FHIR. The backend now ensures every record is submitted only once. [#7477](https://github.com/opencrvs/opencrvs-core/issues/7477)
+- Fixed an issue where address line fields (e.g., address line 1, address line 2, etc.) were not being updated correctly when a user attempted to update a record's event location, such as place of birth or place of death. [#7531](https://github.com/opencrvs/opencrvs-core/issues/7531)
+- When a declaration(birth/death) is created the event location information was not being parsed to ElasticSearch which caused the Advanced search feature to not work when searching for records by event location.[7494](https://github.com/opencrvs/opencrvs-core/issues/7494)
+- When any user's role was updated, incorrect role was shown for that user's actions in the history section of a declaration's record audit page. [#7495](https://github.com/opencrvs/opencrvs-core/issues/7495)
+- When a user updates a marriage declaration editing the signature of the bride, groom, witness one or witness two, handle the changed value of the signature properly. [#7462](https://github.com/opencrvs/opencrvs-core/issues/7462)
+- Registration agent was unable to download declarations that were previously corrected by registrar. [#7582](https://github.com/opencrvs/opencrvs-core/issues/7582)
 
 ## 1.5.0 (TBD)
 
