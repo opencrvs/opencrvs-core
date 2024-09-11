@@ -71,7 +71,7 @@ export function SignatureUploader({
   onChange,
   modalTitle,
   maxSizeMb = 2,
-  allowedFileFormats = ['png'],
+  allowedFileFormats = ['image/png'],
   ...props
 }: SignatureUploaderProps) {
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false)
@@ -121,9 +121,12 @@ export function SignatureUploader({
                     file.type.includes(format)
                   )
                 ) {
+                  const formattedFileTypesOfSignatures = allowedFileFormats.map(
+                    (val) => val.split('/')[1]
+                  )
                   setSignatureError(
                     intl.formatMessage(formMessages.fileUploadError, {
-                      type: allowedFileFormats.join(', ')
+                      type: formattedFileTypesOfSignatures.join(', ')
                     })
                   )
                   return
