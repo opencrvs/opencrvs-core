@@ -715,7 +715,12 @@ export interface INidVerificationButton extends IFormFieldBase {
 export interface ISignatureFormField extends IFormFieldBase {
   type: typeof SIGNATURE
   maxSizeMb?: number
-  allowedFileFormats?: ('png' | 'jpg' | 'jpeg' | 'svg')[]
+  allowedFileFormats?: (
+    | 'image/png'
+    | 'image/jpg'
+    | 'image/jpeg'
+    | 'image/svg'
+  )[]
 }
 
 export type IFormField =
@@ -1209,7 +1214,12 @@ export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
 export interface Ii18nSignatureField extends Ii18nFormFieldBase {
   type: typeof SIGNATURE
   maxSizeMb?: number
-  allowedFileFormats?: ('png' | 'jpg' | 'jpeg' | 'svg')[]
+  allowedFileFormats?: (
+    | 'image/png'
+    | 'image/jpg'
+    | 'image/jpeg'
+    | 'image/svg'
+  )[]
 }
 
 export type Ii18nFormField =
