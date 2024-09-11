@@ -84,7 +84,7 @@ export const up = async (db: Db, client: MongoClient) => {
               },
               {
                 $set: {
-                  'identifier.$[].type': {
+                  'identifier.$.type': {
                     coding: updatedCoding
                   }
                 }
