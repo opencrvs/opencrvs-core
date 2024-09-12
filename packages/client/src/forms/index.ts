@@ -75,7 +75,7 @@ export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
-export const REDIRECT_BUTTON = 'BUTTON'
+export const REDIRECT = 'REDIRECT'
 
 export enum Sort {
   ASC = 'asc',
@@ -744,8 +744,8 @@ export interface IButtonFormField extends IFormFieldBase {
   }
 }
 
-export interface IRedirectButtonFormField extends IFormFieldBase {
-  type: typeof REDIRECT_BUTTON
+export interface IRedirectFormField extends IFormFieldBase {
+  type: typeof REDIRECT
   options: {
     trigger: string
     url: string
@@ -788,7 +788,7 @@ export type IFormField =
   | ISignatureFormField
   | IHttpFormField
   | IButtonFormField
-  | IRedirectButtonFormField
+  | IRedirectFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1267,8 +1267,8 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-export interface Ii18nRedirectButtonFormField extends Ii18nFormFieldBase {
-  type: typeof REDIRECT_BUTTON
+export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
+  type: typeof REDIRECT
   options: {
     trigger: string
     url: string
@@ -1309,7 +1309,7 @@ export type Ii18nFormField =
   | Ii18nSignatureField
   | Ii18nHttpFormField
   | Ii18nButtonFormField
-  | Ii18nRedirectButtonFormField
+  | Ii18nRedirectFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
