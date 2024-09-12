@@ -11,6 +11,7 @@
 import { IFormSectionData, IFormData, IHttpFormField } from '@client/forms'
 import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
+import { getToken } from '@client/utils/authUtils'
 import { UserDetails } from '@client/utils/userUtils'
 import { useState } from 'react'
 
@@ -30,16 +31,14 @@ export function transformHttpFieldIntoRequest(
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {
   const { options: request } = field
-  const authHeader = request.headers.authorization
+  const authHeader = {
+    Authorization: `Bearer ${getToken()}`
+  }
 
   return fetch(request.url, {
     headers: {
       ...request.headers,
-      // eslint-disable-next-line no-eval
-      authorization:
-        authHeader !== null
-          ? evalExpressionInFieldDefinition(authHeader, ...evalParams)
-          : null
+      ...authHeader
     },
     body: request.body
       ? JSON.stringify(transformRequestBody(request.body, ...evalParams))
@@ -57,7 +56,12 @@ export function useHttp<T>(
   const call = () => {
     setLoading(true)
     transformHttpFieldIntoRequest(field, ...evalParams)
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json()
+        }
+        throw new Error(res.statusText)
+      })
       .then((data) => {
         setLoading(false)
         setData(data)

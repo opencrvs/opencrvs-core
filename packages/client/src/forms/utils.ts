@@ -78,7 +78,6 @@ import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
-import { getToken } from '@client/utils/authUtils'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -584,7 +583,6 @@ export const evalExpressionInFieldDefinition = (
   $draft: IFormData,
   $user: (UserDetails & { token?: string }) | null
 ) => {
-  $user = $user !== null ? { ...$user, token: getToken() } : $user
   // For backwards compatibility
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const values = $form
