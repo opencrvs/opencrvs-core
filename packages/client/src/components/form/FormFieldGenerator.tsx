@@ -33,7 +33,8 @@ import {
   getFieldHelperText,
   isInitialValueDependencyInfo,
   getDependentFields,
-  evalExpressionInFieldDefinition
+  evalExpressionInFieldDefinition,
+  handleUnsupportedIcon
 } from '@client/forms/utils'
 import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -93,7 +94,8 @@ import {
   BUTTON,
   HTTP,
   InitialValue,
-  DependencyInfo
+  DependencyInfo,
+  Ii18nButtonFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -133,7 +135,13 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
+import {
+  BulletList,
+  Divider,
+  Icon,
+  InputLabel,
+  Stack
+} from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
@@ -677,17 +685,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === BUTTON) {
+      const { icon, buttonLabel } = fieldDefinition as Ii18nButtonFormField
+      const supportedIcon = handleUnsupportedIcon(icon)
       return (
-        <InputField {...inputFieldProps} hideInputHeader={true}>
+        <InputField {...inputFieldProps}>
           <ButtonField
             fields={fields}
-            fieldDefinition={fieldDefinition}
+            fieldDefinition={fieldDefinition as Ii18nButtonFormField}
             values={values}
             draftData={draftData}
             setFieldValue={onSetFieldValue}
             disabled={disabled}
           >
-            {inputFieldProps.label}
+            {supportedIcon && (
+              <Icon color="currentColor" name={supportedIcon} size="large" />
+            )}
+            {buttonLabel}
           </ButtonField>
         </InputField>
       )

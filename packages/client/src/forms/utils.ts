@@ -51,7 +51,8 @@ import {
   DependencyInfo,
   IHttpFormField,
   IButtonFormField,
-  BUTTON
+  BUTTON,
+  Ii18nButtonFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -78,6 +79,8 @@ import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
+import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
+
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -193,6 +196,12 @@ export const internationaliseFieldObject = (
     )
     ;(base as any).labelForOffline = intl.formatMessage(
       (field as INidVerificationButton).labelForOffline
+    )
+  }
+
+  if (isFieldButton(field)) {
+    ;(base as Ii18nButtonFormField).buttonLabel = intl.formatMessage(
+      field.buttonLabel
     )
   }
 
@@ -781,4 +790,11 @@ export function getDependentFields(
       isInitialValueDependencyInfo(initialValue) &&
       initialValue.dependsOn.includes(fieldName)
   )
+}
+
+export function handleUnsupportedIcon(iconName?: string) {
+  if (iconName && iconName in SupportedIcons) {
+    return iconName as keyof typeof SupportedIcons
+  }
+  return null
 }

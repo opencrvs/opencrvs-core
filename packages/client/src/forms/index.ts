@@ -37,6 +37,7 @@ import {
   DEATH_REGISTRATION_NUMBER,
   NATIONAL_ID
 } from '@client/utils/constants'
+import { IconProps } from '@opencrvs/components/lib'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -736,6 +737,8 @@ export interface IHttpFormField extends IFormFieldBase {
 }
 export interface IButtonFormField extends IFormFieldBase {
   type: typeof BUTTON
+  icon?: IconProps['name']
+  buttonLabel: MessageDescriptor
   options: {
     trigger: string
   }
@@ -1257,6 +1260,8 @@ export interface Ii18nHttpFormField extends Ii18nFormFieldBase {
 
 export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   type: typeof BUTTON
+  icon?: IconProps['name']
+  buttonLabel: string
   options: {
     trigger: string
   }
