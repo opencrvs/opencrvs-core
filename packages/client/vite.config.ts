@@ -117,6 +117,11 @@ export default defineConfig(({ mode }) => {
         '/images/': {
           target: 'http://localhost:3040/static/',
           changeOrigin: true
+        },
+        '/api': {
+          target: 'http://localhost:3040',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '/api')
         }
       }
     }
