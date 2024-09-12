@@ -147,6 +147,9 @@ async function removeDuplicatesFromCompositionAndElastic(
   }
 }
 
+/* When a user updates a signature, we want to track the changes in 'graphqlPayload.registration.changedValues' since the record gets updated 
+depending on this. However, as signatures are not present in our forms for version 1.5, we check for signature update in the declaration payload. 
+In this case, there won't be a 'signatureUri' property inside the payload when a signature is updated. */
 const trackSignatureChanges = (declaration: IReadyDeclaration) => {
   const signatureFields = {
     brideSignature: 'brideSignatureURI',
