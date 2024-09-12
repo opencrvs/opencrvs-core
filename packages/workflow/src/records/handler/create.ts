@@ -157,14 +157,18 @@ async function resolveLocationsForEncounter(
 
 function bundleIncludesLocationResources(record: Saved<Bundle>) {
   const encounter = findEncounterFromRecord(record)
-  const locationIds =
+  const encounterLocationIds =
     encounter?.location?.map(
       ({ location }) => location.reference.split('/')[1]
     ) || []
 
-  return record.entry
-    .filter(({ resource }) => resource.resourceType == 'Location')
-    .every(({ resource }) => locationIds?.includes(resource.id))
+  const bundleLocations = record.entry.filter(
+    ({ resource }) => resource.resourceType == 'Location'
+  )
+
+  return encounterLocationIds.every((locationId) =>
+    bundleLocations.some((location) => location.id === locationId)
+  )
 }
 
 async function createRecord(

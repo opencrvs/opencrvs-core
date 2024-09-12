@@ -14,13 +14,34 @@ import { readFileSync } from 'fs'
 import { createBirthRegistrationPayload } from '@test/mocks/createBirthRecord'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
-import { SavedBundle, SavedTask, URLReference } from '@opencrvs/commons/types'
 import { TransactionResponse } from '@workflow/records/fhir'
+import {
+  SavedBundle,
+  SavedTask,
+  URLReference,
+  SavedLocation
+} from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
   type: 'document',
   entry: []
+}
+
+const existingLocationBundle: SavedBundle<SavedLocation> = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      resource: {
+        resourceType: 'Location',
+        id: '146251e9-df90-4068-82b0-27d8f979e8e2' as UUID
+      },
+      fullUrl:
+        'http://localhost:3447/fhir/Location/146251e9-df90-4068-82b0-27d8f979e8e2/_history/e79c368d-f8e4-49b7-8573-d885e11ebb47' as URLReference
+    }
+  ]
 }
 
 describe('Create record endpoint', () => {
@@ -113,6 +134,12 @@ describe('Create record endpoint', () => {
           ]
         }
         return res(ctx.json(responseBundle))
+      })
+    )
+
+    mswServer.use(
+      rest.get('http://localhost:3447/fhir/Location', (_, res, ctx) => {
+        return res(ctx.json(existingLocationBundle))
       })
     )
 
