@@ -120,7 +120,9 @@ const ButtonField = base.extend({
   type: z.literal('BUTTON'),
   options: z.object({
     trigger: z.string()
-  })
+  }),
+  buttonLabel: messageDescriptor,
+  icon: z.string().optional()
 })
 
 export const field = z.discriminatedUnion('type', [
