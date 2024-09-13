@@ -116,9 +116,8 @@ jobs:
                 console.log('Deploy job completed successfully');
               }
 
-              // Wait for 30 seconds before polling again
               if (!deployJobCompleted) {
-                await new Promise(resolve => setTimeout(resolve, 30000));
+                await new Promise(resolve => setTimeout(resolve, 10000));
               }
             }
 
@@ -152,7 +151,7 @@ jobs:
 
               // Wait for 30 seconds before polling again
               if (status === 'in_progress') {
-                await new Promise(resolve => setTimeout(resolve, 30000));
+                await new Promise(resolve => setTimeout(resolve, 10000));
               }
             }
 
