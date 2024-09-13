@@ -111,8 +111,13 @@ jobs:
               });
 
               const deployJob = jobs.data.jobs.find(job => job.name === 'deploy');
-              if (deployJob && deployJob.status === 'completed' && deployJob.conclusion === 'success') {
+              if (deployJob && deployJob.status === 'completed') {
                 deployJobCompleted = true;
+
+                if(deployJob.conclusion !== 'success') {
+                  throw new Error('Deploy job failed');
+                }
+
                 console.log('Deploy job completed successfully');
               }
 
