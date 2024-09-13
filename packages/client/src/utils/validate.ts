@@ -225,24 +225,20 @@ export const isDateNotPastLimit = (date: string, limit: Date) => {
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
-  const birthDate = drafts.deceased && drafts.deceased.birthDate
-  return birthDate
-    ? new Date(date) >= new Date(JSON.stringify(birthDate))
-    : true
+  const birthDate = drafts?.deceased?.birthDate as string
+  return birthDate ? new Date(date) >= new Date(birthDate) : true
 }
 
 export const isDateNotAfterBirthEvent = (date: string, drafts?: IFormData) => {
-  const dateOfBirth = drafts && drafts.child && drafts.child.childBirthDate
-  return dateOfBirth
-    ? new Date(date) <= new Date(JSON.stringify(dateOfBirth))
-    : true
+  const dateOfBirth = drafts?.child?.childBirthDate as string
+  return dateOfBirth ? new Date(date) <= new Date(dateOfBirth) : true
 }
 
 export const isDateNotAfterDeath = (date: string, drafts?: IFormData) => {
-  const deathDate = drafts && drafts.deathEvent && drafts.deathEvent.deathDate
+  const deathDate = drafts?.deathEvent?.deathDate as string
   return deathDate
     ? new Date(date).setHours(0, 0, 0, 0) <=
-        new Date(JSON.stringify(deathDate)).setHours(0, 0, 0, 0)
+        new Date(deathDate).setHours(0, 0, 0, 0)
     : true
 }
 
