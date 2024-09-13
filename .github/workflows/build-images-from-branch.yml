@@ -18,7 +18,9 @@ on:
   push:
     branches:
       - '**'
-
+    branches-ignore:
+      - 'dependabot/**'
+      - 'renovate/**'
 jobs:
   base:
     runs-on: ubuntu-22.04
