@@ -16,8 +16,6 @@ on:
         default: develop
         required: true
   push:
-    branches:
-      - '**'
     branches-ignore:
       - 'dependabot/**'
       - 'renovate/**'
