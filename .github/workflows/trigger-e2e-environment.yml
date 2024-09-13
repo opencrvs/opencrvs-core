@@ -1,0 +1,124 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Trigger E2E
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
+        type: string
+
+jobs:
+  e2e:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get PR Information (when manually triggered)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headSha)
+          BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
+          HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headSha' | cut -c1-7)
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Get Branch Name and Head Commit Hash (on PR creation)
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        id: vars
+        run: |
+          echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+          COMMIT_HASH=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
+          echo "HEAD_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Check if branch exists in opencrvs-farajaland repo
+        run: |
+          FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
+          if git ls-remote --heads $FARAJALAND_REPO ${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
+            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
+          else
+            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/develop | cut -c1-7)
+          fi
+          echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Output Variables
+        run: |
+          echo "PR Branch: ${{ env.BRANCH_NAME }}"
+          echo "PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}"
+          echo "Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}"
+
+      - name: Trigger E2E Workflow
+        id: dispatch_e2e
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          script: |
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'opencrvs-e2e',
+              event_type: 'run_e2e',
+              client_payload: {
+                actor: '${{ github.actor }}',
+                'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
+                'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
+                stack: '${{ env.BRANCH_NAME }}'
+              }
+            });
+            console.log(result);
+            return result;
+
+      - name: Wait for E2E Workflow to Complete
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          script: |
+            const owner = 'opencrvs';
+            const repo = 'opencrvs-e2e';
+            let runId;
+            let status = 'in_progress';
+
+            // Poll for the workflow run status
+            while (status === 'in_progress') {
+              const runs = await github.rest.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                event: 'repository_dispatch',
+                branch: '${{ env.BRANCH_NAME }}',
+                per_page: 1
+              });
+
+              if (runs.data.workflow_runs.length > 0) {
+                const latestRun = runs.data.workflow_runs[0];
+                runId = latestRun.id;
+                status = latestRun.status;
+                console.log(`Current status: ${status}`);
+              }
+
+              // If still in progress, wait for 30 seconds before polling again
+              if (status === 'in_progress') {
+                await new Promise(resolve => setTimeout(resolve, 30000));
+              }
+            }
+
+            if (status === 'completed') {
+              const conclusion = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+              console.log(`Workflow finished with conclusion: ${conclusion.data.conclusion}`);
+              if (conclusion.data.conclusion !== 'success') {
+                throw new Error('E2E workflow failed');
+              }
+            }
