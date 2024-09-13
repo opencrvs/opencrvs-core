@@ -86,7 +86,9 @@ jobs:
             if (runs.data.workflow_runs.length > 0) {
               const runId = runs.data.workflow_runs[0].id;
               console.log(`Captured runId: ${runId}`);
-              return { runId };
+
+              // Set the runId as an output
+              core.setOutput('runId', runId);
             } else {
               throw new Error('No workflow run found.');
             }
