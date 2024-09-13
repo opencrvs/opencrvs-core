@@ -78,16 +78,17 @@ export const up = async (db: Db, client: MongoClient) => {
             await db.collection('Patient').updateOne(
               {
                 _id: patient._id,
-                'identifier.type': {
-                  $in: EVENT_IDENTIFIER
-                }
+                'identifier.type': identifier.type // Match the specific identifier type
               },
               {
                 $set: {
-                  'identifier.$.type': {
+                  'identifier.$[elem].type': {
                     coding: updatedCoding
                   }
                 }
+              },
+              {
+                arrayFilters: [{ 'elem.type': identifier.type }] // Filter to match all elements with the specific type
               }
             )
             processPatient++
@@ -122,16 +123,17 @@ export const up = async (db: Db, client: MongoClient) => {
             await db.collection('Patient_history').updateOne(
               {
                 _id: patient._id,
-                'identifier.type': {
-                  $in: EVENT_IDENTIFIER
-                }
+                'identifier.type': identifier.type // Match the specific identifier type
               },
               {
                 $set: {
-                  'identifier.$[].type': {
+                  'identifier.$[elem].type': {
                     coding: updatedCoding
                   }
                 }
+              },
+              {
+                arrayFilters: [{ 'elem.type': identifier.type }] // Filter to match all elements with the specific type
               }
             )
             processPatientHistory++
