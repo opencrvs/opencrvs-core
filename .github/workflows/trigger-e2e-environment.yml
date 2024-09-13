@@ -84,7 +84,7 @@ jobs:
           github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
           script: |
             const owner = 'opencrvs';
-            const repo = 'opencrvs-e2e';
+            const repo = 'e2e';
             let runId;
             let status = 'in_progress';
 
