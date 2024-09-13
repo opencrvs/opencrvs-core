@@ -88,7 +88,6 @@ jobs:
             let runId;
             let status = 'in_progress';
 
-            // Poll for the workflow run status
             while (status === 'in_progress') {
               const runs = await github.rest.actions.listWorkflowRunsForRepo({
                 owner,
