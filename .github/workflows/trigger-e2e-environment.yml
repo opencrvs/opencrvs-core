@@ -62,7 +62,7 @@ jobs:
         id: dispatch_e2e
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
@@ -75,6 +75,9 @@ jobs:
                 stack: '${{ env.BRANCH_NAME }}'
               }
             });
+
+            console.log(result);
+            await new Promise(resolve => setTimeout(resolve, 10000));
 
             const runs = await github.rest.actions.listWorkflowRunsForRepo({
               owner: 'opencrvs',
@@ -96,13 +99,17 @@ jobs:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
             const runId = ${{ steps.dispatch_e2e.outputs.runId }};
+            const prNumber = ${{ github.event.pull_request.number }};
+            const deployMessage = `Your environment is deployed to https://${{ env.BRANCH_NAME }}.opencrvs.dev.`;
+
             let deployJobCompleted = false;
 
+            // Check if deploy job has completed
             while (!deployJobCompleted) {
               const jobs = await github.rest.actions.listJobsForWorkflowRun({
                 owner,
@@ -110,11 +117,11 @@ jobs:
                 run_id: runId
               });
 
-              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy');
+              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / deploy');
               if (deployJob && deployJob.status === 'completed') {
                 deployJobCompleted = true;
 
-                if(deployJob.conclusion !== 'success') {
+                if (deployJob.conclusion !== 'success') {
                   throw new Error('Deploy job failed');
                 }
 
@@ -126,25 +133,38 @@ jobs:
               }
             }
 
-            // Add PR comment once the deploy is completed
-            await github.rest.issues.createComment({
+            // Check if the comment already exists
+            const comments = await github.rest.issues.listComments({
               owner: 'opencrvs',
               repo: 'opencrvs-core',
-              issue_number: ${{ github.event.pull_request.number }},
-              body: `Your environment is deployed to https://${{ env.BRANCH_NAME }}.opencrvs.dev.`
+              issue_number: prNumber
             });
+
+            const existingComment = comments.data.find(comment => comment.body.includes(deployMessage));
+            if (!existingComment) {
+              // Add PR comment if it doesn't exist
+              await github.rest.issues.createComment({
+                owner: 'opencrvs',
+                repo: 'opencrvs-core',
+                issue_number: prNumber,
+                body: deployMessage
+              });
+              console.log('PR comment added');
+            } else {
+              console.log('PR comment already exists, skipping...');
+            }
 
       - name: Wait for E2E Workflow Completion
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          github-token: ${{ secrets.GH_TOKEN }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
             const runId = ${{ steps.dispatch_e2e.outputs.runId }};
             let status = 'in_progress';
 
-            while (status === 'in_progress') {
+            while (status === 'in_progress' || status === 'queued') {
               const run = await github.rest.actions.getWorkflowRun({
                 owner,
                 repo,
@@ -154,8 +174,7 @@ jobs:
               status = run.data.status;
               console.log(`Current status: ${status}`);
 
-              // Wait for 30 seconds before polling again
-              if (status === 'in_progress') {
+              if (status === 'in_progress' || status === 'queued') {
                 await new Promise(resolve => setTimeout(resolve, 10000));
               }
             }
