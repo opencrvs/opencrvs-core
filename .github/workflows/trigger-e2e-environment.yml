@@ -75,36 +75,80 @@ jobs:
                 stack: '${{ env.BRANCH_NAME }}'
               }
             });
-            console.log(result);
-            return result;
 
-      - name: Wait for E2E Workflow to Complete
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: 'opencrvs',
+              repo: 'e2e',
+              event: 'repository_dispatch',
+              per_page: 1
+            });
+
+            if (runs.data.workflow_runs.length > 0) {
+              const runId = runs.data.workflow_runs[0].id;
+              console.log(`Captured runId: ${runId}`);
+              return { runId };
+            } else {
+              throw new Error('No workflow run found.');
+            }
+
+      - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
-            let runId;
+            const runId = ${{ steps.dispatch_e2e.outputs.runId }};
+            let deployJobCompleted = false;
+
+            while (!deployJobCompleted) {
+              const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+
+              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy');
+              if (deployJob && deployJob.status === 'completed' && deployJob.conclusion === 'success') {
+                deployJobCompleted = true;
+                console.log('Deploy job completed successfully');
+              }
+
+              // Wait for 30 seconds before polling again
+              if (!deployJobCompleted) {
+                await new Promise(resolve => setTimeout(resolve, 30000));
+              }
+            }
+
+            // Add PR comment once the deploy is completed
+            await github.rest.issues.createComment({
+              owner: 'opencrvs',
+              repo: 'opencrvs-core',
+              issue_number: ${{ github.event.pull_request.number }},
+              body: `Your environment is deployed to https://${{ env.BRANCH_NAME }}.opencrvs.dev.`
+            });
+
+      - name: Wait for E2E Workflow Completion
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          script: |
+            const owner = 'opencrvs';
+            const repo = 'e2e';
+            const runId = ${{ steps.dispatch_e2e.outputs.runId }};
             let status = 'in_progress';
 
             while (status === 'in_progress') {
-              const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              const run = await github.rest.actions.getWorkflowRun({
                 owner,
                 repo,
-                event: 'repository_dispatch',
-                branch: '${{ env.BRANCH_NAME }}',
-                per_page: 1
+                run_id: runId
               });
 
-              if (runs.data.workflow_runs.length > 0) {
-                const latestRun = runs.data.workflow_runs[0];
-                runId = latestRun.id;
-                status = latestRun.status;
-                console.log(`Current status: ${status}`);
-              }
+              status = run.data.status;
+              console.log(`Current status: ${status}`);
 
-              // If still in progress, wait for 30 seconds before polling again
+              // Wait for 30 seconds before polling again
               if (status === 'in_progress') {
                 await new Promise(resolve => setTimeout(resolve, 30000));
               }
