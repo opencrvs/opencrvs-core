@@ -20,6 +20,7 @@ on:
 
 jobs:
   e2e:
+    if: ${{ !contains(github.actor, 'bot') }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -64,6 +65,14 @@ jobs:
         with:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            }
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
               repo: 'e2e',
@@ -72,7 +81,7 @@ jobs:
                 actor: '${{ github.actor }}',
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
-                stack: '${{ env.BRANCH_NAME }}'
+                stack: slugify('${{ env.BRANCH_NAME }}')
               }
             });
 
