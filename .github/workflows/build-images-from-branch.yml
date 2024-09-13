@@ -18,6 +18,8 @@ on:
   push:
     branches:
       - '*'
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
   base:
