@@ -32,7 +32,7 @@ import {
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { CorrectionValueInput, Event, RegStatus } from '@client/utils/gateway'
 import {
   MARK_EVENT_AS_DUPLICATE,
   getBirthMutation
@@ -147,6 +147,38 @@ async function removeDuplicatesFromCompositionAndElastic(
   }
 }
 
+/* When a user updates a signature, we want to track the changes in 'graphqlPayload.registration.changedValues' since the record gets updated 
+depending on this. However, as signatures are not present in our forms for version 1.5, we check for signature update in the declaration payload. 
+In this case, there won't be a 'signatureUri' property inside the payload when a signature is updated. */
+const trackSignatureChanges = (declaration: IReadyDeclaration) => {
+  const signatureFields = {
+    brideSignature: 'brideSignatureURI',
+    groomSignature: 'groomSignatureURI',
+    witnessOneSignature: 'witnessOneSignatureURI',
+    witnessTwoSignature: 'witnessTwoSignatureURI',
+    informantsSignature: 'informantsSignatureURI'
+  }
+
+  const changedValues = Object.entries(signatureFields)
+    .map(([fieldKey, signatureField]) => {
+      const newValue = declaration.data.registration[fieldKey]
+      const oldValue = declaration.data.registration[signatureField]
+
+      if (!oldValue && newValue) {
+        return {
+          fieldName: fieldKey,
+          newValue,
+          oldValue: '',
+          section: 'review'
+        }
+      }
+      return null
+    })
+    .filter((val) => Boolean(val))
+
+  return changedValues as CorrectionValueInput[]
+}
+
 export const submissionMiddleware: Middleware<{}, IStoreState> =
   ({ dispatch, getState }) =>
   (next) =>
@@ -198,6 +230,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     if (isUpdateAction) {
       const changedValues = getChangedValues(form, declaration, offlineData)
+      changedValues.push(...trackSignatureChanges(declaration))
       graphqlPayload.registration ??= {}
       graphqlPayload.registration.changedValues = changedValues
     }

@@ -21,6 +21,7 @@ import {
   dynamicConstantsMessages,
   userMessages
 } from '@client/i18n/messages'
+import { messages as reviewSectionMessages } from '@client/i18n/messages/views/review'
 import { getIndividualNameObj, UserDetails } from '@client/utils/userUtils'
 import { History, RegAction, RegStatus } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
@@ -360,6 +361,17 @@ const ActionDetailsModalListTable = ({
         }
       } else {
         const [parentField] = indexes
+
+        if (section.id === 'review')
+          result.push({
+            item: getItemName(
+              section.name,
+              reviewSectionMessages[
+                parentField as keyof typeof reviewSectionMessages
+              ]
+            ),
+            edit: intl.formatMessage(dynamicConstantsMessages.updated)
+          })
 
         const fieldObj = flatten(
           section.groups.map((group) => {
