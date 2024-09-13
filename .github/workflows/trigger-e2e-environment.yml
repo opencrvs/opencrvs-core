@@ -114,7 +114,17 @@ jobs:
             const repo = 'e2e';
             const runId = ${{ steps.dispatch_e2e.outputs.runId }};
             const prNumber = ${{ github.event.pull_request.number }};
-            const deployMessage = `Your environment is deployed to https://${{ env.BRANCH_NAME }}.opencrvs.dev.`;
+
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+            }
+            const branchName = slugify('${{ env.BRANCH_NAME }}');
+            const deployMessage = `Your environment is deployed to https://${branchName}.opencrvs.dev.`;
 
             let deployJobCompleted = false;
 
@@ -126,7 +136,7 @@ jobs:
                 run_id: runId
               });
 
-              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / deploy');
+              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
               if (deployJob && deployJob.status === 'completed') {
                 deployJobCompleted = true;
 
