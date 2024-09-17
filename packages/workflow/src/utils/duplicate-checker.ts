@@ -24,6 +24,7 @@ import {
 import { SEARCH_URL } from '@workflow/constants'
 
 type DeathDuplicateSearchBody = {
+  compositionId?: string
   deceasedFirstNames?: string
   deceasedFamilyName?: string
   deceasedIdentifier?: string
@@ -37,26 +38,22 @@ function fetch(...params: Parameters<typeof nodeFetch>) {
 
 const searchDeathDuplicates = async (
   authHeader: IAuthHeader,
-  criteria: DeathDuplicateSearchBody
+  criteria: DeathDuplicateSearchBody,
+  transactionId: string
 ) => {
-  try {
-    const response = await fetch(`${SEARCH_URL}search/duplicates/death`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      },
-      body: JSON.stringify(criteria)
-    })
-    return await response.json()
-  } catch (error) {
-    return await Promise.reject(
-      new Error(`Search request failed: ${error.message}`)
-    )
-  }
+  const response = await fetch(`${SEARCH_URL}search/duplicates/death`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify({ criteria, transactionId })
+  })
+  return response.json()
 }
 
 type BirthDuplicateSearchBody = {
+  compositionId?: string
   childFirstNames?: string
   childFamilyName?: string
   childDoB?: string
@@ -68,61 +65,70 @@ type BirthDuplicateSearchBody = {
 
 const searchBirthDuplicates = async (
   authHeader: IAuthHeader,
-  criteria: BirthDuplicateSearchBody
+  criteria: BirthDuplicateSearchBody,
+  transactionId: string
 ) => {
-  try {
-    const response = await fetch(`${SEARCH_URL}search/duplicates/birth`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      },
-      body: JSON.stringify(criteria)
-    })
-    return await response.json()
-  } catch (error) {
-    return await Promise.reject(
-      new Error(`Search request failed: ${error.message}`)
-    )
-  }
+  const response = await fetch(`${SEARCH_URL}search/duplicates/birth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify({ criteria, transactionId })
+  })
+  return response.json()
 }
 
 async function findBirthDuplicateIds(
   authHeader: IAuthHeader,
-  birthRegDetails: BirthRegistration
+  birthRegDetails: BirthRegistration,
+  transactionId: string,
+  compositionId?: string
 ): Promise<{ id: string; trackingId: string }[]> {
   if (!birthRegDetails || !birthRegDetails.child) {
     return []
   }
 
-  const res = await searchBirthDuplicates(authHeader, {
-    motherIdentifier: birthRegDetails.mother?.identifier?.[0]?.id,
-    childFirstNames: birthRegDetails.child.name?.[0]?.firstNames,
-    childFamilyName: birthRegDetails.child.name?.[0]?.familyName,
-    childDoB: birthRegDetails.child.birthDate,
-    motherFirstNames: birthRegDetails.mother?.name?.[0]?.firstNames,
-    motherFamilyName: birthRegDetails.mother?.name?.[0]?.familyName,
-    motherDoB: birthRegDetails.mother?.birthDate
-  })
+  const res = await searchBirthDuplicates(
+    authHeader,
+    {
+      compositionId: compositionId,
+      motherIdentifier: birthRegDetails.mother?.identifier?.[0]?.id,
+      childFirstNames: birthRegDetails.child.name?.[0]?.firstNames,
+      childFamilyName: birthRegDetails.child.name?.[0]?.familyName,
+      childDoB: birthRegDetails.child.birthDate,
+      motherFirstNames: birthRegDetails.mother?.name?.[0]?.firstNames,
+      motherFamilyName: birthRegDetails.mother?.name?.[0]?.familyName,
+      motherDoB: birthRegDetails.mother?.birthDate
+    },
+    transactionId
+  )
 
   return res
 }
 
 async function findDeathDuplicateIds(
   authHeader: IAuthHeader,
-  deathRegDetails: DeathRegistration
+  deathRegDetails: DeathRegistration,
+  transactionId: string,
+  compositionId?: string
 ): Promise<{ id: string; trackingId: string }[]> {
   if (!deathRegDetails || !deathRegDetails.deceased) {
     return []
   }
 
-  const res = await searchDeathDuplicates(authHeader, {
-    deceasedFirstNames: deathRegDetails.deceased?.name?.[0]?.firstNames,
-    deceasedFamilyName: deathRegDetails.deceased?.name?.[0]?.familyName,
-    deceasedIdentifier: deathRegDetails.deceased?.identifier?.[0]?.id,
-    deceasedDoB: deathRegDetails.deceased?.birthDate,
-    deathDate: deathRegDetails.deceased?.deceased?.deathDate
-  })
+  const res = await searchDeathDuplicates(
+    authHeader,
+    {
+      compositionId,
+      deceasedFirstNames: deathRegDetails.deceased?.name?.[0]?.firstNames,
+      deceasedFamilyName: deathRegDetails.deceased?.name?.[0]?.familyName,
+      deceasedIdentifier: deathRegDetails.deceased?.identifier?.[0]?.id,
+      deceasedDoB: deathRegDetails.deceased?.birthDate,
+      deathDate: deathRegDetails.deceased?.deceased?.deathDate
+    },
+    transactionId
+  )
 
   return res
 }
@@ -130,21 +136,39 @@ async function findDeathDuplicateIds(
 export async function findDuplicateIds(
   registrationDetails: BirthRegistration | DeathRegistration,
   authHeader: IAuthHeader,
-  event: EVENT_TYPE
+  event: EVENT_TYPE,
+  transactionId: string,
+  compositionId?: string
 ) {
   if (event === EVENT_TYPE.BIRTH) {
     return findBirthDuplicateIds(
       authHeader,
-      registrationDetails as BirthRegistration
+      registrationDetails as BirthRegistration,
+      transactionId,
+      compositionId
     )
   } else if (event === EVENT_TYPE.DEATH) {
     return findDeathDuplicateIds(
       authHeader,
-      registrationDetails as DeathRegistration
+      registrationDetails as DeathRegistration,
+      transactionId,
+      compositionId
     )
   }
   // NOT IMPLEMENTED FOR MARRIAGE
   return []
+}
+
+export function hasSameDuplicatesInExtension(
+  task: SavedTask,
+  duplicateIds: { id: string; trackingId: string }[]
+) {
+  return task.extension?.some(
+    (ext) =>
+      ext.url === FLAGGED_AS_POTENTIAL_DUPLICATE &&
+      ext.valueString ===
+        duplicateIds.map((duplicate) => duplicate.trackingId).toString()
+  )
 }
 
 export function updateTaskWithDuplicateIds(

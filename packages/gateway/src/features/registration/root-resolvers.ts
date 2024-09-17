@@ -353,7 +353,7 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
+      return createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {

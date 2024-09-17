@@ -38,7 +38,6 @@ import {
   getSectionBySectionCode,
   getTask,
   getPreviousTask,
-  getComposition,
   DECLARATION_STATUS,
   getDeclarationStatus,
   getTimeLoggedFromTask,
@@ -56,6 +55,7 @@ import {
   getPractitionerIdFromBundle,
   fetchDeclarationsBeginnerRole
 } from '@metrics/features/registration/fhirUtils'
+import { getComposition, SavedBundle } from '@opencrvs/commons/types'
 import {
   getAgeInDays,
   getAgeInYears,
@@ -73,8 +73,7 @@ import { fetchTaskHistory } from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export const generateInCompleteFieldPoints = async (
-  payload: fhir.Bundle,
-  authHeader: IAuthHeader
+  payload: SavedBundle
 ): Promise<IPoints[]> => {
   const composition = getComposition(payload)
   const task = getTask(payload)
@@ -137,7 +136,7 @@ export function toInfluxTimestamp(date?: Date | string) {
 }
 
 export const generateCertificationPoint = async (
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   authHeader: IAuthHeader
 ): Promise<ICertifiedPoints> => {
   const composition = getComposition(payload)
@@ -171,7 +170,7 @@ export const generateCertificationPoint = async (
   return point
 }
 export const generateBirthRegPoint = async (
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   regStatus: string,
   authHeader: IAuthHeader
 ): Promise<IPoints> => {
@@ -184,10 +183,7 @@ export const generateBirthRegPoint = async (
     throw new Error('Composition not found')
   }
 
-  const practitionerRole = await fetchDeclarationsBeginnerRole(
-    payload,
-    authHeader
-  )
+  const practitionerRole = await fetchDeclarationsBeginnerRole(payload)
   const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
   const ageInDays =
@@ -202,7 +198,7 @@ export const generateBirthRegPoint = async (
   const compositionDate = new Date(composition.date)
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
-    eventLocationType: await getEncounterLocationType(payload, authHeader),
+    eventLocationType: await getEncounterLocationType(payload),
     gender: child.gender,
     registrarPractitionerId,
     practitionerRole,
@@ -232,7 +228,7 @@ export const generateBirthRegPoint = async (
 }
 
 export const generateDeathRegPoint = async (
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   regStatus: string,
   authHeader: IAuthHeader
 ): Promise<IPoints> => {
@@ -252,10 +248,7 @@ export const generateDeathRegPoint = async (
     throw new Error('Practitioner id not found')
   }
 
-  const practitionerRole = await fetchDeclarationsBeginnerRole(
-    payload,
-    authHeader
-  )
+  const practitionerRole = await fetchDeclarationsBeginnerRole(payload)
 
   const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
@@ -297,7 +290,7 @@ export const generateDeathRegPoint = async (
     dateLabel: !Number.isNaN(compositionDate.getTime())
       ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
       : undefined,
-    eventLocationType: await getEncounterLocationType(payload, authHeader),
+    eventLocationType: await getEncounterLocationType(payload),
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),
     officeLocation: getRegLastOffice(payload)
@@ -314,7 +307,7 @@ export const generateDeathRegPoint = async (
 }
 
 export async function generateCorrectionReasonPoint(
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   authHeader: IAuthHeader
 ): Promise<ICorrectionPoint> {
   const composition = getComposition(payload)
@@ -349,7 +342,7 @@ export async function generateCorrectionReasonPoint(
   }
 }
 export async function generatePaymentPoint(
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   authHeader: IAuthHeader,
   paymentType: 'certification' | 'correction'
 ): Promise<IPaymentPoints> {
@@ -388,9 +381,8 @@ export async function generatePaymentPoint(
 }
 
 export async function generateEventDurationPoint(
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   allowedPreviousStates: DECLARATION_STATUS[],
-  authHeader: IAuthHeader,
   fromTask?: boolean
 ): Promise<IPoints> {
   const currentTask = getTask(payload)
@@ -413,11 +405,7 @@ export async function generateEventDurationPoint(
     throw new Error('Current task not found')
   }
 
-  const previousTask = await getPreviousTask(
-    currentTask,
-    allowedPreviousStates,
-    authHeader
-  )
+  const previousTask = await getPreviousTask(currentTask, allowedPreviousStates)
 
   if (!previousTask || !previousTask.lastModified) {
     throw new Error('Previous task not found')
@@ -448,8 +436,7 @@ export async function generateEventDurationPoint(
 }
 
 export async function generateTimeLoggedPoint(
-  payload: fhir.Bundle,
-  authHeader: IAuthHeader,
+  payload: SavedBundle,
   fromTask?: boolean
 ): Promise<IPoints> {
   const currentTask = getTask(payload)
@@ -502,8 +489,7 @@ export async function generateTimeLoggedPoint(
 }
 
 export async function generateDeclarationStartedPoint(
-  payload: fhir.Bundle,
-  authHeader: IAuthHeader,
+  payload: SavedBundle,
   status: string
 ): Promise<IDeclarationsStartedPoints> {
   const composition = getComposition(payload)
@@ -556,15 +542,14 @@ export async function generateDeclarationStartedPoint(
 }
 
 export async function generateRejectedPoints(
-  payload: fhir.Bundle,
-  authHeader: IAuthHeader
+  payload: SavedBundle
 ): Promise<IRejectedPoints> {
   const task = getTask(payload)
 
   if (!task) {
     throw new Error('Task not found')
   }
-  const taskHistory = await fetchTaskHistory(task.id!, authHeader)
+  const taskHistory = await fetchTaskHistory(task.id!)
   let compositionId
   if (task && task.focus && task.focus.reference) {
     compositionId = task.focus.reference.split('/')[1]
@@ -591,7 +576,7 @@ export async function generateRejectedPoints(
 }
 
 export async function generateMarriageRegPoint(
-  payload: fhir.Bundle,
+  payload: SavedBundle,
   authHeader: IAuthHeader,
   regStatus: string
 ): Promise<IRejectedPoints> {
@@ -616,10 +601,7 @@ export async function generateMarriageRegPoint(
     throw new Error('Composition not found')
   }
 
-  const practitionerRole = await fetchDeclarationsBeginnerRole(
-    payload,
-    authHeader
-  )
+  const practitionerRole = await fetchDeclarationsBeginnerRole(payload)
   const registrarPractitionerId = getPractitionerIdFromBundle(payload) || ''
 
   const fields: IMarriageRegistrationFields = {
@@ -676,6 +658,7 @@ export const generateAuditPoint = (
     ipAddress: ipAddress,
     userAgent: userAgent
   }
+
   return {
     measurement: 'user_audit_event',
     tags,

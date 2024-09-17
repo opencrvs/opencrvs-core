@@ -24,7 +24,10 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { getOrCreateClient } from '@search/elasticsearch/client'
 import { logger } from '@opencrvs/commons'
-import { recordHandler } from '@search/features/registration/record/handler'
+import {
+  deleteRecordByIdHandler,
+  recordHandler
+} from '@search/features/registration/record/handler'
 import { getRecordByIdHandler } from '@search/features/records/handler'
 import {
   reindexHandler,
@@ -106,6 +109,16 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: false,
         description: 'Fetch all FHIR entities concerning a record'
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/records/{recordId}',
+      handler: deleteRecordByIdHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Delete indexed record by recordId. Only removes it from ES'
       }
     },
     {

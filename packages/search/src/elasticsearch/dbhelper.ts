@@ -15,14 +15,15 @@ import * as elasticsearch from '@elastic/elasticsearch'
 export const indexComposition = async (
   compositionIdentifier: string,
   body: SearchDocument,
-  client: elasticsearch.Client
+  client: elasticsearch.Client,
+  transactionId?: string
 ) => {
   try {
     return await client.index(
       {
         index: OPENCRVS_INDEX_NAME,
         id: compositionIdentifier,
-        body,
+        body: { ...body, transactionId: transactionId },
         refresh: 'wait_for' // makes the call wait until the change is available via search
       },
       {
@@ -83,4 +84,20 @@ export const searchByCompositionId = async (
     logger.error(`searchByCompositionId: error: ${err}`)
     return null
   }
+}
+
+export const deleteComposition = async (
+  compositionId: string,
+  client: elasticsearch.Client
+) => {
+  return client.delete(
+    {
+      index: OPENCRVS_INDEX_NAME,
+      id: compositionId,
+      refresh: 'wait_for' // makes the call wait until the change is available via search
+    },
+    {
+      meta: true
+    }
+  )
 }

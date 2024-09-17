@@ -10,12 +10,19 @@
  */
 import type * as Hapi from '@hapi/hapi'
 import { uniqueId } from 'lodash'
+import { Nominal } from './nominal'
 
 export interface IAuthHeader {
   Authorization: string
   'x-correlation-id'?: string
   'x-real-ip'?: string
   'x-real-user-agent'?: string
+}
+
+export function getAuthorizationHeaderFromToken(plainToken: PlainToken) {
+  return {
+    Authorization: `Bearer ${plainToken}`
+  }
 }
 
 export function getAuthHeader(request: Hapi.Request) {
@@ -30,4 +37,15 @@ export function getAuthHeader(request: Hapi.Request) {
 export function joinURL(base: string, path: string) {
   const baseWithSlash = base.endsWith('/') ? base : base + '/'
   return new URL(path, baseWithSlash)
+}
+
+export type PlainToken = Nominal<string, 'PlainToken'>
+export type TokenWithBearer = Nominal<string, 'PlainToken'>
+
+export function getToken(headers: IAuthHeader) {
+  return (headers.Authorization || '').replace('Bearer ', '') as PlainToken
+}
+
+export function toTokenWithBearer(token: string) {
+  return `Bearer ${token.replace('Bearer ', '')}` as TokenWithBearer
 }

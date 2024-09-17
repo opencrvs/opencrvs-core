@@ -31,7 +31,9 @@ import {
   CompositionSectionTitleByCode,
   DEATH_CORRECTION_ENCOUNTER_CODE,
   EVENT_TYPE,
-  PartialBy
+  PartialBy,
+  URLReference,
+  URNReference
 } from '../../types'
 import { UUID } from '../../uuid'
 
@@ -288,6 +290,7 @@ export function createObservationEntryTemplate(
 
 export function createTaskRefTemplate(
   refUuid: UUID,
+  compositionId: URLReference | URNReference,
   event: EVENT_TYPE
 ): BundleEntry<Task> {
   return {
@@ -300,6 +303,9 @@ export function createTaskRefTemplate(
       lastModified: new Date().toISOString(),
       businessStatus: {
         coding: []
+      },
+      focus: {
+        reference: compositionId
       },
       code: {
         coding: [

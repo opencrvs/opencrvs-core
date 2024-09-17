@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@metrics/features/registration'
+
 import {
   fetchLocation,
   fetchPractitionerRole,
@@ -18,6 +18,7 @@ import {
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
+import { Bundle, getComposition } from '@opencrvs/commons/types'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -168,14 +169,7 @@ export function findExtension(
   return extension
 }
 
-export function getComposition(bundle: fhir.Bundle) {
-  return getResourceByType<fhir.Composition>(
-    bundle,
-    FHIR_RESOURCE_TYPE.COMPOSITION
-  )
-}
-
-export function getCompositionIdFromCompositionOrTask(bundle: fhir.Bundle) {
+export function getCompositionIdFromCompositionOrTask(bundle: Bundle) {
   const composition = getComposition(bundle)
 
   if (composition) {
@@ -195,10 +189,9 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
 
 export async function getPreviousTask(
   task: fhir.Task,
-  allowedPreviousStates: DECLARATION_STATUS[],
-  authHeader: IAuthHeader
+  allowedPreviousStates: DECLARATION_STATUS[]
 ) {
-  const taskHistory = await fetchTaskHistory(task.id!, authHeader)
+  const taskHistory = await fetchTaskHistory(task.id!)
   return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
@@ -351,10 +344,7 @@ export function getRegLastOffice(bundle: fhir.Bundle) {
     regLastOffice.valueReference.reference
   )
 }
-export async function getEncounterLocationType(
-  bundle: fhir.Bundle,
-  authHeader: IAuthHeader
-) {
+export async function getEncounterLocationType(bundle: fhir.Bundle) {
   const encounter = getResourceByType<fhir.Encounter>(
     bundle,
     FHIR_RESOURCE_TYPE.ENCOUNTER
@@ -369,7 +359,7 @@ export async function getEncounterLocationType(
     throw new Error('Encounter location not found!')
   }
 
-  const location = await fetchLocation(locationId, authHeader)
+  const location = await fetchLocation(locationId)
   if (!location || !location.type) {
     throw new Error(
       `Encounter location not found from Hearth with id ${locationId}!`
@@ -483,15 +473,12 @@ export function getObservationValueByCode(
   return value
 }
 
-export async function fetchDeclarationsBeginnerRole(
-  fhirBundle: fhir.Bundle,
-  authHeader: IAuthHeader
-) {
+export async function fetchDeclarationsBeginnerRole(fhirBundle: fhir.Bundle) {
   let startedByRole = ''
   const currentTask = getTask(fhirBundle)
 
   if (currentTask) {
-    const bundle = await fetchTaskHistory(currentTask.id!, authHeader)
+    const bundle = await fetchTaskHistory(currentTask.id!)
     const length = bundle.entry ? bundle.entry.length : 0
     const task =
       bundle.entry &&
@@ -507,7 +494,7 @@ export async function fetchDeclarationsBeginnerRole(
       if (!practitionerId) {
         throw new Error('Practitioner id not found')
       }
-      startedByRole = await fetchPractitionerRole(practitionerId, authHeader)
+      startedByRole = await fetchPractitionerRole(practitionerId)
     }
   }
   return startedByRole

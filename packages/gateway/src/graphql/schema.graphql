@@ -194,7 +194,7 @@ type Mutation {
     id: ID!
     details: MarriageRegistrationInput!
   ): ID!
-  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): Void
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
     id: ID!
@@ -789,15 +789,17 @@ input MarriageRegistrationInput {
   updatedAt: Date
 }
 
-type CreatedIds {
-  compositionId: String
-  trackingId: String
-  isPotentiallyDuplicate: Boolean
-}
+scalar Void
 
 type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
+}
+
+type CreatedIds {
+  compositionId: String
+  trackingId: String
+  isPotentiallyDuplicate: Boolean
 }
 
 input UserInput {

@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  fetchChildLocationsByParentId,
   countRegistrarsByLocation,
-  totalOfficesInCountry,
+  fetchChildLocationsByParentId,
+  fetchLocation,
   fetchLocationsByType,
-  fetchLocation
+  totalOfficesInCountry
 } from '@metrics/api'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
-import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 
 interface ILocationStatisticsResponse {
   registrars: number
@@ -60,10 +60,10 @@ function dfs(
   return offices
 }
 
-async function cacheOfficeCount(authHeader: IAuthHeader) {
+async function cacheOfficeCount() {
   const [locations, offices] = await Promise.all([
-    fetchLocationsByType('ADMIN_STRUCTURE', authHeader),
-    fetchLocationsByType('CRVS_OFFICE', authHeader)
+    fetchLocationsByType('ADMIN_STRUCTURE'),
+    fetchLocationsByType('CRVS_OFFICE')
   ])
   locations.forEach(({ id }) => (OFFICE_COUNT_CACHE[id] = -1))
   const locationsMap = locations.reduce<LocationsMap>(
@@ -114,7 +114,7 @@ async function getAdminLocationStatistics(
     }
   }
   if (!OFFICE_COUNT_CACHE[location.id]) {
-    await cacheOfficeCount(authHeader)
+    await cacheOfficeCount()
   }
   return {
     population: getPopulation(location, populationYear),
@@ -130,7 +130,7 @@ async function getCountryWideLocationStatistics(
 ): Promise<ILocationStatisticsResponse> {
   let population = 0
   const [childLocations, offices] = await Promise.all([
-    fetchChildLocationsByParentId('Location/0', authHeader),
+    fetchChildLocationsByParentId('Location/0'),
     totalOfficesInCountry(authHeader)
   ])
   for (const each of childLocations) {
@@ -152,7 +152,7 @@ export async function getLocationStatistics(
   const { registrars } = await countRegistrarsByLocation(authHeader, locationId)
 
   if (locationId) {
-    const location = await fetchLocation(locationId, authHeader)
+    const location = await fetchLocation(locationId)
     return getAdminLocationStatistics(
       location,
       registrars,

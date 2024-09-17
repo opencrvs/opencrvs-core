@@ -26,6 +26,9 @@ import {
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
 import * as database from '@metrics/config/database'
+import { register } from './workers'
+import { badRequest, Boom } from '@hapi/boom'
+import { logger } from '@opencrvs/commons'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -35,7 +38,22 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
-      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
+      response: {
+        failAction: async (req, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`Response validationError: ${err.message}`)
+            throw badRequest(`Invalid response payload returned from handler`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(
+              `${req.path} response has a validation error: ${err.message}`
+            )
+            throw err
+          }
+        }
+      }
     }
   })
 
@@ -79,6 +97,7 @@ export async function createServer() {
       .then(async () => {
         server.log('info', `InfluxDB started on ${INFLUX_HOST}:${INFLUX_PORT}`)
         await server.start()
+        await register()
         await database.start()
         server.log('info', `Metrics server started on ${HOST}:${PORT}`)
       })

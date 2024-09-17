@@ -8,23 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader } from '@opencrvs/commons'
-import {
-  ArchivedRecord,
-  EVENT_TYPE,
-  SavedBundle,
-  Resource,
-  Bundle,
-  CertifiedRecord,
-  ReadyForReviewRecord,
-  RejectedRecord,
-  getTaskFromSavedBundle,
-  getBusinessStatus,
-  IssuedRecord,
-  ValidRecord,
-  getComposition
-} from '@opencrvs/commons/types'
-import { WORKFLOW_URL } from '@gateway/constants'
+import { REDIS_HOST, WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
@@ -35,6 +19,26 @@ import {
   GQLMarriageRegistrationInput,
   GQLPaymentInput
 } from '@gateway/graphql/schema'
+import { IAuthHeader } from '@opencrvs/commons'
+import { inScope, USER_SCOPE } from '@opencrvs/commons/authentication'
+import { useRecordQueue } from '@opencrvs/commons/message-queue'
+import { getToken } from '@opencrvs/commons/http'
+
+import {
+  ArchivedRecord,
+  Bundle,
+  CertifiedRecord,
+  EVENT_TYPE,
+  getBusinessStatus,
+  getComposition,
+  getTaskFromSavedBundle,
+  IssuedRecord,
+  ReadyForReviewRecord,
+  RejectedRecord,
+  Resource,
+  SavedBundle,
+  ValidRecord
+} from '@opencrvs/commons/types'
 
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
@@ -121,6 +125,8 @@ export function rejectRegistrationCorrection(
   )
 }
 
+const recordQueue = useRecordQueue(REDIS_HOST)
+
 export async function createRegistration(
   record:
     | GQLBirthRegistrationInput
@@ -129,13 +135,32 @@ export async function createRegistration(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const res = await createRequest<{
-    compositionId: string
-    trackingId: string
-    isPotentiallyDuplicate: boolean
-  }>('POST', '/create-record', authHeader, { record, event })
+  if (inScope(authHeader, [USER_SCOPE.REGISTER])) {
+    await recordQueue.createRegistration({
+      event,
+      payload: record,
+      token: getToken(authHeader)
+    })
 
-  return res
+    return
+  }
+
+  if (inScope(authHeader, [USER_SCOPE.VALIDATE])) {
+    await recordQueue.createValidatedDeclaration({
+      event,
+      payload: record,
+      token: getToken(authHeader)
+    })
+    return
+  }
+
+  await recordQueue.createDeclaration({
+    event,
+    payload: record,
+    token: getToken(authHeader)
+  })
+
+  return
 }
 
 export async function updateRegistration(

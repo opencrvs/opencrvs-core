@@ -974,9 +974,9 @@ function setResourceIdentifier(
     value: fieldValue
   } as TaskIdentifier
 
-  resource.identifier
+  resource.identifier = resource.identifier
     .filter((obj) => obj.system !== identifier.system)
-    .push(identifier)
+    .concat(identifier)
 }
 
 function createRegStatusComment(
@@ -2531,7 +2531,7 @@ const builders: IFieldBuilders = {
       createOtherInformantType(fhirBundle, fieldValue, context),
     draftId: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return setResourceIdentifier(taskResource, 'draft-id', fieldValue)
+      setResourceIdentifier(taskResource, 'draft-id', fieldValue)
     },
     trackingId: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)

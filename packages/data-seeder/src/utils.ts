@@ -18,6 +18,8 @@ export function raise(msg: string): never {
 export function parseGQLResponse<T>(
   response: { data: T } | { errors: Array<{ message: string }> }
 ) {
+  console.log(JSON.stringify(response))
+
   if ('errors' in response) {
     raise(inspect(response.errors))
   }

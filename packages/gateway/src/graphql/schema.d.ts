@@ -68,7 +68,7 @@ export interface GQLMutation {
   createBirthRegistrationCorrection: string
   createDeathRegistrationCorrection: string
   createMarriageRegistrationCorrection: string
-  createBirthRegistration: GQLCreatedIds
+  createBirthRegistration?: GQLVoid
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsValidated?: string
@@ -651,15 +651,17 @@ export interface GQLMarriageRegistrationInput {
   updatedAt?: GQLDate
 }
 
-export interface GQLCreatedIds {
-  compositionId?: string
-  trackingId?: string
-  isPotentiallyDuplicate?: boolean
-}
+export type GQLVoid = any
 
 export interface GQLReinstated {
   taskEntryResourceID: string
   registrationStatus?: GQLRegStatus
+}
+
+export interface GQLCreatedIds {
+  compositionId?: string
+  trackingId?: string
+  isPotentiallyDuplicate?: boolean
 }
 
 export interface GQLUserInput {
@@ -1980,8 +1982,9 @@ export interface GQLResolver {
   System?: GQLSystemTypeResolver
   SMSNotification?: GQLSMSNotificationTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
-  CreatedIds?: GQLCreatedIdsTypeResolver
+  Void?: GraphQLScalarType
   Reinstated?: GQLReinstatedTypeResolver
+  CreatedIds?: GQLCreatedIdsTypeResolver
   Avatar?: GQLAvatarTypeResolver
   Response?: GQLResponseTypeResolver
   ApplicationConfiguration?: GQLApplicationConfigurationTypeResolver
@@ -6142,6 +6145,35 @@ export interface UserInfoToLocationLevel3FhirIdResolver<
   ): TResult
 }
 
+export interface GQLReinstatedTypeResolver<TParent = any> {
+  taskEntryResourceID?: ReinstatedToTaskEntryResourceIDResolver<TParent>
+  registrationStatus?: ReinstatedToRegistrationStatusResolver<TParent>
+}
+
+export interface ReinstatedToTaskEntryResourceIDResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface ReinstatedToRegistrationStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -6170,35 +6202,6 @@ export interface CreatedIdsToTrackingIdResolver<TParent = any, TResult = any> {
 }
 
 export interface CreatedIdsToIsPotentiallyDuplicateResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLReinstatedTypeResolver<TParent = any> {
-  taskEntryResourceID?: ReinstatedToTaskEntryResourceIDResolver<TParent>
-  registrationStatus?: ReinstatedToRegistrationStatusResolver<TParent>
-}
-
-export interface ReinstatedToTaskEntryResourceIDResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ReinstatedToRegistrationStatusResolver<
   TParent = any,
   TResult = any
 > {

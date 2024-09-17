@@ -8,16 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
+import { USER_MANAGEMENT_URL } from '@metrics/constants'
+import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
+import { IUserAuditBody } from '@metrics/features/registration'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
-import { internal } from '@hapi/boom'
-import { IUserAuditBody } from '@metrics/features/registration'
-import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
-import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@metrics/constants'
+import { countUserAuditEvents, getUserAuditEvents } from './service'
 
 export async function newAuditHandler(
   request: Hapi.Request,
@@ -27,9 +27,14 @@ export async function newAuditHandler(
   try {
     const remoteAddress =
       request.headers['x-real-ip'] || request.info.remoteAddress
+
     const userAgent =
       request.headers['x-real-user-agent'] || request.headers['user-agent']
+
     const payload = request.payload as IUserAuditBody
+
+    const transactionId = payload.transactionId
+
     let practitionerId
     if (payload.practitionerId) {
       practitionerId = payload.practitionerId!
@@ -50,7 +55,8 @@ export async function newAuditHandler(
         payload.additionalData
       )
     )
-    await writePoints(points)
+
+    await writePoints(points, transactionId)
   } catch (err) {
     return internal(err)
   }

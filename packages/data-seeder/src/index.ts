@@ -92,6 +92,8 @@ async function deactivateSuperuser(token: string) {
 async function main() {
   const token = await getToken()
   console.log('Seeding roles')
+  console.log(token)
+
   const roleIdMap = await seedRoles(token)
   console.log('Seeding locations')
   await seedLocations(token)

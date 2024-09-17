@@ -8,16 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getAgeInDays } from '@metrics/features/registration/utils'
 
-describe('Verify age in days conversion', () => {
-  it('Return valid age in days', () => {
-    const birthDate = '2019-02-28'
-
-    const ageInDays = getAgeInDays(
-      birthDate,
-      new Date('2019-03-12T07:35:42.043Z')
-    )
-    expect(ageInDays).toEqual(12)
-  })
-})
+export * from './record'

@@ -101,13 +101,13 @@ export const composeDocument = (
   return body
 }
 
-export async function indexRecord(bundle: SavedBundle) {
+export async function indexRecord(bundle: SavedBundle, transactionId?: string) {
   const client = getOrCreateClient()
 
   const { id: compositionId } = getComposition(bundle)
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(bundle, existingDocument)
-  await indexComposition(compositionId, document, client)
+  await indexComposition(compositionId, document, client, transactionId)
 }
 
 function createIndexBody(

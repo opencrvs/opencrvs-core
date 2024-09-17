@@ -107,12 +107,22 @@ async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
       }
     })
   })
+  console.log(
+    JSON.stringify({
+      query: getSystemRolesQuery,
+      variables: {
+        active: true
+      }
+    })
+  )
+
   if (!res.ok) {
     raise(`Failed to fetch roles from gateway`)
   }
   const parsedResponse = parseGQLResponse<{ getSystemRoles: SystemRole[] }>(
     await res.json()
   )
+
   return parsedResponse.getSystemRoles
 }
 
@@ -159,6 +169,8 @@ async function fetchCountryRoles(token: string) {
     }
   })
   if (!res.ok) {
+    console.log(res)
+
     raise(`Expected to get the roles from ${url}`)
   }
   const parsedRoles = CountryRoleSchema.safeParse(await res.json())

@@ -8,38 +8,51 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const HOST = process.env.HOST || '0.0.0.0'
-export const PORT = process.env.PORT || 5050
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
-export const APPLICATION_CONFIG_URL =
-  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
+import { cleanEnv, str, num, url } from 'envalid'
 
-export const NOTIFICATION_SERVICE_URL =
-  process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
+const env = cleanEnv(process.env, {
+  REDIS_HOST: str({ devDefault: 'localhost' }),
+  HOST: str({ default: '0.0.0.0' }),
+  PORT: num({ default: 5050 }),
+  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
+  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
+  NOTIFICATION_SERVICE_URL: url({ devDefault: 'http://localhost:2020/' }),
+  SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
+  WEBHOOKS_URL: url({ devDefault: 'http://localhost:2525/' }),
+  METRICS_URL: url({ devDefault: 'http://localhost:1050/' }),
+  MOSIP_TOKEN_SEEDER_URL: url({ devDefault: 'http://localhost:8085' }),
+  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
+  CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
+  DOCUMENTS_URL: url({ default: 'http://localhost:9050' }),
+  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
+  SENTRY_DSN: str({ default: '' }),
+  DEFAULT_TIMEOUT: num({ default: 600000 }),
+  LANGUAGES: str({ default: 'en,fr' })
+})
 
-export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
-export const WEBHOOKS_URL = process.env.WEBHOOKS_URL || 'http://localhost:2525/'
-export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050/'
-
-export const MOSIP_TOKEN_SEEDER_URL =
-  process.env.MOSIP_TOKEN_SEEDER_URL || 'http://localhost:8085'
-export const COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const DOCUMENTS_URL =
-  process.env.DOCUMENTS_URL || 'http://localhost:9050'
-export const USER_MANAGEMENT_URL =
-  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
-export const SENTRY_DSN = process.env.SENTRY_DSN
+export const {
+  REDIS_HOST,
+  HOST,
+  PORT,
+  FHIR_URL,
+  APPLICATION_CONFIG_URL,
+  NOTIFICATION_SERVICE_URL,
+  SEARCH_URL,
+  WEBHOOKS_URL,
+  METRICS_URL,
+  MOSIP_TOKEN_SEEDER_URL,
+  COUNTRY_CONFIG_URL,
+  CERT_PUBLIC_KEY_PATH,
+  DOCUMENTS_URL,
+  USER_MANAGEMENT_URL,
+  SENTRY_DSN,
+  DEFAULT_TIMEOUT
+} = env
 
 function getAvailableLanguages() {
-  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,fr'
-  return LANGUAGES.split(',')
+  return env.LANGUAGES.split(',')
 }
 
 export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
-export const DEFAULT_TIMEOUT = 600000

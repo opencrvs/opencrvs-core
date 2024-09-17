@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Influx from 'influx'
+import { IPoints } from '@metrics/features/registration'
 import {
   INFLUX_DB,
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
-import { logger } from '@opencrvs/commons'
-import { IPoints } from '@metrics/features/registration'
+import { getUUID, logger } from '@opencrvs/commons'
+import * as Influx from 'influx'
+import { uniq } from 'lodash'
 import fetch from 'node-fetch'
 
 export const influx = new Influx.InfluxDB({
@@ -26,7 +27,8 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'certification',
       fields: {
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['eventType', 'officeLocation']
     },
@@ -35,7 +37,8 @@ export const influx = new Influx.InfluxDB({
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
-        ageInDays: Influx.FieldType.INTEGER
+        ageInDays: Influx.FieldType.INTEGER,
+        transactionId: Influx.FieldType.STRING
       },
       tags: [
         'regStatus',
@@ -55,7 +58,8 @@ export const influx = new Influx.InfluxDB({
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
         ageInYears: Influx.FieldType.INTEGER,
-        deathDays: Influx.FieldType.INTEGER
+        deathDays: Influx.FieldType.INTEGER,
+        transactionId: Influx.FieldType.STRING
       },
       tags: [
         'regStatus',
@@ -74,7 +78,8 @@ export const influx = new Influx.InfluxDB({
     {
       measurement: 'in_complete_fields',
       fields: {
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: [
         'regStatus',
@@ -89,7 +94,8 @@ export const influx = new Influx.InfluxDB({
       measurement: 'declaration_time_logged',
       fields: {
         timeSpentEditing: Influx.FieldType.INTEGER,
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: [
         'currentStatus',
@@ -105,14 +111,16 @@ export const influx = new Influx.InfluxDB({
         durationInSeconds: Influx.FieldType.INTEGER,
         compositionId: Influx.FieldType.STRING,
         currentTaskId: Influx.FieldType.STRING,
-        previousTaskId: Influx.FieldType.STRING
+        previousTaskId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['currentStatus', 'previousStatus', 'eventType']
     },
     {
       measurement: 'correction',
       fields: {
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['eventType', 'reason', 'officeLocation']
     },
@@ -120,7 +128,8 @@ export const influx = new Influx.InfluxDB({
       measurement: 'payment',
       fields: {
         total: Influx.FieldType.FLOAT,
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['eventType', 'paymentType', 'officeLocation']
     },
@@ -129,21 +138,24 @@ export const influx = new Influx.InfluxDB({
       fields: {
         role: Influx.FieldType.STRING,
         status: Influx.FieldType.STRING,
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['eventType', 'practitionerId', 'officeLocation']
     },
     {
       measurement: 'declarations_rejected',
       fields: {
-        compositionId: Influx.FieldType.STRING
+        compositionId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['eventType', 'startedBy', 'officeLocation']
     },
     {
       measurement: 'search_requests',
       fields: {
-        clientId: Influx.FieldType.STRING
+        clientId: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['ipAddress']
     },
@@ -152,7 +164,8 @@ export const influx = new Influx.InfluxDB({
       fields: {
         data: Influx.FieldType.STRING,
         ipAddress: Influx.FieldType.STRING,
-        userAgent: Influx.FieldType.STRING
+        userAgent: Influx.FieldType.STRING,
+        transactionId: Influx.FieldType.STRING
       },
       tags: ['action', 'practitionerId']
     },
@@ -161,7 +174,8 @@ export const influx = new Influx.InfluxDB({
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
-        daysAfterEvent: Influx.FieldType.INTEGER
+        daysAfterEvent: Influx.FieldType.INTEGER,
+        transactionId: Influx.FieldType.STRING
       },
       tags: [
         'regStatus',
@@ -175,8 +189,53 @@ export const influx = new Influx.InfluxDB({
   ]
 })
 
-export const writePoints = (points: IPoints[]) => {
-  return influx.writePoints(points).catch((err: Error) => {
+export async function writePoints(points: IPoints[], trxId?: string) {
+  const transactionId = trxId || getUUID()
+
+  if (trxId) {
+    const measurements = uniq(points.map((point) => point.measurement))
+    const newPoints: any[] = []
+
+    for (const measurement of measurements) {
+      const result = await influx.queryRaw(
+        `SELECT * FROM "${measurement}" WHERE "transactionId" = $transactionId;`,
+        { placeholders: { transactionId } }
+      )
+
+      const foundCount: number = result.results[0].series
+        ? result.results[0].series.length
+        : 0
+
+      if (foundCount === 0) {
+        newPoints.push(
+          ...points.filter((point) => point.measurement === measurement)
+        )
+      }
+    }
+    const pointsWithTransactionId = newPoints.map((point) => {
+      return {
+        ...point,
+        fields: {
+          ...point.fields,
+          transactionId
+        }
+      }
+    })
+    return influx.writePoints(pointsWithTransactionId).catch((err: Error) => {
+      logger.error(`Error saving data to InfluxDB! ${err.stack}`)
+      throw err
+    })
+  }
+  const pointsWithTransactionId = points.map((point) => {
+    return {
+      ...point,
+      fields: {
+        ...point.fields,
+        transactionId
+      }
+    }
+  })
+  return influx.writePoints(pointsWithTransactionId).catch((err: Error) => {
     logger.error(`Error saving data to InfluxDB! ${err.stack}`)
     throw err
   })

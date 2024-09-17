@@ -8,33 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { indexRecord as upsertBirthEvent } from '@search/features/registration/birth/service'
-import { indexRecord as upsertDeathEvent } from '@search/features/registration/death/service'
-import { indexRecord as upsertMarriageEvent } from '@search/features/registration/marriage/service'
 
 import * as Hapi from '@hapi/hapi'
 import { ValidRecord } from '@opencrvs/commons/types'
-import { getEventType } from '@search/utils/event'
+
+import { deleteRecord, indexRecord } from './service'
+
+export async function deleteRecordByIdHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const recordId = request.params.recordId
+
+  await deleteRecord(recordId)
+  return h.response().code(200)
+}
 
 export async function recordHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const record = request.payload as ValidRecord
-
-  switch (getEventType(record)) {
-    case 'BIRTH':
-      await upsertBirthEvent(record)
-      break
-    case 'DEATH':
-      await upsertDeathEvent(record)
-      break
-    case 'MARRIAGE':
-      await upsertMarriageEvent(record)
-      break
-    default:
-      throw new Error('Unsupported event type')
+  if (typeof request.payload === 'object' && 'record' in request.payload) {
+    const { record, transactionId } = request.payload as {
+      record: ValidRecord
+      transactionId: string
+    }
+    await indexRecord(record, transactionId)
+    return h.response().code(200)
   }
 
+  const record = request.payload as ValidRecord
+  await indexRecord(record)
   return h.response().code(200)
 }

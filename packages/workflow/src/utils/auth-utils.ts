@@ -10,16 +10,7 @@
  */
 import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
-import { hasScope } from '@opencrvs/commons/authentication'
-
-export enum USER_SCOPE {
-  DECLARE = 'declare',
-  VALIDATE = 'validate',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  RECORD_SEARCH = 'recordsearch',
-  VERIFY = 'verify'
-}
+import { PlainToken } from '@opencrvs/commons'
 
 export interface ITokenPayload {
   sub: string
@@ -40,24 +31,10 @@ export const getTokenPayload = (token: string) => {
   return decoded
 }
 
-export const getToken = (request: Hapi.Request): string => {
+export const getToken = (request: Hapi.Request): PlainToken => {
   if (request.headers.authorization.indexOf('Bearer') > -1) {
     return request.headers.authorization.split(' ')[1]
   } else {
     return request.headers.authorization
   }
-}
-
-export function hasRegisterScope(request: Hapi.Request): boolean {
-  return hasScope(
-    { Authorization: request.headers.authorization },
-    USER_SCOPE.REGISTER
-  )
-}
-
-export function hasValidateScope(request: Hapi.Request): boolean {
-  return hasScope(
-    { Authorization: request.headers.authorization },
-    USER_SCOPE.VALIDATE
-  )
 }

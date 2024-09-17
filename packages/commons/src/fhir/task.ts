@@ -28,10 +28,13 @@ import {
   Saved,
   SavedBundle,
   UNASSIGNED_EXTENSION_URL,
+  URLReference,
+  URNReference,
   VERIFIED_EXTENSION_URL,
   VIEWED_EXTENSION_URL,
   findExtension,
-  isSaved
+  isSaved,
+  resourceIdentifierToUUID
 } from '.'
 import { UUID } from '..'
 import { Nominal } from '../nominal'
@@ -111,10 +114,14 @@ export type Task = Omit<
   | 'intent'
   | 'identifier'
   | 'code'
+  | 'focus'
 > & {
   lastModified: string
   status: 'ready' | 'requested' | 'draft' | 'accepted' | 'rejected'
   extension: Array<Extension>
+  focus: {
+    reference: ResourceIdentifier | URLReference | URNReference
+  }
   businessStatus: Omit<fhir3.CodeableConcept, 'coding'> & {
     coding: Array<
       Omit<fhir3.Coding, 'code' | 'system'> & {
@@ -512,4 +519,8 @@ export function notCorrectedHistory(
     }
   }
   return true
+}
+
+export function getCompositionIdFromTask(task: SavedTask) {
+  return resourceIdentifierToUUID(task.focus.reference)
 }

@@ -639,13 +639,12 @@ export function selectOrCreateTaskRefResource(
     })
 
   if (!taskEntry) {
-    const unsavedTaskEntry = createTaskRefTemplate(getUUID(), context.event)
-    const taskResource = unsavedTaskEntry.resource
-    if (!taskResource.focus) {
-      taskResource.focus = { reference: '' }
-    }
+    const unsavedTaskEntry = createTaskRefTemplate(
+      getUUID(),
+      fhirBundle.entry[0].fullUrl!,
+      context.event
+    )
 
-    taskResource.focus.reference = fhirBundle.entry[0].fullUrl
     fhirBundle.entry.push(unsavedTaskEntry)
     return unsavedTaskEntry.resource
   }

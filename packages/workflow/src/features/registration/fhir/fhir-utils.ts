@@ -41,8 +41,9 @@ import {
 } from '@workflow/features/registration/utils'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
 import { logger } from '@opencrvs/commons'
-import { ITokenPayload, USER_SCOPE } from '@workflow/utils/auth-utils'
+import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch, { RequestInit } from 'node-fetch'
+import { USER_SCOPE } from '@opencrvs/commons/authentication'
 
 export async function getSharedContactMsisdn(fhirBundle: Bundle) {
   if (!fhirBundle || !fhirBundle.entry) {

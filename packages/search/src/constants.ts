@@ -8,22 +8,39 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const HOST = process.env.HOST || '0.0.0.0'
-export const PORT = process.env.PORT || 9090
-export const ES_HOST = process.env.ES_HOST || 'localhost:9200'
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const USER_MANAGEMENT_URL =
-  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
-export const MATCH_SCORE_THRESHOLD = 1.0
-export const SENTRY_DSN = process.env.SENTRY_DSN
-export const OPENCRVS_INDEX_NAME = 'ocrvs'
-export const DEFAULT_TIMEOUT = 600000
-export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
-export const APPLICATION_CONFIG_URL =
-  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
+import { cleanEnv, str, num, url } from 'envalid'
 
-export const HEARTH_MONGO_URL =
-  process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev'
+const env = cleanEnv(process.env, {
+  HOST: str({ devDefault: '0.0.0.0' }),
+  PORT: num({ default: 9090 }),
+  ES_HOST: str({ devDefault: 'localhost:9200' }),
+  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
+  CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
+  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
+  MATCH_SCORE_THRESHOLD: num({ default: 1.0 }),
+  SENTRY_DSN: str({ default: '' }),
+  OPENCRVS_INDEX_NAME: str({ default: 'ocrvs' }),
+  DEFAULT_TIMEOUT: num({ default: 600000 }),
+
+  APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
+  HEARTH_MONGO_URL: url({ devDefault: 'mongodb://localhost/hearth-dev' }),
+  REDIS_HOST: str({ devDefault: 'localhost' })
+})
+
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+
+export const {
+  HOST,
+  PORT,
+  ES_HOST,
+  FHIR_URL,
+  CERT_PUBLIC_KEY_PATH,
+  USER_MANAGEMENT_URL,
+  MATCH_SCORE_THRESHOLD,
+  SENTRY_DSN,
+  OPENCRVS_INDEX_NAME,
+  DEFAULT_TIMEOUT,
+  APPLICATION_CONFIG_URL,
+  HEARTH_MONGO_URL,
+  REDIS_HOST
+} = env

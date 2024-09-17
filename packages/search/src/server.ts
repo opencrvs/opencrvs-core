@@ -19,6 +19,7 @@ import {
 import getPlugins from '@search/config/plugins'
 import { getRoutes } from '@search/config/routes'
 import { readFileSync } from 'fs'
+import { register } from './workers'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -60,6 +61,7 @@ export async function createServer() {
   })
 
   async function start() {
+    await register()
     await server.start()
     server.log('info', `Search server started on ${HOST}:${PORT}`)
   }

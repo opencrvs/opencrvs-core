@@ -599,7 +599,7 @@ type Mutation {
   ): ID!
 
   # BIRTH
-  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): Void
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(

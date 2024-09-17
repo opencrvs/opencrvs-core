@@ -8,15 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { auditEvent } from '@workflow/records/audit'
+import { indexBundle } from '@workflow/records/search'
+import { toWaitingForExternalValidationState } from '@workflow/records/state-transitions'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
-import {
-  initiateRegistration,
-  toWaitingForExternalValidationState
-} from '@workflow/records/state-transitions'
-import { indexBundle } from '@workflow/records/search'
-import { auditEvent } from '@workflow/records/audit'
-import { isRejected } from '@opencrvs/commons/types'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
@@ -52,17 +48,6 @@ export const registerRoute = createRoute({
       token
     )
 
-    const rejectedOrWaitingValidationRecord = await initiateRegistration(
-      recordInWaitingValidationState,
-      request.headers,
-      token
-    )
-
-    if (isRejected(rejectedOrWaitingValidationRecord)) {
-      await indexBundle(rejectedOrWaitingValidationRecord, token)
-      await auditEvent('sent-for-updates', record, token)
-    }
-
-    return rejectedOrWaitingValidationRecord
+    return recordInWaitingValidationState
   }
 })

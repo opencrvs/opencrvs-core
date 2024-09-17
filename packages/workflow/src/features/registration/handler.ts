@@ -8,64 +8,59 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
+import { toTokenWithBearer } from '@opencrvs/commons'
+import {
+  RecordValidatedPayload,
+  useExternalValidationQueue
+} from '@opencrvs/commons/message-queue'
+import {
+  isWaitingExternalValidation,
+  SupportedPatientIdentifierCode
+} from '@opencrvs/commons/types'
+import { REDIS_HOST } from '@workflow/constants'
+import { writeMetricsEvent } from '@workflow/records/audit'
 import { getRecordById } from '@workflow/records/index'
-import { toRegistered } from '@workflow/records/state-transitions'
-import { getEventType } from './utils'
-import { indexBundle } from '@workflow/records/search'
-import { auditEvent } from '@workflow/records/audit'
 import {
   isNotificationEnabled,
   sendNotification
 } from '@workflow/records/notification'
+import { indexBundleWithTransaction } from '@workflow/records/search'
+import { toRegistered } from '@workflow/records/state-transitions'
 import { invokeWebhooks } from '@workflow/records/webhooks'
-import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
+import { getToken } from '@workflow/utils/auth-utils'
+import { getEventType } from './utils'
 
-export interface EventRegistrationPayload {
-  trackingId: string
-  registrationNumber: string
-  error: string
-  compositionId: string
-  childIdentifiers?: {
-    type: SupportedPatientIdentifierCode
-    value: string
-  }[]
-}
-
-export async function markEventAsRegisteredCallbackHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
+export async function markEventAsRegistered(
+  { registrationNumber, token, identifiers, recordId }: RecordValidatedPayload,
+  transactionId: string
 ) {
-  const token = getToken(request)
-  const { registrationNumber, error, childIdentifiers, compositionId } =
-    request.payload as EventRegistrationPayload
-
-  if (error) {
-    throw new Error(`Callback triggered with an error: ${error}`)
-  }
-
   const savedRecord = await getRecordById(
-    compositionId,
-    request.headers.authorization,
+    recordId,
+    toTokenWithBearer(token),
     ['WAITING_VALIDATION'],
     true
   )
+
   if (!savedRecord) {
-    throw new Error('Could not find record in elastic search!')
+    throw new Error(
+      'Could not find record in primary database. This should never happen!'
+    )
   }
 
-  const bundle = await toRegistered(
-    request,
-    savedRecord,
-    registrationNumber,
-    token,
-    childIdentifiers
-  )
+  const bundle = isWaitingExternalValidation(savedRecord)
+    ? await toRegistered(savedRecord, registrationNumber, identifiers, token)
+    : savedRecord
+
   const event = getEventType(bundle)
 
-  await indexBundle(bundle, token)
-  await auditEvent('registered', bundle, token)
+  await indexBundleWithTransaction(bundle, token, transactionId)
+
+  await writeMetricsEvent('registered', {
+    record: bundle,
+    authToken: token,
+    transactionId: transactionId
+  })
 
   if (await isNotificationEnabled('registered', event, token)) {
     await sendNotification('registered', bundle, token)
@@ -73,5 +68,33 @@ export async function markEventAsRegisteredCallbackHandler(
 
   await invokeWebhooks({ bundle, token, event })
 
-  return h.response(bundle).code(200)
+  return
+}
+
+const { recordValidated } = useExternalValidationQueue(REDIS_HOST)
+
+type RecordValidatedHTTPPayload = {
+  registrationNumber: string
+  childIdentifiers: { type: SupportedPatientIdentifierCode; value: string }[]
+  compositionId: string
+  trackingId: string
+}
+
+export async function markEventAsRegisteredCallbackHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const token = getToken(request)
+  const { registrationNumber, childIdentifiers, compositionId, trackingId } =
+    request.payload as RecordValidatedHTTPPayload
+
+  await recordValidated({
+    recordId: compositionId,
+    identifiers: childIdentifiers || [],
+    registrationNumber,
+    trackingId,
+    token
+  })
+
+  return h.response().code(200)
 }

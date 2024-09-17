@@ -8,17 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { TokenWithBearer } from '@opencrvs/commons'
 import { StateIdenfitiers } from '@opencrvs/commons/types'
 import { SEARCH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
 export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
   recordId: string,
-  authorizationToken: string,
+  authorizationToken: TokenWithBearer,
   allowedStates: T,
   /** Includes TaskHistories in the bundle. Is always required when the bundle is being indexed by ElasticSearch as when searching for records, workqueue views use status histories */
   includeHistoryResources: boolean
-): Promise<StateIdenfitiers[T[number]]> {
+): Promise<
+  StateIdenfitiers[T[number]] extends never
+    ? StateIdenfitiers[keyof StateIdenfitiers]
+    : StateIdenfitiers[T[number]]
+> {
   const url = new URL(
     `/records/${recordId}${
       includeHistoryResources ? '?includeHistoryResources' : ''
@@ -39,7 +44,7 @@ export async function getRecordById<T extends Array<keyof StateIdenfitiers>>(
 
 export async function getValidRecordById(
   recordId: string,
-  token: string,
+  token: TokenWithBearer,
   includeHistoryResources: boolean
 ) {
   return await getRecordById(

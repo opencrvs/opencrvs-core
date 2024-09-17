@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import * as elasticsearch from '@elastic/elasticsearch'
+import { logger } from '@opencrvs/commons'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import { ISearchResponse } from '@search/elasticsearch/client'
 import {
   searchByCompositionId,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import { BirthDocument, DeathDocument } from '@search/elasticsearch/utils'
-import { get } from 'lodash'
-import { ISearchResponse } from '@search/elasticsearch/client'
-import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { logger } from '@opencrvs/commons'
 import {
-  subYears,
-  addYears,
-  subMonths,
+  addDays,
   addMonths,
+  addYears,
   subDays,
-  addDays
+  subMonths,
+  subYears
 } from 'date-fns'
-import * as elasticsearch from '@elastic/elasticsearch'
+import { get } from 'lodash'
 
 const isNonEmptyCondition = <T>(
   value: T | null | undefined | ''
@@ -66,7 +66,8 @@ const extractRelatesToIDs = (bundle: fhir.Composition & { id: string }) => {
 
 export const searchForBirthDuplicates = async (
   body: Partial<BirthDocument>,
-  client: elasticsearch.Client
+  client: elasticsearch.Client,
+  transactionId: string
 ) => {
   // Names of length of 3 or less characters = 0 edits allowed
   // Names of length of 4 - 6 characters = 1 edit allowed
@@ -210,6 +211,25 @@ export const searchForBirthDuplicates = async (
         index: OPENCRVS_INDEX_NAME,
         query: {
           bool: {
+            must_not: [
+              {
+                term: { transactionId: transactionId }
+              },
+              ...(body.compositionId
+                ? [
+                    {
+                      /*
+                       * This makes sure that the record is not flagged as
+                       * a duplicate because there are records that have the record being submitted as
+                       * a potential duplicate. This really is only for idempotency and an issue only when record is submitted multiple times.
+                       */
+                      terms: {
+                        'relatesTo.keyword': [body.compositionId]
+                      }
+                    }
+                  ]
+                : [])
+            ],
             should: [
               {
                 bool: {
@@ -245,7 +265,8 @@ export const searchForBirthDuplicates = async (
 
 export const searchForDeathDuplicates = async (
   body: Partial<DeathDocument>,
-  client: elasticsearch.Client
+  client: elasticsearch.Client,
+  transactionId: string
 ) => {
   const FIRST_NAME_FUZZINESS = 'AUTO:4,7'
   if (
@@ -324,6 +345,25 @@ export const searchForDeathDuplicates = async (
         index: OPENCRVS_INDEX_NAME,
         query: {
           bool: {
+            must_not: [
+              {
+                term: { transactionId: transactionId }
+              },
+              ...(body.compositionId
+                ? [
+                    {
+                      /*
+                       * This makes sure that the record is not flagged as
+                       * a duplicate because there are records that have the record being submitted as
+                       * a potential duplicate. This really is only for idempotency and an issue only when record is submitted multiple times.
+                       */
+                      terms: {
+                        'relatesTo.keyword': [body.compositionId]
+                      }
+                    }
+                  ]
+                : [])
+            ],
             must: [
               ...deceasedsDetailsMatch,
               {

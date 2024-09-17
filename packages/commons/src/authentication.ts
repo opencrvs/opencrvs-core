@@ -96,6 +96,11 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
+export function getScopes(token: string) {
+  const tokenPayload = getTokenPayload(token)
+  return tokenPayload.scope
+}
+
 export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
   const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
   return !!matchedScope
@@ -111,4 +116,13 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
+}
+
+export enum USER_SCOPE {
+  DECLARE = 'declare',
+  VALIDATE = 'validate',
+  REGISTER = 'register',
+  CERTIFY = 'certify',
+  RECORD_SEARCH = 'recordsearch',
+  VERIFY = 'verify'
 }

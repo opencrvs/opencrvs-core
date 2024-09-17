@@ -8,35 +8,46 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
+
+import { logger } from '@opencrvs/commons'
+import {
+  getAuthorizationHeaderFromToken,
+  PlainToken,
+  toTokenWithBearer
+} from '@opencrvs/commons/http'
 import {
   BirthRegistration,
-  DeathRegistration,
-  EVENT_TYPE,
-  MarriageRegistration,
   buildFHIRBundle,
   Bundle,
-  getComposition,
-  getTrackingId as getTrackingIdFromRecord,
-  isTask,
   changeState,
+  DeathRegistration,
+  EVENT_TYPE,
+  getComposition,
+  getCompositionIdFromTask,
+  getTaskFromSavedBundle,
+  getTrackingId as getTrackingIdFromRecord,
   InProgressRecord,
-  ReadyForReviewRecord,
-  ValidatedRecord,
-  WaitingForValidationRecord,
-  isRejected,
+  isComposition,
   isInProgress,
   isReadyForReview,
+  isTask,
   isValidated,
   isWaitingExternalValidation,
-  isComposition,
-  getTaskFromSavedBundle
+  MarriageRegistration,
+  ReadyForReviewRecord,
+  StateIdenfitiers,
+  ValidatedRecord,
+  WaitingForValidationRecord
 } from '@opencrvs/commons/types'
+import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import {
-  getToken,
-  hasRegisterScope,
-  hasValidateScope
-} from '@workflow/utils/auth-utils'
+  generateTrackingIdForEvents,
+  isInProgressDeclaration
+} from '@workflow/features/registration/utils'
+import {
+  createUserAuditEvent,
+  writeMetricsEvent
+} from '@workflow/records/audit'
 import {
   findTaskFromIdentifier,
   mergeBundles,
@@ -44,32 +55,26 @@ import {
   toSavedBundle,
   withPractitionerDetails
 } from '@workflow/records/fhir'
-import { z } from 'zod'
-import { indexBundle } from '@workflow/records/search'
-import { validateRequest } from '@workflow/utils'
+
+import { useExternalValidationQueue } from '@opencrvs/commons/message-queue'
+import { REDIS_HOST } from '@workflow/constants'
 import {
   findDuplicateIds,
+  hasSameDuplicatesInExtension,
   updateCompositionWithDuplicateIds,
   updateTaskWithDuplicateIds
 } from '@workflow/utils/duplicate-checker'
-import {
-  generateTrackingIdForEvents,
-  isInProgressDeclaration
-} from '@workflow/features/registration/utils'
-import { auditEvent } from '@workflow/records/audit'
-import { getTrackingId } from '@workflow/features/registration/fhir/fhir-utils'
+import { z } from 'zod'
+import { getRecordById } from '@workflow/records'
 import {
   isNotificationEnabled,
   sendNotification
 } from '@workflow/records/notification'
-import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
-import { getAuthHeader } from '@opencrvs/commons/http'
+import { indexBundleWithTransaction } from '@workflow/records/search'
 import {
-  initiateRegistration,
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
-import { logger } from '@opencrvs/commons'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -77,6 +82,8 @@ const requestSchema = z.object({
     BirthRegistration | DeathRegistration | MarriageRegistration
   >()
 })
+
+const { sendForExternalValidation } = useExternalValidationQueue(REDIS_HOST)
 
 function findTask(bundle: Bundle) {
   const task = bundle.entry.map((e) => e.resource).find(isTask)
@@ -86,17 +93,22 @@ function findTask(bundle: Bundle) {
   return task
 }
 
-async function findExistingDeclarationIds(draftId: string) {
+async function findExistingComposition<T extends Array<keyof StateIdenfitiers>>(
+  draftId: string,
+  token: PlainToken,
+  allowedStates: T
+) {
   const taskBundle = await findTaskFromIdentifier(draftId)
+
   if (taskBundle.entry.length > 0) {
-    const trackingId = getTrackingId(taskBundle)
-    if (!trackingId) {
-      throw new Error('No trackingID found for existing declaration')
-    }
-    return {
-      compositionId: taskBundle.entry[0].resource.focus.reference.split('/')[1],
-      trackingId
-    }
+    const compositionId = getCompositionIdFromTask(taskBundle.entry[0].resource)
+
+    return getRecordById(
+      compositionId,
+      toTokenWithBearer(token),
+      allowedStates,
+      false
+    )
   }
   return null
 }
@@ -137,12 +149,18 @@ function createInProgressOrReadyForReviewTask(
   }
 }
 
-async function createRecord(
+type CreatedRecord =
+  | InProgressRecord
+  | ReadyForReviewRecord
+  | ValidatedRecord
+  | WaitingForValidationRecord
+
+async function createRecord<T = InProgressRecord | ReadyForReviewRecord>(
   recordDetails: z.TypeOf<typeof requestSchema>['record'],
   event: z.TypeOf<typeof requestSchema>['event'],
   token: string,
   duplicateIds: Array<{ id: string; trackingId: string }>
-): Promise<InProgressRecord | ReadyForReviewRecord> {
+): Promise<T> {
   const inputBundle = buildFHIRBundle(recordDetails, event)
   const trackingId = await generateTrackingIdForEvents(
     event,
@@ -188,132 +206,369 @@ async function createRecord(
 
   const responseBundle = await sendBundleToHearth(inputBundle)
   const savedBundle = toSavedBundle(inputBundle, responseBundle)
-  const record = inProgress
-    ? changeState(savedBundle, 'IN_PROGRESS')
-    : changeState(savedBundle, 'READY_FOR_REVIEW')
 
-  return mergeBundles(record, practitionerResourcesBundle)
+  const mergedBundle = mergeBundles(savedBundle, practitionerResourcesBundle)
+  return mergedBundle as T
 }
 
-type CreatedRecord =
-  | InProgressRecord
-  | ReadyForReviewRecord
-  | ValidatedRecord
-  | WaitingForValidationRecord
-
+function getEventAction(record: ValidatedRecord): 'sent-for-approval'
+function getEventAction(
+  record: InProgressRecord | ReadyForReviewRecord
+): 'sent-notification' | 'sent-notification-for-review'
+function getEventAction(
+  record: ReadyForReviewRecord
+): 'sent-notification-for-review'
+function getEventAction(
+  record: WaitingForValidationRecord
+): 'waiting-external-validation'
 function getEventAction(record: CreatedRecord) {
   if (isInProgress(record)) {
-    return 'sent-notification'
+    return 'sent-notification' as const
   }
   if (isReadyForReview(record)) {
-    return 'sent-notification-for-review'
+    return 'sent-notification-for-review' as const
   }
   if (isValidated(record)) {
-    return 'sent-for-approval'
+    return 'sent-for-approval' as const
   }
   if (isWaitingExternalValidation(record)) {
-    return 'waiting-external-validation'
+    return 'waiting-external-validation' as const
   }
   // type assertion
   record satisfies never
   // this should never be reached
-  return 'sent-notification'
+  return 'sent-notification' as const
 }
 
-export default async function createRecordHandler(
-  request: Hapi.Request,
-  _: Hapi.ResponseToolkit
+export async function declareRecordHandler(
+  recordDetails: BirthRegistration | DeathRegistration | MarriageRegistration,
+  event: EVENT_TYPE,
+  token: PlainToken
 ) {
-  const token = getToken(request)
-  const { record: recordDetails, event } = validateRequest(
-    requestSchema,
-    request.payload
-  )
-
-  const existingDeclarationIds =
-    recordDetails.registration?.draftId &&
-    (await findExistingDeclarationIds(recordDetails.registration.draftId))
-  if (existingDeclarationIds) {
-    return {
-      ...existingDeclarationIds,
-      isPotentiallyDuplicate: false
-    }
-  }
-  const duplicateIds = await findDuplicateIds(
-    recordDetails,
-    { Authorization: token },
-    event
-  )
+  const transactionId = `declare_${recordDetails.registration?.draftId}`
   const recordInputWithUploadedAttachments =
     await uploadBase64AttachmentsToDocumentsStore(
       recordDetails,
-      getAuthHeader(request)
+      getAuthorizationHeaderFromToken(token)
     )
-  let record: CreatedRecord = await createRecord(
-    recordInputWithUploadedAttachments,
+
+  const draftId = recordDetails.registration?.draftId
+
+  const existingComposition = draftId
+    ? await findExistingComposition(draftId, token, [
+        'READY_FOR_REVIEW',
+        'IN_PROGRESS'
+      ])
+    : null
+
+  const duplicateIds = await findDuplicateIds(
+    recordDetails,
+    { Authorization: token },
     event,
-    token,
-    duplicateIds
+    transactionId,
+    existingComposition ? getComposition(existingComposition).id : undefined
   )
 
-  await auditEvent(
-    isInProgress(record) ? 'sent-notification' : 'sent-notification-for-review',
-    record,
-    token
-  )
+  const declaredRecord = existingComposition
+    ? existingComposition
+    : await createRecord<ReadyForReviewRecord | InProgressRecord>(
+        recordInputWithUploadedAttachments,
+        event,
+        token,
+        duplicateIds
+      )
 
-  if (duplicateIds.length) {
-    await indexBundle(record, token)
-    let task = getTaskFromSavedBundle(record)
-    task = updateTaskWithDuplicateIds(task, duplicateIds)
-    await sendBundleToHearth({
-      ...record,
-      entry: [{ resource: task }]
-    })
-    return {
-      compositionId: getComposition(record).id,
-      trackingId: getTrackingIdFromRecord(record),
-      isPotentiallyDuplicate: true
+  await writeMetricsEvent(
+    isInProgressDeclaration(declaredRecord)
+      ? 'sent-notification'
+      : 'sent-notification-for-review',
+    {
+      record: declaredRecord,
+      authToken: token,
+      transactionId
     }
-  } else if (hasValidateScope(request)) {
-    record = await toValidated(record, token)
-    await auditEvent('sent-for-approval', record, token)
-  } else if (hasRegisterScope(request) && !isInProgress(record)) {
-    record = await toWaitingForExternalValidationState(record, token)
-    await auditEvent('waiting-external-validation', record, token)
-  }
-  const eventAction = getEventAction(record)
-  await indexBundle(record, token)
+  )
 
-  // Notification not implemented for marriage yet
-  const notificationDisabled =
-    eventAction === 'waiting-external-validation' ||
-    !(await isNotificationEnabled(eventAction, event, token))
+  await createUserAuditEvent(
+    isInProgressDeclaration(declaredRecord) ? 'IN_PROGRESS' : 'DECLARED',
+    {
+      transactionId: transactionId,
+      compositionId: getComposition(declaredRecord).id,
+      trackingId: getTrackingIdFromRecord(declaredRecord),
+      headers: getAuthorizationHeaderFromToken(token)
+    }
+  )
+
+  if (duplicateIds.length > 0) {
+    if (
+      /*
+       * This check is so that we don't write new Task_history
+       * items for the task even when it wouldn't otherwise change
+       */
+      !hasSameDuplicatesInExtension(
+        getTaskFromSavedBundle(declaredRecord),
+        duplicateIds
+      )
+    ) {
+      const task = updateTaskWithDuplicateIds(
+        getTaskFromSavedBundle(declaredRecord),
+        duplicateIds
+      )
+
+      await sendBundleToHearth({
+        ...declaredRecord,
+        entry: [{ resource: task }]
+      })
+    }
+    await indexBundleWithTransaction(declaredRecord, token, transactionId)
+
+    return
+  }
+
+  await indexBundleWithTransaction(declaredRecord, token, transactionId)
+
+  const action = getEventAction(declaredRecord)
+  const notificationDisabled = !(await isNotificationEnabled(
+    action,
+    event,
+    token
+  ))
 
   if (!notificationDisabled) {
-    await sendNotification(eventAction, record, token)
+    await sendNotification(action, declaredRecord, token)
+  }
+}
+
+export async function validateRecordHandler(
+  recordDetails: BirthRegistration | DeathRegistration | MarriageRegistration,
+  event: EVENT_TYPE,
+  token: PlainToken
+) {
+  const transactionId = `validate_${recordDetails.registration?.draftId}`
+
+  const recordInputWithUploadedAttachments =
+    await uploadBase64AttachmentsToDocumentsStore(
+      recordDetails,
+      getAuthorizationHeaderFromToken(token)
+    )
+
+  const draftId = recordDetails.registration?.draftId
+
+  const existingComposition = draftId
+    ? await findExistingComposition(draftId, token, [
+        'READY_FOR_REVIEW',
+        'VALIDATED'
+      ])
+    : null
+
+  const duplicateIds = await findDuplicateIds(
+    recordDetails,
+    { Authorization: token },
+    event,
+    transactionId,
+    existingComposition ? getComposition(existingComposition).id : undefined
+  )
+
+  const declaredRecord = existingComposition
+    ? existingComposition
+    : /*
+       * There is an assumption here that a user with a register scope will
+       * never register an incomplete record
+       */
+      await createRecord<ReadyForReviewRecord>(
+        recordInputWithUploadedAttachments,
+        event,
+        token,
+        duplicateIds
+      )
+
+  const readyForReviewRecord = changeState(declaredRecord, 'READY_FOR_REVIEW')
+
+  await writeMetricsEvent('sent-notification-for-review', {
+    record: readyForReviewRecord,
+    authToken: token,
+    transactionId
+  })
+
+  await createUserAuditEvent('DECLARED', {
+    transactionId: transactionId,
+    compositionId: getComposition(readyForReviewRecord).id,
+    trackingId: getTrackingIdFromRecord(readyForReviewRecord),
+    headers: getAuthorizationHeaderFromToken(token)
+  })
+
+  if (duplicateIds.length > 0) {
+    if (
+      /*
+       * This check is so that we don't write new Task_history
+       * items for the task even when it wouldn't otherwise change
+       */
+      !hasSameDuplicatesInExtension(
+        getTaskFromSavedBundle(readyForReviewRecord),
+        duplicateIds
+      )
+    ) {
+      const task = updateTaskWithDuplicateIds(
+        getTaskFromSavedBundle(readyForReviewRecord),
+        duplicateIds
+      )
+
+      await sendBundleToHearth({
+        ...readyForReviewRecord,
+        entry: [{ resource: task }]
+      })
+    }
+
+    await indexBundleWithTransaction(readyForReviewRecord, token, transactionId)
+
+    return
   }
 
   /*
-   * We need to initiate registration for a
-   * record in waiting validation state
+   * You might think, how could validatedRecord be in anything else than READY_FOR_REVIEW state?
+   * If the transaction failed earlier after this point in code
    */
-  if (isWaitingExternalValidation(record)) {
-    const rejectedOrWaitingValidationRecord = await initiateRegistration(
-      record,
-      request.headers,
-      token
+  const validatedRecord = isReadyForReview(readyForReviewRecord)
+    ? await toValidated(readyForReviewRecord, token)
+    : readyForReviewRecord
+
+  await createUserAuditEvent('VALIDATED', {
+    transactionId: transactionId,
+    compositionId: getComposition(validatedRecord).id,
+    trackingId: getTrackingIdFromRecord(validatedRecord),
+    headers: getAuthorizationHeaderFromToken(token)
+  })
+
+  await writeMetricsEvent('sent-for-approval', {
+    record: validatedRecord,
+    authToken: token,
+    transactionId: transactionId
+  })
+
+  await indexBundleWithTransaction(validatedRecord, token, transactionId)
+
+  const action = getEventAction(validatedRecord)
+  const notificationDisabled = !(await isNotificationEnabled(
+    action,
+    event,
+    token
+  ))
+
+  if (!notificationDisabled) {
+    await sendNotification(action, declaredRecord, token)
+  }
+}
+
+export async function registerRecordHandler(
+  recordDetails: BirthRegistration | DeathRegistration | MarriageRegistration,
+  event: EVENT_TYPE,
+  token: PlainToken
+) {
+  const transactionId = `register_${recordDetails.registration?.draftId}`
+  const recordInputWithUploadedAttachments =
+    await uploadBase64AttachmentsToDocumentsStore(
+      recordDetails,
+      getAuthorizationHeaderFromToken(token)
     )
 
-    if (isRejected(rejectedOrWaitingValidationRecord)) {
-      await indexBundle(rejectedOrWaitingValidationRecord, token)
-      await auditEvent('sent-for-updates', record, token)
+  const draftId = recordDetails.registration?.draftId
+
+  const existingComposition = draftId
+    ? await findExistingComposition(draftId, token, [
+        'VALIDATED',
+        'DECLARED',
+        'WAITING_VALIDATION'
+      ])
+    : null
+
+  const duplicateIds = await findDuplicateIds(
+    recordDetails,
+    { Authorization: token },
+    event,
+    transactionId,
+    existingComposition ? getComposition(existingComposition).id : undefined
+  )
+
+  const declaredRecord = existingComposition
+    ? existingComposition
+    : /*
+       * There is an assumption here that a user with a register scope will
+       * never register an incomplete record
+       */
+      await createRecord<ReadyForReviewRecord>(
+        recordInputWithUploadedAttachments,
+        event,
+        token,
+        duplicateIds
+      )
+
+  const validatedRecord = changeState(declaredRecord, 'READY_FOR_REVIEW')
+
+  await writeMetricsEvent('sent-notification-for-review', {
+    record: validatedRecord,
+    authToken: token,
+    transactionId
+  })
+
+  await createUserAuditEvent('DECLARED', {
+    transactionId: transactionId,
+    compositionId: getComposition(validatedRecord).id,
+    trackingId: getTrackingIdFromRecord(validatedRecord),
+    headers: getAuthorizationHeaderFromToken(token)
+  })
+
+  if (duplicateIds.length > 0) {
+    if (
+      /*
+       * This check is so that we don't write new Task_history
+       * items for the task even when it wouldn't otherwise change
+       */
+      !hasSameDuplicatesInExtension(
+        getTaskFromSavedBundle(validatedRecord),
+        duplicateIds
+      )
+    ) {
+      const task = updateTaskWithDuplicateIds(
+        getTaskFromSavedBundle(validatedRecord),
+        duplicateIds
+      )
+
+      await sendBundleToHearth({
+        ...validatedRecord,
+        entry: [{ resource: task }]
+      })
     }
+
+    await indexBundleWithTransaction(validatedRecord, token, transactionId)
+
+    return
   }
 
-  return {
+  /*
+   * You might think, how could validatedRecord be in anything else than READY_FOR_REVIEW state?
+   * If the transaction failed earlier after this point in code
+   */
+  const record = isReadyForReview(validatedRecord)
+    ? await toWaitingForExternalValidationState(validatedRecord, token)
+    : validatedRecord
+
+  await createUserAuditEvent('REGISTERED', {
+    transactionId: transactionId,
     compositionId: getComposition(record).id,
     trackingId: getTrackingIdFromRecord(record),
-    isPotentiallyDuplicate: false
-  }
+    headers: getAuthorizationHeaderFromToken(token)
+  })
+
+  await writeMetricsEvent('waiting-external-validation', {
+    record: record,
+    authToken: token,
+    transactionId: transactionId
+  })
+
+  await indexBundleWithTransaction(record, token, transactionId)
+
+  await sendForExternalValidation({
+    record,
+    token
+  })
 }

@@ -55,13 +55,15 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
-export async function indexRecord(record: SavedBundle) {
+export async function indexRecord(record: SavedBundle, transactionId?: string) {
   const client = getOrCreateClient()
 
   const { id: compositionId } = getComposition(record)
+
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(record, existingDocument)
-  await indexComposition(compositionId, document, client)
+
+  await indexComposition(compositionId, document, client, transactionId)
 }
 
 export const composeDocument = (
