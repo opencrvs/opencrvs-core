@@ -24,7 +24,7 @@ export const env = cleanEnv(process.env, {
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  SENTRY_DSN: str({ devDefault: undefined }),
+  SENTRY_DSN: str({ default: undefined }),
   QA_ENV: bool({ default: false }),
 
   CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
