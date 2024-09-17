@@ -15,8 +15,7 @@ import {
   checkVerificationCode,
   deleteUsedVerificationCode
 } from '@auth/features/verifyCode/service'
-
-import { CONFIG_SMS_CODE_EXPIRY_SECONDS } from '@auth/constants'
+import { env } from '@auth/environment'
 
 const nonce = '12345'
 
@@ -68,7 +67,8 @@ describe('verifyCode service', () => {
       const code = await generateVerificationCode(nonce)
 
       Date.now = jest.fn(
-        () => codeCreationTime + (CONFIG_SMS_CODE_EXPIRY_SECONDS + 60) * 1000
+        () =>
+          codeCreationTime + (env.CONFIG_SMS_CODE_EXPIRY_SECONDS + 60) * 1000
       )
       return expect(checkVerificationCode(nonce, code)).rejects.toThrow(
         'Auth code expired'
