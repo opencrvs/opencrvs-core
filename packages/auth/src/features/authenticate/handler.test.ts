@@ -71,7 +71,19 @@ describe('authenticate handler receives a request', () => {
       expect(res.statusCode).toBe(403)
     })
     it('generates a mobile verification code and sends it to notification gateway', async () => {
-      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+      server = await createServerWithEnvironment({
+        NODE_ENV: 'production',
+        AUTH_HOST: '0.0.0.0',
+        AUTH_PORT: '4040',
+        CLIENT_APP_URL: 'http://localhost:3000/',
+        COUNTRY_CONFIG_URL: 'http://localhost:3040/',
+        DOMAIN: '*',
+        LOGIN_URL: 'http://localhost:3020/',
+        METRICS_URL: 'http://localhost:1050',
+        NOTIFICATION_SERVICE_URL: 'http://localhost:2020/',
+        REDIS_HOST: 'localhost',
+        USER_MANAGEMENT_URL: 'http://localhost:3030/'
+      })
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const reloadedCodeService = require('../verifyCode/service')
@@ -102,7 +114,19 @@ describe('authenticate handler receives a request', () => {
       expect(spy.mock.calls[0][3]).toBe('+345345343')
     })
     it('does not generate a mobile verification code for pending users', async () => {
-      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+      server = await createServerWithEnvironment({
+        NODE_ENV: 'production',
+        AUTH_HOST: '0.0.0.0',
+        AUTH_PORT: '4040',
+        CLIENT_APP_URL: 'http://localhost:3000/',
+        COUNTRY_CONFIG_URL: 'http://localhost:3040/',
+        DOMAIN: '*',
+        LOGIN_URL: 'http://localhost:3020/',
+        METRICS_URL: 'http://localhost:1050',
+        NOTIFICATION_SERVICE_URL: 'http://localhost:2020/',
+        REDIS_HOST: 'localhost',
+        USER_MANAGEMENT_URL: 'http://localhost:3030/'
+      })
 
       // eslint-disable-next-line
       const reloadedCodeService = require('../verifyCode/service')

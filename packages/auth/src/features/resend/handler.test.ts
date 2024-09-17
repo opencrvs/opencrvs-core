@@ -44,7 +44,19 @@ describe('resend handler receives a request', () => {
 
   describe('resend notification service says nonce is valid, generates a mobile verification code and sends it to notification gateway', () => {
     it('returns a nonce to the client', async () => {
-      server = await createServerWithEnvironment({ NODE_ENV: 'production' })
+      server = await createServerWithEnvironment({
+        NODE_ENV: 'production',
+        AUTH_HOST: '0.0.0.0',
+        AUTH_PORT: '4040',
+        CLIENT_APP_URL: 'http://localhost:3000/',
+        COUNTRY_CONFIG_URL: 'http://localhost:3040/',
+        DOMAIN: '*',
+        LOGIN_URL: 'http://localhost:3020/',
+        METRICS_URL: 'http://localhost:1050',
+        NOTIFICATION_SERVICE_URL: 'http://localhost:2020/',
+        REDIS_HOST: 'localhost',
+        USER_MANAGEMENT_URL: 'http://localhost:3030/'
+      })
       // eslint-disable-next-line
       const codeService = require('../verifyCode/service')
       // eslint-disable-next-line
