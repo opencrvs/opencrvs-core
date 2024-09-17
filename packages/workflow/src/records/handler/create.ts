@@ -30,7 +30,11 @@ import {
   isValidated,
   isWaitingExternalValidation,
   isComposition,
-  getTaskFromSavedBundle
+  getTaskFromSavedBundle,
+  Encounter,
+  Location,
+  findEncounterFromRecord,
+  Saved
 } from '@opencrvs/commons/types'
 import {
   getToken,
@@ -39,6 +43,7 @@ import {
 } from '@workflow/utils/auth-utils'
 import {
   findTaskFromIdentifier,
+  getLocationsById,
   mergeBundles,
   sendBundleToHearth,
   toSavedBundle,
@@ -137,6 +142,35 @@ function createInProgressOrReadyForReviewTask(
   }
 }
 
+async function resolveLocationsForEncounter(
+  encounter: Encounter
+): Promise<Bundle<Location> | null> {
+  if (encounter.location == null) {
+    return null
+  }
+  const locationIds: Array<string> = []
+  for (const { location } of encounter.location) {
+    locationIds.push(location.reference.split('/')[1])
+  }
+  return getLocationsById(locationIds)
+}
+
+function bundleIncludesLocationResources(record: Saved<Bundle>) {
+  const encounter = findEncounterFromRecord(record)
+  const encounterLocationIds =
+    encounter?.location?.map(
+      ({ location }) => location.reference.split('/')[1]
+    ) || []
+
+  const bundleLocations = record.entry.filter(
+    ({ resource }) => resource.resourceType == 'Location'
+  )
+
+  return encounterLocationIds.every((locationId) =>
+    bundleLocations.some((location) => location.id === locationId)
+  )
+}
+
 async function createRecord(
   recordDetails: z.TypeOf<typeof requestSchema>['record'],
   event: z.TypeOf<typeof requestSchema>['event'],
@@ -192,7 +226,24 @@ async function createRecord(
     ? changeState(savedBundle, 'IN_PROGRESS')
     : changeState(savedBundle, 'READY_FOR_REVIEW')
 
-  return mergeBundles(record, practitionerResourcesBundle)
+  const mergedBundle = mergeBundles(record, practitionerResourcesBundle)
+
+  const encounter = findEncounterFromRecord(record)
+  if (encounter == null) {
+    return mergedBundle
+  }
+
+  if (bundleIncludesLocationResources(record)) {
+    return mergedBundle
+  }
+
+  const locationResourcesBundle = await resolveLocationsForEncounter(encounter)
+
+  if (locationResourcesBundle == null) {
+    return mergedBundle
+  }
+
+  return mergeBundles(mergedBundle, locationResourcesBundle)
 }
 
 type CreatedRecord =

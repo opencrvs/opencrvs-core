@@ -16,10 +16,9 @@ on:
         default: develop
         required: true
   push:
-    branches:
-      - 'develop'
-      - 'release*'
-
+    branches-ignore:
+      - 'dependabot/**'
+      - 'renovate/**'
 jobs:
   base:
     runs-on: ubuntu-22.04
@@ -38,10 +37,12 @@ jobs:
           export VERSION=`git log -1 --pretty=format:%h`
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" == 'push' ]; then
-            echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           else
-            echo "branch=${{ inputs.branch_name }}" >> $GITHUB_OUTPUT
+            BRANCH=${{ inputs.branch_name }}
           fi
+          ESCAPED_BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Get list of services
         id: get-services

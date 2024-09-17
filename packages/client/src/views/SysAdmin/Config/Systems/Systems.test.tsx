@@ -14,6 +14,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
+  flushPromises,
   mockOfflineDataDispatch,
   selectOption
 } from '@client/tests/util'
@@ -235,6 +236,7 @@ describe('render toggle settings', () => {
     beforeEach(async () => {
       const { store, history } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+      await flushPromises()
 
       const mocks = [
         {
@@ -282,6 +284,7 @@ describe('render toggle settings', () => {
     beforeEach(async () => {
       const { store, history } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+      await flushPromises()
 
       const mocks = [
         {
@@ -332,6 +335,7 @@ describe('render toggle settings', () => {
     beforeEach(async () => {
       const { store, history } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+      await flushPromises()
 
       const mocks = [
         {
