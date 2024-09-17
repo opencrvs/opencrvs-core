@@ -86,24 +86,6 @@ async function getConfigFromCountry() {
   return res.json()
 }
 
-function stripIdFromApplicationConfig(config: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(config).map(([key, value]) => {
-      let rest = value
-      if (
-        typeof value === 'object' &&
-        value !== null &&
-        '_id' in value &&
-        key !== '_id'
-      ) {
-        const { _id, ...remaining } = value as { _id: any }
-        rest = remaining
-      }
-      return [key, rest]
-    })
-  )
-}
-
 async function getEventCertificate(
   event: 'birth' | 'death' | 'marriage',
   authToken: string
@@ -130,11 +112,8 @@ async function getApplicationConfig(
   h?: Hapi.ResponseToolkit
 ) {
   const configFromCountryConfig = await getConfigFromCountry()
-  const stripApplicationConfig = stripIdFromApplicationConfig(
-    configFromCountryConfig
-  )
   const { error, value: updatedConfigFromCountryConfig } =
-    applicationConfigResponseValidation.validate(stripApplicationConfig, {
+    applicationConfigResponseValidation.validate(configFromCountryConfig, {
       allowUnknown: true
     })
   if (error) {
