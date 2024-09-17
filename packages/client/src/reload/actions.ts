@@ -8,16 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/// <reference types="vite/client" />
-/// <reference types="vite-plugin-pwa/react" />
-
-interface ImportMetaEnv {
-  readonly COUNTRY_CONFIG_URL?: string
-  // more env variables...
+export const RELOAD_MODAL_VISIBILITY = 'RELOAD_MODAL_VISIBILITY'
+export type StoreReloadModalVisibilityAction = {
+  type: typeof RELOAD_MODAL_VISIBILITY
+  payload: { visibility: boolean }
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv
+export const storeReloadModalVisibility = (
+  visibility: boolean
+): StoreReloadModalVisibilityAction => {
+  return {
+    type: RELOAD_MODAL_VISIBILITY,
+    payload: { visibility }
+  }
 }
-
-declare const APP_VERSION: string

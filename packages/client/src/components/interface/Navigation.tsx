@@ -405,7 +405,6 @@ const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
