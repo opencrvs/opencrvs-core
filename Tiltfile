@@ -1,0 +1,65 @@
+# Load extensions for configmap/secret/namespace operations
+load('ext://configmap', 'configmap_create')
+load('ext://secret', 'secret_create_generic', 'secret_from_dict')
+load('ext://namespace', 'namespace_create', 'namespace_inject')
+
+# Only use for local dev with docker desktop
+allow_k8s_contexts('docker-desktop')
+
+
+# Build baseimage
+docker_build("opencrvs/ocrvs-base", ".", dockerfile="packages/Dockerfile.base", only=["packages/commons","package.json","yarn.lock"])
+
+# Build services
+docker_build("opencrvs/ocrvs-client:local", "packages", dockerfile="packages/client/Dockerfile", only=["components","client"])
+docker_build("opencrvs/ocrvs-login:local", "packages", dockerfile="packages/login/Dockerfile", only=["components","login"])
+
+apps = ['auth', 
+              'config',
+              'dashboards', 
+              'documents', 
+              'gateway',  
+              'metrics', 
+              'migration', 
+              'notification', 
+              'scheduler', 
+              'search', 
+              'user-mgnt', 
+              'webhooks', 
+              'workflow']
+
+def build_services():
+  for app in apps:
+    docker_build("opencrvs/ocrvs-{}:local".format(app), "packages/{}".format(app))
+
+build_services()
+
+
+# Create namespace
+namespace_create('opencrvs-deps-dev')
+namespace_create('opencrvs-services-dev')
+
+# Create auth keys in k8s
+secret_create_generic('private-key', from_file='.secrets/private-key.pem', namespace="opencrvs-services-dev")
+configmap_create('public-key', from_file=['.secrets/public-key.pem'], namespace="opencrvs-services-dev")
+
+# Deploy dependencies with Helm
+k8s_yaml(helm('kubernetes/dependencies',
+              namespace='opencrvs-deps-dev', 
+              values=['kubernetes/dependencies/values.yaml', 
+                      'kubernetes/dependencies/values-dev.yaml']))
+
+
+# Deploy services with Helm
+k8s_yaml(helm('kubernetes/opencrvs-services',
+              namespace='opencrvs-services-dev', 
+              values=['kubernetes/opencrvs-services/values.yaml', 
+                      'kubernetes/opencrvs-services/values-dev.yaml']))
+
+
+#def wait_for_builds():
+#  for app in apps:
+#    resources_to_be_waited = 
+#    k8s_resource(app, resource_deps=["opencrvs/ocrvs-{}:local".format(app))
+
+#wait_for_builds()

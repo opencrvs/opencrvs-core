@@ -3,7 +3,6 @@
 *.yaml
 .vscode
 **/.git
-**/test
 
 # From root
 **/node_modules
@@ -12,10 +11,4 @@
 **/.env
 **/*.log
 .secrets/*
-data
-grafana
 
-# Exclude unused packages
-packages/
-!packages/commons
-!packages/gateway
