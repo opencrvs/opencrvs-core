@@ -99,6 +99,7 @@ describe('when in device of large viewport', () => {
 
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
     form = await getRegisterFormFromStore(store, DeclarationEvent.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
