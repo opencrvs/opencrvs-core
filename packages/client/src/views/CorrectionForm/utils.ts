@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import { IDeclaration } from '@client/declarations'
 import {
   BULLET_LIST,
   CHECKBOX,
@@ -64,7 +64,8 @@ import {
 import {
   CorrectionInput,
   PaymentOutcomeType,
-  PaymentType
+  PaymentType,
+  RegStatus
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
@@ -105,9 +106,9 @@ export function groupHasError(
 export function isCorrection(declaration: IDeclaration) {
   const { registrationStatus } = declaration
   return (
-    registrationStatus === SUBMISSION_STATUS.REGISTERED ||
-    registrationStatus === SUBMISSION_STATUS.CERTIFIED ||
-    registrationStatus === SUBMISSION_STATUS.ISSUED
+    registrationStatus === RegStatus.Registered ||
+    registrationStatus === RegStatus.Certified ||
+    registrationStatus === RegStatus.Issued
   )
 }
 
