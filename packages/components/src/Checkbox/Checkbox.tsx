@@ -17,7 +17,7 @@ const Label = styled.label<{ disabled?: boolean }>`
   flex-direction: row;
   gap: 12px;
   border-radius: 4px;
-  width: 100%;
+  width: auto;
   padding: 8px 8px;
   align-items: center;
   isolation: isolate;
@@ -85,7 +85,7 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
 
 const Input = styled.input`
   position: absolute;
-  width: 100%;
+  width: auto;
   height: 40px;
   opacity: 0;
   z-index: 2;

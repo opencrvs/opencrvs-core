@@ -74,12 +74,29 @@ export interface ITokenResponse {
   token: string
 }
 
+const loginClientVersion = APP_VERSION
+
 export function request<T>(options: AxiosRequestConfig) {
   const onSuccess = (response: AxiosResponse<T>) => {
+    const gatewayVersion = response.headers['x-version']
+
+    if (gatewayVersion && gatewayVersion !== loginClientVersion) {
+      console.log(
+        `Version Mismatch: Frontend is running on ${loginClientVersion}, whereas backend is running on ${gatewayVersion}. Please Reload to get the latest client`
+      )
+      throw new AxiosError('VERSION_MISMATCH')
+    }
     return response.data
   }
 
   const onError = (error: AxiosError) => {
+    const gatewayVersion = error.response?.headers['x-version']
+    if (gatewayVersion && gatewayVersion !== loginClientVersion) {
+      console.log(
+        `Version Mismatch: Frontend is running on ${loginClientVersion}, whereas backend is running on ${gatewayVersion}. Please Reload to get the latest client`
+      )
+      throw new AxiosError('VERSION_MISMATCH')
+    }
     if (error.response) {
       // Request was made but server responded with something
       // other than 2xx
