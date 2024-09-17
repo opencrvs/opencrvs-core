@@ -33,7 +33,7 @@ export async function register() {
     }
 
     if (job.name === 'record-validated') {
-      return markEventAsRegistered(job.data, job.id || getUUID())
+      return markEventAsRegistered(job.data)
     }
   })
   await registerRecordWorker(REDIS_HOST, async (job) => {

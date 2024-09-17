@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { USER_MANAGEMENT_URL } from '@metrics/constants'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'

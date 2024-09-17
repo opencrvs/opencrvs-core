@@ -205,11 +205,8 @@ export async function sentForUpdatesHandler(
     headers: request.headers,
     record: request.payload as ValidRecord
   })
-  try {
-    await sentForUpdates(request.payload as RejectedRecord)
-  } catch (err) {
-    return internal(err)
-  }
+
+  await sentForUpdates(request.payload as RejectedRecord)
 
   return h.response().code(200)
 }

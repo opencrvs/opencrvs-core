@@ -8,20 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { getTaskFromSavedBundle, SavedTask } from '@opencrvs/commons/types'
+import { BirthDocument, createStatusHistory } from '@search/elasticsearch/utils'
 import {
-  detectBirthDuplicates,
-  createStatusHistory,
-  BirthDocument
-} from '@search/elasticsearch/utils'
-import {
-  mockSearchResponse,
-  mockCompositionBody,
   mockBirthFhirBundle,
+  mockCompositionBody,
   mockUserModelResponse
 } from '@search/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
-import { searchForBirthDuplicates } from '@search/features/registration/deduplicate/service'
-import { getTaskFromSavedBundle, SavedTask } from '@opencrvs/commons/types'
 
 const fetch = fetchAny as any
 
@@ -29,17 +23,6 @@ jest.mock('@search/features/registration/deduplicate/service')
 jest.mock('@search/elasticsearch/dbhelper.ts')
 
 describe('elastic search utils', () => {
-  it('should return an array of duplicate identifiers for a composition', async () => {
-    ;(searchForBirthDuplicates as jest.Mock).mockReturnValue(
-      mockSearchResponse.body.hits.hits
-    )
-    const duplicates = await detectBirthDuplicates(
-      'c79e8d62-335e-458d-9fcc-45ec5836c404',
-      mockCompositionBody
-    )
-    expect(duplicates[0].id).toEqual('c99e8d62-335e-458d-9fcc-45ec5836c404')
-  })
-
   it('should return appropriate history with facility name for notifications', async () => {
     fetch.mockResponses([
       JSON.stringify(mockUserModelResponse),

@@ -18,7 +18,7 @@ import {
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 import { NOTIFICATION_TYPES } from '@metrics/features/metrics/constants'
-import { Bundle, getComposition } from '@opencrvs/commons/types'
+import { Bundle, findComposition } from '@opencrvs/commons/types'
 
 export function getSectionBySectionCode(
   bundle: fhir.Bundle,
@@ -170,7 +170,9 @@ export function findExtension(
 }
 
 export function getCompositionIdFromCompositionOrTask(bundle: Bundle) {
-  const composition = getComposition(bundle)
+  console.log(bundle)
+
+  const composition = findComposition(bundle)
 
   if (composition) {
     return composition.id

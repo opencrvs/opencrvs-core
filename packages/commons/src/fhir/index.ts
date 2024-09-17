@@ -270,20 +270,26 @@ export function isDocumentReference<T extends Resource>(
   return resource.resourceType === 'DocumentReference'
 }
 
-export function getComposition<T extends Bundle>(bundle: T) {
+export function findComposition<T extends Bundle>(bundle: T) {
   const composition = bundle.entry
     .map(({ resource }) => resource)
     .find(isComposition)
-
-  if (!composition) {
-    throw new Error('Composition not found in bundle')
-  }
 
   return composition as T extends Saved<ValidRecord>
     ? SavedComposition
     : T extends SavedComposition
     ? SavedComposition
     : Composition
+}
+
+export function getComposition<T extends Bundle>(bundle: T) {
+  const composition = findComposition<T>(bundle)
+
+  if (!composition) {
+    throw new Error('Composition not found in bundle')
+  }
+
+  return composition
 }
 
 export function isRelatedPerson(resource: Resource): resource is RelatedPerson {
