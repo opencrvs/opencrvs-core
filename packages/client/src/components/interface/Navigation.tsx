@@ -19,7 +19,6 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
   goToAllUserEmail,
-  goToCertificateConfig,
   goToDashboardView,
   goToHomeTab,
   goToInformantNotification,
@@ -221,7 +220,6 @@ interface IProps {
 
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
-  goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -299,7 +297,6 @@ const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
-    goToCertificateConfigAction,
     goToVSExportsAction,
     goToSystemViewAction,
     goToAdvancedSearchResultAction,
@@ -326,12 +323,8 @@ const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab: string[] = [
-    WORKQUEUE_TABS.application,
-    WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.systems,
-    WORKQUEUE_TABS.userRoles
-  ]
+
+  const configTab: string[] = [WORKQUEUE_TABS.systems]
   const conmmunicationTab: string[] = [
     WORKQUEUE_TABS.informantNotification,
     WORKQUEUE_TABS.emailAllUsers
@@ -717,18 +710,6 @@ const NavigationView = (props: IFullProps) => {
                         configTab.includes(activeMenuItem)) && (
                         <>
                           <NavigationSubItem
-                            label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.certificate]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.certificate}`}
-                            onClick={goToCertificateConfigAction}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.certificate
-                            }
-                          />
-
-                          <NavigationSubItem
                             id={`navigation_${WORKQUEUE_TABS.systems}`}
                             label={intl.formatMessage(
                               navigationMessages[WORKQUEUE_TABS.systems]
@@ -998,7 +979,6 @@ export const Navigation = connect<
   IStoreState
 >(mapStateToProps, {
   goToHomeTab,
-  goToCertificateConfigAction: goToCertificateConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,

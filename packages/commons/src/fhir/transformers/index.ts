@@ -568,7 +568,11 @@ function createLocationAddressBuilder(
       if (!location.address.line) {
         location.address.line = []
       }
-      ;(location.address.line as string[]).push(fieldValue)
+      if (location.address.line![context._index.line] != undefined) {
+        location.address.line![context._index.line] = fieldValue
+      } else {
+        ;(location.address.line as string[]).push(fieldValue)
+      }
     },
     city: (fhirBundle, fieldValue, context) => {
       const location = selectOrCreateLocationRefResource(
@@ -974,9 +978,9 @@ function setResourceIdentifier(
     value: fieldValue
   } as TaskIdentifier
 
-  resource.identifier
+  resource.identifier = resource.identifier
     .filter((obj) => obj.system !== identifier.system)
-    .push(identifier)
+    .concat(identifier)
 }
 
 function createRegStatusComment(

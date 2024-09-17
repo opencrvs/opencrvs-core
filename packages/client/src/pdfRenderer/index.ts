@@ -18,11 +18,7 @@ export interface IPDFTemplate {
 }
 
 export interface ISVGTemplate {
-  id: string
   definition: string
-  hash?: string
-  fileName: string
-  lastModifiedDate: string
 }
 
 export function printPDF(template: IPDFTemplate, declarationId: string) {

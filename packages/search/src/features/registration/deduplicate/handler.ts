@@ -12,12 +12,13 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { internal } from '@hapi/boom'
 import { removeDuplicate } from '@search/features/registration/deduplicate/service'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 
 export async function deduplicateHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const client = getOrCreateClient()
   try {
     const payload = request.payload as fhir.Bundle
     const composition = payload.entry?.find(

@@ -685,6 +685,7 @@ export const up = async (db: Db, client: MongoClient) => {
         {
           $project: {
             name: 1,
+            id: 1,
 
             populations: {
               $reduce: {
@@ -763,7 +764,7 @@ export const up = async (db: Db, client: MongoClient) => {
         { $unwind: '$daysInYear' },
         {
           $project: {
-            _id: { $concat: [{ $toString: '$name' }, '$daysInYear.date'] },
+            _id: { $concat: [{ $toString: '$id' }, '_', '$daysInYear.date'] },
             name: 1,
             date: { $dateFromString: { dateString: '$daysInYear.date' } },
             estimatedNumberOfBirths: '$daysInYear.estimatedNumberOfBirths',

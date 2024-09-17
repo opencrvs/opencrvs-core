@@ -39,7 +39,8 @@ describe('signature upload tests', () => {
 
   beforeEach(async () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
   })
 
   describe('when user is in signature upload form page', () => {

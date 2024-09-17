@@ -95,12 +95,12 @@ export type TaskIdentifier =
 export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
 
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
-type AllSystems = ExtractSystem<TaskIdentifier>
+export type TaskIdentifierSystem = ExtractSystem<TaskIdentifier>
 
 type AfterLastSlash<S extends string> =
   S extends `${infer _Start}/${infer Rest}` ? AfterLastSlash<Rest> : S
 
-export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
+export type TaskIdentifierSystemType = AfterLastSlash<TaskIdentifierSystem>
 
 export type Task = Omit<
   fhir3.Task,
@@ -227,6 +227,7 @@ export function sortTasksDescending<T extends { lastModified: string }>(
     )
   })
 }
+
 export const findTaskHistories = (
   bundle: Bundle,
   sort = sortTasksAscending
@@ -239,6 +240,15 @@ export const findTaskHistories = (
       .map(({ resource }) => resource)
   )
 }
+
+export const findAllTasks = (bundle: Bundle, sort = sortTasksAscending) =>
+  sort(
+    bundle.entry
+      .filter((entry): entry is BundleEntry<Task | TaskHistory> =>
+        isTaskOrTaskHistory(entry.resource)
+      )
+      .map(({ resource }) => resource)
+  )
 
 export const findFirstTaskHistory = (bundle: Bundle) =>
   findTaskHistories(bundle).at(0)

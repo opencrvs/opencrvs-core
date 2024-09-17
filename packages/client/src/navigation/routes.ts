@@ -62,7 +62,6 @@ export const REGISTRAR_HOME_TAB_PAGE =
   '/registration-home/:tabId/:selectorId/:pageId'
 
 export const SETTINGS = '/settings'
-export const CERTIFICATE_CONFIG = '/config/certificate'
 export const SYSTEM_LIST = '/config/integration'
 
 export const INFORMANT_NOTIFICATION = '/communications/informantnotification'

@@ -271,7 +271,6 @@ describe('ReviewForm tests', () => {
   })
 
   it('Shared contact phone number should be set properly', async () => {
-    store.dispatch(storeDeclaration(birthDeclaration))
     const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
@@ -296,6 +295,7 @@ describe('ReviewForm tests', () => {
       { store, history }
     )
 
+    store.dispatch(storeDeclaration(birthDeclaration))
     testComponent.update()
     const data = testComponent
       .find(RegisterForm)
@@ -308,7 +308,6 @@ describe('ReviewForm tests', () => {
     ).toBe('+8801711111111')
   })
   it('when registration has attachment', async () => {
-    store.dispatch(storeDeclaration(birthDeclaration))
     const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
@@ -333,6 +332,7 @@ describe('ReviewForm tests', () => {
       { store, history }
     )
 
+    store.dispatch(storeDeclaration(birthDeclaration))
     testComponent.update()
 
     const data = testComponent
@@ -350,7 +350,6 @@ describe('ReviewForm tests', () => {
     ])
   })
   it('check registration', async () => {
-    store.dispatch(storeDeclaration(birthDeclaration))
     const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
@@ -375,6 +374,7 @@ describe('ReviewForm tests', () => {
       { store, history }
     )
 
+    store.dispatch(storeDeclaration(birthDeclaration))
     testComponent.update()
 
     const data = testComponent
@@ -412,16 +412,6 @@ describe('ReviewForm tests', () => {
       Event.Birth,
       'IN_PROGRESS'
     )
-    store.dispatch(
-      getStorageDeclarationsSuccess(
-        JSON.stringify({
-          userID: 'currentUser', // mock
-          drafts: [declaration],
-          declarations: []
-        })
-      )
-    )
-    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -446,6 +436,17 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
+    store.dispatch(
+      getStorageDeclarationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [declaration],
+          declarations: []
+        })
+      )
+    )
+    store.dispatch(storeDeclaration(declaration))
+    testComponent.update()
     testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain('/progress')
@@ -458,16 +459,6 @@ describe('ReviewForm tests', () => {
       Event.Birth,
       'DECLARED'
     )
-    store.dispatch(
-      getStorageDeclarationsSuccess(
-        JSON.stringify({
-          userID: 'currentUser', // mock
-          drafts: [declaration],
-          declarations: []
-        })
-      )
-    )
-    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -492,6 +483,18 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
+
+    store.dispatch(
+      getStorageDeclarationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [declaration],
+          declarations: []
+        })
+      )
+    )
+    store.dispatch(storeDeclaration(declaration))
+    testComponent.update()
     testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
@@ -504,16 +507,6 @@ describe('ReviewForm tests', () => {
       Event.Birth,
       'VALIDATED'
     )
-    store.dispatch(
-      getStorageDeclarationsSuccess(
-        JSON.stringify({
-          userID: 'currentUser', // mock
-          drafts: [declaration],
-          declarations: []
-        })
-      )
-    )
-    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -538,6 +531,18 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
+
+    store.dispatch(
+      getStorageDeclarationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [declaration],
+          declarations: []
+        })
+      )
+    )
+    store.dispatch(storeDeclaration(declaration))
+    testComponent.update()
     testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
@@ -550,16 +555,6 @@ describe('ReviewForm tests', () => {
       Event.Birth,
       'REJECTED'
     )
-    store.dispatch(
-      getStorageDeclarationsSuccess(
-        JSON.stringify({
-          userID: 'currentUser', // mock
-          drafts: [declaration],
-          declarations: []
-        })
-      )
-    )
-    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -584,6 +579,18 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
+
+    store.dispatch(
+      getStorageDeclarationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [declaration],
+          declarations: []
+        })
+      )
+    )
+    store.dispatch(storeDeclaration(declaration))
+    testComponent.update()
     testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain(WORKQUEUE_TABS.requiresUpdate)
@@ -595,16 +602,6 @@ describe('ReviewForm tests', () => {
       birthDraftData,
       Event.Birth
     )
-    store.dispatch(
-      getStorageDeclarationsSuccess(
-        JSON.stringify({
-          userID: 'currentUser', // mock
-          drafts: [declaration],
-          declarations: []
-        })
-      )
-    )
-    store.dispatch(storeDeclaration(declaration))
 
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -629,6 +626,18 @@ describe('ReviewForm tests', () => {
       />,
       { store, history }
     )
+
+    store.dispatch(
+      getStorageDeclarationsSuccess(
+        JSON.stringify({
+          userID: 'currentUser', // mock
+          drafts: [declaration],
+          declarations: []
+        })
+      )
+    )
+    store.dispatch(storeDeclaration(declaration))
+    testComponent.update()
     testComponent.find('#exit-btn').hostNodes().simulate('click')
     testComponent.update()
     expect(window.location.href).toContain('/progress')
@@ -649,7 +658,6 @@ describe('ReviewForm tests', () => {
         })
       )
     )
-    store.dispatch(storeDeclaration(declaration))
     const testComponent = await createTestComponent(
       <ReviewForm
         location={mock}
@@ -674,6 +682,7 @@ describe('ReviewForm tests', () => {
       { store, history }
     )
 
+    store.dispatch(storeDeclaration(declaration))
     testComponent.update()
     const data = testComponent
       .find(RegisterForm)
@@ -684,7 +693,6 @@ describe('ReviewForm tests', () => {
 
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
-      store.dispatch(storeDeclaration(deathDeclaration))
       const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
@@ -709,6 +717,7 @@ describe('ReviewForm tests', () => {
         { store, history }
       )
 
+      store.dispatch(storeDeclaration(deathDeclaration))
       testComponent.update()
       const data = testComponent
         .find(RegisterForm)
@@ -730,7 +739,6 @@ describe('ReviewForm tests', () => {
       )
     })
     it('populates proper death event section', async () => {
-      store.dispatch(storeDeclaration(deathDeclaration))
       const form = await getReviewFormFromStore(store, Event.Death)
       const testComponent = await createTestComponent(
         <ReviewForm
@@ -756,6 +764,7 @@ describe('ReviewForm tests', () => {
         { store, history }
       )
 
+      store.dispatch(storeDeclaration(deathDeclaration))
       testComponent.update()
       const data = testComponent
         .find(RegisterForm)
