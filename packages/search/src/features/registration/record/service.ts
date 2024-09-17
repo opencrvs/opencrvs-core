@@ -1,15 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
 import { SavedBundle } from '@opencrvs/commons/types'
-import { getOrCreateClient } from '@search/elasticsearch/client'
-import { deleteComposition } from '@search/elasticsearch/dbhelper'
-import { getEventType } from '@search/utils/event'
 import { indexRecord as upsertBirthEvent } from '@search/features/registration/birth/service'
 import { indexRecord as upsertDeathEvent } from '@search/features/registration/death/service'
 import { indexRecord as upsertMarriageEvent } from '@search/features/registration/marriage/service'
-
-export async function deleteRecord(recordId: string) {
-  const client = getOrCreateClient()
-  return deleteComposition(recordId, client)
-}
+import { getEventType } from '@search/utils/event'
 
 export async function indexRecord(record: SavedBundle, transactionId?: string) {
   switch (getEventType(record)) {

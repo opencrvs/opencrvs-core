@@ -522,8 +522,6 @@ type RegistrationCountResult {
 
 type CreatedIds {
   compositionId: String
-  trackingId: String
-  isPotentiallyDuplicate: Boolean
 }
 
 type Reinstated {
@@ -599,7 +597,7 @@ type Mutation {
   ): ID!
 
   # BIRTH
-  createBirthRegistration(details: BirthRegistrationInput!): Void
+  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(

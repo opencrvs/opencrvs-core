@@ -8,31 +8,28 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Joi from 'joi'
-import {
-  getAllDocumentsHandler,
-  getStatusWiseRegistrationCountHandler,
-  advancedRecordSearch,
-  searchAssignment,
-  searchForBirthDeDuplication,
-  searchForDeathDeDuplication
-} from '@search/features/search/handler'
-import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
+import { logger } from '@opencrvs/commons'
+import { getOrCreateClient } from '@search/elasticsearch/client'
+import { getRecordByIdHandler } from '@search/features/records/handler'
 import {
   assignEventHandler,
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
-import { getOrCreateClient } from '@search/elasticsearch/client'
-import { logger } from '@opencrvs/commons'
-import {
-  deleteRecordByIdHandler,
-  recordHandler
-} from '@search/features/registration/record/handler'
-import { getRecordByIdHandler } from '@search/features/records/handler'
+import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
+import { recordHandler } from '@search/features/registration/record/handler'
 import {
   reindexHandler,
   reindexStatusHandler
 } from '@search/features/reindex/handler'
+import {
+  advancedRecordSearch,
+  getAllDocumentsHandler,
+  getStatusWiseRegistrationCountHandler,
+  searchAssignment,
+  searchForBirthDeDuplication,
+  searchForDeathDeDuplication
+} from '@search/features/search/handler'
+import * as Joi from 'joi'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -109,16 +106,6 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: false,
         description: 'Fetch all FHIR entities concerning a record'
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/records/{recordId}',
-      handler: deleteRecordByIdHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Delete indexed record by recordId. Only removes it from ES'
       }
     },
     {

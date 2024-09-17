@@ -2535,7 +2535,7 @@ const builders: IFieldBuilders = {
       createOtherInformantType(fhirBundle, fieldValue, context),
     draftId: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      setResourceIdentifier(taskResource, 'draft-id', fieldValue)
+      return setResourceIdentifier(taskResource, 'draft-id', fieldValue)
     },
     trackingId: (fhirBundle, fieldValue, context) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)

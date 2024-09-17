@@ -24,42 +24,40 @@ export async function newAuditHandler(
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-  try {
-    const remoteAddress =
-      request.headers['x-real-ip'] || request.info.remoteAddress
 
-    const userAgent =
-      request.headers['x-real-user-agent'] || request.headers['user-agent']
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
 
-    const payload = request.payload as IUserAuditBody
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
 
-    const transactionId = payload.transactionId
+  const payload = request.payload as IUserAuditBody
 
-    let practitionerId
-    if (payload.practitionerId) {
-      practitionerId = payload.practitionerId!
-    } else {
-      const userId = getClientIdFromToken(request.headers.authorization)
-      const user = await getUser(userId, {
-        Authorization: request.headers.authorization
-      })
-      practitionerId = user.practitionerId
-    }
+  const transactionId = payload.transactionId
 
-    points.push(
-      generateAuditPoint(
-        practitionerId,
-        payload.action,
-        remoteAddress,
-        userAgent,
-        payload.additionalData
-      )
-    )
-
-    await writePoints(points, transactionId)
-  } catch (err) {
-    return internal(err)
+  let practitionerId
+  if (payload.practitionerId) {
+    practitionerId = payload.practitionerId!
+  } else {
+    const userId = getClientIdFromToken(request.headers.authorization)
+    const user = await getUser(userId, {
+      Authorization: request.headers.authorization
+    })
+    practitionerId = user.practitionerId
   }
+
+  points.push(
+    generateAuditPoint(
+      practitionerId,
+      payload.action,
+      remoteAddress,
+      userAgent,
+      payload.additionalData
+    )
+  )
+
+  await writePoints(points, transactionId)
+
   return h.response().code(201)
 }
 

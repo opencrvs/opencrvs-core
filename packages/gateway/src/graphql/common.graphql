@@ -9,7 +9,6 @@
 # automatically map from FHIR
 
 scalar Date
-scalar Void
 scalar Map
 scalar FieldValue
 scalar PlainDate

@@ -31,16 +31,19 @@ import { invokeWebhooks } from '@workflow/records/webhooks'
 import { getToken } from '@workflow/utils/auth-utils'
 import { getEventType } from './utils'
 
-export async function markEventAsRegistered(
-  { registrationNumber, token, identifiers, recordId }: RecordValidatedPayload,
-  transactionId: string
-) {
+export async function markEventAsRegistered({
+  registrationNumber,
+  token,
+  identifiers,
+  recordId
+}: RecordValidatedPayload) {
   const savedRecord = await getRecordById(
     recordId,
     toTokenWithBearer(token),
     ['WAITING_VALIDATION'],
     true
   )
+  const transactionId = `confirm-registration-${recordId}`
 
   if (!savedRecord) {
     throw new Error(

@@ -64,13 +64,14 @@ export async function invokeRegistrationValidation(
       }
     }
   )
-  if (res.ok) {
-    return
+  if (!res.ok) {
+    throw new RegistrationValidationError(
+      `Registration validation failed with status ${
+        res.status
+      } and message ${await res.text()}`
+    )
   }
 
-  if (res.status === 400) {
-    throw new RegistrationValidationError(res.statusText)
-  }
   return
 }
 

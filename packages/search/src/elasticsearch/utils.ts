@@ -9,29 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MATCH_SCORE_THRESHOLD, USER_MANAGEMENT_URL } from '@search/constants'
-import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   getOrCreateClient,
   ISearchResponse
 } from '@search/elasticsearch/client'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 
-import fetch from 'node-fetch'
 import {
-  searchForBirthDuplicates,
-  searchForDeathDuplicates
-} from '@search/features/registration/deduplicate/service'
-import {
+  findAllTasks,
   getBusinessStatus,
+  IOperationHistory,
   SavedBundle,
   SavedOffice,
   SavedPractitioner,
   SavedTask,
   SearchDocument,
-  validStatusMapping,
-  IOperationHistory,
-  findAllTasks
+  validStatusMapping
 } from '@opencrvs/commons/types'
 import { findName } from '@search/features/fhir/fhir-utils'
+import fetch from 'node-fetch'
 
 const client = getOrCreateClient()
 
@@ -173,24 +169,6 @@ export interface IUserModelData {
   _id: string
   role: IUserRole
   name: fhir.HumanName[]
-}
-
-export async function detectBirthDuplicates(
-  compositionId: string,
-  body: BirthDocument
-) {
-  const searchResponse = await searchForBirthDuplicates(body, client)
-  const duplicates = findDuplicateIds(searchResponse)
-  return duplicates
-}
-
-export async function detectDeathDuplicates(
-  compositionId: string,
-  body: DeathDocument
-) {
-  const searchResponse = await searchForDeathDuplicates(body, client)
-  const duplicates = findDuplicateIds(searchResponse)
-  return duplicates
 }
 
 export async function getCreatedBy(compositionId: string) {

@@ -12,17 +12,7 @@
 import * as Hapi from '@hapi/hapi'
 import { ValidRecord } from '@opencrvs/commons/types'
 
-import { deleteRecord, indexRecord } from './service'
-
-export async function deleteRecordByIdHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const recordId = request.params.recordId
-
-  await deleteRecord(recordId)
-  return h.response().code(200)
-}
+import { indexRecord } from './service'
 
 export async function recordHandler(
   request: Hapi.Request,
