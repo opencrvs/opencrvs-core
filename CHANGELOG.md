@@ -2,12 +2,18 @@
 
 ## 1.6.0 (TBD)
 
+## Improvements
+
+- Fetch child identifier in view record
+
 ### New features
 
 - Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
 - Logged in user details handlebar `loggedInUser` [#6529](https://github.com/opencrvs/opencrvs-core/issues/6529)
 - Supporting document fields can now be made required
 - If there is only one option in the document uploader select, then it stays hidden and only the upload button is showed with the only option being selected by default
+- Allow configuring the default search criteria for record search [#6924](https://github.com/opencrvs/opencrvs-core/issues/6924)
+- Add checks to validate client and server are always on the same version. This prevents browsers with a cached or outdated client versions from making potentially invalid requests to the backend [#6695](https://github.com/opencrvs/opencrvs-core/issues/6695)
 
 - #### ElasticSearch reindexing
 
@@ -52,6 +58,10 @@
 }
 ```
 
+### New features
+
+- **Conditional filtering for document select options** The select options for the DOCUMENT_UPLOADER_WITH_OPTION field can now be conditionally filtered similar to the SELECT_WITH_OPTIONS field using the `optionCondition` field
+
 ## 1.5.1
 
 ## Improvements
@@ -66,6 +76,7 @@
 - When a declaration(birth/death) is created the event location information was not being parsed to ElasticSearch which caused the Advanced search feature to not work when searching for records by event location.[7494](https://github.com/opencrvs/opencrvs-core/issues/7494)
 - When any user's role was updated, incorrect role was shown for that user's actions in the history section of a declaration's record audit page. [#7495](https://github.com/opencrvs/opencrvs-core/issues/7495)
 - Registration agent was unable to download declarations that were previously corrected by registrar. [#7582](https://github.com/opencrvs/opencrvs-core/issues/7582)
+- When a user updates a marriage declaration editing the signature of the bride, groom, witness one or witness two, handle the changed value of the signature properly. [#7462](https://github.com/opencrvs/opencrvs-core/issues/7462)
 
 ## 1.5.0 (TBD)
 
@@ -171,6 +182,7 @@ Allows reindexing ElasticSearch via a new search-service endpoint `reindex`. We'
 - Update Content-Security-Policy to allow loading fonts from country configuration [#7296](https://github.com/opencrvs/opencrvs-core/pull/7296)
 - Fix frontend crashing on 'Registration by Status' under performance due to missing translations [#7129](https://github.com/opencrvs/opencrvs-core/pull/7129)
 - Fix email of practitioner to be saved in hearth. A migration is added to correct the email of practitoiner in existing db. [7315](https://github.com/opencrvs/opencrvs-core/pull/7315)
+- Fix inaccessible and only partly visible "Edit" button in "Advanced Search" - feature's date range list [7485](https://github.com/opencrvs/opencrvs-core/pull/7485)
 
 ## Refactor
 
