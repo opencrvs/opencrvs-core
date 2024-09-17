@@ -234,7 +234,7 @@ done
 
 ###
 #
-# Check Docker version for 'docker compose'
+# Check if Docker Compose exists 
 #
 ###
 
