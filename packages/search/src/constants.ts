@@ -21,7 +21,6 @@ const env = cleanEnv(process.env, {
   SENTRY_DSN: str({ default: '' }),
   OPENCRVS_INDEX_NAME: str({ default: 'ocrvs' }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
-
   APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   HEARTH_MONGO_URL: url({ devDefault: 'mongodb://localhost/hearth-dev' }),
   REDIS_HOST: str({ devDefault: 'localhost' })

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IAuthHeader } from './http'
+import { IAuthHeader, PlainToken } from './http'
 import * as decode from 'jwt-decode'
 
 /** All the scopes user can be assigned to */
@@ -96,7 +96,7 @@ export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
-export function getScopes(token: string) {
+export function getScopes(token: PlainToken) {
   const tokenPayload = getTokenPayload(token)
   return tokenPayload.scope
 }

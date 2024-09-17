@@ -771,7 +771,10 @@ export async function toCorrectionRequested(
   )
 }
 
-export async function toUnassigned(record: ValidRecord, token: string) {
+export async function toUnassigned<T extends ValidRecord>(
+  record: T,
+  token: string
+) {
   const previousTask = getTaskFromSavedBundle(record)
   const unassignedTask = await createUnassignedTask(previousTask, token)
 
@@ -788,7 +791,7 @@ export async function toUnassigned(record: ValidRecord, token: string) {
   const unassignedRecord = {
     ...record,
     entry: [...filteredEntriesWithoutTask, newTaskEntry]
-  } as ValidRecord
+  } as T
 
   const unassignedRecordWithTaskOnly: Bundle<SavedTask> = {
     resourceType: 'Bundle',

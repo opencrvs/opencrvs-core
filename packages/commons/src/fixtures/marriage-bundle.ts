@@ -323,7 +323,7 @@ export const MARRIAGE_BUNDLE: Saved<
           {
             use: 'en',
             given: ['george'],
-            family: ['test']
+            family: 'test'
           }
         ],
         birthDate: '1999-11-13',
@@ -430,7 +430,7 @@ export const MARRIAGE_BUNDLE: Saved<
           {
             use: 'en',
             given: ['genie'],
-            family: ['test']
+            family: 'test'
           }
         ],
         birthDate: '2001-02-22',
@@ -605,7 +605,7 @@ export const MARRIAGE_BUNDLE: Saved<
           {
             use: 'en',
             given: ['wit'],
-            family: ['one']
+            family: 'one'
           }
         ],
         meta: {
@@ -625,7 +625,7 @@ export const MARRIAGE_BUNDLE: Saved<
           {
             use: 'en',
             given: ['wit'],
-            family: ['two']
+            family: 'two'
           }
         ],
         meta: {

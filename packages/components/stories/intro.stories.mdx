@@ -3,6 +3,7 @@ import { Pill } from '@opencrvs/components/lib/Pill'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { version } from '../package.json'
 
 <Meta
   title="Introduction"
@@ -32,7 +33,7 @@ export const ExternalLinkIcon = () => (
   </svg>
 )
 
-<Pill label="v 1.5.0" type="default" size="small" />
+<Pill label={`v ${version}`} type="default" size="small" />
 <br />
 <br />
 

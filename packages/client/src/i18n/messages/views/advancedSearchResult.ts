@@ -17,6 +17,7 @@ export type IAdvancedSearchResultMessages = {
   regNumber: MessageDescriptor
   trackingId: MessageDescriptor
   regDate: MessageDescriptor
+  timePeriodFrom: MessageDescriptor
   eventLocation: MessageDescriptor
   regLocation: MessageDescriptor
   childFirstName: MessageDescriptor
@@ -73,6 +74,11 @@ const messagesToDefine: IAdvancedSearchResultMessages = {
     description:
       'The label for  registration date in active advancedSearchParams',
     id: 'advancedSearchResult.pill.regDate'
+  },
+  timePeriodFrom: {
+    defaultMessage: 'Time period',
+    description: 'The label for time period in active advancedSearchParams',
+    id: 'advancedSearchResult.pill.timePeriod'
   },
   eventLocation: {
     defaultMessage: 'Event location',

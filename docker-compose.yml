@@ -35,15 +35,6 @@ services:
     depends_on:
       - base
 
-  components:
-    image: opencrvs/ocrvs-components:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/components/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
   login:
     image: opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64

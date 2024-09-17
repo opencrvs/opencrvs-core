@@ -70,6 +70,31 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
   return certificateDetails
 }
 
+function isPresignedUrl(url: string) {
+  return url.startsWith('http')
+}
+
+function getCanonicalAttachmentURL(url: string) {
+  const parsedUrl = new URL(url)
+  const filePath = parsedUrl.pathname
+
+  return filePath
+}
+
+function uploadOrNormaliseSignatureData(
+  signature: string,
+  authHeader: IAuthHeader
+) {
+  if (isBase64FileString(signature)) {
+    return uploadBase64ToMinio(signature, authHeader)
+  }
+
+  if (isPresignedUrl(signature)) {
+    return getCanonicalAttachmentURL(signature)
+  }
+  return signature
+}
+
 export async function uploadBase64AttachmentsToDocumentsStore(
   record: BirthRegistration | DeathRegistration | MarriageRegistration,
   authHeader: IAuthHeader
@@ -77,50 +102,38 @@ export async function uploadBase64AttachmentsToDocumentsStore(
   /*
    * @todo input schema and target all AttachmentInput types automatically
    */
-  if (
-    record.registration?.informantsSignature &&
-    isBase64FileString(record.registration?.informantsSignature)
-  ) {
-    record.registration.informantsSignature = await uploadBase64ToMinio(
-      record.registration.informantsSignature,
-      authHeader
-    )
+  if (record.registration?.informantsSignature) {
+    record.registration.informantsSignature =
+      await uploadOrNormaliseSignatureData(
+        record.registration.informantsSignature,
+        authHeader
+      )
   }
-  if (
-    record.registration?.groomSignature &&
-    isBase64FileString(record.registration?.groomSignature)
-  ) {
-    record.registration.groomSignature = await uploadBase64ToMinio(
+  if (record.registration?.groomSignature) {
+    record.registration.groomSignature = await uploadOrNormaliseSignatureData(
       record.registration.groomSignature,
       authHeader
     )
   }
-  if (
-    record.registration?.brideSignature &&
-    isBase64FileString(record.registration?.brideSignature)
-  ) {
-    record.registration.brideSignature = await uploadBase64ToMinio(
+  if (record.registration?.brideSignature) {
+    record.registration.brideSignature = await uploadOrNormaliseSignatureData(
       record.registration.brideSignature,
       authHeader
     )
   }
-  if (
-    record.registration?.witnessOneSignature &&
-    isBase64FileString(record.registration?.witnessOneSignature)
-  ) {
-    record.registration.witnessOneSignature = await uploadBase64ToMinio(
-      record.registration.witnessOneSignature,
-      authHeader
-    )
+  if (record.registration?.witnessOneSignature) {
+    record.registration.witnessOneSignature =
+      await uploadOrNormaliseSignatureData(
+        record.registration.witnessOneSignature,
+        authHeader
+      )
   }
-  if (
-    record.registration?.witnessTwoSignature &&
-    isBase64FileString(record.registration?.witnessTwoSignature)
-  ) {
-    record.registration.witnessTwoSignature = await uploadBase64ToMinio(
-      record.registration.witnessTwoSignature,
-      authHeader
-    )
+  if (record.registration?.witnessTwoSignature) {
+    record.registration.witnessTwoSignature =
+      await uploadOrNormaliseSignatureData(
+        record.registration.witnessTwoSignature,
+        authHeader
+      )
   }
   if (record.registration?.attachments) {
     for (const attachment of record.registration.attachments) {

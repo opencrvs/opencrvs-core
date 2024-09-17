@@ -176,7 +176,7 @@ export const up = async (db: Db, client: MongoClient) => {
     }
     /* ==============Create a new userroles collection============== */
 
-    await db.createCollection('userroles')
+    await createCollectionIfDoesNotExist(db, 'userroles')
 
     const userRolesResult = await db.collection('userroles').insertMany(
       UserRoles.map((userRole) => ({
@@ -262,7 +262,7 @@ export const up = async (db: Db, client: MongoClient) => {
       await db.collection('roles').rename('systemroles')
     } else {
       //create a new 'systemroles' collection
-      await db.createCollection('systemroles')
+      await createCollectionIfDoesNotExist(db, 'systemroles')
 
       //insert all system roles to 'systemroles' collection
       await db.collection('systemroles').insertMany(
@@ -289,7 +289,8 @@ export const down = async (db: Db, client: MongoClient) => {
   try {
     /* ==============Drop collection userroles============== */
 
-    await db.dropCollection('userroles')
+    if (await checkIfCollectionExists(db, 'userroles'))
+      await db.dropCollection('userroles')
 
     /* ==============Migration for "users" Collection============== */
 
@@ -351,4 +352,23 @@ export async function getTotalDocCountByCollectionName(
 
 export async function getUserCursor(db: Db, limit = 50, skip = 0) {
   return db.collection('users').find({}, { limit, skip })
+}
+
+async function createCollectionIfDoesNotExist(db: Db, collectionName: string) {
+  const collectionExists = await checkIfCollectionExists(db, collectionName)
+
+  if (!collectionExists) {
+    await db.createCollection(collectionName)
+    console.log(`${collectionName} collection created`)
+  } else {
+    console.log(`${collectionName} collection already exists`)
+  }
+}
+
+async function checkIfCollectionExists(db: Db, collectionName: string) {
+  const collectionExists = await db
+    .listCollections({ name: collectionName })
+    .hasNext()
+
+  return collectionExists
 }

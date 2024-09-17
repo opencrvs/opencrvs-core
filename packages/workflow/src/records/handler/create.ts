@@ -21,7 +21,9 @@ import {
   Bundle,
   changeState,
   DeathRegistration,
+  Encounter,
   EVENT_TYPE,
+  findEncounterFromRecord,
   getComposition,
   getCompositionIdFromTask,
   getTaskFromSavedBundle,
@@ -33,8 +35,10 @@ import {
   isTask,
   isValidated,
   isWaitingExternalValidation,
+  Location,
   MarriageRegistration,
   ReadyForReviewRecord,
+  Saved,
   StateIdenfitiers,
   ValidatedRecord,
   WaitingForValidationRecord
@@ -50,6 +54,7 @@ import {
 } from '@workflow/records/audit'
 import {
   findTaskFromIdentifier,
+  getLocationsById,
   mergeBundles,
   sendBundleToHearth,
   toSavedBundle,
@@ -58,13 +63,6 @@ import {
 
 import { useExternalValidationQueue } from '@opencrvs/commons/message-queue'
 import { REDIS_HOST } from '@workflow/constants'
-import {
-  findDuplicateIds,
-  hasSameDuplicatesInExtension,
-  updateCompositionWithDuplicateIds,
-  updateTaskWithDuplicateIds
-} from '@workflow/utils/duplicate-checker'
-import { z } from 'zod'
 import { getRecordById } from '@workflow/records'
 import {
   isNotificationEnabled,
@@ -75,6 +73,13 @@ import {
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
+import {
+  findDuplicateIds,
+  hasSameDuplicatesInExtension,
+  updateCompositionWithDuplicateIds,
+  updateTaskWithDuplicateIds
+} from '@workflow/utils/duplicate-checker'
+import { z } from 'zod'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -149,6 +154,35 @@ function createInProgressOrReadyForReviewTask(
   }
 }
 
+async function resolveLocationsForEncounter(
+  encounter: Encounter
+): Promise<Bundle<Location> | null> {
+  if (encounter.location == null) {
+    return null
+  }
+  const locationIds: Array<string> = []
+  for (const { location } of encounter.location) {
+    locationIds.push(location.reference.split('/')[1])
+  }
+  return getLocationsById(locationIds)
+}
+
+function bundleIncludesLocationResources(record: Saved<Bundle>) {
+  const encounter = findEncounterFromRecord(record)
+  const encounterLocationIds =
+    encounter?.location?.map(
+      ({ location }) => location.reference.split('/')[1]
+    ) || []
+
+  const bundleLocations = record.entry.filter(
+    ({ resource }) => resource.resourceType == 'Location'
+  )
+
+  return encounterLocationIds.every((locationId) =>
+    bundleLocations.some((location) => location.id === locationId)
+  )
+}
+
 type CreatedRecord =
   | InProgressRecord
   | ReadyForReviewRecord
@@ -208,7 +242,23 @@ async function createRecord<T = InProgressRecord | ReadyForReviewRecord>(
   const savedBundle = toSavedBundle(inputBundle, responseBundle)
 
   const mergedBundle = mergeBundles(savedBundle, practitionerResourcesBundle)
-  return mergedBundle as T
+
+  const encounter = findEncounterFromRecord(savedBundle)
+  if (encounter == null) {
+    return mergedBundle as T
+  }
+
+  if (bundleIncludesLocationResources(savedBundle)) {
+    return mergedBundle as T
+  }
+
+  const locationResourcesBundle = await resolveLocationsForEncounter(encounter)
+
+  if (locationResourcesBundle == null) {
+    return mergedBundle as T
+  }
+
+  return mergeBundles(mergedBundle, locationResourcesBundle) as T
 }
 
 function getEventAction(record: ValidatedRecord): 'sent-for-approval'

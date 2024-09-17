@@ -69,14 +69,12 @@ export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   const language = getDefaultLanguage()
   const name = fhirNames.find((humanName: OpenCRVSPatientName) => {
     return humanName.use === language
-  }) as (Omit<fhir3.HumanName, 'family'> & { family?: string[] }) | undefined
+  })
 
   if (!name) {
     throw new Error(`Didn't found informant's ${language} name`)
   }
-  return [...(name.given ?? []), ...(name.family ?? [])]
-    .filter(Boolean)
-    .join(' ')
+  return [...(name.given ?? []), name.family].filter(Boolean).join(' ')
 }
 
 export function getTrackingId(fhirBundle: Bundle) {
