@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { NOTIFICATION_SERVICE_URL, JWT_ISSUER } from '@auth/constants'
+import { JWT_ISSUER } from '@auth/constants'
+import { env } from '@auth/environment'
 import { resolve } from 'url'
 import { IUserName, createToken } from '@auth/features/authenticate/service'
 
@@ -19,7 +20,7 @@ export async function sendUserName(
   mobile?: string,
   email?: string
 ) {
-  const url = resolve(NOTIFICATION_SERVICE_URL, '/retrieveUserName')
+  const url = resolve(env.NOTIFICATION_SERVICE_URL, '/retrieveUserName')
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({ msisdn: mobile, email, username, userFullName }),
