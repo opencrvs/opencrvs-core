@@ -2,6 +2,10 @@
 
 ## 1.6.0 (TBD)
 
+## Improvements
+
+- Fetch child identifier in view record
+
 ### New features
 
 - Certificate handlebar for registration fees `registrationFees` [#6817](https://github.com/opencrvs/opencrvs-core/issues/6817)
