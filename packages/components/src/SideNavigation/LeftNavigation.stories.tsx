@@ -18,11 +18,7 @@ import { NavigationGroup } from './NavigationGroup'
 import { NavigationItem } from './NavigationItem'
 
 export const SideNav = () => (
-  <LeftNavigation
-    applicationName="OpenCRVS"
-    applicationVersion="1.1.0"
-    buildVersion="Development"
-  >
+  <LeftNavigation applicationName="OpenCRVS" applicationVersion="1.1.0">
     <NavigationGroup>
       <NavigationItem
         icon={() => <DeclarationIconSmall color={'purple'} />}
