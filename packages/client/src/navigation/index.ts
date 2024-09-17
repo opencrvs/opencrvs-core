@@ -49,7 +49,6 @@ import {
   PERFORMANCE_STATISTICS,
   PERFORMANCE_DASHBOARD,
   ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
@@ -155,10 +154,6 @@ export function goForward() {
 
 export function goToHome() {
   return push(HOME)
-}
-
-export function goToInformantNotification() {
-  return push(INFORMANT_NOTIFICATION)
 }
 
 export function goToAllUserEmail() {
