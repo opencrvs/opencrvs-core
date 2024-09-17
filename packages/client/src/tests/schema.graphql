@@ -1045,7 +1045,6 @@ type Mutation {
     details: MarriageRegistrationInput!
   ): ID!
   createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
-  updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
     id: ID!
     details: BirthRegistrationInput
@@ -1128,12 +1127,6 @@ type Mutation {
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
   updateRole(systemRole: SystemRoleInput): Response!
-  createOrUpdateCertificateSVG(
-    certificateSVG: CertificateSVGInput!
-  ): CertificateSVG
-  updateApplicationConfig(
-    applicationConfig: ApplicationConfigurationInput
-  ): ApplicationConfiguration
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -1146,9 +1139,6 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
-  toggleInformantSMSNotification(
-    smsNotifications: [SMSNotificationInput!]
-  ): [SMSNotification!]
 }
 
 type Notification {

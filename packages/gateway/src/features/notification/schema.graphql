@@ -37,23 +37,10 @@ type NotificationResult {
 }
 
 type Query {
-  listNotifications(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-  ): [Notification]
   sendNotificationToAllUsers(
     subject: String!
     body: String!
     locale: String!
     type: NotificationType = EMAIL
   ): NotificationResult
-}
-
-type Mutation {
-  # Notification as a separate entity as they can be capture by a 3rd party and may be unreliable
-  createNotification(details: NotificationInput!): Notification!
-  voidNotification(id: ID!): Notification
 }
