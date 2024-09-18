@@ -8,25 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createServerWithEnvironment } from '@auth/tests/util'
+import { createProductionEnvironmentServer } from '@auth/tests/util'
 
 describe('authenticate handler receives a request', () => {
   let server: any
 
   beforeEach(async () => {
-    server = await createServerWithEnvironment({
-      NODE_ENV: 'production',
-      AUTH_HOST: '0.0.0.0',
-      AUTH_PORT: '4040',
-      CLIENT_APP_URL: 'http://localhost:3000/',
-      COUNTRY_CONFIG_URL: 'http://localhost:3040/',
-      DOMAIN: '*',
-      LOGIN_URL: 'http://localhost:3020/',
-      METRICS_URL: 'http://localhost:1050',
-      NOTIFICATION_SERVICE_URL: 'http://localhost:2020/',
-      REDIS_HOST: 'localhost',
-      USER_MANAGEMENT_URL: 'http://localhost:3030/'
-    })
+    server = await createProductionEnvironmentServer()
   })
 
   describe('user management service says credentials are valid', () => {

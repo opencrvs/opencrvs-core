@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetchAny from 'jest-fetch-mock'
-import { createServerWithEnvironment } from '@auth/tests/util'
+import { createProductionEnvironmentServer } from '@auth/tests/util'
 import * as codeService from '@auth/features/verifyCode/service'
 import { createServer } from '@auth/server'
 
@@ -66,19 +66,7 @@ describe('verifyUser handler receives a request', () => {
       expect(JSON.parse(res.payload).nonce).toBe('12345')
     })
     it('generates a mobile verification code and sends it to notification gateway', async () => {
-      server = await createServerWithEnvironment({
-        NODE_ENV: 'production',
-        AUTH_HOST: '0.0.0.0',
-        AUTH_PORT: '4040',
-        CLIENT_APP_URL: 'http://localhost:3000/',
-        COUNTRY_CONFIG_URL: 'http://localhost:3040/',
-        DOMAIN: '*',
-        LOGIN_URL: 'http://localhost:3020/',
-        METRICS_URL: 'http://localhost:1050',
-        NOTIFICATION_SERVICE_URL: 'http://localhost:2020/',
-        REDIS_HOST: 'localhost',
-        USER_MANAGEMENT_URL: 'http://localhost:3030/'
-      })
+      server = await createProductionEnvironmentServer()
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const reloadedCodeService = require('../../verifyCode/service')
