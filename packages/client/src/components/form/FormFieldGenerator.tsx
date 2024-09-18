@@ -95,7 +95,8 @@ import {
   HTTP,
   InitialValue,
   DependencyInfo,
-  Ii18nButtonFormField
+  Ii18nButtonFormField,
+  REDIRECT
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -145,6 +146,7 @@ import {
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
+import { RedirectField } from '@client/components/form/Redirect'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -634,6 +636,16 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
           />
         </InputField>
+      )
+    }
+
+    if (fieldDefinition.type === REDIRECT) {
+      return (
+        <RedirectField
+          to={fieldDefinition.options.url}
+          form={values}
+          draft={draftData}
+        />
       )
     }
 

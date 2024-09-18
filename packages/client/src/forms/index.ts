@@ -747,7 +747,6 @@ export interface IButtonFormField extends IFormFieldBase {
 export interface IRedirectFormField extends IFormFieldBase {
   type: typeof REDIRECT
   options: {
-    trigger: string
     url: string
   }
 }
@@ -1270,7 +1269,6 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
 export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   type: typeof REDIRECT
   options: {
-    trigger: string
     url: string
   }
 }
