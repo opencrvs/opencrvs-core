@@ -12,10 +12,7 @@ import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 import { EVENT_TYPE, ValidRecord } from '@opencrvs/commons/types'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
-import {
-  getInformantSMSNotification,
-  InformantNotificationName
-} from '@workflow/features/registration/sms-notification-utils'
+import { getInformantSMSNotification } from '@workflow/features/registration/sms-notification-utils'
 import { internal } from '@hapi/boom'
 import { RecordEvent } from './record-events'
 
@@ -60,37 +57,7 @@ async function getNotificationFlags(token: string) {
   try {
     return await getInformantSMSNotification(token)
   } catch {
-    return []
-  }
-}
-
-/** If the mapping is null, the notification is not enabled and won't be sent. */
-const MAPPING: Record<
-  EVENT_TYPE,
-  Record<NotificationEvent, InformantNotificationName | null>
-> = {
-  [EVENT_TYPE.BIRTH]: {
-    'sent-notification': InformantNotificationName.birthInProgressSMS,
-    'sent-notification-for-review':
-      InformantNotificationName.birthDeclarationSMS,
-    'sent-for-approval': InformantNotificationName.birthDeclarationSMS,
-    registered: InformantNotificationName.birthRegistrationSMS,
-    'sent-for-updates': InformantNotificationName.birthRejectionSMS
-  },
-  [EVENT_TYPE.DEATH]: {
-    'sent-notification': InformantNotificationName.deathInProgressSMS,
-    'sent-notification-for-review':
-      InformantNotificationName.deathDeclarationSMS,
-    'sent-for-approval': InformantNotificationName.deathDeclarationSMS,
-    registered: InformantNotificationName.deathRegistrationSMS,
-    'sent-for-updates': InformantNotificationName.deathRejectionSMS
-  },
-  [EVENT_TYPE.MARRIAGE]: {
-    'sent-notification': null,
-    'sent-notification-for-review': null,
-    'sent-for-approval': null,
-    registered: null,
-    'sent-for-updates': null
+    return {}
   }
 }
 
@@ -99,11 +66,6 @@ export async function isNotificationEnabled(
   event: EVENT_TYPE,
   token: string
 ) {
-  if (MAPPING[event][action] === null) return false
-
   const notificationFlags = await getNotificationFlags(token)
-  return (
-    notificationFlags.find(({ name }) => name === MAPPING[event][action])
-      ?.enabled ?? false
-  )
+  return notificationFlags?.[event]?.[action] ?? false
 }
