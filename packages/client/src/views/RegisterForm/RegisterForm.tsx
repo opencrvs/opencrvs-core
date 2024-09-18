@@ -58,7 +58,7 @@ import {
   IFormFieldValue,
   SubmissionAction
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -314,7 +314,7 @@ function FormAppBar({
     }
     const [exitModalTitle, exitModalDescription] =
       isCorrection(declaration) ||
-      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+      declaration.registrationStatus === RegStatus.CorrectionRequested
         ? [
             intl.formatMessage(
               messages.exitWithoutSavingModalForCorrectionRecordTitle
@@ -452,7 +452,7 @@ function FormAppBar({
                 {!duplicate &&
                   !isCorrection(declaration) &&
                   declaration.registrationStatus !==
-                    SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                    RegStatus.CorrectionRequested && (
                     <>
                       <Button
                         id="save-exit-btn"
