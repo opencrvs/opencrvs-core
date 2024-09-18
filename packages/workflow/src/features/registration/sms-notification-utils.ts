@@ -13,11 +13,11 @@ import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 
 type EventNotificationFlags = {
-  'sent-notification': boolean
-  'sent-notification-for-review': boolean
-  'sent-for-approval': boolean
-  registered: boolean
-  'sent-for-updates': boolean
+  'sent-notification'?: boolean
+  'sent-notification-for-review'?: boolean
+  'sent-for-approval'?: boolean
+  registered?: boolean
+  'sent-for-updates'?: boolean
 }
 
 type NotificationFlags = {
