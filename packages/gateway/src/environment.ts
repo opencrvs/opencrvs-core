@@ -13,7 +13,7 @@ import { cleanEnv, str, port, url, bool, num } from 'envalid'
 export const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
   HOST: str({ devDefault: '0.0.0.0' }),
-  PORT: port({ devDefault: 7070 }),
+  PORT: port({ default: 7070 }),
   DOMAIN: str({ devDefault: '*' }),
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
@@ -43,9 +43,9 @@ export const env = cleanEnv(process.env, {
   }),
   LANGUAGES: str({ devDefault: 'bn,en' }),
   COUNTRY: str({ devDefault: 'FAR' }),
-  CONFIG_TOKEN_EXPIRY_SECONDS: num({ devDefault: 604800 }), // 1 week
-  CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ devDefault: 600 }), // 10 minutes
-  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ devDefault: 600 }), // 10 minutes
+  CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
+  CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
+  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   MINIO_BUCKET: str({ devDefault: 'ocrvs' }),
 
   NATIONAL_ID_OIDP_BASE_URL: str({ default: undefined }),

@@ -13,7 +13,7 @@ import { bool, cleanEnv, port, str, url } from 'envalid'
 export const env = cleanEnv(process.env, {
   MONGO_URL: str({ devDefault: 'mongodb://localhost/webhooks' }),
   HOST: str({ devDefault: '0.0.0.0' }),
-  PORT: port({ devDefault: 2525 }),
+  PORT: port({ default: 2525 }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
