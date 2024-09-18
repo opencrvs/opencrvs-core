@@ -18,6 +18,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: ${{ inputs.pr_number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     if: ${{ !contains(github.actor, 'bot') }}
@@ -71,7 +75,8 @@ jobs:
                 .replace(/[^\w\s-]/g, '')
                 .trim()
                 .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
+                .replace(/-+/g, '-')
+                .substr(0, 35);
             }
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
@@ -121,7 +126,8 @@ jobs:
                 .replace(/[^\w\s-]/g, '')
                 .trim()
                 .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
+                .replace(/-+/g, '-')
+                .substr(0, 35);
             }
             const branchName = slugify('${{ env.BRANCH_NAME }}');
             const deployMessage = `Your environment is deployed to https://${branchName}.opencrvs.dev.`;
