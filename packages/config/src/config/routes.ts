@@ -10,7 +10,6 @@
  */
 import {
   createCertificateHandler,
-  deleteCertificateHandler,
   getActiveCertificatesHandler,
   getCertificateHandler,
   requestActiveCertificate,
@@ -19,17 +18,8 @@ import {
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
-  getLoginConfigHandler,
-  updateApplicationConfig,
-  updateApplicationConfigHandler
+  getLoginConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
-import createInformantSMSNotificationHandler, {
-  requestSchema as createInformantSMSNotificationReqSchema
-} from '@config/handlers/informantSMSNotifications/createInformantSMSNotification/handler'
-import getInformantSMSNotificationsHandler from '@config/handlers/informantSMSNotifications/getInformantSMSNotification/handler'
-import updateInformantSMSNotificationHandler, {
-  requestSchema as updateInformantSMSNotificationReqSchema
-} from '@config/handlers/informantSMSNotifications/updateInformantSMSNotification/handler'
 import getSystems from '@config/handlers/system/systemHandler'
 import getForms from '@config/handlers/forms/formsHandler'
 import getDashboardQueries from '@config/handlers/dashboardQueries/dashboardQueries'
@@ -194,82 +184,6 @@ export default function getRoutes(): ServerRoute[] {
         }
       }
     },
-    {
-      method: 'DELETE',
-      path: '/certificate/{certificateId}',
-      handler: deleteCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Delete certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateApplicationConfig',
-      handler: updateApplicationConfigHandler,
-      options: {
-        tags: ['api'],
-        description: 'Updates an existing Config',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: updateApplicationConfig
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/informantSMSNotification',
-      handler: createInformantSMSNotificationHandler,
-      options: {
-        tags: ['api'],
-        description: 'Creates informantSMSNotifications',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: createInformantSMSNotificationReqSchema
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/informantSMSNotification',
-      handler: getInformantSMSNotificationsHandler,
-      options: {
-        tags: ['api'],
-        description: 'Get informantSMSNotifications',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.VALIDATE
-          ]
-        }
-      }
-    },
-    {
-      method: 'PUT',
-      path: '/informantSMSNotification',
-      handler: updateInformantSMSNotificationHandler,
-      options: {
-        tags: ['api'],
-        description: 'Update informantSMSNotification',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: updateInformantSMSNotificationReqSchema
-        }
-      }
-    },
-
     {
       method: 'GET',
       path: '/dashboardQueries',
