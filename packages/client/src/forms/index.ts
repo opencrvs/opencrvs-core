@@ -739,8 +739,10 @@ export interface IButtonFormField extends IFormFieldBase {
   type: typeof BUTTON
   icon?: IconProps['name']
   buttonLabel: MessageDescriptor
+  loadingLabel?: MessageDescriptor
   options: {
     trigger: string
+    shouldHandleLoadingState?: boolean
   }
 }
 
@@ -1261,8 +1263,10 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   type: typeof BUTTON
   icon?: IconProps['name']
   buttonLabel: string
+  loadingLabel?: string
   options: {
     trigger: string
+    shouldHandleLoadingState?: boolean
   }
 }
 

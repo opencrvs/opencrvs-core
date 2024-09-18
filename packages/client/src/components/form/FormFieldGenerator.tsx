@@ -33,8 +33,7 @@ import {
   getFieldHelperText,
   isInitialValueDependencyInfo,
   getDependentFields,
-  evalExpressionInFieldDefinition,
-  handleUnsupportedIcon
+  evalExpressionInFieldDefinition
 } from '@client/forms/utils'
 import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -136,13 +135,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { useOnlineStatus } from '@client/utils'
 import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
-import {
-  BulletList,
-  Divider,
-  Icon,
-  InputLabel,
-  Stack
-} from '@opencrvs/components'
+import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
@@ -697,8 +690,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     if (fieldDefinition.type === BUTTON) {
-      const { icon, buttonLabel } = fieldDefinition as Ii18nButtonFormField
-      const supportedIcon = handleUnsupportedIcon(icon)
       return (
         <InputField {...inputFieldProps}>
           <ButtonField
@@ -708,12 +699,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             draftData={draftData}
             setFieldValue={onSetFieldValue}
             disabled={disabled}
-          >
-            {supportedIcon && (
-              <Icon color="currentColor" name={supportedIcon} size="large" />
-            )}
-            {buttonLabel}
-          </ButtonField>
+          />
         </InputField>
       )
     }

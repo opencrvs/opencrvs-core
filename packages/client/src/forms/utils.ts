@@ -203,6 +203,11 @@ export const internationaliseFieldObject = (
     ;(base as Ii18nButtonFormField).buttonLabel = intl.formatMessage(
       field.buttonLabel
     )
+    if (field.loadingLabel) {
+      ;(base as Ii18nButtonFormField).loadingLabel = intl.formatMessage(
+        field.loadingLabel
+      )
+    }
   }
 
   return base as Ii18nFormField
