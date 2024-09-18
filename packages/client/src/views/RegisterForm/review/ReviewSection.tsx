@@ -1102,7 +1102,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         .map((field) =>
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
-        .filter((value) => value)
+        .filter((value) => value.props.children)
       let completeValue = values[0]
       values.shift()
       values.forEach(
@@ -1146,7 +1146,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               true
             )
           )
-          .filter((value) => value)
+          .filter((value) => value.props.children)
         let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
         previousValues.shift()
         previousValues.forEach(
