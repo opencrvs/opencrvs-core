@@ -18,6 +18,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: ${{ inputs.pr_number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     if: ${{ !contains(github.actor, 'bot') }}
