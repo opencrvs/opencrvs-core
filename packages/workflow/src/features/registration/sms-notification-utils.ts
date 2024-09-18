@@ -12,14 +12,12 @@ import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 
-type NotificationStatus = boolean | null
-
 type EventNotificationFlags = {
-  'sent-notification': NotificationStatus
-  'sent-notification-for-review': NotificationStatus
-  'sent-for-approval': NotificationStatus
-  registered: NotificationStatus
-  'sent-for-updates': NotificationStatus
+  'sent-notification': boolean
+  'sent-notification-for-review': boolean
+  'sent-for-approval': boolean
+  registered: boolean
+  'sent-for-updates': boolean
 }
 
 type NotificationFlags = {
