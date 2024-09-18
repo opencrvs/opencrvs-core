@@ -191,7 +191,6 @@ export const influx = new Influx.InfluxDB({
 
 export async function writePoints(points: IPoints[], trxId?: string) {
   const transactionId = trxId || getUUID()
-  console.log('trxId', trxId)
 
   if (trxId) {
     const measurements = uniq(points.map((point) => point.measurement))
