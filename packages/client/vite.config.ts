@@ -18,6 +18,11 @@ import dns from 'node:dns'
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
 dns.setDefaultResultOrder('ipv4first')
 
+if (process.env.NODE_ENV === 'production' && !process.env.COUNTRY_CONFIG_URL) {
+  throw new Error(
+    `Missing environment variable: COUNTRY_CONFIG_URL. Please set it to your country config URL.`
+  )
+}
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 
@@ -68,16 +73,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    /*
-     * https://github.com/storybookjs/storybook/issues/18920
-     * the issue occurs because of util.js which is a
-     * transitive depedency of storybook. I think it might
-     * be a good idea to separate components and storybook
-     * in that case because possibly storybook is getting
-     * included in components bundle
-     */
     define: {
-      'process.env': {},
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
     // This changes the output dir from dist to build
