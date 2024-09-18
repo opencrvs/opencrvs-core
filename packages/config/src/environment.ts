@@ -23,14 +23,9 @@ export const env = cleanEnv(process.env, {
   }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ devDefault: undefined }),
-
-  GATEWAY_URL: url({ devDefault: 'http://localhost:7070/' }),
-  SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
-  METRICS_URL: url({ devDefault: 'http://localhost:1050/' }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
   MONGO_URL: url({ devDefault: 'mongodb://localhost/application-config' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050/' }),
   FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' })
 })
