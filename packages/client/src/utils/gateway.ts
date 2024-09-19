@@ -36,6 +36,7 @@ export type Scalars = {
   FieldValue: any
   Map: any
   PlainDate: PlainDate
+  Void: never
 }
 
 export type AdditionalIdWithCompositionId = {
@@ -187,6 +188,7 @@ export type AdvancedSearchParametersInput = {
   deceasedIdentifier?: InputMaybe<Scalars['String']>
   declarationJurisdictionId?: InputMaybe<Scalars['String']>
   declarationLocationId?: InputMaybe<Scalars['String']>
+  draftId?: InputMaybe<Scalars['String']>
   event?: InputMaybe<Event>
   eventCountry?: InputMaybe<Scalars['String']>
   eventLocationId?: InputMaybe<Scalars['String']>
@@ -582,13 +584,6 @@ export type CountryLogo = {
 export type CountryLogoInput = {
   file?: InputMaybe<Scalars['String']>
   fileName?: InputMaybe<Scalars['String']>
-}
-
-export type CreatedIds = {
-  __typename?: 'CreatedIds'
-  compositionId?: Maybe<Scalars['String']>
-  isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
-  trackingId?: Maybe<Scalars['String']>
 }
 
 export type Currency = {
@@ -1130,11 +1125,11 @@ export type Mutation = {
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
-  createBirthRegistration: CreatedIds
+  createBirthRegistration: Scalars['Void']
   createBirthRegistrationCorrection: Scalars['ID']
-  createDeathRegistration: CreatedIds
+  createDeathRegistration: Scalars['Void']
   createDeathRegistrationCorrection: Scalars['ID']
-  createMarriageRegistration: CreatedIds
+  createMarriageRegistration: Scalars['Void']
   createMarriageRegistrationCorrection: Scalars['ID']
   createNotification: Notification
   createOrUpdateCertificateSVG?: Maybe<CertificateSvg>
@@ -1642,6 +1637,7 @@ export type Query = {
   fetchMarriageRegistration?: Maybe<MarriageRegistration>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRecordDetailsForVerification?: Maybe<RecordDetails>
+  fetchRecordStatus: RecordStatus
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1711,6 +1707,10 @@ export type QueryFetchMonthWiseEventMetricsArgs = {
 
 export type QueryFetchRecordDetailsForVerificationArgs = {
   id: Scalars['String']
+}
+
+export type QueryFetchRecordStatusArgs = {
+  draftId: Scalars['ID']
 }
 
 export type QueryFetchRegistrationArgs = {
@@ -1935,6 +1935,21 @@ export type QuestionnaireQuestionInput = {
 }
 
 export type RecordDetails = BirthRegistration | DeathRegistration
+
+export type RecordProcessed = {
+  __typename?: 'RecordProcessed'
+  hasPotentialDuplicates: Scalars['Boolean']
+  processed: Scalars['Boolean']
+  recordId: Scalars['ID']
+  trackingId: Scalars['String']
+}
+
+export type RecordProcessing = {
+  __typename?: 'RecordProcessing'
+  processed: Scalars['Boolean']
+}
+
+export type RecordStatus = RecordProcessed | RecordProcessing
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -2509,6 +2524,23 @@ export type CreateOrUpdateCertificateSvgMutation = {
   } | null
 }
 
+export type FetchRecordStatusQueryVariables = Exact<{
+  id: Scalars['ID']
+}>
+
+export type FetchRecordStatusQuery = {
+  __typename?: 'Query'
+  fetchRecordStatus:
+    | {
+        __typename?: 'RecordProcessed'
+        processed: boolean
+        trackingId: string
+        hasPotentialDuplicates: boolean
+        recordId: string
+      }
+    | { __typename?: 'RecordProcessing'; processed: boolean }
+}
+
 export type CreateBirthRegistrationCorrectionMutationVariables = Exact<{
   id: Scalars['ID']
   details: BirthRegistrationInput
@@ -2687,6 +2719,7 @@ export type AdvancedSeachParametersFragment = {
   dateOfEvent?: string | null
   dateOfEventStart?: string | null
   dateOfEventEnd?: string | null
+  timePeriodFrom?: string | null
   contactNumber?: string | null
   nationalId?: string | null
   registrationNumber?: string | null
@@ -2831,6 +2864,7 @@ export type RemoveBookmarkedAdvancedSearchMutation = {
         dateOfEvent?: string | null
         dateOfEventStart?: string | null
         dateOfEventEnd?: string | null
+        timePeriodFrom?: string | null
         contactNumber?: string | null
         nationalId?: string | null
         registrationNumber?: string | null
@@ -3006,6 +3040,7 @@ export type SearchEventsQueryVariables = Exact<{
   sort?: InputMaybe<Scalars['String']>
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
+  sortColumn?: InputMaybe<Scalars['String']>
 }>
 
 export type SearchEventsQuery = {
@@ -3319,12 +3354,7 @@ export type CreateBirthRegistrationMutationVariables = Exact<{
 
 export type CreateBirthRegistrationMutation = {
   __typename?: 'Mutation'
-  createBirthRegistration: {
-    __typename?: 'CreatedIds'
-    trackingId?: string | null
-    compositionId?: string | null
-    isPotentiallyDuplicate?: boolean | null
-  }
+  createBirthRegistration: never
 }
 
 export type MarkBirthAsValidatedMutationVariables = Exact<{
@@ -4088,12 +4118,7 @@ export type CreateDeathRegistrationMutationVariables = Exact<{
 
 export type CreateDeathRegistrationMutation = {
   __typename?: 'Mutation'
-  createDeathRegistration: {
-    __typename?: 'CreatedIds'
-    trackingId?: string | null
-    compositionId?: string | null
-    isPotentiallyDuplicate?: boolean | null
-  }
+  createDeathRegistration: never
 }
 
 export type MarkDeathAsValidatedMutationVariables = Exact<{
@@ -4878,11 +4903,7 @@ export type CreateMarriageRegistrationMutationVariables = Exact<{
 
 export type CreateMarriageRegistrationMutation = {
   __typename?: 'Mutation'
-  createMarriageRegistration: {
-    __typename?: 'CreatedIds'
-    trackingId?: string | null
-    compositionId?: string | null
-  }
+  createMarriageRegistration: never
 }
 
 export type MarkMarriageAsValidatedMutationVariables = Exact<{
@@ -7853,82 +7874,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 
@@ -8182,6 +8197,12 @@ export type FetchViewRecordByCompositionQuery = {
           id?: string | null
           birthDate?: PlainDate | null
           gender?: string | null
+          identifier?: Array<{
+            __typename?: 'IdentityType'
+            id?: string | null
+            type?: string | null
+            otherType?: string | null
+          } | null> | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null

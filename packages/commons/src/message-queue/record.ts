@@ -36,8 +36,16 @@ export type RecordValidatedPayload = {
 }
 
 type Payload =
-  | { event: EVENT_TYPE.BIRTH; payload: BirthRegistration; token: PlainToken }
-  | { event: EVENT_TYPE.DEATH; payload: DeathRegistration; token: PlainToken }
+  | {
+      event: EVENT_TYPE.BIRTH
+      payload: BirthRegistration
+      token: PlainToken
+    }
+  | {
+      event: EVENT_TYPE.DEATH
+      payload: DeathRegistration
+      token: PlainToken
+    }
   | {
       event: EVENT_TYPE.MARRIAGE
       payload: MarriageRegistration

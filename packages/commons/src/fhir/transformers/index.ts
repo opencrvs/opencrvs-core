@@ -63,6 +63,7 @@ import {
   CHILD_CODE,
   CHILD_TITLE,
   CompositionSectionCode,
+  CompositionSectionTitleByCode,
   DECEASED_CODE,
   DECEASED_TITLE,
   EncounterParticipant,
@@ -91,8 +92,7 @@ import {
   WITNESS_TWO_TITLE,
   findExtension,
   getComposition,
-  markSaved,
-  CompositionSectionTitleByCode
+  markSaved
 } from '..'
 import { getUUID } from '../..'
 import { EVENT_TYPE, replaceFromBundle } from '../../record'
@@ -108,7 +108,7 @@ import {
   QuestionnaireQuestion
 } from './input'
 
-import { subYears, format } from 'date-fns'
+import { format, subYears } from 'date-fns'
 type StringReplace<
   T extends string,
   S extends string,

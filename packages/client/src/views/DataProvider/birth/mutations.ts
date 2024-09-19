@@ -19,11 +19,7 @@ import { SubmissionAction } from '@client/forms'
 
 const SUBMIT_BIRTH_DECLARATION = gql`
   mutation createBirthRegistration($details: BirthRegistrationInput!) {
-    createBirthRegistration(details: $details) {
-      trackingId
-      compositionId
-      isPotentiallyDuplicate
-    }
+    createBirthRegistration(details: $details)
   }
 `
 const APPROVE_BIRTH_DECLARATION = gql`

@@ -520,9 +520,7 @@ type RegistrationCountResult {
   total: Int!
 }
 
-type CreatedIds {
-  compositionId: String
-}
+scalar Void
 
 type Reinstated {
   taskEntryResourceID: ID!
@@ -597,7 +595,7 @@ type Mutation {
   ): ID!
 
   # BIRTH
-  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): Void!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   # process transitions
   markBirthAsVerified(
@@ -618,7 +616,7 @@ type Mutation {
     duplicateTrackingId: String
   ): ID! # updates status to 'archived'
   # DEATH
-  createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
+  createDeathRegistration(details: DeathRegistrationInput!): Void!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   # process transitions
   markDeathAsVerified(
@@ -631,7 +629,7 @@ type Mutation {
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'issued' - remove the certificate doc reference
   markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
   #MARRIAGE
-  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  createMarriageRegistration(details: MarriageRegistrationInput!): Void!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markMarriageAsRegistered(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists

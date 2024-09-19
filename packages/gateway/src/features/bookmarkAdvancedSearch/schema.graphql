@@ -83,6 +83,7 @@ input AdvancedSearchParametersInput {
   event: Event
   name: String
   registrationStatuses: [String]
+  draftId: String
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String

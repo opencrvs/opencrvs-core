@@ -47,6 +47,7 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   getUserAuditLog?: GQLUserAuditLogResultSet
+  fetchRecordStatus: GQLRecordStatus
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
@@ -68,7 +69,7 @@ export interface GQLMutation {
   createBirthRegistrationCorrection: string
   createDeathRegistrationCorrection: string
   createMarriageRegistrationCorrection: string
-  createBirthRegistration: GQLCreatedIds
+  createBirthRegistration: GQLVoid
   updateBirthRegistration: string
   markBirthAsVerified?: GQLBirthRegistration
   markBirthAsValidated?: string
@@ -79,7 +80,7 @@ export interface GQLMutation {
   markEventAsReinstated?: GQLReinstated
   markEventAsNotDuplicate: string
   markEventAsArchived: string
-  createDeathRegistration: GQLCreatedIds
+  createDeathRegistration: GQLVoid
   updateDeathRegistration: string
   markDeathAsVerified?: GQLDeathRegistration
   markDeathAsValidated?: string
@@ -87,7 +88,7 @@ export interface GQLMutation {
   markDeathAsCertified: string
   markDeathAsIssued: string
   markEventAsUnassigned: string
-  createMarriageRegistration: GQLCreatedIds
+  createMarriageRegistration: GQLVoid
   markMarriageAsValidated?: string
   markMarriageAsRegistered: string
   markMarriageAsCertified: string
@@ -411,6 +412,19 @@ export interface GQLUserAuditLogResultSet {
   results: Array<GQLUserAuditLogResultItem>
 }
 
+export type GQLRecordStatus = GQLRecordProcessing | GQLRecordProcessed
+
+/** Use this to resolve union type RecordStatus */
+export type GQLPossibleRecordStatusTypeNames =
+  | 'RecordProcessing'
+  | 'RecordProcessed'
+
+export interface GQLRecordStatusNameMap {
+  RecordStatus: GQLRecordStatus
+  RecordProcessing: GQLRecordProcessing
+  RecordProcessed: GQLRecordProcessed
+}
+
 export interface GQLEventSearchResultSet {
   results?: Array<GQLEventSearchSet | null>
   totalItems?: number
@@ -420,6 +434,7 @@ export interface GQLAdvancedSearchParametersInput {
   event?: GQLEvent
   name?: string
   registrationStatuses?: Array<string | null>
+  draftId?: string
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string
@@ -652,9 +667,7 @@ export interface GQLMarriageRegistrationInput {
   updatedAt?: GQLDate
 }
 
-export interface GQLCreatedIds {
-  compositionId?: string
-}
+export type GQLVoid = any
 
 export interface GQLReinstated {
   taskEntryResourceID: string
@@ -1065,6 +1078,17 @@ export interface GQLUserAuditLogResultItemNameMap {
   UserAuditLogResultItem: GQLUserAuditLogResultItem
   UserAuditLogItemWithComposition: GQLUserAuditLogItemWithComposition
   UserAuditLogItem: GQLUserAuditLogItem
+}
+
+export interface GQLRecordProcessing {
+  processed: boolean
+}
+
+export interface GQLRecordProcessed {
+  recordId: string
+  processed: boolean
+  trackingId: string
+  hasPotentialDuplicates: boolean
 }
 
 export interface GQLEventSearchSet {
@@ -1973,6 +1997,10 @@ export interface GQLResolver {
   MonthWiseEstimationMetric?: GQLMonthWiseEstimationMetricTypeResolver
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
   UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
+  RecordStatus?: {
+    __resolveType: GQLRecordStatusTypeResolver
+  }
+
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   SystemRole?: GQLSystemRoleTypeResolver
@@ -1980,7 +2008,7 @@ export interface GQLResolver {
   System?: GQLSystemTypeResolver
   SMSNotification?: GQLSMSNotificationTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
-  CreatedIds?: GQLCreatedIdsTypeResolver
+  Void?: GraphQLScalarType
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   Response?: GQLResponseTypeResolver
@@ -2017,6 +2045,8 @@ export interface GQLResolver {
     __resolveType: GQLUserAuditLogResultItemTypeResolver
   }
 
+  RecordProcessing?: GQLRecordProcessingTypeResolver
+  RecordProcessed?: GQLRecordProcessedTypeResolver
   EventSearchSet?: {
     __resolveType: GQLEventSearchSetTypeResolver
   }
@@ -2100,6 +2130,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
+  fetchRecordStatus?: QueryToFetchRecordStatusResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
@@ -2653,6 +2684,21 @@ export interface QueryToGetUserAuditLogResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetUserAuditLogArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToFetchRecordStatusArgs {
+  draftId: string
+}
+export interface QueryToFetchRecordStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToFetchRecordStatusArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5752,6 +5798,12 @@ export interface UserAuditLogResultSetToResultsResolver<
   ): TResult
 }
 
+export interface GQLRecordStatusTypeResolver<TParent = any> {
+  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+    | 'RecordProcessing'
+    | 'RecordProcessed'
+    | Promise<'RecordProcessing' | 'RecordProcessed'>
+}
 export interface GQLEventSearchResultSetTypeResolver<TParent = any> {
   results?: EventSearchResultSetToResultsResolver<TParent>
   totalItems?: EventSearchResultSetToTotalItemsResolver<TParent>
@@ -6131,22 +6183,6 @@ export interface UserInfoToStateFhirIdResolver<TParent = any, TResult = any> {
 }
 
 export interface UserInfoToLocationLevel3FhirIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCreatedIdsTypeResolver<TParent = any> {
-  compositionId?: CreatedIdsToCompositionIdResolver<TParent>
-}
-
-export interface CreatedIdsToCompositionIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -8479,6 +8515,77 @@ export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
 }
+export interface GQLRecordProcessingTypeResolver<TParent = any> {
+  processed?: RecordProcessingToProcessedResolver<TParent>
+}
+
+export interface RecordProcessingToProcessedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLRecordProcessedTypeResolver<TParent = any> {
+  recordId?: RecordProcessedToRecordIdResolver<TParent>
+  processed?: RecordProcessedToProcessedResolver<TParent>
+  trackingId?: RecordProcessedToTrackingIdResolver<TParent>
+  hasPotentialDuplicates?: RecordProcessedToHasPotentialDuplicatesResolver<TParent>
+}
+
+export interface RecordProcessedToRecordIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RecordProcessedToProcessedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RecordProcessedToTrackingIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RecordProcessedToHasPotentialDuplicatesResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: Context, info: GraphQLResolveInfo):
     | 'BirthEventSearchSet'

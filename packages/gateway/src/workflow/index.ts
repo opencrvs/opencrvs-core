@@ -21,8 +21,8 @@ import {
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 import { inScope, USER_SCOPE } from '@opencrvs/commons/authentication'
-import { useRecordQueue } from '@opencrvs/commons/message-queue'
 import { getToken } from '@opencrvs/commons/http'
+import { useRecordQueue } from '@opencrvs/commons/message-queue'
 
 import {
   ArchivedRecord,

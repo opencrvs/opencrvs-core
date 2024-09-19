@@ -44,12 +44,13 @@ import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { Action, Middleware, createAction } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
 // eslint-disable-next-line no-restricted-imports
-import { captureException } from '@sentry/browser'
-import { getOfflineData } from '@client/offline/selectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
-import { getReviewForm } from '@client/forms/register/review-selectors'
+import { captureException } from '@sentry/browser'
+import { submitAndWaitUntilRecordInWorkqueue } from './createRecord'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -152,6 +153,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
   (next) =>
   async (action: Action) => {
     next(action)
+
     if (!declarationReadyForStatusChange.match(action)) {
       return
     }
@@ -226,23 +228,20 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
 
     try {
       if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
-        const response = await client.mutate({
-          mutation,
-          variables: {
-            details: graphqlPayload
-          }
-        })
+        const draftId = graphqlPayload.registration.draftId
 
-        const { isPotentiallyDuplicate, trackingId, compositionId } =
-          response?.data?.createBirthRegistration ??
-          response?.data?.createDeathRegistration ??
-          {}
+        const { isPotentiallyDuplicate, trackingId, recordId } =
+          await submitAndWaitUntilRecordInWorkqueue(
+            mutation,
+            graphqlPayload,
+            draftId
+          )
 
         if (isPotentiallyDuplicate) {
           dispatch(
             showDuplicateRecordsToast({
               trackingId,
-              compositionId
+              compositionId: recordId
             })
           )
         }
@@ -353,6 +352,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         captureException(error)
         return
       }
+      console.log(error)
 
       updateDeclaration(dispatch, {
         ...declaration,

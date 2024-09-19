@@ -49,6 +49,7 @@ export interface IAssignment {
 }
 
 export interface BirthDocument extends SearchDocument {
+  draftId?: string
   childFirstNames?: string
   childMiddleName?: string
   childFamilyName?: string
@@ -85,6 +86,7 @@ export interface BirthDocument extends SearchDocument {
 }
 
 export interface DeathDocument extends SearchDocument {
+  draftId?: string
   deceasedFirstNames?: string
   deceasedMiddleName?: string
   deceasedFamilyName?: string
@@ -125,6 +127,7 @@ export interface DeathDocument extends SearchDocument {
 }
 
 export interface MarriageDocument extends SearchDocument {
+  draftId?: string
   brideFirstNames?: string
   brideMiddleName?: string
   brideFamilyName?: string

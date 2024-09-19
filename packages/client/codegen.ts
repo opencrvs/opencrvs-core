@@ -23,7 +23,8 @@ const config: CodegenConfig = {
     './src/utils/gateway.ts': {
       config: {
         scalars: {
-          PlainDate: 'PlainDate'
+          PlainDate: 'PlainDate',
+          Void: 'never'
         }
       },
       plugins: [

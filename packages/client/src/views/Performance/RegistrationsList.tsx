@@ -30,9 +30,6 @@ import { IStoreState } from '@client/store'
 import {
   GetRegistrationsListByFilterQuery,
   QueryGetRegistrationsListByFilterArgs,
-  RegistrationsListByLocationFilter,
-  RegistrationsListByRegistrarFilter,
-  RegistrationsListByTimeFilter,
   RegistrationType
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -398,7 +395,10 @@ function RegistrationListComponent(props: IProps) {
   }
 
   const getTableContentByRegistrar = (
-    result: RegistrationsListByRegistrarFilter['results'][0],
+    result: Extract<
+      GetRegistrationsListByFilterQuery['getRegistrationsListByFilter'],
+      { __typename: 'TotalMetricsByRegistrar' }
+    >['results'][number],
     index: number
   ) => ({
     ...result,
@@ -463,7 +463,10 @@ function RegistrationListComponent(props: IProps) {
   })
 
   const getTableContentByLocation = (
-    result: RegistrationsListByLocationFilter['results'][0],
+    result: Extract<
+      GetRegistrationsListByFilterQuery['getRegistrationsListByFilter'],
+      { __typename: 'TotalMetricsByLocation' }
+    >['results'][number],
     index: number
   ) => ({
     ...result,
@@ -485,7 +488,10 @@ function RegistrationListComponent(props: IProps) {
   })
 
   const getTableContentByTime = (
-    result: RegistrationsListByTimeFilter['results'][0],
+    result: Extract<
+      GetRegistrationsListByFilterQuery['getRegistrationsListByFilter'],
+      { __typename: 'TotalMetricsByTime' }
+    >['results'][number],
     index: number
   ) => {
     return {

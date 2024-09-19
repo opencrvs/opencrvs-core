@@ -1044,7 +1044,7 @@ type Mutation {
     id: ID!
     details: MarriageRegistrationInput!
   ): ID!
-  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): Void!
   updateBirthRegistration(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsVerified(
     id: ID!
@@ -1066,7 +1066,7 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
-  createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
+  createDeathRegistration(details: DeathRegistrationInput!): Void!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVerified(
     id: ID!
@@ -1080,7 +1080,7 @@ type Mutation {
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   markEventAsUnassigned(id: String!): ID!
-  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  createMarriageRegistration(details: MarriageRegistrationInput!): Void!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
   markMarriageAsRegistered(
     id: ID!

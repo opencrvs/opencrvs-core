@@ -130,7 +130,20 @@ input SortBy {
   order: String!
 }
 
+union RecordStatus = RecordProcessing | RecordProcessed
+
+type RecordProcessing {
+  processed: Boolean!
+}
+type RecordProcessed {
+  recordId: ID!
+  processed: Boolean!
+  trackingId: String!
+  hasPotentialDuplicates: Boolean!
+}
+
 type Query {
+  fetchRecordStatus(draftId: ID!): RecordStatus!
   searchEvents(
     userId: String
     advancedSearchParameters: AdvancedSearchParametersInput!
