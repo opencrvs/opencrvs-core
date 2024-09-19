@@ -30,6 +30,7 @@ interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   values: IFormSectionData
   draftData: IFormData
   setFieldValue: (name: string, value: IFormFieldValue) => void
+  setFieldTouched: (name: string, isTouched?: boolean) => void
 }
 
 export function ButtonField(props: ButtonFieldProps) {
@@ -37,6 +38,7 @@ export function ButtonField(props: ButtonFieldProps) {
     fieldDefinition,
     fields,
     setFieldValue,
+    setFieldTouched,
     values,
     draftData,
     ...buttonProps
@@ -56,8 +58,23 @@ export function ButtonField(props: ButtonFieldProps) {
     userDetails
   )
   useEffect(() => {
-    setFieldValue(trigger.name, { loading, data, error })
-  }, [loading, data, error, setFieldValue, trigger.name])
+    function updateFormState() {
+      const isRequestCompleted = Boolean(data) || Boolean(error)
+      if (isRequestCompleted) {
+        setFieldTouched(fieldDefinition.name)
+      }
+      setFieldValue(trigger.name, { loading, data, error })
+    }
+    updateFormState()
+  }, [
+    loading,
+    data,
+    error,
+    setFieldValue,
+    trigger.name,
+    setFieldTouched,
+    fieldDefinition.name
+  ])
   const supportedIcon = handleUnsupportedIcon(icon)
   const isLoading = fieldDefinition.options.shouldHandleLoadingState && loading
   const label =

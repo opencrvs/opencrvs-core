@@ -18,10 +18,12 @@ import {
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getFieldValidation
+  getFieldValidation,
+  isFieldButton
 } from '@opencrvs/client/src/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
+import { httpErrorResponseValidator } from '@client/components/form/http'
 
 export interface IFieldErrors {
   errors: IValidationResult[]
@@ -69,13 +71,18 @@ const getValidationErrors = {
 
     if (field.required && !checkValidationErrorsOnly) {
       validators.push(required(requiredErrorMessage))
+    } else if (isFieldButton(field)) {
+      const { trigger } = field.options
+      validators.push(httpErrorResponseValidator(trigger))
     } else if (field.validateEmpty) {
     } else if (!value && value !== 0) {
       validators = []
     }
 
     const validationResults = validators
-      .map((validator) => validator(value, drafts, offlineCountryConfig))
+      .map((validator) =>
+        validator(value, drafts, offlineCountryConfig, values)
+      )
       .filter((error) => error !== undefined) as IValidationResult[]
 
     return {

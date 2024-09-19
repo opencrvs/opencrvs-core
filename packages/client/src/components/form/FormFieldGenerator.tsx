@@ -175,7 +175,7 @@ type GeneratedInputFieldProps = {
   fieldDefinition: Ii18nFormField
   fields: IFormField[]
   values: IFormSectionData
-  onSetFieldValue: (name: string, value: IFormFieldValue) => void
+  setFieldValue: (name: string, value: IFormFieldValue) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent<any>) => void
   onBlur: (e: React.FocusEvent<any>) => void
@@ -189,7 +189,7 @@ type GeneratedInputFieldProps = {
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-  setFieldTouched?: (name: string, isTouched?: boolean) => void
+  setFieldTouched: (name: string, isTouched?: boolean) => void
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
 const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
@@ -197,7 +197,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     fieldDefinition,
     onChange,
     onBlur,
-    onSetFieldValue,
+    setFieldValue,
     resetDependentSelectValues,
     resetNestedInputValues,
     error,
@@ -232,8 +232,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
     const intl = useIntl()
     const onChangeGroupInput = React.useCallback(
-      (val: string) => onSetFieldValue(fieldDefinition.name, val),
-      [fieldDefinition.name, onSetFieldValue]
+      (val: string) => setFieldValue(fieldDefinition.name, val),
+      [fieldDefinition.name, setFieldValue]
     )
     const isOnline = useOnlineStatus()
 
@@ -256,7 +256,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             value={value as string}
             onChange={(val: string) => {
               resetDependentSelectValues(fieldDefinition.name)
-              onSetFieldValue(fieldDefinition.name, val)
+              setFieldValue(fieldDefinition.name, val)
             }}
             onFocus={() =>
               handleSelectFocus(
@@ -280,7 +280,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             extraValue={fieldDefinition.extraValue || ''}
             hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
             onComplete={(files: IFileValue[]) => {
-              onSetFieldValue(fieldDefinition.name, files)
+              setFieldValue(fieldDefinition.name, files)
               setFieldTouched && setFieldTouched(fieldDefinition.name, true)
             }}
             compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
@@ -303,7 +303,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           error={error}
           onComplete={(file) => {
             setFieldTouched && setFieldTouched(fieldDefinition.name, true)
-            onSetFieldValue(fieldDefinition.name, file)
+            setFieldValue(fieldDefinition.name, file)
           }}
           onUploadingStateChanged={onUploadingStateChanged}
           requiredErrorMessage={requiredErrorMessage}
@@ -318,7 +318,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             size={fieldDefinition.size}
             onChange={(val: string) => {
               resetDependentSelectValues(fieldDefinition.name)
-              onSetFieldValue(fieldDefinition.name, val)
+              setFieldValue(fieldDefinition.name, val)
             }}
             options={fieldDefinition.options}
             name={fieldDefinition.name}
@@ -346,7 +346,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             size={RadioSize.LARGE}
             onChange={(val: string) => {
               resetNestedInputValues(fieldDefinition)
-              onSetFieldValue(`${fieldDefinition.name}.value`, val)
+              setFieldValue(`${fieldDefinition.name}.value`, val)
             }}
             nestedFields={nestedFields}
             options={visibleRadioOptions}
@@ -363,7 +363,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InformativeRadioGroup
           inputProps={inputProps}
           value={value as string}
-          onSetFieldValue={onSetFieldValue}
+          onSetFieldValue={setFieldValue}
           fieldDefinition={fieldDefinition}
           inputFieldProps={inputFieldProps}
         />
@@ -379,7 +379,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             name={fieldDefinition.name}
             value={value as string[]}
             onChange={(val: string[]) =>
-              onSetFieldValue(fieldDefinition.name, val)
+              setFieldValue(fieldDefinition.name, val)
             }
           />
         </InputField>
@@ -397,7 +397,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             value={String(value)}
             selected={(value as string) === checkedValue}
             onChange={(event: { target: { value: string } }) =>
-              onSetFieldValue(
+              setFieldValue(
                 fieldDefinition.name,
                 event.target.value === String(checkedValue)
                   ? uncheckedValue
@@ -416,9 +416,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             {...inputProps}
             notice={fieldDefinition.notice}
             ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
-            onChange={(val: string) =>
-              onSetFieldValue(fieldDefinition.name, val)
-            }
+            onChange={(val: string) => setFieldValue(fieldDefinition.name, val)}
             value={value as string}
           />
         </InputField>
@@ -444,7 +442,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             notice={fieldDefinition.notice}
             ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
             onChange={(val: IDateRangePickerValue) =>
-              onSetFieldValue(fieldDefinition.name, val)
+              setFieldValue(fieldDefinition.name, val)
             }
             value={value as IDateRangePickerValue}
           />
@@ -567,7 +565,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <Link
           type="reg16"
-          onClick={() => onSetFieldValue(fieldDefinition.name, true)}
+          onClick={() => setFieldValue(fieldDefinition.name, true)}
         >
           {fieldDefinition.label}
         </Link>
@@ -590,7 +588,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             selectedLocation={selectedLocation}
             locationList={fieldDefinition.locationList}
             searchHandler={(item) => {
-              onSetFieldValue(fieldDefinition.name, item.id)
+              setFieldValue(fieldDefinition.name, item.id)
               if (fieldDefinition.dispatchOptions) {
                 dynamicDispatch(fieldDefinition.dispatchOptions.action, {
                   [fieldDefinition.dispatchOptions.payloadKey]: item.id
@@ -679,7 +677,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             maxSizeMb={maxSizeMb}
             allowedFileFormats={allowedFileFormats}
             required={required}
-            onChange={(sig) => onSetFieldValue(name, sig)}
+            onChange={(sig) => setFieldValue(name, sig)}
           />
         </SignatureField>
       )
@@ -697,8 +695,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             fieldDefinition={fieldDefinition as Ii18nButtonFormField}
             values={values}
             draftData={draftData}
-            setFieldValue={onSetFieldValue}
+            setFieldValue={setFieldValue}
             disabled={disabled}
+            setFieldTouched={setFieldTouched}
           />
         </InputField>
       )
@@ -1139,7 +1138,8 @@ class FormSectionComponent extends React.Component<Props> {
                         intl,
                         withDynamicallyGeneratedFields
                       )}
-                      onSetFieldValue={this.setFieldValuesWithDependency}
+                      setFieldValue={this.setFieldValuesWithDependency}
+                      setFieldTouched={setFieldTouched}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
@@ -1199,7 +1199,7 @@ class FormSectionComponent extends React.Component<Props> {
                               ...nestedField,
                               name: nestedFieldName
                             })}
-                            onSetFieldValue={setFieldValue}
+                            setFieldValue={setFieldValue}
                             setFieldTouched={setFieldTouched}
                             resetDependentSelectValues={
                               this.resetDependentSelectValues
@@ -1236,7 +1236,8 @@ class FormSectionComponent extends React.Component<Props> {
                         intl,
                         withDynamicallyGeneratedFields
                       )}
-                      onSetFieldValue={setFieldValue}
+                      setFieldValue={setFieldValue}
+                      setFieldTouched={setFieldTouched}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
@@ -1268,7 +1269,8 @@ class FormSectionComponent extends React.Component<Props> {
                           intl,
                           withDynamicallyGeneratedFields
                         )}
-                        onSetFieldValue={setFieldValue}
+                        setFieldValue={setFieldValue}
+                        setFieldTouched={setFieldTouched}
                         resetDependentSelectValues={
                           this.resetDependentSelectValues
                         }

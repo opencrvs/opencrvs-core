@@ -13,6 +13,8 @@ import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { Validation } from '@client/utils/validate'
+import { get } from 'lodash'
 import { useState } from 'react'
 
 function transformRequestBody(
@@ -44,6 +46,25 @@ export function transformHttpFieldIntoRequest(
       ? JSON.stringify(transformRequestBody(request.body, ...evalParams))
       : null
   })
+}
+
+export function httpErrorResponseValidator(httpFieldName: string): Validation {
+  return function (
+    _: unknown,
+    __: unknown,
+    ___: unknown,
+    form?: IFormSectionData
+  ) {
+    const errorInHttpField = get(form, `${httpFieldName}.error`)?.toString()
+    if (errorInHttpField) {
+      return {
+        message: {
+          id: 'httpError',
+          defaultMessage: errorInHttpField
+        }
+      }
+    }
+  }
 }
 
 export function useHttp<T>(

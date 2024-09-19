@@ -10,7 +10,11 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
+import {
+  IFormFieldValue,
+  IFormData,
+  IFormSectionData
+} from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -45,7 +49,8 @@ export type MaxLengthValidation = (
 export type Validation = (
   value: IFormFieldValue,
   drafts?: IFormData,
-  offlineCountryConfig?: IOfflineData
+  offlineCountryConfig?: IOfflineData,
+  form?: IFormSectionData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
