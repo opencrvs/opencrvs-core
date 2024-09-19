@@ -57,7 +57,7 @@ const getValidationErrors = {
     )
     if (
       conditionalActions.includes('hide') ||
-      conditionalActions.includes('disable')
+      (conditionalActions.includes('disable') && !isFieldButton(field))
     ) {
       return {
         errors: [],
