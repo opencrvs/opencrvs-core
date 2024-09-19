@@ -12,6 +12,7 @@ import styled from 'styled-components'
 import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '../Button'
 import { noop } from 'lodash'
+import { disabled } from '../Button/Button.styles'
 
 const ToggleMenuContainer = styled.nav`
   position: relative;
@@ -47,7 +48,12 @@ const MenuHeader = styled.li`
   margin-bottom: 6px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
-const MenuItem = styled.li`
+
+interface MenuItemProps extends React.HTMLAttributes<HTMLLIElement> {
+  disabled?: boolean
+}
+
+const MenuItem = styled.li<MenuItemProps>`
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.grey500};
   display: flex;
@@ -69,18 +75,31 @@ const MenuItem = styled.li`
   &:focus-visible {
     background-color: ${({ theme }) => theme.colors.yellow};
   }
+  ${(props) => props.disabled && disabled}
 `
 
 export interface IToggleMenuItem {
   label: string
   icon?: JSX.Element
   handler: () => void
+  isDisabled?: boolean
 }
+
+type ButtonType =
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'positive'
+  | 'negative'
+  | 'secondary_negative'
+  | 'icon'
+  | 'iconPrimary'
 
 interface IProps {
   id: string
   menuHeader?: JSX.Element
   toggleButton: JSX.Element
+  toggleButtonType?: ButtonType
   menuItems: IToggleMenuItem[]
   hide?: boolean
 }
@@ -89,6 +108,7 @@ export const ToggleMenu = ({
   id,
   menuHeader,
   toggleButton,
+  toggleButtonType = 'icon',
   menuItems,
   hide
 }: IProps) => {
@@ -131,7 +151,7 @@ export const ToggleMenu = ({
     <>
       <ToggleMenuContainer aria-expanded={showSubmenu}>
         <Button
-          type="icon"
+          type={toggleButtonType}
           size="large"
           id={`${id}ToggleButton`}
           onClick={toggleMenu}
@@ -149,8 +169,9 @@ export const ToggleMenu = ({
                 onKeyUp={(e) =>
                   e.key === 'Enter' || e.key === ' ' ? mi.handler() : noop
                 }
-                tabIndex={0}
+                tabIndex={mi.isDisabled ? -1 : 0}
                 role="button"
+                disabled={mi.isDisabled}
               >
                 {mi.icon && mi.icon}
                 {mi.label}
