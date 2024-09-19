@@ -1,0 +1,217 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Build E2E environment
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ inputs.pr_number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    if: ${{ !contains(github.actor, 'bot') }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get PR Information (when manually triggered)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headSha)
+          BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
+          HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headSha' | cut -c1-7)
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Get Branch Name and Head Commit Hash (on PR creation)
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        id: vars
+        run: |
+          echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+          COMMIT_HASH=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
+          echo "HEAD_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Check if branch exists in opencrvs-farajaland repo
+        run: |
+          FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
+          if git ls-remote --heads $FARAJALAND_REPO ${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
+            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
+          else
+            COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/develop | cut -c1-7)
+          fi
+          echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+
+      - name: Output Variables
+        run: |
+          echo "PR Branch: ${{ env.BRANCH_NAME }}"
+          echo "PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}"
+          echo "Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}"
+
+      - name: Trigger E2E Workflow
+        id: dispatch_e2e
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substr(0, 35);
+            }
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: 'opencrvs',
+              repo: 'e2e',
+              event_type: 'run_e2e',
+              client_payload: {
+                actor: '${{ github.actor }}',
+                'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
+                'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
+                stack: slugify('${{ env.BRANCH_NAME }}')
+              }
+            });
+
+            console.log(result);
+            await new Promise(resolve => setTimeout(resolve, 10000));
+
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: 'opencrvs',
+              repo: 'e2e',
+              event: 'repository_dispatch',
+              per_page: 1
+            });
+
+            if (runs.data.workflow_runs.length > 0) {
+              const runId = runs.data.workflow_runs[0].id;
+              console.log(`Captured runId: ${runId}`);
+
+              // Set the runId as an output
+              core.setOutput('runId', runId);
+            } else {
+              throw new Error('No workflow run found.');
+            }
+
+      - name: Wait for Environment Deployment (Deploy Job)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const owner = 'opencrvs';
+            const repo = 'e2e';
+            const runId = ${{ steps.dispatch_e2e.outputs.runId }};
+            const prNumber = ${{ github.event.pull_request.number }};
+
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substr(0, 35);
+            }
+            const branchName = slugify('${{ env.BRANCH_NAME }}');
+            const deployMessage = `Your environment is deployed to https://${branchName}.opencrvs.dev.`;
+
+            let deployJobCompleted = false;
+
+            // Check if deploy job has completed
+            while (!deployJobCompleted) {
+              const jobs = await github.rest.actions.listJobsForWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+
+              const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
+              if (deployJob && deployJob.status === 'completed') {
+                deployJobCompleted = true;
+
+                if (deployJob.conclusion !== 'success') {
+                  throw new Error('Deploy job failed');
+                }
+
+                console.log('Deploy job completed successfully');
+              }
+
+              if (!deployJobCompleted) {
+                await new Promise(resolve => setTimeout(resolve, 10000));
+              }
+            }
+
+            // Check if the comment already exists
+            const comments = await github.rest.issues.listComments({
+              owner: 'opencrvs',
+              repo: 'opencrvs-core',
+              issue_number: prNumber
+            });
+
+            const existingComment = comments.data.find(comment => comment.body.includes(deployMessage));
+            if (!existingComment) {
+              // Add PR comment if it doesn't exist
+              await github.rest.issues.createComment({
+                owner: 'opencrvs',
+                repo: 'opencrvs-core',
+                issue_number: prNumber,
+                body: deployMessage
+              });
+              console.log('PR comment added');
+            } else {
+              console.log('PR comment already exists, skipping...');
+            }
+
+      - name: Wait for E2E Workflow Completion
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const owner = 'opencrvs';
+            const repo = 'e2e';
+            const runId = ${{ steps.dispatch_e2e.outputs.runId }};
+            let status = 'in_progress';
+
+            while (status === 'in_progress' || status === 'queued') {
+              const run = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+
+              status = run.data.status;
+              console.log(`Current status: ${status}`);
+
+              if (status === 'in_progress' || status === 'queued') {
+                await new Promise(resolve => setTimeout(resolve, 10000));
+              }
+            }
+
+            if (status === 'completed') {
+              const conclusion = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
+              console.log(`Workflow finished with conclusion: ${conclusion.data.conclusion}`);
+              if (conclusion.data.conclusion !== 'success') {
+                throw new Error('E2E workflow failed');
+              }
+            }

@@ -70,7 +70,6 @@ import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
-import InformantNotification from './views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
 import { ReloadModal } from './views/Modals/ReloadModal'
 
 interface IAppProps {
@@ -255,16 +254,6 @@ export function App(props: IAppProps) {
                                                 routes.REGISTRAR_HOME_TAB_PAGE
                                               }
                                               component={OfficeHome}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              roles={[
-                                                SystemRoleType.NationalSystemAdmin
-                                              ]}
-                                              path={
-                                                routes.INFORMANT_NOTIFICATION
-                                              }
-                                              component={InformantNotification}
                                             />
                                             <ProtectedRoute
                                               exact

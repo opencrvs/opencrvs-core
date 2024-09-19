@@ -64,9 +64,7 @@ export const REGISTRAR_HOME_TAB_PAGE =
 export const SETTINGS = '/settings'
 export const SYSTEM_LIST = '/config/integration'
 
-export const INFORMANT_NOTIFICATION = '/communications/informantnotification'
 export const ALL_USER_EMAIL = '/communications/emailAllUsers'
-
 export const DECLARATION_RECORD_AUDIT = '/record-audit/:tab/:declarationId'
 
 export const PERFORMANCE_HOME = '/performance'

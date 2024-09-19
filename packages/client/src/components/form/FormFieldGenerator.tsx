@@ -57,7 +57,6 @@ import {
   IFormSectionData,
   Ii18nFormField,
   INFORMATIVE_RADIO_GROUP,
-  ISelectFormFieldWithDynamicOptions,
   ISelectFormFieldWithOptions,
   ITextFormField,
   Ii18nTextFormField,
@@ -95,7 +94,8 @@ import {
   InitialValue,
   DependencyInfo,
   Ii18nButtonFormField,
-  REDIRECT
+  REDIRECT,
+  IDocumentUploaderWithOptionsFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -1016,28 +1016,28 @@ class FormSectionComponent extends React.Component<Props> {
           }
 
           const withDynamicallyGeneratedFields =
-            field.type === SELECT_WITH_OPTIONS
+            field.type === SELECT_WITH_OPTIONS ||
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
                   ...field,
                   type: SELECT_WITH_OPTIONS,
                   options: getFieldOptions(
-                    field as ISelectFormFieldWithOptions,
+                    field,
                     values,
                     offlineCountryConfig,
                     draftData
                   )
-                } as ISelectFormFieldWithOptions)
-              : field.type === SELECT_WITH_DYNAMIC_OPTIONS
+                } satisfies ISelectFormFieldWithOptions)
+              : field.type === DOCUMENT_UPLOADER_WITH_OPTION
               ? ({
                   ...field,
-                  type: SELECT_WITH_OPTIONS,
                   options: getFieldOptions(
-                    field as ISelectFormFieldWithDynamicOptions,
+                    field,
                     values,
                     offlineCountryConfig,
                     draftData
                   )
-                } as ISelectFormFieldWithOptions)
+                } satisfies IDocumentUploaderWithOptionsFormField)
               : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
               ? ({
                   ...field,

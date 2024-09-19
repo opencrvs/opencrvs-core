@@ -22,7 +22,7 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   IDeclaration,
   storeDeclaration,
@@ -90,7 +90,7 @@ const deathDeclaration: IDeclaration = {
   originalData: mockDeathDeclarationData,
   review: true,
   event: Event.Death,
-  registrationStatus: 'REGISTERED',
+  registrationStatus: RegStatus.Registered,
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644490181166,
   visitedGroupIds: [
@@ -149,7 +149,7 @@ const birthDeclaration: IDeclaration = {
   originalData: mockDeclarationData,
   review: true,
   event: Event.Birth,
-  registrationStatus: 'REGISTERED',
+  registrationStatus: RegStatus.Registered,
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644407705186,
   visitedGroupIds: [

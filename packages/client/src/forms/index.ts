@@ -655,6 +655,7 @@ export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
   compressImagesToSizeMB?: number
   maxSizeMB?: number
   options: ISelectOption[]
+  optionCondition?: string
   hideOnEmptyOption?: boolean
 }
 export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
@@ -725,7 +726,12 @@ export interface INidVerificationButton extends IFormFieldBase {
 export interface ISignatureFormField extends IFormFieldBase {
   type: typeof SIGNATURE
   maxSizeMb?: number
-  allowedFileFormats?: ('png' | 'jpg' | 'jpeg' | 'svg')[]
+  allowedFileFormats?: (
+    | 'image/png'
+    | 'image/jpg'
+    | 'image/jpeg'
+    | 'image/svg'
+  )[]
 }
 
 export interface IHttpFormField extends IFormFieldBase {
@@ -1182,6 +1188,7 @@ export interface Ii18nImageUploaderWithOptionsFormField
 export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: SelectComponentOption[]
+  optionCondition?: string
   compressImagesToSizeMB?: number
   maxSizeMB?: number
   hideOnEmptyOption?: boolean
@@ -1248,7 +1255,12 @@ export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
 export interface Ii18nSignatureField extends Ii18nFormFieldBase {
   type: typeof SIGNATURE
   maxSizeMb?: number
-  allowedFileFormats?: ('png' | 'jpg' | 'jpeg' | 'svg')[]
+  allowedFileFormats?: (
+    | 'image/png'
+    | 'image/jpg'
+    | 'image/jpeg'
+    | 'image/svg'
+  )[]
 }
 
 export interface Ii18nHttpFormField extends Ii18nFormFieldBase {

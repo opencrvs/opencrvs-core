@@ -24,10 +24,10 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOfficeId
 } from '@workflow/features/user/utils'
-import { createNewAuditEvent } from '@workflow/records/audit'
+import { auditEvent, createNewAuditEvent } from '@workflow/records/audit'
 import { sendBundleToHearth } from '@workflow/records/fhir'
-import { indexBundle } from '@workflow/records/search'
-import { toCorrected } from '@workflow/records/state-transitions'
+import { indexBundle, indexBundleToRoute } from '@workflow/records/search'
+import { toCorrected, toUnassigned } from '@workflow/records/state-transitions'
 import { CorrectionRequestInput } from '@workflow/records/validations'
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
@@ -117,6 +117,16 @@ export const makeCorrectionRoute = createRoute({
     await sendBundleToHearth(recordWithUpdatedValues)
     await createNewAuditEvent(recordWithUpdatedValues, token)
 
-    return changeState(recordWithUpdatedValues, 'REGISTERED')
+    const correctedRecord = changeState(recordWithUpdatedValues, 'REGISTERED')
+
+    const { unassignedRecord, unassignedRecordWithTaskOnly } =
+      await toUnassigned(correctedRecord, token)
+
+    await sendBundleToHearth(unassignedRecordWithTaskOnly)
+
+    await indexBundleToRoute(unassignedRecord, token, '/events/unassigned')
+    await auditEvent('unassigned', unassignedRecord, token)
+
+    return unassignedRecord
   }
 })

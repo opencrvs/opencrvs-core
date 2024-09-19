@@ -46,6 +46,7 @@ import {
   BULLET_LIST,
   HIDDEN,
   Ii18nHiddenFormField,
+  IDocumentUploaderWithOptionsFormField,
   HTTP,
   InitialValue,
   DependencyInfo,
@@ -363,12 +364,18 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
-  field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
+  field:
+    | ISelectFormFieldWithOptions
+    | ISelectFormFieldWithDynamicOptions
+    | IDocumentUploaderWithOptionsFormField,
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData,
   declaration?: IFormData
 ) => {
-  if (field.type === SELECT_WITH_OPTIONS) {
+  if (
+    field.type === SELECT_WITH_OPTIONS ||
+    field.type === DOCUMENT_UPLOADER_WITH_OPTION
+  ) {
     if (field.optionCondition) {
       // eslint-disable-next-line no-eval
       const conditionEvaluator = eval(field.optionCondition!)
