@@ -25,7 +25,7 @@ const MenuHeader = styled.div`
   white-space: normal;
 `
 
-interface IProps {
+export interface IProps {
   id: string
   menuItems: IToggleMenuItem[]
   headerText?: string
