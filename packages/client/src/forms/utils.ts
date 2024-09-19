@@ -566,7 +566,7 @@ export const getConditionalActionsForField = (
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData,
   draftData: IFormData,
-  userDetails: UserDetails | null
+  userDetails: UserDetails | null = null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -668,8 +668,8 @@ export const getSectionFields = (
 export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData,
-  resource?: IOfflineData,
-  drafts?: IFormData
+  resource: IOfflineData,
+  drafts: IFormData
 ): boolean => {
   const errors: Errors = getValidationErrorsForForm(
     fields,

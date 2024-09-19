@@ -38,8 +38,8 @@ const getValidationErrors = {
   forField: function (
     field: IFormField,
     values: IFormSectionData,
-    offlineCountryConfig?: IOfflineData,
-    drafts?: IFormData,
+    offlineCountryConfig: IOfflineData,
+    drafts: IFormData,
     requiredErrorMessage?: MessageDescriptor,
     checkValidationErrorsOnly?: boolean
   ) {
@@ -92,8 +92,8 @@ const getValidationErrors = {
   forNestedField: function (
     field: IFormField,
     values: IFormSectionData,
-    resource?: IOfflineData,
-    drafts?: IFormData,
+    resource: IOfflineData,
+    drafts: IFormData,
     requiredErrorMessage?: MessageDescriptor
   ): {
     [fieldName: string]: IValidationResult[]
@@ -126,8 +126,8 @@ const getValidationErrors = {
 export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData,
-  resource?: IOfflineData,
-  drafts?: IFormData,
+  resource: IOfflineData,
+  drafts: IFormData,
   requiredErrorMessage?: MessageDescriptor,
   checkValidationErrorsOnly?: boolean
 ) {
