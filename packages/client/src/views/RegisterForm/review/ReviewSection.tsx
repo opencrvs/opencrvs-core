@@ -73,7 +73,7 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -1793,7 +1793,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                             action={
                               sec.action &&
                               declaration.registrationStatus !==
-                                SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                RegStatus.CorrectionRequested && (
                                 <Link font="reg16" onClick={sec.action.handler}>
                                   {sec.action.label}
                                 </Link>
@@ -1817,7 +1817,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                                   actions={
                                     !item?.action?.disabled &&
                                     declaration.registrationStatus !==
-                                      SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                                      RegStatus.CorrectionRequested && (
                                       <Link
                                         key={item.action.id}
                                         id={item.action.id}
@@ -1846,7 +1846,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                       viewRecord ||
                       isDuplicate ||
                       declaration.registrationStatus ===
-                        SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                        RegStatus.CorrectionRequested ? null : (
                         <Link
                           font="reg16"
                           element="button"
@@ -1949,7 +1949,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 {viewRecord ||
                 isDuplicate ||
                 declaration.registrationStatus ===
-                  SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                  RegStatus.CorrectionRequested ? null : (
                   <>
                     {!isCorrection(declaration) ? (
                       <>
@@ -2007,7 +2007,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     isDuplicate ||
                     !isUploadButtonVisible ||
                     declaration.registrationStatus ===
-                      SUBMISSION_STATUS.CORRECTION_REQUESTED ? null : (
+                      RegStatus.CorrectionRequested ? null : (
                       <LinkButton
                         id="edit-document"
                         disabled={isCorrection(declaration)}

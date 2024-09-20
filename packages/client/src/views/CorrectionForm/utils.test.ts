@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { IDeclaration } from '@client/declarations'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { isCorrection } from './utils'
 
 let declaration: IDeclaration = {
@@ -27,7 +27,7 @@ describe('isCorrection()', () => {
   it('should return true if an declaration is registered', () => {
     declaration = {
       ...declaration,
-      registrationStatus: SUBMISSION_STATUS.REGISTERED
+      registrationStatus: RegStatus.Registered
     }
     expect(isCorrection(declaration)).toBeTruthy()
   })
@@ -35,7 +35,7 @@ describe('isCorrection()', () => {
   it('should return false if an declaration is not registered', () => {
     declaration = {
       ...declaration,
-      registrationStatus: SUBMISSION_STATUS.DRAFT
+      registrationStatus: RegStatus.Declared
     }
     expect(isCorrection(declaration)).toBeFalsy()
   })
