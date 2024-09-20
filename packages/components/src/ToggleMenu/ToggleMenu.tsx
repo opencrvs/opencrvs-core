@@ -11,7 +11,6 @@
 import styled from 'styled-components'
 import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '../Button'
-import { noop } from 'lodash'
 import { disabled } from '../Button/Button.styles'
 
 const ToggleMenuContainer = styled.nav`
@@ -113,6 +112,9 @@ export const ToggleMenu = ({
   hide
 }: IProps) => {
   const [showSubmenu, setShowSubmenu] = useState(false)
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null)
+  const menuRef = useRef<HTMLUListElement>(null)
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([])
 
   const closeMenuRef = useRef(() => {
     setShowSubmenu(false)
@@ -124,13 +126,43 @@ export const ToggleMenu = ({
     }
   })
 
+  const getNextIndex = (last: number) => {
+    let nextIndex = (last ?? -1) + 1
+    while (nextIndex < menuItems.length && menuItems[nextIndex].isDisabled) {
+      nextIndex++
+    }
+    return nextIndex < menuItems.length ? nextIndex : last
+  }
+
+  const getPreviousIndex = (last: number) => {
+    let prevIndex = (last ?? menuItems.length) - 1
+    while (prevIndex >= 0 && menuItems[prevIndex].isDisabled) {
+      prevIndex--
+    }
+    return prevIndex >= 0 ? prevIndex : last
+  }
+
+  const handleKeyUp = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      setFocusedIndex(getNextIndex)
+    } else if (e.key === 'ArrowUp') {
+      setFocusedIndex(getPreviousIndex)
+    } else if ((e.key === 'Enter' || e.key === ' ') && focusedIndex !== null) {
+      menuItems[focusedIndex].handler()
+      setShowSubmenu(false)
+    }
+  }
+
   useEffect(() => {
     const closeMenu = closeMenuRef.current
     const closeMenuOnEscape = closeMenuOnEscapeRef.current
     if (showSubmenu) {
+      menuRef.current?.focus()
       //https://github.com/facebook/react/issues/24657#issuecomment-1150119055
       setTimeout(() => document.addEventListener('click', closeMenu), 0)
       setTimeout(() => document.addEventListener('keyup', closeMenuOnEscape), 0)
+    } else {
+      setFocusedIndex(null)
     }
 
     return () => {
@@ -138,6 +170,12 @@ export const ToggleMenu = ({
       document.removeEventListener('keyup', closeMenuOnEscape)
     }
   }, [showSubmenu])
+
+  useEffect(() => {
+    if (focusedIndex !== null && itemRefs.current[focusedIndex]) {
+      itemRefs.current[focusedIndex]?.focus()
+    }
+  }, [focusedIndex])
 
   const toggleMenu = () => {
     setShowSubmenu(!showSubmenu)
@@ -159,16 +197,20 @@ export const ToggleMenu = ({
           {toggleButton}
         </Button>
         {showSubmenu && (
-          <MenuContainer id={`${id}SubMenu`}>
+          <MenuContainer
+            id={`${id}SubMenu`}
+            ref={menuRef}
+            tabIndex={0}
+            onKeyUp={handleKeyUp}
+          >
             {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
             {menuItems.map((mi: IToggleMenuItem, index) => (
               <MenuItem
                 id={`${id}Item${index}`}
                 key={`${id}-${index}`}
+                ref={(el) => (itemRefs.current[index] = el)}
+                onFocus={() => setFocusedIndex(index)}
                 onClick={mi.handler}
-                onKeyUp={(e) =>
-                  e.key === 'Enter' || e.key === ' ' ? mi.handler() : noop
-                }
                 tabIndex={mi.isDisabled ? -1 : 0}
                 role="button"
                 disabled={mi.isDisabled}
