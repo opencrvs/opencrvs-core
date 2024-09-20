@@ -8,43 +8,38 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { APPLICATION_CONFIG_URL } from '@workflow/constants'
+import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 
-export enum InformantNotificationName {
-  birthInProgressSMS = 'birthInProgressSMS',
-  birthDeclarationSMS = 'birthDeclarationSMS',
-  birthRegistrationSMS = 'birthRegistrationSMS',
-  birthRejectionSMS = 'birthRejectionSMS',
-  deathRegistrationSMS = 'deathRegistrationSMS',
-  deathInProgressSMS = 'deathInProgressSMS',
-  deathDeclarationSMS = 'deathDeclarationSMS',
-  deathRejectionSMS = 'deathRejectionSMS'
+type EventNotificationFlags = {
+  'sent-notification'?: boolean
+  'sent-notification-for-review'?: boolean
+  'sent-for-approval'?: boolean
+  registered?: boolean
+  'sent-for-updates'?: boolean
 }
 
-interface IInformantSMSNotification {
-  _id: string
-  name: InformantNotificationName
-  enabled: boolean
-  updatedAt: number
-  createdAt: number
+type NotificationFlags = {
+  BIRTH?: EventNotificationFlags
+  DEATH?: EventNotificationFlags
+  MARRIAGE?: EventNotificationFlags
 }
 
 export async function getInformantSMSNotification(token: string) {
   try {
-    const informantSMSNotificationURL = new URL(
-      'informantSMSNotification',
-      APPLICATION_CONFIG_URL
+    const recordNotificationURL = new URL(
+      'record-notification',
+      COUNTRY_CONFIG_URL
     ).toString()
-    const res = await fetch(informantSMSNotificationURL, {
+    const res = await fetch(recordNotificationURL, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       }
     })
-    return (await res.json()) as IInformantSMSNotification[]
+    return (await res.json()) as NotificationFlags
   } catch (err) {
     logger.error(`Unable to get informant SMS Notifications for error : ${err}`)
     throw err
