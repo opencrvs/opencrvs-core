@@ -28,29 +28,6 @@ interface IProps extends WrappedComponentProps {
   completenessRateTime?: CompletenessRateTime
 }
 
-/* Not Needed for functional component
-
-interface IActiveState {
-  value: number
-  stroke: string
-}
-
-interface IState {
-  legendMarginTop: number
-  legendMarginLeft: number
-  chartTop: number
-  chartRight: number
-  chartBottom: number
-  chartLeft: number
-  maximizeXAxisInterval?: boolean
-  legendLayout: LegendProps['layout']
-  activeLabel: string
-  activeRegisteredInTargetDays: IActiveState
-  activeTotalRegistered: IActiveState
-  activeTotalEstimate: IActiveState
-}
-*/
-
 const CustomLegendContainer = styled.div<{
   marginLeft: number
   marginTop: number

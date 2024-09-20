@@ -84,6 +84,8 @@ import {
   isBirthEvent,
   isDeathEvent
 } from '@client/search/transformer'
+import { useState } from 'react';
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -109,12 +111,6 @@ interface IBaseRegistrarHomeProps {
   pageSize: number
 }
 
-interface IRegistrarHomeState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
-
 interface IProps {
   offlineCountryConfig: IOfflineData
   loading?: boolean
@@ -129,52 +125,31 @@ export const SELECTOR_ID = {
   hospitalDrafts: 'hospitals'
 }
 
-class InProgressComponent extends React.Component<
-  IRegistrarHomeProps,
-  IRegistrarHomeState
-> {
-  constructor(props: IRegistrarHomeProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth,
-      sortedCol:
-        this.props.selectorId && this.props.selectorId !== SELECTOR_ID.ownDrafts
-          ? COLUMNS.NOTIFICATION_SENT
-          : COLUMNS.LAST_UPDATED,
-      sortOrder: SORT_ORDER.DESCENDING
-    }
-  }
+function InProgressComponent(props: IRegistrarHomeProps) {
+  const {width} = useWindowSize();
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
+  const [sortedCol, setSortedCol] = useState<COLUMNS>(
+    props.selectorId && props.selectorId !== SELECTOR_ID.ownDrafts
+    ? COLUMNS.NOTIFICATION_SENT
+    : COLUMNS.LAST_UPDATED);
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING);
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  onColumnClick = (columnName: string) => {
+  const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
+    setSortOrder(newSortOrder)
+    setSortedCol(newSortedCol)
   }
 
-  transformRemoteDraftsContent = (data: GQLEventSearchResultSet) => {
+  const transformRemoteDraftsContent = (data: GQLEventSearchResultSet) => {
     if (!data || !data.results) {
       return []
     }
 
-    const { intl } = this.props
+    const { intl } = props
     const { locale } = intl
 
     const items = data.results.map((reg, index) => {
@@ -228,17 +203,17 @@ class InProgressComponent extends React.Component<
         ? plainDateToLocalDate(eventDate)
         : ''
       const actions: IAction[] = []
-      const foundDeclaration = this.props.outboxDeclarations.find(
+      const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
       const downloadStatus = foundDeclaration?.downloadStatus
 
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      if (width > props.theme.grid.breakpoints.lg) {
         actions.push({
           label: intl.formatMessage(buttonMessages.update),
           handler: () => {
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              this.props.goToPage(
+              props.goToPage(
                 pageRoute,
                 regId,
                 'review',
@@ -267,8 +242,8 @@ class InProgressComponent extends React.Component<
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit(
-              this.props.selectorId === SELECTOR_ID.hospitalDrafts
+            props.goToDeclarationRecordAudit(
+              props.selectorId === SELECTOR_ID.hospitalDrafts
                 ? 'notificationTab'
                 : 'inProgressTab',
               regId
@@ -281,7 +256,7 @@ class InProgressComponent extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('inProgressTab', regId)
+            props.goToDeclarationRecordAudit('inProgressTab', regId)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -320,8 +295,8 @@ class InProgressComponent extends React.Component<
     })
     const sortedItems = getSortedItems(
       items,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
     return sortedItems.map((item) => {
       return {
@@ -335,22 +310,22 @@ class InProgressComponent extends React.Component<
     })
   }
 
-  getDraftsPaginatedData = (drafts: IDeclaration[], pageId: number) => {
+  const getDraftsPaginatedData = (drafts: IDeclaration[], pageId: number) => {
     return drafts.slice(
-      (pageId - 1) * this.props.pageSize,
-      pageId * this.props.pageSize
+      (pageId - 1) * props.pageSize,
+      pageId * props.pageSize
     )
   }
 
-  transformDraftContent = () => {
-    const { intl } = this.props
+  const transformDraftContent = () => {
+    const { intl } = props
     const { locale } = intl
-    if (!this.props.drafts || this.props.drafts.length <= 0) {
+    if (!props.drafts || props.drafts.length <= 0) {
       return []
     }
-    const paginatedDrafts = this.getDraftsPaginatedData(
-      this.props.drafts,
-      this.props.paginationId.draftId
+    const paginatedDrafts = getDraftsPaginatedData(
+      props.drafts,
+      props.paginationId.draftId
     )
     const items = paginatedDrafts.map((draft: IDeclaration, index) => {
       let pageRoute: string
@@ -365,14 +340,14 @@ class InProgressComponent extends React.Component<
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions: IAction[] = []
 
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      if (width > props.theme.grid.breakpoints.lg) {
         actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.update),
+          label: props.intl.formatMessage(buttonMessages.update),
           handler: (
             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
           ) => {
             e && e.stopPropagation()
-            this.props.goToPage(
+            props.goToPage(
               pageRoute,
               draft.id,
               'preview',
@@ -405,7 +380,7 @@ class InProgressComponent extends React.Component<
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
+            props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }
         >
           {name}
@@ -414,7 +389,7 @@ class InProgressComponent extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
+            props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -448,8 +423,8 @@ class InProgressComponent extends React.Component<
     })
     const sortedItems = getSortedItems(
       items,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
 
     return sortedItems.map((item) => {
@@ -463,50 +438,50 @@ class InProgressComponent extends React.Component<
     })
   }
 
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+  const getColumns = () => {
+    if (width > props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           width: 30,
           key: COLUMNS.ICON_WITH_NAME,
-          isSorted: this.state.sortedCol === COLUMNS.NAME,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.NAME,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.event),
+          label: props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: props.intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: onColumnClick
         },
         {
           label:
-            this.props.selectorId &&
-            this.props.selectorId !== SELECTOR_ID.ownDrafts
-              ? this.props.intl.formatMessage(
+            props.selectorId &&
+            props.selectorId !== SELECTOR_ID.ownDrafts
+              ? props.intl.formatMessage(
                   constantsMessages.notificationSent
                 )
-              : this.props.intl.formatMessage(constantsMessages.lastUpdated),
+              : props.intl.formatMessage(constantsMessages.lastUpdated),
           width: 18,
           key:
-            this.props.selectorId &&
-            this.props.selectorId !== SELECTOR_ID.ownDrafts
+            props.selectorId &&
+            props.selectorId !== SELECTOR_ID.ownDrafts
               ? COLUMNS.NOTIFICATION_SENT
               : COLUMNS.LAST_UPDATED,
           isSorted:
-            this.props.selectorId &&
-            this.props.selectorId !== SELECTOR_ID.ownDrafts
-              ? this.state.sortedCol === COLUMNS.NOTIFICATION_SENT
-              : this.state.sortedCol === COLUMNS.LAST_UPDATED,
-          sortFunction: this.onColumnClick
+            props.selectorId &&
+            props.selectorId !== SELECTOR_ID.ownDrafts
+              ? sortedCol === COLUMNS.NOTIFICATION_SENT
+              : sortedCol === COLUMNS.LAST_UPDATED,
+          sortFunction: onColumnClick
         },
         {
           width: 18,
@@ -518,7 +493,7 @@ class InProgressComponent extends React.Component<
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -532,38 +507,38 @@ class InProgressComponent extends React.Component<
     }
   }
 
-  getTabs(
+  const getTabs = (
     selectorId: string,
     drafts: IDeclaration[],
     fieldAgentCount: number,
     hospitalCount: number
-  ) {
-    if (this.props.isFieldAgent) {
+  ) => {
+    if (props.isFieldAgent) {
       return undefined
     }
     const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
       onTabClick: (tabId: string) => {
-        this.props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
+        props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
       },
       sections: [
         {
           id: SELECTOR_ID.ownDrafts,
-          title: `${this.props.intl.formatMessage(
+          title: `${props.intl.formatMessage(
             messages.inProgressOwnDrafts
           )} (${drafts && drafts.length})`,
           disabled: false
         },
         {
           id: SELECTOR_ID.fieldAgentDrafts,
-          title: `${this.props.intl.formatMessage(
+          title: `${props.intl.formatMessage(
             messages.inProgressFieldAgents
           )} (${fieldAgentCount})`,
           disabled: false
         },
         {
           id: SELECTOR_ID.hospitalDrafts,
-          title: `${this.props.intl.formatMessage(
+          title: `${props.intl.formatMessage(
             messages.hospitalDrafts
           )} (${hospitalCount})`,
           disabled: false
@@ -580,141 +555,138 @@ class InProgressComponent extends React.Component<
     )
   }
 
-  renderFieldAgentTable = (
+  const renderFieldAgentTable = (
     data: GQLEventSearchResultSet,
     isShowPagination: boolean
   ) => {
     return (
       <Workqueue
-        content={this.transformRemoteDraftsContent(data)}
-        columns={this.getColumns()}
-        loading={this.props.loading}
-        sortOrder={this.state.sortOrder}
+        content={transformRemoteDraftsContent(data)}
+        columns={getColumns()}
+        loading={props.loading}
+        sortOrder={sortOrder}
         hideLastBorder={!isShowPagination}
       />
     )
   }
 
-  renderHospitalTable = (
+  const renderHospitalTable = (
     data: GQLEventSearchResultSet,
     isShowPagination: boolean
   ) => {
     return (
       <Workqueue
-        content={this.transformRemoteDraftsContent(data)}
-        columns={this.getColumns()}
-        loading={this.props.loading}
-        sortOrder={this.state.sortOrder}
+        content={transformRemoteDraftsContent(data)}
+        columns={getColumns()}
+        loading={props.loading}
+        sortOrder={sortOrder}
         hideLastBorder={!isShowPagination}
       />
     )
   }
 
-  render() {
-    const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
-      this.props
+  const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } = props
 
-    const isShowPagination =
-      !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
-        ? this.props.drafts.length > this.props.pageSize
-          ? true
-          : false
-        : this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.queryData.inProgressData &&
-          this.props.queryData.inProgressData.totalItems &&
-          this.props.queryData.inProgressData.totalItems > this.props.pageSize
-          ? true
-          : false
-        : this.props.queryData.notificationData &&
-          this.props.queryData.notificationData.totalItems &&
-          this.props.queryData.notificationData.totalItems > this.props.pageSize
+  const isShowPagination =
+    !props.selectorId || props.selectorId === SELECTOR_ID.ownDrafts
+      ? props.drafts.length > props.pageSize
         ? true
         : false
+      : props.selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? props.queryData.inProgressData &&
+        props.queryData.inProgressData.totalItems &&
+        props.queryData.inProgressData.totalItems > props.pageSize
+        ? true
+        : false
+      : props.queryData.notificationData &&
+        props.queryData.notificationData.totalItems &&
+        props.queryData.notificationData.totalItems > props.pageSize
+      ? true
+      : false
 
-    const { inProgressData, notificationData } = queryData
-    const paginationId =
-      !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? this.props.paginationId.draftId
-        : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.paginationId.fieldAgentId
-        : this.props.paginationId.healthSystemId
+  const { inProgressData, notificationData } = queryData
+  const paginationId =
+    !selectorId || selectorId === SELECTOR_ID.ownDrafts
+      ? props.paginationId.draftId
+      : selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? props.paginationId.fieldAgentId
+      : props.paginationId.healthSystemId
 
-    const totalPages =
-      !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? Math.ceil(this.props.drafts.length / this.props.pageSize)
-        : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.queryData.inProgressData &&
-          this.props.queryData.inProgressData.totalItems &&
-          Math.ceil(
-            this.props.queryData.inProgressData.totalItems / this.props.pageSize
-          )
-        : this.props.queryData.notificationData &&
-          this.props.queryData.notificationData.totalItems &&
-          Math.ceil(
-            this.props.queryData.notificationData.totalItems /
-              this.props.pageSize
-          )
+  const totalPages =
+    !selectorId || selectorId === SELECTOR_ID.ownDrafts
+      ? Math.ceil(props.drafts.length / props.pageSize)
+      : selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? props.queryData.inProgressData &&
+        props.queryData.inProgressData.totalItems &&
+        Math.ceil(
+          props.queryData.inProgressData.totalItems / props.pageSize
+        )
+      : props.queryData.notificationData &&
+        props.queryData.notificationData.totalItems &&
+        Math.ceil(
+          props.queryData.notificationData.totalItems /
+            props.pageSize
+        )
 
-    const noContent =
-      !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? this.transformDraftContent().length <= 0
-        : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.transformRemoteDraftsContent(inProgressData).length <= 0
-        : this.transformRemoteDraftsContent(notificationData).length <= 0
+  const noContent =
+    !selectorId || selectorId === SELECTOR_ID.ownDrafts
+      ? transformDraftContent().length <= 0
+      : selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? transformRemoteDraftsContent(inProgressData).length <= 0
+      : transformRemoteDraftsContent(notificationData).length <= 0
 
-    const noResultMessage =
-      !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? intl.formatMessage(wqMessages.noRecordsDraft)
-        : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? intl.formatMessage(wqMessages.noRecordsFieldAgents)
-        : intl.formatMessage(wqMessages.noRecordsHealthSystem)
+  const noResultMessage =
+    !selectorId || selectorId === SELECTOR_ID.ownDrafts
+      ? intl.formatMessage(wqMessages.noRecordsDraft)
+      : selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? intl.formatMessage(wqMessages.noRecordsFieldAgents)
+      : intl.formatMessage(wqMessages.noRecordsHealthSystem)
 
-    return (
-      <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.progress)}
-        isMobileSize={
-          this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
-        }
-        tabBarContent={
-          !isFieldAgent &&
-          this.getTabs(
-            selectorId,
-            drafts,
-            (inProgressData && inProgressData.totalItems) || 0,
-            (notificationData && notificationData.totalItems) || 0
-          )
-        }
-        isShowPagination={isShowPagination}
-        paginationId={paginationId}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        loading={isFieldAgent ? false : this.props.loading}
-        error={
-          !selectorId || selectorId === SELECTOR_ID.ownDrafts || isFieldAgent
-            ? false
-            : this.props.error
-        }
-        noResultText={noResultMessage}
-        noContent={noContent}
-      >
-        {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <Workqueue
-            content={this.transformDraftContent()}
-            columns={this.getColumns()}
-            loading={isFieldAgent ? false : this.props.loading}
-            sortOrder={this.state.sortOrder}
-            hideLastBorder={!isShowPagination}
-          />
-        )}
-        {selectorId === SELECTOR_ID.fieldAgentDrafts &&
-          !isFieldAgent &&
-          this.renderFieldAgentTable(inProgressData, isShowPagination)}
-        {selectorId === SELECTOR_ID.hospitalDrafts &&
-          !isFieldAgent &&
-          this.renderHospitalTable(notificationData, isShowPagination)}
-      </WQContentWrapper>
-    )
-  }
+  return (
+    <WQContentWrapper
+      title={intl.formatMessage(navigationMessages.progress)}
+      isMobileSize={
+        width < props.theme.grid.breakpoints.lg ? true : false
+      }
+      tabBarContent={
+        !isFieldAgent &&
+        getTabs(
+          selectorId,
+          drafts,
+          (inProgressData && inProgressData.totalItems) || 0,
+          (notificationData && notificationData.totalItems) || 0
+        )
+      }
+      isShowPagination={isShowPagination}
+      paginationId={paginationId}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      loading={isFieldAgent ? false : props.loading}
+      error={
+        !selectorId || selectorId === SELECTOR_ID.ownDrafts || isFieldAgent
+          ? false
+          : props.error
+      }
+      noResultText={noResultMessage}
+      noContent={noContent}
+    >
+      {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+        <Workqueue
+          content={transformDraftContent()}
+          columns={getColumns()}
+          loading={isFieldAgent ? false : props.loading}
+          sortOrder={sortOrder}
+          hideLastBorder={!isShowPagination}
+        />
+      )}
+      {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+        !isFieldAgent &&
+        renderFieldAgentTable(inProgressData, isShowPagination)}
+      {selectorId === SELECTOR_ID.hospitalDrafts &&
+        !isFieldAgent &&
+        renderHospitalTable(notificationData, isShowPagination)}
+    </WQContentWrapper>
+  )
 }
 
 function mapStateToProps(state: IStoreState) {
