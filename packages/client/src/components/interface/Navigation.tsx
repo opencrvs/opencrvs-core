@@ -21,7 +21,6 @@ import {
   goToAllUserEmail,
   goToDashboardView,
   goToHomeTab,
-  goToInformantNotification,
   goToLeaderBoardsView,
   goToOrganisationView,
   goToPerformanceStatistics,
@@ -233,7 +232,6 @@ interface IDispatchProps {
   goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
-  goToInformantNotification: typeof goToInformantNotification
   goToAllUserEmail: typeof goToAllUserEmail
 }
 
@@ -312,7 +310,6 @@ const NavigationView = (props: IFullProps) => {
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
-    goToInformantNotification,
     goToAllUserEmail,
     className
   } = props
@@ -405,7 +402,6 @@ const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
@@ -757,20 +753,6 @@ const NavigationView = (props: IFullProps) => {
                         <>
                           <NavigationSubItem
                             label={intl.formatMessage(
-                              navigationMessages[
-                                WORKQUEUE_TABS.informantNotification
-                              ]
-                            )}
-                            id={`navigation_${WORKQUEUE_TABS.informantNotification}`}
-                            onClick={goToInformantNotification}
-                            isSelected={
-                              enableMenuSelection &&
-                              activeMenuItem ===
-                                WORKQUEUE_TABS.informantNotification
-                            }
-                          />
-                          <NavigationSubItem
-                            label={intl.formatMessage(
                               navigationMessages[WORKQUEUE_TABS.emailAllUsers]
                             )}
                             id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
@@ -992,7 +974,6 @@ export const Navigation = connect<
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,
-  goToInformantNotification,
   goToAllUserEmail
 })(injectIntl(withRouter(NavigationView)))
 

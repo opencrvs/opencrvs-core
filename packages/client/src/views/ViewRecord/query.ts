@@ -140,6 +140,11 @@ export const FETCH_VIEW_RECORD_BY_COMPOSITION = gql`
         _fhirIDMap
         child {
           id
+          identifier {
+            id
+            type
+            otherType
+          }
           name {
             use
             firstNames

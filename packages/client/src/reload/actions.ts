@@ -8,20 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
-
-export interface IInformantSMSNotification {
-  _id: string
-  name: string
-  enabled: boolean
-  updatedAt: string
-  createdAt: string
+export const RELOAD_MODAL_VISIBILITY = 'RELOAD_MODAL_VISIBILITY'
+export type StoreReloadModalVisibilityAction = {
+  type: typeof RELOAD_MODAL_VISIBILITY
+  payload: { visibility: boolean }
 }
 
-export const informantSMSNotiTypeResolvers: GQLResolver = {
-  SMSNotification: {
-    id(informantSMSNotification: IInformantSMSNotification) {
-      return informantSMSNotification._id
-    }
+export const storeReloadModalVisibility = (
+  visibility: boolean
+): StoreReloadModalVisibilityAction => {
+  return {
+    type: RELOAD_MODAL_VISIBILITY,
+    payload: { visibility }
   }
 }
