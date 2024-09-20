@@ -143,6 +143,12 @@ jobs:
               });
 
               const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
+              const cancelled = jobs.data.jobs.find(job => job.conclusion === 'cancelled');
+
+              if (cancelled) {
+                throw new Error('E2E workflow was cancelled');
+              }
+
               if (deployJob && deployJob.status === 'completed') {
                 deployJobCompleted = true;
 
