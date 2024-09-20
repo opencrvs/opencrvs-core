@@ -52,7 +52,6 @@ import {
   getResourceFromBundleById,
   TransactionResponse,
   TaskIdentifierSystem,
-  UNASSIGNED_EXTENSION_URL,
   Location
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
@@ -614,9 +613,6 @@ export function createCorrectedTask(
       {
         url: MAKE_CORRECTION_EXTENSION_URL,
         valueString: 'REGISTERED'
-      },
-      {
-        url: UNASSIGNED_EXTENSION_URL
       }
     ],
     input: correctionDetails.values.map((update) => ({
