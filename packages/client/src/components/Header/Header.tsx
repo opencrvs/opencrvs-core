@@ -181,71 +181,70 @@ export const HeaderComponent = (props: IFullProps) => {
           }
         ]
       }
-    } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      if (changeTeamLocation) {
-        return {
-          mobileLeft: [
-            {
-              icon: () => <Hamburger />,
-              handler: () => {}
-            }
-          ],
-          mobileRight: [
-            {
-              icon: () => (
-                <Icon name="MagnifyingGlass" size="medium" color="primary" />
-              ),
-              handler: () => changeTeamLocation && changeTeamLocation()
-            },
-            {
-              icon: () => (
-                <Icon name="UserPlus" size="medium" color="primary" />
-              ),
-              handler: () => {
-                if (locationId) {
-                  return goToCreateNewUserWithLocationId(locationId)
-                }
-                goToCreateNewUser()
+    }
+    if (activeMenuItem === ACTIVE_MENU_ITEM.USERS && changeTeamLocation) {
+      return {
+        mobileLeft: [
+          {
+            icon: () => <Hamburger />,
+            handler: () => {}
+          }
+        ],
+        mobileRight: [
+          {
+            icon: () => (
+              <Icon name="MagnifyingGlass" size="medium" color="primary" />
+            ),
+            handler: () => changeTeamLocation && changeTeamLocation()
+          },
+          {
+            icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
+            handler: () => {
+              if (locationId) {
+                return goToCreateNewUserWithLocationId(locationId)
               }
+              goToCreateNewUser()
             }
-          ]
-        }
-      } else if (
-        userDetails?.systemRole &&
-        SYS_ADMIN_ROLES.includes(userDetails?.systemRole)
-      ) {
-        return {
-          mobileLeft: [
-            {
-              icon: () => <Hamburger />,
-              handler: () => {}
-            }
-          ],
-          mobileRight: [
-            {
-              icon: () => (
-                <Icon name="UserPlus" size="medium" color="primary" />
-              ),
-              handler: () => {
-                if (locationId) {
-                  return goToCreateNewUserWithLocationId(locationId)
-                }
-                goToCreateNewUser()
-              }
-            }
-          ]
-        }
-      } else {
-        return {
-          mobileLeft: [
-            {
-              icon: () => <Hamburger />,
-              handler: () => {}
-            }
-          ]
-        }
+          }
+        ]
       }
-    } else if (
+    }
+    if (
+      activeMenuItem === ACTIVE_MENU_ITEM.USERS &&
+      userDetails?.systemRole &&
+      SYS_ADMIN_ROLES.includes(userDetails?.systemRole)
+    ) {
+      return {
+        mobileLeft: [
+          {
+            icon: () => <Hamburger />,
+            handler: () => {}
+          }
+        ],
+        mobileRight: [
+          {
+            icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
+            handler: () => {
+              if (locationId) {
+                return goToCreateNewUserWithLocationId(locationId)
+              }
+              goToCreateNewUser()
+            }
+          }
+        ]
+      }
+    }
+    if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+      return {
+        mobileLeft: [
+          {
+            icon: () => <Hamburger />,
+            handler: () => {}
+          }
+        ]
+      }
+    }
+    if (
       userDetails?.systemRole &&
       USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
     ) {
@@ -257,35 +256,33 @@ export const HeaderComponent = (props: IFullProps) => {
           }
         ]
       }
-    } else {
-      if (mobileSearchBar) {
-        return {
-          mobileLeft: [
-            {
-              icon: () => <HistoryNavigator hideForward />,
-              handler: () => {}
-            }
-          ],
-          mobileBody: renderSearchInput(props, true)
-        }
-      } else {
-        return {
-          mobileLeft: [
-            {
-              icon: () => <Hamburger />,
-              handler: () => {}
-            }
-          ],
-          mobileRight: [
-            {
-              icon: () => (
-                <Icon name="MagnifyingGlass" size="medium" color="primary" />
-              ),
-              handler: () => goToSearch()
-            }
-          ]
-        }
+    }
+    if (mobileSearchBar) {
+      return {
+        mobileLeft: [
+          {
+            icon: () => <HistoryNavigator hideForward />,
+            handler: () => {}
+          }
+        ],
+        mobileBody: renderSearchInput(props, true)
       }
+    }
+    return {
+      mobileLeft: [
+        {
+          icon: () => <Hamburger />,
+          handler: () => {}
+        }
+      ],
+      mobileRight: [
+        {
+          icon: () => (
+            <Icon name="MagnifyingGlass" size="medium" color="primary" />
+          ),
+          handler: () => goToSearch()
+        }
+      ]
     }
   }
 
