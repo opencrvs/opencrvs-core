@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -29,7 +28,6 @@ import {
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
@@ -146,11 +144,27 @@ const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
   PERFORMANCE_MANAGEMENT_ROLES
 )
 
-class HeaderComp extends React.Component<IFullProps> {
-  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
-    const locationId = new URLSearchParams(this.props.location.search).get(
-      'locationId'
-    )
+export const HeaderComponent = (props: IFullProps) => {
+  const {
+    location,
+    mapPerformanceClickHandler,
+    goToCreateNewUserWithLocationId,
+    changeTeamLocation,
+    goToCreateNewUser,
+    userDetails,
+    mobileSearchBar,
+    goToSearch,
+    offlineData,
+    className,
+    intl,
+    activeMenuItem,
+    title,
+    mobileRight,
+    goToEvents
+  } = props
+
+  const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
+    const locationId = new URLSearchParams(location.search).get('locationId')
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [
@@ -163,13 +177,12 @@ class HeaderComp extends React.Component<IFullProps> {
           {
             icon: () => <Icon name="Activity" size="medium" color="primary" />,
             handler: () =>
-              this.props.mapPerformanceClickHandler &&
-              this.props.mapPerformanceClickHandler()
+              mapPerformanceClickHandler && mapPerformanceClickHandler()
           }
         ]
       }
     } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      if (this.props.changeTeamLocation) {
+      if (changeTeamLocation) {
         return {
           mobileLeft: [
             {
@@ -182,8 +195,7 @@ class HeaderComp extends React.Component<IFullProps> {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: () =>
-                this.props.changeTeamLocation && this.props.changeTeamLocation()
+              handler: () => changeTeamLocation && changeTeamLocation()
             },
             {
               icon: () => (
@@ -191,17 +203,16 @@ class HeaderComp extends React.Component<IFullProps> {
               ),
               handler: () => {
                 if (locationId) {
-                  this.props.goToCreateNewUserWithLocationId(locationId)
-                } else {
-                  this.props.goToCreateNewUser()
+                  return goToCreateNewUserWithLocationId(locationId)
                 }
+                goToCreateNewUser()
               }
             }
           ]
         }
       } else if (
-        this.props.userDetails?.systemRole &&
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole)
+        userDetails?.systemRole &&
+        SYS_ADMIN_ROLES.includes(userDetails?.systemRole)
       ) {
         return {
           mobileLeft: [
@@ -217,10 +228,9 @@ class HeaderComp extends React.Component<IFullProps> {
               ),
               handler: () => {
                 if (locationId) {
-                  this.props.goToCreateNewUserWithLocationId(locationId)
-                } else {
-                  this.props.goToCreateNewUser()
+                  return goToCreateNewUserWithLocationId(locationId)
                 }
+                goToCreateNewUser()
               }
             }
           ]
@@ -236,8 +246,8 @@ class HeaderComp extends React.Component<IFullProps> {
         }
       }
     } else if (
-      this.props.userDetails?.systemRole &&
-      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
+      userDetails?.systemRole &&
+      USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
     ) {
       return {
         mobileLeft: [
@@ -248,7 +258,7 @@ class HeaderComp extends React.Component<IFullProps> {
         ]
       }
     } else {
-      if (this.props.mobileSearchBar) {
+      if (mobileSearchBar) {
         return {
           mobileLeft: [
             {
@@ -256,7 +266,7 @@ class HeaderComp extends React.Component<IFullProps> {
               handler: () => {}
             }
           ],
-          mobileBody: this.renderSearchInput(this.props, true)
+          mobileBody: renderSearchInput(props, true)
         }
       } else {
         return {
@@ -271,7 +281,7 @@ class HeaderComp extends React.Component<IFullProps> {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: () => this.props.goToSearch()
+              handler: () => goToSearch()
             }
           ]
         }
@@ -279,12 +289,7 @@ class HeaderComp extends React.Component<IFullProps> {
     }
   }
 
-  logout = () => {
-    storage.removeItem(SCREEN_LOCK)
-    this.props.redirectToAuthentication()
-  }
-
-  renderSearchInput(props: IFullProps, isMobile?: boolean) {
+  const renderSearchInput = (props: IFullProps, isMobile?: boolean) => {
     const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
@@ -343,8 +348,8 @@ class HeaderComp extends React.Component<IFullProps> {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
-          this.props.setAdvancedSearchParam(advancedSearchInitialState)
-          this.props.goToAdvancedSearch()
+          setAdvancedSearchParam(advancedSearchInitialState)
+          goToAdvancedSearch()
         }
       }
     ]
@@ -355,14 +360,11 @@ class HeaderComp extends React.Component<IFullProps> {
         language={language}
         searchText={searchText}
         selectedSearchType={
-          selectedSearchType ??
-          this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA
+          selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
         navigationList={
-          FIELD_AGENT_ROLES.includes(
-            this.props.userDetails?.systemRole as string
-          )
+          FIELD_AGENT_ROLES.includes(userDetails?.systemRole as string)
             ? undefined
             : navigationList
         }
@@ -373,115 +375,95 @@ class HeaderComp extends React.Component<IFullProps> {
     )
   }
 
-  goToTeamView(props: IFullProps) {
-    const { userDetails, goToTeamUserListAction, goToTeamSearchAction } = props
-    if (userDetails && userDetails.systemRole) {
-      if (NATL_ADMIN_ROLES.includes(userDetails.systemRole)) {
-        return goToTeamSearchAction()
-      } else {
-        return goToTeamUserListAction(
-          (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-        )
-      }
-    }
-  }
+  const headerTitle =
+    title ||
+    intl.formatMessage(
+      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+        ? constantsMessages.performanceTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
+          activeMenuItem === ACTIVE_MENU_ITEM.USERS
+        ? messages.teamTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
+        ? constantsMessages.certificateTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
+        ? constantsMessages.applicationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.FORM
+        ? constantsMessages.formDeclarationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+        ? constantsMessages.integrationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
+        ? constantsMessages.vsExportTitle
+        : constantsMessages.declarationTitle
+    )
 
-  render() {
-    const { className, intl, activeMenuItem } = this.props
+  let rightMenu = [
+    {
+      element: <HistoryNavigator />
+    },
+    {
+      element: (
+        <>
+          {!(
+            userDetails?.systemRole &&
+            USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
+          ) && (
+            <HeaderCenter>
+              <Button
+                type="iconPrimary"
+                size="medium"
+                key="newEvent"
+                id="header_new_event"
+                onClick={goToEvents}
+              >
+                <Icon name="Plus" size="medium" />
+              </Button>
 
-    const title =
-      this.props.title ||
-      intl.formatMessage(
-        activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-          ? constantsMessages.performanceTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
-            activeMenuItem === ACTIVE_MENU_ITEM.USERS
-          ? messages.teamTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
-          ? constantsMessages.certificateTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
-          ? constantsMessages.applicationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.FORM
-          ? constantsMessages.formDeclarationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
-          ? constantsMessages.integrationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
-          ? constantsMessages.vsExportTitle
-          : constantsMessages.declarationTitle
+              {renderSearchInput(props)}
+            </HeaderCenter>
+          )}
+        </>
       )
+    },
+    {
+      element: (
+        <HeaderRight>
+          <ProfileMenu key="profileMenu" />
+        </HeaderRight>
+      )
+    }
+  ]
 
-    let rightMenu = [
+  if (
+    activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
+    (NATL_ADMIN_ROLES.includes(userDetails?.systemRole as string) ||
+      SYS_ADMIN_ROLES.includes(userDetails?.systemRole as string))
+  ) {
+    rightMenu = [
       {
         element: <HistoryNavigator />
       },
       {
-        element: (
-          <>
-            {!(
-              this.props.userDetails?.systemRole &&
-              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.systemRole)
-            ) && (
-              <HeaderCenter>
-                <Button
-                  type="iconPrimary"
-                  size="medium"
-                  key="newEvent"
-                  id="header_new_event"
-                  onClick={this.props.goToEvents}
-                >
-                  <Icon name="Plus" size="medium" />
-                </Button>
-
-                {this.renderSearchInput(this.props)}
-              </HeaderCenter>
-            )}
-          </>
-        )
-      },
-      {
-        element: (
-          <HeaderRight>
-            <ProfileMenu key="profileMenu" />
-          </HeaderRight>
-        )
+        element: <ProfileMenu key="profileMenu" />
       }
     ]
-
-    if (
-      activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-      (NATL_ADMIN_ROLES.includes(
-        this.props.userDetails?.systemRole as string
-      ) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.systemRole as string))
-    ) {
-      rightMenu = [
-        {
-          element: <HistoryNavigator />
-        },
-        {
-          element: <ProfileMenu key="profileMenu" />
-        }
-      ]
-    }
-
-    const mobileHeaderActionProps =
-      this.getMobileHeaderActionProps(activeMenuItem)
-
-    const mobileHeaderActionPropsWithDefaults = {
-      mobileRight: this.props.mobileRight,
-      ...mobileHeaderActionProps
-    }
-
-    return (
-      <AppHeader
-        id="register_app_header"
-        desktopRightMenu={rightMenu}
-        className={className}
-        title={title}
-        {...mobileHeaderActionPropsWithDefaults}
-      />
-    )
   }
+
+  const mobileHeaderActionProps = getMobileHeaderActionProps(activeMenuItem)
+
+  const mobileHeaderActionPropsWithDefaults = {
+    mobileRight: mobileRight,
+    ...mobileHeaderActionProps
+  }
+
+  return (
+    <AppHeader
+      id="register_app_header"
+      desktopRightMenu={rightMenu}
+      className={className}
+      title={headerTitle}
+      {...mobileHeaderActionPropsWithDefaults}
+    />
+  )
 }
 
 export const Header = connect(
@@ -528,7 +510,7 @@ export const Header = connect(
     goToAdvancedSearch: goToAdvancedSearch,
     setAdvancedSearchParam: setAdvancedSearchParam
   }
-)(injectIntl(withRouter(HeaderComp)))
+)(injectIntl(withRouter(HeaderComponent)))
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`
