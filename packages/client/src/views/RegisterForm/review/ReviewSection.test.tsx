@@ -23,7 +23,7 @@ import {
   IForm
   // MarriageSection
 } from '@client/forms'
-import { Event as DeclarationEvent } from '@client/utils/gateway'
+import { Event as DeclarationEvent, RegStatus } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { createStore } from '@client/store'
@@ -35,7 +35,6 @@ import {
   mockOfflineDataDispatch,
   resizeWindow
 } from '@client/tests/util'
-import { REJECTED } from '@client/utils/constants'
 import {
   renderSelectDynamicLabel,
   ReviewSection
@@ -79,19 +78,19 @@ const rejectedDraftBirth = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Birth,
-  REJECTED
+  RegStatus.Rejected
 )
 const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Death,
-  REJECTED
+  RegStatus.Rejected
 )
 const rejectedDraftMarriage = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Marriage,
-  REJECTED
+  RegStatus.Rejected
 )
 
 describe('when in device of large viewport', () => {

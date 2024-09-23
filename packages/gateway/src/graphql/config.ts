@@ -17,7 +17,6 @@ import {
   GraphQLError
 } from 'graphql'
 
-import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
@@ -31,9 +30,7 @@ import { resolvers as searchRootResolvers } from '@gateway/features/search/root-
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
 import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
@@ -51,8 +48,6 @@ import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual } from 'lodash'
-import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
-import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
 import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
@@ -78,7 +73,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   locationRootResolvers as IResolvers,
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
-  certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   metricsTypeResolvers as IResolvers,
@@ -87,13 +81,9 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   searchTypeResolvers as IResolvers,
   roleRootResolvers as IResolvers,
   roleTypeResolvers as IResolvers,
-  certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
-  applicationRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  informantSMSNotificationResolvers as IResolvers,
-  informantSMSNotiTypeResolvers as IResolvers,
   OIDPUserInfoResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({

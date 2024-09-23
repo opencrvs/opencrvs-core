@@ -21,7 +21,11 @@ import { useParams } from 'react-router'
 import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'
-import { Event, FetchViewRecordByCompositionQuery } from '@client/utils/gateway'
+import {
+  Event,
+  FetchViewRecordByCompositionQuery,
+  RegStatus
+} from '@client/utils/gateway'
 import styled from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -157,12 +161,12 @@ export const ViewRecord = () => {
     offlineData,
     userDetails!
   )
-  const downloadedAppStatus: string =
+  const downloadedAppStatus: RegStatus | undefined =
     (eventData &&
       eventData.registration &&
       eventData.registration.status &&
       eventData?.registration?.status[0]?.type) ||
-    ''
+    undefined
   const declaration = createReviewDeclaration(
     declarationId,
     transData,
