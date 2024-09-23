@@ -18,6 +18,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: ${{ inputs.pr_number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e:
     if: ${{ !contains(github.actor, 'bot') }}
@@ -71,7 +75,8 @@ jobs:
                 .replace(/[^\w\s-]/g, '')
                 .trim()
                 .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
+                .replace(/-+/g, '-')
+                .substr(0, 35);
             }
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
@@ -121,7 +126,8 @@ jobs:
                 .replace(/[^\w\s-]/g, '')
                 .trim()
                 .replace(/\s+/g, '-')
-                .replace(/-+/g, '-');
+                .replace(/-+/g, '-')
+                .substr(0, 35);
             }
             const branchName = slugify('${{ env.BRANCH_NAME }}');
             const deployMessage = `Your environment is deployed to https://${branchName}.opencrvs.dev.`;
@@ -130,6 +136,11 @@ jobs:
 
             // Check if deploy job has completed
             while (!deployJobCompleted) {
+              const workflowRun = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
               const jobs = await github.rest.actions.listJobsForWorkflowRun({
                 owner,
                 repo,
@@ -137,6 +148,12 @@ jobs:
               });
 
               const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
+              const cancelled = jobs.data.jobs.find(job => job.conclusion === 'cancelled');
+
+              if (cancelled) {
+                throw new Error('E2E workflow was cancelled');
+              }
+
               if (deployJob && deployJob.status === 'completed') {
                 deployJobCompleted = true;
 
@@ -145,6 +162,14 @@ jobs:
                 }
 
                 console.log('Deploy job completed successfully');
+              }
+
+              if(workflowRun.data.status === 'completed') {
+                deployJobCompleted = true;
+
+                if (workflowRun.data.conclusion !== 'success') {
+                  throw new Error('E2E workflow failed');
+                }
               }
 
               if (!deployJobCompleted) {
