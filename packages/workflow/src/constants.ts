@@ -20,7 +20,7 @@ const env = cleanEnv(process.env, {
   SEARCH_URL: url({ devDefault: 'http://localhost:9090/' }),
   WEBHOOKS_URL: url({ devDefault: 'http://localhost:2525/' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050/' }),
-  MOSIP_TOKEN_SEEDER_URL: url({ devDefault: 'http://localhost:8085' }),
+  MOSIP_TOKEN_SEEDER_URL: url({ default: 'http://localhost:8085' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   CERT_PUBLIC_KEY_PATH: str({ default: '../../.secrets/public-key.pem' }),
   DOCUMENTS_URL: url({ default: 'http://localhost:9050' }),
