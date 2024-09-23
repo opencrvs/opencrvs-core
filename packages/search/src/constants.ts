@@ -22,8 +22,7 @@ const env = cleanEnv(process.env, {
   OPENCRVS_INDEX_NAME: str({ default: 'ocrvs' }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
   APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
-  HEARTH_MONGO_URL: url({ devDefault: 'mongodb://localhost/hearth-dev' }),
-  REDIS_HOST: str({ devDefault: 'localhost' })
+  HEARTH_MONGO_URL: url({ devDefault: 'mongodb://localhost/hearth-dev' })
 })
 
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
@@ -40,6 +39,5 @@ export const {
   OPENCRVS_INDEX_NAME,
   DEFAULT_TIMEOUT,
   APPLICATION_CONFIG_URL,
-  HEARTH_MONGO_URL,
-  REDIS_HOST
+  HEARTH_MONGO_URL
 } = env

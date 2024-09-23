@@ -83,6 +83,7 @@ services:
       - base
     environment:
       - NODE_ENV=development
+      - REDIS_HOST=redis
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - DOCUMENTS_URL=http://documents:9050

@@ -28,8 +28,7 @@ const env = cleanEnv(process.env, {
   CONFIG_API_URL: url({ devDefault: 'http://localhost:2021' }),
   DEFAULT_TIMEOUT: num({ default: 600000 }),
   HEARTH_MONGO_URL: str({ devDefault: 'mongodb://localhost/hearth-dev' }),
-  DASHBOARD_MONGO_URL: str({ devDefault: 'mongodb://localhost/performance' }),
-  REDIS_HOST: str({ devDefault: 'localhost' })
+  DASHBOARD_MONGO_URL: str({ devDefault: 'mongodb://localhost/performance' })
 })
 
 export const {
@@ -49,8 +48,7 @@ export const {
   CONFIG_API_URL,
   DEFAULT_TIMEOUT,
   HEARTH_MONGO_URL,
-  DASHBOARD_MONGO_URL,
-  REDIS_HOST
+  DASHBOARD_MONGO_URL
 } = env
 
 export const VS_EXPORT_SCRIPT_PATH = PRODUCTION
