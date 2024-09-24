@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect, useRef } from 'react'
 import { disabled } from '../Button/Button.styles'
 import styled from 'styled-components'
 import { DropdownProvider, useDropdown } from './DropdownContext'
@@ -135,10 +135,33 @@ const Content: React.FC<{
   offset_y: number
   children: ReactNode
 }> = ({ position, offset_x, offset_y, children }) => {
-  const { isOpen } = useDropdown()
+  const { isOpen, closeDropdown } = useDropdown()
+
+  const contentRef = useRef<HTMLUListElement | null>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        contentRef.current &&
+        !contentRef.current.contains(event.target as Node)
+      ) {
+        closeDropdown()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [closeDropdown])
 
   return isOpen ? (
-    <StyledContent position={position} offset_x={offset_x} offset_y={offset_y}>
+    <StyledContent
+      position={position}
+      offset_x={offset_x}
+      offset_y={offset_y}
+      ref={contentRef}
+    >
       {children}
     </StyledContent>
   ) : null
@@ -159,12 +182,15 @@ const Item = ({
   children: ReactNode
   disabled?: boolean
 }) => {
-  const { addItemRef, handleKeyDown, toggleDropdown } = useDropdown()
+  const { addItemRef, handleKeyDown, toggleDropdown, closeDropdown } =
+    useDropdown()
 
   const keyDownhandler = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       onClickHandler()
       toggleDropdown()
+    } else if (e.key === 'Escape') {
+      closeDropdown()
     } else handleKeyDown(e)
   }
 

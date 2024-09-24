@@ -21,6 +21,7 @@ import React, {
 interface DropdownContextType {
   isOpen: boolean
   toggleDropdown: () => void
+  closeDropdown: () => void
   addItemRef: (item: HTMLLIElement | null) => void
   handleKeyDown: (e: React.KeyboardEvent) => void
 }
@@ -51,6 +52,8 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
       if (itemRefs.current.length === 1) itemRefs.current[0]?.focus()
     }
   }
+
+  const closeDropdown = () => isOpen && toggleDropdown()
 
   const toggleDropdown = () => {
     itemRefs.current = []
@@ -87,6 +90,7 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         isOpen,
         toggleDropdown,
+        closeDropdown,
         addItemRef,
         handleKeyDown
       }}
