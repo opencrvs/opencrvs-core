@@ -22,7 +22,7 @@ export const env = cleanEnv(process.env, {
     desc: `Check if the token has been invalided in the auth service before it has expired`
   }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
-  SENTRY_DSN: str({ devDefault: undefined }),
+  SENTRY_DSN: str({ default: undefined }),
   AUTH_URL: url({ devDefault: 'http://localhost:4040/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
   MONGO_URL: url({ devDefault: 'mongodb://localhost/application-config' }),
