@@ -108,7 +108,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   .react-select__option {
     cursor: pointer;
     border-radius: 4px;
-    padding: 12px 16px;
+    padding: 10px 16px;
     ${({ theme }) => theme.fonts.reg18};
     background-color: ${({ theme }) => theme.colors.white};
   }
