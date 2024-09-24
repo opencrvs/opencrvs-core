@@ -137,17 +137,11 @@ const Content: React.FC<{
 }> = ({ position, offset_x, offset_y, children }) => {
   const { isOpen } = useDropdown()
 
-  return (
-    isOpen && (
-      <StyledContent
-        position={position}
-        offset_x={offset_x}
-        offset_y={offset_y}
-      >
-        {children}
-      </StyledContent>
-    )
-  )
+  return isOpen ? (
+    <StyledContent position={position} offset_x={offset_x} offset_y={offset_y}>
+      {children}
+    </StyledContent>
+  ) : null
 }
 
 DropdownMenu.Content = Content
@@ -156,19 +150,37 @@ DropdownMenu.Label = ({ children }: { children: string }) => (
   <Label>{children}</Label>
 )
 
-DropdownMenu.Item = ({
-  onClick,
+const Item = ({
+  onClick: onClickHandler,
   children,
   disabled = false
 }: {
   onClick: () => void
   children: ReactNode
   disabled?: boolean
-}) => (
-  <MenuItem onClick={onClick} disabled={disabled}>
-    {children}
-  </MenuItem>
-)
+}) => {
+  const { addItemRef, handleKeyDown, toggleDropdown } = useDropdown()
+
+  const keyDownhandler = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      onClickHandler()
+      toggleDropdown()
+    } else handleKeyDown(e)
+  }
+
+  return (
+    <MenuItem
+      onClick={onClickHandler}
+      disabled={disabled}
+      tabIndex={disabled ? -1 : 0}
+      ref={(item) => addItemRef(item)}
+      onKeyDown={keyDownhandler}
+    >
+      {children}
+    </MenuItem>
+  )
+}
+DropdownMenu.Item = Item
 
 DropdownMenu.Separator = ({ weight = 1 }: { weight?: number }) => (
   <Separator weight={weight} />
