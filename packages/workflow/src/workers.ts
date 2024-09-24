@@ -32,7 +32,7 @@ export async function register() {
       )
     }
 
-    if (job.name === 'record-validated') {
+    if (job.name === 'record-validated-externally') {
       return markEventAsRegistered(job.data)
     }
   })

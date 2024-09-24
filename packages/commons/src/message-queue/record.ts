@@ -74,7 +74,7 @@ export function useExternalValidationQueue(redisHost: string) {
   async function recordValidated(payload: RecordValidatedPayload) {
     await queue.waitUntilReady()
 
-    await queue.add('record-validated', payload, {
+    await queue.add('record-validated-externally', payload, {
       attempts: Number.MAX_SAFE_INTEGER,
       backoff: {
         type: 'fixed',
@@ -166,7 +166,7 @@ export async function registerExternalValidationsWorker(
   processJob: (
     job:
       | Job<ExternalValidationPayload, any, 'send-to-external-validation'>
-      | Job<RecordValidatedPayload, any, 'record-validated'>
+      | Job<RecordValidatedPayload, any, 'record-validated-externally'>
   ) => Promise<any>
 ) {
   const worker = new Worker<ExternalValidationPayload | RecordValidatedPayload>(
@@ -174,7 +174,7 @@ export async function registerExternalValidationsWorker(
     async (
       job:
         | Job<ExternalValidationPayload, any, 'send-to-external-validation'>
-        | Job<RecordValidatedPayload, any, 'record-validated'>
+        | Job<RecordValidatedPayload, any, 'record-validated-externally'>
     ) => {
       return processJob(job)
     },
