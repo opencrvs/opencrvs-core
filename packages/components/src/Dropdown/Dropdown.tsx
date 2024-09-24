@@ -43,7 +43,7 @@ const StyledContent = styled.ul<{
   display: flex;
   flex-direction: column;
   padding: 8px 0;
-  margin: ${({ offset_x, offset_y }) => `${offset_x}px ${offset_y}px`};
+  margin: ${({ offset_x, offset_y }) => `${offset_y}px ${offset_x}px`};
   list-style: none;
 
   ${({ position }) => {
@@ -130,11 +130,11 @@ const Trigger: React.FC<{ children: JSX.Element }> = ({ children }) => {
 DropdownMenu.Trigger = Trigger
 
 const Content: React.FC<{
-  position: string
-  offset_x: number
-  offset_y: number
+  position?: string
+  offset_x?: number
+  offset_y?: number
   children: ReactNode
-}> = ({ position, offset_x, offset_y, children }) => {
+}> = ({ position = 'bottom-left', offset_x = 0, offset_y = 10, children }) => {
   const { isOpen, closeDropdown } = useDropdown()
 
   const contentRef = useRef<HTMLUListElement | null>(null)
@@ -174,11 +174,11 @@ DropdownMenu.Label = ({ children }: { children: string }) => (
 )
 
 const Item = ({
-  onClick: onClickHandler,
+  onClick: onClickHandler = () => {},
   children,
   disabled = false
 }: {
-  onClick: () => void
+  onClick?: () => void
   children: ReactNode
   disabled?: boolean
 }) => {
