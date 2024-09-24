@@ -896,16 +896,21 @@ class FormSectionComponent extends React.Component<Props> {
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     updatedValues[fieldName] = value
-    const dependentFields = getDependentFields(this.props.fields, fieldName)
-    for (const field of dependentFields) {
-      updatedValues[field.name] = evalExpressionInFieldDefinition(
-        (field.initialValue as DependencyInfo).expression,
-        updatedValues,
-        this.props.offlineCountryConfig,
-        this.props.draftData,
-        this.props.userDetails
-      )
+    const updateDependentFields = (fieldName: string) => {
+      const dependentFields = getDependentFields(this.props.fields, fieldName)
+      for (const field of dependentFields) {
+        updatedValues[field.name] = evalExpressionInFieldDefinition(
+          (field.initialValue as DependencyInfo).expression,
+          updatedValues,
+          this.props.offlineCountryConfig,
+          this.props.draftData,
+          this.props.userDetails
+        )
+        updateDependentFields(field.name)
+      }
     }
+    updateDependentFields(fieldName)
+
     this.props.setValues(updatedValues)
   }
 

@@ -454,6 +454,65 @@ const form = z.object({
         )
     )
     .refine(
+      (sections) => {
+        const fieldMap = new Map()
+        sections.forEach((section) => {
+          section.groups.forEach((group) => {
+            group.fields.forEach((field) => {
+              if (
+                field.initialValue &&
+                typeof field.initialValue === 'object' &&
+                'dependsOn' in field.initialValue
+              ) {
+                fieldMap.set(field.name, field.initialValue.dependsOn)
+              } else {
+                fieldMap.set(field.name, [])
+              }
+            })
+          })
+        })
+
+        const hasCycle = (
+          fieldName: string,
+          visited: Set<string>,
+          stack: Set<string>
+        ) => {
+          if (!visited.has(fieldName)) {
+            visited.add(fieldName)
+            stack.add(fieldName)
+
+            const dependencies = fieldMap.get(fieldName) || []
+            for (const dep of dependencies) {
+              if (!visited.has(dep) && hasCycle(dep, visited, stack)) {
+                return true
+              } else if (stack.has(dep)) {
+                return true
+              }
+            }
+          }
+          stack.delete(fieldName)
+          return false
+        }
+        const visited: Set<string> = new Set()
+        const stack: Set<string> = new Set()
+        for (const section of sections) {
+          for (const group of section.groups) {
+            for (const field of group.fields) {
+              if (hasCycle(field.name, visited, stack)) {
+                return false
+              }
+            }
+          }
+        }
+
+        return true
+      },
+      {
+        message: 'Circular dependency detected among fields'
+      }
+    )
+
+    .refine(
       (sections) =>
         sections
           .find(({ id }) => id === 'review')

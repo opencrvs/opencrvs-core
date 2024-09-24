@@ -28,10 +28,19 @@ export const conditional = z.object({
   expression: z.string()
 })
 
+const dependencyInfo = z.object({
+  dependsOn: z.array(z.string()),
+  expression: z.string()
+})
+export const initialValue = z
+  .union([dependencyInfo, z.string(), z.number(), z.boolean()])
+  .optional()
+
 const base = z
   .object({
     name: z.string(),
     type: z.string(),
+    initialValue,
     custom: z.boolean().optional(),
     label: messageDescriptor,
     conditionals: z.array(conditional).optional(),
