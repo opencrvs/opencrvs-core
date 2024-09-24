@@ -13,7 +13,7 @@ import { METRICS_URL } from '@workflow/constants'
 import { getEventType } from '@workflow/features/registration/utils'
 import fetch from 'node-fetch'
 import { RecordEvent } from './record-events'
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, PlainToken } from '@opencrvs/commons'
 
 export async function createUserAuditEvent(
   action: RecordAction,
@@ -54,9 +54,20 @@ export async function createUserAuditEvent(
   }
   return res
 }
-
+/*
+ * Some Metrics endpoints have been refactored to expect a {record, transactionId} object
+ * as a payload. This function doesn't support those endpoints. Use writeMetricsEvent instead.
+ */
+type EventsAcceptedByLegacyMetricsHandler = Exclude<
+  RecordEvent,
+  | 'waiting-external-validation'
+  | 'sent-for-approval'
+  | 'sent-notification-for-review'
+  | 'sent-notification'
+  | 'registered'
+>
 export async function auditEvent(
-  action: RecordEvent,
+  action: EventsAcceptedByLegacyMetricsHandler,
   bundle: ValidRecord,
   authToken: string
 ) {
@@ -89,7 +100,7 @@ export async function writeMetricsEvent(
     record,
     authToken,
     transactionId
-  }: { record: ValidRecord; authToken: string; transactionId: string }
+  }: { record: ValidRecord; authToken: PlainToken; transactionId: string }
 ) {
   const eventType = getEventType(record).toLowerCase()
   const res = await fetch(

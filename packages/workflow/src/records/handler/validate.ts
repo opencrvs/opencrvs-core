@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createRoute } from '@workflow/states'
-import { getToken } from '@workflow/utils/auth-utils'
+import { getComposition } from '@opencrvs/commons/types'
+import { writeMetricsEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { toValidated } from '@workflow/records/state-transitions'
-import { auditEvent } from '@workflow/records/audit'
+import { createRoute } from '@workflow/states'
+import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
@@ -40,7 +41,11 @@ export const validateRoute = createRoute({
     )
 
     await indexBundle(validatedRecord, token)
-    await auditEvent('sent-for-approval', validatedRecord, token)
+    await writeMetricsEvent('sent-for-approval', {
+      record: validatedRecord,
+      authToken: token,
+      transactionId: `validate__${getComposition(validatedRecord).id}`
+    })
 
     return validatedRecord
   }

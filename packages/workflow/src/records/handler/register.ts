@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { auditEvent } from '@workflow/records/audit'
+import { getComposition } from '@opencrvs/commons/types'
+import { writeMetricsEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { toWaitingForExternalValidationState } from '@workflow/records/state-transitions'
 import { createRoute } from '@workflow/states'
@@ -42,11 +43,13 @@ export const registerRoute = createRoute({
       )
 
     await indexBundle(recordInWaitingValidationState, token)
-    await auditEvent(
-      'waiting-external-validation',
-      recordInWaitingValidationState,
-      token
-    )
+    await writeMetricsEvent('waiting-external-validation', {
+      record: recordInWaitingValidationState,
+      authToken: token,
+      transactionId: `send-to-external-validation__${
+        getComposition(recordInWaitingValidationState).id
+      }`
+    })
 
     return recordInWaitingValidationState
   }

@@ -170,8 +170,6 @@ export function findExtension(
 }
 
 export function getCompositionIdFromCompositionOrTask(bundle: Bundle) {
-  console.log(bundle)
-
   const composition = findComposition(bundle)
 
   if (composition) {
