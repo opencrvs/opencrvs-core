@@ -11,13 +11,7 @@
 
 import { Db, MongoClient } from 'mongodb'
 
-const USER_MGNT_MONGO_URL =
-  process.env.USER_MGNT_MONGO_URL || 'mongodb://localhost/user-mgnt'
-
 export const up = async (db: Db, client: MongoClient) => {
-  const userManagementClient = new MongoClient(USER_MGNT_MONGO_URL)
-  const userMgntDb = (await userManagementClient.connect()).db()
-
   const documents = await db
     .collection('PractitionerRole')
     .find({ 'code.coding.system': 'http://opencrvs.org/specs/types' })
@@ -35,27 +29,6 @@ export const up = async (db: Db, client: MongoClient) => {
       .updateOne({ _id: doc._id }, { $set: { code: filteredCode } })
   }
   console.log('Documents updated.')
-
-  const relatedPersons = await db.collection('RelatedPerson').find().toArray()
-
-  for (const person of relatedPersons) {
-    const relationship = person.relationship.coding[0].code
-    if (relationship === 'PRINT_IN_ADVANCE') {
-      const userRole = person.relationship.text
-      const formattedUserRole = userRole.toUpperCase().replace(' ', '_')
-
-      const userRoleId = userMgntDb.collection('users').find({
-        role: formattedUserRole
-      })
-
-      await db
-        .collection('RelatedPerson')
-        .updateOne(
-          { _id: person._id },
-          { $set: { 'resource.relationship.text': userRoleId } }
-        )
-    }
-  }
 }
 
 export const down = async (db: Db, client: MongoClient) => {}
