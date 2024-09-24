@@ -949,7 +949,6 @@ class FormSectionComponent extends React.Component<Props> {
     const {
       values,
       fields,
-      setFieldValue,
       setFieldTouched,
       touched,
       offlineCountryConfig,
@@ -1204,7 +1203,7 @@ class FormSectionComponent extends React.Component<Props> {
                               ...nestedField,
                               name: nestedFieldName
                             })}
-                            setFieldValue={setFieldValue}
+                            setFieldValue={this.setFieldValuesWithDependency}
                             setFieldTouched={setFieldTouched}
                             resetDependentSelectValues={
                               this.resetDependentSelectValues
@@ -1241,7 +1240,7 @@ class FormSectionComponent extends React.Component<Props> {
                         intl,
                         withDynamicallyGeneratedFields
                       )}
-                      setFieldValue={setFieldValue}
+                      setFieldValue={this.setFieldValuesWithDependency}
                       setFieldTouched={setFieldTouched}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
@@ -1274,7 +1273,7 @@ class FormSectionComponent extends React.Component<Props> {
                           intl,
                           withDynamicallyGeneratedFields
                         )}
-                        setFieldValue={setFieldValue}
+                        setFieldValue={this.setFieldValuesWithDependency}
                         setFieldTouched={setFieldTouched}
                         resetDependentSelectValues={
                           this.resetDependentSelectValues
