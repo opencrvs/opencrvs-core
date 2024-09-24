@@ -4,6 +4,7 @@ FROM opencrvs/ocrvs-base:${BRANCH}
 USER node
 
 ENV CONTENT_SECURITY_POLICY_WILDCARD "{{CONTENT_SECURITY_POLICY_WILDCARD}}"
+ENV COUNTRY_CONFIG_URL_INTERNAL "{{COUNTRY_CONFIG_URL_INTERNAL}}"
 
 WORKDIR /app/packages/components
 COPY --chown=node:node packages/components /app/packages/components

@@ -19,7 +19,7 @@ import dns from 'node:dns'
 dns.setDefaultResultOrder('ipv4first')
 
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+  process.env.COUNTRY_CONFIG_URL_INTERNAL || 'http://localhost:3040'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
