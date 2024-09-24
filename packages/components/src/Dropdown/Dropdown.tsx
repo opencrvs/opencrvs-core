@@ -115,10 +115,28 @@ export type IDropdownPosition =
   | 'left'
   | 'right'
 
+const DropdownWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { closeDropdown } = useDropdown()
+  const rootRef = useRef<HTMLUListElement | null>(null)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+        closeDropdown()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [closeDropdown])
+  return <StyledWrapper ref={rootRef}>{children}</StyledWrapper>
+}
+
 export const DropdownMenu = ({ children }: { children: ReactNode }) => {
   return (
     <DropdownProvider>
-      <StyledWrapper>{children}</StyledWrapper>
+      <DropdownWrapper>{children}</DropdownWrapper>
     </DropdownProvider>
   )
 }
@@ -135,33 +153,10 @@ const Content: React.FC<{
   offset_y?: number
   children: ReactNode
 }> = ({ position = 'bottom-left', offset_x = 0, offset_y = 10, children }) => {
-  const { isOpen, closeDropdown } = useDropdown()
-
-  const contentRef = useRef<HTMLUListElement | null>(null)
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        contentRef.current &&
-        !contentRef.current.contains(event.target as Node)
-      ) {
-        closeDropdown()
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [closeDropdown])
+  const { isOpen } = useDropdown()
 
   return isOpen ? (
-    <StyledContent
-      position={position}
-      offset_x={offset_x}
-      offset_y={offset_y}
-      ref={contentRef}
-    >
+    <StyledContent position={position} offset_x={offset_x} offset_y={offset_y}>
       {children}
     </StyledContent>
   ) : null
