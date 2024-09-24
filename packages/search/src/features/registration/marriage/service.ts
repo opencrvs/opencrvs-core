@@ -63,9 +63,15 @@ export const composeDocument = (
 ) => {
   const task = getTaskFromSavedBundle(bundle)
   const composition = getComposition(bundle)
+  const draftId = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/draft-id'
+  )
+
   const body: SearchDocument = {
     compositionId: composition.id,
     event: EVENT.MARRIAGE,
+    draftId: draftId && draftId.value,
     createdAt:
       existingDocument?.body?.hits?.hits?.[0]?._source?.createdAt ||
       Date.now().toString(),
