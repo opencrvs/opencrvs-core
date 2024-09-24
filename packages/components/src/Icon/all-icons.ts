@@ -69,6 +69,8 @@ export {
   CircleWavyCheck,
   CircleWavyQuestion,
   ArchiveBox,
-  ArrowCircleDown
+  ArrowCircleDown,
+  FileArrowUp,
+  PencilLine
 } from 'phosphor-react'
 export * from './custom-icons'

@@ -126,6 +126,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
+import { ActionMenu } from './ActionMenu'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -521,6 +522,19 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
+
+  actions.push(
+    <ActionMenu
+      declaration={declaration}
+      intl={intl}
+      scope={scope as any}
+      draft={draft}
+      userDetails={userDetails}
+      toggleDisplayDialog={toggleDisplayDialog}
+      goToPage={goToPage}
+    />
+  )
+  desktopActionsView.push(actions[actions.length - 1])
 
   if (!isDownloaded) {
     actions.push(
