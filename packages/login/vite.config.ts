@@ -18,6 +18,11 @@ import dns from 'node:dns'
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
 dns.setDefaultResultOrder('ipv4first')
 
+if (process.env.NODE_ENV === 'production' && !process.env.COUNTRY_CONFIG_URL) {
+  throw new Error(
+    `Missing environment variable: COUNTRY_CONFIG_URL. Please set it to your country config URL.`
+  )
+}
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 
