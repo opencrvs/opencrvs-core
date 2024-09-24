@@ -8,7 +8,7 @@
   "scripts": {
     "start": "yarn build && ./run-migrations.sh",
     "revert": "./revert-migrations.sh",
-    "start:prod": "./run-migrations.sh",
+    "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-migrations.sh hearth",
     "create:openhim": "./create-migrations.sh openhim",
     "create:performance": "./create-migrations.sh performance",
