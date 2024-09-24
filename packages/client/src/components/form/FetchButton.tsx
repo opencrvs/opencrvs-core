@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { ApolloError, ApolloQueryResult, ApolloConsumer } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
@@ -36,16 +36,6 @@ interface IFetchButtonProps {
   errorTitle: string
   onFetch?: (response: any) => void
   isDisabled?: boolean
-}
-
-interface IFetchButtonState {
-  response?: ApolloQueryResult<GQLQuery>
-  error?: boolean
-  success?: boolean
-  loading?: boolean
-  show?: boolean
-  isDisconnected: boolean
-  networkError?: boolean
 }
 
 type IFullProps = IFetchButtonProps & IntlShapeProps
@@ -114,75 +104,81 @@ const StyledPrimaryButton = styled(PrimaryButton)`
     }`
   }}
 `
-class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      loading: false,
-      error: false,
-      isDisconnected: false
-    }
-  }
+const FetchButton = (props: IFullProps) => {
+  const {
+    intl,
+    label,
+    modalTitle,
+    successTitle,
+    errorTitle,
+    queryData,
+    isDisabled,
+    onFetch
+  } = props
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [show, setShow] = useState(false)
+  const [isDisconnected, setIsDisconnected] = useState(!isNavigatorOnline())
+  const [networkError, setNetworkError] = useState(false)
 
-  componentDidMount() {
-    this.handleConnectionChange()
-    window.addEventListener('online', this.handleConnectionChange)
-    window.addEventListener('offline', this.handleConnectionChange)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('online', this.handleConnectionChange)
-    window.removeEventListener('offline', this.handleConnectionChange)
-  }
-
-  handleConnectionChange = () => {
+  const handleConnectionChange = () => {
     const condition = isNavigatorOnline() ? 'online' : 'offline'
     if (condition === 'online') {
-      return this.setState({ isDisconnected: false })
+      return setIsDisconnected(false)
     }
-
-    return this.setState({ isDisconnected: true })
+    return setIsDisconnected(true)
   }
 
-  hideModal = () => {
-    this.setState({
-      show: false,
-      loading: false,
-      error: false,
-      networkError: false,
-      response: undefined
-    })
+  useEffect(() => {
+    handleConnectionChange()
+    window.addEventListener('online', handleConnectionChange)
+    window.addEventListener('offline', handleConnectionChange)
+
+    return () => {
+      window.removeEventListener('online', handleConnectionChange)
+      window.removeEventListener('offline', handleConnectionChange)
+    }
+  }, [])
+
+  const hideModal = () => {
+    setShow(false)
+    setLoading(false)
+    setError(false)
+    setNetworkError(false)
   }
-  performQuery = async (client: any) => {
-    const { query, variables, responseTransformer } = this.props
-      .queryData as IQuery
+
+  const performQuery = async (client: any) => {
+    const { query, variables, responseTransformer } = queryData as IQuery
     try {
-      this.setState({ show: true, loading: true, success: false, error: false })
+      setShow(true)
+      setLoading(true)
+      setSuccess(false)
+      setError(false)
       const response = await client.query({
         query,
         variables
       })
-      this.setState({ success: true, loading: false, error: false })
-      if (responseTransformer && this.props.onFetch) {
+      setSuccess(true)
+      setLoading(false)
+      setError(false)
+      if (responseTransformer && onFetch) {
         const transformedResponse = responseTransformer(response)
-        this.props.onFetch(transformedResponse)
+        onFetch(transformedResponse)
       }
     } catch (error) {
       Sentry.captureException(error)
-      this.setState({
-        error: true,
-        loading: false,
-        success: false,
-        networkError:
-          error instanceof ApolloError && Boolean(error.networkError)
-            ? true
-            : false
-      })
+      setError(true)
+      setLoading(false)
+      setSuccess(false)
+      setNetworkError(
+        error instanceof ApolloError && Boolean(error.networkError)
+      )
     }
   }
 
-  getModalInfo = (intl: IntlShape) => {
-    const { variables, modalInfoText } = this.props.queryData as IQuery
+  const getModalInfo = (intl: IntlShape) => {
+    const { variables, modalInfoText } = queryData as IQuery
     return (
       <>
         {modalInfoText && <Info>{intl.formatMessage(modalInfoText)}</Info>}
@@ -191,89 +187,73 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
     )
   }
 
-  render() {
-    const {
-      intl,
-      label,
-      modalTitle,
-      successTitle,
-      errorTitle,
-      queryData,
-      isDisabled
-    } = this.props
-    const { loading, error, success, show, isDisconnected, networkError } =
-      this.state
+  return (
+    <Container {...props}>
+      <ApolloConsumer>
+        {(client) => {
+          return (
+            <div>
+              <StyledPrimaryButton
+                type={'button'}
+                disabled={isDisabled || isDisconnected}
+                onClick={async (event: React.MouseEvent<HTMLElement>) => {
+                  performQuery(client)
+                  event.preventDefault()
+                }}
+              >
+                {label}
+              </StyledPrimaryButton>
+              {show && (
+                <Backdrop>
+                  <ModalContent>
+                    {success && (
+                      <>
+                        <Heading>{successTitle}</Heading>
+                        {getModalInfo(intl)}
+                        <StyledSuccess id="loader-button-success" />
+                      </>
+                    )}
 
-    return (
-      <Container {...this.props}>
-        <ApolloConsumer>
-          {(client) => {
-            return (
-              <div>
-                <StyledPrimaryButton
-                  type={'button'}
-                  disabled={isDisabled || isDisconnected}
-                  onClick={async (event: React.MouseEvent<HTMLElement>) => {
-                    this.performQuery(client)
-                    event.preventDefault()
-                  }}
-                >
-                  {label}
-                </StyledPrimaryButton>
-                {show && (
-                  <Backdrop>
-                    <ModalContent>
-                      {success && (
-                        <>
-                          <Heading>{successTitle}</Heading>
-                          {this.getModalInfo(intl)}
-                          <StyledSuccess id="loader-button-success" />
-                        </>
-                      )}
+                    {error && (
+                      <>
+                        <Heading>{errorTitle}</Heading>
+                        {getModalInfo(intl)}
+                        <StyledError id="loader-button-error" />
+                        {queryData && (
+                          <Info>
+                            {!networkError
+                              ? intl.formatMessage(queryData.errorText)
+                              : intl.formatMessage(queryData.networkErrorText)}
+                          </Info>
+                        )}
+                      </>
+                    )}
 
-                      {error && (
-                        <>
-                          <Heading>{errorTitle}</Heading>
-                          {this.getModalInfo(intl)}
-                          <StyledError id="loader-button-error" />
-                          {queryData && (
-                            <Info>
-                              {!networkError
-                                ? intl.formatMessage(queryData.errorText)
-                                : intl.formatMessage(
-                                    queryData.networkErrorText
-                                  )}
-                            </Info>
-                          )}
-                        </>
-                      )}
-
-                      {loading && (
-                        <>
-                          <Heading>{modalTitle}</Heading>
-                          {this.getModalInfo(intl)}
-                          <StyledSpinner id="loader-button-spinner" />
-                          <ConfirmButton onClick={this.hideModal}>
-                            {intl.formatMessage(buttonMessages.cancel)}
-                          </ConfirmButton>
-                        </>
-                      )}
-
-                      {!loading && (
-                        <ConfirmButton onClick={this.hideModal}>
-                          {intl.formatMessage(buttonMessages.back)}
+                    {loading && (
+                      <>
+                        <Heading>{modalTitle}</Heading>
+                        {getModalInfo(intl)}
+                        <StyledSpinner id="loader-button-spinner" />
+                        <ConfirmButton onClick={hideModal}>
+                          {intl.formatMessage(buttonMessages.cancel)}
                         </ConfirmButton>
-                      )}
-                    </ModalContent>
-                  </Backdrop>
-                )}
-              </div>
-            )
-          }}
-        </ApolloConsumer>
-      </Container>
-    )
-  }
+                      </>
+                    )}
+
+                    {!loading && (
+                      <ConfirmButton onClick={hideModal}>
+                        {intl.formatMessage(buttonMessages.back)}
+                      </ConfirmButton>
+                    )}
+                  </ModalContent>
+                </Backdrop>
+              )}
+            </div>
+          )
+        }}
+      </ApolloConsumer>
+    </Container>
+  )
 }
 
 export const FetchButtonField = injectIntl<'intl', IFullProps>(FetchButton)
