@@ -8,7 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { useExternalValidationQueue } from '@opencrvs/commons/message-queue'
 import { getComposition } from '@opencrvs/commons/types'
+import { REDIS_HOST } from '@workflow/constants'
 import { writeMetricsEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { toWaitingForExternalValidationState } from '@workflow/records/state-transitions'
@@ -16,6 +18,8 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
+
+const { sendForExternalValidation } = useExternalValidationQueue(REDIS_HOST)
 
 export const registerRoute = createRoute({
   method: 'POST',
@@ -49,6 +53,11 @@ export const registerRoute = createRoute({
       transactionId: `send-to-external-validation__${
         getComposition(recordInWaitingValidationState).id
       }`
+    })
+
+    await sendForExternalValidation({
+      record: recordInWaitingValidationState,
+      token
     })
 
     return recordInWaitingValidationState
