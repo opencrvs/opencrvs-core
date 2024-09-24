@@ -55,7 +55,10 @@ export function httpErrorResponseValidator(httpFieldName: string): Validation {
     ___: unknown,
     form?: IFormSectionData
   ) {
-    const errorInHttpField = get(form, `${httpFieldName}.error`)?.toString()
+    const errorInHttpField = get(
+      form,
+      `${httpFieldName}.error.message`
+    )?.toString()
     if (errorInHttpField) {
       return {
         message: {
@@ -67,35 +70,100 @@ export function httpErrorResponseValidator(httpFieldName: string): Validation {
   }
 }
 
-export function useHttp<T>(
+interface IRequestState<T> {
+  loading: boolean
+  success: boolean
+  data: T | null
+  error: { statusCode: number; message: string } | null
+  networkError: boolean
+  isCompleted: boolean
+}
+
+class HttpError extends Error {
+  statusCode: number
+  constructor({
+    statusCode,
+    message
+  }: {
+    statusCode: number
+    message: string
+  }) {
+    super()
+    this.statusCode = statusCode
+    this.message = message
+  }
+}
+
+export function useHttp<T = any>(
   field: IHttpFormField,
+  onChange: ({
+    loading,
+    success,
+    data,
+    error,
+    networkError,
+    isCompleted
+  }: IRequestState<T>) => void,
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {
-  const [loading, setLoading] = useState<boolean>(false)
-  const [data, setData] = useState<T | undefined>(undefined)
-  const [error, setError] = useState<string | undefined>(undefined)
+  const [requestState, setRequestState] = useState<IRequestState<T>>({
+    loading: false,
+    success: false,
+    data: null,
+    error: null,
+    networkError: false,
+    isCompleted: false
+  })
   const call = () => {
-    setLoading(true)
+    setRequestState((state) => {
+      const updatedState = {
+        ...state,
+        loading: true,
+        isCompleted: false
+      }
+      onChange(updatedState)
+      return updatedState
+    })
     transformHttpFieldIntoRequest(field, ...evalParams)
       .then((res) => {
         if (res.ok) {
           return res.json()
         }
-        throw new Error(res.statusText)
+        throw new HttpError({
+          statusCode: res.status,
+          message: res.statusText
+        })
       })
       .then((data) => {
-        setLoading(false)
-        setData(data)
+        setRequestState((state) => {
+          const updatedState = {
+            ...state,
+            loading: false,
+            isCompleted: true,
+            data
+          }
+          onChange(updatedState)
+          return updatedState
+        })
       })
       .catch((error) => {
-        setLoading(false)
-        setError(error.message)
+        setRequestState((state) => {
+          const updatedState = {
+            ...state,
+            loading: false,
+            isCompleted: true,
+            error: {
+              statusCode: error.statusCode,
+              message: error.message
+            }
+          }
+          onChange(updatedState)
+          return updatedState
+        })
       })
   }
   return {
     call,
-    loading,
-    data,
-    error
+    ...requestState
   }
 }

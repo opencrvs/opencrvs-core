@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Button, ButtonProps, Icon } from '@opencrvs/components/lib'
 import {
   Ii18nButtonFormField,
@@ -50,31 +50,26 @@ export function ButtonField(props: ButtonFieldProps) {
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.trigger
   )!
-  const { call, loading, data, error } = useHttp<string>(
+  const onChange: Parameters<typeof useHttp>[1] = ({
+    data,
+    error,
+    loading,
+    isCompleted
+  }) => {
+    if (isCompleted) {
+      setFieldTouched(fieldDefinition.name)
+    }
+    setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
+  }
+  const { call, loading } = useHttp<string>(
     trigger as IHttpFormField,
+    onChange,
     values,
     offlineCountryConfig,
     draftData,
     userDetails
   )
-  useEffect(() => {
-    function updateFormState() {
-      const isRequestCompleted = Boolean(data) || Boolean(error)
-      if (isRequestCompleted) {
-        setFieldTouched(fieldDefinition.name)
-      }
-      setFieldValue(trigger.name, { loading, data, error })
-    }
-    updateFormState()
-  }, [
-    loading,
-    data,
-    error,
-    setFieldValue,
-    trigger.name,
-    setFieldTouched,
-    fieldDefinition.name
-  ])
+
   const supportedIcon = handleUnsupportedIcon(icon)
   const isLoading = fieldDefinition.options.shouldHandleLoadingState && loading
   const label =
