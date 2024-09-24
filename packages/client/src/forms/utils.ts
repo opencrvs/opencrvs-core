@@ -785,11 +785,7 @@ export function isFieldHttp(field: IFormField): field is IHttpFormField {
 export function isInitialValueDependencyInfo(
   value: InitialValue
 ): value is DependencyInfo {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    Boolean((value as DependencyInfo).dependsOn)
-  )
+  return typeof value === 'object' && value !== null && 'dependsOn' in value
 }
 
 export function getDependentFields(
