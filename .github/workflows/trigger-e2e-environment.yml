@@ -136,6 +136,11 @@ jobs:
 
             // Check if deploy job has completed
             while (!deployJobCompleted) {
+              const workflowRun = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
               const jobs = await github.rest.actions.listJobsForWorkflowRun({
                 owner,
                 repo,
@@ -157,6 +162,14 @@ jobs:
                 }
 
                 console.log('Deploy job completed successfully');
+              }
+
+              if(workflowRun.data.status === 'completed') {
+                deployJobCompleted = true;
+
+                if (workflowRun.data.conclusion !== 'success') {
+                  throw new Error('E2E workflow failed');
+                }
               }
 
               if (!deployJobCompleted) {
