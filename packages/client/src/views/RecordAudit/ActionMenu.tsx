@@ -71,152 +71,22 @@ export const ActionMenu: React.FC<{
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
 
-  const { id, type, assignment } = declaration
+  const { id, type, assignment, status } = declaration
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
-  const recordOrDeclaration = [
-    SUBMISSION_STATUS.REGISTERED,
-    SUBMISSION_STATUS.CORRECTION_REQUESTED,
-    SUBMISSION_STATUS.CERTIFIED
-  ].includes(declaration.status as any as SUBMISSION_STATUS)
-    ? 'record'
-    : 'declaration'
-
-  const ViewAction = () => (
-    <DropdownMenu.Item
-      onClick={() => {
-        dispatch(goToViewRecordPage(id as string))
-      }}
-    >
-      <Icon name="Eye" color="currentColor" size="large" />
-      {intl.formatMessage(messages.view, { recordOrDeclaration })}
-    </DropdownMenu.Item>
-  )
-
-  const CorrectRecordAction = () => (
-    <DropdownMenu.Item
-      onClick={() => {
-        clearCorrectionAndPrintChanges(id)
-        goToCertificateCorrection(id, CorrectionSection.Corrector)
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="NotePencil" color="currentColor" size="large" />
-      {intl.formatMessage(messages.correctRecord)}
-    </DropdownMenu.Item>
-  )
-
-  const ArchiveAction = () => (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
-      <Icon name="Archive" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.archive)}
-    </DropdownMenu.Item>
-  )
-
-  const ReinstateAction = () => (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
-      <Icon name="FileArrowUp" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.reinstate)}
-    </DropdownMenu.Item>
-  )
-
-  const ReviewAction = () => {
-    return (
-      <DropdownMenu.Item
-        onClick={() => {
-          if (declaration.status === EVENT_STATUS.CORRECTION_REQUESTED) {
-            goToPage(REVIEW_CORRECTION, id, 'review', type!)
-          } else {
-            goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type!)
-          }
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="PencilLine" color="currentColor" size="large" />
-        {intl.formatMessage(constantsMessages.review)}
-      </DropdownMenu.Item>
-    )
-  }
-
-  const DeleteAction = () => {
-    return (
-      <DropdownMenu.Item
-        onClick={async () => {
-          const deleteConfirm = await openModal<boolean | null>((close) => (
-            <DeleteModal intl={intl} close={close}></DeleteModal>
-          ))
-          if (deleteConfirm) {
-            dispatch(deleteDeclaration(declaration.id, client))
-            dispatch(goToHome())
-          }
-          return
-        }}
-      >
-        <Icon name="Trash" color="currentColor" size="large" />
-        {intl.formatMessage(buttonMessages.deleteDeclaration)}
-      </DropdownMenu.Item>
-    )
-  }
-
-  const UpdateAction = () => {
-    let PAGE_ROUTE: string, PAGE_ID: string
-
-    if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
-      PAGE_ID = 'preview'
-      if (type === 'birth') {
-        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
-      } else if (type === 'death') {
-        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
-      } else if (type === 'marriage') {
-        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
-      }
-    } else {
-      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
-      PAGE_ID = 'review'
+  const handleDelete = async () => {
+    const deleteConfirm = await openModal<boolean | null>((close) => (
+      <DeleteModal intl={intl} close={close}></DeleteModal>
+    ))
+    if (deleteConfirm) {
+      dispatch(deleteDeclaration(id, client))
+      dispatch(goToHome())
     }
-    return (
-      <DropdownMenu.Item
-        onClick={() => {
-          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type as string)
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="PencilCircle" color="currentColor" size="large" />
-        {intl.formatMessage(buttonMessages.update)}
-      </DropdownMenu.Item>
-    )
+    return
   }
-
-  const PrintAction = () => (
-    <DropdownMenu.Item
-      onClick={() => {
-        clearCorrectionAndPrintChanges &&
-          clearCorrectionAndPrintChanges(declaration.id)
-        goToPrintCertificate &&
-          goToPrintCertificate(id, (type as string).toLocaleLowerCase())
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="Printer" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.print)}
-    </DropdownMenu.Item>
-  )
-
-  const IssueAction = () => (
-    <DropdownMenu.Item
-      onClick={() => {
-        dispatch(clearCorrectionAndPrintChanges(id))
-        dispatch(goToIssueCertificate(id))
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="Handshake" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.issue)}
-    </DropdownMenu.Item>
-  )
 
   return (
     <>
@@ -238,18 +108,263 @@ export const ActionMenu: React.FC<{
               <DropdownMenu.Separator />
             </>
           )}
-          <ViewAction />
-          <CorrectRecordAction />
-          <ArchiveAction />
-          <ReinstateAction />
-          <ReviewAction />
-          <UpdateAction />
-          <PrintAction />
-          <IssueAction />
-          <DeleteAction />
+          <ViewAction
+            declarationId={id}
+            declarationStatus={status}
+            intl={intl}
+          />
+          <CorrectRecordAction
+            declarationId={id}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <ArchiveAction
+            toggleDisplayDialog={toggleDisplayDialog}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <ReinstateAction
+            toggleDisplayDialog={toggleDisplayDialog}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <ReviewAction
+            declarationId={id}
+            declarationStatus={status}
+            type={type}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <UpdateAction
+            declarationId={id}
+            declarationStatus={status}
+            type={type}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <PrintAction
+            declarationId={id}
+            type={type}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <IssueAction
+            declarationId={id}
+            isDownloaded={isDownloaded}
+            intl={intl}
+          />
+          <DeleteAction handleDelete={handleDelete} intl={intl} />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modal}
     </>
+  )
+}
+
+interface ActionItemProps {
+  declarationId?: string
+  type?: string
+  declarationStatus?: string
+  declaration?: IDeclarationData
+  intl: IntlShape
+  scope?: Scope | null
+  draft?: IDeclaration | null
+  userDetails?: UserDetails | null
+  toggleDisplayDialog?: () => void
+  goToPage?: typeof goToPage
+  goToPrintCertificate?: typeof goToPrintCertificate
+  isDownloaded?: boolean
+}
+
+const ViewAction: React.FC<ActionItemProps> = ({
+  declarationStatus,
+  declarationId,
+  intl
+}) => {
+  const dispatch = useDispatch()
+
+  const recordOrDeclaration = [
+    SUBMISSION_STATUS.REGISTERED,
+    SUBMISSION_STATUS.CORRECTION_REQUESTED,
+    SUBMISSION_STATUS.CERTIFIED
+  ].includes(declarationStatus as any as SUBMISSION_STATUS)
+    ? 'record'
+    : 'declaration'
+
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(goToViewRecordPage(declarationId as string))
+      }}
+    >
+      <Icon name="Eye" color="currentColor" size="large" />
+      {intl.formatMessage(messages.view, { recordOrDeclaration })}
+    </DropdownMenu.Item>
+  )
+}
+
+const CorrectRecordAction: React.FC<ActionItemProps> = ({
+  declarationId,
+  isDownloaded,
+  intl
+}) => (
+  <DropdownMenu.Item
+    onClick={() => {
+      clearCorrectionAndPrintChanges(declarationId as string)
+      goToCertificateCorrection(
+        declarationId as string,
+        CorrectionSection.Corrector
+      )
+    }}
+    disabled={!isDownloaded}
+  >
+    <Icon name="NotePencil" color="currentColor" size="large" />
+    {intl.formatMessage(messages.correctRecord)}
+  </DropdownMenu.Item>
+)
+const ArchiveAction: React.FC<ActionItemProps> = ({
+  toggleDisplayDialog,
+  intl,
+  isDownloaded
+}) => (
+  <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+    <Icon name="Archive" color="currentColor" size="large" />
+    {intl.formatMessage(buttonMessages.archive)}
+  </DropdownMenu.Item>
+)
+
+const ReinstateAction: React.FC<ActionItemProps> = ({
+  toggleDisplayDialog,
+  isDownloaded,
+  intl
+}) => (
+  <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+    <Icon name="FileArrowUp" color="currentColor" size="large" />
+    {intl.formatMessage(buttonMessages.reinstate)}
+  </DropdownMenu.Item>
+)
+
+const ReviewAction: React.FC<ActionItemProps> = ({
+  declarationId,
+  declarationStatus,
+  type,
+  isDownloaded,
+  intl
+}) => {
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        if (declarationStatus === EVENT_STATUS.CORRECTION_REQUESTED) {
+          goToPage(
+            REVIEW_CORRECTION,
+            declarationId as string,
+            'review',
+            type as string
+          )
+        } else {
+          goToPage(
+            REVIEW_EVENT_PARENT_FORM_PAGE,
+            declarationId as string,
+            'review',
+            type as string
+          )
+        }
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="PencilLine" color="currentColor" size="large" />
+      {intl.formatMessage(constantsMessages.review)}
+    </DropdownMenu.Item>
+  )
+}
+
+const UpdateAction: React.FC<ActionItemProps> = ({
+  declarationId,
+  declarationStatus,
+  type,
+  isDownloaded,
+  intl
+}) => {
+  let PAGE_ROUTE: string, PAGE_ID: string
+
+  if (declarationStatus === SUBMISSION_STATUS.DRAFT) {
+    PAGE_ID = 'preview'
+    if (type === 'birth') {
+      PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+    } else if (type === 'death') {
+      PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+    } else if (type === 'marriage') {
+      PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
+    }
+  } else {
+    PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
+    PAGE_ID = 'review'
+  }
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        goToPage &&
+          goToPage(PAGE_ROUTE, declarationId as string, PAGE_ID, type as string)
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="PencilCircle" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.update)}
+    </DropdownMenu.Item>
+  )
+}
+
+const PrintAction: React.FC<ActionItemProps> = ({
+  declarationId,
+  type,
+  isDownloaded,
+  intl
+}) => (
+  <DropdownMenu.Item
+    onClick={() => {
+      clearCorrectionAndPrintChanges &&
+        clearCorrectionAndPrintChanges(declarationId as string)
+      goToPrintCertificate &&
+        goToPrintCertificate(
+          declarationId as string,
+          (type as string).toLocaleLowerCase()
+        )
+    }}
+    disabled={!isDownloaded}
+  >
+    <Icon name="Printer" color="currentColor" size="large" />
+    {intl.formatMessage(buttonMessages.print)}
+  </DropdownMenu.Item>
+)
+
+const IssueAction: React.FC<ActionItemProps> = ({
+  declarationId,
+  isDownloaded,
+  intl
+}) => {
+  const dispatch = useDispatch()
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+        dispatch(goToIssueCertificate(declarationId as string))
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="Handshake" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.issue)}
+    </DropdownMenu.Item>
+  )
+}
+
+const DeleteAction: React.FC<{
+  intl: IntlShape
+  handleDelete: () => void
+}> = ({ intl, handleDelete }) => {
+  return (
+    <DropdownMenu.Item onClick={handleDelete}>
+      <Icon name="Trash" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.deleteDeclaration)}
+    </DropdownMenu.Item>
   )
 }
