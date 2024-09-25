@@ -958,6 +958,8 @@ export async function toCertified(
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    certificateDetails.collector,
+    certifiedTask,
     certificateDetails.data
   )
 
@@ -1040,6 +1042,8 @@ export async function toIssued(
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    certificateDetails.collector,
+    issuedTask,
     undefined,
     paymentEntry.fullUrl
   )

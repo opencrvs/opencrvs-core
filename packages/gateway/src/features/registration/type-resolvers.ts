@@ -663,37 +663,12 @@ export const typeResolvers: GQLResolver = {
       return person?.address
     }
   },
-  // incomplete
   Practitioner: {
-    id: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    active: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    address: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    birthDate: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    gender: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    identifier: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
     name: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    photo: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
+      return practitioner.name
     },
     telecom: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
-    },
-    resourceType: (practitioner: Saved<Practitioner>) => {
-      return practitioner.id
+      return practitioner.telecom
     }
   },
   Deceased: {
@@ -1278,7 +1253,29 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-    async certifier(docRef: any, _, context) {}
+    async certifier(docRef: DocumentReference, _, context) {
+      const practitionerRef =
+        docRef.extension &&
+        findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
+          docRef.extension
+        )
+
+      if (
+        practitionerRef &&
+        practitionerRef.valueReference &&
+        practitionerRef.valueReference.reference &&
+        practitionerRef.valueReference.reference.startsWith('Practitioner')
+      ) {
+        return getResourceFromBundleById<Practitioner>(
+          context.record!,
+          resourceIdentifierToUUID(
+            practitionerRef.valueReference.reference as ResourceIdentifier
+          )
+        )
+      }
+      return null
+    }
   },
   Identifier: {
     system: (identifier) => identifier.system,

@@ -50,7 +50,8 @@ import {
   urlReferenceToResourceIdentifier,
   RegistrationStatus,
   getResourceFromBundleById,
-  TransactionResponse
+  TransactionResponse,
+  findExtension
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -216,9 +217,21 @@ export function createDocumentReferenceEntryForCertificate(
   temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
+  collectorDetails: CertifyInput['collector'],
+  currentTask: SavedTask,
   attachmentUrl?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
+  /* For 'PRINT_IN_ADVANCE' records, there will be no related person entry to add. Thus the
+  related person id should not be referenced rather the regLastUser Practitioner is referenced.*/
+  const collectorReference =
+    collectorDetails.relationship !== 'PRINT_IN_ADVANCE'
+      ? (`urn:uuid:${temporaryRelatedPersonId}` as const)
+      : findExtension(
+          'http://opencrvs.org/specs/extension/regLastUser',
+          currentTask.extension
+        )!.valueReference.reference
+
   return {
     fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
     resource: {
@@ -231,7 +244,7 @@ export function createDocumentReferenceEntryForCertificate(
         {
           url: 'http://opencrvs.org/specs/extension/collector',
           valueReference: {
-            reference: `urn:uuid:${temporaryRelatedPersonId}`
+            reference: collectorReference
           }
         },
         {
@@ -286,7 +299,7 @@ export function createRelatedPersonEntries(
   collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
   record: RegisteredRecord | CertifiedRecord
-): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] {
+): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] | [] {
   const knownRelationships = z.enum([
     'MOTHER',
     'FATHER',
@@ -301,6 +314,7 @@ export function createRelatedPersonEntries(
     `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
 
   if ('otherRelationship' in collectorDetails) {
+    if (collectorDetails.relationship === 'PRINT_IN_ADVANCE') return []
     const temporaryPatientId = getUUID()
     return [
       {
