@@ -27,6 +27,7 @@ import { Scope } from '@sentry/react'
 import { IDeclarationData } from './utils'
 import {
   clearCorrectionAndPrintChanges,
+  deleteDeclaration,
   DOWNLOAD_STATUS,
   IDeclaration,
   SUBMISSION_STATUS
@@ -43,6 +44,9 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { messages } from '@client/i18n/messages/views/action'
+import { useModal } from '@client/hooks/useModal'
+import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
+import { client } from '@client/utils/apolloClient'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -134,11 +138,26 @@ export const ActionMenu: React.FC<{
   }
 
   const DeleteAction = () => {
+    const [modal, openModal] = useModal()
+    const dispatch = useDispatch()
+
     return (
-      <DropdownMenu.Item onClick={() => {}}>
-        <Icon name="Trash" color="currentColor" size="large" />
-        {intl.formatMessage(buttonMessages.deleteDeclaration)}
-      </DropdownMenu.Item>
+      <>
+        <DropdownMenu.Item
+          onClick={async () => {
+            const deleteConfirm = await openModal<boolean | null>((close) => (
+              <DeleteModal intl={intl} close={close}></DeleteModal>
+            ))
+
+            deleteConfirm && dispatch(deleteDeclaration(declaration.id, client))
+            return
+          }}
+        >
+          <Icon name="Trash" color="currentColor" size="large" />
+          {intl.formatMessage(buttonMessages.deleteDeclaration)}
+        </DropdownMenu.Item>
+        {modal}
+      </>
     )
   }
 
