@@ -55,6 +55,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          repository: 'opencrvs/opencrvs-core'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
 
       - name: Get the PR branch name
         id: get_branch
