@@ -129,9 +129,8 @@ export function useHttp<T = any>(
         if (res.ok) {
           return res.json()
         }
-        throw new HttpError({
-          statusCode: res.status,
-          message: res.statusText
+        return res.json().then((error: HttpError) => {
+          throw new HttpError(error)
         })
       })
       .then((data) => {
