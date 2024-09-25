@@ -70,6 +70,8 @@ jobs:
         id: get_branch
         run: |
           echo "PR_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json headRefName --jq .headRefName)" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
 
       - name: Build components
         run: cd packages/components && yarn build
