@@ -1928,6 +1928,7 @@ type Practitioner {
   gender: String
   birthDate: String
   photo: [Attachment]
+  role: String
 }
 
 interface AuditLogItemBase {

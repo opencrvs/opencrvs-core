@@ -389,6 +389,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               value
               use
             }
+            role
           }
         }
         duplicateOf
@@ -656,18 +657,17 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             }
           }
           certifier {
-            identifier
             name {
               use
               firstNames
               familyName
             }
-            address
             telecom {
               system
               value
               use
             }
+            role
           }
         }
         duplicateOf

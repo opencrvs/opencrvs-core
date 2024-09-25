@@ -14554,7 +14554,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Identifier",
+                "name": "IdentityType",
                 "ofType": null
               }
             },
@@ -14595,6 +14595,18 @@
           },
           {
             "name": "resourceType",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "role",
             "description": null,
             "args": [],
             "type": {

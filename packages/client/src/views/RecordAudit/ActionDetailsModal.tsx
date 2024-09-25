@@ -413,8 +413,8 @@ const ActionDetailsModalListTable = ({
       }`
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
-      if (!certificate.collector?.relationship) {
-        return `${collectorName} (${certificate.collector?.otherRelationship})`
+      if (certificate.certifier?.role) {
+        return `${collectorName} (${certificate.certifier?.role})`
       }
       return collectorName
     }

@@ -1701,10 +1701,11 @@ export type Practitioner = {
   birthDate?: Maybe<Scalars['String']>
   gender?: Maybe<Scalars['String']>
   id: Scalars['ID']
-  identifier?: Maybe<Array<Maybe<Identifier>>>
+  identifier?: Maybe<Array<Maybe<IdentityType>>>
   name?: Maybe<Array<Maybe<HumanName>>>
   photo?: Maybe<Array<Maybe<Attachment>>>
   resourceType?: Maybe<Scalars['String']>
+  role?: Maybe<Scalars['String']>
   telecom?: Maybe<Array<Maybe<ContactPoint>>>
 }
 
@@ -3794,6 +3795,22 @@ export type FetchBirthRegistrationForReviewQuery = {
             use?: string | null
           } | null> | null
         } | null
+        certifier?: {
+          __typename?: 'Practitioner'
+          role?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
       } | null> | null
     } | null> | null
   } | null
@@ -4100,6 +4117,22 @@ export type FetchBirthRegistrationForCertificateQuery = {
           __typename?: 'RelatedPerson'
           relationship?: string | null
           otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'Practitioner'
+          role?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -4595,6 +4628,22 @@ export type FetchDeathRegistrationForReviewQuery = {
             use?: string | null
           } | null> | null
         } | null
+        certifier?: {
+          __typename?: 'Practitioner'
+          role?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
       } | null> | null
     } | null> | null
   } | null
@@ -4890,6 +4939,22 @@ export type FetchDeathRegistrationForCertificationQuery = {
           __typename?: 'RelatedPerson'
           relationship?: string | null
           otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'Practitioner'
+          role?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null
@@ -5311,6 +5376,22 @@ export type FetchMarriageRegistrationForReviewQuery = {
             use?: string | null
           } | null> | null
         } | null
+        certifier?: {
+          __typename?: 'Practitioner'
+          role?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
       } | null> | null
     } | null> | null
   } | null
@@ -5636,6 +5717,22 @@ export type FetchMarriageRegistrationForCertificateQuery = {
           __typename?: 'RelatedPerson'
           relationship?: string | null
           otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'Practitioner'
+          role?: string | null
           name?: Array<{
             __typename?: 'HumanName'
             use?: string | null

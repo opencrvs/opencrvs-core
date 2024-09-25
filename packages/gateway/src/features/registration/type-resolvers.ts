@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import {
+  getPractitionerRoleFromPractitioner,
+  getPresignedUrlFromUri
+} from '@gateway/features/registration/utils'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 import {
@@ -669,6 +672,13 @@ export const typeResolvers: GQLResolver = {
     },
     telecom: (practitioner: Saved<Practitioner>) => {
       return practitioner.telecom
+    },
+    role: async (practitioner: Saved<Practitioner>, _, context) => {
+      const practitionerRole = getPractitionerRoleFromPractitioner(
+        practitioner,
+        context.record!
+      )
+      return practitionerRole
     }
   },
   Deceased: {

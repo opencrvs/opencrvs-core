@@ -323,6 +323,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
               value
               use
             }
+            role
           }
         }
       }
@@ -617,7 +618,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
             }
           }
           certifier {
-            identifier
             name {
               use
               firstNames
@@ -628,6 +628,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               value
               use
             }
+            role
           }
         }
       }

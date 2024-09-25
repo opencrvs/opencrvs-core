@@ -1823,6 +1823,7 @@ export interface GQLPractitioner {
   gender?: string
   birthDate?: string
   photo?: Array<GQLAttachment | null>
+  role?: string
 }
 
 export interface GQLAuditLogItemBase {
@@ -11723,6 +11724,7 @@ export interface GQLPractitionerTypeResolver<TParent = any> {
   gender?: PractitionerToGenderResolver<TParent>
   birthDate?: PractitionerToBirthDateResolver<TParent>
   photo?: PractitionerToPhotoResolver<TParent>
+  role?: PractitionerToRoleResolver<TParent>
 }
 
 export interface PractitionerToIdResolver<TParent = any, TResult = any> {
@@ -11813,6 +11815,15 @@ export interface PractitionerToBirthDateResolver<TParent = any, TResult = any> {
 }
 
 export interface PractitionerToPhotoResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface PractitionerToRoleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

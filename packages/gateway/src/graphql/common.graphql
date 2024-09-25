@@ -91,6 +91,7 @@ type Practitioner {
   gender: String
   birthDate: String
   photo: [Attachment]
+  role: String
 }
 
 type RelatedPerson { # -> Related Person
