@@ -23,7 +23,7 @@ RUN apt-get update && apt-get upgrade -y
 COPY --from=0 /app/packages/login/build/ /usr/share/nginx/html/
 
 COPY infrastructure/nginx-deploy-config.sh /
-COPY infrastructure/login/nginx.conf /etc/nginx/conf.d/default.conf
+COPY packages/login/nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN chmod +x /nginx-deploy-config.sh
 CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
