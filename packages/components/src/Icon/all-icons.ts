@@ -71,6 +71,8 @@ export {
   ArchiveBox,
   ArrowCircleDown,
   FileArrowUp,
-  PencilLine
+  PencilLine,
+  PencilCircle,
+  Handshake
 } from 'phosphor-react'
 export * from './custom-icons'

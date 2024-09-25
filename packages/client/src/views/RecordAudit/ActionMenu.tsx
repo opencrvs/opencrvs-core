@@ -17,7 +17,9 @@ import { useDispatch } from 'react-redux'
 import { Icon } from '@opencrvs/components'
 import {
   goToCertificateCorrection,
+  goToIssueCertificate,
   goToPage,
+  goToPrintCertificate,
   goToViewRecordPage
 } from '@client/navigation'
 import { IntlShape } from 'react-intl'
@@ -25,6 +27,7 @@ import { Scope } from '@sentry/react'
 import { IDeclarationData } from './utils'
 import {
   clearCorrectionAndPrintChanges,
+  DOWNLOAD_STATUS,
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
@@ -33,6 +36,9 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { UserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/workqueue'
 import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
   REVIEW_CORRECTION,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
@@ -46,6 +52,7 @@ export const ActionMenu: React.FC<{
   userDetails: UserDetails | null
   toggleDisplayDialog: () => void
   goToPage: typeof goToPage
+  goToPrintCertificate: typeof goToPrintCertificate
 }> = ({
   declaration,
   intl,
@@ -53,9 +60,14 @@ export const ActionMenu: React.FC<{
   draft,
   userDetails,
   toggleDisplayDialog,
-  goToPage
+  goToPage,
+  goToPrintCertificate
 }) => {
   const dispatch = useDispatch()
+  const { id, type } = declaration
+  const isDownloaded =
+    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   const recordOrDeclaration = [
     SUBMISSION_STATUS.REGISTERED,
@@ -68,7 +80,7 @@ export const ActionMenu: React.FC<{
   const ViewAction = () => (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(goToViewRecordPage(declaration.id as string))
+        dispatch(goToViewRecordPage(id as string))
       }}
     >
       <Icon name="Eye" color="currentColor" size="large" />
@@ -79,9 +91,10 @@ export const ActionMenu: React.FC<{
   const CorrectRecordAction = () => (
     <DropdownMenu.Item
       onClick={() => {
-        clearCorrectionAndPrintChanges(declaration.id)
-        goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
+        clearCorrectionAndPrintChanges(id)
+        goToCertificateCorrection(id, CorrectionSection.Corrector)
       }}
+      disabled={!isDownloaded}
     >
       <Icon name="NotePencil" color="currentColor" size="large" />
       {intl.formatMessage(messages.correctRecord)}
@@ -89,21 +102,20 @@ export const ActionMenu: React.FC<{
   )
 
   const ArchiveAction = () => (
-    <DropdownMenu.Item onClick={toggleDisplayDialog}>
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
       <Icon name="Archive" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.archive)}
     </DropdownMenu.Item>
   )
 
   const ReinstateAction = () => (
-    <DropdownMenu.Item onClick={toggleDisplayDialog}>
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
       <Icon name="FileArrowUp" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.reinstate)}
     </DropdownMenu.Item>
   )
 
   const ReviewAction = () => {
-    const { id, type } = declaration
     return (
       <DropdownMenu.Item
         onClick={() => {
@@ -113,16 +125,86 @@ export const ActionMenu: React.FC<{
             goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type!)
           }
         }}
+        disabled={!isDownloaded}
       >
         <Icon name="PencilLine" color="currentColor" size="large" />
         {intl.formatMessage(constantsMessages.review)}
       </DropdownMenu.Item>
     )
   }
+
+  const DeleteAction = () => {
+    return (
+      <DropdownMenu.Item onClick={() => {}}>
+        <Icon name="Trash" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.deleteDeclaration)}
+      </DropdownMenu.Item>
+    )
+  }
+
+  const UpdateAction = () => {
+    let PAGE_ROUTE: string, PAGE_ID: string
+
+    if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
+      PAGE_ID = 'preview'
+      if (type === 'birth') {
+        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+      } else if (type === 'death') {
+        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      } else if (type === 'marriage') {
+        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
+      }
+    } else {
+      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
+      PAGE_ID = 'review'
+    }
+    return (
+      <DropdownMenu.Item
+        onClick={() => {
+          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="PencilCircle" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.update)}
+      </DropdownMenu.Item>
+    )
+  }
+
+  const PrintAction = () => (
+    <DropdownMenu.Item
+      onClick={() => {
+        clearCorrectionAndPrintChanges &&
+          clearCorrectionAndPrintChanges(declaration.id)
+        goToPrintCertificate &&
+          goToPrintCertificate(id, type.toLocaleLowerCase())
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="Printer" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.print)}
+    </DropdownMenu.Item>
+  )
+
+  const IssueAction = () => (
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(clearCorrectionAndPrintChanges(id))
+        dispatch(goToIssueCertificate(id))
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="Handshake" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.issue)}
+    </DropdownMenu.Item>
+  )
+
   return (
     <DropdownMenu>
       <DropdownMenu.Trigger>
-        <PrimaryButton icon={() => <CaretDown />}> Action</PrimaryButton>
+        <PrimaryButton icon={() => <CaretDown />}>
+          {intl.formatMessage(messages.action)}
+        </PrimaryButton>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         <ViewAction />
@@ -130,6 +212,10 @@ export const ActionMenu: React.FC<{
         <ArchiveAction />
         <ReinstateAction />
         <ReviewAction />
+        <UpdateAction />
+        <PrintAction />
+        <IssueAction />
+        <DeleteAction />
       </DropdownMenu.Content>
     </DropdownMenu>
   )
