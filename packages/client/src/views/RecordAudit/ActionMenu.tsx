@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux'
 import { Icon } from '@opencrvs/components'
 import {
   goToCertificateCorrection,
+  goToHome,
   goToIssueCertificate,
   goToPage,
   goToPrintCertificate,
@@ -68,7 +69,10 @@ export const ActionMenu: React.FC<{
   goToPrintCertificate
 }) => {
   const dispatch = useDispatch()
+  const [modal, openModal] = useModal()
+
   const { id, type } = declaration
+
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -138,26 +142,22 @@ export const ActionMenu: React.FC<{
   }
 
   const DeleteAction = () => {
-    const [modal, openModal] = useModal()
-    const dispatch = useDispatch()
-
     return (
-      <>
-        <DropdownMenu.Item
-          onClick={async () => {
-            const deleteConfirm = await openModal<boolean | null>((close) => (
-              <DeleteModal intl={intl} close={close}></DeleteModal>
-            ))
-
-            deleteConfirm && dispatch(deleteDeclaration(declaration.id, client))
-            return
-          }}
-        >
-          <Icon name="Trash" color="currentColor" size="large" />
-          {intl.formatMessage(buttonMessages.deleteDeclaration)}
-        </DropdownMenu.Item>
-        {modal}
-      </>
+      <DropdownMenu.Item
+        onClick={async () => {
+          const deleteConfirm = await openModal<boolean | null>((close) => (
+            <DeleteModal intl={intl} close={close}></DeleteModal>
+          ))
+          if (deleteConfirm) {
+            dispatch(deleteDeclaration(declaration.id, client))
+            dispatch(goToHome())
+          }
+          return
+        }}
+      >
+        <Icon name="Trash" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.deleteDeclaration)}
+      </DropdownMenu.Item>
     )
   }
 
@@ -180,7 +180,7 @@ export const ActionMenu: React.FC<{
     return (
       <DropdownMenu.Item
         onClick={() => {
-          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type as string)
         }}
         disabled={!isDownloaded}
       >
@@ -196,7 +196,7 @@ export const ActionMenu: React.FC<{
         clearCorrectionAndPrintChanges &&
           clearCorrectionAndPrintChanges(declaration.id)
         goToPrintCertificate &&
-          goToPrintCertificate(id, type.toLocaleLowerCase())
+          goToPrintCertificate(id, (type as string).toLocaleLowerCase())
       }}
       disabled={!isDownloaded}
     >
@@ -219,23 +219,26 @@ export const ActionMenu: React.FC<{
   )
 
   return (
-    <DropdownMenu>
-      <DropdownMenu.Trigger>
-        <PrimaryButton icon={() => <CaretDown />}>
-          {intl.formatMessage(messages.action)}
-        </PrimaryButton>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <ViewAction />
-        <CorrectRecordAction />
-        <ArchiveAction />
-        <ReinstateAction />
-        <ReviewAction />
-        <UpdateAction />
-        <PrintAction />
-        <IssueAction />
-        <DeleteAction />
-      </DropdownMenu.Content>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenu.Trigger>
+          <PrimaryButton icon={() => <CaretDown />}>
+            {intl.formatMessage(messages.action)}
+          </PrimaryButton>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <ViewAction />
+          <CorrectRecordAction />
+          <ArchiveAction />
+          <ReinstateAction />
+          <ReviewAction />
+          <UpdateAction />
+          <PrintAction />
+          <IssueAction />
+          <DeleteAction />
+        </DropdownMenu.Content>
+      </DropdownMenu>
+      {modal}
+    </>
   )
 }
