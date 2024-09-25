@@ -87,7 +87,7 @@ export default defineConfig(({ mode }) => {
         '/api/countryconfig/': {
           target: 'http://localhost:3040',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/countryconfig/, '/api')
+          rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
         }
       }
     }
