@@ -663,6 +663,39 @@ export const typeResolvers: GQLResolver = {
       return person?.address
     }
   },
+  // incomplete
+  Practitioner: {
+    id: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    active: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    address: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    birthDate: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    gender: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    identifier: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    name: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    photo: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    telecom: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    },
+    resourceType: (practitioner: Saved<Practitioner>) => {
+      return practitioner.id
+    }
+  },
   Deceased: {
     deceased: (person) => {
       return person && person.deceasedBoolean
@@ -1244,7 +1277,8 @@ export const typeResolvers: GQLResolver = {
       }
 
       return false
-    }
+    },
+    async certifier(docRef: any, _, context) {}
   },
   Identifier: {
     system: (identifier) => identifier.system,

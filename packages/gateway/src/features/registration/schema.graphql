@@ -427,6 +427,7 @@ input CertificateInput {
 
 type Certificate { # -> Document Reference
   collector: RelatedPerson # -> .extension
+  certifier: Practitioner # -> .extension
   hasShowedVerifiedDocument: Boolean # -> .extension
   payments: [Payment] # -> .extension
   data: String # -> .content.attachment.data base64

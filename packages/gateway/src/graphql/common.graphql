@@ -80,6 +80,64 @@ input RelatedPersonInput {
   ageOfIndividualInYears: Int
 }
 
+type Practitioner {
+  id: ID!
+  resourceType: String
+  identifier: [IdentityType]
+  active: Boolean
+  name: [HumanName]
+  telecom: [ContactPoint]
+  address: [Address]
+  gender: String
+  birthDate: String
+  photo: [Attachment]
+  # qualification: [Qualification]
+  # communication: [CodeableConcept]
+}
+
+# type Attachment {
+#   contentType: String
+#   language: String
+#   data: String
+#   url: String
+#   size: Int
+#   hash: String
+#   title: String
+#   creation: String
+# }
+
+# type Qualification {
+#   identifier: [Identifier]
+#   code: CodeableConcept
+#   period: Period
+#   issuer: Reference
+# }
+
+# type CodeableConcept {
+#   coding: [Coding]
+#   text: String
+# }
+
+# type Coding {
+#   system: String
+#   version: String
+#   code: String
+#   display: String
+#   userSelected: Boolean
+# }
+
+# type Period {
+#   start: String
+#   end: String
+# }
+
+# type Reference {
+#   reference: String
+#   type: String
+#   identifier: Identifier
+#   display: String
+# }
+
 type RelatedPerson { # -> Related Person
   id: ID
   _fhirID: ID # -> .id relatedPerson ID

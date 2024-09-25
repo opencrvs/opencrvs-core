@@ -309,6 +309,18 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               use
             }
           }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
+            }
+          }
         }
         duplicateOf
         potentialDuplicates
@@ -574,6 +586,18 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           collector {
             relationship
             otherRelationship
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
+            }
+          }
+          certifier {
             name {
               use
               firstNames

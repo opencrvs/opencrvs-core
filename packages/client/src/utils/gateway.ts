@@ -521,6 +521,7 @@ export type BookmarkedSeachItem = {
 
 export type Certificate = {
   __typename?: 'Certificate'
+  certifier?: Maybe<Practitioner>
   collector?: Maybe<RelatedPerson>
   data?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
@@ -1693,6 +1694,20 @@ export type PersonInput = {
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
 }
 
+export type Practitioner = {
+  __typename?: 'Practitioner'
+  active?: Maybe<Scalars['Boolean']>
+  address?: Maybe<Array<Maybe<Address>>>
+  birthDate?: Maybe<Scalars['String']>
+  gender?: Maybe<Scalars['String']>
+  id: Scalars['ID']
+  identifier?: Maybe<Array<Maybe<Identifier>>>
+  name?: Maybe<Array<Maybe<HumanName>>>
+  photo?: Maybe<Array<Maybe<Attachment>>>
+  resourceType?: Maybe<Scalars['String']>
+  telecom?: Maybe<Array<Maybe<ContactPoint>>>
+}
+
 export type Query = {
   __typename?: 'Query'
   fetchBirthRegistration?: Maybe<BirthRegistration>
@@ -2677,6 +2692,7 @@ export type GetUserRolesQuery = {
   getUserRoles: Array<{
     __typename?: 'UserRole'
     id: string
+    scopes: Array<string>
     label: {
       __typename?: 'I18nMessage'
       id: string
