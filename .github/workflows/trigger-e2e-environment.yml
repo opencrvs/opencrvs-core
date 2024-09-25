@@ -136,6 +136,11 @@ jobs:
 
             // Check if deploy job has completed
             while (!deployJobCompleted) {
+              const workflowRun = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id: runId
+              });
               const jobs = await github.rest.actions.listJobsForWorkflowRun({
                 owner,
                 repo,
@@ -143,6 +148,12 @@ jobs:
               });
 
               const deployJob = jobs.data.jobs.find(job => job.name === 'deploy / seed-data / seed-data');
+              const cancelled = jobs.data.jobs.find(job => job.conclusion === 'cancelled');
+
+              if (cancelled) {
+                throw new Error('E2E workflow was cancelled');
+              }
+
               if (deployJob && deployJob.status === 'completed') {
                 deployJobCompleted = true;
 
@@ -151,6 +162,14 @@ jobs:
                 }
 
                 console.log('Deploy job completed successfully');
+              }
+
+              if(workflowRun.data.status === 'completed') {
+                deployJobCompleted = true;
+
+                if (workflowRun.data.conclusion !== 'success') {
+                  throw new Error('E2E workflow failed');
+                }
               }
 
               if (!deployJobCompleted) {
