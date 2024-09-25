@@ -71,7 +71,7 @@ export const ActionMenu: React.FC<{
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
 
-  const { id, type } = declaration
+  const { id, type, assignment } = declaration
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -227,6 +227,17 @@ export const ActionMenu: React.FC<{
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
+          {!isDownloaded && assignment && (
+            <>
+              <DropdownMenu.Label>
+                {intl.formatMessage(messages.assignedTo, {
+                  name: assignment.firstName + ' ' + assignment.lastName,
+                  officeName: assignment.officeName
+                })}
+              </DropdownMenu.Label>
+              <DropdownMenu.Separator />
+            </>
+          )}
           <ViewAction />
           <CorrectRecordAction />
           <ArchiveAction />

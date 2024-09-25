@@ -13,6 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IActionMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   action: MessageDescriptor
+  assignedTo: MessageDescriptor
   view: MessageDescriptor
   correctRecord: MessageDescriptor
 }
@@ -22,6 +23,11 @@ const messagesToDefine: IActionMessages = {
     defaultMessage: 'Action',
     description: 'Label for action button in dropdown menu',
     id: 'action.action'
+  },
+  assignedTo: {
+    defaultMessage: 'Assigned to {name} at {officeName}',
+    description: 'Label for assignee',
+    id: 'action.assignee'
   },
   view: {
     defaultMessage: 'View {recordOrDeclaration}',

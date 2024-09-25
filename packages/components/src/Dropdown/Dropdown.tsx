@@ -72,6 +72,7 @@ const StyledContent = styled.ul<{
 
 const Label = styled.li`
   padding: 6px 12px;
+  white-space: normal;
 `
 
 const Separator = styled.div<{ weight: number }>`
