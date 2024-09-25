@@ -393,7 +393,12 @@ const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.name
+    const name = certificate.certifier?.name
+      ? getIndividualNameObj(
+          certificate.certifier.name,
+          window.config.LANGUAGES
+        )
+      : certificate.collector?.name
       ? getIndividualNameObj(
           certificate.collector.name,
           window.config.LANGUAGES
@@ -408,7 +413,7 @@ const ActionDetailsModalListTable = ({
       }`
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
-      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      if (!certificate.collector?.relationship) {
         return `${collectorName} (${certificate.collector?.otherRelationship})`
       }
       return collectorName
@@ -432,10 +437,9 @@ const ActionDetailsModalListTable = ({
   const certificateCollector = [
     {
       key: 'collector',
-      label:
-        collectorData.relationship === 'PRINT_IN_ADVANCE'
-          ? intl.formatMessage(certificateMessages.printedOnAdvance)
-          : intl.formatMessage(certificateMessages.printedOnCollection),
+      label: collectorData.relationship
+        ? intl.formatMessage(certificateMessages.printedOnCollection)
+        : intl.formatMessage(certificateMessages.printedOnAdvance),
       width: 100
     }
   ]
