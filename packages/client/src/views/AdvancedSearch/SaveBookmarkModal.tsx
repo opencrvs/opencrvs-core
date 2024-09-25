@@ -185,7 +185,7 @@ export function BookmarkAdvancedSearchModal({
           <TextInput
             id="queryName"
             type="text"
-            placeholder="Name of query"
+            placeholder={intl.formatMessage(messagesSearch.placeholder)}
             touched={true}
             error={false}
             value={queryName}
