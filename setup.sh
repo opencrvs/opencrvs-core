@@ -170,9 +170,7 @@ echo
 nvmVersion=$(cat .nvmrc | tr -d '[:space:]')
 
 dependencies=( "docker" "node" "yarn" "tmux")
-if [ $OS == "UBUNTU" ]; then
-  dependencies+=("docker compose")
-fi
+
 for i in "${dependencies[@]}"
 do
    :
@@ -192,15 +190,7 @@ do
                 echo "Please follow the documentation here: https://docs.docker.com/desktop/mac/install/"
             fi
         fi
-        if [ $i == "docker compose" ] ; then
-            if [ $OS == "UBUNTU" ]; then
-                echo "You need to install Docker Compose, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker compose installation."
-                echo "Please follow the documentation here: https://docs.docker.com/compose/install/"
-            else
-                echo "You need to install Docker Desktop for Mac, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your docker installation."
-                echo "Please follow the documentation here: https://docs.docker.com/desktop/mac/install/"
-            fi
-        fi
+
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
             echo "We recommend you install Node $nvmVersion as this release has been tested on that version."
@@ -241,6 +231,26 @@ do
         exit 1
     fi
 done
+
+###
+#
+# Check if Docker Compose exists 
+#
+###
+
+if ! docker compose version &> /dev/null
+then
+    echo "Docker Compose is not available in your Docker installation"
+    echo "Your Docker version may be too old to include Docker Compose as part of the Docker CLI."
+    
+    if [ $OS == "UBUNTU" ]; then
+        echo "Please follow the installation instructions here: https://docs.docker.com/engine/install/ubuntu/"
+    else
+        echo "Please follow the installation instructions here: https://docs.docker.com/desktop/mac/install/"
+    fi
+
+    exit 1
+fi
 
 ###
 #
