@@ -54,6 +54,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'opencrvs/opencrvs-core'
+
       - name: Get the PR branch name
         id: get_branch
         run: |
@@ -61,7 +66,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
 
-      - name: Checkout repository
+      - name: Checkout PR branch
         uses: actions/checkout@v3
         with:
           repository: 'opencrvs/opencrvs-core'
