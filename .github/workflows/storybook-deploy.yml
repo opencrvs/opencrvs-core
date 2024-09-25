@@ -17,14 +17,10 @@ on:
   issue_comment:
     types:
       - created
-  workflow_dispatch:
 
 jobs:
   build:
-    if: |
-      github.event_name == 'push' ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/uikit')) ||
-      github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -40,8 +36,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
-      # @TODO: when Yarn 2 is available
-      #  run: yarn workspaces focus --production @opencrvs/components
 
       - name: Build components
         run: cd packages/components && yarn build
@@ -54,11 +48,33 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-      - name: Comment deployment link on PR
-        if: github.event_name == 'issue_comment' || github.event_name == 'workflow_dispatch'
+  comment-check:
+    if: github.event_name == 'issue_comment' && github.event.comment.body == '/uikit'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get the PR branch name
+        id: get_branch
         run: |
-          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          COMMENT_BODY="Storybook deployed to: https://${{ github.ref_name }}.ui-kit.opencrvs.dev"
-          gh pr comment $PR_NUMBER --body "$COMMENT_BODY"
+          echo "PR_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json headRefName --jq .headRefName)" >> $GITHUB_ENV
+
+      - name: Build components
+        run: cd packages/components && yarn build
+
+      - name: Build Storybook
+        run: cd packages/components && yarn build-storybook
+
+      - name: Deploy Storybook to Cloudflare Pages
+        run: npx wrangler pages deploy ./packages/components/build --project-name opencrvs --branch ${{ env.PR_BRANCH }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Comment on PR with Storybook link
+        run: |
+          COMMENT="Storybook deployed: https://${{ env.PR_BRANCH }}.ui-kit.opencrvs.dev"
+          gh pr comment ${{ github.event.issue.number }} --body "$COMMENT"
         env:
           GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
