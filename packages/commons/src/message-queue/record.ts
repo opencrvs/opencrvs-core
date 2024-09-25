@@ -65,6 +65,7 @@ export function useExternalValidationQueue(redisHost: string) {
 
     await queue.add('send-to-external-validation', payload, {
       attempts: Number.MAX_SAFE_INTEGER,
+      removeOnComplete: true,
       backoff: {
         type: 'exponential',
         delay: 1000
@@ -76,6 +77,7 @@ export function useExternalValidationQueue(redisHost: string) {
 
     await queue.add('record-validated-externally', payload, {
       attempts: Number.MAX_SAFE_INTEGER,
+      removeOnComplete: true,
       backoff: {
         type: 'exponential',
         delay: 1000
@@ -98,6 +100,7 @@ export function useRecordQueue(redisHost: string) {
 
     await queue.add('create-declaration', payload, {
       attempts: Number.MAX_SAFE_INTEGER,
+      removeOnComplete: true,
       backoff: {
         type: 'exponential',
         delay: 1000
@@ -110,6 +113,7 @@ export function useRecordQueue(redisHost: string) {
 
     await queue.add('create-registration', payload, {
       attempts: Number.MAX_SAFE_INTEGER,
+      removeOnComplete: true,
       backoff: {
         type: 'exponential',
         delay: 1000
@@ -122,6 +126,7 @@ export function useRecordQueue(redisHost: string) {
 
     await queue.add('create-validated-declaration', payload, {
       attempts: Number.MAX_SAFE_INTEGER,
+      removeOnComplete: true,
       backoff: {
         type: 'exponential',
         delay: 1000
