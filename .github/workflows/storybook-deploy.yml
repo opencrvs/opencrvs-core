@@ -86,7 +86,7 @@ jobs:
 
       - name: Comment on PR with Storybook link
         run: |
-          COMMENT="Storybook deployed: https://${{ env.PR_BRANCH }}.ui-kit.opencrvs.dev"
+          COMMENT="Storybook deployed: https://${{ env.PR_BRANCH }}.opencrvs.pages.dev"
           gh pr comment ${{ github.event.issue.number }} --body "$COMMENT"
         env:
           GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
