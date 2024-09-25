@@ -8,31 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface ISearchMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  dataTableResults: MessageDescriptor
-  dataTableNoResults: MessageDescriptor
-  listItemEventRegistrationNumber: MessageDescriptor
-  informantContact: MessageDescriptor
-  searchingFor: MessageDescriptor
-  searchResultFor: MessageDescriptor
-  noResultFor: MessageDescriptor
-  totalResultText: MessageDescriptor
-  locationNotFound: MessageDescriptor
-  bookmarkAdvancedSearchModalTitle: MessageDescriptor
-  bookmarkAdvancedSearchModalBody: MessageDescriptor
-  removeBookmarkAdvancedSearchModalTitle: MessageDescriptor
-  removeBookmarkAdvancedSearchModalBody: MessageDescriptor
-  advancedSearchBookmarkSuccessNotification: MessageDescriptor
-  removedAdvancedSearchBookmarkSuccessNotification: MessageDescriptor
-  advancedSearchBookmarkErrorNotification: MessageDescriptor
-  advancedSearchBookmarkLoadingNotification: MessageDescriptor
-  removeAdvancedSearchBookmarkLoadingNotification: MessageDescriptor
-}
-
-const messagesToDefine: ISearchMessages = {
+const messagesToDefine = {
   dataTableResults: {
     id: 'search.results',
     defaultMessage: 'Results',
@@ -60,6 +38,11 @@ const messagesToDefine: ISearchMessages = {
     id: 'search.searchingFor',
     defaultMessage: 'Searching for “{param}”',
     description: 'The searching for text'
+  },
+  placeholder: {
+    id: 'search.placeholder',
+    defaultMessage: 'Name of query',
+    description: 'Placeholder text of search input'
   },
   searchResultFor: {
     id: 'search.searchResultFor',
@@ -138,4 +121,4 @@ const messagesToDefine: ISearchMessages = {
   }
 }
 
-export const messages: ISearchMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)
