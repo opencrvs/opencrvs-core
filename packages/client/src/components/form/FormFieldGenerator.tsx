@@ -118,7 +118,7 @@ import {
   Formik
 } from 'formik'
 import { IOfflineData, LocationType } from '@client/offline/reducer'
-import { isEqual, flatten, cloneDeep } from 'lodash'
+import { isEqual, flatten, cloneDeep, set } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
 import { dynamicDispatch } from '@client/declarations'
@@ -895,7 +895,7 @@ class FormSectionComponent extends React.Component<Props> {
     value: IFormFieldValue
   ) => {
     const updatedValues = cloneDeep(this.props.values)
-    updatedValues[fieldName] = value
+    set(updatedValues, fieldName, value)
     const updateDependentFields = (fieldName: string) => {
       const dependentFields = getDependentFields(this.props.fields, fieldName)
       for (const field of dependentFields) {
