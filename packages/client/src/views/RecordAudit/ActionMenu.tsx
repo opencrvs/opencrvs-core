@@ -347,6 +347,7 @@ const ReviewAction: React.FC<
     declarationStatus &&
     [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED].includes(declarationStatus)
 
+  // @ToDo use: `record.declaration-review` or other appropriate scope after configurable role pr is merged
   const userHasReviewScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
