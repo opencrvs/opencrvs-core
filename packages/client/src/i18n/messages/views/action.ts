@@ -16,6 +16,8 @@ interface IActionMessages
   assignedTo: MessageDescriptor
   view: MessageDescriptor
   correctRecord: MessageDescriptor
+  archiveRecord: MessageDescriptor
+  reinstateRecord: MessageDescriptor
 }
 
 const messagesToDefine: IActionMessages = {
@@ -38,6 +40,16 @@ const messagesToDefine: IActionMessages = {
     defaultMessage: 'Correct Record',
     description: 'Label for correct record button in dropdown menu',
     id: 'action.correct'
+  },
+  archiveRecord: {
+    defaultMessage: 'Archive Record',
+    description: 'Label for archive record button in dropdown menu',
+    id: 'action.archive'
+  },
+  reinstateRecord: {
+    defaultMessage: 'Reinstate Record',
+    description: 'Label for reinstate record button in dropdown menu',
+    id: 'action.reinstate'
   }
 }
 export const messages: IActionMessages = defineMessages(messagesToDefine)

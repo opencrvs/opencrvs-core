@@ -141,6 +141,8 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             intl={intl}
             scope={scope}
+            declarationId={id}
+            declarationStatus={status}
           />
           <ReviewAction
             declarationId={id}
@@ -292,20 +294,35 @@ const ArchiveAction: React.FC<
     userHasArchiveScope && (
       <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
         <Icon name="Archive" color="currentColor" size="large" />
-        {intl.formatMessage(buttonMessages.archive)}
+        {intl.formatMessage(messages.archiveRecord)}
       </DropdownMenu.Item>
     )
   )
 }
 
 const ReinstateAction: React.FC<
-  IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, intl }) => (
-  <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
-    <Icon name="FileArrowUp" color="currentColor" size="large" />
-    {intl.formatMessage(buttonMessages.reinstate)}
-  </DropdownMenu.Item>
-)
+  IActionItemCommonProps &
+    IDeclarationProps & { toggleDisplayDialog?: () => void }
+> = ({ toggleDisplayDialog, isDownloaded, intl, declarationStatus, scope }) => {
+  const isArchived = declarationStatus === SUBMISSION_STATUS.ARCHIVED
+
+  // @ToDo use: `record.registration-reinstate` after configurable role pr is merged
+  // @Question: If user has reinstate scope but not register scope,
+  // can he reinstate validated record?
+  const userHasReinstateScope =
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      (scope as any as string[]).includes('validated'))
+  return (
+    isArchived &&
+    userHasReinstateScope && (
+      <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+        <Icon name="FileArrowUp" color="currentColor" size="large" />
+        {intl.formatMessage(messages.reinstateRecord)}
+      </DropdownMenu.Item>
+    )
+  )
+}
 
 const ReviewAction: React.FC<
   IActionItemCommonProps & IDeclarationProps & { goToPage: typeof goToPage }
