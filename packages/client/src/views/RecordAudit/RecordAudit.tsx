@@ -526,6 +526,7 @@ function RecordAuditBody({
   actions.push(
     <ActionMenu
       declaration={declaration}
+      duplicates={duplicates}
       intl={intl}
       scope={scope as any}
       draft={draft}

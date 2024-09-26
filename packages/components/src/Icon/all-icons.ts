@@ -73,7 +73,7 @@ export {
   FileArrowUp,
   PencilLine,
   PencilCircle,
-  Handshake
+  Handshake,
   UserCircle
 } from 'phosphor-react'
 export * from './custom-icons'

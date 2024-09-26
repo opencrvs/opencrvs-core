@@ -57,6 +57,7 @@ export const ActionMenu: React.FC<{
   scope: Scope
   draft: IDeclaration | null
   userDetails: UserDetails | null
+  duplicates?: string[]
   toggleDisplayDialog: () => void
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToPage: typeof goToPage
@@ -73,7 +74,8 @@ export const ActionMenu: React.FC<{
   goToPage,
   clearCorrectionAndPrintChanges,
   goToPrintCertificate,
-  goToIssueCertificate
+  goToIssueCertificate,
+  duplicates
 }) => {
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
@@ -83,6 +85,8 @@ export const ActionMenu: React.FC<{
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  const isDuplicate = (duplicates ?? []).length > 0
 
   const handleDelete = async () => {
     const deleteConfirm = await openModal<boolean | null>((close) => (
@@ -150,6 +154,7 @@ export const ActionMenu: React.FC<{
             intl={intl}
             scope={scope}
             goToPage={goToPage}
+            isDuplicate={isDuplicate}
           />
           <UpdateAction
             declarationId={id}
@@ -323,39 +328,62 @@ const ReinstateAction: React.FC<
 }
 
 const ReviewAction: React.FC<
-  IActionItemCommonProps & IDeclarationProps & { goToPage: typeof goToPage }
+  IActionItemCommonProps &
+    IDeclarationProps & { isDuplicate: boolean; goToPage: typeof goToPage }
 > = ({
   declarationId,
   declarationStatus,
   type,
+  scope,
   isDownloaded,
+  isDuplicate,
   intl,
   goToPage
 }) => {
-  return (
+  const isPendingCorrection =
+    declarationStatus === EVENT_STATUS.CORRECTION_REQUESTED
+
+  const isReviewableDeclaration =
+    declarationStatus &&
+    [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED].includes(declarationStatus)
+
+  const userHasReviewScope =
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      (scope as any as string[]).includes('validated'))
+
+  return isPendingCorrection && userHasReviewScope ? (
     <DropdownMenu.Item
       onClick={() => {
-        if (declarationStatus === EVENT_STATUS.CORRECTION_REQUESTED) {
-          goToPage(
-            REVIEW_CORRECTION,
-            declarationId as string,
-            'review',
-            type as string
-          )
-        } else {
+        goToPage(
+          REVIEW_CORRECTION,
+          declarationId as string,
+          'review',
+          type as string
+        )
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="PencilLine" color="currentColor" size="large" />
+      {intl.formatMessage(messages.reviewCorrection)}
+    </DropdownMenu.Item>
+  ) : (
+    isReviewableDeclaration && userHasReviewScope && (
+      <DropdownMenu.Item
+        onClick={() => {
           goToPage(
             REVIEW_EVENT_PARENT_FORM_PAGE,
             declarationId as string,
             'review',
             type as string
           )
-        }
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="PencilLine" color="currentColor" size="large" />
-      {intl.formatMessage(constantsMessages.review)}
-    </DropdownMenu.Item>
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="PencilLine" color="currentColor" size="large" />
+        {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
+      </DropdownMenu.Item>
+    )
   )
 }
 
