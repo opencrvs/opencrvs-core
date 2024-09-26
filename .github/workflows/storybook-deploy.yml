@@ -14,9 +14,13 @@ on:
       - master
       - develop
       - release-v*
+  issue_comment:
+    types:
+      - created
 
 jobs:
   build:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -24,6 +28,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'opencrvs/opencrvs-core'
+          ref: ${{ github.ref }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -32,8 +37,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
-      # @TODO: when Yarn 2 is available
-      #  run: yarn workspaces focus --production @opencrvs/components
 
       - name: Build components
         run: cd packages/components && yarn build
@@ -45,3 +48,52 @@ jobs:
         run: npx wrangler pages deploy ./packages/components/build --project-name opencrvs --branch ${{ github.ref_name }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+  comment-check:
+    if: github.event_name == 'issue_comment' && github.event.comment.body == '/uikit'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'opencrvs/opencrvs-core'
+
+      - name: Get the PR branch name
+        id: get_branch
+        run: |
+          echo "PR_BRANCH=$(gh pr view ${{ github.event.issue.number }} --json headRefName --jq .headRefName)" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+        with:
+          repository: 'opencrvs/opencrvs-core'
+          ref: ${{ env.PR_BRANCH }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build components
+        run: cd packages/components && yarn build
+
+      - name: Build Storybook
+        run: cd packages/components && yarn build-storybook
+
+      - name: Deploy Storybook to Cloudflare Pages
+        run: npx wrangler pages deploy ./packages/components/build --project-name opencrvs --branch ${{ env.PR_BRANCH }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Comment on PR with Storybook link
+        run: |
+          COMMENT="Storybook deployed: https://${{ env.PR_BRANCH }}.opencrvs.pages.dev"
+          gh pr comment ${{ github.event.issue.number }} --body "$COMMENT"
+        env:
+          GITHUB_TOKEN: ${{ secrets.OLLIE_BOT_GITHUB_TOKEN }}
