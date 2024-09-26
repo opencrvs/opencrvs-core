@@ -182,7 +182,11 @@ export const ActionMenu: React.FC<{
             intl={intl}
             scope={scope}
           />
-          <DeleteAction handleDelete={handleDelete} intl={intl} scope={scope} />
+          <DeleteAction
+            handleDelete={handleDelete}
+            intl={intl}
+            declarationStatus={status}
+          />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modal}
@@ -537,12 +541,11 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 const DeleteAction: React.FC<{
   intl: IntlShape
   handleDelete: () => void
-  scope: Scope
-}> = ({ intl, handleDelete, scope }) => {
-  return (
+  declarationStatus?: string
+}> = ({ intl, handleDelete, declarationStatus }) =>
+  declarationStatus === SUBMISSION_STATUS.DRAFT && (
     <DropdownMenu.Item onClick={handleDelete}>
       <Icon name="Trash" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.deleteDeclaration)}
     </DropdownMenu.Item>
   )
-}
