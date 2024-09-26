@@ -37,11 +37,12 @@ import {
   RejectedRecord,
   Resource,
   SavedBundle,
+  SupportedPatientIdentifierCode,
   ValidRecord
 } from '@opencrvs/commons/types'
 
 const createRequest = async <T = any>(
-  method: 'POST' | 'GET' | 'PUT' | 'DELETE',
+  method: 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
   authHeader: IAuthHeader,
   body?: Record<string, any>
@@ -391,5 +392,40 @@ export async function createHospitalNotification(
     `/records/event-notification`,
     authHeader,
     bundle
+  )
+}
+
+type ConfirmRegistrationDetails = {
+  childIdentifiers?: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
+}
+export async function confirmRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  details: ConfirmRegistrationDetails
+) {
+  return createRequest<undefined>(
+    'POST',
+    `/records/${id}/confirm`,
+    authHeader,
+    details
+  )
+}
+
+type RejectRegistrationDetails = {
+  error: string
+}
+export async function rejectRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  details: RejectRegistrationDetails
+) {
+  return createRequest<undefined>(
+    'POST',
+    `/records/${id}/reject`,
+    authHeader,
+    details
   )
 }

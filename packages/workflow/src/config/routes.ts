@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
 import { archiveRoute } from '@workflow/records/handler/archive'
 import { certifyRoute } from '@workflow/records/handler/certify'
+import { confirmRegistrationHandler } from '@workflow/records/handler/confirm'
 import { approveCorrectionRoute } from '@workflow/records/handler/correction/approve'
 import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
 import { rejectCorrectionRoute } from '@workflow/records/handler/correction/reject'
@@ -60,12 +60,11 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/confirm/registration',
-      handler: markEventAsRegisteredCallbackHandler,
+      path: '/records/{id}/confirm',
+      handler: confirmRegistrationHandler,
       config: {
         tags: ['api'],
-        description:
-          'Register event based on tracking id and registration number.'
+        description: 'Confirm registration after external validation'
       }
     },
     {
