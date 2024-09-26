@@ -22,6 +22,7 @@ interface IActionMessages
   reviewDeclaration: MessageDescriptor
   updateDeclaration: MessageDescriptor
   printDeclaration: MessageDescriptor
+  issueCertificate: MessageDescriptor
 }
 
 const messagesToDefine: IActionMessages = {
@@ -75,6 +76,11 @@ const messagesToDefine: IActionMessages = {
     defaultMessage: 'Print certified copy',
     description: 'Label for print certified copy in dropdown menu',
     id: 'action.print'
+  },
+  issueCertificate: {
+    defaultMessage: 'Issue certificate',
+    description: 'Label for issue certificate in dropdown menu',
+    id: 'action.issue'
   }
 }
 export const messages: IActionMessages = defineMessages(messagesToDefine)

@@ -503,20 +503,34 @@ const PrintAction: React.FC<
 const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   isDownloaded,
+  declarationStatus,
+  scope,
   intl
 }) => {
   const dispatch = useDispatch()
+
+  const isCertified = declarationStatus === SUBMISSION_STATUS.CERTIFIED
+
+  // @ToDo use: `record.print-issue-certified-copies` or other appropriate scope after configurable role pr is merged
+  const userHasIssueScope =
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      (scope as any as string[]).includes('validate'))
+
   return (
-    <DropdownMenu.Item
-      onClick={() => {
-        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(goToIssueCertificate(declarationId as string))
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="Handshake" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.issue)}
-    </DropdownMenu.Item>
+    isCertified &&
+    userHasIssueScope && (
+      <DropdownMenu.Item
+        onClick={() => {
+          dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+          dispatch(goToIssueCertificate(declarationId as string))
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="Handshake" color="currentColor" size="large" />
+        {intl.formatMessage(messages.issueCertificate)}
+      </DropdownMenu.Item>
+    )
   )
 }
 
