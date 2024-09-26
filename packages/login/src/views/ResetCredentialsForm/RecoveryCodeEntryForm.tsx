@@ -54,6 +54,7 @@ interface BaseProps
 }
 
 type Props = BaseProps & WrappedComponentProps
+const RECOVERY_CODE_LENGTH = 6
 
 const RecoveryCodeEntryComponent = ({
   intl,
@@ -70,7 +71,7 @@ const RecoveryCodeEntryComponent = ({
   const handleChange = (value: string) => {
     setRecoveryCode(value)
     setTouched(true)
-    setError(value.length !== 6)
+    setError(value.length !== RECOVERY_CODE_LENGTH)
     setResentAuthenticationCode(false)
   }
 
