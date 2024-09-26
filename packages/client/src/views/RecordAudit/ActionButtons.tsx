@@ -249,12 +249,6 @@ export const ShowPrintButton = ({
     ]
   }
 
-  console.log({
-    systemRole,
-    type,
-    showActionButton
-  })
-
   if (
     systemRole &&
     type &&
