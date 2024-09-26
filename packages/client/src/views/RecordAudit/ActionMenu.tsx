@@ -460,26 +460,45 @@ const PrintAction: React.FC<
     }
 > = ({
   declarationId,
+  declarationStatus,
+  scope,
   type,
   isDownloaded,
   intl,
   clearCorrectionAndPrintChanges,
   goToPrintCertificate
-}) => (
-  <DropdownMenu.Item
-    onClick={() => {
-      clearCorrectionAndPrintChanges(declarationId as string)
-      goToPrintCertificate(
-        declarationId as string,
-        (type as string).toLocaleLowerCase()
-      )
-    }}
-    disabled={!isDownloaded}
-  >
-    <Icon name="Printer" color="currentColor" size="large" />
-    {intl.formatMessage(buttonMessages.print)}
-  </DropdownMenu.Item>
-)
+}) => {
+  const isPrintable =
+    declarationStatus &&
+    [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.ISSUED].includes(
+      declarationStatus as SUBMISSION_STATUS
+    )
+
+  // @ToDo use: `record.print-records` or other appropriate scope after configurable role pr is merged
+  const userHasPrintScope =
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      (scope as any as string[]).includes('validate'))
+
+  return (
+    isPrintable &&
+    userHasPrintScope && (
+      <DropdownMenu.Item
+        onClick={() => {
+          clearCorrectionAndPrintChanges(declarationId as string)
+          goToPrintCertificate(
+            declarationId as string,
+            (type as string).toLocaleLowerCase()
+          )
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="Printer" color="currentColor" size="large" />
+        {intl.formatMessage(messages.printDeclaration)}
+      </DropdownMenu.Item>
+    )
+  )
+}
 
 const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,

@@ -21,6 +21,7 @@ interface IActionMessages
   reviewCorrection: MessageDescriptor
   reviewDeclaration: MessageDescriptor
   updateDeclaration: MessageDescriptor
+  printDeclaration: MessageDescriptor
 }
 
 const messagesToDefine: IActionMessages = {
@@ -68,7 +69,12 @@ const messagesToDefine: IActionMessages = {
   updateDeclaration: {
     defaultMessage: 'Update declaration',
     description: 'Label for update record button in dropdown menu',
-    id: 'action.update.declaration'
+    id: 'action.update'
+  },
+  printDeclaration: {
+    defaultMessage: 'Print certified copy',
+    description: 'Label for print certified copy in dropdown menu',
+    id: 'action.print'
   }
 }
 export const messages: IActionMessages = defineMessages(messagesToDefine)
