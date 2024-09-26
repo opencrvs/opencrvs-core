@@ -49,11 +49,12 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
+import { Event } from '@client/utils/gateway'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
   intl: IntlShape
-  scope: Scope | null
+  scope: Scope
   draft: IDeclaration | null
   userDetails: UserDetails | null
   toggleDisplayDialog: () => void
@@ -121,18 +122,23 @@ export const ActionMenu: React.FC<{
           />
           <CorrectRecordAction
             declarationId={id}
+            declarationStatus={status}
+            type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
           />
           <ArchiveAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
           />
           <ReinstateAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
           />
           <ReviewAction
             declarationId={id}
@@ -140,6 +146,7 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
             goToPage={goToPage}
           />
           <UpdateAction
@@ -148,6 +155,7 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
             goToPage={goToPage}
           />
           <PrintAction
@@ -155,6 +163,7 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
             clearCorrectionAndPrintChanges={clearCorrectionAndPrintChanges}
             goToPrintCertificate={goToPrintCertificate}
           />
@@ -162,8 +171,9 @@ export const ActionMenu: React.FC<{
             declarationId={id}
             isDownloaded={isDownloaded}
             intl={intl}
+            scope={scope}
           />
-          <DeleteAction handleDelete={handleDelete} intl={intl} />
+          <DeleteAction handleDelete={handleDelete} intl={intl} scope={scope} />
         </DropdownMenu.Content>
       </DropdownMenu>
       {modal}
@@ -174,6 +184,7 @@ export const ActionMenu: React.FC<{
 interface IActionItemCommonProps {
   isDownloaded: boolean
   intl: IntlShape
+  scope: Scope
 }
 
 interface IDeclarationProps {
@@ -211,25 +222,44 @@ const ViewAction: React.FC<{
 
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
-> = ({ declarationId, isDownloaded, intl }) => {
+> = ({ declarationId, declarationStatus, type, isDownloaded, intl, scope }) => {
   const dispatch = useDispatch()
-  return (
-    <DropdownMenu.Item
-      onClick={() => {
-        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
 
-        dispatch(
-          goToCertificateCorrection(
-            declarationId as string,
-            CorrectionSection.Corrector
+  const isBirthOrDeathEvent =
+    type && [Event.Birth, Event.Death].includes(type.toLowerCase() as Event)
+
+  const canBeCorrected =
+    declarationStatus &&
+    [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED,
+      SUBMISSION_STATUS.ISSUED
+    ].includes(declarationStatus as SUBMISSION_STATUS)
+
+  // @ToDo use: `record.registration-correct` after configurable role pr is merged
+  const userHasRegisterScope =
+    scope && (scope as any as string[]).includes('register')
+
+  return (
+    isBirthOrDeathEvent &&
+    canBeCorrected &&
+    userHasRegisterScope && (
+      <DropdownMenu.Item
+        onClick={() => {
+          dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+          dispatch(
+            goToCertificateCorrection(
+              declarationId as string,
+              CorrectionSection.Corrector
+            )
           )
-        )
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="NotePencil" color="currentColor" size="large" />
-      {intl.formatMessage(messages.correctRecord)}
-    </DropdownMenu.Item>
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="NotePencil" color="currentColor" size="large" />
+        {intl.formatMessage(messages.correctRecord)}
+      </DropdownMenu.Item>
+    )
   )
 }
 const ArchiveAction: React.FC<
@@ -378,7 +408,8 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 const DeleteAction: React.FC<{
   intl: IntlShape
   handleDelete: () => void
-}> = ({ intl, handleDelete }) => {
+  scope: Scope
+}> = ({ intl, handleDelete, scope }) => {
   return (
     <DropdownMenu.Item onClick={handleDelete}>
       <Icon name="Trash" color="currentColor" size="large" />
