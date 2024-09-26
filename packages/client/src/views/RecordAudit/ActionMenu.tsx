@@ -124,28 +124,6 @@ export const ActionMenu: React.FC<{
             declarationStatus={status}
             intl={intl}
           />
-          <CorrectRecordAction
-            declarationId={id}
-            declarationStatus={status}
-            type={type}
-            isDownloaded={isDownloaded}
-            intl={intl}
-            scope={scope}
-          />
-          <ArchiveAction
-            toggleDisplayDialog={toggleDisplayDialog}
-            isDownloaded={isDownloaded}
-            intl={intl}
-            scope={scope}
-            declarationStatus={status}
-          />
-          <ReinstateAction
-            toggleDisplayDialog={toggleDisplayDialog}
-            isDownloaded={isDownloaded}
-            intl={intl}
-            scope={scope}
-            declarationStatus={status}
-          />
           <ReviewAction
             declarationId={id}
             declarationStatus={status}
@@ -165,6 +143,20 @@ export const ActionMenu: React.FC<{
             scope={scope}
             goToPage={goToPage}
           />
+          <ArchiveAction
+            toggleDisplayDialog={toggleDisplayDialog}
+            isDownloaded={isDownloaded}
+            intl={intl}
+            scope={scope}
+            declarationStatus={status}
+          />
+          <ReinstateAction
+            toggleDisplayDialog={toggleDisplayDialog}
+            isDownloaded={isDownloaded}
+            intl={intl}
+            scope={scope}
+            declarationStatus={status}
+          />
           <PrintAction
             declarationStatus={status}
             declarationId={id}
@@ -178,6 +170,14 @@ export const ActionMenu: React.FC<{
           <IssueAction
             declarationStatus={status}
             declarationId={id}
+            isDownloaded={isDownloaded}
+            intl={intl}
+            scope={scope}
+          />
+          <CorrectRecordAction
+            declarationId={id}
+            declarationStatus={status}
+            type={type}
             isDownloaded={isDownloaded}
             intl={intl}
             scope={scope}
