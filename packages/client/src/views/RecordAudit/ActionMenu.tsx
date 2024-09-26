@@ -21,6 +21,7 @@ import {
   goToIssueCertificate,
   goToPage,
   goToPrintCertificate,
+  goToUserProfile,
   goToViewRecordPage
 } from '@client/navigation'
 import { IntlShape } from 'react-intl'
@@ -56,8 +57,11 @@ export const ActionMenu: React.FC<{
   draft: IDeclaration | null
   userDetails: UserDetails | null
   toggleDisplayDialog: () => void
+  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
+  goToIssueCertificate: typeof goToIssueCertificate
+  goToUserProfile: typeof goToUserProfile
 }> = ({
   declaration,
   intl,
@@ -66,7 +70,9 @@ export const ActionMenu: React.FC<{
   userDetails,
   toggleDisplayDialog,
   goToPage,
-  goToPrintCertificate
+  clearCorrectionAndPrintChanges,
+  goToPrintCertificate,
+  goToIssueCertificate
 }) => {
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
@@ -134,6 +140,7 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            goToPage={goToPage}
           />
           <UpdateAction
             declarationId={id}
@@ -141,12 +148,15 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            goToPage={goToPage}
           />
           <PrintAction
             declarationId={id}
             type={type}
             isDownloaded={isDownloaded}
             intl={intl}
+            clearCorrectionAndPrintChanges={clearCorrectionAndPrintChanges}
+            goToPrintCertificate={goToPrintCertificate}
           />
           <IssueAction
             declarationId={id}
@@ -161,26 +171,22 @@ export const ActionMenu: React.FC<{
   )
 }
 
-interface ActionItemProps {
-  declarationId?: string
-  type?: string
-  declarationStatus?: string
-  declaration?: IDeclarationData
+interface IActionItemCommonProps {
+  isDownloaded: boolean
   intl: IntlShape
-  scope?: Scope | null
-  draft?: IDeclaration | null
-  userDetails?: UserDetails | null
-  toggleDisplayDialog?: () => void
-  goToPage?: typeof goToPage
-  goToPrintCertificate?: typeof goToPrintCertificate
-  isDownloaded?: boolean
 }
 
-const ViewAction: React.FC<ActionItemProps> = ({
-  declarationStatus,
-  declarationId,
-  intl
-}) => {
+interface IDeclarationProps {
+  declarationId: string
+  type?: string
+  declarationStatus?: string
+}
+
+const ViewAction: React.FC<{
+  intl: IntlShape
+  declarationStatus?: string
+  declarationId: string
+}> = ({ declarationStatus, declarationId, intl }) => {
   const dispatch = useDispatch()
 
   const recordOrDeclaration = [
@@ -203,53 +209,56 @@ const ViewAction: React.FC<ActionItemProps> = ({
   )
 }
 
-const CorrectRecordAction: React.FC<ActionItemProps> = ({
-  declarationId,
-  isDownloaded,
-  intl
-}) => (
-  <DropdownMenu.Item
-    onClick={() => {
-      clearCorrectionAndPrintChanges(declarationId as string)
-      goToCertificateCorrection(
-        declarationId as string,
-        CorrectionSection.Corrector
-      )
-    }}
-    disabled={!isDownloaded}
-  >
-    <Icon name="NotePencil" color="currentColor" size="large" />
-    {intl.formatMessage(messages.correctRecord)}
-  </DropdownMenu.Item>
-)
-const ArchiveAction: React.FC<ActionItemProps> = ({
-  toggleDisplayDialog,
-  intl,
-  isDownloaded
-}) => (
+const CorrectRecordAction: React.FC<
+  IActionItemCommonProps & IDeclarationProps
+> = ({ declarationId, isDownloaded, intl }) => {
+  const dispatch = useDispatch()
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+
+        dispatch(
+          goToCertificateCorrection(
+            declarationId as string,
+            CorrectionSection.Corrector
+          )
+        )
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="NotePencil" color="currentColor" size="large" />
+      {intl.formatMessage(messages.correctRecord)}
+    </DropdownMenu.Item>
+  )
+}
+const ArchiveAction: React.FC<
+  IActionItemCommonProps & { toggleDisplayDialog?: () => void }
+> = ({ toggleDisplayDialog, intl, isDownloaded }) => (
   <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
     <Icon name="Archive" color="currentColor" size="large" />
     {intl.formatMessage(buttonMessages.archive)}
   </DropdownMenu.Item>
 )
 
-const ReinstateAction: React.FC<ActionItemProps> = ({
-  toggleDisplayDialog,
-  isDownloaded,
-  intl
-}) => (
+const ReinstateAction: React.FC<
+  IActionItemCommonProps & { toggleDisplayDialog?: () => void }
+> = ({ toggleDisplayDialog, isDownloaded, intl }) => (
   <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
     <Icon name="FileArrowUp" color="currentColor" size="large" />
     {intl.formatMessage(buttonMessages.reinstate)}
   </DropdownMenu.Item>
 )
 
-const ReviewAction: React.FC<ActionItemProps> = ({
+const ReviewAction: React.FC<
+  IActionItemCommonProps & IDeclarationProps & { goToPage: typeof goToPage }
+> = ({
   declarationId,
   declarationStatus,
   type,
   isDownloaded,
-  intl
+  intl,
+  goToPage
 }) => {
   return (
     <DropdownMenu.Item
@@ -278,12 +287,15 @@ const ReviewAction: React.FC<ActionItemProps> = ({
   )
 }
 
-const UpdateAction: React.FC<ActionItemProps> = ({
+const UpdateAction: React.FC<
+  IActionItemCommonProps & IDeclarationProps & { goToPage: typeof goToPage }
+> = ({
   declarationId,
   declarationStatus,
   type,
   isDownloaded,
-  intl
+  intl,
+  goToPage
 }) => {
   let PAGE_ROUTE: string, PAGE_ID: string
 
@@ -314,21 +326,27 @@ const UpdateAction: React.FC<ActionItemProps> = ({
   )
 }
 
-const PrintAction: React.FC<ActionItemProps> = ({
+const PrintAction: React.FC<
+  IActionItemCommonProps &
+    IDeclarationProps & {
+      clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
+      goToPrintCertificate: typeof goToPrintCertificate
+    }
+> = ({
   declarationId,
   type,
   isDownloaded,
-  intl
+  intl,
+  clearCorrectionAndPrintChanges,
+  goToPrintCertificate
 }) => (
   <DropdownMenu.Item
     onClick={() => {
-      clearCorrectionAndPrintChanges &&
-        clearCorrectionAndPrintChanges(declarationId as string)
-      goToPrintCertificate &&
-        goToPrintCertificate(
-          declarationId as string,
-          (type as string).toLocaleLowerCase()
-        )
+      clearCorrectionAndPrintChanges(declarationId as string)
+      goToPrintCertificate(
+        declarationId as string,
+        (type as string).toLocaleLowerCase()
+      )
     }}
     disabled={!isDownloaded}
   >
@@ -337,7 +355,7 @@ const PrintAction: React.FC<ActionItemProps> = ({
   </DropdownMenu.Item>
 )
 
-const IssueAction: React.FC<ActionItemProps> = ({
+const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   isDownloaded,
   intl

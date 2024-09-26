@@ -533,6 +533,9 @@ function RecordAuditBody({
       toggleDisplayDialog={toggleDisplayDialog}
       goToPage={goToPage}
       goToPrintCertificate={goToPrintCertificate}
+      clearCorrectionAndPrintChanges={clearCorrectionAndPrintChanges}
+      goToIssueCertificate={goToIssueCertificate}
+      goToUserProfile={goToUserProfile}
     />
   )
   desktopActionsView.push(actions[actions.length - 1])
