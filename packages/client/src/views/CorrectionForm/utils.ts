@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import { IDeclaration } from '@client/declarations'
 import {
   BULLET_LIST,
   CHECKBOX,
@@ -64,7 +64,8 @@ import {
 import {
   CorrectionInput,
   PaymentOutcomeType,
-  PaymentType
+  PaymentType,
+  RegStatus
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
@@ -73,9 +74,16 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export function groupHasError(
   group: IFormSectionGroup,
-  sectionData: IFormSectionData
+  sectionData: IFormSectionData,
+  config: IOfflineData,
+  draft: IFormData
 ) {
-  const errors = getValidationErrorsForForm(group.fields, sectionData || {})
+  const errors = getValidationErrorsForForm(
+    group.fields,
+    sectionData || {},
+    config,
+    draft
+  )
 
   for (const field of group.fields) {
     const fieldErrors = errors[field.name].errors
@@ -105,9 +113,9 @@ export function groupHasError(
 export function isCorrection(declaration: IDeclaration) {
   const { registrationStatus } = declaration
   return (
-    registrationStatus === SUBMISSION_STATUS.REGISTERED ||
-    registrationStatus === SUBMISSION_STATUS.CERTIFIED ||
-    registrationStatus === SUBMISSION_STATUS.ISSUED
+    registrationStatus === RegStatus.Registered ||
+    registrationStatus === RegStatus.Certified ||
+    registrationStatus === RegStatus.Issued
   )
 }
 
@@ -267,11 +275,15 @@ export function updateDeclarationRegistrationWithCorrection(
 export function sectionHasError(
   group: IFormSectionGroup,
   section: IFormSection,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  config: IOfflineData,
+  draft: IFormData
 ) {
   const errors = getValidationErrorsForForm(
     group.fields,
-    declaration.data[section.id] || {}
+    declaration.data[section.id] || {},
+    config,
+    draft
   )
 
   for (const field of group.fields) {

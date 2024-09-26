@@ -76,8 +76,7 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { Checkbox, Stack } from '@opencrvs/components/lib'
 import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
-import { Event, History } from '@client/utils/gateway'
-import { DECLARED, VALIDATED } from '@client/utils/constants'
+import { Event, History, RegStatus } from '@client/utils/gateway'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 
@@ -884,7 +883,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     ?.reverse()
     ?.find(
       (history) =>
-        history.regStatus && [DECLARED, VALIDATED].includes(history.regStatus)
+        history.regStatus &&
+        [RegStatus.Declared, RegStatus.Validated].includes(history.regStatus)
     )
   return (
     <div>

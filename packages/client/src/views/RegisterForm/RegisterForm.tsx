@@ -58,7 +58,7 @@ import {
   IFormFieldValue,
   SubmissionAction
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -105,6 +105,8 @@ import { client } from '@client/utils/apolloClient'
 import { Stack, ToggleMenu } from '@client/../../components/lib'
 import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -178,6 +180,7 @@ type Props = {
   isWritingDraft: boolean
   userDetails: UserDetails | null
   scope: Scope | null
+  config: IOfflineData
 }
 
 export type FullProps = IFormProps &
@@ -314,7 +317,7 @@ function FormAppBar({
     }
     const [exitModalTitle, exitModalDescription] =
       isCorrection(declaration) ||
-      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+      declaration.registrationStatus === RegStatus.CorrectionRequested
         ? [
             intl.formatMessage(
               messages.exitWithoutSavingModalForCorrectionRecordTitle
@@ -452,7 +455,7 @@ function FormAppBar({
                 {!duplicate &&
                   !isCorrection(declaration) &&
                   declaration.registrationStatus !==
-                    SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                    RegStatus.CorrectionRequested && (
                     <>
                       <Button
                         id="save-exit-btn"
@@ -920,7 +923,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         const activeSectionFields = this.props.activeSectionGroup.fields
         const activeSectionValues =
           this.props.declaration.data[this.props.activeSection.id]
-        groupHasError = hasFormError(activeSectionFields, activeSectionValues)
+        groupHasError = hasFormError(
+          activeSectionFields,
+          activeSectionValues,
+          this.props.config,
+          this.props.declaration.data
+        )
       }
       if (groupHasError) {
         this.showAllValidationErrors()
@@ -1439,6 +1447,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state),
+    config: getOfflineData(state),
     userDetails
   }
 }

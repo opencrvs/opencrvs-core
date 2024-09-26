@@ -7,7 +7,6 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 # import Query.* from '../features/notification/schema.graphql'
-# import Mutation.* from '../features/notification/schema.graphql'
 # import Query.* from '../features/registration/schema.graphql'
 # import Mutation.* from '../features/registration/schema.graphql'
 # import Query.* from '../features/location/schema.graphql'
@@ -17,14 +16,9 @@
 # import Query.* from '../features/search/schema.graphql'
 # import Query.* from '../features/role/schema.graphql'
 # import Mutation.* from '../features/role/schema.graphql'
-# import Query.* from '../features/certificate/schema.graphql'
-# import Mutation.* from '../features/certificate/schema.graphql'
-# import Mutation.* from '../features/application/schema.graphql'
 # import Mutation.* from '../features/systems/schema.graphql'
 # import Query.* from '../features/systems/schema.graphql'
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
-# import Query.* from '../features/informantSMSNotifications/schema.graphql'
-# import Mutation.* from '../features/informantSMSNotifications/schema.graphql'
 # import Query.* from '../features/OIDPUserInfo/schema.graphql'
 # import * from 'common.graphql'
 
