@@ -24,7 +24,8 @@ services:
     restart: unless-stopped
     depends_on:
       - base
-
+    environment:
+      - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION}
     #platform: linux/amd64
@@ -53,6 +54,8 @@ services:
     restart: unless-stopped
     depends_on:
       - base
+    environment:
+      - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64

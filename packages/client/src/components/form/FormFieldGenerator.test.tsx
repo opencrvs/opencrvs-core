@@ -50,6 +50,7 @@ describe('form component', () => {
         id="mother"
         onChange={modifyDraft}
         setAllFieldsDirty={false}
+        draftData={draft.data}
         fields={[
           {
             name: 'countryPrimary',
@@ -155,6 +156,7 @@ describe('when field definition has location search input', () => {
         id="locationForm"
         setAllFieldsDirty={false}
         onChange={modifyDraft}
+        draftData={{}}
         fields={[
           {
             name: 'placeOfBirth',
@@ -222,6 +224,7 @@ describe('when user is in the register section', () => {
         id="registration"
         onChange={modifyDraft}
         setAllFieldsDirty={false}
+        draftData={draft.data}
         fields={[
           {
             name: 'registrationPhone',
@@ -263,6 +266,7 @@ describe('when field definition has nested fields', () => {
         id="registration"
         onChange={modifyDraft}
         setAllFieldsDirty={false}
+        draftData={draft.data}
         fields={[
           {
             name: 'informant',
@@ -438,6 +442,7 @@ describe('when field definition has date field', () => {
           id="locationForm"
           setAllFieldsDirty={false}
           onChange={modifyDraft}
+          draftData={{}}
           fields={[
             {
               name: 'childDateOfBirth',
@@ -474,6 +479,7 @@ describe('when field definition has number field', () => {
         id="numberForm"
         setAllFieldsDirty={false}
         onChange={modifyDraftMock}
+        draftData={{}}
         fields={[
           {
             name: 'multipleBirth',
@@ -524,6 +530,7 @@ describe('when field definition has select field on mobile device', () => {
         id="numberForm"
         setAllFieldsDirty={false}
         onChange={modifyDraftMock}
+        draftData={{}}
         fields={[
           {
             name: 'countryPrimary',
