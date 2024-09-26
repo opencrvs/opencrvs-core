@@ -133,7 +133,6 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             intl={intl}
             scope={scope}
-            declarationId={id}
             declarationStatus={status}
           />
           <ReinstateAction
@@ -141,7 +140,6 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             intl={intl}
             scope={scope}
-            declarationId={id}
             declarationStatus={status}
           />
           <ReviewAction
@@ -163,6 +161,7 @@ export const ActionMenu: React.FC<{
             goToPage={goToPage}
           />
           <PrintAction
+            declarationStatus={status}
             declarationId={id}
             type={type}
             isDownloaded={isDownloaded}
@@ -172,6 +171,7 @@ export const ActionMenu: React.FC<{
             goToPrintCertificate={goToPrintCertificate}
           />
           <IssueAction
+            declarationStatus={status}
             declarationId={id}
             isDownloaded={isDownloaded}
             intl={intl}
@@ -189,12 +189,12 @@ interface IActionItemCommonProps {
   isDownloaded: boolean
   intl: IntlShape
   scope: Scope
+  declarationStatus?: string
 }
 
 interface IDeclarationProps {
   declarationId: string
   type?: string
-  declarationStatus?: string
 }
 
 const ViewAction: React.FC<{
@@ -268,8 +268,7 @@ const CorrectRecordAction: React.FC<
 }
 
 const ArchiveAction: React.FC<
-  IActionItemCommonProps &
-    IDeclarationProps & { toggleDisplayDialog?: () => void }
+  IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, intl, isDownloaded, declarationStatus, scope }) => {
   const isArchivable =
     declarationStatus &&
@@ -301,8 +300,7 @@ const ArchiveAction: React.FC<
 }
 
 const ReinstateAction: React.FC<
-  IActionItemCommonProps &
-    IDeclarationProps & { toggleDisplayDialog?: () => void }
+  IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, isDownloaded, intl, declarationStatus, scope }) => {
   const isArchived = declarationStatus === SUBMISSION_STATUS.ARCHIVED
 
