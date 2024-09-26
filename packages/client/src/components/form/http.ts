@@ -44,7 +44,8 @@ export function transformHttpFieldIntoRequest(
     },
     body: request.body
       ? JSON.stringify(transformRequestBody(request.body, ...evalParams))
-      : null
+      : null,
+    method: request.method
   })
 }
 
