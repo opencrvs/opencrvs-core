@@ -42,7 +42,7 @@ import {
 } from '@opencrvs/commons/types'
 
 const createRequest = async <T = any>(
-  method: 'POST' | 'GET' | 'PUT' | 'PATCH' | 'DELETE',
+  method: 'POST' | 'GET' | 'PUT' | 'DELETE',
   path: string,
   authHeader: IAuthHeader,
   body?: Record<string, any>
