@@ -2,6 +2,8 @@
 
 ## 1.6.2
 
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+
 ## 1.6.1
 
 ### Bug fixes
