@@ -1211,7 +1211,8 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Certificate: {
-    async collector(docRef: DocumentReference, _, context) {
+    async collector(parent: { docRef: DocumentReference }, _, context) {
+      const { docRef } = parent
       const relatedPersonRef =
         docRef.extension &&
         findExtension(
@@ -1229,7 +1230,8 @@ export const typeResolvers: GQLResolver = {
         )
       )
     },
-    async hasShowedVerifiedDocument(docRef: DocumentReference, _) {
+    async hasShowedVerifiedDocument(parent: { docRef: DocumentReference }, _) {
+      const { docRef } = parent
       const hasShowedDocument = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         docRef.extension as Extension[]
@@ -1245,7 +1247,12 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-    async certifier(docRef: DocumentReference, _, context) {
+    async certifier(
+      parent: { docRef: DocumentReference; task: Saved<Task> },
+      _,
+      context
+    ) {
+      const { docRef, task } = parent
       const practitionerRef =
         docRef.extension &&
         findExtension(
@@ -1274,7 +1281,6 @@ export const typeResolvers: GQLResolver = {
           await context.dataSources.fhirAPI.getPractionerRoleHistory(
             practitionerRoleId
           )
-        const task = getTaskFromSavedBundle(context.record!)
         const result = practitionerRoleHistory.find(
           (it) =>
             it?.meta?.lastUpdated &&
@@ -2174,8 +2180,11 @@ async function resolveCertificates(
       return null
     }
 
-    return dataSources.fhirAPI.getDocumentReference(
-      resourceIdentifierToUUID(certSection.entry[0].reference)
-    )
+    return {
+      task,
+      docRef: dataSources.fhirAPI.getDocumentReference(
+        resourceIdentifierToUUID(certSection.entry[0].reference)
+      )
+    }
   })
 }
