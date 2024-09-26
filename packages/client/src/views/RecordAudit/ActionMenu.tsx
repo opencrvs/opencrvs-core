@@ -290,7 +290,7 @@ const ArchiveAction: React.FC<
   const userHasArchiveScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
-      ((scope as any as string[]).includes('validated') &&
+      ((scope as any as string[]).includes('validate') &&
         declarationStatus !== SUBMISSION_STATUS.VALIDATED))
 
   return (
@@ -315,7 +315,7 @@ const ReinstateAction: React.FC<
   const userHasReinstateScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validated'))
+      (scope as any as string[]).includes('validate'))
   return (
     isArchived &&
     userHasReinstateScope && (
@@ -351,7 +351,7 @@ const ReviewAction: React.FC<
   const userHasReviewScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validated'))
+      (scope as any as string[]).includes('validate'))
 
   return isPendingCorrection && userHasReviewScope ? (
     <DropdownMenu.Item
@@ -394,10 +394,27 @@ const UpdateAction: React.FC<
   declarationId,
   declarationStatus,
   type,
+  scope,
   isDownloaded,
   intl,
   goToPage
 }) => {
+  const isUpdatableDeclaration =
+    declarationStatus &&
+    [
+      SUBMISSION_STATUS.DRAFT,
+      EVENT_STATUS.IN_PROGRESS,
+      EVENT_STATUS.REJECTED
+    ].includes(declarationStatus)
+
+  // @ToDo use: appropriate scope after configurable role pr is merged
+  const userHasUpdateScope =
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      (scope as any as string[]).includes('validate') ||
+      ((scope as any as string[]).includes('validate') &&
+        declarationStatus === SUBMISSION_STATUS.DRAFT))
+
   let PAGE_ROUTE: string, PAGE_ID: string
 
   if (declarationStatus === SUBMISSION_STATUS.DRAFT) {
@@ -414,16 +431,24 @@ const UpdateAction: React.FC<
     PAGE_ID = 'review'
   }
   return (
-    <DropdownMenu.Item
-      onClick={() => {
-        goToPage &&
-          goToPage(PAGE_ROUTE, declarationId as string, PAGE_ID, type as string)
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="PencilCircle" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.update)}
-    </DropdownMenu.Item>
+    isUpdatableDeclaration &&
+    userHasUpdateScope && (
+      <DropdownMenu.Item
+        onClick={() => {
+          goToPage &&
+            goToPage(
+              PAGE_ROUTE,
+              declarationId as string,
+              PAGE_ID,
+              type as string
+            )
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="PencilCircle" color="currentColor" size="large" />
+        {intl.formatMessage(messages.updateDeclaration)}
+      </DropdownMenu.Item>
+    )
   )
 }
 

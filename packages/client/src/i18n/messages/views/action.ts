@@ -20,6 +20,7 @@ interface IActionMessages
   reinstateRecord: MessageDescriptor
   reviewCorrection: MessageDescriptor
   reviewDeclaration: MessageDescriptor
+  updateDeclaration: MessageDescriptor
 }
 
 const messagesToDefine: IActionMessages = {
@@ -63,6 +64,11 @@ const messagesToDefine: IActionMessages = {
       'Review {isDuplicate, select, true{potential duplicate} other{declaration}}',
     description: 'Label for review record button in dropdown menu',
     id: 'action.review.declaration'
+  },
+  updateDeclaration: {
+    defaultMessage: 'Update declaration',
+    description: 'Label for update record button in dropdown menu',
+    id: 'action.update.declaration'
   }
 }
 export const messages: IActionMessages = defineMessages(messagesToDefine)
