@@ -20,9 +20,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - uses: mskelton/changelog-reminder-action@v3
         with:
+          token: ${{ secrets.GH_TOKEN }}
           message: >
             Oops! Looks like you forgot to update the changelog.
             When updating CHANGELOG.md, please consider the following:
