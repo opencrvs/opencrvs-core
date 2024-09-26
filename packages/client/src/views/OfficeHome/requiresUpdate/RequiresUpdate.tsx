@@ -54,7 +54,7 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
-import { useState} from 'react';
+import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 interface IBaseRejectTabProps {
@@ -76,19 +76,19 @@ interface IBaseRejectTabProps {
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
 function RequiresUpdateComponent(props: IRejectTabProps) {
-  const {width} = useWindowSize();
-  const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES);
-  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING);
+  const { width } = useWindowSize()
+  const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES)
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
       sortedCol,
       sortOrder
-    );
-    setSortedCol(newSortedCol);
-    setSortOrder(newSortOrder);
-  };
+    )
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
 
   const getColumns = () => {
     if (width > props.theme.grid.breakpoints.lg) {
@@ -115,9 +115,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           sortFunction: onColumnClick
         },
         {
-          label: props.intl.formatMessage(
-            constantsMessages.sentForUpdates
-          ),
+          label: props.intl.formatMessage(constantsMessages.sentForUpdates),
           width: 18,
           key: COLUMNS.SENT_FOR_UPDATES,
           isSorted: sortedCol === COLUMNS.SENT_FOR_UPDATES,
@@ -129,7 +127,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           key: COLUMNS.ACTIONS,
           isActionColumn: true
         }
-      ];
+      ]
     } else {
       return [
         {
@@ -143,9 +141,9 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           key: COLUMNS.ACTIONS,
           isActionColumn: true
         }
-      ];
+      ]
     }
-  };
+  }
 
   const transformRejectedContent = (data: GQLEventSearchResultSet) => {
     const { intl } = props
@@ -163,10 +161,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (
-          width > props.theme.grid.breakpoints.lg &&
-          !isFieldAgent
-        ) {
+        if (width > props.theme.grid.breakpoints.lg && !isFieldAgent) {
           actions.push({
             label: props.intl.formatMessage(buttonMessages.update),
             handler: () => {},
@@ -174,10 +169,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           })
         }
       } else {
-        if (
-          width > props.theme.grid.breakpoints.lg &&
-          !isFieldAgent
-        ) {
+        if (width > props.theme.grid.breakpoints.lg && !isFieldAgent) {
           actions.push({
             label: props.intl.formatMessage(buttonMessages.update),
             handler: (
@@ -227,18 +219,14 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() =>
-            props.goToDeclarationRecordAudit('rejectTab', reg.id)
-          }
+          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() =>
-            props.goToDeclarationRecordAudit('rejectTab', reg.id)
-          }
+          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -267,11 +255,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      sortedCol,
-      sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
     return sortedItems.map((item) => {
       return {
         ...item,
@@ -281,11 +265,11 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
           item.sentForUpdates && formattedDuration(item.sentForUpdates as Date)
       }
     })
-  };
+  }
 
   const totalPages = props.queryData.data.totalItems
     ? Math.ceil(props.queryData.data.totalItems / props.pageSize)
-    : 0;
+    : 0
   const isShowPagination =
     props.queryData.data.totalItems &&
     props.queryData.data.totalItems > props.pageSize
@@ -301,7 +285,9 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       onPageChange={props.onPageChange}
       loading={props.loading}
       error={props.error}
-      noResultText={props.intl.formatMessage(wqMessages.noRecordsRequireUpdates)}
+      noResultText={props.intl.formatMessage(
+        wqMessages.noRecordsRequireUpdates
+      )}
       noContent={transformRejectedContent(props.queryData.data).length <= 0}
     >
       <Workqueue
@@ -312,7 +298,7 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
         hideLastBorder={!isShowPagination}
       />
     </WQContentWrapper>
-  );
+  )
 }
 
 function mapStateToProps(state: IStoreState) {

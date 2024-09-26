@@ -24,7 +24,6 @@ import type {
   GQLUserAuditLogResultSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { LoadingGrey } from '@opencrvs/components/lib/LoadingGrey'
 import { Table } from '@opencrvs/components/lib/Table'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { DateRangePicker } from '@client/components/DateRangePicker'
@@ -64,11 +63,6 @@ const HistoryHeader = styled.div`
 const RecentActionsHolder = styled.div`
   margin-top: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.grey200};
-`
-
-const SectionTitle = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 10px;
 `
 
 const AuditContent = styled.div`
@@ -156,10 +150,6 @@ function UserAuditHistoryComponent(props: Props) {
     }))
   }
 
-  const setCurrentPage = (currentPage: number) => {
-    setState((prevState) => ({...prevState, currentPageNumber: currentPage }))
-  }
-
   function getAuditColumns() {
     const { intl } = props
     return [
@@ -227,9 +217,7 @@ function UserAuditHistoryComponent(props: Props) {
 
   function getActionMessage(auditLog: UserAuditLogResultItem) {
     const actionDescriptor = getUserAuditDescription(auditLog.action)
-    return actionDescriptor
-      ? props.intl.formatMessage(actionDescriptor)
-      : ''
+    return actionDescriptor ? props.intl.formatMessage(actionDescriptor) : ''
   }
 
   function getAuditData(data: GQLUserAuditLogResultSet) {
@@ -321,24 +309,8 @@ function UserAuditHistoryComponent(props: Props) {
     })
     return (
       (auditList &&
-        orderBy(
-          auditList,
-          [state.sortedColumn],
-          [state.sortOrder]
-        )) ||
+        orderBy(auditList, [state.sortedColumn], [state.sortOrder])) ||
       []
-    )
-  }
-
-  function getLoadingView() {
-    return (
-      <>
-        <SectionTitle>
-          <LoadingGrey width={5} />
-        </SectionTitle>
-        <LoadingGrey width={10} />
-        {getLoadingAuditListView()}
-      </>
     )
   }
 
@@ -408,14 +380,11 @@ function UserAuditHistoryComponent(props: Props) {
                       <Table
                         columns={getAuditColumns()}
                         content={getAuditData(data.getUserAuditLog)}
-                        noResultText={intl.formatMessage(
-                          messages.noAuditFound
-                        )}
+                        noResultText={intl.formatMessage(messages.noAuditFound)}
                         fixedWidth={1088}
                         isLoading={loading}
                         hideTableHeader={
-                          state.viewportWidth <=
-                          theme.grid.breakpoints.md
+                          state.viewportWidth <= theme.grid.breakpoints.md
                         }
                         pageSize={DEFAULT_LIST_SIZE}
                       />
@@ -423,7 +392,10 @@ function UserAuditHistoryComponent(props: Props) {
                         currentPage={state.currentPageNumber}
                         totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
                         onPageChange={(page: any) =>
-                          setState((prevState) => ({...prevState, currentPageNumber: page }))
+                          setState((prevState) => ({
+                            ...prevState,
+                            currentPageNumber: page
+                          }))
                         }
                       />
 
@@ -433,9 +405,7 @@ function UserAuditHistoryComponent(props: Props) {
                           handleClose={() => toggleActionDetails(null)}
                           show={state.showModal}
                           responsive={true}
-                          title={getActionMessage(
-                            state.actionDetailsData
-                          )}
+                          title={getActionMessage(state.actionDetailsData)}
                           width={1024}
                           autoHeight={true}
                         >

@@ -18,7 +18,7 @@ import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
 import type { LegendProps } from 'recharts'
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
@@ -133,19 +133,18 @@ function LegendDot(props: React.HTMLAttributes<SVGElement>) {
   )
 }
 
-function RegRatesLineChartComponent (props: IProps) {
-
+function RegRatesLineChartComponent(props: IProps) {
   const getStatePropertiesForChart = () => {
     if (window.innerWidth > props.theme.grid.breakpoints.md) {
-      return getStatePropertiesForLargeWindowChart();
+      return getStatePropertiesForLargeWindowChart()
     } else {
-      return getStatePropertiesForSmallWindowChart();
+      return getStatePropertiesForSmallWindowChart()
     }
-  };
+  }
 
   const getLatestData = () => {
-    const { data, theme } = props;
-    const latestData = data && data[data.length - 1];
+    const { data, theme } = props
+    const latestData = data && data[data.length - 1]
     return {
       activeLabel: (latestData && latestData.label) || '',
       activeRegisteredInTargetDays: {
@@ -160,20 +159,20 @@ function RegRatesLineChartComponent (props: IProps) {
         value: (latestData && latestData.totalEstimate) || 0,
         stroke: theme.colors.grey300
       }
-    };
-  };
+    }
+  }
 
   const [state, setState] = useState<IState>({
     ...getStatePropertiesForChart(),
     ...getLatestData()
-  });
+  })
 
   useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth);
+    window.addEventListener('resize', recordWindowWidth)
     return () => {
-      window.removeEventListener('resize', recordWindowWidth);
-    };
-  }, []);
+      window.removeEventListener('resize', recordWindowWidth)
+    }
+  })
 
   const getStatePropertiesForSmallWindowChart = () => {
     return {
@@ -185,8 +184,8 @@ function RegRatesLineChartComponent (props: IProps) {
       chartLeft: 40,
       maximizeXAxisInterval: true,
       legendLayout: 'horizontal' as const
-    };
-  };
+    }
+  }
 
   const getStatePropertiesForLargeWindowChart = () => {
     return {
@@ -198,15 +197,15 @@ function RegRatesLineChartComponent (props: IProps) {
       chartLeft: 10,
       maximizeXAxisInterval: false,
       legendLayout: 'vertical' as const
-    };
-  };
+    }
+  }
 
   const recordWindowWidth = () => {
     setState({
       ...state,
       ...getStatePropertiesForChart()
-    });
-  };
+    })
+  }
 
   const customizedLegend = () => {
     const {
@@ -214,8 +213,8 @@ function RegRatesLineChartComponent (props: IProps) {
       activeRegisteredInTargetDays,
       activeTotalRegistered,
       activeTotalEstimate
-    } = state.activeLabel ? state : getLatestData();
-    const { intl, eventType, completenessRateTime } = props;
+    } = state.activeLabel ? state : getLatestData()
+    const { intl, eventType, completenessRateTime } = props
     return (
       <CustomLegendContainer
         marginLeft={state.legendMarginLeft}
@@ -287,7 +286,7 @@ function RegRatesLineChartComponent (props: IProps) {
   }
 
   const customizedTooltip = (dataPoint: any) => {
-    const wrapperPayload = dataPoint.payload[0];
+    const wrapperPayload = dataPoint.payload[0]
 
     return (
       <TooltipContent>
@@ -295,12 +294,12 @@ function RegRatesLineChartComponent (props: IProps) {
           wrapperPayload.payload &&
           wrapperPayload.payload.registrationPercentage}
       </TooltipContent>
-    );
-  };
+    )
+  }
 
   const mouseMoveHandler = (data: any) => {
-    const { theme } = props;
-  
+    const { theme } = props
+
     if (data && data.activePayload) {
       setState((prevState) => ({
         ...prevState,
@@ -317,9 +316,9 @@ function RegRatesLineChartComponent (props: IProps) {
           value: data.activePayload[0].value || 0,
           stroke: theme.colors.grey200
         }
-      }));
+      }))
     }
-  };
+  }
 
   const mouseLeaveHandler = () => {
     setState({
@@ -333,8 +332,8 @@ function RegRatesLineChartComponent (props: IProps) {
       chartLeft: 0,
       maximizeXAxisInterval: false,
       legendLayout: 'horizontal'
-    });
-  };
+    })
+  }
 
   const getLoadingIndicatorForMobileView = () => {
     return (
@@ -390,7 +389,7 @@ function RegRatesLineChartComponent (props: IProps) {
         <MobileChartLoadingIndicator />
       </LoadingIndicator>
     )
-  };
+  }
 
   const getLoadingIndicatorForDesktopView = () => {
     return (
@@ -446,15 +445,15 @@ function RegRatesLineChartComponent (props: IProps) {
         </LegendLoadingIndicator>
       </LoadingIndicator>
     )
-  };
+  }
 
   const getLoadingIndicator = () => {
     if (window.innerWidth > props.theme.grid.breakpoints.md) {
-      return getLoadingIndicatorForDesktopView();
+      return getLoadingIndicatorForDesktopView()
     } else {
-      return getLoadingIndicatorForMobileView();
+      return getLoadingIndicatorForMobileView()
     }
-  };
+  }
 
   const getChart = (data: ILineDataPoint[]) => {
     const {
@@ -464,7 +463,7 @@ function RegRatesLineChartComponent (props: IProps) {
       chartLeft,
       maximizeXAxisInterval,
       legendLayout
-    } = state;
+    } = state
     return (
       <LineChart
         data={data}
@@ -484,14 +483,14 @@ function RegRatesLineChartComponent (props: IProps) {
         maximizeXAxisInterval={maximizeXAxisInterval}
         legendLayout={legendLayout}
       />
-    );
-  };
+    )
+  }
 
-  const { data } = props;
+  const { data } = props
 
-  if (data) return getChart(data);
-  else return getLoadingIndicator();
-};
+  if (data) return getChart(data)
+  else return getLoadingIndicator()
+}
 
 export const RegRatesLineChart = withTheme(
   injectIntl(RegRatesLineChartComponent)

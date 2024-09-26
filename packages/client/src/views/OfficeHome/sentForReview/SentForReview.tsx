@@ -80,8 +80,7 @@ interface IBaseApprovalTabProps {
 type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
 
 function SentForReviewComponent(props: IApprovalTabProps) {
-
-  const {width} = useWindowSize();
+  const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_APPROVAL)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
@@ -93,8 +92,8 @@ function SentForReviewComponent(props: IApprovalTabProps) {
       sortedCol,
       sortOrder
     )
-      setSortOrder(newSortOrder)
-      setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
+    setSortedCol(newSortedCol)
   }
 
   const getColumns = () => {
@@ -282,11 +281,7 @@ function SentForReviewComponent(props: IApprovalTabProps) {
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      sortedCol,
-      sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
     return sortedItems.map((item) => {
       return {
         ...item,

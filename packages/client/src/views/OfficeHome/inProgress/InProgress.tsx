@@ -84,7 +84,7 @@ import {
   isBirthEvent,
   isDeathEvent
 } from '@client/search/transformer'
-import { useState } from 'react';
+import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 interface IQueryData {
@@ -126,13 +126,14 @@ export const SELECTOR_ID = {
 }
 
 function InProgressComponent(props: IRegistrarHomeProps) {
-  const {width} = useWindowSize();
+  const { width } = useWindowSize()
 
   const [sortedCol, setSortedCol] = useState<COLUMNS>(
     props.selectorId && props.selectorId !== SELECTOR_ID.ownDrafts
-    ? COLUMNS.NOTIFICATION_SENT
-    : COLUMNS.LAST_UPDATED);
-  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING);
+      ? COLUMNS.NOTIFICATION_SENT
+      : COLUMNS.LAST_UPDATED
+  )
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -293,11 +294,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      sortedCol,
-      sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
     return sortedItems.map((item) => {
       return {
         ...item,
@@ -311,10 +308,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
   }
 
   const getDraftsPaginatedData = (drafts: IDeclaration[], pageId: number) => {
-    return drafts.slice(
-      (pageId - 1) * props.pageSize,
-      pageId * props.pageSize
-    )
+    return drafts.slice((pageId - 1) * props.pageSize, pageId * props.pageSize)
   }
 
   const transformDraftContent = () => {
@@ -421,11 +415,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      sortedCol,
-      sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
 
     return sortedItems.map((item) => {
       return {
@@ -464,21 +454,16 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         },
         {
           label:
-            props.selectorId &&
-            props.selectorId !== SELECTOR_ID.ownDrafts
-              ? props.intl.formatMessage(
-                  constantsMessages.notificationSent
-                )
+            props.selectorId && props.selectorId !== SELECTOR_ID.ownDrafts
+              ? props.intl.formatMessage(constantsMessages.notificationSent)
               : props.intl.formatMessage(constantsMessages.lastUpdated),
           width: 18,
           key:
-            props.selectorId &&
-            props.selectorId !== SELECTOR_ID.ownDrafts
+            props.selectorId && props.selectorId !== SELECTOR_ID.ownDrafts
               ? COLUMNS.NOTIFICATION_SENT
               : COLUMNS.LAST_UPDATED,
           isSorted:
-            props.selectorId &&
-            props.selectorId !== SELECTOR_ID.ownDrafts
+            props.selectorId && props.selectorId !== SELECTOR_ID.ownDrafts
               ? sortedCol === COLUMNS.NOTIFICATION_SENT
               : sortedCol === COLUMNS.LAST_UPDATED,
           sortFunction: onColumnClick
@@ -524,9 +509,9 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       sections: [
         {
           id: SELECTOR_ID.ownDrafts,
-          title: `${props.intl.formatMessage(
-            messages.inProgressOwnDrafts
-          )} (${drafts && drafts.length})`,
+          title: `${props.intl.formatMessage(messages.inProgressOwnDrafts)} (${
+            drafts && drafts.length
+          })`,
           disabled: false
         },
         {
@@ -585,7 +570,8 @@ function InProgressComponent(props: IRegistrarHomeProps) {
     )
   }
 
-  const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } = props
+  const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
+    props
 
   const isShowPagination =
     !props.selectorId || props.selectorId === SELECTOR_ID.ownDrafts
@@ -618,15 +604,10 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       : selectorId === SELECTOR_ID.fieldAgentDrafts
       ? props.queryData.inProgressData &&
         props.queryData.inProgressData.totalItems &&
-        Math.ceil(
-          props.queryData.inProgressData.totalItems / props.pageSize
-        )
+        Math.ceil(props.queryData.inProgressData.totalItems / props.pageSize)
       : props.queryData.notificationData &&
         props.queryData.notificationData.totalItems &&
-        Math.ceil(
-          props.queryData.notificationData.totalItems /
-            props.pageSize
-        )
+        Math.ceil(props.queryData.notificationData.totalItems / props.pageSize)
 
   const noContent =
     !selectorId || selectorId === SELECTOR_ID.ownDrafts
@@ -645,9 +626,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
   return (
     <WQContentWrapper
       title={intl.formatMessage(navigationMessages.progress)}
-      isMobileSize={
-        width < props.theme.grid.breakpoints.lg ? true : false
-      }
+      isMobileSize={width < props.theme.grid.breakpoints.lg ? true : false}
       tabBarContent={
         !isFieldAgent &&
         getTabs(

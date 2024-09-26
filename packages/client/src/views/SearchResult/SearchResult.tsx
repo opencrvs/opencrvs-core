@@ -138,21 +138,10 @@ type ISearchResultProps = IntlShapeProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
 
-interface ISearchResultState {
-  width: number
-}
-
 type QueryData = SearchEventsQuery['searchEvents']
 
-function SearchResultView (props: ISearchResultProps) {
- 
-  const {width} = useWindowSize()
-
-  const getExpandable = () => {
-    return width > props.theme.grid.breakpoints.lg
-      ? true
-      : false
-  }
+function SearchResultView(props: ISearchResultProps) {
+  const { width } = useWindowSize()
 
   const getColumns = () => {
     if (width > props.theme.grid.breakpoints.lg) {
@@ -386,18 +375,14 @@ function SearchResultView (props: ISearchResultProps) {
         const NameComponent = reg.name ? (
           <NameContainer
             id={`name_${index}`}
-            onClick={() =>
-              props.goToDeclarationRecordAudit('search', reg.id)
-            }
+            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
           >
             {reg.name}
           </NameContainer>
         ) : (
           <NoNameContainer
             id={`name_${index}`}
-            onClick={() =>
-              props.goToDeclarationRecordAudit('search', reg.id)
-            }
+            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
           >
             {intl.formatMessage(constantsMessages.noNameProvided)}
           </NoNameContainer>
@@ -496,9 +481,7 @@ function SearchResultView (props: ISearchResultProps) {
                 title={intl.formatMessage(messages.searchResultFor, {
                   param: searchText
                 })}
-                isMobileSize={
-                  width < props.theme.grid.breakpoints.lg
-                }
+                isMobileSize={width < props.theme.grid.breakpoints.lg}
                 noResultText={intl.formatMessage(messages.noResultFor, {
                   param: searchText
                 })}
@@ -524,9 +507,7 @@ function SearchResultView (props: ISearchResultProps) {
                         </ToolTipContainer>
                       </ReactTooltip>
                       <Workqueue
-                        content={transformSearchContent(
-                          data.searchEvents
-                        )}
+                        content={transformSearchContent(data.searchEvents)}
                         columns={getColumns()}
                         noResultText={intl.formatMessage(
                           constantsMessages.noResults

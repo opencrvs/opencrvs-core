@@ -60,7 +60,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
-import {useState} from 'react'
+import { useState } from 'react'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -80,16 +80,10 @@ interface IBasePrintTabProps {
 
 type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
 
-function  ReadyToPrintComponent(props: IPrintTabProps) {
-  const {width} = useWindowSize()
+function ReadyToPrintComponent(props: IPrintTabProps) {
+  const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
-
-  const getExpandable = () => {
-    return width > props.theme.grid.breakpoints.lg
-      ? true
-      : false
-  }
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -221,18 +215,14 @@ function  ReadyToPrintComponent(props: IPrintTabProps) {
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() =>
-            props.goToDeclarationRecordAudit('printTab', reg.id)
-          }
+          onClick={() => props.goToDeclarationRecordAudit('printTab', reg.id)}
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() =>
-            props.goToDeclarationRecordAudit('printTab', reg.id)
-          }
+          onClick={() => props.goToDeclarationRecordAudit('printTab', reg.id)}
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -256,11 +246,7 @@ function  ReadyToPrintComponent(props: IPrintTabProps) {
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      sortedCol,
-      sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
 
     return sortedItems.map((item) => {
       return {
