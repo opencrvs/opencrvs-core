@@ -54,7 +54,8 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -72,28 +73,12 @@ interface IBaseRejectTabProps {
   error?: boolean
 }
 
-// Not needed for functional component
-/*interface IRejectTabState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
-*/
-
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
 function RequiresUpdateComponent(props: IRejectTabProps) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
+  const {width} = useWindowSize();
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES);
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING);
-
-  useEffect(() => {
-    function recordWindowWidth() {
-      setWidth(window.innerWidth);
-    }
-    window.addEventListener('resize', recordWindowWidth);
-    return () => window.removeEventListener('resize', recordWindowWidth);
-  }, []);
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(

@@ -17,7 +17,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
-// import type { LegendProps } from 'recharts'
+import type { LegendProps } from 'recharts'
 import { useState, useEffect } from 'react';
 
 interface IProps extends WrappedComponentProps {
@@ -105,6 +105,26 @@ interface ILineDataPoint {
   registrationPercentage: string
 }
 
+interface IActiveState {
+  value: number
+  stroke: string
+}
+
+interface IState {
+  legendMarginTop: number
+  legendMarginLeft: number
+  chartTop: number
+  chartRight: number
+  chartBottom: number
+  chartLeft: number
+  maximizeXAxisInterval?: boolean
+  legendLayout: LegendProps['layout']
+  activeLabel: string
+  activeRegisteredInTargetDays: IActiveState
+  activeTotalRegistered: IActiveState
+  activeTotalEstimate: IActiveState
+}
+
 function LegendDot(props: React.HTMLAttributes<SVGElement>) {
   return (
     <svg width={10} height={10} viewBox="0 0 10 10" fill="none" {...props}>
@@ -143,7 +163,7 @@ function RegRatesLineChartComponent (props: IProps) {
     };
   };
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<IState>({
     ...getStatePropertiesForChart(),
     ...getLatestData()
   });
