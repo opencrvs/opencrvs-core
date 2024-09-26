@@ -37,6 +37,7 @@ import {
   DEATH_REGISTRATION_NUMBER,
   NATIONAL_ID
 } from '@client/utils/constants'
+import { IconProps } from '@opencrvs/components/lib'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -72,6 +73,9 @@ export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 export const DIVIDER = 'DIVIDER'
 export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
+export const HTTP = 'HTTP'
+export const BUTTON = 'BUTTON'
+export const REDIRECT = 'REDIRECT'
 
 export enum Sort {
   ASC = 'asc',
@@ -462,6 +466,12 @@ export enum REVIEW_OVERRIDE_POSITION {
   AFTER = 'after'
 }
 
+export type DependencyInfo = {
+  expression: string
+  dependsOn: string[]
+}
+export type InitialValue = IFormFieldValue | DependencyInfo
+
 export interface IFormFieldBase {
   name: string
   type: IFormField['type']
@@ -480,7 +490,7 @@ export interface IFormFieldBase {
   disabled?: boolean
   enabled?: string
   custom?: boolean
-  initialValue?: IFormFieldValue
+  initialValue?: InitialValue
   initialValueKey?: string
   extraValue?: IFormFieldValue
   conditionals?: Conditional[]
@@ -724,6 +734,31 @@ export interface ISignatureFormField extends IFormFieldBase {
   )[]
 }
 
+export interface IHttpFormField extends IFormFieldBase {
+  type: typeof HTTP
+  options: {
+    headers: Record<string, string>
+    body: Record<string, any>
+  } & Omit<Request, 'body' | 'headers'>
+}
+export interface IButtonFormField extends IFormFieldBase {
+  type: typeof BUTTON
+  icon?: IconProps['name']
+  buttonLabel: MessageDescriptor
+  loadingLabel?: MessageDescriptor
+  options: {
+    trigger: string
+    shouldHandleLoadingState?: boolean
+  }
+}
+
+export interface IRedirectFormField extends IFormFieldBase {
+  type: typeof REDIRECT
+  options: {
+    url: string
+  }
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -758,6 +793,9 @@ export type IFormField =
   | INidVerificationButton
   | IDividerFormField
   | ISignatureFormField
+  | IHttpFormField
+  | IButtonFormField
+  | IRedirectFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1028,6 +1066,7 @@ export interface Ii18nFormFieldBase {
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
   ignoreBottomMargin?: boolean
+  dependsOn?: string[]
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
@@ -1224,6 +1263,32 @@ export interface Ii18nSignatureField extends Ii18nFormFieldBase {
   )[]
 }
 
+export interface Ii18nHttpFormField extends Ii18nFormFieldBase {
+  type: typeof HTTP
+  options: {
+    headers: Record<string, string>
+    body: Record<string, any>
+  } & Omit<Request, 'body' | 'headers'>
+}
+
+export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
+  type: typeof BUTTON
+  icon?: IconProps['name']
+  buttonLabel: string
+  loadingLabel?: string
+  options: {
+    trigger: string
+    shouldHandleLoadingState?: boolean
+  }
+}
+
+export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
+  type: typeof REDIRECT
+  options: {
+    url: string
+  }
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1256,6 +1321,9 @@ export type Ii18nFormField =
   | I18nDividerField
   | I18nHeading3Field
   | Ii18nSignatureField
+  | Ii18nHttpFormField
+  | Ii18nButtonFormField
+  | Ii18nRedirectFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

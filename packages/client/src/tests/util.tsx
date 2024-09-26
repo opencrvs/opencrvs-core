@@ -1805,7 +1805,10 @@ export const mockUserGraphqlOperation = {
           )
         ]
       },
-      { user: mockCompleteFormData }
+      { user: mockCompleteFormData },
+      '',
+      userDetails,
+      mockOfflineData
     )
   },
   result: {
