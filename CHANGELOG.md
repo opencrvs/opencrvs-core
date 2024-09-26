@@ -27,7 +27,7 @@
 
 ## Bug fixes
 
-- TBC
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 
 ## 1.6.0 Release candidate
 
