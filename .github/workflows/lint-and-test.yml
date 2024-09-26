@@ -15,8 +15,7 @@ jobs:
   setup:
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
