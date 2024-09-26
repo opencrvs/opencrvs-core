@@ -13,8 +13,8 @@ import { cleanEnv, str, port, url, num, bool } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
-  AUTH_HOST: str({ devDefault: '0.0.0.0' }),
-  AUTH_PORT: port({ devDefault: 4040 }),
+  AUTH_HOST: str({ default: '0.0.0.0' }),
+  AUTH_PORT: port({ default: 4040 }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
   NOTIFICATION_SERVICE_URL: url({ devDefault: 'http://localhost:2020/' }),
