@@ -133,6 +133,8 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             intl={intl}
             scope={scope}
+            declarationId={id}
+            declarationStatus={status}
           />
           <ReinstateAction
             toggleDisplayDialog={toggleDisplayDialog}
@@ -262,14 +264,39 @@ const CorrectRecordAction: React.FC<
     )
   )
 }
+
 const ArchiveAction: React.FC<
-  IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, intl, isDownloaded }) => (
-  <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
-    <Icon name="Archive" color="currentColor" size="large" />
-    {intl.formatMessage(buttonMessages.archive)}
-  </DropdownMenu.Item>
-)
+  IActionItemCommonProps &
+    IDeclarationProps & { toggleDisplayDialog?: () => void }
+> = ({ toggleDisplayDialog, intl, isDownloaded, declarationStatus, scope }) => {
+  const isArchivable =
+    declarationStatus &&
+    [
+      SUBMISSION_STATUS.IN_PROGRESS,
+      SUBMISSION_STATUS.DECLARED,
+      SUBMISSION_STATUS.VALIDATED,
+      SUBMISSION_STATUS.REJECTED
+    ].includes(declarationStatus as SUBMISSION_STATUS)
+
+  // @ToDo use: `record.registration-archive` after configurable role pr is merged
+  // @Question: If user has archive scope but not register scope,
+  // can he archive validated record?
+  const userHasArchiveScope =
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      ((scope as any as string[]).includes('validated') &&
+        declarationStatus !== SUBMISSION_STATUS.VALIDATED))
+
+  return (
+    isArchivable &&
+    userHasArchiveScope && (
+      <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+        <Icon name="Archive" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.archive)}
+      </DropdownMenu.Item>
+    )
+  )
+}
 
 const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
