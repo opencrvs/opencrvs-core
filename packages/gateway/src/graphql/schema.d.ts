@@ -1414,7 +1414,7 @@ export const enum GQLRegistrationType {
 
 export interface GQLCertificate {
   collector?: GQLRelatedPerson
-  certifier?: GQLPractitioner
+  certifier?: GQLUser
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPayment | null>
   data?: string
@@ -1812,20 +1812,6 @@ export interface GQLMarriageFeeInput {
   DELAYED?: number
 }
 
-export interface GQLPractitioner {
-  id: string
-  resourceType?: string
-  identifier?: Array<GQLIdentityType | null>
-  active?: boolean
-  name?: Array<GQLHumanName | null>
-  telecom?: Array<GQLContactPoint | null>
-  address?: Array<GQLAddress | null>
-  gender?: string
-  birthDate?: string
-  photo?: Array<GQLAttachment | null>
-  role?: string
-}
-
 export interface GQLAuditLogItemBase {
   time: string
   ipAddress: string
@@ -2032,7 +2018,6 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   MarriageFee?: GQLMarriageFeeTypeResolver
-  Practitioner?: GQLPractitionerTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
@@ -11705,125 +11690,6 @@ export interface MarriageFeeToON_TIMEResolver<TParent = any, TResult = any> {
 }
 
 export interface MarriageFeeToDELAYEDResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLPractitionerTypeResolver<TParent = any> {
-  id?: PractitionerToIdResolver<TParent>
-  resourceType?: PractitionerToResourceTypeResolver<TParent>
-  identifier?: PractitionerToIdentifierResolver<TParent>
-  active?: PractitionerToActiveResolver<TParent>
-  name?: PractitionerToNameResolver<TParent>
-  telecom?: PractitionerToTelecomResolver<TParent>
-  address?: PractitionerToAddressResolver<TParent>
-  gender?: PractitionerToGenderResolver<TParent>
-  birthDate?: PractitionerToBirthDateResolver<TParent>
-  photo?: PractitionerToPhotoResolver<TParent>
-  role?: PractitionerToRoleResolver<TParent>
-}
-
-export interface PractitionerToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToResourceTypeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToIdentifierResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToActiveResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToNameResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToTelecomResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToAddressResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToGenderResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToBirthDateResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToPhotoResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PractitionerToRoleResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

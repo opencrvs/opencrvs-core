@@ -80,20 +80,6 @@ input RelatedPersonInput {
   ageOfIndividualInYears: Int
 }
 
-type Practitioner {
-  id: ID!
-  resourceType: String
-  identifier: [IdentityType]
-  active: Boolean
-  name: [HumanName]
-  telecom: [ContactPoint]
-  address: [Address]
-  gender: String
-  birthDate: String
-  photo: [Attachment]
-  role: String
-}
-
 type RelatedPerson { # -> Related Person
   id: ID
   _fhirID: ID # -> .id relatedPerson ID

@@ -315,12 +315,14 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               firstNames
               familyName
             }
-            telecom {
-              system
-              value
-              use
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
-            role
           }
         }
         duplicateOf
@@ -604,12 +606,14 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
               firstNames
               familyName
             }
-            telecom {
-              system
-              value
-              use
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
-            role
           }
         }
         duplicateOf

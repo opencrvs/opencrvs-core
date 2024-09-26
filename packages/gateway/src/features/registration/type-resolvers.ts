@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  getPractitionerRoleFromPractitioner,
-  getPresignedUrlFromUri
-} from '@gateway/features/registration/utils'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 import {
@@ -666,21 +663,6 @@ export const typeResolvers: GQLResolver = {
       return person?.address
     }
   },
-  Practitioner: {
-    name: (practitioner: Saved<Practitioner>) => {
-      return practitioner.name
-    },
-    telecom: (practitioner: Saved<Practitioner>) => {
-      return practitioner.telecom
-    },
-    role: async (practitioner: Saved<Practitioner>, _, context) => {
-      const practitionerRole = getPractitionerRoleFromPractitioner(
-        practitioner,
-        context.record!
-      )
-      return practitionerRole
-    }
-  },
   Deceased: {
     deceased: (person) => {
       return person && person.deceasedBoolean
@@ -1277,12 +1259,45 @@ export const typeResolvers: GQLResolver = {
         practitionerRef.valueReference.reference &&
         practitionerRef.valueReference.reference.startsWith('Practitioner')
       ) {
-        return getResourceFromBundleById<Practitioner>(
-          context.record!,
-          resourceIdentifierToUUID(
-            practitionerRef.valueReference.reference as ResourceIdentifier
-          )
+        const practitionerId = resourceIdentifierToUUID(
+          practitionerRef.valueReference.reference as ResourceIdentifier
         )
+        const practitionerRoleBundle =
+          await context.dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
+            practitionerId
+          )
+
+        const practitionerRoleId =
+          practitionerRoleBundle.entry?.[0].resource?.id
+
+        const practitionerRoleHistory =
+          await context.dataSources.fhirAPI.getPractionerRoleHistory(
+            practitionerRoleId
+          )
+        const task = getTaskFromSavedBundle(context.record!)
+        const result = practitionerRoleHistory.find(
+          (it) =>
+            it?.meta?.lastUpdated &&
+            task.lastModified &&
+            it?.meta?.lastUpdated <= task.lastModified!
+        )
+
+        const targetCode = result?.code?.find((element) => {
+          return (
+            element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
+          )
+        })
+
+        const roleId = targetCode?.coding?.[0].code
+        const userResponse =
+          await context.dataSources.usersAPI.getUserByPractitionerId(
+            practitionerId
+          )
+
+        const allRoles = await context.dataSources.countryConfigAPI.getRoles()
+        const role = allRoles.find((role) => role.id === roleId)?.id
+
+        return { ...userResponse, role }
       }
       return null
     }

@@ -521,7 +521,7 @@ export type BookmarkedSeachItem = {
 
 export type Certificate = {
   __typename?: 'Certificate'
-  certifier?: Maybe<Practitioner>
+  certifier?: Maybe<User>
   collector?: Maybe<RelatedPerson>
   data?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
@@ -1692,21 +1692,6 @@ export type PersonInput = {
   photo?: InputMaybe<Array<AttachmentInput>>
   reasonNotApplying?: InputMaybe<Scalars['String']>
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
-}
-
-export type Practitioner = {
-  __typename?: 'Practitioner'
-  active?: Maybe<Scalars['Boolean']>
-  address?: Maybe<Array<Maybe<Address>>>
-  birthDate?: Maybe<Scalars['String']>
-  gender?: Maybe<Scalars['String']>
-  id: Scalars['ID']
-  identifier?: Maybe<Array<Maybe<IdentityType>>>
-  name?: Maybe<Array<Maybe<HumanName>>>
-  photo?: Maybe<Array<Maybe<Attachment>>>
-  resourceType?: Maybe<Scalars['String']>
-  role?: Maybe<Scalars['String']>
-  telecom?: Maybe<Array<Maybe<ContactPoint>>>
 }
 
 export type Query = {
@@ -3796,20 +3781,23 @@ export type FetchBirthRegistrationForReviewQuery = {
           } | null> | null
         } | null
         certifier?: {
-          __typename?: 'Practitioner'
-          role?: string | null
-          name?: Array<{
+          __typename?: 'User'
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
-          telecom?: Array<{
-            __typename?: 'ContactPoint'
-            system?: string | null
-            value?: string | null
-            use?: string | null
-          } | null> | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4131,20 +4119,23 @@ export type FetchBirthRegistrationForCertificateQuery = {
           } | null> | null
         } | null
         certifier?: {
-          __typename?: 'Practitioner'
-          role?: string | null
-          name?: Array<{
+          __typename?: 'User'
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
-          telecom?: Array<{
-            __typename?: 'ContactPoint'
-            system?: string | null
-            value?: string | null
-            use?: string | null
-          } | null> | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4629,20 +4620,23 @@ export type FetchDeathRegistrationForReviewQuery = {
           } | null> | null
         } | null
         certifier?: {
-          __typename?: 'Practitioner'
-          role?: string | null
-          name?: Array<{
+          __typename?: 'User'
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
-          telecom?: Array<{
-            __typename?: 'ContactPoint'
-            system?: string | null
-            value?: string | null
-            use?: string | null
-          } | null> | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4953,20 +4947,23 @@ export type FetchDeathRegistrationForCertificationQuery = {
           } | null> | null
         } | null
         certifier?: {
-          __typename?: 'Practitioner'
-          role?: string | null
-          name?: Array<{
+          __typename?: 'User'
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
-          telecom?: Array<{
-            __typename?: 'ContactPoint'
-            system?: string | null
-            value?: string | null
-            use?: string | null
-          } | null> | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -5377,20 +5374,23 @@ export type FetchMarriageRegistrationForReviewQuery = {
           } | null> | null
         } | null
         certifier?: {
-          __typename?: 'Practitioner'
-          role?: string | null
-          name?: Array<{
+          __typename?: 'User'
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
-          telecom?: Array<{
-            __typename?: 'ContactPoint'
-            system?: string | null
-            value?: string | null
-            use?: string | null
-          } | null> | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -5731,20 +5731,23 @@ export type FetchMarriageRegistrationForCertificateQuery = {
           } | null> | null
         } | null
         certifier?: {
-          __typename?: 'Practitioner'
-          role?: string | null
-          name?: Array<{
+          __typename?: 'User'
+          name: Array<{
             __typename?: 'HumanName'
             use?: string | null
             firstNames?: string | null
             familyName?: string | null
-          } | null> | null
-          telecom?: Array<{
-            __typename?: 'ContactPoint'
-            system?: string | null
-            value?: string | null
-            use?: string | null
-          } | null> | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null

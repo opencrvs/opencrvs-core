@@ -1520,7 +1520,7 @@ enum RegistrationType {
 
 type Certificate {
   collector: RelatedPerson
-  certifier: Practitioner
+  certifier: User
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
@@ -1915,20 +1915,6 @@ input DeathFeeInput {
 input MarriageFeeInput {
   ON_TIME: Float
   DELAYED: Float
-}
-
-type Practitioner {
-  id: ID!
-  resourceType: String
-  identifier: [IdentityType]
-  active: Boolean
-  name: [HumanName]
-  telecom: [ContactPoint]
-  address: [Address]
-  gender: String
-  birthDate: String
-  photo: [Attachment]
-  role: String
 }
 
 interface AuditLogItemBase {

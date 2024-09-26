@@ -318,12 +318,14 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
               firstNames
               familyName
             }
-            telecom {
-              system
-              value
-              use
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
-            role
           }
         }
       }
@@ -623,12 +625,14 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               firstNames
               familyName
             }
-            telecom {
-              system
-              value
-              use
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
-            role
           }
         }
       }

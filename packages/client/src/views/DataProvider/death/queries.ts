@@ -384,12 +384,14 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               firstNames
               familyName
             }
-            telecom {
-              system
-              value
-              use
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
-            role
           }
         }
         duplicateOf
@@ -662,12 +664,14 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
               firstNames
               familyName
             }
-            telecom {
-              system
-              value
-              use
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
-            role
           }
         }
         duplicateOf
