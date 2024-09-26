@@ -14,7 +14,7 @@ import {
   IDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
   goBack,
@@ -35,6 +35,7 @@ import { correctReasonSection } from '@client/forms/correction/reason'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getOfflineData } from '@client/offline/selectors'
 
 type IProps = {
   declaration: IDeclaration
@@ -68,6 +69,7 @@ function getGroupWithInitialValues(
 
 function CorrectionReasonFormComponent(props: IFullProps) {
   const { declaration, intl } = props
+  const config = useSelector(getOfflineData)
 
   const section = correctReasonSection
 
@@ -104,7 +106,12 @@ function CorrectionReasonFormComponent(props: IFullProps) {
       id="confirm_form"
       key="confirm_form"
       onClick={continueButtonHandler}
-      disabled={groupHasError(group, declaration.data[section.id])}
+      disabled={groupHasError(
+        group,
+        declaration.data[section.id],
+        config,
+        props.declaration.data
+      )}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </PrimaryButton>
