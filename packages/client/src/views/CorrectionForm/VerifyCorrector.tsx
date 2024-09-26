@@ -41,6 +41,10 @@ import { TimeMounted } from '@client/components/TimeMounted'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { UserDetails } from '@client/utils/userUtils'
 
 interface INameField {
   firstNamesField: string
@@ -73,6 +77,8 @@ interface IStateProps {
   declaration: IDeclaration
   form: ICertificateCorrectorDefinition
   registerForm: IForm
+  config: IOfflineData
+  user: UserDetails | null
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -113,14 +119,17 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 
   getGenericCorrectorInfo = (corrector: string): ICorrectorInfo => {
-    const { intl, declaration, form, registerForm } = this.props
+    const { intl, declaration, form, registerForm, config, user } = this.props
     const info = declaration.data[corrector]
     //TODO :: we have to get form defination from new certificateCorrectorDefination
     const showInfoFor = ['mother', 'father', 'child', 'informant']
 
     const eventRegistrationInput = draftToGqlTransformer(
       registerForm,
-      declaration.data
+      declaration.data,
+      declaration.id,
+      user,
+      config
     )
 
     const informantType =
@@ -260,7 +269,9 @@ const mapStateToProps = (
   return {
     declaration: declaration,
     form: getVerifyCorrectorDefinition(declaration.event),
-    registerForm: getEventRegisterForm(state, declaration.event)
+    registerForm: getEventRegisterForm(state, declaration.event),
+    config: getOfflineData(state),
+    user: getUserDetails(state)
   }
 }
 

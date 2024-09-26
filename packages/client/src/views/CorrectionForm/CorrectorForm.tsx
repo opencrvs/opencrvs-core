@@ -18,7 +18,7 @@ import {
   CorrectorRelationship,
   getCorrectorSection
 } from '@client/forms/correction/corrector'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
   goBack,
@@ -38,6 +38,7 @@ import { groupHasError } from './utils'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { getOfflineData } from '@client/offline/selectors'
 
 type IProps = {
   declaration: IDeclaration
@@ -56,7 +57,7 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function CorrectorFormComponent(props: IFullProps) {
   const { declaration, intl } = props
-
+  const config = useSelector(getOfflineData)
   const section = getCorrectorSection(declaration)
 
   const group = React.useMemo(
@@ -129,7 +130,12 @@ function CorrectorFormComponent(props: IFullProps) {
       size="large"
       fullWidth
       onClick={continueButtonHandler}
-      disabled={groupHasError(group, declaration.data[section.id])}
+      disabled={groupHasError(
+        group,
+        declaration.data[section.id],
+        config,
+        declaration.data
+      )}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </Button>
