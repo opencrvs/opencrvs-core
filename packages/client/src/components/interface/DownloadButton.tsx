@@ -44,6 +44,8 @@ import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
+import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
+import { messages } from '@client/i18n/messages/views/action'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -60,6 +62,7 @@ interface DownloadButtonProps {
   className?: string
   downloadConfigs: IDownloadConfig
   status?: DOWNLOAD_STATUS
+  isActionItem?: boolean
 }
 
 interface IConnectProps {
@@ -220,7 +223,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration,
     userRole,
     practitionerId,
-    unassignDeclaration
+    unassignDeclaration,
+    isActionItem
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -260,6 +264,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      console.log('onClickDownload triggered')
+
       if (
         (assignment?.practitionerId !== practitionerId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
@@ -331,6 +337,31 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       </NoConnectionViewContainer>
     )
   }
+
+  if (isActionItem)
+    return (
+      <>
+        <DropdownMenu.Item onClick={onClickDownload}>
+          {intl.formatMessage(messages.unassign)}
+        </DropdownMenu.Item>
+        {assignModal !== null && (
+          <ResponsiveModal
+            id="assignment"
+            show
+            title={intl.formatMessage(assignModal.title)}
+            actions={assignModal.actions.map((action) =>
+              renderModalAction(action, intl)
+            )}
+            autoHeight
+            responsive={false}
+            preventClickOnParent
+            handleClose={hideModal}
+          >
+            {intl.formatMessage(assignModal.content, assignModal.contentArgs)}
+          </ResponsiveModal>
+        )}
+      </>
+    )
 
   return (
     <>

@@ -34,8 +34,8 @@ import {
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { CorrectionSection } from '@client/forms'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { CorrectionSection, DownloadAction } from '@client/forms'
+import { buttonMessages } from '@client/i18n/messages'
 import { UserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/workqueue'
 import {
@@ -50,6 +50,8 @@ import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
 import { Event } from '@client/utils/gateway'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -186,6 +188,12 @@ export const ActionMenu: React.FC<{
             handleDelete={handleDelete}
             intl={intl}
             declarationStatus={status}
+          />
+          <UnassignAction
+            isDownloaded={isDownloaded}
+            declaration={declaration}
+            intl={intl}
+            scope={scope}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
@@ -549,3 +557,35 @@ const DeleteAction: React.FC<{
       {intl.formatMessage(buttonMessages.deleteDeclaration)}
     </DropdownMenu.Item>
   )
+
+const UnassignAction: React.FC<{
+  declaration: IDeclarationData
+  intl: IntlShape
+  scope: Scope
+  isDownloaded: boolean
+}> = ({ intl, isDownloaded, declaration, scope }) => {
+  const { id, type, status } = declaration
+  const refetchQueries = [
+    { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
+  ]
+  const downLoadConfig = {
+    event: type as string,
+    compositionId: id,
+    action: DownloadAction.LOAD_REVIEW_DECLARATION,
+    assignment: declaration?.assignment,
+    declarationStatus: declaration.status,
+    refetchQueries
+  }
+  return (
+    !isDownloaded &&
+    declaration.assignment &&
+    (scope as any as string[]).includes('register') && (
+      <DownloadButton
+        key={id}
+        downloadConfigs={downLoadConfig}
+        status={status as DOWNLOAD_STATUS}
+        isActionItem={true}
+      />
+    )
+  )
+}
