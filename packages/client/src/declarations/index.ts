@@ -799,13 +799,19 @@ export async function updateWorkqueueData(
     const transformedDeclarationForGroom = draftToGqlTransformer(
       // transforming required section only
       { sections: groomSectionDefinition ? [groomSectionDefinition] : [] },
-      declaration.data
+      declaration.data,
+      declaration.id,
+      getUserDetails(state),
+      getOfflineData(state)
     )
 
     const transformedDeclarationForBride = draftToGqlTransformer(
       // transforming required section only
       { sections: brideSectionDefinition ? [brideSectionDefinition] : [] },
-      declaration.data
+      declaration.data,
+      declaration.id,
+      getUserDetails(state),
+      getOfflineData(state)
     )
 
     transformedNameForGroom =
@@ -832,7 +838,10 @@ export async function updateWorkqueueData(
     const transformedDeclaration = draftToGqlTransformer(
       // transforming required section only
       { sections: sectionDefinition ? [sectionDefinition] : [] },
-      declaration.data
+      declaration.data,
+      declaration.id,
+      getUserDetails(state),
+      getOfflineData(state)
     )
     transformedName =
       (transformedDeclaration &&
