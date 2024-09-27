@@ -11,10 +11,14 @@
 
 import React from 'react'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  DangerButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { useDispatch } from 'react-redux'
-import { Icon } from '@opencrvs/components'
+import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {
   goToCertificateCorrection,
   goToHome,
@@ -32,10 +36,11 @@ import {
   deleteDeclaration,
   DOWNLOAD_STATUS,
   IDeclaration,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  unassignDeclaration
 } from '@client/declarations'
 import { CorrectionSection } from '@client/forms'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { UserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/workqueue'
 import {
@@ -50,6 +55,8 @@ import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
 import { Event } from '@client/utils/gateway'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -95,6 +102,19 @@ export const ActionMenu: React.FC<{
     if (deleteConfirm) {
       dispatch(deleteDeclaration(id, client))
       dispatch(goToHome())
+    }
+    return
+  }
+  const handleUnassign = async () => {
+    const unassignConfirm = await openModal<boolean | null>((close) => (
+      <UnassignModal
+        intl={intl}
+        assignment={assignment}
+        close={close}
+      ></UnassignModal>
+    ))
+    if (unassignConfirm) {
+      dispatch(unassignDeclaration(id, client))
     }
     return
   }
@@ -186,6 +206,13 @@ export const ActionMenu: React.FC<{
             handleDelete={handleDelete}
             intl={intl}
             declarationStatus={status}
+          />
+          <UnassignAction
+            handleUnassign={handleUnassign}
+            intl={intl}
+            isDownloaded={isDownloaded}
+            scope={scope}
+            assignment={assignment}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
@@ -548,4 +575,67 @@ const DeleteAction: React.FC<{
       <Icon name="Trash" color="currentColor" size="large" />
       {intl.formatMessage(buttonMessages.deleteDeclaration)}
     </DropdownMenu.Item>
+  )
+const UnassignAction: React.FC<{
+  intl: IntlShape
+  handleUnassign: () => void
+  isDownloaded: boolean
+  assignment?: GQLAssignmentData
+  scope: Scope
+}> = ({ intl, handleUnassign, isDownloaded, assignment, scope }) => {
+  const isAssignedToSomeoneElse = !isDownloaded && assignment
+
+  // @ToDo use: appropriate scope after configurable role pr is merged
+  const userHasUnassignScope =
+    scope && (scope as any as string[]).includes('register')
+
+  return (
+    isAssignedToSomeoneElse &&
+    userHasUnassignScope && (
+      <DropdownMenu.Item onClick={handleUnassign}>
+        <Icon name="ArrowCircleDown" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.unassign)}
+      </DropdownMenu.Item>
+    )
+  )
+}
+
+const UnassignModal: React.FC<{
+  intl: IntlShape
+  close: (result: boolean | null) => void
+  assignment?: GQLAssignmentData
+}> = ({ intl, close, assignment }) =>
+  assignment && (
+    <ResponsiveModal
+      autoHeight
+      responsive={false}
+      title={intl.formatMessage(conflictsMessages.unassignTitle)}
+      actions={[
+        <TertiaryButton
+          id="cancel_unassign"
+          key="cancel_unassign"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(buttonMessages.cancel)}
+        </TertiaryButton>,
+        <DangerButton
+          key="confirm_unassign"
+          id="confirm_unassign"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(buttonMessages.unassign)}
+        </DangerButton>
+      ]}
+      show={true}
+      handleClose={() => close(null)}
+    >
+      {intl.formatMessage(conflictsMessages.regUnassignDesc, {
+        name: assignment.firstName + ' ' + assignment.lastName,
+        officeName: assignment.officeName
+      })}
+    </ResponsiveModal>
   )
