@@ -71,6 +71,7 @@ const StyledContent = styled.ul<{
 `
 
 const Label = styled.li`
+  ${({ theme }) => theme.fonts.reg14};
   padding: 6px 12px;
   white-space: normal;
 `
@@ -83,7 +84,7 @@ const Separator = styled.div<{ weight: number }>`
 
 const MenuItem = styled.li<{ disabled?: boolean }>`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.grey500};
+  color: ${({ theme }) => theme.colors.grey600};
   display: flex;
   align-items: center;
   gap: 8px;
