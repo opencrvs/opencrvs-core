@@ -166,7 +166,7 @@ const Content: React.FC<{
 
 DropdownMenu.Content = Content
 
-DropdownMenu.Label = ({ children }: { children: string }) => (
+DropdownMenu.Label = ({ children }: { children: string | JSX.Element }) => (
   <Label>{children}</Label>
 )
 
