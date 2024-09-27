@@ -18,7 +18,6 @@ import {
 import styled from 'styled-components'
 import {
   DeclarationIcon,
-  Edit,
   BackArrow,
   Duplicate
 } from '@opencrvs/components/lib/icons'
@@ -31,7 +30,6 @@ import {
   goToPrintCertificate,
   goToUserProfile,
   goToTeamUserList,
-  goToViewRecordPage,
   goToIssueCertificate
 } from '@client/navigation'
 import {
@@ -61,24 +59,16 @@ import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   PrimaryButton,
   TertiaryButton,
-  ICON_ALIGNMENT,
   DangerButton,
   CircleButton
 } from '@opencrvs/components/lib/buttons'
-import {
-  ARCHIVED,
-  DECLARED,
-  VALIDATED,
-  REJECTED,
-  FIELD_AGENT_ROLES,
-  IN_PROGRESS
-} from '@client/utils/constants'
+import { ARCHIVED } from '@client/utils/constants'
 import { IQueryData } from '@client/workqueue'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import { CorrectionSection, IForm } from '@client/forms'
+import { IForm } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import {
@@ -87,7 +77,6 @@ import {
   Event,
   History
 } from '@client/utils/gateway'
-import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
@@ -98,13 +87,7 @@ import {
   getWQDeclarationData
 } from './utils'
 import { GetDeclarationInfo } from './DeclarationInfo'
-import {
-  ShowDownloadButton,
-  ShowReviewButton,
-  ShowUpdateButton,
-  ShowPrintButton,
-  ShowIssueButton
-} from './ActionButtons'
+import { ShowDownloadButton } from './ActionButtons'
 import { GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
@@ -119,9 +102,6 @@ import { useDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
-import { useOnlineStatus } from '@client/utils'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
@@ -140,10 +120,6 @@ const MobileHeader = styled(AppBar)`
   }
 `
 
-const StyledTertiaryButton = styled(TertiaryButton)`
-  align-self: center;
-`
-
 const BackButtonDiv = styled.div`
   display: inline;
 `
@@ -160,12 +136,6 @@ const StyledDuplicateWarning = styled(DuplicateWarning)`
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 16px 0;
-  }
-`
-
-const DesktopDiv = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
   }
 `
 
@@ -220,8 +190,6 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   ISSUED: 'blue'
 }
 
-const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
-
 function ReinstateButton({
   toggleDisplayDialog,
   refetchDeclarationInfo
@@ -250,7 +218,7 @@ function ReinstateButton({
           : REINSTATE_DEATH_DECLARATION
       }
       // update the store and indexDb with the latest status of the declaration
-      onCompleted={(data) => {
+      onCompleted={() => {
         refetchDeclarationInfo?.()
         dispatch(deleteDeclaration(declaration.id, client))
       }}
@@ -287,7 +255,6 @@ function RecordAuditBody({
   draft,
   duplicates,
   intl,
-  goToCertificateCorrection,
   goToPrintCertificate,
   goToPage,
   goToHomeTab,
@@ -318,9 +285,6 @@ function RecordAuditBody({
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
 
   const [actionDetailsData, setActionDetailsData] = React.useState<History>()
-
-  const isOnline = useOnlineStatus()
-  const dispatch = useDispatch()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
