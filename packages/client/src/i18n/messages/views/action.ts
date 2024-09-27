@@ -23,7 +23,6 @@ interface IActionMessages
   updateDeclaration: MessageDescriptor
   printDeclaration: MessageDescriptor
   issueCertificate: MessageDescriptor
-  unassign: MessageDescriptor
 }
 
 const messagesToDefine: IActionMessages = {
@@ -82,11 +81,6 @@ const messagesToDefine: IActionMessages = {
     defaultMessage: 'Issue certificate',
     description: 'Label for issue certificate in dropdown menu',
     id: 'action.issue'
-  },
-  unassign: {
-    defaultMessage: 'Unassign',
-    description: 'Label for unassign in dropdown menu',
-    id: 'action.unassign'
   }
 }
 export const messages: IActionMessages = defineMessages(messagesToDefine)

@@ -174,9 +174,7 @@ const Item = ({
   children,
   disabled = false
 }: {
-  onClick?:
-    | (() => void)
-    | ((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void)
+  onClick?: () => void
   children: ReactNode
   disabled?: boolean
 }) => {
