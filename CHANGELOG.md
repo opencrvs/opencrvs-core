@@ -44,6 +44,7 @@
 - Fix wrong status shown in the Comparison View page of the duplicate record [#7439](https://github.com/opencrvs/opencrvs-core/issues/7439)
 - Fix date validation not working correctly in Firefox [#7615](https://github.com/opencrvs/opencrvs-core/issues/7615)
 - Fix layout issue that was causing the edit button on the AdvancedSearch's date range picker to not show on mobile view. [#7417](https://github.com/opencrvs/opencrvs-core/issues/7417)
+- Fix hardcoded placeholder copy of input when saving a query in advanced search
 
 ### Breaking changes
 
