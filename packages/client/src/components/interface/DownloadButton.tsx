@@ -337,7 +337,12 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       <DownloadAction
         type="icon"
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
-        onClick={onClickDownload}
+        onClick={
+          status === DOWNLOAD_STATUS.DOWNLOADED ||
+          (assignment && assignment.practitionerId !== practitionerId)
+            ? () => {}
+            : onClickDownload
+        }
         className={className}
         aria-label={intl.formatMessage(constantsMessages.assignRecord)}
       >
