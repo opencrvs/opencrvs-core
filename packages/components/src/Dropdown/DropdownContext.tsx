@@ -72,6 +72,7 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.preventDefault()
     if (e.key === 'ArrowDown') {
       setFocusedIndex(getNextIndex)
     } else if (e.key === 'ArrowUp') {
