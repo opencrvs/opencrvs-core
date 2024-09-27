@@ -395,7 +395,10 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
 
         return getRenderableField(
           section,
-          (tagDef[0] && tagDef[0].label) || field.label,
+          {
+            fieldLabel: (tagDef[0] && tagDef[0].label) || field.label,
+            fieldLabelParams: field.labelParam
+          },
           previousCompleteValue,
           completeValue,
           intl
@@ -438,7 +441,13 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
         true
       )
 
-      return getRenderableField(section, field.label, original, changed, intl)
+      return getRenderableField(
+        section,
+        { fieldLabel: field.label, fieldLabelParams: field.labelParam },
+        original,
+        changed,
+        intl
+      )
     }
   }
 
