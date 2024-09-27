@@ -111,6 +111,7 @@ export const ActionMenu: React.FC<{
         intl={intl}
         assignment={assignment}
         close={close}
+        isDownloaded={isDownloaded}
       ></UnassignModal>
     ))
     if (unassignConfirm) {
@@ -590,8 +591,7 @@ const UnassignAction: React.FC<{
     scope && (scope as any as string[]).includes('register')
 
   return (
-    isAssignedToSomeoneElse &&
-    userHasUnassignScope && (
+    ((isAssignedToSomeoneElse && userHasUnassignScope) || isDownloaded) && (
       <DropdownMenu.Item onClick={handleUnassign}>
         <Icon name="ArrowCircleDown" color="currentColor" size="large" />
         {intl.formatMessage(buttonMessages.unassign)}
@@ -604,7 +604,8 @@ const UnassignModal: React.FC<{
   intl: IntlShape
   close: (result: boolean | null) => void
   assignment?: GQLAssignmentData
-}> = ({ intl, close, assignment }) =>
+  isDownloaded: boolean
+}> = ({ intl, close, assignment, isDownloaded }) =>
   assignment && (
     <ResponsiveModal
       autoHeight
@@ -633,9 +634,11 @@ const UnassignModal: React.FC<{
       show={true}
       handleClose={() => close(null)}
     >
-      {intl.formatMessage(conflictsMessages.regUnassignDesc, {
-        name: assignment.firstName + ' ' + assignment.lastName,
-        officeName: assignment.officeName
-      })}
+      {isDownloaded
+        ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
+        : intl.formatMessage(conflictsMessages.regUnassignDesc, {
+            name: assignment.firstName + ' ' + assignment.lastName,
+            officeName: assignment.officeName
+          })}
     </ResponsiveModal>
   )
