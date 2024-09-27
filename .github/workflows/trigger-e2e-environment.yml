@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   e2e:
-    if: ${{ !contains(github.actor, 'bot') }}
+    if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3

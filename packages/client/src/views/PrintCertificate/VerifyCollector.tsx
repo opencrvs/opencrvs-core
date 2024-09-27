@@ -46,6 +46,8 @@ import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
+import { UserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IMatchParams {
   registrationId: string
@@ -57,6 +59,7 @@ interface IStateProps {
   registerForm: IForm
   declaration?: IPrintableDeclaration
   offlineCountryConfiguration: IOfflineData
+  userDetails: UserDetails | null
 }
 interface IDispatchProps {
   goBack: typeof goBack
@@ -131,7 +134,10 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
     const eventRegistrationInput = draftToGqlTransformer(
       registerForm,
-      declaration!.data
+      declaration!.data,
+      declaration!.id,
+      this.props.userDetails,
+      this.props.offlineCountryConfiguration
     )
 
     const informantType =
@@ -265,7 +271,8 @@ const mapStateToProps = (
         sections: []
       },
       declaration: undefined,
-      offlineCountryConfiguration: getOfflineData(state)
+      offlineCountryConfiguration: getOfflineData(state),
+      userDetails: getUserDetails(state)
     }
   }
 
@@ -274,7 +281,8 @@ const mapStateToProps = (
   return {
     registerForm,
     declaration,
-    offlineCountryConfiguration: getOfflineData(state)
+    offlineCountryConfiguration: getOfflineData(state),
+    userDetails: getUserDetails(state)
   }
 }
 

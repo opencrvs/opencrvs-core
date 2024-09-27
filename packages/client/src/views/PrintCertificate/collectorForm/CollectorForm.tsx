@@ -94,6 +94,7 @@ type PropsWhenDeclarationIsFound = {
 }
 type PropsWhenDeclarationIsNotFound = {
   declaration: undefined
+  offlineCountryConfiguration: IOfflineData
 }
 
 interface IBaseProps {
@@ -143,14 +144,17 @@ function getNextSectionIds(
 const getErrorsOnFieldsBySection = (
   sectionId: keyof IPrintableDeclaration['data'],
   fields: IFormField[],
-  draft: IPrintableDeclaration
+  draft: IPrintableDeclaration,
+  config: IOfflineData
 ) => {
   const certificates = draft.data.registration.certificates
   const certificate = (certificates && certificates[0]) || {}
   const errors = getValidationErrorsForForm(
     fields,
     (certificate[sectionId as keyof typeof certificate] as IFormSectionData) ||
-      {}
+      {},
+    config,
+    draft.data
   )
 
   return {
@@ -230,7 +234,12 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   ) => {
     if (!draft) return
 
-    const errors = getErrorsOnFieldsBySection(sectionId, fields, draft)
+    const errors = getErrorsOnFieldsBySection(
+      sectionId,
+      fields,
+      draft,
+      this.props.offlineCountryConfiguration
+    )
     const errorValues = Object.values(errors).map(Object.values)
     const errLength = flatten(errorValues).filter(
       (errs) => errs.length > 0
@@ -481,7 +490,10 @@ const mapStateToProps = (
   ) as IPrintableDeclaration | undefined
 
   if (!declaration) {
-    return { declaration: undefined }
+    return {
+      declaration: undefined,
+      offlineCountryConfiguration: getOfflineData(state)
+    }
   }
 
   const userDetails = getUserDetails(state)
