@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as Hapi from '@hapi/hapi'
 import { getPlugins } from '@gateway/config/plugins'
 import { getRoutes } from '@gateway/config/routes'
 import {
+  AUTH_URL,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL,
-  PORT,
-  HOST,
-  DEFAULT_TIMEOUT,
-  HOSTNAME,
   CLIENT_APP_URL,
-  LOGIN_URL
+  DEFAULT_TIMEOUT,
+  HOST,
+  HOSTNAME,
+  LOGIN_URL,
+  PORT
 } from '@gateway/constants'
-import { readFileSync } from 'fs'
-import { validateFunc, logger } from '@opencrvs/commons'
+import { getApolloConfig } from '@gateway/graphql/config'
+import * as database from '@gateway/utils/redis'
+import { badRequest, isBoom } from '@hapi/boom'
+import * as Hapi from '@hapi/hapi'
+import { logger, validateFunc } from '@opencrvs/commons'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import {
   ApolloServer,
   ApolloServerPluginStopHapiServer
 } from 'apollo-server-hapi'
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
-import { getApolloConfig } from '@gateway/graphql/config'
-import * as database from '@gateway/utils/redis'
-import { badRequest, Boom, isBoom } from '@hapi/boom'
+import { readFileSync } from 'fs'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -49,7 +49,10 @@ export async function createServer() {
     routes: {
       cors: { origin: whitelist },
       validate: {
-        failAction: async (_, _2, err: Boom) => {
+        failAction: async (_, _2, err) => {
+          if (!err) {
+            throw new Error('Invalid error')
+          }
           if (process.env.NODE_ENV === 'production') {
             // In prod, log a limited error message and throw the default Bad Request error.
             logger.error(`ValidationError: ${err.message}`)

@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import React, { useState, useEffect, useCallback } from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector, useDispatch } from 'react-redux'
+import { useTheme } from 'styled-components'
 import {
   goToDeclarationRecordAudit,
   goToPrintCertificate
 } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
-import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -22,30 +25,7 @@ import {
   COLUMNS,
   IAction
 } from '@opencrvs/components/lib/Workqueue'
-import type { GQLEventSearchResultSet } from '@client/utils/gateway-deprecated-do-not-use'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { withTheme } from 'styled-components'
-import {
-  buttonMessages,
-  constantsMessages,
-  dynamicConstantsMessages,
-  wqMessages
-} from '@client/i18n/messages'
-import { IStoreState } from '@client/store'
-import {
-  IDeclaration,
-  DOWNLOAD_STATUS,
-  clearCorrectionAndPrintChanges
-} from '@client/declarations'
-import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import {
-  formattedDuration,
-  plainDateToLocalDate
-} from '@client/utils/date-formatting'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
   getPreviousOperationDateByOperationType,
@@ -58,16 +38,32 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { RegStatus } from '@client/utils/gateway'
+import {
+  constantsMessages,
+  buttonMessages,
+  dynamicConstantsMessages,
+  wqMessages
+} from '@client/i18n/messages'
+import {
+  clearCorrectionAndPrintChanges,
+  DOWNLOAD_STATUS,
+  IDeclaration
+} from '@client/declarations'
+import {
+  formattedDuration,
+  plainDateToLocalDate
+} from '@client/utils/date-formatting'
+import { IStoreState } from '@client/store'
+import { Event, SearchEventsQuery } from '@client/utils/gateway'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { DownloadAction } from '@client/forms'
+import { isLegacyFormType, useForms } from '@client/hooks/useForms'
 
+type Data = NonNullable<SearchEventsQuery['searchEvents']>
 interface IBasePrintTabProps {
-  theme: ITheme
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   outboxDeclarations: IDeclaration[]
   queryData: {
-    data: GQLEventSearchResultSet
+    data: Data
   }
   paginationId: number
   onPageChange: (newPageNumber: number) => void
@@ -76,87 +72,79 @@ interface IBasePrintTabProps {
   pageSize: number
 }
 
-interface IPrintTabState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
+export const ReadyToPrint: React.FC<IBasePrintTabProps> = ({
+  queryData,
+  paginationId,
+  onPageChange,
+  loading,
+  error,
+  pageSize
+}) => {
+  const intl = useIntl()
+  const theme = useTheme()
+  const dispatch = useDispatch()
+  const { getRecordSearchLabel, getFormLabel } = useForms()
+  const outboxDeclarations = useSelector(
+    (state: IStoreState) => state.declarationsState.declarations
+  )
 
-type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
+  const [width, setWidth] = useState(window.innerWidth)
+  const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
-class ReadyToPrintComponent extends React.Component<
-  IPrintTabProps,
-  IPrintTabState
-> {
-  constructor(props: IPrintTabProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth,
-      sortedCol: COLUMNS.REGISTERED,
-      sortOrder: SORT_ORDER.DESCENDING
+  const recordWindowWidth = useCallback(() => {
+    setWidth(window.innerWidth)
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('resize', recordWindowWidth)
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
     }
-  }
+  }, [recordWindowWidth])
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
+  const getExpandable = () => width > theme.grid.breakpoints.lg
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
-  }
-
-  onColumnClick = (columnName: string) => {
+  const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
   }
 
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+  const getColumns = () => {
+    if (width > theme.grid.breakpoints.lg) {
       return [
         {
           width: 30,
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME,
-          isSorted: this.state.sortedCol === COLUMNS.NAME,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.NAME,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.event),
+          label: intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.registered),
+          label: intl.formatMessage(constantsMessages.registered),
           width: 18,
           key: COLUMNS.REGISTERED,
-          isSorted: this.state.sortedCol === COLUMNS.REGISTERED,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.REGISTERED,
+          sortFunction: onColumnClick
         },
         {
           width: 18,
@@ -168,7 +156,7 @@ class ReadyToPrintComponent extends React.Component<
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -182,167 +170,213 @@ class ReadyToPrintComponent extends React.Component<
     }
   }
 
-  transformRegisteredContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = this.props
-    if (!data || !data.results) {
-      return []
+  const transformLegacyRecord = (
+    reg: ReturnType<typeof transformData>[number]
+  ) => {
+    const foundDeclaration = outboxDeclarations.find(
+      (declaration) => declaration.id === reg.id
+    )
+    const downloadStatus = foundDeclaration?.downloadStatus
+    const actions: IAction[] = []
+
+    if (width > theme.grid.breakpoints.lg) {
+      actions.push({
+        label: intl.formatMessage(buttonMessages.print),
+        disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
+        handler: (e) => {
+          e && e.stopPropagation()
+          if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+            dispatch(clearCorrectionAndPrintChanges(reg.id))
+            dispatch(
+              goToPrintCertificate(reg.id, reg.event.toLocaleLowerCase() || '')
+            )
+          }
+        }
+      })
     }
 
-    const transformedData = transformData(data, this.props.intl)
-    const items = transformedData.map((reg, index) => {
-      const foundDeclaration = this.props.outboxDeclarations.find(
-        (declaration) => declaration.id === reg.id
+    actions.push({
+      actionComponent: (
+        <DownloadButton
+          downloadConfigs={{
+            event: reg.event,
+            compositionId: reg.id,
+            action: DownloadAction.LOAD_REVIEW_DECLARATION,
+            assignment: reg.assignment ?? undefined
+          }}
+          key={`DownloadButton-${reg.id}`}
+          status={downloadStatus}
+        />
       )
-      const actions: IAction[] = []
-      const downloadStatus = foundDeclaration?.downloadStatus
+    })
 
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-        actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
-          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
-          handler: (
-            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-          ) => {
-            e && e.stopPropagation()
-            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              this.props.clearCorrectionAndPrintChanges(reg.id)
-              this.props.goToPrintCertificate(
-                reg.id,
-                reg.event.toLocaleLowerCase() || ''
+    const event =
+      (reg.event &&
+        intl.formatMessage(
+          dynamicConstantsMessages[reg.event.toLowerCase()]
+        )) ||
+      ''
+    const dateOfEvent = reg.dateOfEvent && plainDateToLocalDate(reg.dateOfEvent)
+    const registered =
+      getPreviousOperationDateByOperationType(
+        reg.operationHistories,
+        'Registered'
+      ) || ''
+
+    const NameComponent = reg.name ? (
+      <NameContainer
+        onClick={() => dispatch(goToDeclarationRecordAudit('printTab', reg.id))}
+      >
+        {reg.name}
+      </NameContainer>
+    ) : (
+      <NoNameContainer
+        onClick={() => dispatch(goToDeclarationRecordAudit('printTab', reg.id))}
+      >
+        {intl.formatMessage(constantsMessages.noNameProvided)}
+      </NoNameContainer>
+    )
+
+    return {
+      ...reg,
+      event,
+      name: reg.name && reg.name.toLowerCase(),
+      iconWithName: (
+        <IconWithName status={reg.declarationStatus} name={NameComponent} />
+      ),
+      iconWithNameEvent: (
+        <IconWithNameEvent
+          status={reg.declarationStatus}
+          name={NameComponent}
+          event={event}
+        />
+      ),
+      dateOfEvent,
+      registered,
+      actions
+    }
+  }
+
+  const transformRegisteredContent = (data: Data) => {
+    if (!data || !data.results) return []
+
+    const legacyEventsData = transformData(
+      {
+        results: data.results.filter(
+          (req) =>
+            req?.type && isLegacyFormType(req.type.toLowerCase() as Event)
+        )
+      },
+      intl
+    ).map(transformLegacyRecord)
+
+    const eventsData = data.results
+      .filter(
+        (req) => req?.type && !isLegacyFormType(req.type.toLowerCase() as Event)
+      )
+      .map((item) => {
+        const dateOfEvent = item.registration.createdAt
+        const registered =
+          getPreviousOperationDateByOperationType(
+            item.operationHistories,
+            'Registered'
+          ) || ''
+        const foundDeclaration = outboxDeclarations.find(
+          (declaration) => declaration.id === item.id
+        )
+        const downloadStatus = foundDeclaration?.downloadStatus
+        return {
+          ...item,
+          event: getFormLabel(item.type),
+          name: getRecordSearchLabel(item.type, item),
+          iconWithName: (
+            <IconWithName
+              status={item.registration.status}
+              name={
+                <NameContainer
+                  onClick={() =>
+                    dispatch(goToDeclarationRecordAudit('printTab', item.id))
+                  }
+                >
+                  {getRecordSearchLabel(item.type, item)}
+                </NameContainer>
+              }
+            />
+          ),
+          iconWithNameEvent: (
+            <IconWithNameEvent
+              status={item.registration.status}
+              name={
+                <NameContainer
+                  onClick={() =>
+                    dispatch(goToDeclarationRecordAudit('printTab', item.id))
+                  }
+                >
+                  {getRecordSearchLabel(item.type, item)}
+                </NameContainer>
+              }
+              event={getFormLabel(item.type)}
+            />
+          ),
+          actions: [
+            {
+              actionComponent: (
+                <DownloadButton
+                  downloadConfigs={{
+                    event: item.type,
+                    compositionId: item.id,
+                    action: DownloadAction.LOAD_REVIEW_DECLARATION,
+                    assignment: item.registration.assignment ?? undefined
+                  }}
+                  key={`DownloadButton-${item.id}`}
+                  status={downloadStatus}
+                />
               )
             }
-          }
-        })
-      }
-      actions.push({
-        actionComponent: (
-          <DownloadButton
-            downloadConfigs={{
-              event: reg.event,
-              compositionId: reg.id,
-              action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: reg.assignment ?? undefined
-            }}
-            key={`DownloadButton-${index}`}
-            status={downloadStatus}
-          />
-        )
+          ],
+          dateOfEvent,
+          registered
+        }
       })
-      const event =
-        (reg.event &&
-          intl.formatMessage(
-            dynamicConstantsMessages[reg.event.toLowerCase()]
-          )) ||
-        ''
-      const dateOfEvent =
-        reg.dateOfEvent &&
-        reg.dateOfEvent.length > 0 &&
-        plainDateToLocalDate(reg.dateOfEvent)
-      const registered =
-        getPreviousOperationDateByOperationType(
-          reg.operationHistories,
-          RegStatus.Registered
-        ) || ''
 
-      const NameComponent = reg.name ? (
-        <NameContainer
-          id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('printTab', reg.id)
-          }
-        >
-          {reg.name}
-        </NameContainer>
-      ) : (
-        <NoNameContainer
-          id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('printTab', reg.id)
-          }
-        >
-          {intl.formatMessage(constantsMessages.noNameProvided)}
-        </NoNameContainer>
-      )
-      return {
-        ...reg,
-        event,
-        name: reg.name && reg.name.toLowerCase(),
-        iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={NameComponent} />
-        ),
-        iconWithNameEvent: (
-          <IconWithNameEvent
-            status={reg.declarationStatus}
-            name={NameComponent}
-            event={event}
-          />
-        ),
-        dateOfEvent,
-        registered,
-        actions
-      }
-    })
-    const sortedItems = getSortedItems(
-      items,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
+    const items = [...legacyEventsData, ...eventsData]
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
 
-    return sortedItems.map((item) => {
-      return {
-        ...item,
-        dateOfEvent:
-          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
-        registered:
-          item.registered && formattedDuration(item.registered as Date)
-      }
-    })
+    return sortedItems.map((item) => ({
+      ...item,
+      dateOfEvent:
+        item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+      registered: item.registered && formattedDuration(item.registered as Date)
+    }))
   }
 
-  render() {
-    const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
-    const { data } = queryData
-    const totalPages = this.props.queryData.data.totalItems
-      ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
-    return (
-      <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.print)}
-        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
-        isShowPagination={isShowPagination}
-        paginationId={paginationId}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        loading={this.props.loading}
-        error={this.props.error}
-        noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
-        noContent={this.transformRegisteredContent(data).length <= 0}
-      >
-        <Workqueue
-          content={this.transformRegisteredContent(data)}
-          columns={this.getColumns()}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
-        />
-      </WQContentWrapper>
-    )
-  }
+  const { data } = queryData
+  const totalPages = queryData.data.totalItems
+    ? Math.ceil(queryData.data.totalItems / pageSize)
+    : 0
+  const isShowPagination =
+    (queryData.data.totalItems && queryData.data.totalItems > pageSize) || false
+
+  return (
+    <WQContentWrapper
+      title={intl.formatMessage(navigationMessages.print)}
+      isMobileSize={width < theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      paginationId={paginationId}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      loading={loading}
+      error={error}
+      noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
+      noContent={transformRegisteredContent(data).length <= 0}
+    >
+      <Workqueue
+        content={transformRegisteredContent(data)}
+        columns={getColumns()}
+        loading={loading}
+        sortOrder={sortOrder}
+        hideLastBorder={!isShowPagination}
+      />
+    </WQContentWrapper>
+  )
 }
-
-function mapStateToProps(state: IStoreState) {
-  return {
-    outboxDeclarations: state.declarationsState.declarations
-  }
-}
-
-export const ReadyToPrint = connect(mapStateToProps, {
-  goToPrintCertificate,
-  goToDeclarationRecordAudit,
-  clearCorrectionAndPrintChanges
-})(injectIntl(withTheme(ReadyToPrintComponent)))

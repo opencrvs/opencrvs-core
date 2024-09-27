@@ -137,6 +137,7 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
 import { FormFieldGenerator } from '@client/components/form'
+import { Form } from '@client/hooks/useForms'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -267,7 +268,7 @@ type onChangeReviewForm = (
 
 interface IProps {
   draft: IDeclaration
-  form: IForm
+  form: IForm | Form
   pageRoute: string
   rejectDeclarationClickEvent?: () => void
   goToPageGroup: typeof goToPageGroup
@@ -621,6 +622,7 @@ export const getErrorsOnFieldsBySection = (
           )
             ? validationErrors
             : { errors: [], nestedFields: {} }
+        console.log({ name: field.name, validationErrors })
 
         return { ...fields, [field.name]: informationMissing }
       }, {})
@@ -661,12 +663,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     )
   }
 
-  getViewableSection = (registerForm: IForm): IFormSection[] => {
+  getViewableSection = (registerForm: IForm | Form): IFormSection[] => {
     const sections = registerForm.sections.filter(({ viewType }) =>
       ['form', 'hidden', 'preview', 'review'].includes(viewType)
     )
 
-    return this.getVisibleSections(sections)
+    return this.getVisibleSections(sections as IFormSection[])
   }
 
   getLabelForDoc = (docForWhom: string, docType: string) => {
@@ -1696,6 +1698,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       flatten(Object.values(errorsOnFields).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
       ).length === 0
+
     const hasValidationErrors =
       flatten(Object.values(badInputErrors).map(Object.values)).filter(
         (errors) => errors.errors.length > 0
@@ -2105,7 +2108,7 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
   return readyOnlyField
 }
 export const ReviewSection = connect(
-  (state: IStoreState, { form }: { form: IForm }) => {
+  (state: IStoreState, { form }: { form: IForm | Form }) => {
     const registrationSection = form.sections.find(
       ({ id }) => id === 'registration'
     )

@@ -84,6 +84,7 @@ import {
   isBirthEvent,
   isDeathEvent
 } from '@client/search/transformer'
+import { getFormFromState, isLegacyFormType } from '@client/hooks/useForms'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -97,6 +98,7 @@ interface IBaseRegistrarHomeProps {
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
   drafts: IDeclaration[]
+  state: IStoreState
   outboxDeclarations: IDeclaration[]
   queryData: IQueryData
   isFieldAgent: boolean
@@ -343,7 +345,7 @@ class InProgressComponent extends React.Component<
   }
 
   transformDraftContent = () => {
-    const { intl } = this.props
+    const { intl, state } = this.props
     const { locale } = intl
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
@@ -361,7 +363,10 @@ class InProgressComponent extends React.Component<
       } else if (draft.event && draft.event.toString() === 'marriage') {
         pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
-      const name = getDeclarationFullName(draft, locale)
+      const name = isLegacyFormType(draft.event)
+        ? getDeclarationFullName(draft, locale)
+        : 'Testi testi'
+
       const lastModificationDate = draft.modifiedOn || draft.savedOn
       const actions: IAction[] = []
 
@@ -385,11 +390,11 @@ class InProgressComponent extends React.Component<
         actionComponent: <Downloaded />
       })
       const event =
-        (draft.event &&
-          intl.formatMessage(
-            dynamicConstantsMessages[draft.event.toLowerCase()]
-          )) ||
-        ''
+        draft.event && isLegacyFormType(draft.event)
+          ? intl.formatMessage(
+              dynamicConstantsMessages[draft.event.toLowerCase()]
+            )
+          : intl.formatMessage(getFormFromState(draft.event, state).label)
 
       const eventTime =
         draft.event === Event.Birth
@@ -719,6 +724,7 @@ class InProgressComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
+    state: state,
     outboxDeclarations: state.declarationsState.declarations,
     offlineCountryConfig: getOfflineData(state)
   }

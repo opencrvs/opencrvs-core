@@ -307,10 +307,10 @@ export type BirthEventSearchSet = EventSearchSet & {
   motherIdentifier?: Maybe<Scalars['String']>
   mothersFirstName?: Maybe<Scalars['String']>
   mothersLastName?: Maybe<Scalars['String']>
-  operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
+  operationHistories: Array<OperationHistorySearchSet>
   placeOfBirth?: Maybe<Scalars['String']>
-  registration?: Maybe<RegistrationSearchSet>
-  type?: Maybe<Scalars['String']>
+  registration: RegistrationSearchSet
+  type: Scalars['String']
 }
 
 export type BirthRegResultSet = {
@@ -480,6 +480,11 @@ export type CorrectionValueInput = {
   section: Scalars['String']
 }
 
+export type CreateRecordResponse = {
+  __typename?: 'CreateRecordResponse'
+  id: Scalars['ID']
+}
+
 export type CreatedIds = {
   __typename?: 'CreatedIds'
   compositionId?: Maybe<Scalars['String']>
@@ -493,9 +498,9 @@ export type DeathEventSearchSet = EventSearchSet & {
   deceasedGender?: Maybe<Scalars['String']>
   deceasedName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
-  operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
-  registration?: Maybe<RegistrationSearchSet>
-  type?: Maybe<Scalars['String']>
+  operationHistories: Array<OperationHistorySearchSet>
+  registration: RegistrationSearchSet
+  type: Scalars['String']
 }
 
 export type DeathRegistration = EventRegistration & {
@@ -649,11 +654,11 @@ export type EventProgressSet = {
   id: Scalars['ID']
   name?: Maybe<Array<Maybe<HumanName>>>
   progressReport?: Maybe<EventProgressData>
-  registration?: Maybe<RegistrationSearchSet>
+  registration: RegistrationSearchSet
   startedAt?: Maybe<Scalars['Date']>
   startedBy?: Maybe<User>
   startedByFacility?: Maybe<Scalars['String']>
-  type?: Maybe<Scalars['String']>
+  type: Scalars['String']
 }
 
 export type EventRegistration = {
@@ -665,15 +670,15 @@ export type EventRegistration = {
 
 export type EventSearchResultSet = {
   __typename?: 'EventSearchResultSet'
-  results?: Maybe<Array<Maybe<EventSearchSet>>>
-  totalItems?: Maybe<Scalars['Int']>
+  results: Array<EventSearchSet>
+  totalItems: Scalars['Int']
 }
 
 export type EventSearchSet = {
   id: Scalars['ID']
-  operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
-  registration?: Maybe<RegistrationSearchSet>
-  type?: Maybe<Scalars['String']>
+  operationHistories: Array<OperationHistorySearchSet>
+  registration: RegistrationSearchSet
+  type: Scalars['String']
 }
 
 export type FhiridMap = {
@@ -684,11 +689,30 @@ export type FhiridMap = {
   questionnaireResponse?: InputMaybe<Scalars['String']>
 }
 
+export type Field = {
+  __typename?: 'Field'
+  id: Scalars['String']
+  value: Scalars['FieldValue']
+}
+
+export type FieldInput = {
+  id: Scalars['String']
+  value: Scalars['FieldValue']
+}
+
 export enum Gender {
   Female = 'female',
   Male = 'male',
   Other = 'other',
   Unknown = 'unknown'
+}
+
+export type GenericEventSearchSet = EventSearchSet & {
+  __typename?: 'GenericEventSearchSet'
+  id: Scalars['ID']
+  operationHistories: Array<OperationHistorySearchSet>
+  registration: RegistrationSearchSet
+  type: Scalars['String']
 }
 
 export type History = {
@@ -853,9 +877,9 @@ export type MarriageEventSearchSet = EventSearchSet & {
   groomIdentifier?: Maybe<Scalars['String']>
   groomName?: Maybe<Array<Maybe<HumanName>>>
   id: Scalars['ID']
-  operationHistories?: Maybe<Array<Maybe<OperationHistorySearchSet>>>
-  registration?: Maybe<RegistrationSearchSet>
-  type?: Maybe<Scalars['String']>
+  operationHistories: Array<OperationHistorySearchSet>
+  registration: RegistrationSearchSet
+  type: Scalars['String']
 }
 
 export type MarriageRegistration = EventRegistration & {
@@ -939,6 +963,7 @@ export type Mutation = {
   createMarriageRegistration: CreatedIds
   createMarriageRegistrationCorrection: Scalars['ID']
   createOrUpdateUser: User
+  createRecord: CreateRecordResponse
   deactivateSystem?: Maybe<System>
   deleteSystem?: Maybe<System>
   markBirthAsCertified: Scalars['ID']
@@ -1061,6 +1086,10 @@ export type MutationCreateMarriageRegistrationCorrectionArgs = {
 
 export type MutationCreateOrUpdateUserArgs = {
   user: UserInput
+}
+
+export type MutationCreateRecordArgs = {
+  recordInput: RecordInput
 }
 
 export type MutationDeactivateSystemArgs = {
@@ -1288,16 +1317,16 @@ export type ObservationFhirids = {
 
 export type OperationHistorySearchSet = {
   __typename?: 'OperationHistorySearchSet'
-  notificationFacilityAlias?: Maybe<Array<Maybe<Scalars['String']>>>
+  notificationFacilityAlias: Array<Scalars['String']>
   notificationFacilityName?: Maybe<Scalars['String']>
-  operatedOn?: Maybe<Scalars['Date']>
-  operationType?: Maybe<Scalars['String']>
-  operatorName?: Maybe<Array<Maybe<HumanName>>>
-  operatorOfficeAlias?: Maybe<Array<Maybe<Scalars['String']>>>
-  operatorOfficeName?: Maybe<Scalars['String']>
-  operatorRole?: Maybe<Scalars['String']>
-  rejectComment?: Maybe<Scalars['String']>
-  rejectReason?: Maybe<Scalars['String']>
+  operatedOn: Scalars['Date']
+  operationType: Scalars['String']
+  operatorName: Array<HumanName>
+  operatorOfficeAlias: Array<Scalars['String']>
+  operatorOfficeName: Scalars['String']
+  operatorRole: Scalars['String']
+  rejectComment: Scalars['String']
+  rejectReason: Scalars['String']
 }
 
 export type Payment = {
@@ -1399,6 +1428,7 @@ export type Query = {
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getOIDPUserInfo?: Maybe<UserInfo>
+  getRecord: Record
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
   getSystemRoles?: Maybe<Array<SystemRole>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
@@ -1417,7 +1447,7 @@ export type Query = {
   queryRegistrationByIdentifier?: Maybe<BirthRegistration>
   searchBirthRegistrations?: Maybe<Array<Maybe<BirthRegistration>>>
   searchDeathRegistrations?: Maybe<Array<Maybe<DeathRegistration>>>
-  searchEvents?: Maybe<EventSearchResultSet>
+  searchEvents: EventSearchResultSet
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
   sendNotificationToAllUsers?: Maybe<NotificationResult>
@@ -1501,6 +1531,10 @@ export type QueryGetOidpUserInfoArgs = {
   code: Scalars['String']
   grantType?: InputMaybe<Scalars['String']>
   redirectUri: Scalars['String']
+}
+
+export type QueryGetRecordArgs = {
+  recordId: Scalars['ID']
 }
 
 export type QueryGetRegistrationsListByFilterArgs = {
@@ -1666,7 +1700,19 @@ export type QuestionnaireQuestionInput = {
   value?: InputMaybe<Scalars['String']>
 }
 
+export type Record = {
+  __typename?: 'Record'
+  event: Scalars['String']
+  fields: Array<Field>
+  id: Scalars['ID']
+}
+
 export type RecordDetails = BirthRegistration | DeathRegistration
+
+export type RecordInput = {
+  fields: Array<FieldInput>
+  type: Scalars['String']
+}
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -1793,15 +1839,15 @@ export type RegistrationSearchSet = {
   contactEmail?: Maybe<Scalars['String']>
   contactNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
-  createdAt?: Maybe<Scalars['String']>
+  createdAt: Scalars['String']
   dateOfDeclaration?: Maybe<Scalars['Date']>
-  duplicates?: Maybe<Array<Maybe<Scalars['ID']>>>
+  duplicates: Array<Scalars['ID']>
   eventLocationId?: Maybe<Scalars['String']>
-  modifiedAt?: Maybe<Scalars['String']>
+  modifiedAt: Scalars['String']
   reason?: Maybe<Scalars['String']>
   registeredLocationId?: Maybe<Scalars['String']>
   registrationNumber?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
+  status: Scalars['String']
   trackingId?: Maybe<Scalars['String']>
 }
 
@@ -2701,6 +2747,15 @@ export type FetchUserQuery = {
   } | null
 }
 
+export type CreateRecordMutationVariables = Exact<{
+  recordInput: RecordInput
+}>
+
+export type CreateRecordMutation = {
+  __typename?: 'Mutation'
+  createRecord: { __typename?: 'CreateRecordResponse'; id: string }
+}
+
 export type SearchEventsQueryVariables = Exact<{
   advancedSearchParameters: AdvancedSearchParametersInput
   sort?: InputMaybe<Scalars['String']>
@@ -2711,15 +2766,15 @@ export type SearchEventsQueryVariables = Exact<{
 
 export type SearchEventsQuery = {
   __typename?: 'Query'
-  searchEvents?: {
+  searchEvents: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -2727,17 +2782,17 @@ export type SearchEventsQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactNumber?: string | null
             contactEmail?: string | null
             trackingId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -2746,18 +2801,18 @@ export type SearchEventsQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -2765,17 +2820,17 @@ export type SearchEventsQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactNumber?: string | null
             contactEmail?: string | null
             trackingId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -2784,18 +2839,48 @@ export type SearchEventsQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactNumber?: string | null
+            contactEmail?: string | null
+            trackingId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -2810,17 +2895,17 @@ export type SearchEventsQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactNumber?: string | null
             contactEmail?: string | null
             trackingId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -2829,16 +2914,15 @@ export type SearchEventsQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
+    >
+  }
 }
 
 export type ResendInviteMutationVariables = Exact<{
@@ -5381,7 +5465,7 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
   __typename?: 'BirthEventSearchSet'
   dateOfBirth?: PlainDate | null
   id: string
-  type?: string | null
+  type: string
   childName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
@@ -5389,18 +5473,18 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
     familyName?: string | null
     use?: string | null
   } | null> | null
-  registration?: {
+  registration: {
     __typename?: 'RegistrationSearchSet'
-    status?: string | null
+    status: string
     contactRelationship?: string | null
     contactNumber?: string | null
     trackingId?: string | null
     eventLocationId?: string | null
     registrationNumber?: string | null
     registeredLocationId?: string | null
-    duplicates?: Array<string | null> | null
-    createdAt?: string | null
-    modifiedAt?: string | null
+    duplicates: Array<string>
+    createdAt: string
+    modifiedAt: string
     assignment?: {
       __typename?: 'AssignmentData'
       practitionerId?: string | null
@@ -5409,19 +5493,19 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
       officeName?: string | null
       avatarURL: string
     } | null
-  } | null
-  operationHistories?: Array<{
+  }
+  operationHistories: Array<{
     __typename?: 'OperationHistorySearchSet'
-    operationType?: string | null
-    operatedOn?: any | null
-  } | null> | null
+    operationType: string
+    operatedOn: any
+  }>
 }
 
 type EventSearchFields_DeathEventSearchSet_Fragment = {
   __typename?: 'DeathEventSearchSet'
   dateOfDeath?: PlainDate | null
   id: string
-  type?: string | null
+  type: string
   deceasedName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
@@ -5429,18 +5513,18 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
     familyName?: string | null
     use?: string | null
   } | null> | null
-  registration?: {
+  registration: {
     __typename?: 'RegistrationSearchSet'
-    status?: string | null
+    status: string
     contactRelationship?: string | null
     contactNumber?: string | null
     trackingId?: string | null
     eventLocationId?: string | null
     registrationNumber?: string | null
     registeredLocationId?: string | null
-    duplicates?: Array<string | null> | null
-    createdAt?: string | null
-    modifiedAt?: string | null
+    duplicates: Array<string>
+    createdAt: string
+    modifiedAt: string
     assignment?: {
       __typename?: 'AssignmentData'
       practitionerId?: string | null
@@ -5449,19 +5533,51 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
       officeName?: string | null
       avatarURL: string
     } | null
-  } | null
-  operationHistories?: Array<{
+  }
+  operationHistories: Array<{
     __typename?: 'OperationHistorySearchSet'
-    operationType?: string | null
-    operatedOn?: any | null
-  } | null> | null
+    operationType: string
+    operatedOn: any
+  }>
+}
+
+type EventSearchFields_GenericEventSearchSet_Fragment = {
+  __typename?: 'GenericEventSearchSet'
+  id: string
+  type: string
+  registration: {
+    __typename?: 'RegistrationSearchSet'
+    status: string
+    contactRelationship?: string | null
+    contactNumber?: string | null
+    trackingId?: string | null
+    eventLocationId?: string | null
+    registrationNumber?: string | null
+    registeredLocationId?: string | null
+    duplicates: Array<string>
+    createdAt: string
+    modifiedAt: string
+    assignment?: {
+      __typename?: 'AssignmentData'
+      practitionerId?: string | null
+      firstName?: string | null
+      lastName?: string | null
+      officeName?: string | null
+      avatarURL: string
+    } | null
+  }
+  operationHistories: Array<{
+    __typename?: 'OperationHistorySearchSet'
+    operationType: string
+    operatedOn: any
+  }>
 }
 
 type EventSearchFields_MarriageEventSearchSet_Fragment = {
   __typename?: 'MarriageEventSearchSet'
   dateOfMarriage?: PlainDate | null
   id: string
-  type?: string | null
+  type: string
   brideName?: Array<{
     __typename?: 'HumanName'
     firstNames?: string | null
@@ -5476,18 +5592,18 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
     familyName?: string | null
     use?: string | null
   } | null> | null
-  registration?: {
+  registration: {
     __typename?: 'RegistrationSearchSet'
-    status?: string | null
+    status: string
     contactRelationship?: string | null
     contactNumber?: string | null
     trackingId?: string | null
     eventLocationId?: string | null
     registrationNumber?: string | null
     registeredLocationId?: string | null
-    duplicates?: Array<string | null> | null
-    createdAt?: string | null
-    modifiedAt?: string | null
+    duplicates: Array<string>
+    createdAt: string
+    modifiedAt: string
     assignment?: {
       __typename?: 'AssignmentData'
       practitionerId?: string | null
@@ -5496,17 +5612,18 @@ type EventSearchFields_MarriageEventSearchSet_Fragment = {
       officeName?: string | null
       avatarURL: string
     } | null
-  } | null
-  operationHistories?: Array<{
+  }
+  operationHistories: Array<{
     __typename?: 'OperationHistorySearchSet'
-    operationType?: string | null
-    operatedOn?: any | null
-  } | null> | null
+    operationType: string
+    operatedOn: any
+  }>
 }
 
 export type EventSearchFieldsFragment =
   | EventSearchFields_BirthEventSearchSet_Fragment
   | EventSearchFields_DeathEventSearchSet_Fragment
+  | EventSearchFields_GenericEventSearchSet_Fragment
   | EventSearchFields_MarriageEventSearchSet_Fragment
 
 export type RegistrationHomeQueryVariables = Exact<{
@@ -5527,15 +5644,15 @@ export type RegistrationHomeQueryVariables = Exact<{
 
 export type RegistrationHomeQuery = {
   __typename?: 'Query'
-  inProgressTab?: {
+  inProgressTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5543,18 +5660,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5563,18 +5680,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5582,18 +5699,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5602,18 +5719,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5628,18 +5776,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5648,25 +5796,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  notificationTab?: {
+    >
+  }
+  notificationTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5674,18 +5821,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5694,18 +5841,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5713,18 +5860,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5733,18 +5880,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5759,18 +5937,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5779,25 +5957,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  reviewTab?: {
+    >
+  }
+  reviewTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5805,18 +5982,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5825,18 +6002,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5844,18 +6021,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5864,18 +6041,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5890,18 +6098,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5910,25 +6118,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  rejectTab?: {
+    >
+  }
+  rejectTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5936,18 +6143,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5956,18 +6163,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -5975,18 +6182,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -5995,18 +6202,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6021,18 +6259,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6041,25 +6279,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  approvalTab?: {
+    >
+  }
+  approvalTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6067,18 +6304,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6087,18 +6324,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6106,18 +6343,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6126,18 +6363,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6152,18 +6420,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6172,25 +6440,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  externalValidationTab?: {
+    >
+  }
+  externalValidationTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6198,18 +6465,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6218,18 +6485,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6237,18 +6504,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6257,18 +6524,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6283,18 +6581,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6303,25 +6601,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  printTab?: {
+    >
+  }
+  printTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6329,18 +6626,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6349,18 +6646,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6368,18 +6665,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6388,18 +6685,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6414,18 +6742,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6434,25 +6762,24 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  issueTab?: {
+    >
+  }
+  issueTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6460,18 +6787,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6480,18 +6807,18 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6499,18 +6826,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6519,18 +6846,49 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6545,18 +6903,18 @@ export type RegistrationHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6565,16 +6923,15 @@ export type RegistrationHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
+    >
+  }
 }
 
 export type FieldAgentHomeQueryVariables = Exact<{
@@ -6587,15 +6944,15 @@ export type FieldAgentHomeQueryVariables = Exact<{
 
 export type FieldAgentHomeQuery = {
   __typename?: 'Query'
-  reviewTab?: {
+  reviewTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6603,18 +6960,18 @@ export type FieldAgentHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6623,18 +6980,18 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6642,18 +6999,18 @@ export type FieldAgentHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6662,18 +7019,49 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6688,18 +7076,18 @@ export type FieldAgentHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6708,25 +7096,24 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
-  rejectTab?: {
+    >
+  }
+  rejectTab: {
     __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
+    totalItems: number
+    results: Array<
       | {
           __typename?: 'BirthEventSearchSet'
           dateOfBirth?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           childName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6734,18 +7121,18 @@ export type FieldAgentHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6754,18 +7141,18 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'DeathEventSearchSet'
           dateOfDeath?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           deceasedName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6773,18 +7160,18 @@ export type FieldAgentHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6793,18 +7180,49 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
+        }
+      | {
+          __typename?: 'GenericEventSearchSet'
+          id: string
+          type: string
+          registration: {
+            __typename?: 'RegistrationSearchSet'
+            status: string
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
+            assignment?: {
+              __typename?: 'AssignmentData'
+              practitionerId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+              avatarURL: string
+            } | null
+          }
+          operationHistories: Array<{
+            __typename?: 'OperationHistorySearchSet'
+            operationType: string
+            operatedOn: any
+          }>
         }
       | {
           __typename?: 'MarriageEventSearchSet'
           dateOfMarriage?: PlainDate | null
           id: string
-          type?: string | null
+          type: string
           brideName?: Array<{
             __typename?: 'HumanName'
             firstNames?: string | null
@@ -6819,18 +7237,18 @@ export type FieldAgentHomeQuery = {
             familyName?: string | null
             use?: string | null
           } | null> | null
-          registration?: {
+          registration: {
             __typename?: 'RegistrationSearchSet'
-            status?: string | null
+            status: string
             contactRelationship?: string | null
             contactNumber?: string | null
             trackingId?: string | null
             eventLocationId?: string | null
             registrationNumber?: string | null
             registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
+            duplicates: Array<string>
+            createdAt: string
+            modifiedAt: string
             assignment?: {
               __typename?: 'AssignmentData'
               practitionerId?: string | null
@@ -6839,16 +7257,15 @@ export type FieldAgentHomeQuery = {
               officeName?: string | null
               avatarURL: string
             } | null
-          } | null
-          operationHistories?: Array<{
+          }
+          operationHistories: Array<{
             __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
+            operationType: string
+            operatedOn: any
+          }>
         }
-      | null
-    > | null
-  } | null
+    >
+  }
 }
 
 export type MarkEventAsReinstatedMutationVariables = Exact<{
@@ -7390,7 +7807,7 @@ export type GetEventsWithProgressQuery = {
     results?: Array<{
       __typename?: 'EventProgressSet'
       id: string
-      type?: string | null
+      type: string
       dateOfEvent?: PlainDate | null
       startedByFacility?: string | null
       startedAt?: any | null
@@ -7400,18 +7817,18 @@ export type GetEventsWithProgressQuery = {
         firstNames?: string | null
         familyName?: string | null
       } | null> | null
-      registration?: {
+      registration: {
         __typename?: 'RegistrationSearchSet'
-        status?: string | null
+        status: string
         contactNumber?: string | null
         contactRelationship?: string | null
         contactEmail?: string | null
         dateOfDeclaration?: any | null
         trackingId?: string | null
         registrationNumber?: string | null
-        createdAt?: string | null
-        modifiedAt?: string | null
-      } | null
+        createdAt: string
+        modifiedAt: string
+      }
       startedBy?: {
         __typename?: 'User'
         systemRole: SystemRoleType
@@ -7454,82 +7871,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 

@@ -19,6 +19,10 @@ export let validators: Record<string, Validator> = builtInValidators as Record<
   any
 >
 
+export function getValidators() {
+  return validators
+}
+
 export async function initValidators() {
   const countryConfigValidators = await referenceApi.importValidators()
   validators = {

@@ -336,6 +336,7 @@ const ReviewActionComponent = ({
         String(draftDeclaration || alreadyRejectedDeclaration)
       ].completionStatus[String(completeDeclaration)]) ||
     null
+
   return !actionContent ? null : (
     <Container id={id}>
       <UnderLayBackground background={background} />

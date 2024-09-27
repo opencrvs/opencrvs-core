@@ -1508,6 +1508,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         client
       ) as any
 
+      console.log(request, requestArgs)
+
       return loop(
         newState,
         Cmd.run<IDownloadDeclarationFail, IDownloadDeclarationSuccess>(

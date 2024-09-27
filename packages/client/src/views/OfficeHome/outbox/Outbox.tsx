@@ -18,6 +18,11 @@ import {
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { declarationReadyForStatusChange } from '@client/declarations/submissionMiddleware'
 import {
+  getFormFromState,
+  isLegacyFormType,
+  useForms
+} from '@client/hooks/useForms'
+import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
@@ -151,6 +156,7 @@ export function Outbox() {
   const { width } = useWindowSize()
   const isOnline = useOnlineStatus()
   const theme = getTheme()
+  const { getForm, getRecordTitle } = useForms()
   const declarations = useSelector((state: IStoreState) =>
     state.declarationsState?.declarations.filter(isOutboxDeclaration)
   )
@@ -168,7 +174,10 @@ export function Outbox() {
 
   function transformDeclarationsReadyToSend() {
     const items = declarations.map((declaration, index) => {
-      const name = getDeclarationFullName(declaration)
+      const name = isLegacyFormType(declaration.event)
+        ? getDeclarationFullName(declaration)
+        : getRecordTitle(declaration.event, declaration)
+
       let dateOfEvent
       if (declaration.event && declaration.event.toString() === 'birth') {
         dateOfEvent = declaration.data?.child?.childBirthDate as string
@@ -199,11 +208,11 @@ export function Outbox() {
         id: declaration.id,
         name,
         event:
-          (declaration.event &&
-            intl.formatMessage(
-              dynamicConstantsMessages[declaration.event.toLowerCase()]
-            )) ||
-          '',
+          (declaration.event && isLegacyFormType(declaration.event)
+            ? intl.formatMessage(
+                dynamicConstantsMessages[declaration.event.toLowerCase()]
+              )
+            : intl.formatMessage(getForm(declaration.event).label)) || '',
         iconWithName: (
           <IconWithName
             status={declaration.registrationStatus || 'IN_PROGRESS'}

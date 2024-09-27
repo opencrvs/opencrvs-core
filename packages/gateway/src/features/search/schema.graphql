@@ -7,8 +7,8 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 type EventSearchResultSet {
-  results: [EventSearchSet]
-  totalItems: Int
+  results: [EventSearchSet!]!
+  totalItems: Int!
 }
 
 type AssignmentData {
@@ -21,13 +21,13 @@ type AssignmentData {
 
 interface EventSearchSet {
   id: ID!
-  type: String
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  type: String!
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type RegistrationSearchSet {
-  status: String
+  status: String!
   contactNumber: String
   contactEmail: String
   contactRelationship: String
@@ -38,33 +38,40 @@ type RegistrationSearchSet {
   registeredLocationId: String
   reason: String
   comment: String
-  duplicates: [ID]
-  createdAt: String
-  modifiedAt: String
+  duplicates: [ID!]!
+  createdAt: String!
+  modifiedAt: String!
   assignment: AssignmentData
 }
 
 type OperationHistorySearchSet {
-  operationType: String
-  operatedOn: Date
-  operatorRole: String
-  operatorName: [HumanName]
-  operatorOfficeName: String
-  operatorOfficeAlias: [String]
+  operationType: String!
+  operatedOn: Date!
+  operatorRole: String!
+  operatorName: [HumanName!]!
+  operatorOfficeName: String!
+  operatorOfficeAlias: [String!]!
   notificationFacilityName: String
-  notificationFacilityAlias: [String]
-  rejectReason: String
-  rejectComment: String
+  notificationFacilityAlias: [String!]!
+  rejectReason: String!
+  rejectComment: String!
+}
+
+type GenericEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String!
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
-  type: String
+  type: String!
   childName: [HumanName]
   childIdentifier: String
   dateOfBirth: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
   placeOfBirth: String
   childGender: String
   mothersFirstName: String
@@ -79,24 +86,24 @@ type BirthEventSearchSet implements EventSearchSet {
 
 type DeathEventSearchSet implements EventSearchSet {
   id: ID!
-  type: String
+  type: String!
   deceasedGender: String
   deceasedName: [HumanName]
   dateOfDeath: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type MarriageEventSearchSet implements EventSearchSet {
   id: ID!
-  type: String
+  type: String!
   brideName: [HumanName]
   groomName: [HumanName]
   brideIdentifier: String
   groomIdentifier: String
   dateOfMarriage: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type EventProgressResultSet {
@@ -115,10 +122,10 @@ type EventProgressData {
 
 type EventProgressSet {
   id: ID!
-  type: String
+  type: String!
   name: [HumanName]
   dateOfEvent: PlainDate
-  registration: RegistrationSearchSet
+  registration: RegistrationSearchSet!
   startedBy: User
   startedByFacility: String
   startedAt: Date
@@ -139,7 +146,7 @@ type Query {
     sort: String
     sortColumn: String
     sortBy: [SortBy!]
-  ): EventSearchResultSet
+  ): EventSearchResultSet!
   getEventsWithProgress(
     declarationJurisdictionId: String
     registrationStatuses: [String]

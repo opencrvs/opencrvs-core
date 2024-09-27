@@ -50,6 +50,12 @@ import { IOfflineData } from '@client/offline/reducer'
 import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import {
+  formDataToFieldData,
+  getFormFromState,
+  isLegacyFormType
+} from '@client/hooks/useForms'
+import { createRecord } from '@client/records'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -147,6 +153,220 @@ async function removeDuplicatesFromCompositionAndElastic(
   }
 }
 
+async function legacySubmission({
+  dispatch,
+  getState,
+  action
+}: {
+  dispatch: Dispatch
+  getState: () => IStoreState
+  action: ReturnType<typeof declarationReadyForStatusChange>
+}) {
+  const declaration = action.payload
+  const { event, action: submissionAction } = declaration
+
+  let payments: Payment | undefined
+  updateDeclaration(dispatch, {
+    ...declaration,
+    submissionStatus: STATUS_CHANGE_MAP[submissionAction]
+  })
+  //If SubmissionAction is certify and issue declaration then remove payment for certify first
+  if (submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION) {
+    const certificate = (
+      declaration.data.registration.certificates as ICertificate[]
+    )?.[0]
+    if (certificate) {
+      payments = certificate.payments
+      delete certificate.payments
+    }
+  }
+
+  const isUpdateAction =
+    isValidationAction(submissionAction) ||
+    isRegisterAction(submissionAction) ||
+    isCorrectionAction(submissionAction)
+
+  const form = isUpdateAction
+    ? getReviewForm(getState())[event]
+    : getRegisterForm(getState())[event]
+
+  const offlineData = getOfflineData(getState())
+  const graphqlPayload = getGqlDetails(
+    form,
+    declaration,
+    getOfflineData(getState()),
+    getState().offline.userDetails as UserDetails
+  )
+
+  if (isCorrectionAction(submissionAction)) {
+    const changedValues = getChangedValues(form, declaration, offlineData)
+    graphqlPayload.registration ??= {}
+    graphqlPayload.registration.correction =
+      declaration.data.registration.correction ?? {}
+    graphqlPayload.registration.correction.values = changedValues
+  }
+
+  if (isUpdateAction && !isCorrectionAction(submissionAction)) {
+    const changedValues = getChangedValues(form, declaration, offlineData)
+    graphqlPayload.registration ??= {}
+    graphqlPayload.registration.changedValues = changedValues
+  }
+
+  //then add payment while issue declaration
+  if (payments) {
+    ;(
+      declaration.data.registration.certificates as ICertificate[]
+    )[0].payments = payments
+  }
+
+  const mutation =
+    event === Event.Birth
+      ? getBirthMutation(submissionAction)
+      : event === Event.Death
+      ? getDeathMutation(submissionAction)
+      : getMarriageMutation(submissionAction)
+
+  if (!mutation) {
+    throw new Error(
+      'Unknown mutation for submission action ' + submissionAction
+    )
+  }
+
+  try {
+    if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
+      const response = await client.mutate({
+        mutation,
+        variables: {
+          details: graphqlPayload
+        }
+      })
+
+      const { isPotentiallyDuplicate, trackingId, compositionId } =
+        response?.data?.createBirthRegistration ??
+        response?.data?.createDeathRegistration ??
+        {}
+
+      if (isPotentiallyDuplicate) {
+        dispatch(
+          showDuplicateRecordsToast({
+            trackingId,
+            compositionId
+          })
+        )
+      }
+    } else if (submissionAction === SubmissionAction.REQUEST_CORRECTION) {
+      await client.mutate<
+        { requestRegistrationCorrection: string },
+        MutationToRequestRegistrationCorrectionArgs
+      >({
+        mutation,
+        variables: {
+          id: declaration.id,
+          details: graphqlPayload.registration.correction
+        }
+      })
+    } else if (
+      [
+        SubmissionAction.REJECT_DECLARATION,
+        SubmissionAction.ARCHIVE_DECLARATION,
+        SubmissionAction.REJECT_CORRECTION
+      ].includes(submissionAction)
+    ) {
+      if (
+        declaration.payload?.reason === 'duplicate' &&
+        SubmissionAction.ARCHIVE_DECLARATION === submissionAction
+      ) {
+        await client.mutate({
+          mutation: MARK_EVENT_AS_DUPLICATE,
+          variables: {
+            ...declaration.payload
+          }
+        })
+      }
+      await removeDuplicatesFromCompositionAndElastic(
+        declaration,
+        submissionAction
+      )
+      await client.mutate({
+        mutation,
+        variables: {
+          ...declaration.payload
+        }
+      })
+    } else if (
+      submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+    ) {
+      await client.mutate({
+        mutation,
+        variables: {
+          id: declaration.id,
+          details: graphqlPayload
+        }
+      })
+      //delete data from certificates to identify event in workflow for markEventAsIssued
+      if (declaration.data.registration.certificates) {
+        delete (
+          declaration.data.registration.certificates as ICertificate[]
+        )?.[0].data
+      }
+      updateDeclaration(dispatch, {
+        ...declaration,
+        registrationStatus: RegStatus.Certified,
+        action: SubmissionAction.ISSUE_DECLARATION,
+        submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
+      })
+      return
+    } else {
+      await removeDuplicatesFromCompositionAndElastic(
+        declaration,
+        submissionAction
+      )
+      await client.mutate({
+        mutation,
+        variables: {
+          id: declaration.id,
+          details: graphqlPayload
+        }
+      })
+    }
+    updateWorkqueue(getState(), dispatch)
+
+    // wrapping deleteDeclaration inside a setTimeout
+    // make deleteDeclaration wait a bit until workqueue refreshes
+    // because for the deleteDeclaration's updates, there was an "workqueue count flickering" issue ticket
+    // This is a "quick fix" for the issue #5268://github.com/opencrvs/opencrvs-core/issues/5268
+    setTimeout(() => dispatch(deleteDeclaration(declaration.id, client)), 2000)
+  } catch (error) {
+    if (
+      error instanceof ApolloError &&
+      error.graphQLErrors.length > 0 &&
+      error.graphQLErrors[0].extensions.code === 'UNASSIGNED'
+    ) {
+      dispatch(
+        showUnassigned({
+          trackingId: declaration.data.registration.trackingId as string
+        })
+      )
+      dispatch(deleteDeclaration(declaration.id, client))
+      return
+    }
+    if (error instanceof ApolloError && error.networkError) {
+      updateDeclaration(dispatch, {
+        ...declaration,
+        submissionStatus: SUBMISSION_STATUS.FAILED_NETWORK
+      })
+      captureException(error)
+      return
+    }
+
+    updateDeclaration(dispatch, {
+      ...declaration,
+      submissionStatus: SUBMISSION_STATUS.FAILED
+    })
+    captureException(error)
+  }
+}
+
 export const submissionMiddleware: Middleware<{}, IStoreState> =
   ({ dispatch, getState }) =>
   (next) =>
@@ -156,171 +376,21 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       return
     }
     const declaration = action.payload
-    const { event, action: submissionAction } = declaration
-    let payments: Payment | undefined
-    updateDeclaration(dispatch, {
-      ...declaration,
-      submissionStatus: STATUS_CHANGE_MAP[submissionAction]
-    })
-    //If SubmissionAction is certify and issue declaration then remove payment for certify first
-    if (submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION) {
-      const certificate = (
-        declaration.data.registration.certificates as ICertificate[]
-      )?.[0]
-      if (certificate) {
-        payments = certificate.payments
-        delete certificate.payments
-      }
+    const { event } = declaration
+
+    if (isLegacyFormType(event)) {
+      return legacySubmission({ dispatch, getState, action })
     }
 
-    const isUpdateAction =
-      isValidationAction(submissionAction) ||
-      isRegisterAction(submissionAction) ||
-      isCorrectionAction(submissionAction)
+    const form = getFormFromState(event, getState())
 
-    const form = isUpdateAction
-      ? getReviewForm(getState())[event]
-      : getRegisterForm(getState())[event]
-
-    const offlineData = getOfflineData(getState())
-    const graphqlPayload = getGqlDetails(
-      form,
-      declaration,
-      getOfflineData(getState()),
-      getState().offline.userDetails as UserDetails
-    )
-
-    if (isCorrectionAction(submissionAction)) {
-      const changedValues = getChangedValues(form, declaration, offlineData)
-      graphqlPayload.registration ??= {}
-      graphqlPayload.registration.correction =
-        declaration.data.registration.correction ?? {}
-      graphqlPayload.registration.correction.values = changedValues
-    }
-
-    if (isUpdateAction && !isCorrectionAction(submissionAction)) {
-      const changedValues = getChangedValues(form, declaration, offlineData)
-      graphqlPayload.registration ??= {}
-      graphqlPayload.registration.changedValues = changedValues
-    }
-
-    //then add payment while issue declaration
-    if (payments) {
-      ;(
-        declaration.data.registration.certificates as ICertificate[]
-      )[0].payments = payments
-    }
-
-    const mutation =
-      event === Event.Birth
-        ? getBirthMutation(submissionAction)
-        : event === Event.Death
-        ? getDeathMutation(submissionAction)
-        : getMarriageMutation(submissionAction)
-
-    if (!mutation) {
-      throw new Error(
-        'Unknown mutation for submission action ' + submissionAction
-      )
+    const payload = {
+      type: declaration.event,
+      fields: formDataToFieldData(declaration.data, form)
     }
 
     try {
-      if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
-        const response = await client.mutate({
-          mutation,
-          variables: {
-            details: graphqlPayload
-          }
-        })
-
-        const { isPotentiallyDuplicate, trackingId, compositionId } =
-          response?.data?.createBirthRegistration ??
-          response?.data?.createDeathRegistration ??
-          {}
-
-        if (isPotentiallyDuplicate) {
-          dispatch(
-            showDuplicateRecordsToast({
-              trackingId,
-              compositionId
-            })
-          )
-        }
-      } else if (submissionAction === SubmissionAction.REQUEST_CORRECTION) {
-        await client.mutate<
-          { requestRegistrationCorrection: string },
-          MutationToRequestRegistrationCorrectionArgs
-        >({
-          mutation,
-          variables: {
-            id: declaration.id,
-            details: graphqlPayload.registration.correction
-          }
-        })
-      } else if (
-        [
-          SubmissionAction.REJECT_DECLARATION,
-          SubmissionAction.ARCHIVE_DECLARATION,
-          SubmissionAction.REJECT_CORRECTION
-        ].includes(submissionAction)
-      ) {
-        if (
-          declaration.payload?.reason === 'duplicate' &&
-          SubmissionAction.ARCHIVE_DECLARATION === submissionAction
-        ) {
-          await client.mutate({
-            mutation: MARK_EVENT_AS_DUPLICATE,
-            variables: {
-              ...declaration.payload
-            }
-          })
-        }
-        await removeDuplicatesFromCompositionAndElastic(
-          declaration,
-          submissionAction
-        )
-        await client.mutate({
-          mutation,
-          variables: {
-            ...declaration.payload
-          }
-        })
-      } else if (
-        submissionAction === SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
-      ) {
-        await client.mutate({
-          mutation,
-          variables: {
-            id: declaration.id,
-            details: graphqlPayload
-          }
-        })
-        //delete data from certificates to identify event in workflow for markEventAsIssued
-        if (declaration.data.registration.certificates) {
-          delete (
-            declaration.data.registration.certificates as ICertificate[]
-          )?.[0].data
-        }
-        updateDeclaration(dispatch, {
-          ...declaration,
-          registrationStatus: RegStatus.Certified,
-          action: SubmissionAction.ISSUE_DECLARATION,
-          submissionStatus: SUBMISSION_STATUS.READY_TO_ISSUE
-        })
-        return
-      } else {
-        await removeDuplicatesFromCompositionAndElastic(
-          declaration,
-          submissionAction
-        )
-        await client.mutate({
-          mutation,
-          variables: {
-            id: declaration.id,
-            details: graphqlPayload
-          }
-        })
-      }
+      const response = await createRecord(payload)
       updateWorkqueue(getState(), dispatch)
 
       // wrapping deleteDeclaration inside a setTimeout
@@ -332,32 +402,6 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         2000
       )
     } catch (error) {
-      if (
-        error instanceof ApolloError &&
-        error.graphQLErrors.length > 0 &&
-        error.graphQLErrors[0].extensions.code === 'UNASSIGNED'
-      ) {
-        dispatch(
-          showUnassigned({
-            trackingId: declaration.data.registration.trackingId as string
-          })
-        )
-        dispatch(deleteDeclaration(declaration.id, client))
-        return
-      }
-      if (error instanceof ApolloError && error.networkError) {
-        updateDeclaration(dispatch, {
-          ...declaration,
-          submissionStatus: SUBMISSION_STATUS.FAILED_NETWORK
-        })
-        captureException(error)
-        return
-      }
-
-      updateDeclaration(dispatch, {
-        ...declaration,
-        submissionStatus: SUBMISSION_STATUS.FAILED
-      })
-      captureException(error)
+      console.log(error)
     }
   }

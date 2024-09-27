@@ -13,6 +13,9 @@ import { Event } from '@client/utils/gateway'
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 
+/*
+ * Legacy birth, death & marriage flows
+ */
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.Birth}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.Birth}/:pageId`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Birth}/:pageId/group/:groupId`
@@ -24,6 +27,13 @@ export const SELECT_MARRIAGE_INFORMANT = `/drafts/:declarationId/events/${Event.
 export const DRAFT_MARRIAGE_FORM = `/drafts/:declarationId/events/${Event.Marriage}`
 export const DRAFT_MARRIAGE_FORM_PAGE = `/drafts/:declarationId/events/${Event.Marriage}/:pageId`
 export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Marriage}/:pageId/group/:groupId`
+
+/*
+ * New fully configurable form flows
+ */
+export const FORM = `/drafts/:declarationId/events/:event`
+export const FORM_PAGE = `/drafts/:declarationId/events/:event/:pageId`
+export const FORM_PAGE_GROUP = `/drafts/:declarationId/events/:event/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'

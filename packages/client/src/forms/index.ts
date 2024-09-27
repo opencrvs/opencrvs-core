@@ -998,6 +998,7 @@ export interface IForm {
   sections: IFormSection[]
 }
 export interface ISerializedForm {
+  label: MessageDescriptor
   sections: ISerializedFormSection[]
 }
 

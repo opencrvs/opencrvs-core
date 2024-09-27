@@ -200,7 +200,21 @@ export const searchTypeResolvers: GQLResolver = {
       if (obj._source.event === 'Marriage') {
         return 'MarriageEventSearchSet'
       }
-      return null as never
+      return 'GenericEventSearchSet'
+    }
+  },
+  GenericEventSearchSet: {
+    id(resultSet: ISearchEventDataTemplate) {
+      return resultSet._id
+    },
+    type(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.event
+    },
+    registration(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source
+    },
+    operationHistories(resultSet: ISearchEventDataTemplate) {
+      return resultSet._source.operationHistories
     }
   },
   BirthEventSearchSet: {
@@ -326,7 +340,7 @@ export const searchTypeResolvers: GQLResolver = {
       return searchData.eventLocationId
     },
     duplicates(searchData: ISearchDataTemplate) {
-      return searchData.relatesTo
+      return searchData.relatesTo || []
     },
     contactRelationship(searchData: ISearchDataTemplate) {
       return searchData.informantType

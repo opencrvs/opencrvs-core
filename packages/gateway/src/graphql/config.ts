@@ -16,6 +16,7 @@ import {
   GraphQLSchema,
   GraphQLError
 } from 'graphql'
+import { z } from 'zod'
 
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
@@ -32,6 +33,7 @@ import { resolvers as userRootResolvers } from '@gateway/features/user/root-reso
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
+import { resolvers as RecordResolvers } from '@gateway/features/records/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -67,7 +69,17 @@ interface IStringIndexSignatureInterface {
 
 type StringIndexed<T> = T & IStringIndexSignatureInterface
 
+const DOCUMENT_UPLOADER_WITH_OPTION_VALUE = z.array(
+  z.object({
+    optionValues: z.array(z.string()),
+    type: z.string(),
+    data: z.string(),
+    fileSize: z.number().positive()
+  })
+)
+
 export const resolvers: StringIndexed<IResolvers> = merge(
+  RecordResolvers as IResolvers,
   notificationRootResolvers as IResolvers,
   registrationRootResolvers as IResolvers,
   locationRootResolvers as IResolvers,
@@ -97,6 +109,16 @@ export const resolvers: StringIndexed<IResolvers> = merge(
         return value
       },
       parseValue(value) {
+        if (typeof value === 'object') {
+          const result = DOCUMENT_UPLOADER_WITH_OPTION_VALUE.safeParse(value)
+          if (!result.success) {
+            throw new Error(
+              'Unknown object. Expected optionValues, type, data and fileSize'
+            )
+          }
+          return result.data
+        }
+
         if (!['string', 'number', 'boolean'].includes(typeof value)) {
           throw new Error('Value must be either a String, Boolean or an number')
         }
@@ -104,6 +126,8 @@ export const resolvers: StringIndexed<IResolvers> = merge(
         return value
       },
       parseLiteral(ast) {
+        console.log(ast.kind)
+
         switch (ast.kind) {
           case Kind.INT:
             return parseInt(ast.value, 10)

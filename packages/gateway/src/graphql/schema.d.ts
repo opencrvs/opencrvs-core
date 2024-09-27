@@ -46,11 +46,12 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   getUserAuditLog?: GQLUserAuditLogResultSet
-  searchEvents?: GQLEventSearchResultSet
+  searchEvents: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
   fetchSystem?: GQLSystem
   getOIDPUserInfo?: GQLUserInfo
+  getRecord: GQLRecord
 }
 
 export interface GQLMutation {
@@ -105,6 +106,7 @@ export interface GQLMutation {
   deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
+  createRecord: GQLCreateRecordResponse
 }
 
 export interface GQLDummy {
@@ -391,8 +393,8 @@ export interface GQLUserAuditLogResultSet {
 }
 
 export interface GQLEventSearchResultSet {
-  results?: Array<GQLEventSearchSet | null>
-  totalItems?: number
+  results: Array<GQLEventSearchSet>
+  totalItems: number
 }
 
 export interface GQLAdvancedSearchParametersInput {
@@ -513,6 +515,12 @@ export interface GQLUserInfo {
   districtFhirId?: string
   stateFhirId?: string
   locationLevel3FhirId?: string
+}
+
+export interface GQLRecord {
+  id: string
+  event: string
+  fields: Array<GQLField>
 }
 
 export interface GQLCorrectionInput {
@@ -674,6 +682,15 @@ export interface GQLBookmarkSearchInput {
 export interface GQLRemoveBookmarkedSeachInput {
   userId: string
   searchId: string
+}
+
+export interface GQLCreateRecordResponse {
+  id: string
+}
+
+export interface GQLRecordInput {
+  type: string
+  fields: Array<GQLFieldInput>
 }
 
 export type GQLMap = any
@@ -957,19 +974,21 @@ export interface GQLUserAuditLogResultItemNameMap {
 
 export interface GQLEventSearchSet {
   id: string
-  type?: string
-  registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
+  type: string
+  registration: GQLRegistrationSearchSet
+  operationHistories: Array<GQLOperationHistorySearchSet>
 }
 
 /** Use this to resolve interface type EventSearchSet */
 export type GQLPossibleEventSearchSetTypeNames =
+  | 'GenericEventSearchSet'
   | 'BirthEventSearchSet'
   | 'DeathEventSearchSet'
   | 'MarriageEventSearchSet'
 
 export interface GQLEventSearchSetNameMap {
   EventSearchSet: GQLEventSearchSet
+  GenericEventSearchSet: GQLGenericEventSearchSet
   BirthEventSearchSet: GQLBirthEventSearchSet
   DeathEventSearchSet: GQLDeathEventSearchSet
   MarriageEventSearchSet: GQLMarriageEventSearchSet
@@ -983,10 +1002,10 @@ export const enum GQLEvent {
 
 export interface GQLEventProgressSet {
   id: string
-  type?: string
+  type: string
   name?: Array<GQLHumanName | null>
   dateOfEvent?: GQLPlainDate
-  registration?: GQLRegistrationSearchSet
+  registration: GQLRegistrationSearchSet
   startedBy?: GQLUser
   startedByFacility?: string
   startedAt?: GQLDate
@@ -1041,43 +1060,9 @@ export interface GQLOIDPUserInfo {
   updated_at?: number
 }
 
-export interface GQLPersonInput {
-  _fhirID?: string
-  identifier?: Array<GQLIdentityInput | null>
-  name?: Array<GQLHumanNameInput | null>
-  telecom?: Array<GQLContactPointInput | null>
-  gender?: GQLGender
-  birthDate?: GQLPlainDate
-  age?: number
-  maritalStatus?: string
-  occupation?: string
-  detailsExist?: boolean
-  reasonNotApplying?: string
-  dateOfMarriage?: GQLPlainDate
-  multipleBirth?: number
-  address?: Array<GQLAddressInput | null>
-  photo?: Array<GQLAttachmentInput>
-  deceased?: GQLDeceasedInput
-  nationality?: Array<string | null>
-  educationalAttainment?: string
-  ageOfIndividualInYears?: number
-}
-
-export interface GQLLocationInput {
-  _fhirID?: string
-  identifier?: Array<string | null>
-  status?: string
-  name?: string
-  alias?: Array<string | null>
-  description?: string
-  partOf?: string
-  type?: string
-  telecom?: Array<GQLContactPointInput | null>
-  address?: GQLAddressInput
-  longitude?: number
-  latitude?: number
-  altitude?: number
-  geoData?: string
+export interface GQLField {
+  id: string
+  value: GQLFieldValue
 }
 
 export interface GQLAttachmentInput {
@@ -1108,6 +1093,23 @@ export interface GQLCorrectionValueInput {
   fieldName: string
   oldValue?: GQLFieldValue
   newValue: GQLFieldValue
+}
+
+export interface GQLLocationInput {
+  _fhirID?: string
+  identifier?: Array<string | null>
+  status?: string
+  name?: string
+  alias?: Array<string | null>
+  description?: string
+  partOf?: string
+  type?: string
+  telecom?: Array<GQLContactPointInput | null>
+  address?: GQLAddressInput
+  longitude?: number
+  latitude?: number
+  altitude?: number
+  geoData?: string
 }
 
 export interface GQLFHIRIDMap {
@@ -1144,6 +1146,28 @@ export interface GQLRegistrationInput {
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
   changedValues?: Array<GQLCorrectionValueInput>
+}
+
+export interface GQLPersonInput {
+  _fhirID?: string
+  identifier?: Array<GQLIdentityInput | null>
+  name?: Array<GQLHumanNameInput | null>
+  telecom?: Array<GQLContactPointInput | null>
+  gender?: GQLGender
+  birthDate?: GQLPlainDate
+  age?: number
+  maritalStatus?: string
+  occupation?: string
+  detailsExist?: boolean
+  reasonNotApplying?: string
+  dateOfMarriage?: GQLPlainDate
+  multipleBirth?: number
+  address?: Array<GQLAddressInput | null>
+  photo?: Array<GQLAttachmentInput>
+  deceased?: GQLDeceasedInput
+  nationality?: Array<string | null>
+  educationalAttainment?: string
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLRelatedPersonInput {
@@ -1231,6 +1255,11 @@ export interface GQLSystemSettingsInput {
 export interface GQLWebhookInput {
   event: string
   permissions: Array<string | null>
+}
+
+export interface GQLFieldInput {
+  id: string
+  value: GQLFieldValue
 }
 
 export interface GQLAssignmentData {
@@ -1429,7 +1458,7 @@ export interface GQLUserAuditLogItem extends GQLAuditLogItemBase {
 }
 
 export interface GQLRegistrationSearchSet {
-  status?: string
+  status: string
   contactNumber?: string
   contactEmail?: string
   contactRelationship?: string
@@ -1440,33 +1469,40 @@ export interface GQLRegistrationSearchSet {
   registeredLocationId?: string
   reason?: string
   comment?: string
-  duplicates?: Array<string | null>
-  createdAt?: string
-  modifiedAt?: string
+  duplicates: Array<string>
+  createdAt: string
+  modifiedAt: string
   assignment?: GQLAssignmentData
 }
 
 export interface GQLOperationHistorySearchSet {
-  operationType?: string
-  operatedOn?: GQLDate
-  operatorRole?: string
-  operatorName?: Array<GQLHumanName | null>
-  operatorOfficeName?: string
-  operatorOfficeAlias?: Array<string | null>
+  operationType: string
+  operatedOn: GQLDate
+  operatorRole: string
+  operatorName: Array<GQLHumanName>
+  operatorOfficeName: string
+  operatorOfficeAlias: Array<string>
   notificationFacilityName?: string
-  notificationFacilityAlias?: Array<string | null>
-  rejectReason?: string
-  rejectComment?: string
+  notificationFacilityAlias: Array<string>
+  rejectReason: string
+  rejectComment: string
+}
+
+export interface GQLGenericEventSearchSet extends GQLEventSearchSet {
+  id: string
+  type: string
+  registration: GQLRegistrationSearchSet
+  operationHistories: Array<GQLOperationHistorySearchSet>
 }
 
 export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
   id: string
-  type?: string
+  type: string
   childName?: Array<GQLHumanName | null>
   childIdentifier?: string
   dateOfBirth?: GQLPlainDate
-  registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
+  registration: GQLRegistrationSearchSet
+  operationHistories: Array<GQLOperationHistorySearchSet>
   placeOfBirth?: string
   childGender?: string
   mothersFirstName?: string
@@ -1481,24 +1517,24 @@ export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
 
 export interface GQLDeathEventSearchSet extends GQLEventSearchSet {
   id: string
-  type?: string
+  type: string
   deceasedGender?: string
   deceasedName?: Array<GQLHumanName | null>
   dateOfDeath?: GQLPlainDate
-  registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
+  registration: GQLRegistrationSearchSet
+  operationHistories: Array<GQLOperationHistorySearchSet>
 }
 
 export interface GQLMarriageEventSearchSet extends GQLEventSearchSet {
   id: string
-  type?: string
+  type: string
   brideName?: Array<GQLHumanName | null>
   groomName?: Array<GQLHumanName | null>
   brideIdentifier?: string
   groomIdentifier?: string
   dateOfMarriage?: GQLPlainDate
-  registration?: GQLRegistrationSearchSet
-  operationHistories?: Array<GQLOperationHistorySearchSet | null>
+  registration: GQLRegistrationSearchSet
+  operationHistories: Array<GQLOperationHistorySearchSet>
 }
 
 export interface GQLEventProgressData {
@@ -1525,45 +1561,7 @@ export interface GQLOIDPUserAddress {
   country?: string
 }
 
-export interface GQLIdentityInput {
-  id?: string
-  type?: string
-  otherType?: string
-  fieldsModifiedByIdentity?: Array<string | null>
-}
-
-export interface GQLContactPointInput {
-  system?: GQLTelecomSystem
-  value?: string
-  use?: GQLTelecomUse
-}
-
-export const enum GQLGender {
-  male = 'male',
-  female = 'female',
-  other = 'other',
-  unknown = 'unknown'
-}
-
-export interface GQLAddressInput {
-  use?: GQLAddressUse
-  type?: GQLAddressType
-  text?: string
-  line?: Array<string>
-  city?: string
-  district?: string
-  state?: string
-  postalCode?: string
-  country?: string
-  from?: GQLDate
-  to?: GQLDate
-  partOf?: string
-}
-
-export interface GQLDeceasedInput {
-  deceased?: boolean
-  deathDate?: GQLPlainDate
-}
+export type GQLFieldValue = any
 
 export const enum GQLAttachmentInputStatus {
   approved = 'approved',
@@ -1581,7 +1579,26 @@ export const enum GQLPaymentOutcomeType {
   PARTIAL = 'PARTIAL'
 }
 
-export type GQLFieldValue = any
+export interface GQLContactPointInput {
+  system?: GQLTelecomSystem
+  value?: string
+  use?: GQLTelecomUse
+}
+
+export interface GQLAddressInput {
+  use?: GQLAddressUse
+  type?: GQLAddressType
+  text?: string
+  line?: Array<string>
+  city?: string
+  district?: string
+  state?: string
+  postalCode?: string
+  country?: string
+  from?: GQLDate
+  to?: GQLDate
+  partOf?: string
+}
 
 export interface GQLObservationFHIRIDS {
   maleDependentsOfDeceased?: string
@@ -1615,6 +1632,25 @@ export interface GQLCertificateInput {
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPaymentInput | null>
   data?: string
+}
+
+export interface GQLIdentityInput {
+  id?: string
+  type?: string
+  otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
+}
+
+export const enum GQLGender {
+  male = 'male',
+  female = 'female',
+  other = 'other',
+  unknown = 'unknown'
+}
+
+export interface GQLDeceasedInput {
+  deceased?: boolean
+  deathDate?: GQLPlainDate
 }
 
 export interface GQLLabelInput {
@@ -1748,12 +1784,14 @@ export interface GQLResolver {
   SystemRole?: GQLSystemRoleTypeResolver
   System?: GQLSystemTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
+  Record?: GQLRecordTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
   Response?: GQLResponseTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
+  CreateRecordResponse?: GQLCreateRecordResponseTypeResolver
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
@@ -1791,6 +1829,7 @@ export interface GQLResolver {
   EventProgressSet?: GQLEventProgressSetTypeResolver
   SystemSettings?: GQLSystemSettingsTypeResolver
   OIDPUserInfo?: GQLOIDPUserInfoTypeResolver
+  Field?: GQLFieldTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -1809,6 +1848,7 @@ export interface GQLResolver {
   UserAuditLogItem?: GQLUserAuditLogItemTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   OperationHistorySearchSet?: GQLOperationHistorySearchSetTypeResolver
+  GenericEventSearchSet?: GQLGenericEventSearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
   MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
@@ -1861,6 +1901,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getOIDPUserInfo?: QueryToGetOIDPUserInfoResolver<TParent>
+  getRecord?: QueryToGetRecordResolver<TParent>
 }
 
 export interface QueryToSendNotificationToAllUsersArgs {
@@ -2474,6 +2515,18 @@ export interface QueryToGetOIDPUserInfoResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface QueryToGetRecordArgs {
+  recordId: string
+}
+export interface QueryToGetRecordResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetRecordArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
@@ -2526,6 +2579,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
+  createRecord?: MutationToCreateRecordResolver<TParent>
 }
 
 export interface MutationToRequestRegistrationCorrectionArgs {
@@ -3309,6 +3363,18 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateRecordArgs {
+  recordInput: GQLRecordInput
+}
+export interface MutationToCreateRecordResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToCreateRecordArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5502,6 +5568,39 @@ export interface UserInfoToLocationLevel3FhirIdResolver<
   ): TResult
 }
 
+export interface GQLRecordTypeResolver<TParent = any> {
+  id?: RecordToIdResolver<TParent>
+  event?: RecordToEventResolver<TParent>
+  fields?: RecordToFieldsResolver<TParent>
+}
+
+export interface RecordToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RecordToEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RecordToFieldsResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -5637,6 +5736,22 @@ export interface GQLBookMarkedSearchesTypeResolver<TParent = any> {
 }
 
 export interface BookMarkedSearchesToSearchListResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLCreateRecordResponseTypeResolver<TParent = any> {
+  id?: CreateRecordResponseToIdResolver<TParent>
+}
+
+export interface CreateRecordResponseToIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -7666,11 +7781,15 @@ export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
 }
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
   (parent: TParent, context: Context, info: GraphQLResolveInfo):
+    | 'GenericEventSearchSet'
     | 'BirthEventSearchSet'
     | 'DeathEventSearchSet'
     | 'MarriageEventSearchSet'
     | Promise<
-        'BirthEventSearchSet' | 'DeathEventSearchSet' | 'MarriageEventSearchSet'
+        | 'GenericEventSearchSet'
+        | 'BirthEventSearchSet'
+        | 'DeathEventSearchSet'
+        | 'MarriageEventSearchSet'
       >
 }
 export interface GQLEventProgressSetTypeResolver<TParent = any> {
@@ -8068,6 +8187,29 @@ export interface OIDPUserInfoToUpdated_atResolver<
   TParent = any,
   TResult = any
 > {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLFieldTypeResolver<TParent = any> {
+  id?: FieldToIdResolver<TParent>
+  value?: FieldToValueResolver<TParent>
+}
+
+export interface FieldToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface FieldToValueResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -9963,6 +10105,61 @@ export interface OperationHistorySearchSetToRejectReasonResolver<
 }
 
 export interface OperationHistorySearchSetToRejectCommentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLGenericEventSearchSetTypeResolver<TParent = any> {
+  id?: GenericEventSearchSetToIdResolver<TParent>
+  type?: GenericEventSearchSetToTypeResolver<TParent>
+  registration?: GenericEventSearchSetToRegistrationResolver<TParent>
+  operationHistories?: GenericEventSearchSetToOperationHistoriesResolver<TParent>
+}
+
+export interface GenericEventSearchSetToIdResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GenericEventSearchSetToTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GenericEventSearchSetToRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GenericEventSearchSetToOperationHistoriesResolver<
   TParent = any,
   TResult = any
 > {

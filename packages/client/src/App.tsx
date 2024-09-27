@@ -139,6 +139,7 @@ export function App(props: IAppProps) {
                                               component={SelectVitalEvent}
                                             />
 
+                                            {/* Legacy form routes */}
                                             <ProtectedRoute
                                               exact
                                               path={
@@ -159,13 +160,6 @@ export function App(props: IAppProps) {
                                                 routes.DRAFT_BIRTH_PARENT_FORM
                                               }
                                               component={DeclarationForm}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                routes.VIEW_VERIFY_CERTIFICATE
-                                              }
-                                              component={VerifyCertificatePage}
                                             />
                                             <ProtectedRoute
                                               exact
@@ -218,6 +212,30 @@ export function App(props: IAppProps) {
                                                 routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP
                                               }
                                               component={DeclarationForm}
+                                            />
+                                            {/* New form routes */}
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.FORM}
+                                              component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.FORM_PAGE}
+                                              component={DeclarationForm}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={routes.FORM_PAGE_GROUP}
+                                              component={DeclarationForm}
+                                            />
+
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                routes.VIEW_VERIFY_CERTIFICATE
+                                              }
+                                              component={VerifyCertificatePage}
                                             />
                                             <ProtectedRoute
                                               exact

@@ -16,7 +16,7 @@ import {
   useIntl
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router'
 import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
@@ -102,9 +102,11 @@ import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
-import { Stack, ToggleMenu } from '@client/../../components/lib'
+
 import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
+import { Form, FormSection } from '@client/hooks/useForms'
+import { Stack, ToggleMenu } from '@opencrvs/components'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -146,7 +148,7 @@ const ErrorText = styled.div`
 `
 interface IFormProps {
   declaration: IDeclaration
-  registerForm: IForm
+  registerForm: IForm | Form
   pageRoute: string
   duplicate?: boolean
   reviewSummaryHeader?: React.ReactNode
@@ -1310,7 +1312,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
 }
 
 function firstVisibleGroup(
-  section: IFormSection,
+  section: IFormSection | FormSection,
   declaration: IDeclaration,
   userDetails?: UserDetails | null
 ): IFormSectionGroup | undefined {
@@ -1323,15 +1325,12 @@ function firstVisibleGroup(
 }
 
 function getValidSectionGroup(
-  sections: IFormSection[],
+  sections: Array<IFormSection | FormSection>,
   declaration: IDeclaration,
   sectionId: string,
   groupId?: string,
   userDetails?: UserDetails | null
-): {
-  activeSection: IFormSection
-  activeSectionGroup: IFormSectionGroup
-} {
+) {
   const currentSection = sectionId
     ? sections.find((sec) => sec.id === sectionId)
     : findFirstVisibleSection(sections)
@@ -1383,7 +1382,7 @@ export function replaceInitialValues(
   }))
 }
 
-function findFirstVisibleSection(sections: IFormSection[]) {
+function findFirstVisibleSection(sections: Array<IFormSection | FormSection>) {
   return sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
@@ -1443,20 +1442,20 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   }
 }
 
-export const RegisterForm = connect<
-  Props,
-  DispatchProps,
-  IFormProps & RouteProps,
-  IStoreState
->(mapStateToProps, {
-  writeDeclaration,
-  modifyDeclaration,
-  deleteDeclaration,
-  goToPageGroup: goToPageGroupAction,
-  goBack: goBackAction,
-  goToCertificateCorrection,
-  goToHome,
-  goToHomeTab,
-  toggleDraftSavedNotification,
-  goToPrintRecord: goToPrintRecordView
-})(injectIntl<'intl', FullProps>(RegisterFormView))
+export const RegisterForm = withRouter(
+  connect<Props, DispatchProps, IFormProps & RouteProps, IStoreState>(
+    mapStateToProps,
+    {
+      writeDeclaration,
+      modifyDeclaration,
+      deleteDeclaration,
+      goToPageGroup: goToPageGroupAction,
+      goBack: goBackAction,
+      goToCertificateCorrection,
+      goToHome,
+      goToHomeTab,
+      toggleDraftSavedNotification,
+      goToPrintRecord: goToPrintRecordView
+    }
+  )(injectIntl<'intl', FullProps>(RegisterFormView))
+)

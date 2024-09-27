@@ -129,7 +129,7 @@ type Query {
     sort: String
     sortColumn: String
     sortBy: [SortBy!]
-  ): EventSearchResultSet
+  ): EventSearchResultSet!
   getEventsWithProgress(
     declarationJurisdictionId: String
     registrationStatuses: [String]
@@ -153,6 +153,7 @@ type Query {
     redirectUri: String!
     grantType: String
   ): UserInfo
+  getRecord(recordId: ID!): Record!
 }
 
 type Mutation {
@@ -268,6 +269,7 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createRecord(recordInput: RecordInput!): CreateRecordResponse!
 }
 
 type Dummy {
@@ -517,8 +519,8 @@ type UserAuditLogResultSet {
 }
 
 type EventSearchResultSet {
-  results: [EventSearchSet]
-  totalItems: Int
+  results: [EventSearchSet!]!
+  totalItems: Int!
 }
 
 input AdvancedSearchParametersInput {
@@ -639,6 +641,12 @@ type UserInfo {
   districtFhirId: String
   stateFhirId: String
   locationLevel3FhirId: String
+}
+
+type Record {
+  id: ID!
+  event: String!
+  fields: [Field!]!
 }
 
 input CorrectionInput {
@@ -800,6 +808,15 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+type CreateRecordResponse {
+  id: ID!
+}
+
+input RecordInput {
+  type: String!
+  fields: [FieldInput!]!
 }
 
 scalar Map
@@ -1072,9 +1089,9 @@ union UserAuditLogResultItem =
 
 interface EventSearchSet {
   id: ID!
-  type: String
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  type: String!
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 enum Event {
@@ -1085,10 +1102,10 @@ enum Event {
 
 type EventProgressSet {
   id: ID!
-  type: String
+  type: String!
   name: [HumanName]
   dateOfEvent: PlainDate
-  registration: RegistrationSearchSet
+  registration: RegistrationSearchSet!
   startedBy: User
   startedByFacility: String
   startedAt: Date
@@ -1143,43 +1160,9 @@ type OIDPUserInfo {
   updated_at: Int
 }
 
-input PersonInput {
-  _fhirID: ID
-  identifier: [IdentityInput]
-  name: [HumanNameInput]
-  telecom: [ContactPointInput]
-  gender: Gender
-  birthDate: PlainDate
-  age: Float
-  maritalStatus: String
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: PlainDate
-  multipleBirth: Int
-  address: [AddressInput]
-  photo: [AttachmentInput!]
-  deceased: DeceasedInput
-  nationality: [String]
-  educationalAttainment: String
-  ageOfIndividualInYears: Int
-}
-
-input LocationInput {
-  _fhirID: ID
-  identifier: [ID]
-  status: String
-  name: String
-  alias: [String]
-  description: String
-  partOf: String
-  type: String
-  telecom: [ContactPointInput]
-  address: AddressInput
-  longitude: Float
-  latitude: Float
-  altitude: Float
-  geoData: String
+type Field {
+  id: String!
+  value: FieldValue!
 }
 
 input AttachmentInput {
@@ -1210,6 +1193,23 @@ input CorrectionValueInput {
   fieldName: String!
   oldValue: FieldValue
   newValue: FieldValue!
+}
+
+input LocationInput {
+  _fhirID: ID
+  identifier: [ID]
+  status: String
+  name: String
+  alias: [String]
+  description: String
+  partOf: String
+  type: String
+  telecom: [ContactPointInput]
+  address: AddressInput
+  longitude: Float
+  latitude: Float
+  altitude: Float
+  geoData: String
 }
 
 input FHIRIDMap {
@@ -1246,6 +1246,28 @@ input RegistrationInput {
   location: LocationInput
   correction: CorrectionInput
   changedValues: [CorrectionValueInput!]
+}
+
+input PersonInput {
+  _fhirID: ID
+  identifier: [IdentityInput]
+  name: [HumanNameInput]
+  telecom: [ContactPointInput]
+  gender: Gender
+  birthDate: PlainDate
+  age: Float
+  maritalStatus: String
+  occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
+  dateOfMarriage: PlainDate
+  multipleBirth: Int
+  address: [AddressInput]
+  photo: [AttachmentInput!]
+  deceased: DeceasedInput
+  nationality: [String]
+  educationalAttainment: String
+  ageOfIndividualInYears: Int
 }
 
 input RelatedPersonInput {
@@ -1333,6 +1355,11 @@ input SystemSettingsInput {
 input WebhookInput {
   event: String!
   permissions: [String]!
+}
+
+input FieldInput {
+  id: String!
+  value: FieldValue!
 }
 
 type AssignmentData {
@@ -1530,7 +1557,7 @@ type UserAuditLogItem implements AuditLogItemBase {
 }
 
 type RegistrationSearchSet {
-  status: String
+  status: String!
   contactNumber: String
   contactEmail: String
   contactRelationship: String
@@ -1541,33 +1568,40 @@ type RegistrationSearchSet {
   registeredLocationId: String
   reason: String
   comment: String
-  duplicates: [ID]
-  createdAt: String
-  modifiedAt: String
+  duplicates: [ID!]!
+  createdAt: String!
+  modifiedAt: String!
   assignment: AssignmentData
 }
 
 type OperationHistorySearchSet {
-  operationType: String
-  operatedOn: Date
-  operatorRole: String
-  operatorName: [HumanName]
-  operatorOfficeName: String
-  operatorOfficeAlias: [String]
+  operationType: String!
+  operatedOn: Date!
+  operatorRole: String!
+  operatorName: [HumanName!]!
+  operatorOfficeName: String!
+  operatorOfficeAlias: [String!]!
   notificationFacilityName: String
-  notificationFacilityAlias: [String]
-  rejectReason: String
-  rejectComment: String
+  notificationFacilityAlias: [String!]!
+  rejectReason: String!
+  rejectComment: String!
+}
+
+type GenericEventSearchSet implements EventSearchSet {
+  id: ID!
+  type: String!
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type BirthEventSearchSet implements EventSearchSet {
   id: ID!
-  type: String
+  type: String!
   childName: [HumanName]
   childIdentifier: String
   dateOfBirth: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
   placeOfBirth: String
   childGender: String
   mothersFirstName: String
@@ -1582,24 +1616,24 @@ type BirthEventSearchSet implements EventSearchSet {
 
 type DeathEventSearchSet implements EventSearchSet {
   id: ID!
-  type: String
+  type: String!
   deceasedGender: String
   deceasedName: [HumanName]
   dateOfDeath: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type MarriageEventSearchSet implements EventSearchSet {
   id: ID!
-  type: String
+  type: String!
   brideName: [HumanName]
   groomName: [HumanName]
   brideIdentifier: String
   groomIdentifier: String
   dateOfMarriage: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
+  registration: RegistrationSearchSet!
+  operationHistories: [OperationHistorySearchSet!]!
 }
 
 type EventProgressData {
@@ -1626,45 +1660,7 @@ type OIDPUserAddress {
   country: String
 }
 
-input IdentityInput {
-  id: ID
-  type: String
-  otherType: String
-  fieldsModifiedByIdentity: [String]
-}
-
-input ContactPointInput {
-  system: TelecomSystem
-  value: String
-  use: TelecomUse
-}
-
-enum Gender {
-  male
-  female
-  other
-  unknown
-}
-
-input AddressInput {
-  use: AddressUse
-  type: AddressType
-  text: String
-  line: [String!]
-  city: String
-  district: String
-  state: String
-  postalCode: String
-  country: String
-  from: Date
-  to: Date
-  partOf: String
-}
-
-input DeceasedInput {
-  deceased: Boolean
-  deathDate: PlainDate
-}
+scalar FieldValue
 
 enum AttachmentInputStatus {
   approved
@@ -1682,7 +1678,26 @@ enum PaymentOutcomeType {
   PARTIAL
 }
 
-scalar FieldValue
+input ContactPointInput {
+  system: TelecomSystem
+  value: String
+  use: TelecomUse
+}
+
+input AddressInput {
+  use: AddressUse
+  type: AddressType
+  text: String
+  line: [String!]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+  partOf: String
+}
 
 input ObservationFHIRIDS {
   maleDependentsOfDeceased: String
@@ -1716,6 +1731,25 @@ input CertificateInput {
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
   data: String
+}
+
+input IdentityInput {
+  id: ID
+  type: String
+  otherType: String
+  fieldsModifiedByIdentity: [String]
+}
+
+enum Gender {
+  male
+  female
+  other
+  unknown
+}
+
+input DeceasedInput {
+  deceased: Boolean
+  deathDate: PlainDate
 }
 
 input LabelInput {

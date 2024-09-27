@@ -1,38 +1,18 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * OpenCRVS is also distributed under the terms of the Civil Registration
- * & Healthcare Disclaimer located at http://opencrvs.org/license.
- *
- * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
- */
-import * as React from 'react'
-import {
-  RegisterForm,
-  RouteProps
-} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { useForms } from '@client/hooks/useForms'
+import { Event } from '@client/utils/gateway'
+import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
   DRAFT_MARRIAGE_FORM_PAGE_GROUP,
+  FORM_PAGE_GROUP,
   HOME
 } from '@opencrvs/client/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { connect } from 'react-redux'
-import { IForm } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { IDeclaration } from '@client/declarations'
-import { Redirect } from 'react-router'
-
-interface IFormProps {
-  declaration?: IDeclaration
-  registerForm: IForm
-  pageRoute: string
-  duplicate?: boolean
-}
+import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { Redirect, useParams } from 'react-router'
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
@@ -40,32 +20,32 @@ const pageRoute: { [key in Event]: string } = {
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-class DeclarationFormView extends React.Component<IFormProps & RouteProps> {
-  render() {
-    const { declaration, ...rest } = this.props
-    if (!declaration) {
-      return <Redirect to={HOME} />
-    }
-    return <RegisterForm declaration={declaration} {...rest} />
-  }
-}
+const DeclarationFormView: React.FC = () => {
+  const { getForm } = useForms()
+  const { declarationId } = useParams<{ declarationId: string }>()
 
-function mapStatetoProps(state: IStoreState, props: RouteProps) {
-  const { match } = props
-  const declaration = state.declarationsState.declarations.find(
-    ({ id }) => id === match.params.declarationId
+  const declaration = useSelector((state: IStoreState) =>
+    state.declarationsState.declarations.find(({ id }) => id === declarationId)
   )
 
   const event = declaration?.event || Event.Birth
-  const registerForm = getRegisterForm(state)[event]
+  console.log(declaration)
 
-  return {
-    declaration,
-    registerForm,
-    pageRoute: pageRoute[event]
+  const registerForm = getForm(event)
+
+  const currentPageRoute = pageRoute[event] || FORM_PAGE_GROUP
+
+  if (!declaration) {
+    return <Redirect to={HOME} />
   }
+
+  return (
+    <RegisterForm
+      declaration={declaration}
+      registerForm={registerForm}
+      pageRoute={currentPageRoute}
+    />
+  )
 }
 
-export const DeclarationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
-  mapStatetoProps
-)(DeclarationFormView)
+export const DeclarationForm = DeclarationFormView

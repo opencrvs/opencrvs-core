@@ -16,6 +16,7 @@ import {
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
+import { type Event } from '@opencrvs/records/src/storage'
 
 type DeathDuplicateSearchBody = {
   deceasedFirstNames?: string
@@ -23,6 +24,21 @@ type DeathDuplicateSearchBody = {
   deceasedIdentifier?: string
   deceasedDoB?: string
   deathDate?: string
+}
+export const AD_HOC_DO_NOT_USE_indexRecord = (
+  authHeader: IAuthHeader,
+  event: Event
+) => {
+  return fetch(`${SEARCH_URL}record`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    },
+    body: JSON.stringify(event)
+  }).catch((error) => {
+    return Promise.reject(new Error(`Search request failed: ${error.message}`))
+  })
 }
 export const findDeathDuplicates = (
   authHeader: IAuthHeader,

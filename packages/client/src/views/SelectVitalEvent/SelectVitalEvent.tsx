@@ -1,196 +1,140 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * OpenCRVS is also distributed under the terms of the Civil Registration
- * & Healthcare Disclaimer located at http://opencrvs.org/license.
- *
- * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
- */
-import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { RadioButton } from '@opencrvs/components/lib/Radio'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Stack } from '@opencrvs/components/lib/Stack'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Event } from '@client/utils/gateway'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import {
-  goBack,
-  goToHome,
-  goToDeathInformant,
   goToBirthRegistrationAsParent,
+  goToDeathInformant,
+  goToHome,
   goToMarriageInformant
 } from '@client/navigation'
-import { messages } from '@client/i18n/messages/views/selectVitalEvent'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
+import { Event } from '@client/utils/gateway'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { RadioButton } from '@opencrvs/components/lib/Radio'
+import { Stack } from '@opencrvs/components/lib/Stack'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
 
-import {
-  storeDeclaration,
-  IDeclaration,
-  createDeclaration
-} from '@client/declarations'
+import { createDeclaration, storeDeclaration } from '@client/declarations'
+import { useForms } from '@client/hooks/useForms'
+import { useState } from 'react'
 
-class SelectVitalEventView extends React.Component<
-  IntlShapeProps & {
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    storeDeclaration: typeof storeDeclaration
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    goToDeathInformant: typeof goToDeathInformant
-    goToMarriageInformant: typeof goToMarriageInformant
+const SelectVitalEventView = () => {
+  const intl = useIntl()
+  const [selectedEventType, setGoTo] = useState<Event>()
+  const [noEventSelectedError, setNoEventSelectedError] = useState(false)
+  const { forms, goToNewForm } = useForms()
+
+  const dispatch = useDispatch()
+
+  const legacyFlows = {
+    [Event.Birth]: goToBirthRegistrationAsParent,
+    [Event.Death]: goToDeathInformant,
+    [Event.Marriage]: goToMarriageInformant
   }
-> {
-  state = {
-    goTo: '',
-    noEventSelectedError: false
-  }
-  handleContinue = () => {
-    if (this.state.goTo === '') {
-      this.setState({ noEventSelectedError: true })
-    } else {
-      let declaration: IDeclaration
-      switch (this.state.goTo as Event) {
-        case Event.Birth:
-          declaration = createDeclaration(Event.Birth)
-          this.props.storeDeclaration(declaration)
-          this.props.goToBirthRegistrationAsParent(declaration.id)
-          break
-        case Event.Death:
-          declaration = createDeclaration(Event.Death)
-          this.props.storeDeclaration(declaration)
-          this.props.goToDeathInformant(declaration.id)
-          break
-        case Event.Marriage:
-          declaration = createDeclaration(Event.Marriage)
-          this.props.storeDeclaration(declaration)
-          this.props.goToMarriageInformant(declaration.id)
-          break
-        default:
-          throw new Error(`Unknown eventType ${this.state.goTo}`)
-      }
+
+  const handleContinue = () => {
+    if (selectedEventType === undefined) {
+      setNoEventSelectedError(true)
+      return
     }
+
+    if (legacyFlows[selectedEventType]) {
+      const declaration = createDeclaration(selectedEventType)
+      dispatch(storeDeclaration(declaration))
+      dispatch(legacyFlows[selectedEventType](declaration.id))
+      return
+    }
+
+    goToNewForm(selectedEventType)
   }
 
-  render() {
-    const { intl } = this.props
-    return (
-      <Frame
-        header={
-          <AppBar
-            desktopLeft={<Icon name="Draft" size="large" />}
-            desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
-            desktopRight={
-              <Button
-                id="goBack"
-                type="secondary"
-                size="small"
-                onClick={this.props.goToHome}
-              >
-                <Icon name="X" />
-                {intl.formatMessage(buttonMessages.exitButton)}
-              </Button>
-            }
-            mobileLeft={<Icon name="Draft" size="large" />}
-            mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
-            mobileRight={
-              <Button type="icon" size="medium" onClick={this.props.goToHome}>
-                <Icon name="X" />
-              </Button>
-            }
-          />
-        }
-        skipToContentText={intl.formatMessage(
-          constantsMessages.skipToMainContent
-        )}
-      >
-        <Content
-          size={ContentSize.SMALL}
-          title={intl.formatMessage(messages.registerNewEventHeading)}
-          bottomActionButtons={[
+  return (
+    <Frame
+      header={
+        <AppBar
+          desktopLeft={<Icon name="Draft" size="large" />}
+          desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
+          desktopRight={
             <Button
-              key="select-vital-event-continue"
-              id="continue"
-              type="primary"
-              size="large"
-              fullWidth
-              onClick={this.handleContinue}
+              id="goBack"
+              type="secondary"
+              size="small"
+              onClick={() => dispatch(goToHome())}
             >
-              {intl.formatMessage(buttonMessages.continueButton)}
+              <Icon name="X" />
+              {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
-          ]}
-        >
-          {this.state.noEventSelectedError && (
-            <ErrorText id="require-error">
-              {intl.formatMessage(messages.errorMessage)}
-            </ErrorText>
-          )}
-          <Stack
-            id="select_vital_event_view"
-            direction="column"
-            alignItems="left"
-            gap={0}
+          }
+          mobileLeft={<Icon name="Draft" size="large" />}
+          mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
+          mobileRight={
+            <Button
+              type="icon"
+              size="medium"
+              onClick={() => dispatch(goToHome())}
+            >
+              <Icon name="X" />
+            </Button>
+          }
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      <Content
+        size={ContentSize.SMALL}
+        title={intl.formatMessage(messages.registerNewEventHeading)}
+        bottomActionButtons={[
+          <Button
+            key="select-vital-event-continue"
+            id="continue"
+            type="primary"
+            size="large"
+            fullWidth
+            onClick={handleContinue}
           >
-            <RadioButton
-              size="large"
-              key="birthevent"
-              name="birthevent"
-              label={intl.formatMessage(constantsMessages.birth)}
-              value="birth"
-              id="select_birth_event"
-              selected={this.state.goTo === 'birth' ? 'birth' : ''}
-              onChange={() =>
-                this.setState({ goTo: 'birth', noEventSelectedError: false })
-              }
-            />
-            {window.config.FEATURES.DEATH_REGISTRATION && (
+            {intl.formatMessage(buttonMessages.continueButton)}
+          </Button>
+        ]}
+      >
+        {noEventSelectedError && (
+          <ErrorText id="require-error">
+            {intl.formatMessage(messages.errorMessage)}
+          </ErrorText>
+        )}
+        <Stack
+          id="select_vital_event_view"
+          direction="column"
+          alignItems="left"
+          gap={0}
+        >
+          {forms
+            .filter((form) => form.enabled)
+            .map((form) => (
               <RadioButton
                 size="large"
-                key="deathevent"
-                name="deathevent"
-                label={intl.formatMessage(constantsMessages.death)}
-                value="death"
-                id="select_death_event"
-                selected={this.state.goTo === 'death' ? 'death' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'death', noEventSelectedError: false })
-                }
+                key={form.id}
+                name={form.id}
+                label={intl.formatMessage(form.label)}
+                value={form.id}
+                id={form.id}
+                selected={selectedEventType === form.id ? form.id : ''}
+                onChange={() => {
+                  setGoTo(form.id as Event)
+                  setNoEventSelectedError(false)
+                }}
               />
-            )}
-            {window.config.FEATURES.MARRIAGE_REGISTRATION && (
-              <RadioButton
-                size="large"
-                key="marriagevent"
-                name="marriageevent"
-                label={intl.formatMessage(constantsMessages.marriage)}
-                value="marriage"
-                id="select_marriage_event"
-                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-                onChange={() =>
-                  this.setState({
-                    goTo: 'marriage',
-                    noEventSelectedError: false
-                  })
-                }
-              />
-            )}
-          </Stack>
-        </Content>
-      </Frame>
-    )
-  }
+            ))}
+        </Stack>
+      </Content>
+    </Frame>
+  )
 }
 
-export const SelectVitalEvent = connect(null, {
-  goBack,
-  goToHome,
-  storeDeclaration,
-  goToBirthRegistrationAsParent,
-  goToDeathInformant,
-  goToMarriageInformant
-})(injectIntl(SelectVitalEventView))
+export const SelectVitalEvent = SelectVitalEventView

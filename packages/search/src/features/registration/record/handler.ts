@@ -13,28 +13,81 @@ import { indexRecord as upsertDeathEvent } from '@search/features/registration/d
 import { indexRecord as upsertMarriageEvent } from '@search/features/registration/marriage/service'
 
 import * as Hapi from '@hapi/hapi'
-import { ValidRecord } from '@opencrvs/commons/types'
+import { EVENT, SearchDocument, ValidRecord } from '@opencrvs/commons/types'
+import { type Event } from '@opencrvs/records/src/storage'
 import { getEventType } from '@search/utils/event'
+import { indexComposition } from '@search/elasticsearch/dbhelper'
+import { getOrCreateClient } from '@search/elasticsearch/client'
+
+function isBundle(object: any): object is ValidRecord {
+  return 'resourceType' in object
+}
+function isEvent(object: any): object is Event {
+  return 'fields' in object
+}
+
+function computeEventStatus(actions: Event['actions']) {
+  return 'REGISTERED'
+}
+
+function indexEvent(event: Event): SearchDocument {
+  return {
+    compositionId: event.id,
+    event: event.type as EVENT,
+    name: 'Test tester',
+    lastStatusChangedAt: new Date(
+      event.actions[event.actions.length - 1].createdAt
+    )
+      .valueOf()
+      .toString(),
+    type: computeEventStatus(event.actions),
+    dateOfDeclaration: new Date(event.actions[0]?.createdAt)
+      .valueOf()
+      .toString(),
+    trackingId: (
+      event.actions.find((action) => action.type === 'REGISTERED') as any
+    )?.identifiers.trackingId,
+    registrationNumber: (
+      event.actions.find((action) => action.type === 'REGISTERED') as any
+    )?.identifiers.registrationNumber,
+    eventLocationId: undefined /* @todo */,
+    declarationLocationId: '78801f14-0266-4ca0-a34f-6a2e4c2bb936' /* @todo */,
+    relatesTo: [] /* @todo */,
+    createdAt: new Date(event.createdAt).valueOf().toString(),
+    modifiedAt: new Date().valueOf().toString(),
+    operationHistories: [],
+    assignment: null
+  }
+}
 
 export async function recordHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const record = request.payload as ValidRecord
+  const record = request.payload
 
-  switch (getEventType(record)) {
-    case 'BIRTH':
-      await upsertBirthEvent(record)
-      break
-    case 'DEATH':
-      await upsertDeathEvent(record)
-      break
-    case 'MARRIAGE':
-      await upsertMarriageEvent(record)
-      break
-    default:
-      throw new Error('Unsupported event type')
+  if (isBundle(record)) {
+    switch (getEventType(record)) {
+      case 'BIRTH':
+        await upsertBirthEvent(record)
+        break
+      case 'DEATH':
+        await upsertDeathEvent(record)
+        break
+      case 'MARRIAGE':
+        await upsertMarriageEvent(record)
+        break
+      default:
+        throw new Error('Unsupported event type')
+    }
+    return h.response().code(200)
   }
 
-  return h.response().code(200)
+  if (isEvent(record)) {
+    await indexComposition(record.id, indexEvent(record), getOrCreateClient())
+
+    return h.response().code(200)
+  }
+
+  return h.response().code(400)
 }

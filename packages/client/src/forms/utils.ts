@@ -73,6 +73,7 @@ import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
+import { FormSection } from '@client/hooks/useForms'
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -294,7 +295,7 @@ export const getFieldValidation = (
 }
 
 export function getNextSectionIds(
-  sections: IFormSection[],
+  sections: Array<IFormSection | FormSection>,
   fromSection: IFormSection,
   fromSectionGroup: IFormSectionGroup,
   declaration: IDeclaration,
@@ -323,7 +324,7 @@ export function getNextSectionIds(
     )
 
     const currentIndex = visibleSections.findIndex(
-      (section: IFormSection) => section.id === fromSection.id
+      (section: IFormSection | FormSection) => section.id === fromSection.id
     )
     if (currentIndex === visibleSections.length - 1) {
       return null
@@ -570,7 +571,7 @@ export const getConditionalActionsForField = (
 }
 
 export const getVisibleSectionGroupsBasedOnConditions = (
-  section: IFormSection,
+  section: IFormSection | FormSection,
   sectionData: IFormSectionData,
   draftData?: IFormData,
   userDetails?: UserDetails | null
@@ -590,7 +591,7 @@ export const getVisibleSectionGroupsBasedOnConditions = (
         .map((conditional: Conditional) => conditional.action)
         .includes('hide') !== true
     )
-  })
+  }) as IFormSectionGroup[] // @todo
 }
 
 export const getVisibleOptions = (

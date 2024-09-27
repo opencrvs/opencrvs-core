@@ -8,44 +8,44 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import type {
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLHumanName,
-  GQLMarriageEventSearchSet,
-  GQLRegStatus
-} from '@client/utils/gateway-deprecated-do-not-use'
-import { IntlShape } from 'react-intl'
+import { ITaskHistory } from '@client/declarations'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import {
-  HumanName,
+  BirthEventSearchSet,
+  DeathEventSearchSet,
   EventSearchSet,
+  HumanName,
+  MarriageEventSearchSet,
   SearchEventsQuery
 } from '@client/utils/gateway'
-import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import { ITaskHistory } from '@client/declarations'
+import type {
+  GQLHumanName,
+  GQLRegStatus
+} from '@client/utils/gateway-deprecated-do-not-use'
+import { IntlShape } from 'react-intl'
 
 export const isBirthEvent = (
   req: EventSearchSet
-): req is GQLBirthEventSearchSet => {
+): req is BirthEventSearchSet => {
   return req.type === 'Birth'
 }
 
 export const isDeathEvent = (
   req: EventSearchSet
-): req is GQLDeathEventSearchSet => {
+): req is DeathEventSearchSet => {
   return req.type === 'Death'
 }
 
 export const isMarriageEvent = (
   reg: EventSearchSet
-): reg is GQLMarriageEventSearchSet => {
+): reg is MarriageEventSearchSet => {
   return reg.type === 'Marriage'
 }
 
 export const transformData = (
-  data: SearchEventsQuery['searchEvents'],
+  data: { results: SearchEventsQuery['searchEvents']['results'] },
   intl: IntlShape
 ) => {
   const { locale } = intl
@@ -110,12 +110,12 @@ export const transformData = (
               (createNamesMap(names as HumanName[])[LANG_EN] as string) ||
               '',
         dob:
-          (birthReg?.dateOfBirth?.length &&
-            formatLongDate(birthReg.dateOfBirth, locale)) ||
+          (birthReg?.dateOfBirth &&
+            formatLongDate(birthReg.dateOfBirth.toString(), locale)) ||
           '',
         dod:
-          (deathReg?.dateOfDeath?.length &&
-            formatLongDate(deathReg.dateOfDeath, locale)) ||
+          (deathReg?.dateOfDeath &&
+            formatLongDate(deathReg.dateOfDeath.toString(), locale)) ||
           '',
         dateOfEvent,
         registrationNumber:
