@@ -192,8 +192,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         size="large"
         onClick={this.togglePrompt}
         disabled={
-          sectionHasError(group, section, declaration) ||
-          this.state.isFileUploading
+          sectionHasError(
+            group,
+            section,
+            declaration,
+            this.props.offlineResources,
+            this.props.declaration.data
+          ) || this.state.isFileUploading
         }
       >
         <Check />
