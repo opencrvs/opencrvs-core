@@ -1424,7 +1424,11 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
       ) > -1) ||
     false
 
-  const fields = activeSectionGroup.fields
+  const fields = replaceInitialValues(
+    activeSectionGroup.fields,
+    declaration.data[activeSection.id] || {},
+    declaration.data
+  )
 
   let updatedFields: IFormField[] = []
 
