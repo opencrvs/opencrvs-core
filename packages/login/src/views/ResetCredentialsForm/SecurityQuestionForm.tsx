@@ -21,7 +21,7 @@ import {
 } from '@login/utils/authApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
@@ -97,174 +97,150 @@ interface BaseProps
   goToUpdatePasswordForm: typeof goToUpdatePasswordForm
   goToSuccessPage: typeof goToSuccessPage
 }
-interface State {
-  answer: string
-  touched: boolean
-  error: boolean
-  questionKey: QUESTION_KEYS
-}
 
 type Props = BaseProps & WrappedComponentProps
 
-class SecurityQuestionComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      answer: '',
-      touched: false,
-      error: false,
-      questionKey: props.location.state.securityQuestionKey
-    }
+const SecurityQuestionComponent = ({
+  location,
+  goToSuccessPage,
+  goToUpdatePasswordForm,
+  intl,
+  goToPhoneNumberVerificationForm
+}: Props) => {
+  const [answer, setAnswer] = useState('')
+  const [touched, setTouched] = useState(false)
+  const [error, setError] = useState(false)
+  const [questionKey, setQuestionKey] = useState(
+    location.state.securityQuestionKey
+  )
+
+  const handleChange = (value: string) => {
+    setError(value === '')
+    setAnswer(value)
+    setTouched(true)
   }
 
-  handleChange = (value: string) => {
-    this.setState({
-      error: value === '',
-      answer: value,
-      touched: true
-    })
-  }
-
-  handleContinue = async (event: React.FormEvent) => {
+  const handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!this.state.answer) {
-      this.setState({
-        touched: true,
-        error: true
-      })
-      return
+    if (!answer) {
+      setError(true)
+      return setTouched(true)
     }
-    if (this.state.error) {
+    if (error) {
       return
     }
 
     let result: IVerifySecurityAnswerResponse
 
     try {
-      result = await authApi.verifySecurityAnswer(
-        this.props.location.state.nonce,
-        this.state.answer
-      )
+      result = await authApi.verifySecurityAnswer(location.state.nonce, answer)
 
       if (!result.matched) {
-        this.setState({ questionKey: result.securityQuestionKey })
-        return
+        return setQuestionKey(result.securityQuestionKey)
       }
-      if (
-        this.props.location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME
-      ) {
-        await authApi.sendUserName(this.props.location.state.nonce)
-        this.props.goToSuccessPage(this.props.location.state.forgottenItem)
-      } else {
-        this.props.goToUpdatePasswordForm(result.nonce)
+      if (location.state.forgottenItem === FORGOTTEN_ITEMS.USERNAME) {
+        await authApi.sendUserName(location.state.nonce)
+        return goToSuccessPage(location.state.forgottenItem)
       }
+      return goToUpdatePasswordForm(result.nonce)
     } catch (error) {
       // @todo error handling
-      this.setState({ error: true })
+      setError(true)
     }
   }
 
-  render() {
-    const { intl, goToPhoneNumberVerificationForm } = this.props
-    const { forgottenItem } = this.props.location.state
+  const { forgottenItem } = location.state
 
-    return (
-      <>
-        <Frame
-          header={
-            <AppBar
-              desktopLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
+  return (
+    <>
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileTitle={intl.formatMessage(
+              sharedMessages.credentialsResetFormTitle,
+              {
+                forgottenItem
               }
-              mobileLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
+            )}
+            desktopTitle={intl.formatMessage(
+              sharedMessages.credentialsResetFormTitle,
+              {
+                forgottenItem
               }
-              mobileTitle={intl.formatMessage(
-                sharedMessages.credentialsResetFormTitle,
-                {
-                  forgottenItem
-                }
-              )}
-              desktopTitle={intl.formatMessage(
-                sharedMessages.credentialsResetFormTitle,
-                {
-                  forgottenItem
-                }
-              )}
-            />
-          }
-          skipToContentText={intl.formatMessage(
-            constantsMessages.skipToMainContent
-          )}
-        >
-          <form id="security-question-form" onSubmit={this.handleContinue}>
-            <Content
-              size={ContentSize.SMALL}
-              title={intl.formatMessage(messages[this.state.questionKey])}
-              showTitleOnMobile
-              subtitle={intl.formatMessage(
-                sharedMessages.securityQuestionFormBodySubheader
-              )}
-              bottomActionButtons={[
-                <Button
-                  key="1"
-                  id="continue"
-                  onClick={this.handleContinue}
-                  type="primary"
-                  size="large"
-                >
-                  {intl.formatMessage(sharedMessages.continueButtonLabel)}
-                </Button>
-              ]}
-            >
-              <Actions id="security-answer">
-                <InputField
-                  id="security-answer"
-                  key="securityAnswerFieldContainer"
-                  label={this.props.intl.formatMessage(
-                    sharedMessages.answerFieldLabel
-                  )}
-                  touched={this.state.touched}
-                  error={
-                    this.state.error
-                      ? this.props.intl.formatMessage(sharedMessages.error)
-                      : ''
-                  }
-                  hideAsterisk={true}
-                >
-                  <TextInput
-                    id="security-answer-input"
-                    type="text"
-                    key="securityAnswerInputField"
-                    name="securityAnswerInput"
-                    isSmallSized={true}
-                    value={this.state.answer}
-                    onChange={(e) => this.handleChange(e.target.value)}
-                    touched={this.state.touched}
-                    error={this.state.error}
-                  />
-                </InputField>
-              </Actions>
-            </Content>
-          </form>
-        </Frame>
-      </>
-    )
-  }
+            )}
+          />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <form id="security-question-form" onSubmit={handleContinue}>
+          <Content
+            size={ContentSize.SMALL}
+            title={intl.formatMessage(messages[questionKey])}
+            showTitleOnMobile
+            subtitle={intl.formatMessage(
+              sharedMessages.securityQuestionFormBodySubheader
+            )}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={handleContinue}
+                type="primary"
+                size="large"
+              >
+                {intl.formatMessage(sharedMessages.continueButtonLabel)}
+              </Button>
+            ]}
+          >
+            <Actions id="security-answer">
+              <InputField
+                id="security-answer"
+                key="securityAnswerFieldContainer"
+                label={intl.formatMessage(sharedMessages.answerFieldLabel)}
+                touched={touched}
+                error={error ? intl.formatMessage(sharedMessages.error) : ''}
+                hideAsterisk={true}
+              >
+                <TextInput
+                  id="security-answer-input"
+                  type="text"
+                  key="securityAnswerInputField"
+                  name="securityAnswerInput"
+                  isSmallSized={true}
+                  value={answer}
+                  onChange={(e) => handleChange(e.target.value)}
+                  touched={touched}
+                  error={error}
+                />
+              </InputField>
+            </Actions>
+          </Content>
+        </form>
+      </Frame>
+    </>
+  )
 }
 
 export const SecurityQuestion = withRouter(
