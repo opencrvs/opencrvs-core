@@ -173,12 +173,12 @@ const RegRatesLineChartComponent = (props: IProps) => {
     }
   }
 
-  const getStatePropertiesForChart = () => {
+  const getStatePropertiesForChart = useCallback(() => {
     if (window.innerWidth > theme.grid.breakpoints.md) {
       return getStatePropertiesForLargeWindowChart()
     }
     return getStatePropertiesForSmallWindowChart()
-  }
+  }, [theme])
 
   useEffect(() => {
     const recordWindowWidth = () => {
@@ -193,7 +193,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     return () => {
       window.removeEventListener('resize', recordWindowWidth)
     }
-  }, [])
+  }, [getStatePropertiesForChart])
 
   const getLatestData = () => {
     const latestData = data && data[data.length - 1]
@@ -442,25 +442,27 @@ const RegRatesLineChartComponent = (props: IProps) => {
     return getLoadingIndicatorForMobileView()
   }
 
-  const getChart = (data: ILineDataPoint[]) => (
-    <LineChart
-      data={data}
-      dataKeys={['totalEstimate', 'totalRegistered', 'registeredInTargetDays']}
-      mouseMoveHandler={mouseMoveHandler}
-      mouseLeaveHandler={mouseLeaveHandler}
-      tooltipContent={customizedTooltip}
-      legendContent={customizedLegend}
-      chartTop={chartTop}
-      chartRight={chartRight}
-      chartBottom={chartBottom}
-      chartLeft={chartLeft}
-      maximizeXAxisInterval={maximizeXAxisInterval}
-      legendLayout={legendLayout}
-    />
-  )
-
   if (data) {
-    return getChart(data)
+    return (
+      <LineChart
+        data={data}
+        dataKeys={[
+          'totalEstimate',
+          'totalRegistered',
+          'registeredInTargetDays'
+        ]}
+        mouseMoveHandler={mouseMoveHandler}
+        mouseLeaveHandler={mouseLeaveHandler}
+        tooltipContent={customizedTooltip}
+        legendContent={customizedLegend}
+        chartTop={chartTop}
+        chartRight={chartRight}
+        chartBottom={chartBottom}
+        chartLeft={chartLeft}
+        maximizeXAxisInterval={maximizeXAxisInterval}
+        legendLayout={legendLayout}
+      />
+    )
   }
   return getLoadingIndicator()
 }
