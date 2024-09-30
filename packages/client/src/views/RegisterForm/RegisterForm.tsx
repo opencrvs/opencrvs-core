@@ -80,8 +80,7 @@ import {
   hasFormError,
   getSectionFields,
   getNextSectionIds,
-  VIEW_TYPE,
-  isInitialValueDependencyInfo
+  VIEW_TYPE
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
@@ -1386,10 +1385,7 @@ export function replaceInitialValues(
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
-      isNull(sectionValues[field.name]) ||
-      (field.initialValue &&
-        isInitialValueDependencyInfo(field.initialValue) &&
-        !sectionValues[field.name])
+      isNull(sectionValues[field.name])
         ? getInitialValue(field, data || {})
         : sectionValues[field.name]
   }))
