@@ -9,7 +9,7 @@
 
 name: Lint, run unit tests and security scans
 
-on: [pull_request, pull_request_target]
+on: [pull_request]
 
 jobs:
   setup:
@@ -142,7 +142,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.23.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
