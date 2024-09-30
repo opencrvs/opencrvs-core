@@ -74,9 +74,16 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export function groupHasError(
   group: IFormSectionGroup,
-  sectionData: IFormSectionData
+  sectionData: IFormSectionData,
+  config: IOfflineData,
+  draft: IFormData
 ) {
-  const errors = getValidationErrorsForForm(group.fields, sectionData || {})
+  const errors = getValidationErrorsForForm(
+    group.fields,
+    sectionData || {},
+    config,
+    draft
+  )
 
   for (const field of group.fields) {
     const fieldErrors = errors[field.name].errors
@@ -268,11 +275,15 @@ export function updateDeclarationRegistrationWithCorrection(
 export function sectionHasError(
   group: IFormSectionGroup,
   section: IFormSection,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  config: IOfflineData,
+  draft: IFormData
 ) {
   const errors = getValidationErrorsForForm(
     group.fields,
-    declaration.data[section.id] || {}
+    declaration.data[section.id] || {},
+    config,
+    draft
   )
 
   for (const field of group.fields) {
