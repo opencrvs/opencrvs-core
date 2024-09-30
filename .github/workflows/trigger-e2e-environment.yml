@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Build E2E environment
+name: Deploy branch & run E2E
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   e2e:
-    if: ${{ !contains(github.actor, 'bot') }}
+    if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
@@ -90,6 +90,8 @@ jobs:
               }
             });
 
+            core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
+
             console.log(result);
             await new Promise(resolve => setTimeout(resolve, 10000));
 
@@ -109,6 +111,13 @@ jobs:
             } else {
               throw new Error('No workflow run found.');
             }
+
+      - name: Print link to E2E workflow run
+        run: |
+          echo "See your E2E deployment run details here: https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.runId }}" >> $GITHUB_STEP_SUMMARY
+          echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.dispatch_e2e.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "If everything goes alright, you should see your stack getting deployed here: https://${{ steps.dispatch_e2e.outputs.stack }}.opencrvs.dev" >> $GITHUB_STEP_SUMMARY
 
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
