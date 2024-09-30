@@ -35,6 +35,7 @@ import { Redirect } from 'react-router'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 function collectorFormFieldsForOthers(event: Event) {
   const collectCertFormSection =
@@ -57,6 +58,7 @@ export const IssueCollectorFormForOthers = ({
   const intl = useIntl()
   const dispatch = useDispatch()
   const config = useSelector(getOfflineData)
+  const user = useSelector(getUserDetails)
 
   const fields: IFormField[] = collectorFormFieldsForOthers(declaration.event)
   const handleChange = (
@@ -118,7 +120,8 @@ export const IssueCollectorFormForOthers = ({
             { id: 'otherCollector', fields },
             declaration.data.registration.certificates?.[0]?.collector ?? {},
             config,
-            declaration.data
+            declaration.data,
+            user
           )}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
@@ -141,7 +144,9 @@ export const IssueCollectorFormForOthers = ({
               declaration.data.registration.certificates.length - 1
             ].collector) ||
             {},
-          declaration && declaration.data
+          declaration && declaration.data,
+          config,
+          user
         )}
         draftData={declaration.data}
       />
