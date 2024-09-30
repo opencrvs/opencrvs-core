@@ -300,9 +300,10 @@ const ActionDetailsModalListTable = ({
 
   const getItemName = (
     sectionName: MessageDescriptor,
-    fieldLabel: MessageDescriptor
+    fieldLabel: MessageDescriptor,
+    fieldLabelParam?: Record<string, string>
   ) => {
-    const label = intl.formatMessage(fieldLabel)
+    const label = intl.formatMessage(fieldLabel, fieldLabelParam)
     const section = intl.formatMessage(sectionName)
 
     return (label && label.trim().length > 0 && `${label} (${section})`) || ''
@@ -353,7 +354,11 @@ const ActionDetailsModalListTable = ({
          */
         if (fieldObj) {
           result.push({
-            item: getItemName(section.name, fieldObj.label),
+            item: getItemName(
+              section.name,
+              fieldObj.label,
+              fieldObj.labelParam
+            ),
             original: getFieldValue(item.value, fieldObj, offlineData, intl),
             edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
           })
@@ -373,7 +378,11 @@ const ActionDetailsModalListTable = ({
          */
         if (fieldObj) {
           result.push({
-            item: getItemName(section.name, fieldObj.label),
+            item: getItemName(
+              section.name,
+              fieldObj.label,
+              fieldObj.labelParam
+            ),
             original: getFieldValue(item.value, fieldObj, offlineData, intl),
             edit: getFieldValue(editedValue.value, fieldObj, offlineData, intl)
           })
