@@ -641,7 +641,7 @@ export const resolvers: GQLResolver = {
         throw new Error('User does not have a register or validate scope')
       }
 
-      return confirmRegistration(id, authHeader, details as any) // Type 'string' is not assignable to type '"PASSPORT" | "NATIONAL_ID" | "MOSIP_PSUT_TOKEN_ID" | "DECEASED_PATIENT_ENTRY" | "BIRTH_PA...
+      return confirmRegistration(id, authHeader, details)
     },
     async rejectRegistration(_, { id, details }, { headers: authHeader }) {
       if (!inScope(authHeader, ['register', 'validate'])) {

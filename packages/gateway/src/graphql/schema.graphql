@@ -1322,7 +1322,7 @@ enum RegStatus {
 }
 
 input IdentifierInput {
-  type: String!
+  type: SupportedPatientIdentifierCode!
   value: String!
 }
 
@@ -1746,6 +1746,25 @@ enum Gender {
 input DeceasedInput {
   deceased: Boolean
   deathDate: PlainDate
+}
+
+enum SupportedPatientIdentifierCode {
+  PASSPORT
+  NATIONAL_ID
+  MOSIP_PSUT_TOKEN_ID
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
+  DRIVING_LICENSE
+  REFUGEE_NUMBER
+  ALIEN_NUMBER
+  OTHER
+  SOCIAL_SECURITY_NO
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
+  BIRTH_CONFIGURABLE_IDENTIFIER_1
+  BIRTH_CONFIGURABLE_IDENTIFIER_2
+  BIRTH_CONFIGURABLE_IDENTIFIER_3
 }
 
 input LabelInput {
