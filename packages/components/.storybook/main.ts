@@ -14,12 +14,6 @@ import type { StorybookConfig } from '@storybook/react-vite'
 const viteFinal = async (config: Record<string, any>) => {
   // return the customized config
   return mergeConfig(config, {
-    // customize the Vite config here
-    resolve: {
-      alias: {
-        crypto: 'crypto-js'
-      }
-    },
     build: {
       minify: false,
       sourcemap: false
