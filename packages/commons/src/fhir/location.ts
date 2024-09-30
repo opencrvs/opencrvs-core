@@ -120,3 +120,7 @@ export function isHealthFacility(
 ): location is HealthFacility {
   return location.type?.coding?.[0].code === 'HEALTH_FACILITY'
 }
+
+export function getLocationType(location: Location): string | undefined {
+  return location.type?.coding?.[0].code
+}

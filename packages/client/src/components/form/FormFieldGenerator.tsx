@@ -345,8 +345,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             {...inputProps}
             size={RadioSize.LARGE}
             onChange={(val: string) => {
-              resetNestedInputValues(fieldDefinition)
               setFieldValue(`${fieldDefinition.name}.value`, val)
+              resetNestedInputValues(fieldDefinition)
             }}
             nestedFields={nestedFields}
             options={visibleRadioOptions}
