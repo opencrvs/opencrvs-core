@@ -110,10 +110,6 @@ export interface GQLMutation {
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
 }
 
-export interface GQLDummy {
-  dummy: string
-}
-
 export interface GQLNotificationResult {
   success: boolean
 }
@@ -1752,7 +1748,6 @@ export interface GQLPaymentInput {
 export interface GQLResolver {
   Query?: GQLQueryTypeResolver
   Mutation?: GQLMutationTypeResolver
-  Dummy?: GQLDummyTypeResolver
   NotificationResult?: GQLNotificationResultTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
   Date?: GraphQLScalarType
@@ -3410,19 +3405,6 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLDummyTypeResolver<TParent = any> {
-  dummy?: DummyToDummyResolver<TParent>
-}
-
-export interface DummyToDummyResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

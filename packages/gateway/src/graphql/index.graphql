@@ -21,10 +21,3 @@
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
 # import Query.* from '../features/OIDPUserInfo/schema.graphql'
 # import * from 'common.graphql'
-
-# TODO
-# https://github.com/prismagraphql/graphql-import/issues/180
-# https://github.com/prismagraphql/graphql-import/issues/45
-type Dummy {
-  dummy: String!
-}

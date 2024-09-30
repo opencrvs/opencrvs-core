@@ -273,10 +273,6 @@ type Mutation {
   ): BookMarkedSearches
 }
 
-type Dummy {
-  dummy: String!
-}
-
 type NotificationResult {
   success: Boolean!
 }
