@@ -481,6 +481,125 @@ describe('when in device of large viewport', () => {
       expect(reviewSectionComponent.find('#Hospital')).toBeTruthy()
     })
   })
+
+  describe('when form has a postfix with no value', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+
+    beforeAll(() => {
+      vi.resetAllMocks()
+    })
+
+    beforeEach(async () => {
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      const form = {
+        sections: [
+          {
+            id: 'registration',
+            viewType: 'hidden',
+            name: {
+              defaultMessage: 'Registration'
+            },
+            groups: []
+          },
+          {
+            id: 'child',
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'weight',
+                    type: 'NUMBER',
+                    required: false,
+                    validator: [],
+                    postfix: 'kg',
+                    label: {
+                      defaultMessage: 'Weight',
+                      id: 'weight'
+                    }
+                  },
+                  {
+                    name: 'height',
+                    type: 'NUMBER',
+                    required: false,
+                    validator: [],
+                    postfix: 'inches',
+                    label: {
+                      defaultMessage: 'Height',
+                      id: 'height'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'documents',
+            name: formMessages.documentsName,
+            title: formMessages.documentsTitle,
+            viewType: 'form' as ViewType,
+            groups: [
+              {
+                id: 'documents-view-group',
+                fields: []
+              }
+            ]
+          },
+          {
+            id: 'preview',
+            viewType: 'preview',
+            name: {
+              defaultMessage: 'Preview'
+            },
+            title: {
+              defaultMessage: 'Preview'
+            },
+            groups: [
+              {
+                id: 'preview-view-group',
+                fields: []
+              }
+            ]
+          }
+        ]
+      } satisfies IForm
+
+      const data = {
+        child: {
+          weight: 67
+        },
+        documents: {}
+      }
+
+      const simpleDraft = createReviewDeclaration(
+        uuid(),
+        data,
+        DeclarationEvent.Birth
+      )
+
+      const testComponent = await createTestComponent(
+        <ReviewSection
+          form={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={simpleDraft}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+        />,
+        { store, history }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('should not render postfix', () => {
+      const text = reviewSectionComponent.text()
+
+      expect(text).toContain('kg')
+      expect(text).not.toContain('inches')
+    })
+  })
 })
 
 describe('when in device of small viewport', () => {

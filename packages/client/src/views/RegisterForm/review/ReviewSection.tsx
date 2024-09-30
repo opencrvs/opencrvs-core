@@ -568,7 +568,7 @@ const renderValue = (
       : intl.formatMessage(buttonMessages.no)
   }
 
-  if (typeof value === 'string' || typeof value === 'number') {
+  if (value && (typeof value === 'string' || typeof value === 'number')) {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
