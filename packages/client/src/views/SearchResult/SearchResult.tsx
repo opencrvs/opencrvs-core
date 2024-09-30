@@ -47,7 +47,11 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import { SEARCH_RESULT_SORT } from '@client/utils/constants'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
+import {
+  SearchEventsQuery,
+  SystemRoleType,
+  RejectionReason
+} from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -86,18 +90,14 @@ const ToolTipContainer = styled.span`
   text-align: center;
 `
 
-export function getRejectionReasonDisplayValue(reason: string) {
-  switch (reason.toLowerCase()) {
-    case 'duplicate':
+export function getRejectionReasonDisplayValue(reason: RejectionReason) {
+  switch (reason) {
+    case RejectionReason.Duplicate:
       return rejectMessages.rejectionReasonDuplicate
-    case 'misspelling':
-      return rejectMessages.rejectionReasonMisspelling
-    case 'missing_supporting_doc':
-      return rejectMessages.rejectionReasonMissingSupportingDoc
-    case 'other':
+    case RejectionReason.Other:
       return rejectMessages.rejectionReasonOther
     default:
-      return rejectMessages.rejectionReasonOther
+      return reason satisfies never
   }
 }
 

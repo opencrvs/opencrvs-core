@@ -192,7 +192,11 @@ type Mutation {
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  markEventAsVoided(id: String!, reason: String!, comment: String!): ID!
+  markEventAsVoided(
+    id: String!
+    reason: RejectionReason!
+    comment: String!
+  ): ID!
   markEventAsReinstated(id: String!): Reinstated
   markEventAsNotDuplicate(id: String!): ID!
   markEventAsArchived(
@@ -721,6 +725,11 @@ input MarriageRegistrationInput {
 
 scalar Void
 
+enum RejectionReason {
+  other
+  duplicate
+}
+
 type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
@@ -884,7 +893,7 @@ type History {
   action: RegAction
   note: String
   statusReason: StatusReason
-  reason: String
+  reason: RejectionReason
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
@@ -1324,11 +1333,6 @@ enum RegStatus {
 input IdentifierInput {
   type: SupportedPatientIdentifierCode!
   value: String!
-}
-
-enum RejectionReason {
-  other
-  duplicate
 }
 
 input HumanNameInput {

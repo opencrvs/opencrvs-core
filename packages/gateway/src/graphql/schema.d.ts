@@ -606,6 +606,11 @@ export interface GQLMarriageRegistrationInput {
 
 export type GQLVoid = any
 
+export const enum GQLRejectionReason {
+  other = 'other',
+  duplicate = 'duplicate'
+}
+
 export interface GQLReinstated {
   taskEntryResourceID: string
   registrationStatus?: GQLRegStatus
@@ -769,7 +774,7 @@ export interface GQLHistory {
   action?: GQLRegAction
   note?: string
   statusReason?: GQLStatusReason
-  reason?: string
+  reason?: GQLRejectionReason
   requester?: string
   requesterOther?: string
   hasShowedVerifiedDocument?: boolean
@@ -1233,11 +1238,6 @@ export const enum GQLRegStatus {
 export interface GQLIdentifierInput {
   type: GQLSupportedPatientIdentifierCode
   value: string
-}
-
-export const enum GQLRejectionReason {
-  other = 'other',
-  duplicate = 'duplicate'
 }
 
 export interface GQLHumanNameInput {
@@ -2836,7 +2836,7 @@ export interface MutationToMarkBirthAsIssuedResolver<
 
 export interface MutationToMarkEventAsVoidedArgs {
   id: string
-  reason: string
+  reason: GQLRejectionReason
   comment: string
 }
 export interface MutationToMarkEventAsVoidedResolver<

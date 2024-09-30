@@ -428,6 +428,12 @@ export type ComparisonInput = {
   nin?: InputMaybe<Array<Scalars['String']>>
 }
 
+export type ConfirmRegistrationInput = {
+  childIdentifiers?: InputMaybe<Array<IdentifierInput>>
+  registrationNumber?: InputMaybe<Scalars['String']>
+  trackingId?: InputMaybe<Scalars['String']>
+}
+
 export type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
@@ -556,11 +562,6 @@ export type DeclarationsStartedMetrics = {
   fieldAgentDeclarations: Scalars['Int']
   hospitalDeclarations: Scalars['Int']
   officeDeclarations: Scalars['Int']
-}
-
-export type Dummy = {
-  __typename?: 'Dummy'
-  dummy: Scalars['String']
 }
 
 export type DuplicatesInfo = {
@@ -706,7 +707,7 @@ export type History = {
   output?: Maybe<Array<Maybe<InputOutput>>>
   payment?: Maybe<Payment>
   potentialDuplicates?: Maybe<Array<Scalars['String']>>
-  reason?: Maybe<Scalars['String']>
+  reason?: Maybe<RejectionReason>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
   requesterOther?: Maybe<Scalars['String']>
@@ -737,6 +738,11 @@ export type Identifier = {
   __typename?: 'Identifier'
   system?: Maybe<Scalars['String']>
   value?: Maybe<Scalars['String']>
+}
+
+export type IdentifierInput = {
+  type: SupportedPatientIdentifierCode
+  value: Scalars['String']
 }
 
 export type IdentityInput = {
@@ -927,6 +933,7 @@ export type Mutation = {
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
+  confirmRegistration: Scalars['ID']
   createBirthRegistration: Scalars['Void']
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: Scalars['Void']
@@ -959,6 +966,7 @@ export type Mutation = {
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
+  rejectRegistration: Scalars['ID']
   rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestRegistrationCorrection: Scalars['ID']
@@ -1025,6 +1033,11 @@ export type MutationChangePhoneArgs = {
   phoneNumber: Scalars['String']
   userId: Scalars['String']
   verifyCode: Scalars['String']
+}
+
+export type MutationConfirmRegistrationArgs = {
+  details: ConfirmRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationCreateBirthRegistrationArgs = {
@@ -1145,7 +1158,7 @@ export type MutationMarkEventAsUnassignedArgs = {
 export type MutationMarkEventAsVoidedArgs = {
   comment: Scalars['String']
   id: Scalars['String']
-  reason: Scalars['String']
+  reason: RejectionReason
 }
 
 export type MutationMarkMarriageAsCertifiedArgs = {
@@ -1178,6 +1191,11 @@ export type MutationRefreshSystemSecretArgs = {
 
 export type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
+}
+
+export type MutationRejectRegistrationArgs = {
+  details: RejectRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationRejectRegistrationCorrectionArgs = {
@@ -1832,6 +1850,16 @@ export type Reinstated = {
   taskEntryResourceID: Scalars['ID']
 }
 
+export type RejectRegistrationInput = {
+  comment: Scalars['String']
+  reason: RejectionReason
+}
+
+export enum RejectionReason {
+  Duplicate = 'duplicate',
+  Other = 'other'
+}
+
 export type RelatedPerson = {
   __typename?: 'RelatedPerson'
   _fhirID?: Maybe<Scalars['ID']>
@@ -1980,6 +2008,25 @@ export type StatusWiseRegistrationCount = {
   __typename?: 'StatusWiseRegistrationCount'
   count: Scalars['Int']
   status: Scalars['String']
+}
+
+export enum SupportedPatientIdentifierCode {
+  AlienNumber = 'ALIEN_NUMBER',
+  BirthConfigurableIdentifier_1 = 'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+  BirthConfigurableIdentifier_2 = 'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+  BirthConfigurableIdentifier_3 = 'BIRTH_CONFIGURABLE_IDENTIFIER_3',
+  BirthPatientEntry = 'BIRTH_PATIENT_ENTRY',
+  BirthRegistrationNumber = 'BIRTH_REGISTRATION_NUMBER',
+  DeathRegistrationNumber = 'DEATH_REGISTRATION_NUMBER',
+  DeceasedPatientEntry = 'DECEASED_PATIENT_ENTRY',
+  DrivingLicense = 'DRIVING_LICENSE',
+  MarriageRegistrationNumber = 'MARRIAGE_REGISTRATION_NUMBER',
+  MosipPsutTokenId = 'MOSIP_PSUT_TOKEN_ID',
+  NationalId = 'NATIONAL_ID',
+  Other = 'OTHER',
+  Passport = 'PASSPORT',
+  RefugeeNumber = 'REFUGEE_NUMBER',
+  SocialSecurityNo = 'SOCIAL_SECURITY_NO'
 }
 
 export type System = {
@@ -3077,7 +3124,7 @@ export type MarkBirthAsRegisteredMutation = {
 
 export type MarkEventAsVoidedMutationVariables = Exact<{
   id: Scalars['String']
-  reason: Scalars['String']
+  reason: RejectionReason
   comment: Scalars['String']
 }>
 
@@ -3373,7 +3420,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
-      reason?: string | null
+      reason?: RejectionReason | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
       documents: Array<{
@@ -3707,7 +3754,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
-      reason?: string | null
+      reason?: RejectionReason | null
       otherReason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
@@ -4169,7 +4216,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
-      reason?: string | null
+      reason?: RejectionReason | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
       documents: Array<{
@@ -4888,7 +4935,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
-      reason?: string | null
+      reason?: RejectionReason | null
       documents: Array<{
         __typename?: 'Attachment'
         id: string
@@ -5242,7 +5289,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
-      reason?: string | null
+      reason?: RejectionReason | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -8001,7 +8048,7 @@ export type FetchViewRecordByCompositionQuery = {
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
           ipAddress?: string | null
-          reason?: string | null
+          reason?: RejectionReason | null
           statusReason?: {
             __typename?: 'StatusReason'
             text?: string | null
@@ -8387,7 +8434,7 @@ export type FetchViewRecordByCompositionQuery = {
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
           ipAddress?: string | null
-          reason?: string | null
+          reason?: RejectionReason | null
           statusReason?: {
             __typename?: 'StatusReason'
             text?: string | null
@@ -8705,7 +8752,7 @@ export type FetchViewRecordByCompositionQuery = {
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
           ipAddress?: string | null
-          reason?: string | null
+          reason?: RejectionReason | null
           statusReason?: {
             __typename?: 'StatusReason'
             text?: string | null
