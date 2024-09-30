@@ -117,7 +117,10 @@ export type IDropdownPosition =
   | 'left'
   | 'right'
 
-const DropdownWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
+const DropdownWrapper: React.FC<{ children: ReactNode; id?: string }> = ({
+  children,
+  id
+}) => {
   const { closeDropdown } = useDropdown()
   const rootRef = useRef<HTMLUListElement | null>(null)
   useEffect(() => {
@@ -132,13 +135,23 @@ const DropdownWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [closeDropdown])
-  return <StyledWrapper ref={rootRef}>{children}</StyledWrapper>
+  return (
+    <StyledWrapper id={id + '-dropdownMenu'} ref={rootRef}>
+      {children}
+    </StyledWrapper>
+  )
 }
 
-export const DropdownMenu = ({ children }: { children: ReactNode }) => {
+export const DropdownMenu = ({
+  children,
+  id
+}: {
+  children: ReactNode
+  id?: string
+}) => {
   return (
     <DropdownProvider>
-      <DropdownWrapper>{children}</DropdownWrapper>
+      <DropdownWrapper id={id}>{children}</DropdownWrapper>
     </DropdownProvider>
   )
 }

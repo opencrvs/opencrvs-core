@@ -122,7 +122,7 @@ export const ActionMenu: React.FC<{
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu id="action">
         <DropdownMenu.Trigger>
           <PrimaryButton icon={() => <CaretDown />}>
             {intl.formatMessage(messages.action)}

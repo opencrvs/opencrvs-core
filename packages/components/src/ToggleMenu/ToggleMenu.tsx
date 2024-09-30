@@ -10,6 +10,13 @@
  */
 import React from 'react'
 import { DropdownMenu } from '../Dropdown'
+import styled from 'styled-components'
+
+const TriggerWrapper = styled.div`
+  height: 40px;
+  display: flex;
+  align-items: center;
+`
 
 export interface IToggleMenuItem {
   label: string
@@ -32,8 +39,10 @@ export const ToggleMenu = ({
   hide
 }: IProps) => {
   return hide ? null : (
-    <DropdownMenu>
-      <DropdownMenu.Trigger>{toggleButton}</DropdownMenu.Trigger>
+    <DropdownMenu id={id}>
+      <DropdownMenu.Trigger>
+        <TriggerWrapper>{toggleButton}</TriggerWrapper>
+      </DropdownMenu.Trigger>
       <DropdownMenu.Content>
         {menuHeader && <DropdownMenu.Label>{menuHeader}</DropdownMenu.Label>}
         {menuItems.map((item) => (
