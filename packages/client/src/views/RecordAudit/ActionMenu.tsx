@@ -279,7 +279,9 @@ const CorrectRecordAction: React.FC<
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =
-    scope && (scope as any as string[]).includes('register')
+    scope &&
+    ((scope as any as string[]).includes('register') ||
+      (scope as any as string[]).includes('validate'))
 
   return (
     isBirthOrDeathEvent &&
