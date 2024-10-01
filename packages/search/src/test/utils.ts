@@ -3216,7 +3216,7 @@ export const mockDeathRejectionTaskBundle = {
         id: 'be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a',
         note: [
           {
-            text: 'reason=missing_supporting_doc&comment=No documents found!',
+            text: 'reason=other&comment=No documents found!',
             time: 'Wed, 27 Mar 2019 11:44:41 GMT',
             authorString: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
           }
@@ -3287,7 +3287,7 @@ export const mockMarriageRejectionTaskBundle = {
         id: 'be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a',
         note: [
           {
-            text: 'reason=missing_supporting_doc&comment=No documents found!',
+            text: 'reason=other&comment=No documents found!',
             time: 'Wed, 27 Mar 2019 11:44:41 GMT',
             authorString: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
           }
@@ -3355,7 +3355,7 @@ export const mockDeathRejectionTaskBundleWithoutCompositionReference = {
         id: 'be13e81f-0cd7-4ff3-a2d3-a1bc7a7f543a',
         note: [
           {
-            text: 'reason=missing_supporting_doc&comment=No documents found!',
+            text: 'reason=other&comment=No documents found!',
             time: 'Wed, 27 Mar 2019 11:44:41 GMT',
             authorString: 'Practitioner/220ad6b8-346f-4a1d-8a5c-086ce38067c9'
           }
