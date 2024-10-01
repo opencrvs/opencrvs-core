@@ -867,6 +867,7 @@ class FormSectionComponent extends React.Component<Props> {
         }
       }, 0)
     }
+    this.props.onChange(this.props.values)
   }
 
   showValidationErrors(fields: IFormField[]) {
