@@ -50,13 +50,13 @@ export const messages = {
     id: 'form.section.userDetails'
   },
   firstNameEn: {
-    defaultMessage: 'First name',
-    description: 'English first name',
+    defaultMessage: "User's first name",
+    description: "User's English first name",
     id: 'form.field.label.firstNameEN'
   },
   lastNameEn: {
-    defaultMessage: 'Last name',
-    description: 'English last name',
+    defaultMessage: "User's surname",
+    description: "User's English surname",
     id: 'form.field.label.lastNameEN'
   },
   phoneNumber: {
