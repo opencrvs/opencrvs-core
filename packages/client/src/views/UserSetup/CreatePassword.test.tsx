@@ -77,7 +77,7 @@ describe('CreatePassword page tests', () => {
       target: { id: 'ConfirmPassword', value: '0crvsPassword' }
     })
     component.find('button#Continue').simulate('click')
-    expect(component.find('#GlobalError').hostNodes().length).toBe(0)
+    expect(component.find('#GlobalError').hostNodes().text().length).toBe(0)
   })
   it('it passes validations when Enter/Return key is pressed on ConfirmPassword field', () => {
     component.find('input#NewPassword').simulate('change', {
@@ -91,7 +91,7 @@ describe('CreatePassword page tests', () => {
       keyCode: 13,
       which: 13
     })
-    expect(component.find('#GlobalError').hostNodes().length).toBe(0)
+    expect(component.find('#GlobalError').hostNodes().text().length).toBe(0)
   })
   it('it passes validations when Enter/Return key is pressed on NewPassword field', () => {
     component.find('input#NewPassword').simulate('change', {
@@ -105,7 +105,7 @@ describe('CreatePassword page tests', () => {
       keyCode: 13,
       which: 13
     })
-    expect(component.find('#GlobalError').hostNodes().length).toBe(0)
+    expect(component.find('#GlobalError').hostNodes().text().length).toBe(0)
   })
   it('it shows disabled continue button when no password is given', () => {
     expect(
