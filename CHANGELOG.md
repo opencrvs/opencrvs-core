@@ -28,6 +28,7 @@
 ## Bug fixes
 
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+- Accessibility improvement in Choose New Password page [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
 
 ## 1.6.0 Release candidate
 
@@ -47,7 +48,6 @@
 - Fix layout issue that was causing the edit button on the AdvancedSearch's date range picker to not show on mobile view. [#7417](https://github.com/opencrvs/opencrvs-core/issues/7417)
 - Fix hardcoded placeholder copy of input when saving a query in advanced search
 - Handle label params used in form inputs when rendering in action details modal
-- Accessibility improvement in Choose New Password page [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
 
 ### Breaking changes
 
