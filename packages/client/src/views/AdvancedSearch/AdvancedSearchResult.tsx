@@ -55,6 +55,7 @@ import {
   ColumnContentAlignment,
   COLUMNS,
   IAction,
+  SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { transformData } from '@client/search/transformer'
@@ -76,12 +77,15 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   advancedSearchPillKey,
   getFormattedAdvanceSearchParamPills,
+  getSortColumn,
+  replacePeriodWithDate,
   transformStoreDataToAdvancedSearchLocalState
 } from '@client/search/advancedSearch/utils'
 import { omitBy } from 'lodash'
 import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/BookmarkAdvancedSearchResult'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { UserDetails } from '@client/utils/userUtils'
+import { changeSortedColumn } from '@client/views/OfficeHome/utils'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -121,14 +125,17 @@ type IFullProps = ISearchInputProps &
   RouteComponentProps<IMatchParams>
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
+  const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NONE)
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
+
   const { width: windowWidth } = useWindowSize()
   const intl = useIntl()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
-  const { searchId, ...advancedSearchParams } = useSelector(
+  const { searchId, bookmarkName, ...advancedSearchParams } = useSelector(
     AdvancedSearchParamsState
   )
   const filteredAdvancedSearchParams = omitBy(
-    advancedSearchParams,
+    replacePeriodWithDate(advancedSearchParams),
     (properties: string | null) =>
       properties === null || properties === EMPTY_STRING
   )
@@ -140,7 +147,12 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const searchEventsQueryVariables = {
     advancedSearchParameters: filteredAdvancedSearchParams,
     count: DEFAULT_PAGE_SIZE,
-    skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1)
+    skip: DEFAULT_PAGE_SIZE * (currentPageNumber - 1),
+    sort: sortOrder,
+    sortColumn: getSortColumn(
+      sortedCol,
+      advancedSearchParamsState.event || 'birth'
+    )
   }
 
   const isEnoughParams = () => {
@@ -153,13 +165,25 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     )
   }
 
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedCol,
+      sortOrder
+    )
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
   const getContentTableColumns = () => {
     if (windowWidth > props.theme.grid.breakpoints.lg) {
       return [
         {
           width: 35,
           label: intl.formatMessage(constantsMessages.name),
-          key: COLUMNS.ICON_WITH_NAME
+          key: COLUMNS.ICON_WITH_NAME,
+          isSorted: sortedCol === COLUMNS.NAME,
+          sortFunction: onColumnClick
         },
         {
           label: intl.formatMessage(constantsMessages.event),
@@ -169,7 +193,9 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         {
           label: intl.formatMessage(constantsMessages.eventDate),
           width: 20,
-          key: COLUMNS.DATE_OF_EVENT
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: onColumnClick
         },
         {
           width: 25,
@@ -306,7 +332,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
-                assignment: reg.assignment,
+                assignment: reg.assignment ?? undefined,
                 refetchQueries: [
                   {
                     query: SEARCH_EVENTS,
@@ -400,9 +426,10 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
             const total = loading ? -1 : data?.searchEvents?.totalItems || 0
             return (
               <WQContentWrapper
-                title={intl.formatMessage(
-                  advancedSearchResultMessages.searchResult
-                )}
+                title={`${
+                  bookmarkName ||
+                  intl.formatMessage(advancedSearchResultMessages.searchResult)
+                } ${loading ? '' : ' (' + total + ')'}`}
                 isMobileSize={false}
                 noResultText={intl.formatMessage(
                   advancedSearchResultMessages.noResult
@@ -433,6 +460,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                       <Workqueue
                         content={transformSearchContent(data?.searchEvents)}
                         columns={getContentTableColumns()}
+                        sortOrder={sortOrder}
                         noResultText={intl.formatMessage(
                           constantsMessages.noResults
                         )}

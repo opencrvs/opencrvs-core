@@ -165,7 +165,7 @@ const toCorrectionValue = (
 export function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
-  offlineCountryConfig?: IOfflineData
+  offlineCountryConfig: IOfflineData
 ) {
   const draftData = declaration.data
   const originalDraftData = declaration.originalData || {}
@@ -223,9 +223,9 @@ export function getChangedValues(
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
-  draftId?: string,
-  userDetails?: UserDetails | null,
-  offlineCountryConfig?: IOfflineData
+  draftId: string,
+  userDetails: UserDetails | null,
+  offlineCountryConfig: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')

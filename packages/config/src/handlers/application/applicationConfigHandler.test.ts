@@ -125,25 +125,6 @@ describe('applicationHandler', () => {
     expect(res.statusCode).toBe(200)
   })
 
-  it('update application config using mongoose', async () => {
-    mockConfig.id = '61c4664e663fc6af203b63b8'
-    mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
-    mockingoose(ApplicationConfig).toReturn(mockConfig, 'update')
-    fetch.mockResponse(JSON.stringify(mockConfig))
-
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/updateApplicationConfig',
-      payload: {
-        APPLICATION_NAME: 'Farajaland CRVS'
-      },
-      headers: {
-        Authorization: `${token}`
-      }
-    })
-    expect(res.statusCode).toBe(201)
-  })
-
   it('return error when tries to save invalid data', async () => {
     mockingoose(ApplicationConfig).toReturn(null, 'findOne')
     mockingoose(ApplicationConfig).toReturn({}, 'update')

@@ -28,6 +28,9 @@ import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { IRejectCorrectionForm } from '@client/review/reject-correction'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasFormError } from '@client/forms/utils'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 
 interface IChildrenProps {
   toggleRejectModal: () => void
@@ -39,6 +42,10 @@ interface IProps {
   children(props: IChildrenProps): React.ReactNode
 }
 
+interface IConnectProps {
+  config: IOfflineData
+}
+
 type DispatchProps = {
   writeDeclaration: typeof writeDeclaration
   goToHomeTab: typeof goToHomeTab
@@ -47,7 +54,7 @@ type DispatchProps = {
 
 type FullProps = IProps &
   IntlShapeProps &
-  DispatchProps & { form: IRejectCorrectionForm }
+  DispatchProps & { form: IRejectCorrectionForm } & IConnectProps
 
 type State = {
   data: IFormSectionData
@@ -130,7 +137,9 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
         this.setState(() => ({
           enabledForReject: !hasFormError(
             this.props.form.fields,
-            rejectionFormData
+            rejectionFormData,
+            this.props.config,
+            this.props.declaration.data
           )
         }))
     )
@@ -212,6 +221,7 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
             fields={fields}
             onChange={this.storeData}
             setAllFieldsDirty={false}
+            draftData={this.props.declaration.data}
           />
         </Dialog>
       </>
@@ -219,7 +229,12 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
   }
 }
 
-export const ReviewSectionCorrection = connect<{}, DispatchProps>(null, {
+export const ReviewSectionCorrection = connect<
+  IConnectProps,
+  DispatchProps,
+  {},
+  IStoreState
+>((state) => ({ config: getOfflineData(state) }), {
   writeDeclaration,
   goToHomeTab,
   modifyDeclaration

@@ -24,7 +24,8 @@ services:
     restart: unless-stopped
     depends_on:
       - base
-
+    environment:
+      - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION}
     #platform: linux/amd64
@@ -35,15 +36,6 @@ services:
     depends_on:
       - base
 
-  components:
-    image: opencrvs/ocrvs-components:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/components/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
   login:
     image: opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
@@ -53,6 +45,8 @@ services:
     restart: unless-stopped
     depends_on:
       - base
+    environment:
+      - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64

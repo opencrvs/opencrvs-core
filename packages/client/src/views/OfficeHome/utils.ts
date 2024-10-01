@@ -69,7 +69,7 @@ export const changeSortedColumn = (
       newSortedCol = COLUMNS.REGISTRATION_NO
       break
     default:
-      newSortedCol = COLUMNS.NAME
+      newSortedCol = COLUMNS.NONE
   }
 
   if (newSortedCol === presentSortedCol) {
@@ -77,6 +77,7 @@ export const changeSortedColumn = (
       newSortOrder = SORT_ORDER.DESCENDING
     } else {
       newSortOrder = SORT_ORDER.ASCENDING
+      newSortedCol = COLUMNS.NONE
     }
   }
 

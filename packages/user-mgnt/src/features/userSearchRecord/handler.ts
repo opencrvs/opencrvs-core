@@ -37,6 +37,7 @@ interface IUserCreateSearchPayload {
     dateOfEvent?: string
     dateOfEventStart?: string
     dateOfEventEnd?: string
+    timePeriodFrom?: string
     registrationNumber?: string
     trackingId?: string
     dateOfRegistration?: string
@@ -178,6 +179,7 @@ export const createSearchrequestSchema = Joi.object({
     dateOfEvent: Joi.string(),
     dateOfEventStart: Joi.string(),
     dateOfEventEnd: Joi.string(),
+    timePeriodFrom: Joi.string(),
     registrationNumber: Joi.string(),
     trackingId: Joi.string(),
     dateOfRegistration: Joi.string(),

@@ -45,7 +45,15 @@ import {
   INidVerificationButton,
   BULLET_LIST,
   HIDDEN,
-  Ii18nHiddenFormField
+  Ii18nHiddenFormField,
+  IDocumentUploaderWithOptionsFormField,
+  HTTP,
+  InitialValue,
+  DependencyInfo,
+  IHttpFormField,
+  IButtonFormField,
+  BUTTON,
+  Ii18nButtonFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -72,6 +80,8 @@ import differenceInDays from 'date-fns/differenceInDays'
 import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
 import { Conditional } from './conditionals'
 import { UserDetails } from '@client/utils/userUtils'
+import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
+
 export const VIEW_TYPE = {
   FORM: 'form',
   REVIEW: 'review',
@@ -188,6 +198,17 @@ export const internationaliseFieldObject = (
     ;(base as any).labelForOffline = intl.formatMessage(
       (field as INidVerificationButton).labelForOffline
     )
+  }
+
+  if (isFieldButton(field)) {
+    ;(base as Ii18nButtonFormField).buttonLabel = intl.formatMessage(
+      field.buttonLabel
+    )
+    if (field.loadingLabel) {
+      ;(base as Ii18nButtonFormField).loadingLabel = intl.formatMessage(
+        field.loadingLabel
+      )
+    }
   }
 
   return base as Ii18nFormField
@@ -343,12 +364,18 @@ export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
 export const getFieldOptions = (
-  field: ISelectFormFieldWithOptions | ISelectFormFieldWithDynamicOptions,
+  field:
+    | ISelectFormFieldWithOptions
+    | ISelectFormFieldWithDynamicOptions
+    | IDocumentUploaderWithOptionsFormField,
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData,
   declaration?: IFormData
 ) => {
-  if (field.type === SELECT_WITH_OPTIONS) {
+  if (
+    field.type === SELECT_WITH_OPTIONS ||
+    field.type === DOCUMENT_UPLOADER_WITH_OPTION
+  ) {
     if (field.optionCondition) {
       // eslint-disable-next-line no-eval
       const conditionEvaluator = eval(field.optionCondition!)
@@ -543,13 +570,10 @@ export function getQueryData(
 
 export const getConditionalActionsForField = (
   field: IFormField,
-  /*
-   * These are used in the eval expression
-   */
   values: IFormSectionData,
-  offlineCountryConfig?: IOfflineData,
-  draftData?: IFormData,
-  userDetails?: UserDetails | null
+  offlineCountryConfig: IOfflineData,
+  draftData: IFormData,
+  userDetails: UserDetails | null = null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -557,9 +581,39 @@ export const getConditionalActionsForField = (
   return (
     field.conditionals
       // eslint-disable-next-line no-eval
-      .filter((conditional) => eval(conditional.expression))
+      .filter((conditional) =>
+        evalExpressionInFieldDefinition(
+          conditional.expression,
+          values,
+          offlineCountryConfig,
+          draftData,
+          userDetails
+        )
+      )
       .map((conditional: Conditional) => conditional.action)
   )
+}
+
+export const evalExpressionInFieldDefinition = (
+  expression: string,
+  /*
+   * These are used in the eval expression
+   */
+  $form: IFormSectionData,
+  $config: IOfflineData,
+  $draft: IFormData,
+  $user: (UserDetails & { token?: string }) | null
+) => {
+  // For backwards compatibility
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const values = $form
+  const offlineCountryConfig = $config
+  const draftData = $draft
+  const userDetails = $user
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  // eslint-disable-next-line no-eval
+  return eval(expression)
 }
 
 export const getVisibleSectionGroupsBasedOnConditions = (
@@ -621,8 +675,8 @@ export const getSectionFields = (
 export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData,
-  resource?: IOfflineData,
-  drafts?: IFormData
+  resource: IOfflineData,
+  drafts: IFormData
 ): boolean => {
   const errors: Errors = getValidationErrorsForForm(
     fields,
@@ -717,5 +771,38 @@ export function getSelectedOption(
     return selectedOption
   }
 
+  return null
+}
+
+export function isFieldButton(field: IFormField): field is IButtonFormField {
+  return field.type === BUTTON
+}
+
+export function isFieldHttp(field: IFormField): field is IHttpFormField {
+  return field.type === HTTP
+}
+
+export function isInitialValueDependencyInfo(
+  value: InitialValue
+): value is DependencyInfo {
+  return typeof value === 'object' && value !== null && 'dependsOn' in value
+}
+
+export function getDependentFields(
+  fields: IFormField[],
+  fieldName: string
+): IFormField[] {
+  return fields.filter(
+    ({ initialValue }) =>
+      initialValue &&
+      isInitialValueDependencyInfo(initialValue) &&
+      initialValue.dependsOn.includes(fieldName)
+  )
+}
+
+export function handleUnsupportedIcon(iconName?: string) {
+  if (iconName && iconName in SupportedIcons) {
+    return iconName as keyof typeof SupportedIcons
+  }
   return null
 }

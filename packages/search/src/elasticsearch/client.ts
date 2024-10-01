@@ -50,6 +50,14 @@ export interface ISearchResponse<T> {
   aggregations?: any
 }
 
-export const client = new elasticsearch.Client({
-  node: `http://${ES_HOST}`
-})
+let client: elasticsearch.Client
+
+export const getOrCreateClient = () => {
+  if (!client) {
+    return new elasticsearch.Client({
+      node: `http://${ES_HOST}`
+    })
+  }
+
+  return client
+}

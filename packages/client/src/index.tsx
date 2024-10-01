@@ -21,6 +21,7 @@ import * as Sentry from '@sentry/react'
 import { SubmissionController } from '@client/SubmissionController'
 import WebFont from 'webfontloader'
 import { BrowserTracing } from '@sentry/tracing'
+import { APPLICATION_VERSION } from './utils/constants'
 
 WebFont.load({
   google: {
@@ -39,7 +40,7 @@ if (
   // setup error reporting using sentry
   if (window.config.SENTRY) {
     Sentry.init({
-      release: import.meta.env.REACT_APP_VERSION,
+      release: APPLICATION_VERSION,
       environment: import.meta.env.NODE_ENV,
       integrations: [new BrowserTracing()],
 

@@ -27,6 +27,7 @@ import {
 } from '@client/forms/utils'
 import {
   buttonMessages as messages,
+  userMessages,
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'
@@ -39,7 +40,6 @@ import {
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { draftToGqlTransformer } from '@client/transformer'
 import {
   modifyUserFormData,
   submitUserFormData
@@ -90,7 +90,7 @@ interface IStateProps {
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
   goToUserReviewForm: typeof goToUserReviewForm
-  submitForm: (userFormSection: IFormSection) => void
+  submitForm: (variables: Record<string, any>) => void
   goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
@@ -166,7 +166,12 @@ const transformSectionData = ({
             return
           let label = intl.formatMessage(field.label)
           if (
-            !getConditionalActionsForField(field, formData).includes('hide')
+            !getConditionalActionsForField(
+              field,
+              props.formData,
+              props.offlineCountryConfiguration,
+              { user: props.formData }
+            ).includes('hide')
           ) {
             fieldValue = getValue({ ...props, field })
 
@@ -413,22 +418,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goBack: () => dispatch(goBack()),
     goToTeamUserList: (id: string) => dispatch(goToTeamUserList(id)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
-    submitForm: (userFormSection: IFormSection) => {
-      const variables = draftToGqlTransformer(
-        { sections: [userFormSection] },
-        { user: props.formData }
-      )
-
-      if (variables.user._fhirID) {
-        variables.user.id = variables.user._fhirID
-        delete variables.user._fhirID
-      }
-
-      if (variables.user.signature) {
-        delete variables.user.signature.name
-        delete variables.user.signature.__typename //to fix updating registrar bug
-      }
-
+    submitForm: (variables: Record<string, any>) => {
       dispatch(
         submitUserFormData(
           props.client,

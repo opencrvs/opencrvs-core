@@ -30,6 +30,7 @@ import { UpdatePassword } from './views/ResetCredentialsForm/UpdatePasswordForm'
 import { Page } from './Page'
 import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
+import { ReloadModal } from './views/ReloadModal'
 
 export const { store, history } = createStore()
 interface IAppProps {
@@ -53,6 +54,7 @@ export const App = ({ store, history }: IAppProps) => (
       <IntlContainer>
         <ThemeProvider theme={getTheme()}>
           <ConnectedRouter history={history}>
+            <ReloadModal />
             <Page>
               <Switch>
                 <Route exact path={routes.STEP_ONE}>

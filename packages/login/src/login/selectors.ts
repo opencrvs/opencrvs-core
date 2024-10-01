@@ -30,6 +30,10 @@ export const getResentAuthenticationCode = (
 ): LoginState['resentAuthenticationCode'] =>
   getKey(store, 'resentAuthenticationCode')
 
+export const getReloadModalVisibility = (
+  store: IStoreState
+): LoginState['reloadModalVisibility'] => getKey(store, 'reloadModalVisibility')
+
 export const getsubmitting = (store: IStoreState): LoginState['submitting'] =>
   getKey(store, 'submitting')
 

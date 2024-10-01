@@ -9,7 +9,7 @@
     "precommit": "lint-staged",
     "start": "vite --port=3000",
     "preview": "vite preview",
-    "build": "VITE_APP_VERSION=$VERSION NODE_OPTIONS=--max_old_space_size=8000 vite build",
+    "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-client ocrvs-client",
     "test": "yarn test:compilation && NODE_OPTIONS=--max_old_space_size=8000 vitest run",
@@ -18,12 +18,10 @@
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=0",
-    "start:prod": "yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",
-    "build:clean": "rm -rf build",
-    "serve": "node serve-static.js"
+    "build:clean": "rm -rf build"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -69,7 +67,6 @@
     "graphql-tools": "^4.0.7",
     "handlebars": "^4.7.6",
     "history": "^4.7.2",
-    "http-proxy-middleware": "^0.21.0",
     "iframe-resizer-react": "^1.1.0",
     "jsdom-worker": "^0.3.0",
     "jwt-decode": "^2.2.0",
@@ -97,7 +94,7 @@
     "sanitize-html": "^2.4.0",
     "styled-components": "^5.2.0",
     "tsconfig-paths": "^3.13.0",
-    "vite": "^5.0.0",
+    "vite": "^5.4.8",
     "vite-plugin-svgr": "^0.6.0",
     "vite-tsconfig-paths": "^3.5.0",
     "webfontloader": "^1.6.28",
@@ -150,7 +147,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.13.0",
     "eslint-plugin-react-hooks": "^4.0.8",
-    "express": "^4.17.1",
     "fetch-mock": "^10.0.0",
     "glob": "^7.1.2",
     "jsonwebtoken": "^9.0.0",

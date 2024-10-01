@@ -19,7 +19,13 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
-import { Attachment, Event, History, Query } from '@client/utils/gateway'
+import {
+  Attachment,
+  Event,
+  History,
+  Query,
+  RegStatus
+} from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   Action as NavigationAction,
@@ -214,7 +220,7 @@ export interface IDeclaration {
   eventType?: string
   review?: boolean
   event: Event
-  registrationStatus?: string
+  registrationStatus?: RegStatus
   submissionStatus?: string
   downloadStatus?: DOWNLOAD_STATUS
   downloadRetryAttempt?: number
@@ -516,7 +522,7 @@ export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
   event: Event,
-  status?: string,
+  status?: RegStatus,
   duplicates?: IDuplicates[]
 ): IDeclaration {
   return {
@@ -782,13 +788,19 @@ export async function updateWorkqueueData(
     const transformedDeclarationForGroom = draftToGqlTransformer(
       // transforming required section only
       { sections: groomSectionDefinition ? [groomSectionDefinition] : [] },
-      declaration.data
+      declaration.data,
+      declaration.id,
+      getUserDetails(state),
+      getOfflineData(state)
     )
 
     const transformedDeclarationForBride = draftToGqlTransformer(
       // transforming required section only
       { sections: brideSectionDefinition ? [brideSectionDefinition] : [] },
-      declaration.data
+      declaration.data,
+      declaration.id,
+      getUserDetails(state),
+      getOfflineData(state)
     )
 
     transformedNameForGroom =
@@ -815,7 +827,10 @@ export async function updateWorkqueueData(
     const transformedDeclaration = draftToGqlTransformer(
       // transforming required section only
       { sections: sectionDefinition ? [sectionDefinition] : [] },
-      declaration.data
+      declaration.data,
+      declaration.id,
+      getUserDetails(state),
+      getOfflineData(state)
     )
     transformedName =
       (transformedDeclaration &&
@@ -1537,12 +1552,11 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         offlineData,
         userDetails
       )
-      const downloadedAppStatus: string =
-        (eventData &&
-          eventData.registration &&
-          eventData.registration.status &&
-          eventData.registration.status[0].type) ||
-        ''
+      const downloadedAppStatus =
+        eventData &&
+        eventData.registration &&
+        eventData.registration.status &&
+        eventData.registration.status[0].type
       const updateWorkqueue = () =>
         updateRegistrarWorkqueue(userDetails?.practitionerId, 10)
 
