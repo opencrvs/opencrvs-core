@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { ACTIVATE_USERS, COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
+import { env } from './environment'
 import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
@@ -66,7 +66,7 @@ const createUserMutation = print(gql`
 `)
 
 async function getUsers(token: string) {
-  const url = new URL('users', COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('users', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -101,7 +101,7 @@ async function userAlreadyExists(
   token: string,
   username: string
 ): Promise<boolean> {
-  const searchResponse = await fetch(`${GATEWAY_HOST}/graphql`, {
+  const searchResponse = await fetch(`${env.GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ async function userAlreadyExists(
 
 async function getOfficeIdFromIdentifier(identifier: string) {
   const response = await fetch(
-    `${GATEWAY_HOST}/location?identifier=${identifier}`,
+    `${env.GATEWAY_HOST}/location?identifier=${identifier}`,
     {
       headers: {
         'Content-Type': 'application/fhir+json'
@@ -142,7 +142,7 @@ async function getOfficeIdFromIdentifier(identifier: string) {
 }
 
 async function callCreateUserMutation(token: string, userPayload: unknown) {
-  return fetch(`${GATEWAY_HOST}/graphql`, {
+  return fetch(`${env.GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ export async function seedUsers(
           firstNames: givenNames
         }
       ],
-      ...(ACTIVATE_USERS === 'true' && { status: 'active' }),
+      ...(env.ACTIVATE_USERS && { status: 'active' }),
       primaryOffice,
       username
     }
