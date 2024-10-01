@@ -30,7 +30,7 @@ import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@c
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { goToAdvancedSearchResult } from '@client/navigation'
 import { pick } from 'lodash'
-import { IDateRangePickerValue } from '@client/forms'
+import { IDateRangePickerValue, IFormSectionData } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
 import { Accordion } from '@client/../../components/lib/Accordion'
 import {
@@ -154,6 +154,7 @@ const BirthSection = () => {
             'registrationStatuses',
             'registrationByPeriod'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -177,6 +178,7 @@ const BirthSection = () => {
             'childLastName',
             'childGender'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -213,6 +215,7 @@ const BirthSection = () => {
             'eventLocationLevel1',
             'eventLocationLevel2'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -235,6 +238,7 @@ const BirthSection = () => {
             'motherFirstNames',
             'motherFamilyName'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -257,6 +261,7 @@ const BirthSection = () => {
             'fatherFirstNames',
             'fatherFamilyName'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -279,6 +284,7 @@ const BirthSection = () => {
             'informantFirstNames',
             'informantFamilyName'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -358,6 +364,7 @@ const DeathSection = () => {
             'registrationStatuses',
             'registrationByPeriod'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -381,6 +388,7 @@ const DeathSection = () => {
             'deceasedFamilyName',
             'deceasedGender'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -417,6 +425,7 @@ const DeathSection = () => {
             'eventLocationLevel1',
             'eventLocationLevel2'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 
@@ -439,6 +448,7 @@ const DeathSection = () => {
             'informantFirstNames',
             'informantFamilyName'
           ])}
+          draftData={{ advancedSearchForm: formState as IFormSectionData }}
         />
       </Accordion>
 

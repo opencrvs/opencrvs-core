@@ -13,6 +13,9 @@ on: [pull_request]
 
 jobs:
   setup:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -20,7 +23,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - uses: mskelton/changelog-reminder-action@v3
         with:
           message: >
@@ -139,7 +142,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.23.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: 'fs'
           scan-ref: '.'

@@ -10,7 +10,11 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import { IFormFieldValue, IFormData } from '@opencrvs/client/src/forms'
+import {
+  IFormFieldValue,
+  IFormData,
+  IFormSectionData
+} from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -45,7 +49,8 @@ export type MaxLengthValidation = (
 export type Validation = (
   value: IFormFieldValue,
   drafts?: IFormData,
-  offlineCountryConfig?: IOfflineData
+  offlineCountryConfig?: IOfflineData,
+  form?: IFormSectionData
 ) => IValidationResult | undefined
 
 export type ValidationInitializer = (...value: any[]) => Validation
@@ -225,24 +230,20 @@ export const isDateNotPastLimit = (date: string, limit: Date) => {
 }
 
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
-  const birthDate = drafts.deceased && drafts.deceased.birthDate
-  return birthDate
-    ? new Date(date) >= new Date(JSON.stringify(birthDate))
-    : true
+  const birthDate = drafts?.deceased?.birthDate as string
+  return birthDate ? new Date(date) >= new Date(birthDate) : true
 }
 
 export const isDateNotAfterBirthEvent = (date: string, drafts?: IFormData) => {
-  const dateOfBirth = drafts && drafts.child && drafts.child.childBirthDate
-  return dateOfBirth
-    ? new Date(date) <= new Date(JSON.stringify(dateOfBirth))
-    : true
+  const dateOfBirth = drafts?.child?.childBirthDate as string
+  return dateOfBirth ? new Date(date) <= new Date(dateOfBirth) : true
 }
 
 export const isDateNotAfterDeath = (date: string, drafts?: IFormData) => {
-  const deathDate = drafts && drafts.deathEvent && drafts.deathEvent.deathDate
+  const deathDate = drafts?.deathEvent?.deathDate as string
   return deathDate
     ? new Date(date).setHours(0, 0, 0, 0) <=
-        new Date(JSON.stringify(deathDate)).setHours(0, 0, 0, 0)
+        new Date(deathDate).setHours(0, 0, 0, 0)
     : true
 }
 

@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-const express = require('express')
-const path = require('path')
-const app = express()
+import { bool, cleanEnv, str, url } from 'envalid'
 
-app.use(express.static(path.join(__dirname, 'build')))
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'))
+export const env = cleanEnv(process.env, {
+  AUTH_HOST: url({ devDefault: 'http://localhost:4040' }),
+  COUNTRY_CONFIG_HOST: url({ devDefault: 'http://localhost:3040' }),
+  GATEWAY_HOST: url({ devDefault: 'http://localhost:7070' }),
+  SUPER_USER_PASSWORD: str({ devDefault: 'password' }),
+  ACTIVATE_USERS: bool({ devDefault: true })
 })
-require('./src/setupProxy.js')(app)
-app.listen(3000)
