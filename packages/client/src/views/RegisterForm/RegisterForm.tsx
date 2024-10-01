@@ -917,6 +917,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     this.updateVisitedGroups()
+    this.modifyDeclaration(
+      this.getFormValues(),
+      this.props.activeSection,
+      this.props.declaration
+    )
 
     this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
   }
@@ -965,6 +970,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
         visitedGroup.sectionId === this.props.activeSection.id &&
         visitedGroup.groupId === this.props.activeSectionGroup.id
     ) ?? false
+
+  getFormValues = () => {
+    const { activeSectionGroup, declaration, activeSection } = this.props
+    return {
+      ...mapFieldsToValues(
+        activeSectionGroup.fields,
+        declaration.data[activeSection.id],
+        this.props.config,
+        declaration.data,
+        this.props.userDetails
+      ),
+      ...declaration.data[activeSection.id]
+    }
+  }
 
   render() {
     const {
@@ -1199,16 +1218,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 fieldsToShowValidationErrors={
                                   fieldsToShowValidationErrors
                                 }
-                                initialValues={{
-                                  ...mapFieldsToValues(
-                                    activeSectionGroup.fields,
-                                    declaration.data[activeSection.id],
-                                    this.props.config,
-                                    declaration.data,
-                                    this.props.userDetails
-                                  ),
-                                  ...declaration.data[activeSection.id]
-                                }}
+                                initialValues={this.getFormValues()}
                                 fields={getVisibleGroupFields(
                                   activeSectionGroup
                                 )}
