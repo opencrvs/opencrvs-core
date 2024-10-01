@@ -17,21 +17,6 @@ import {
   defaultFieldResolver
 } from 'graphql'
 
-import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
-import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
-import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
-import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
-import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
-import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
-import LocationsAPI from '@gateway/features/fhir/locationsAPI'
-import MetricsAPI from '@gateway/features/fhir/metricsAPI'
-import MinioAPI from '@gateway/features/fhir/minioAPI'
-import PatientAPI from '@gateway/features/fhir/patientAPI'
-import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
-import { resolvers as informantSMSNotificationResolvers } from '@gateway/features/informantSMSNotifications/root-resolvers'
-import { informantSMSNotiTypeResolvers } from '@gateway/features/informantSMSNotifications/type-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
@@ -44,6 +29,9 @@ import { resolvers as searchRootResolvers } from '@gateway/features/search/root-
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
+import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
+import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -65,6 +53,13 @@ import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
 import { merge } from 'lodash'
 import CountryConfigAPI from '@gateway/features/fhir/countryConfigAPI'
+import LocationsAPI from '@gateway/features/fhir/locationsAPI'
+import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
+import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
+import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
+import PatientAPI from '@gateway/features/fhir/patientAPI'
+import MinioAPI from '@gateway/features/fhir/minioAPI'
+import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -80,7 +75,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   locationRootResolvers as IResolvers,
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
-  certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   metricsTypeResolvers as IResolvers,
@@ -89,13 +83,9 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   searchTypeResolvers as IResolvers,
   roleRootResolvers as IResolvers,
   roleTypeResolvers as IResolvers,
-  certificateResolvers as IResolvers,
   correctionRootResolvers as IResolvers,
-  applicationRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  informantSMSNotificationResolvers as IResolvers,
-  informantSMSNotiTypeResolvers as IResolvers,
   OIDPUserInfoResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({

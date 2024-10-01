@@ -11,6 +11,7 @@
 import {
   createTestComponent,
   createTestStore,
+  flushPromises,
   mockOfflineDataDispatch,
   mockRegistrarUserResponse,
   REGISTRAR_DEFAULT_SCOPES,
@@ -45,6 +46,7 @@ describe('Status wise registration count', () => {
     history = storeContext.history
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
     vi.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
     vi.spyOn(performanceUtils, 'isUnderJurisdictionOfUser').mockReturnValue(
       true

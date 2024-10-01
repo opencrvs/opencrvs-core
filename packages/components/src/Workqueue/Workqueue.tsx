@@ -108,7 +108,8 @@ export enum COLUMNS {
   NOTIFICATION_SENT = 'notificationSent',
   NAME = 'name',
   TRACKING_ID = 'trackingId',
-  REGISTRATION_NO = 'registrationNumber'
+  REGISTRATION_NO = 'registrationNumber',
+  NONE = 'none'
 }
 
 export enum SORT_ORDER {

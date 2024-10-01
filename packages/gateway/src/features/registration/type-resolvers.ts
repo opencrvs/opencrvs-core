@@ -181,11 +181,8 @@ export const typeResolvers: GQLResolver = {
     middleName(name: fhir3.HumanName) {
       return name.given?.at(1) ?? ''
     },
-    familyName(name) {
-      if (!name.family) {
-        return null
-      }
-      return Array.isArray(name.family) ? name.family.join(' ') : name.family
+    familyName(name: fhir3.HumanName) {
+      return name.family
     },
     marriedLastName(name) {
       if (!name.suffix) {

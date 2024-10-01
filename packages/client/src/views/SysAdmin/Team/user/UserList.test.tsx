@@ -43,7 +43,8 @@ describe('user list without admin scope', () => {
       payload: mockUserResponse
     }
     await store.dispatch(action)
-    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
 
     const userListMock = [
       {
@@ -95,7 +96,8 @@ describe('User list tests', () => {
       payload: mockLocalSysAdminUserResponse
     }
     await store.dispatch(action)
-    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
   })
 
   describe('Header test', () => {

@@ -41,10 +41,14 @@ const DateRangePickerContainer = styled.div`
 
 const DateRangeBody = styled.div`
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
   ${({ theme }) => theme.fonts.bold14};
   align-items: center;
   margin-top: 8px;
+`
+
+const NoShrinkLink = styled(Link)`
+  flex-shrink: 0;
 `
 
 function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
@@ -94,14 +98,9 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
     })
   }
 
-  const isValidDateRange =
-    props.value.rangeStart !== undefined && props.value.rangeEnd !== undefined
   const dateRangeLabel =
-    formatDateRangeLabel(props.value.rangeStart, props.value.rangeEnd) || ''
-
-  const linkLabel = isValidDateRange
-    ? intl.formatMessage(buttonMessages.edit)
-    : intl.formatMessage(buttonMessages.exactDateUnknown)
+    formatDateRangeLabel(props.value.rangeStart, props.value.rangeEnd) ||
+    intl.formatMessage(buttonMessages.exactDateUnknown)
 
   return (
     <DateRangePickerContainer>
@@ -115,22 +114,25 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
         disabled={props.value.isDateRangeActive}
       />
       <DateRangeBody>
-        {isValidDateRange && (
+        {props.value.isDateRangeActive && (
           <Checkbox
             name={props.inputProps.id + 'date_range_toggle'}
             label={dateRangeLabel || ''}
             value={''}
             selected={props.value.isDateRangeActive || false}
             onChange={handleDateRangeActiveChange}
-          ></Checkbox>
+          />
         )}
 
-        <Link
+        <NoShrinkLink
           id={props.inputProps.id + '-date_range_button'}
           onClick={handleLinkOnClick}
         >
-          {linkLabel}
-        </Link>
+          {props.value.isDateRangeActive
+            ? intl.formatMessage(buttonMessages.edit)
+            : intl.formatMessage(buttonMessages.exactDateUnknown)}
+        </NoShrinkLink>
+
         {modalVisible && (
           <DateRangePicker
             startDate={

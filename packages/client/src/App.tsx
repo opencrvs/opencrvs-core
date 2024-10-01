@@ -65,8 +65,7 @@ import { RecordAudit } from './views/RecordAudit/RecordAudit'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
-import InformantNotification from './views/SysAdmin/Communications/InformantSMSNotification/InformantSMSNotification'
-import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
+import { ReloadModal } from './views/Modals/ReloadModal'
 import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
@@ -109,6 +108,7 @@ export function App(props: IAppProps) {
                     <NotificationComponent>
                       <Switch>
                         <Route>
+                          <ReloadModal />
                           <Page>
                             <MainSection>
                               <ProtectedPage
@@ -253,24 +253,6 @@ export function App(props: IAppProps) {
                                                 routes.REGISTRAR_HOME_TAB_PAGE
                                               }
                                               component={OfficeHome}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin
-                                              // ]}
-                                              path={routes.CERTIFICATE_CONFIG}
-                                              component={CertificatesConfig}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin
-                                              // ]}
-                                              path={
-                                                routes.INFORMANT_NOTIFICATION
-                                              }
-                                              component={InformantNotification}
                                             />
                                             <ProtectedRoute
                                               exact

@@ -15,13 +15,12 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   IDeclaration,
   storeDeclaration,
   modifyDeclaration,
-  createReviewDeclaration,
-  SUBMISSION_STATUS
+  createReviewDeclaration
 } from '@client/declarations'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
@@ -38,7 +37,7 @@ const declaration: IDeclaration = createReviewDeclaration(
   '72c18939-70c1-40b4-9b80-b162c4871160',
   mockDeclarationData,
   Event.Birth,
-  SUBMISSION_STATUS.REGISTERED
+  RegStatus.Registered
 )
 
 declaration.data.mother = {

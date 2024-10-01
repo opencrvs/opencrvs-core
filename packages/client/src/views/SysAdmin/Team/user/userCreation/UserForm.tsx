@@ -86,7 +86,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
   handleFormAction = () => {
     const { formData, activeGroup, offlineCountryConfig } = this.props
-    if (hasFormError(activeGroup.fields, formData, offlineCountryConfig)) {
+    if (hasFormError(activeGroup.fields, formData, offlineCountryConfig, {})) {
       this.showAllValidationErrors()
     } else {
       this.props.userId
@@ -175,6 +175,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               onSetTouched={(setTouchedFunc) => {
                 this.setAllFormFieldsTouched = setTouchedFunc
               }}
+              draftData={{ user: formData }}
               requiredErrorMessage={messages.requiredForNewUser}
               onUploadingStateChanged={this.onUploadingStateChanged}
             />

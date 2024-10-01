@@ -17,7 +17,7 @@ import {
 } from '@search/elasticsearch/utils'
 import { findName, findTaskExtension } from '@search/features/fhir/fhir-utils'
 import * as Hapi from '@hapi/hapi'
-import { client } from '@search/elasticsearch/client'
+import { getOrCreateClient } from '@search/elasticsearch/client'
 import {
   findExtension,
   findLastOfficeFromSavedBundle,
@@ -29,6 +29,7 @@ import {
 } from '@opencrvs/commons/types'
 
 export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
+  const client = getOrCreateClient()
   const bundle = requestBundle.payload as SavedBundle
   const authHeader = requestBundle.headers.authorization
 
@@ -80,6 +81,7 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
 export async function updateEventToRemoveAssignment(
   requestBundle: Hapi.Request
 ) {
+  const client = getOrCreateClient()
   const bundle = requestBundle.payload as SavedBundle
 
   const task = getTaskFromSavedBundle(bundle)

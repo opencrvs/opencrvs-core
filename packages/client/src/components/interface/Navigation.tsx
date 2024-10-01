@@ -20,10 +20,8 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   goToAdvancedSearchResult,
   goToAllUserEmail,
-  goToCertificateConfig,
   goToDashboardView,
   goToHomeTab,
-  goToInformantNotification,
   goToLeaderBoardsView,
   goToOrganisationView,
   goToPerformanceStatistics,
@@ -130,7 +128,6 @@ interface IProps {
 
 interface IDispatchProps {
   goToHomeTab: typeof goToHomeTab
-  goToCertificateConfigAction: typeof goToCertificateConfig
   goToVSExportsAction: typeof goToVSExport
   goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
@@ -144,7 +141,6 @@ interface IDispatchProps {
   goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
-  goToInformantNotification: typeof goToInformantNotification
   goToAllUserEmail: typeof goToAllUserEmail
 }
 
@@ -233,12 +229,8 @@ const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab: string[] = [
-    WORKQUEUE_TABS.application,
-    WORKQUEUE_TABS.certificate,
-    WORKQUEUE_TABS.systems,
-    WORKQUEUE_TABS.userRoles
-  ]
+
+  const configTab: string[] = [WORKQUEUE_TABS.systems]
   const conmmunicationTab: string[] = [
     WORKQUEUE_TABS.informantNotification,
     WORKQUEUE_TABS.emailAllUsers
@@ -366,7 +358,6 @@ const NavigationView = (props: IFullProps) => {
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      buildVersion={import.meta.env.VITE_APP_VERSION ?? 'Development'}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
@@ -735,7 +726,8 @@ const NavigationView = (props: IFullProps) => {
                   ) as IAdvancedSearchParamState
                   setAdvancedSearchParam({
                     ...filteredParam,
-                    searchId: bookmarkResult?.searchId
+                    searchId: bookmarkResult?.searchId,
+                    bookmarkName: bookmarkResult?.name
                   })
                   goToAdvancedSearchResultAction()
                 }}
@@ -813,7 +805,6 @@ export const Navigation = connect<
   IStoreState
 >(mapStateToProps, {
   goToHomeTab,
-  goToCertificateConfigAction: goToCertificateConfig,
   goToAdvancedSearchResultAction: goToAdvancedSearchResult,
   goToVSExportsAction: goToVSExport,
   goToPerformanceViewAction: goToPerformanceView,
@@ -827,7 +818,6 @@ export const Navigation = connect<
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,
-  goToInformantNotification,
   goToAllUserEmail
 })(injectIntl(withRouter(NavigationView)))
 

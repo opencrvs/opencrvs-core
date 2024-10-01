@@ -268,7 +268,7 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Bashir'],
-            family: ['Khan']
+            family: 'Khan'
           }
         ],
         gender: 'male',
@@ -361,7 +361,7 @@ export const CERTIFIED_BIRTH_RECORD: SavedBundle<
           {
             use: 'en',
             given: ['Jane'],
-            family: ['Foster']
+            family: 'Foster'
           }
         ],
         identifier: [

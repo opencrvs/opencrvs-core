@@ -115,24 +115,6 @@ export async function updateCertificateHandler(
   }
 }
 
-export async function deleteCertificateHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const certificateId = request.params.certificateId
-  if (!certificateId) {
-    return h.response('No certificate id in URL params').code(404)
-  }
-  try {
-    await Certificate.findOneAndRemove({ _id: certificateId })
-  } catch (err) {
-    return h
-      .response(`Could not delete certificate: ${certificateId}`)
-      .code(400)
-  }
-  return h.response().code(204)
-}
-
 export const requestActiveCertificate = Joi.object({
   status: Joi.string().required(),
   event: Joi.string().required()

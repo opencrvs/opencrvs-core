@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/react" />
 
 interface ImportMetaEnv {
-  readonly VITE_APP_VERSION?: string
   readonly COUNTRY_CONFIG_URL?: string
   // more env variables...
 }
@@ -19,3 +19,5 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+declare const APP_VERSION: string

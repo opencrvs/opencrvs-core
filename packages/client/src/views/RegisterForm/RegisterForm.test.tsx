@@ -18,7 +18,9 @@ import {
   getRegisterFormFromStore,
   getReviewFormFromStore,
   createTestStore,
-  flushPromises
+  flushPromises,
+  userDetails,
+  mockOfflineData
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -27,7 +29,8 @@ import {
   createReviewDeclaration,
   storeDeclaration,
   setInitialDeclarations,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  IDeclaration
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { AppStore } from '@client/store'
@@ -40,7 +43,7 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
 import { IFormData } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
@@ -48,7 +51,6 @@ import * as profileSelectors from '@client/profile/profileSelectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
-import { DECLARED } from '@client/utils/constants'
 import { vi } from 'vitest'
 import { createClient } from '@client/utils/apolloClient'
 import { ApolloClient } from '@apollo/client'
@@ -495,7 +497,7 @@ describe('when user is in the register form from sent for review edit', () => {
       uuid(),
       mockDeclarationData,
       Event.Birth,
-      DECLARED
+      RegStatus.Declared
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
@@ -575,7 +577,7 @@ describe('When user is in Preview section death event', () => {
   let store: AppStore
   let history: History
   let component: ReactWrapper<{}, {}>
-  let deathDraft
+  let deathDraft: IDeclaration
   let deathForm: IForm
 
   const mock: any = vi.fn()
@@ -630,15 +632,25 @@ describe('When user is in Preview section death event', () => {
 
   it('Check if death location type is parsed properly', () => {
     expect(
-      draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
-        .eventLocation.type
+      draftToGqlTransformer(
+        deathForm,
+        mockDeathDeclarationData as IFormData,
+        deathDraft.id,
+        userDetails,
+        mockOfflineData
+      ).eventLocation.type
     ).toBe('OTHER')
   })
 
   it('Check if death location partOf is parsed properly', () => {
     expect(
-      draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
-        .eventLocation.address.country
+      draftToGqlTransformer(
+        deathForm,
+        mockDeathDeclarationData as IFormData,
+        deathDraft.id,
+        userDetails,
+        mockOfflineData
+      ).eventLocation.address.country
     ).toEqual('FAR')
   })
 
@@ -664,7 +676,10 @@ describe('When user is in Preview section death event', () => {
     expect(
       draftToGqlTransformer(
         deathForm,
-        hospitalLocatioMockDeathDeclarationData as IFormData
+        hospitalLocatioMockDeathDeclarationData as IFormData,
+        '123',
+        userDetails,
+        mockOfflineData
       ).eventLocation.address
     ).toBe(undefined)
   })
@@ -681,7 +696,10 @@ describe('When user is in Preview section death event', () => {
     expect(
       draftToGqlTransformer(
         deathForm,
-        hospitalLocatioMockDeathDeclarationData as IFormData
+        hospitalLocatioMockDeathDeclarationData as IFormData,
+        '123',
+        userDetails,
+        mockOfflineData
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
   })
@@ -690,8 +708,13 @@ describe('When user is in Preview section death event', () => {
     const mockDeathDeclaration = clone(mockDeathDeclarationData)
     mockDeathDeclaration.deathEvent.placeOfDeath = 'PRIMARY_ADDRESS'
     expect(
-      draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
-        .eventLocation.type
+      draftToGqlTransformer(
+        deathForm,
+        mockDeathDeclaration as IFormData,
+        '123',
+        userDetails,
+        mockOfflineData
+      ).eventLocation.type
     ).toBe('PRIMARY_ADDRESS')
   })
 })
@@ -830,7 +853,10 @@ describe('When user is in Preview section marriage event', () => {
     expect(
       draftToGqlTransformer(
         marriageForm,
-        mockMarriageDeclarationData as unknown as IFormData
+        mockMarriageDeclarationData as unknown as IFormData,
+        '123',
+        userDetails,
+        mockOfflineData
       ).eventLocation.address.country
     ).toEqual('FAR')
   })
@@ -839,7 +865,10 @@ describe('When user is in Preview section marriage event', () => {
     expect(
       draftToGqlTransformer(
         marriageForm,
-        mockMarriageDeclarationData as unknown as IFormData
+        mockMarriageDeclarationData as unknown as IFormData,
+        '123',
+        userDetails,
+        mockOfflineData
       ).witnessOne._fhirID
     ).toEqual('36972633-1c80-4fb4-a636-17f7dc9c2e14')
   })

@@ -123,6 +123,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { IReviewFormState } from '@client/forms/register/reviewReducer'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -175,6 +176,7 @@ interface IStateProps {
   workqueueDeclaration: GQLEventSearchSet | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
+  reviewForm: IReviewFormState
 }
 
 interface IDispatchProps {
@@ -291,7 +293,8 @@ function RecordAuditBody({
   goToUserProfile,
   goToTeamUserList,
   goBack,
-  offlineData
+  offlineData,
+  reviewForm
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
@@ -302,6 +305,7 @@ function RecordAuditBody({
   offlineData: Partial<IOfflineData>
   refetchDeclarationInfo?: () => void
   tab: IRecordAuditTabs
+  reviewForm: IReviewFormState
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
@@ -548,7 +552,8 @@ function RecordAuditBody({
     goToUser: goToUserProfile,
     registerForm: regForm,
     offlineData,
-    draft
+    draft,
+    reviewForm
   }
 
   const mobileProps: IAppBarProps = {
@@ -849,7 +854,8 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
         state.workqueueState.workqueue.data[tab]?.results?.find(
           (gqlSearchSet) => gqlSearchSet?.id === declarationId
         )) ||
-      null
+      null,
+    reviewForm: state.reviewForm
   }
 }
 

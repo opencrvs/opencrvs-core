@@ -162,7 +162,7 @@ const ReadyForReviewComponent = ({
               event: reg.event,
               compositionId: reg.id,
               action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: reg.assignment
+              assignment: reg.assignment ?? undefined
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus as DOWNLOAD_STATUS}
