@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { dropCollectionsExcept } from '../../utils/resource-helper.js'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const result = await db.dropDatabase()
-      console.log(`Database drop result: ${result}`)
+      await dropCollectionsExcept(db, 'changelog')
     })
   } finally {
     console.log(
