@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { Db } from 'mongodb'
 import { NotificationContent } from './migration-interfaces.js'
 
 export const INFORMANT_SMS_NOTIFICATION_COLLECTION = 'informantsmsnotifications'
@@ -31,4 +32,26 @@ export function getNotificationContent(): NotificationContent[] {
     createdAt: Date.now(),
     updatedAt: Date.now()
   }))
+}
+
+export const dropCollectionsExcept = async (
+  db: Db,
+  collectionToKeep: string
+) => {
+  const allCollections = await db.listCollections().toArray()
+  const collectionNames = allCollections.map((col) => col.name)
+  const filteredCollectionNames = collectionNames.filter(
+    (c) => c !== collectionToKeep
+  )
+
+  for (const collection of filteredCollectionNames) {
+    await db
+      .collection(collection)
+      .drop()
+      .catch((error) => {
+        console.error(`Error dropping collection ${collection}:`, error)
+      })
+  }
+
+  console.log(`Removed collections: ${filteredCollectionNames.toString()}`)
 }
