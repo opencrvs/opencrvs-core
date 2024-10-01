@@ -25,6 +25,9 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: mskelton/changelog-reminder-action@v3
+        # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
+        # to fail
+        continue-on-error: true
         with:
           message: >
             Oops! Looks like you forgot to update the changelog.
