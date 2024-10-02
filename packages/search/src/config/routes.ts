@@ -61,8 +61,6 @@ export const getRoutes = () => {
       method: 'GET',
       path: '/ping',
       handler: async (request: any, h: any) => {
-        console.trace()
-
         try {
           const res = await client.ping(undefined, { meta: true })
 
