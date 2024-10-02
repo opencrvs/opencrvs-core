@@ -26,10 +26,10 @@ export const env = cleanEnv(process.env, {
   FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
 
-  NATIONAL_ID_OIDP_BASE_URL: str({ devDefault: undefined }),
-  NATIONAL_ID_OIDP_CLIENT_ID: str({ devDefault: undefined }),
-  NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS: str({ devDefault: undefined }),
-  NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS: str({ devDefault: undefined }),
+  NATIONAL_ID_OIDP_BASE_URL: str({ default: undefined }),
+  NATIONAL_ID_OIDP_CLIENT_ID: str({ default: undefined }),
+  NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS: str({ default: undefined }),
+  NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS: str({ default: undefined }),
 
   MINIO_BUCKET: str({ devDefault: 'ocrvs' })
 })
