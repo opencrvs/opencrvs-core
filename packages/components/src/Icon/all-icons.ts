@@ -67,6 +67,7 @@ export {
   WarningCircle,
   X,
   CircleWavyCheck,
-  CircleWavyQuestion
+  CircleWavyQuestion,
+  UserCircle
 } from 'phosphor-react'
 export * from './custom-icons'
