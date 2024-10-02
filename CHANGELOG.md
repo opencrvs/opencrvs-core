@@ -35,6 +35,7 @@
 
 - Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
 - Remove the leftover features from the application config pages, such as certificates and informant notification. [#7156](https://github.com/opencrvs/opencrvs-core/issues/7156)
+- **PDF page size** The generated PDF used to be defaulted to A4 size. Now it respects the SVG dimensions if specified
 
 ## Bug fixes
 
