@@ -23,7 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  e2e:
+  trigger-e2e:
     if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
     steps:
@@ -119,6 +119,10 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "If everything goes alright, you should see your stack getting deployed here: https://${{ steps.dispatch_e2e.outputs.stack }}.opencrvs.dev" >> $GITHUB_STEP_SUMMARY
 
+  listen-e2e:
+    needs: trigger-e2e
+    runs-on: ubuntu-22.04
+    steps:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
         with:
@@ -126,7 +130,7 @@ jobs:
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
-            const runId = ${{ steps.dispatch_e2e.outputs.runId }};
+            const runId = ${{ needs.trigger-e2e.outputs.runId }};
             const prNumber = ${{ github.event.pull_request.number }};
 
             function slugify(str) {
