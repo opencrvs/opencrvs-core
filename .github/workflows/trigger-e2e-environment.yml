@@ -126,7 +126,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "If everything goes alright, you should see your stack getting deployed here: $DEPLOYMENT_LINK" >> $GITHUB_STEP_SUMMARY
 
-          echo "::set-output name=e2e_run_link::$E2E_RUN_LINK"
+          echo "deployment_link=$DEPLOYMENT_LINK" >> $GITHUB_OUTPUT
 
   listen-e2e:
     needs: trigger-e2e
