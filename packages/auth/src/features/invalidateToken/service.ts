@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { setex } from '@auth/database'
-import {
-  INVALID_TOKEN_NAMESPACE,
-  CONFIG_TOKEN_EXPIRY_SECONDS
-} from '@auth/constants'
+import { INVALID_TOKEN_NAMESPACE } from '@auth/constants'
+import { env } from '@auth/environment'
 
 export async function invalidateToken(token: string) {
   return setex(
     `${INVALID_TOKEN_NAMESPACE}:${token}`,
-    CONFIG_TOKEN_EXPIRY_SECONDS,
+    env.CONFIG_TOKEN_EXPIRY_SECONDS,
     'INVALID'
   )
 }
