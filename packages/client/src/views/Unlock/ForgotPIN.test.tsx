@@ -22,7 +22,7 @@ import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
-import { SystemRoleType, Status } from '@client/utils/gateway'
+import { Status } from '@client/utils/gateway'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
@@ -75,7 +75,13 @@ describe('ForgotPIN tests', () => {
                   familyName: 'Ashraful'
                 }
               ],
-              role: SystemRoleType.LocalRegistrar,
+              role: {
+                label: {
+                  defaultMessage: 'Local Registrar',
+                  description: 'Name for user role Local Registrar',
+                  id: 'userRole.localRegistrar'
+                }
+              },
               signature: undefined
             }
           }

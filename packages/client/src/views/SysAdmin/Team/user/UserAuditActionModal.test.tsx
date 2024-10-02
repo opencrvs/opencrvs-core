@@ -18,7 +18,7 @@ import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
-import { SystemRoleType, Status } from '@client/utils/gateway'
+import { Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 const users: UserDetails[] = [
@@ -40,7 +40,13 @@ const users: UserDetails[] = [
           familyName: 'Huq'
         }
       ],
-      role: SystemRoleType.LocalRegistrar,
+      role: {
+        label: {
+          defaultMessage: 'Local Registrar',
+          description: 'Name for user role Local Registrar',
+          id: 'userRole.localRegistrar'
+        }
+      },
       signature: undefined
     },
     role: {
@@ -88,7 +94,13 @@ const users: UserDetails[] = [
           familyName: 'Islam'
         }
       ],
-      role: SystemRoleType.LocalRegistrar,
+      role: {
+        label: {
+          defaultMessage: 'Local Registrar',
+          description: 'Name for user role Local Registrar',
+          id: 'userRole.localRegistrar'
+        }
+      },
       signature: undefined
     },
     creationDate: '2022-10-03T10:42:46.920Z',
