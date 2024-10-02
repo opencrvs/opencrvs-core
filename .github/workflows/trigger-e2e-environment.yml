@@ -26,6 +26,8 @@ jobs:
   trigger-e2e:
     if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
+    outputs:
+      runId: ${{ steps.dispatch_e2e.outputs.runId }}
     steps:
       - uses: actions/checkout@v3
 
