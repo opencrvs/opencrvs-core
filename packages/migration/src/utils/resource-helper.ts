@@ -33,25 +33,3 @@ export function getNotificationContent(): NotificationContent[] {
     updatedAt: Date.now()
   }))
 }
-
-export const dropCollectionsExcept = async (
-  db: Db,
-  collectionToKeep: string
-) => {
-  const allCollections = await db.listCollections().toArray()
-  const collectionNames = allCollections.map((col) => col.name)
-  const filteredCollectionNames = collectionNames.filter(
-    (c) => c !== collectionToKeep
-  )
-
-  for (const collection of filteredCollectionNames) {
-    await db
-      .collection(collection)
-      .drop()
-      .catch((error) => {
-        console.error(`Error dropping collection ${collection}:`, error)
-      })
-  }
-
-  console.log(`Removed collections: ${filteredCollectionNames.toString()}`)
-}
