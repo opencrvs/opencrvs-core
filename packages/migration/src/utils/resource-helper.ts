@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Db } from 'mongodb'
 import { NotificationContent } from './migration-interfaces.js'
 
 export const INFORMANT_SMS_NOTIFICATION_COLLECTION = 'informantsmsnotifications'
