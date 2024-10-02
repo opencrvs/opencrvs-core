@@ -117,7 +117,6 @@ jobs:
         # Skip temporarily for non-develop branches because of
         # a TOOMANYREQUESTS error failing the check
         # https://github.com/aquasecurity/trivy/discussions/7591
-        if: ${{ needs.base.outputs.branch == 'develop' }}
         uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
