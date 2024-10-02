@@ -27,7 +27,8 @@ jobs:
     if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
     outputs:
-      runId: ${{ steps.dispatch_e2e.outputs.runId }}
+      run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
+      deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
       - uses: actions/checkout@v3
 
@@ -109,17 +110,23 @@ jobs:
               console.log(`Captured runId: ${runId}`);
 
               // Set the runId as an output
-              core.setOutput('runId', runId);
+              core.setOutput('run_id', runId);
             } else {
               throw new Error('No workflow run found.');
             }
 
       - name: Print link to E2E workflow run
+        id: print-links
         run: |
-          echo "See your E2E deployment run details here: https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.runId }}" >> $GITHUB_STEP_SUMMARY
+          E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
+          DEPLOYMENT_LINK="https://${{ steps.dispatch_e2e.outputs.stack }}.opencrvs.dev"
+
+          echo "See your E2E deployment run details here: $E2E_RUN_LINK" >> $GITHUB_STEP_SUMMARY
           echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.dispatch_e2e.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "If everything goes alright, you should see your stack getting deployed here: https://${{ steps.dispatch_e2e.outputs.stack }}.opencrvs.dev" >> $GITHUB_STEP_SUMMARY
+          echo "If everything goes alright, you should see your stack getting deployed here: $DEPLOYMENT_LINK" >> $GITHUB_STEP_SUMMARY
+
+          echo "::set-output name=e2e_run_link::$E2E_RUN_LINK"
 
   listen-e2e:
     needs: trigger-e2e
@@ -132,20 +139,9 @@ jobs:
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
-            const runId = ${{ needs.trigger-e2e.outputs.runId }};
+            const runId = ${{ needs.trigger-e2e.outputs.run_id }};
             const prNumber = ${{ github.event.pull_request.number }};
-
-            function slugify(str) {
-              return str
-                .toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .substr(0, 35);
-            }
-            const branchName = slugify('${{ env.BRANCH_NAME }}');
-            const deployMessage = `Your environment is deployed to https://${branchName}.opencrvs.dev.`;
+            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
 
             let deployJobCompleted = false;
 
@@ -220,7 +216,7 @@ jobs:
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
-            const runId = ${{ steps.dispatch_e2e.outputs.runId }};
+            const runId = ${{ needs.trigger-e2e.outputs.run_id }};
             let status = 'in_progress';
 
             while (status === 'in_progress' || status === 'queued') {
