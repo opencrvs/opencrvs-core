@@ -8,4 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+import { bool, cleanEnv, str, url } from 'envalid'
+
+export const env = cleanEnv(process.env, {
+  AUTH_HOST: url({ devDefault: 'http://localhost:4040' }),
+  COUNTRY_CONFIG_HOST: url({ devDefault: 'http://localhost:3040' }),
+  GATEWAY_HOST: url({ devDefault: 'http://localhost:7070' }),
+  SUPER_USER_PASSWORD: str({ devDefault: 'password' }),
+  ACTIVATE_USERS: bool({ devDefault: true })
+})
