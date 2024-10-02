@@ -96,7 +96,6 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  updateRole: GQLResponse
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
@@ -480,20 +479,8 @@ export interface GQLEventProgressResultSet {
 
 export interface GQLUserRole {
   id: string
-  value: GQLSystemRoleType
-  roles: Array<GQLRole>
-  active: boolean
-}
-
-export interface GQLComparisonInput {
-  eq?: string
-  gt?: string
-  lt?: string
-  gte?: string
-  lte?: string
-  in?: Array<string>
-  ne?: string
-  nin?: Array<string>
+  label: GQLI18nMessage
+  scopes: Array<string>
 }
 
 export interface GQLSystem {
@@ -629,17 +616,6 @@ export interface GQLAvatar {
 export interface GQLAvatarInput {
   type: string
   data: string
-}
-
-export interface GQLResponse {
-  roleIdMap: GQLMap
-}
-
-export interface GQLSystemRoleInput {
-  id: string
-  value?: string
-  active?: boolean
-  roles?: Array<GQLRoleInput>
 }
 
 export interface GQLSystemSecret {
@@ -854,7 +830,7 @@ export const enum GQLStatus {
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: GQLSystemRoleType
+  role: GQLUserRole
   signature?: GQLSignature
 }
 
@@ -1207,11 +1183,6 @@ export interface GQLSignatureInput {
   type?: string
 }
 
-export interface GQLRoleInput {
-  _id?: string
-  labels: Array<GQLLabelInput>
-}
-
 export interface GQLSystemSettingsInput {
   dailyQuota?: number
   webhook?: Array<GQLWebhookInput | null>
@@ -1307,16 +1278,6 @@ export interface GQLPayment {
   outcome: GQLPaymentOutcomeType
   date: GQLDate
   attachmentURL?: string
-}
-
-export const enum GQLSystemRoleType {
-  FIELD_AGENT = 'FIELD_AGENT',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  LOCAL_SYSTEM_ADMIN = 'LOCAL_SYSTEM_ADMIN',
-  NATIONAL_SYSTEM_ADMIN = 'NATIONAL_SYSTEM_ADMIN',
-  PERFORMANCE_MANAGEMENT = 'PERFORMANCE_MANAGEMENT',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR'
 }
 
 export interface GQLAdvancedSeachParameters {
@@ -1612,11 +1573,6 @@ export interface GQLDeceasedInput {
   deathDate?: GQLPlainDate
 }
 
-export interface GQLLabelInput {
-  lang: string
-  label: string
-}
-
 export interface GQLAuditLogItemBase {
   time: string
   ipAddress: string
@@ -1741,13 +1697,11 @@ export interface GQLResolver {
   EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   UserRole?: GQLUserRoleTypeResolver
-  CertificateSVG?: GQLCertificateSVGTypeResolver
   System?: GQLSystemTypeResolver
   UserInfo?: GQLUserInfoTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
-  Response?: GQLResponseTypeResolver
   SystemSecret?: GQLSystemSecretTypeResolver
   BookMarkedSearches?: GQLBookMarkedSearchesTypeResolver
   Map?: GraphQLScalarType
@@ -2424,15 +2378,7 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetSystemRolesArgs {
-  title?: string
-  value?: GQLComparisonInput
-  role?: string
-  active?: boolean
-  sortBy?: string
-  sortOrder?: string
-}
-export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
+export interface QueryToGetUserRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -2511,7 +2457,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  updateRole?: MutationToUpdateRoleResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
@@ -3174,18 +3119,6 @@ export interface MutationToResetPasswordInviteResolver<
   (
     parent: TParent,
     args: MutationToResetPasswordInviteArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToUpdateRoleArgs {
-  systemRole?: GQLSystemRoleInput
-}
-export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToUpdateRoleArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5332,16 +5265,7 @@ export interface UserRoleToLabelResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface SystemRoleToRolesResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface SystemRoleToActiveResolver<TParent = any, TResult = any> {
+export interface UserRoleToScopesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -5568,19 +5492,6 @@ export interface AvatarToTypeResolver<TParent = any, TResult = any> {
 }
 
 export interface AvatarToDataResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLResponseTypeResolver<TParent = any> {
-  roleIdMap?: ResponseToRoleIdMapResolver<TParent>
-}
-
-export interface ResponseToRoleIdMapResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
