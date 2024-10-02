@@ -426,11 +426,15 @@ const ActionDetailsModalListTable = ({
       }`
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
-      if (certificate.certifier?.role) {
+
+      if (certificate.certifier?.role)
         return `${collectorName} (${intl.formatMessage(
           certificate.certifier.role.label
         )})`
-      }
+
+      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE')
+        return `${collectorName} (${certificate.collector.otherRelationship})`
+
       return collectorName
     }
 
@@ -452,9 +456,11 @@ const ActionDetailsModalListTable = ({
   const certificateCollector = [
     {
       key: 'collector',
-      label: collectorData.relationship
-        ? intl.formatMessage(certificateMessages.printedOnCollection)
-        : intl.formatMessage(certificateMessages.printedOnAdvance),
+      label:
+        !collectorData.relationship || // relationship should not be available if certifier is found for certificate
+        collectorData.relationship === 'PRINT_IN_ADVANCE'
+          ? intl.formatMessage(certificateMessages.printedOnAdvance)
+          : intl.formatMessage(certificateMessages.printedOnCollection),
       width: 100
     }
   ]
