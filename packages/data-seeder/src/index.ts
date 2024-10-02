@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { AUTH_HOST, GATEWAY_HOST, SUPER_USER_PASSWORD } from './constants'
+import { env } from './environment'
 import fetch from 'node-fetch'
 import { seedLocations } from './locations'
 import { seedRoles } from './roles'
@@ -19,12 +19,12 @@ import gql from 'graphql-tag'
 import decode from 'jwt-decode'
 
 async function getToken(): Promise<string> {
-  const authUrl = new URL('authenticate-super-user', AUTH_HOST).toString()
+  const authUrl = new URL('authenticate-super-user', env.AUTH_HOST).toString()
   const res = await fetch(authUrl, {
     method: 'POST',
     body: JSON.stringify({
       username: 'o.admin',
-      password: SUPER_USER_PASSWORD
+      password: env.SUPER_USER_PASSWORD
     }),
     headers: {
       'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ function getTokenPayload(token: string): TokenPayload {
 
 async function deactivateSuperuser(token: string) {
   const { sub } = getTokenPayload(token)
-  const res = await fetch(`${GATEWAY_HOST}/graphql`, {
+  const res = await fetch(`${env.GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
