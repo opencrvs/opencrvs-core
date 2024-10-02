@@ -29,7 +29,5 @@ export const env = cleanEnv(process.env, {
   NATIONAL_ID_OIDP_BASE_URL: str({ default: undefined }),
   NATIONAL_ID_OIDP_CLIENT_ID: str({ default: undefined }),
   NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS: str({ default: undefined }),
-  NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS: str({ default: undefined }),
-
-  MINIO_BUCKET: str({ devDefault: 'ocrvs' })
+  NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS: str({ default: undefined })
 })
