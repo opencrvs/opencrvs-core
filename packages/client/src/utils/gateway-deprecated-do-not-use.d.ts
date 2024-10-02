@@ -113,8 +113,6 @@ export interface GQLMutation {
   usernameReminder?: string
   resetPasswordInvite?: string
   updateRole: GQLResponse
-  createOrUpdateCertificateSVG?: GQLCertificateSVG
-  updateApplicationConfig?: GQLApplicationConfiguration
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
@@ -123,7 +121,6 @@ export interface GQLMutation {
   deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
-  toggleInformantSMSNotification?: Array<GQLSMSNotification>
 }
 
 export interface GQLDummy {
@@ -2790,8 +2787,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
   updateRole?: MutationToUpdateRoleResolver<TParent>
-  createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
-  updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
@@ -2800,7 +2795,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
-  toggleInformantSMSNotification?: MutationToToggleInformantSMSNotificationResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {

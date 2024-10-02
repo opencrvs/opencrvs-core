@@ -95,12 +95,12 @@ export type TaskIdentifier =
 export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
 
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
-type AllSystems = ExtractSystem<TaskIdentifier>
+export type TaskIdentifierSystem = ExtractSystem<TaskIdentifier>
 
 type AfterLastSlash<S extends string> =
   S extends `${infer _Start}/${infer Rest}` ? AfterLastSlash<Rest> : S
 
-export type TaskIdentifierSystemType = AfterLastSlash<AllSystems>
+export type TaskIdentifierSystemType = AfterLastSlash<TaskIdentifierSystem>
 
 export type Task = Omit<
   fhir3.Task,
@@ -227,6 +227,7 @@ export function sortTasksDescending<T extends { lastModified: string }>(
     )
   })
 }
+
 export const findTaskHistories = (
   bundle: Bundle,
   sort = sortTasksAscending
@@ -239,6 +240,15 @@ export const findTaskHistories = (
       .map(({ resource }) => resource)
   )
 }
+
+export const findAllTasks = (bundle: Bundle, sort = sortTasksAscending) =>
+  sort(
+    bundle.entry
+      .filter((entry): entry is BundleEntry<Task | TaskHistory> =>
+        isTaskOrTaskHistory(entry.resource)
+      )
+      .map(({ resource }) => resource)
+  )
 
 export const findFirstTaskHistory = (bundle: Bundle) =>
   findTaskHistories(bundle).at(0)
@@ -502,4 +512,27 @@ export function notCorrectedHistory(
     }
   }
   return true
+}
+
+export const getLastStatusChangedAt = (bundle: Bundle, task: Task) => {
+  const taskHistories = findTaskHistories(bundle)
+
+  if (taskHistories.length === 0)
+    return new Date(task.lastModified).getTime().toString()
+
+  if (
+    task.businessStatus.coding[0].code !==
+    taskHistories.at(-1)?.businessStatus.coding[0].code
+  )
+    return new Date(task.lastModified).getTime().toString()
+
+  for (let i = taskHistories.length - 1; i > 0; i--) {
+    if (
+      taskHistories[i].businessStatus.coding[0].code !==
+      taskHistories[i - 1].businessStatus.coding[0].code
+    )
+      return new Date(taskHistories[i].lastModified).getTime().toString()
+  }
+
+  return new Date(taskHistories[0].lastModified).getTime().toString()
 }

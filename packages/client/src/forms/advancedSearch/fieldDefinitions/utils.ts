@@ -11,6 +11,13 @@
 // eslint-disable-next-line no-restricted-imports
 import { isValid, parse } from 'date-fns'
 
+export enum TIME_PERIOD {
+  LAST_7_DAYS = 'LAST_7_DAYS',
+  LAST_30_DAYS = 'LAST_30_DAYS',
+  LAST_90_DAYS = 'LAST_90_DAYS',
+  LAST_YEAR = 'LAST_YEAR'
+}
+
 const validateDate = (dateString: string) => {
   const formats = ['yyyy-M-d', 'yyyy-MM-dd']
   return formats.some((format) =>

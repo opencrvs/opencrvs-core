@@ -12,13 +12,17 @@ import {
   advancedSearch,
   formatSearchParams
 } from '@search/features/search/service'
-import { client } from '@search/elasticsearch/client'
+import * as esClient from '@search/elasticsearch/client'
 import { SortOrder } from '@search/features/search/types'
 import { UUID } from '@opencrvs/commons'
 
-describe('elasticsearch db helper', () => {
+describe('Search service', () => {
   it('should index a composition with proper configuration', async () => {
-    const searchSpy = jest.spyOn(client, 'search')
+    const searchMock = jest.fn()
+    jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue({
+      search: searchMock
+    } as any)
+
     await advancedSearch(false, {
       parameters: {
         trackingId: 'dummy',
@@ -32,22 +36,31 @@ describe('elasticsearch db helper', () => {
       from: 0,
       size: 10
     })
-    expect(searchSpy).toBeCalled()
+    expect(searchMock).toBeCalled()
   })
 
   it('should index a composition with minimum configuration', async () => {
-    const searchSpy = jest.spyOn(client, 'search')
-    advancedSearch(false, {
+    const searchMock = jest.fn()
+    jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue({
+      search: searchMock
+    } as any)
+
+    await advancedSearch(false, {
       parameters: {
         event: 'birth'
       }
     })
-    expect(searchSpy).toBeCalled()
+
+    expect(searchMock).toBeCalled()
   })
 
   it('should index a composition and call combination search configuration', async () => {
-    const searchSpy = jest.spyOn(client, 'search')
-    advancedSearch(false, {
+    const searchMock = jest.fn()
+    jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue({
+      search: searchMock
+    } as any)
+
+    await advancedSearch(false, {
       parameters: {
         trackingId: 'dummy',
         contactNumber: 'dummy',
@@ -59,7 +72,7 @@ describe('elasticsearch db helper', () => {
       from: 0,
       size: 10
     })
-    expect(searchSpy).toBeCalled()
+    expect(searchMock).toBeCalled()
   })
 })
 

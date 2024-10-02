@@ -18,9 +18,8 @@ export const indexComposition = async (
   body: SearchDocument,
   client: elasticsearch.Client
 ) => {
-  let response: any
   try {
-    response = await client.index(
+    return await client.index(
       {
         index: OPENCRVS_INDEX_NAME,
         id: compositionIdentifier,
@@ -34,7 +33,7 @@ export const indexComposition = async (
   } catch (e) {
     logger.error(`indexComposition: error: ${e}`)
   }
-  return response
+  return
 }
 
 export const updateComposition = async (

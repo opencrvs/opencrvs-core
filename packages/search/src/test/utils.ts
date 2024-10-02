@@ -17,6 +17,9 @@ import {
   URLReference
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+import { isNil } from 'lodash'
+import * as jwt from 'jsonwebtoken'
+import { readFileSync } from 'fs'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,6 +31,27 @@ import { UUID } from '@opencrvs/commons'
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+export const getOrThrow = <T>(value: T | undefined, message: string): T => {
+  if (isNil(value)) {
+    throw new Error(message ?? 'Tried to access a nil value')
+  }
+
+  return value
+}
+
+export const generateBearerTokenHeader = (scope: { scope?: string[] } = {}) => {
+  const token = jwt.sign(scope, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:search-user'
+  })
+
+  return {
+    Authorization: `Bearer ${token}`
+  }
+}
+
 export const mockBirthFhirBundle: SavedBundle<
   | Composition
   | Encounter
@@ -230,7 +254,7 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Salam'],
-            family: ['Ahmed']
+            family: 'Ahmed'
           }
         ],
         gender: 'male',
@@ -297,7 +321,7 @@ export const mockBirthFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Sufiana'],
-            family: ['Khatum']
+            family: 'Khatum'
           }
         ],
         identifier: [
@@ -1185,7 +1209,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -1241,7 +1265,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Zack'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         gender: 'female',
@@ -1321,7 +1345,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: [''],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
 
@@ -1506,7 +1530,7 @@ export const mockDeathFhirBundle: SavedBundle<
           {
             use: 'en',
             given: ['Frank'],
-            family: ['Pacocha']
+            family: 'Pacocha'
           }
         ],
         birthDate: '2003-08-16',
@@ -2776,7 +2800,6 @@ export const mockSearchResponse = {
       hits: [
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
           _score: 2.7509375,
           _source: {
@@ -2809,7 +2832,6 @@ export const mockSearchResponseWithoutCreatedBy = {
       hits: [
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'c99e8d62-335e-458d-9fcc-45ec5836c404',
           _score: 2.7509375,
           _source: {
@@ -3363,7 +3385,6 @@ export const mockSearchResult = {
       hits: [
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'BGM9CA2',
           _score: 1,
           _source: {
@@ -3380,7 +3401,6 @@ export const mockSearchResult = {
         },
         {
           _index: 'ocrvs',
-          _type: 'compositions',
           _id: 'DGM9CA2',
           _score: 1,
           _source: {

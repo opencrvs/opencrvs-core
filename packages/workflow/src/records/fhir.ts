@@ -51,7 +51,9 @@ import {
   RegistrationStatus,
   getResourceFromBundleById,
   TransactionResponse,
-  findExtension
+  findExtension,
+  TaskIdentifierSystem,
+  Location
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -354,7 +356,7 @@ export function createRelatedPersonEntries(
             ({ use, firstNames, familyName }) => ({
               use,
               given: firstNames.split(' '),
-              family: [familyName]
+              family: familyName
             })
           ),
           identifier: collectorDetails.identifier.map(({ id, type }) => ({
@@ -1427,8 +1429,11 @@ export function mergeBundles<T extends Bundle, R extends Bundle>(
 export async function findTaskFromIdentifier(
   identifier: string
 ): Promise<Bundle<SavedTask>> {
+  const system =
+    'http://opencrvs.org/specs/id/draft-id' satisfies TaskIdentifierSystem
+
   const res = await fetch(
-    new URL(`/fhir/Task?identifier=${identifier}`, FHIR_URL).href,
+    new URL(`/fhir/Task?identifier=${system}|${identifier}`, FHIR_URL).href,
     {
       method: 'GET',
       headers: {
@@ -1458,6 +1463,27 @@ export async function getTaskHistory(taskId: string): Promise<Bundle<Task>> {
   if (!res.ok) {
     throw new Error(
       `Fetching task history from Hearth failed with [${res.status}] body: ${res.statusText}`
+    )
+  }
+
+  return res.json()
+}
+
+export async function getLocationsById(
+  locationIds: Array<string>
+): Promise<Bundle<Location>> {
+  const res = await fetch(
+    new URL(`/fhir/Location?_id=${locationIds.join(',')}`, FHIR_URL).href,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/fhir+json'
+      }
+    }
+  )
+  if (!res.ok) {
+    throw new Error(
+      `Fetching locations from Hearth failed with [${res.status}] body: ${res.statusText}`
     )
   }
 

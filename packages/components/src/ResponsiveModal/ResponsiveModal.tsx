@@ -162,6 +162,7 @@ interface IProps {
   autoHeight?: boolean
   contentScrollableY?: boolean
   actions: JSX.Element[]
+  showCloseButton?: boolean
   handleClose?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   hideHeaderBoxShadow?: boolean
   preventClickOnParent?: boolean
@@ -173,6 +174,7 @@ export const ResponsiveModal = ({
   title,
   show,
   responsive = true,
+  showCloseButton = true,
   handleClose,
   id,
   actions,
@@ -225,9 +227,11 @@ export const ResponsiveModal = ({
           showHeaderBorder={showHeaderBorder}
         >
           <Title>{title}</Title>
-          <CircleButton id="close-btn" type="button" onClick={handleClose}>
-            <Cross color="currentColor" />
-          </CircleButton>
+          {showCloseButton && (
+            <CircleButton id="close-btn" type="button" onClick={handleClose}>
+              <Cross color="currentColor" />
+            </CircleButton>
+          )}
         </Header>
         <Body
           height={contentHeight}

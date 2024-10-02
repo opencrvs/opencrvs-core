@@ -18,9 +18,6 @@ import dns from 'node:dns'
 // https://github.com/cypress-io/cypress/issues/25397#issuecomment-1775454875
 dns.setDefaultResultOrder('ipv4first')
 
-process.env.VITE_APP_COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
-
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
@@ -80,6 +77,18 @@ export default defineConfig(({ mode }) => {
       globals: true,
       coverage: {
         reporter: ['text', 'json', 'html']
+      }
+    },
+    define: {
+      APP_VERSION: JSON.stringify(process.env.npm_package_version)
+    },
+    server: {
+      proxy: {
+        '/api/countryconfig/': {
+          target: 'http://localhost:3040',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
+        }
       }
     }
   }

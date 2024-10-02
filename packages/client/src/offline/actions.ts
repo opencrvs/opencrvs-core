@@ -10,7 +10,6 @@
  */
 import {
   AdminStructure,
-  CertificatePayload,
   CRVSOffice,
   Facility,
   ILocation,
@@ -23,7 +22,6 @@ import {
   IContentResponse,
   IApplicationConfigResponse,
   IApplicationConfig,
-  ICertificateTemplateData,
   IApplicationConfigAnonymous,
   LoadFormsResponse,
   LoadValidatorsResponse,
@@ -70,6 +68,12 @@ export type FormsLoadedAction = {
   payload: LoadFormsResponse
 }
 
+export const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
+export type CustomValidatorsLoadedLoadedAction = {
+  type: typeof CUSTOM_VALIDATORS_LOADED
+  payload: LoadFormsResponse
+}
+
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
 export type FormsFailedAction = {
   type: typeof FORMS_FAILED
@@ -106,27 +110,9 @@ type ApplicationConfigLoadedAction = {
   payload: IApplicationConfigResponse
 }
 
-export const CERTIFICATE_LOADED = 'OFFLINE/CERTIFICATE_LOADED'
-type CertificateLoadedAction = {
-  type: typeof CERTIFICATE_LOADED
-  payload: CertificatePayload
-}
-
 const CERTIFICATE_LOAD_FAILED = 'OFFLINE/CERTIFICATE_LOAD_FAILED'
 type CertificateLoadFailedAction = {
   type: typeof CERTIFICATE_LOAD_FAILED
-  payload: Error
-}
-
-export const CERTIFICATES_LOADED = 'OFFLINE/CERTIFICATES_LOADED'
-type CertificatesLoadedAction = {
-  type: typeof CERTIFICATES_LOADED
-  payload: CertificatePayload[]
-}
-
-export const CERTIFICATES_LOAD_FAILED = 'OFFLINE/CERTIFICATES_LOAD_FAILED'
-type CertificatesLoadFailedAction = {
-  type: typeof CERTIFICATES_LOAD_FAILED
   payload: Error
 }
 
@@ -208,6 +194,14 @@ export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
   payload: payload
 })
 
+export const CustomValidatorsSuccess = (
+  forms: LoadFormsResponse
+): CustomValidatorsLoadedLoadedAction => {
+  return {
+    type: CUSTOM_VALIDATORS_LOADED,
+    payload: forms
+  }
+}
 export const formsFailed = (error: Error): FormsFailedAction => ({
   type: FORMS_FAILED,
   payload: error
@@ -273,24 +267,10 @@ export const configLoaded = (
   payload: payload
 })
 
-export const certificateLoaded = (
-  payload: CertificatePayload
-): CertificateLoadedAction => ({
-  type: CERTIFICATE_LOADED,
-  payload
-})
-
 export const certificateLoadFailed = (
   payload: CertificateLoadFailedAction['payload']
 ): CertificateLoadFailedAction => ({
   type: CERTIFICATE_LOAD_FAILED,
-  payload
-})
-
-export const certificatesLoaded = (
-  payload: CertificatePayload[]
-): CertificatesLoadedAction => ({
-  type: CERTIFICATES_LOADED,
   payload
 })
 
@@ -331,23 +311,6 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
-export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
-type UpdateOfflineCertificateAction = {
-  type: typeof UPDATE_OFFLINE_CERTIFICATE
-  payload: {
-    certificate: ICertificateTemplateData
-  }
-}
-
-export const updateOfflineCertificate = (
-  certificate: ICertificateTemplateData
-): UpdateOfflineCertificateAction => ({
-  type: UPDATE_OFFLINE_CERTIFICATE,
-  payload: {
-    certificate
-  }
-})
-
 export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
   type: 'OFFLINE/VALIDATORS_LOADED' as const,
   payload: payload
@@ -384,6 +347,7 @@ export type Action =
   | LocationsLoadedAction
   | FormsFailedAction
   | FormsLoadedAction
+  | CustomValidatorsLoadedLoadedAction
   | SetOfflineData
   | IGetOfflineDataSuccessAction
   | IGetOfflineDataFailedAction
@@ -397,14 +361,10 @@ export type Action =
   | ApplicationConfigAnonymousUserAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | CertificateLoadedAction
   | CertificateLoadFailedAction
-  | CertificatesLoadedAction
-  | CertificatesLoadFailedAction
   | CertificateConfigurationLoadedAction
   | CertificateConfigurationLoadFailedAction
   | UpdateOfflineSystemsAction
-  | UpdateOfflineCertificateAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

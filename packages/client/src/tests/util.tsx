@@ -938,7 +938,8 @@ export const mockOfflineDataDispatch = {
 
 export async function createTestStore() {
   const { store, history } = createStore()
-  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+  store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+  await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
   return { store, history }
 }
 
@@ -957,7 +958,8 @@ export async function createTestComponent(
   },
   options?: MountRendererProps
 ) {
-  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+  store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+  await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
 
   const withGraphQL = (node: JSX.Element) => {
     if (apolloClient) {
@@ -1633,7 +1635,10 @@ export const mockUserGraphqlOperation = {
           )
         ]
       },
-      { user: mockCompleteFormData }
+      { user: mockCompleteFormData },
+      '',
+      userDetails,
+      mockOfflineData
     )
   },
   result: {
