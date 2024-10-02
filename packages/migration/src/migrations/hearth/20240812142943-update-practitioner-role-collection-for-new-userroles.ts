@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
@@ -30,27 +29,6 @@ export const up = async (db: Db, client: MongoClient) => {
       .updateOne({ _id: doc._id }, { $set: { code: filteredCode } })
   }
   console.log('Documents updated.')
-
-  const relatedPersonDocuments = await db
-    .collection('RelatedPerson')
-    .find({ 'relationship.coding.code': 'PRINT_IN_ADVANCE' })
-    .toArray()
-
-  for (const relatedPerson of relatedPersonDocuments) {
-    const patientRef = relatedPerson.patient.reference
-    const patientId = resourceIdentifierToUUID(patientRef)
-    await db.collection('Patient').deleteOne({ id: patientId })
-
-    const docResource = db
-      .collection('DocumentReference')
-      .find({ 'extension.valueReference.reference': patientRef })
-
-    await db.collection('DocumentReference').updateOne(
-      { id: docResource.id },
-      // we have to import the practitioner id here for that specific task
-      { $set: { 'extension.valueReference.reference': '' } }
-    )
-  }
 }
 
 export const down = async (db: Db, client: MongoClient) => {}
