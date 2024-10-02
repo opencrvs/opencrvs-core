@@ -9,6 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+if (
+  process.env.NODE_ENV === 'production' &&
+  !process.env.PERFORMANCE_MONGO_URL
+) {
+  throw new Error(
+    `Missing environment variable: PERFORMANCE_MONGO_URL. Please set it to your Mongo URL of Performance.`
+  )
+}
+
 const config = {
   mongodb: {
     url: process.env.PERFORMANCE_MONGO_URL || 'mongodb://localhost/performance',
