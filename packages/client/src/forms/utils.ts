@@ -53,7 +53,9 @@ import {
   IHttpFormField,
   IButtonFormField,
   BUTTON,
-  Ii18nButtonFormField
+  Ii18nButtonFormField,
+  IRedirectFormField,
+  REDIRECT
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -573,7 +575,7 @@ export const getConditionalActionsForField = (
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData,
   draftData: IFormData,
-  userDetails: UserDetails | null = null
+  userDetails: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -676,13 +678,15 @@ export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData,
   resource: IOfflineData,
-  drafts: IFormData
+  drafts: IFormData,
+  user: UserDetails | null
 ): boolean => {
   const errors: Errors = getValidationErrorsForForm(
     fields,
     values,
     resource,
-    drafts
+    drafts,
+    user
   )
 
   const fieldListWithErrors = Object.values(errors).filter(
@@ -782,6 +786,12 @@ export function isFieldHttp(field: IFormField): field is IHttpFormField {
   return field.type === HTTP
 }
 
+export function isFieldRedirect(
+  field: IFormField
+): field is IRedirectFormField {
+  return field.type === REDIRECT
+}
+
 export function isInitialValueDependencyInfo(
   value: InitialValue
 ): value is DependencyInfo {
@@ -805,4 +815,16 @@ export function handleUnsupportedIcon(iconName?: string) {
     return iconName as keyof typeof SupportedIcons
   }
   return null
+}
+
+export function handleInitialValue(
+  initialValue: InitialValue,
+  ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
+): IFormFieldValue {
+  return isInitialValueDependencyInfo(initialValue)
+    ? (evalExpressionInFieldDefinition(
+        initialValue.expression,
+        ...evalParams
+      ) as IFormFieldValue)
+    : initialValue
 }

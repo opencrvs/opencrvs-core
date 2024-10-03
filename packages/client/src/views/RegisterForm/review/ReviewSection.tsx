@@ -285,7 +285,7 @@ interface IProps {
   writeDeclaration: typeof writeDeclaration
   registrationSection: IFormSection
   documentsSection: IFormSection
-  userDetails?: UserDetails | null
+  userDetails: UserDetails | null
   viewRecord?: boolean
   reviewSummaryHeader?: React.ReactNode
 }
@@ -583,6 +583,7 @@ export const getErrorsOnFieldsBySection = (
   formSections: IFormSection[],
   offlineCountryConfig: IOfflineData,
   draft: IDeclaration,
+  user: UserDetails | null,
   checkValidationErrorsOnly?: boolean
 ): IErrorsBySection => {
   return formSections.reduce((sections, section: IFormSection) => {
@@ -597,6 +598,7 @@ export const getErrorsOnFieldsBySection = (
       draft.data[section.id] || {},
       offlineCountryConfig,
       draft.data,
+      user,
       undefined,
       checkValidationErrorsOnly
     )
@@ -1663,7 +1665,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       draft: { event },
       onContinue,
       viewRecord,
-      reviewSummaryHeader
+      reviewSummaryHeader,
+      userDetails
     } = this.props
     const isDuplicate = Boolean(declaration.duplicates?.length)
     const formSections =
@@ -1683,12 +1686,14 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
-      declaration
+      declaration,
+      userDetails
     )
     const badInputErrors = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
       declaration,
+      userDetails,
       true
     )
 

@@ -222,6 +222,7 @@ export const ViewRecord = () => {
         submitClickEvent={() => {}}
         pageRoute={''}
         draft={declaration}
+        userDetails={userDetails}
       />
     </Frame>
   )

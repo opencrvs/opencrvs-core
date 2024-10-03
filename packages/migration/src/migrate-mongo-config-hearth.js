@@ -9,6 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+if (process.env.NODE_ENV === 'production' && !process.env.HEARTH_MONGO_URL) {
+  throw new Error(
+    `Missing environment variable: HEARTH_MONGO_URL. Please set it to your Mongo URL of Hearth.`
+  )
+}
+
 const config = {
   mongodb: {
     url: process.env.HEARTH_MONGO_URL || 'mongodb://localhost/hearth-dev',
