@@ -28,6 +28,7 @@
 ## Bug fixes
 
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+- Fix dropdown options not flowing to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
 
 ## 1.6.0 Release candidate
 
