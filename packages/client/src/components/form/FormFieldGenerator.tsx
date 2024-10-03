@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useEffect, useCallback } from 'react'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
@@ -811,35 +811,62 @@ export interface ITouchedNestedFields {
   }
 }
 
-class FormSectionComponent extends React.Component<Props> {
-  componentDidUpdate(prevProps: Props) {
-    const userChangedForm = !isEqual(this.props.values, prevProps.values)
-    const sectionChanged = prevProps.id !== this.props.id
+const FormSectionComponent = (props: Props) => {
+  const {
+    values,
+    id,
+    fields,
+    onChange,
+    resetForm,
+    setAllFieldsDirty,
+    fieldsToShowValidationErrors,
+    setTouched,
+    setFieldTouched,
+    setValues,
+    onSetTouched,
+    errors: errorProps,
+    offlineCountryConfig,
+    draftData,
+    userDetails,
+    dynamicDispatch,
+    onNidAuthenticationClick,
+    onUploadingStateChanged,
+    intl,
+    touched,
+    setFieldValue
+  } = props
 
-    if (userChangedForm) {
-      prevProps.onChange(this.props.values)
+  const showValidationErrors = useCallback(
+    (fields: IFormField[]) => {
+      const touched = fields.reduce((memo, field) => {
+        let fieldTouched: boolean | ITouchedNestedFields = true
+        if (field.nestedFields) {
+          fieldTouched = {
+            value: true,
+            nestedFields: flatten(Object.values(field.nestedFields)).reduce(
+              (nestedMemo, nestedField) => ({
+                ...nestedMemo,
+                [nestedField.name]: true
+              }),
+              {}
+            )
+          }
+        }
+        return { ...memo, [field.name]: fieldTouched }
+      }, {})
+
+      setTouched(touched)
+    },
+    [setTouched]
+  )
+
+  useEffect(() => {
+    if (setAllFieldsDirty) {
+      showValidationErrors(fields)
     }
 
-    if (sectionChanged) {
-      prevProps.resetForm()
-      if (this.props.setAllFieldsDirty) {
-        this.showValidationErrors(this.props.fields)
-      } else if (
-        this.props.fieldsToShowValidationErrors &&
-        this.props.fieldsToShowValidationErrors.length > 0
-      ) {
-        this.showValidationErrors(this.props.fieldsToShowValidationErrors)
-      }
-    }
-  }
-
-  async componentDidMount() {
-    if (this.props.setAllFieldsDirty) {
-      this.showValidationErrors(this.props.fields)
-    }
-
-    if (this.props.onSetTouched) {
-      this.props.onSetTouched(this.props.setTouched)
+    if (onSetTouched) {
+      onSetTouched(setTouched)
     }
 
     if (window.location.hash) {
@@ -851,72 +878,85 @@ class FormSectionComponent extends React.Component<Props> {
         let focusedElement = document.querySelector(
           `input[id*="${focusedElementId}"]`
         ) as HTMLElement
+
         if (focusedElement === null) {
           // Handling for Select
           focusedElement = document.querySelector(
             `${window.location.hash} input`
           ) as HTMLElement
-          focusedElement && focusedElement.focus()
         } else {
           // Handling for Input
           focusedElement && focusedElement.focus()
         }
       }, 0)
     }
-  }
+  }, [
+    fields,
+    onSetTouched,
+    setAllFieldsDirty,
+    setTouched,
+    showValidationErrors
+  ])
 
-  showValidationErrors(fields: IFormField[]) {
-    const touched = fields.reduce((memo, field) => {
-      let fieldTouched: boolean | ITouchedNestedFields = true
-      if (field.nestedFields) {
-        fieldTouched = {
-          value: true,
-          nestedFields: flatten(Object.values(field.nestedFields)).reduce(
-            (nestedMemo, nestedField) => ({
-              ...nestedMemo,
-              [nestedField.name]: true
-            }),
-            {}
-          )
-        }
+  useEffect(() => {
+    const userChangedForm = !isEqual(values, props.values)
+    const sectionChanged = props.id !== id
+
+    if (userChangedForm) {
+      onChange(values)
+    }
+
+    if (sectionChanged) {
+      resetForm()
+      if (setAllFieldsDirty) {
+        showValidationErrors(fields)
+      } else if (
+        fieldsToShowValidationErrors &&
+        fieldsToShowValidationErrors.length > 0
+      ) {
+        showValidationErrors(fieldsToShowValidationErrors)
       }
-      return { ...memo, [field.name]: fieldTouched }
-    }, {})
+    }
+  }, [
+    values,
+    props.values,
+    id,
+    props.id,
+    onChange,
+    resetForm,
+    fields,
+    setAllFieldsDirty,
+    fieldsToShowValidationErrors,
+    showValidationErrors
+  ])
 
-    this.props.setTouched(touched)
-  }
-
-  handleBlur = (e: React.FocusEvent<any>) => {
-    this.props.setFieldTouched(e.target.name)
-  }
-
-  setFieldValuesWithDependency = (
+  const setFieldValuesWithDependency = (
     fieldName: string,
     value: IFormFieldValue
   ) => {
-    const updatedValues = cloneDeep(this.props.values)
+    const updatedValues = cloneDeep(values)
     set(updatedValues, fieldName, value)
     const updateDependentFields = (fieldName: string) => {
-      const dependentFields = getDependentFields(this.props.fields, fieldName)
+      const dependentFields = getDependentFields(fields, fieldName)
       for (const field of dependentFields) {
         updatedValues[field.name] = evalExpressionInFieldDefinition(
           (field.initialValue as DependencyInfo).expression,
           updatedValues,
-          this.props.offlineCountryConfig,
-          this.props.draftData,
-          this.props.userDetails
+          offlineCountryConfig,
+          draftData,
+          userDetails
         )
         updateDependentFields(field.name)
       }
     }
     updateDependentFields(fieldName)
 
-    this.props.setValues(updatedValues)
+    setValues(updatedValues)
   }
 
-  resetDependentSelectValues = (fieldName: string) => {
-    const fields = this.props.fields
-    const fieldsToReset = fields.filter(
+  const resetDependentSelectValues = (fieldName: string) => {
+    const currentFields = fields
+    const fieldsToReset = currentFields.filter(
       (field) =>
         (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
           field.dynamicOptions.dependency === fieldName) ||
@@ -924,12 +964,12 @@ class FormSectionComponent extends React.Component<Props> {
     )
 
     fieldsToReset.forEach((fieldToReset) => {
-      this.props.setFieldValue(fieldToReset.name, '')
-      this.resetDependentSelectValues(fieldToReset.name)
+      setFieldValue(fieldToReset.name, '')
+      resetDependentSelectValues(fieldToReset.name)
     })
   }
 
-  resetNestedInputValues = (parentField: Ii18nFormField) => {
+  const resetNestedInputValues = (parentField: Ii18nFormField) => {
     const nestedFields = (
       parentField as Ii18nRadioGroupWithNestedFieldsFormField
     ).nestedFields
@@ -938,368 +978,335 @@ class FormSectionComponent extends React.Component<Props> {
     )
 
     nestedFieldsToReset.forEach((nestedField) => {
-      this.props.setFieldValue(
-        `${parentField.name}.nestedFields.${nestedField.name}`,
-        ''
-      )
+      setFieldValue(`${parentField.name}.nestedFields.${nestedField.name}`, '')
     })
   }
 
-  render() {
-    const {
-      values,
-      fields,
-      setFieldTouched,
-      touched,
-      offlineCountryConfig,
-      intl,
-      draftData,
-      userDetails,
-      setValues,
-      dynamicDispatch
-    } = this.props
+  const language = intl.locale
+  const errors = errorProps as unknown as Errors
+  const sectionName = id.split('-')[0]
 
-    const language = this.props.intl.locale
+  return (
+    <section>
+      {fields.map((field) => {
+        let error: string
+        const fieldErrors = errors[field.name] && errors[field.name].errors
 
-    const errors = this.props.errors as unknown as Errors
+        if (fieldErrors && fieldErrors.length > 0) {
+          const [firstError] = fieldErrors
+          error = intl.formatMessage(firstError.message, firstError.props)
+        }
 
-    const sectionName = this.props.id.split('-')[0]
+        const conditionalActions: string[] = getConditionalActionsForField(
+          field,
+          { ...draftData?.[sectionName], ...values },
+          offlineCountryConfig,
+          draftData,
+          userDetails
+        )
 
-    return (
-      <section>
-        {fields.map((field) => {
-          let error: string
-          const fieldErrors = errors[field.name] && errors[field.name].errors
+        if (conditionalActions.includes('hide')) {
+          return null
+        }
 
-          if (fieldErrors && fieldErrors.length > 0) {
-            const [firstError] = fieldErrors
-            error = intl.formatMessage(firstError.message, firstError.props)
-          }
+        const isFieldDisabled = conditionalActions.includes('disable')
+        const isDateField =
+          field.type === DATE ||
+          (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
+            getFieldType(field as IDynamicFormField, values) === DATE)
 
-          const conditionalActions: string[] = getConditionalActionsForField(
-            field,
-            { ...draftData?.[sectionName], ...values },
-            offlineCountryConfig,
-            draftData,
-            userDetails
-          )
+        const isDateRangePickerField = field.type === DATE_RANGE_PICKER
 
-          if (conditionalActions.includes('hide')) {
-            return null
-          }
+        const dateFields = [
+          `${field.name}-dd`,
+          `${field.name}-mm`,
+          `${field.name}-yyyy`
+        ]
+        // for date range picker fields
+        const dateRangeFields = [
+          `${field.name}exact-dd`,
+          `${field.name}exact-mm`,
+          `${field.name}exact-yyyy`
+        ]
 
-          const isFieldDisabled = conditionalActions.includes('disable')
-          const isDateField =
-            field.type === DATE ||
-            (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS &&
-              getFieldType(field as IDynamicFormField, values) === DATE)
+        const areFieldsTouched = (fields: string[]) =>
+          fields.every((field) => touched[field])
 
-          const isDateRangePickerField = field.type === DATE_RANGE_PICKER
+        if (isDateField && areFieldsTouched(dateFields)) {
+          touched[field.name] = areFieldsTouched(dateFields)
+        }
 
-          const dateFields = [
-            `${field.name}-dd`,
-            `${field.name}-mm`,
-            `${field.name}-yyyy`
-          ]
-          // for date range picker fields
-          const dateRangeFields = [
-            `${field.name}exact-dd`,
-            `${field.name}exact-mm`,
-            `${field.name}exact-yyyy`
-          ]
+        if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
+          touched[field.name] = areFieldsTouched(dateRangeFields)
+        }
 
-          const areFieldsTouched = (fields: string[]) =>
-            fields.every((field) => touched[field])
-
-          if (isDateField && areFieldsTouched(dateFields)) {
-            touched[field.name] = areFieldsTouched(dateFields)
-          }
-
-          if (isDateRangePickerField && areFieldsTouched(dateRangeFields)) {
-            touched[field.name] = areFieldsTouched(dateRangeFields)
-          }
-
-          const withDynamicallyGeneratedFields =
-            field.type === SELECT_WITH_OPTIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS
-              ? ({
-                  ...field,
-                  type: SELECT_WITH_OPTIONS,
-                  options: getFieldOptions(
-                    field,
-                    values,
-                    offlineCountryConfig,
-                    draftData
-                  )
-                } satisfies ISelectFormFieldWithOptions)
-              : field.type === DOCUMENT_UPLOADER_WITH_OPTION
-              ? ({
-                  ...field,
-                  options: getFieldOptions(
-                    field,
-                    values,
-                    offlineCountryConfig,
-                    draftData
-                  )
-                } satisfies IDocumentUploaderWithOptionsFormField)
-              : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
-              ? ({
-                  ...field,
-                  type: getFieldType(field as IDynamicFormField, values),
-                  label: getFieldLabel(field as IDynamicFormField, values),
-                  helperText: getFieldHelperText(
-                    field as IDynamicFormField,
-                    values
-                  ),
-                  tooltip: getFieldLabelToolTip(
-                    field as IDynamicFormField,
-                    values
-                  )
-                } as ITextFormField)
-              : field.type === DYNAMIC_LIST
-              ? ({
-                  ...field,
-                  type: BULLET_LIST,
-                  items: getFieldOptionsByValueMapper(
-                    field as IDynamicListFormField,
-                    draftData as IFormData,
-                    field.dynamicItems.valueMapper
-                  )
-                } as IListFormField)
-              : field.type === FETCH_BUTTON
-              ? ({
-                  ...field,
-                  queryData: getQueryData(field as ILoaderButton, values),
-                  draftData: draftData as IFormData,
-                  onFetch: (response) => {
-                    const section = {
-                      id: this.props.id,
-                      groups: [
-                        {
-                          id: `${this.props.id}-view-group`,
-                          fields
-                        }
-                      ]
-                    } as IFormSection
-
-                    const form = {
-                      sections: [section]
-                    } as IForm
-
-                    const queryData: IQueryData = {}
-                    queryData[this.props.id] = response
-
-                    const transformedData = gqlToDraftTransformer(
-                      form,
-                      queryData
-                    )
-                    const updatedValues = Object.assign(
-                      {},
-                      values,
-                      transformedData[this.props.id]
-                    )
-                    setValues(updatedValues)
-                  }
-                } as ILoaderButton)
-              : field.type === LOCATION_SEARCH_INPUT
-              ? {
-                  ...field,
-                  locationList: generateLocations(
-                    field.searchableResource.reduce((locations, resource) => {
-                      return {
-                        ...locations,
-                        ...getListOfLocations(offlineCountryConfig, resource)
+        const withDynamicallyGeneratedFields =
+          field.type === SELECT_WITH_OPTIONS ||
+          field.type === SELECT_WITH_DYNAMIC_OPTIONS
+            ? ({
+                ...field,
+                type: SELECT_WITH_OPTIONS,
+                options: getFieldOptions(
+                  field,
+                  values,
+                  offlineCountryConfig,
+                  draftData
+                )
+              } satisfies ISelectFormFieldWithOptions)
+            : field.type === DOCUMENT_UPLOADER_WITH_OPTION
+            ? ({
+                ...field,
+                options: getFieldOptions(
+                  field,
+                  values,
+                  offlineCountryConfig,
+                  draftData
+                )
+              } satisfies IDocumentUploaderWithOptionsFormField)
+            : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+            ? ({
+                ...field,
+                type: getFieldType(field as IDynamicFormField, values),
+                label: getFieldLabel(field as IDynamicFormField, values),
+                helperText: getFieldHelperText(
+                  field as IDynamicFormField,
+                  values
+                ),
+                tooltip: getFieldLabelToolTip(
+                  field as IDynamicFormField,
+                  values
+                )
+              } as ITextFormField)
+            : field.type === DYNAMIC_LIST
+            ? ({
+                ...field,
+                type: BULLET_LIST,
+                items: getFieldOptionsByValueMapper(
+                  field as IDynamicListFormField,
+                  draftData as IFormData,
+                  field.dynamicItems.valueMapper
+                )
+              } as IListFormField)
+            : field.type === FETCH_BUTTON
+            ? ({
+                ...field,
+                queryData: getQueryData(field as ILoaderButton, values),
+                draftData: draftData as IFormData,
+                onFetch: (response) => {
+                  const section = {
+                    id: id,
+                    groups: [
+                      {
+                        id: `${id}-view-group`,
+                        fields
                       }
-                    }, {}),
-                    intl,
-                    undefined,
-                    field.searchableType as LocationType[]
+                    ]
+                  } as IFormSection
+
+                  const form = {
+                    sections: [section]
+                  } as IForm
+
+                  const queryData: IQueryData = {}
+                  queryData[id] = response
+
+                  const transformedData = gqlToDraftTransformer(form, queryData)
+                  const updatedValues = Object.assign(
+                    {},
+                    values,
+                    transformedData[id]
+                  )
+                  setValues(updatedValues)
+                }
+              } as ILoaderButton)
+            : field.type === LOCATION_SEARCH_INPUT
+            ? {
+                ...field,
+                locationList: generateLocations(
+                  field.searchableResource.reduce((locations, resource) => {
+                    return {
+                      ...locations,
+                      ...getListOfLocations(offlineCountryConfig, resource)
+                    }
+                  }, {}),
+                  intl,
+                  undefined,
+                  field.searchableType as LocationType[]
+                )
+              }
+            : field.type === NID_VERIFICATION_BUTTON
+            ? ({
+                ...field,
+                onClick: onNidAuthenticationClick
+              } as INidVerificationButton)
+            : field
+
+        if (
+          field.type === FETCH_BUTTON ||
+          field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
+          field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+          field.type === NID_VERIFICATION_BUTTON ||
+          field.type === BUTTON
+        ) {
+          return (
+            <FormItem
+              key={`${field.name}`}
+              ignoreBottomMargin={field.ignoreBottomMargin}
+            >
+              <Field name={field.name}>
+                {(formikFieldProps: FieldProps<any>) => (
+                  <GeneratedInputField
+                    fieldDefinition={internationaliseFieldObject(
+                      intl,
+                      withDynamicallyGeneratedFields
+                    )}
+                    setFieldValue={setFieldValuesWithDependency}
+                    setFieldTouched={setFieldTouched}
+                    resetDependentSelectValues={resetDependentSelectValues}
+                    {...formikFieldProps.field}
+                    touched={touched[field.name] || false}
+                    error={error}
+                    fields={fields}
+                    values={values}
+                    draftData={draftData}
+                    disabled={isFieldDisabled}
+                    dynamicDispatch={dynamicDispatch}
+                  />
+                )}
+              </Field>
+            </FormItem>
+          )
+        } else if (
+          field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+          field.nestedFields
+        ) {
+          let nestedFieldElements = Object.create(null)
+
+          nestedFieldElements = Object.keys(field.nestedFields).reduce(
+            (childElements, key) => ({
+              ...childElements,
+              [key]: field.nestedFields[key].map((nestedField) => {
+                let nestedError: string
+                const nestedFieldErrors =
+                  errors[field.name] &&
+                  errors[field.name].nestedFields[nestedField.name]
+
+                if (nestedFieldErrors && nestedFieldErrors.length > 0) {
+                  const [firstError] = nestedFieldErrors
+                  nestedError = intl.formatMessage(
+                    firstError.message,
+                    firstError.props
                   )
                 }
-              : field.type === NID_VERIFICATION_BUTTON
-              ? ({
-                  ...field,
-                  onClick: this.props.onNidAuthenticationClick
-                } as INidVerificationButton)
-              : field
 
-          if (
-            field.type === FETCH_BUTTON ||
-            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_BUTTON ||
-            field.type === BUTTON
-          ) {
-            return (
-              <FormItem
-                key={`${field.name}`}
-                ignoreBottomMargin={field.ignoreBottomMargin}
-              >
-                <Field name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
+                const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
+                const nestedFieldTouched =
+                  touched[field.name] &&
+                  (touched[field.name] as unknown as ITouchedNestedFields)
+                    .nestedFields &&
+                  (touched[field.name] as unknown as ITouchedNestedFields)
+                    .nestedFields[nestedField.name]
+
+                return (
+                  <FormItem
+                    key={nestedFieldName}
+                    ignoreBottomMargin={field.ignoreBottomMargin}
+                  >
+                    <FastField name={nestedFieldName}>
+                      {(formikFieldProps: FieldProps<any>) => (
+                        <GeneratedInputField
+                          fieldDefinition={internationaliseFieldObject(intl, {
+                            ...nestedField,
+                            name: nestedFieldName
+                          })}
+                          setFieldValue={setFieldValuesWithDependency}
+                          setFieldTouched={setFieldTouched}
+                          resetDependentSelectValues={
+                            resetDependentSelectValues
+                          }
+                          {...formikFieldProps.field}
+                          fields={fields}
+                          values={values}
+                          touched={nestedFieldTouched || false}
+                          error={nestedError}
+                          draftData={draftData}
+                          dynamicDispatch={dynamicDispatch}
+                          onUploadingStateChanged={onUploadingStateChanged}
+                        />
+                      )}
+                    </FastField>
+                  </FormItem>
+                )
+              })
+            }),
+            {}
+          )
+
+          return (
+            <FormItem
+              key={field.name}
+              ignoreBottomMargin={field.ignoreBottomMargin}
+            >
+              <Field name={`${field.name}.value`}>
+                {(formikFieldProps: FieldProps<any>) => (
+                  <GeneratedInputField
+                    fieldDefinition={internationaliseFieldObject(
+                      intl,
+                      withDynamicallyGeneratedFields
+                    )}
+                    setFieldValue={setFieldValuesWithDependency}
+                    setFieldTouched={setFieldTouched}
+                    resetDependentSelectValues={resetDependentSelectValues}
+                    resetNestedInputValues={resetNestedInputValues}
+                    {...formikFieldProps.field}
+                    nestedFields={nestedFieldElements}
+                    touched={Boolean(touched[field.name]) || false}
+                    error={error}
+                    fields={fields}
+                    values={values}
+                    draftData={draftData}
+                    dynamicDispatch={dynamicDispatch}
+                  />
+                )}
+              </Field>
+            </FormItem>
+          )
+        } else {
+          return (
+            <FormItem
+              key={`${field.name}${language}`}
+              ignoreBottomMargin={field.ignoreBottomMargin}
+            >
+              <Field name={field.name}>
+                {(formikFieldProps: FieldProps<any>) => {
+                  return (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
                         intl,
                         withDynamicallyGeneratedFields
                       )}
-                      setFieldValue={this.setFieldValuesWithDependency}
+                      setFieldValue={setFieldValuesWithDependency}
                       setFieldTouched={setFieldTouched}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
+                      resetDependentSelectValues={resetDependentSelectValues}
                       {...formikFieldProps.field}
                       touched={touched[field.name] || false}
-                      error={error}
+                      error={isFieldDisabled ? '' : error}
+                      draftData={draftData}
                       fields={fields}
                       values={values}
-                      draftData={draftData}
+                      dynamicDispatch={dynamicDispatch}
                       disabled={isFieldDisabled}
-                      dynamicDispatch={dynamicDispatch}
+                      onUploadingStateChanged={onUploadingStateChanged}
                     />
-                  )}
-                </Field>
-              </FormItem>
-            )
-          } else if (
-            field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
-            field.nestedFields
-          ) {
-            let nestedFieldElements = Object.create(null)
-
-            nestedFieldElements = Object.keys(field.nestedFields).reduce(
-              (childElements, key) => ({
-                ...childElements,
-                [key]: field.nestedFields[key].map((nestedField) => {
-                  let nestedError: string
-                  const nestedFieldErrors =
-                    errors[field.name] &&
-                    errors[field.name].nestedFields[nestedField.name]
-
-                  if (nestedFieldErrors && nestedFieldErrors.length > 0) {
-                    const [firstError] = nestedFieldErrors
-                    nestedError = intl.formatMessage(
-                      firstError.message,
-                      firstError.props
-                    )
-                  }
-
-                  const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
-                  const nestedFieldTouched =
-                    touched[field.name] &&
-                    (touched[field.name] as unknown as ITouchedNestedFields)
-                      .nestedFields &&
-                    (touched[field.name] as unknown as ITouchedNestedFields)
-                      .nestedFields[nestedField.name]
-
-                  return (
-                    <FormItem
-                      key={nestedFieldName}
-                      ignoreBottomMargin={field.ignoreBottomMargin}
-                    >
-                      <FastField name={nestedFieldName}>
-                        {(formikFieldProps: FieldProps<any>) => (
-                          <GeneratedInputField
-                            fieldDefinition={internationaliseFieldObject(intl, {
-                              ...nestedField,
-                              name: nestedFieldName
-                            })}
-                            setFieldValue={this.setFieldValuesWithDependency}
-                            setFieldTouched={setFieldTouched}
-                            resetDependentSelectValues={
-                              this.resetDependentSelectValues
-                            }
-                            {...formikFieldProps.field}
-                            fields={fields}
-                            values={values}
-                            touched={nestedFieldTouched || false}
-                            error={nestedError}
-                            draftData={draftData}
-                            dynamicDispatch={dynamicDispatch}
-                            onUploadingStateChanged={
-                              this.props.onUploadingStateChanged
-                            }
-                          />
-                        )}
-                      </FastField>
-                    </FormItem>
                   )
-                })
-              }),
-              {}
-            )
-
-            return (
-              <FormItem
-                key={field.name}
-                ignoreBottomMargin={field.ignoreBottomMargin}
-              >
-                <Field name={`${field.name}.value`}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      setFieldTouched={setFieldTouched}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      resetNestedInputValues={this.resetNestedInputValues}
-                      {...formikFieldProps.field}
-                      nestedFields={nestedFieldElements}
-                      touched={Boolean(touched[field.name]) || false}
-                      error={error}
-                      fields={fields}
-                      values={values}
-                      draftData={draftData}
-                      dynamicDispatch={dynamicDispatch}
-                    />
-                  )}
-                </Field>
-              </FormItem>
-            )
-          } else {
-            return (
-              <FormItem
-                key={`${field.name}${language}`}
-                ignoreBottomMargin={field.ignoreBottomMargin}
-              >
-                <Field name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => {
-                    return (
-                      <GeneratedInputField
-                        fieldDefinition={internationaliseFieldObject(
-                          intl,
-                          withDynamicallyGeneratedFields
-                        )}
-                        setFieldValue={this.setFieldValuesWithDependency}
-                        setFieldTouched={setFieldTouched}
-                        resetDependentSelectValues={
-                          this.resetDependentSelectValues
-                        }
-                        {...formikFieldProps.field}
-                        touched={touched[field.name] || false}
-                        error={isFieldDisabled ? '' : error}
-                        draftData={draftData}
-                        fields={fields}
-                        values={values}
-                        dynamicDispatch={dynamicDispatch}
-                        disabled={isFieldDisabled}
-                        onUploadingStateChanged={
-                          this.props.onUploadingStateChanged
-                        }
-                      />
-                    )
-                  }}
-                </Field>
-              </FormItem>
-            )
-          }
-        })}
-      </section>
-    )
-  }
+                }}
+              </Field>
+            </FormItem>
+          )
+        }
+      })}
+    </section>
+  )
 }
 
 export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
