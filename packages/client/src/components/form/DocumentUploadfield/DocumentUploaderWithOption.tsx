@@ -8,21 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
-import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
+import { IAttachmentValue, IFileValue, IFormFieldValue } from '@client/forms'
+import { formMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/imageUpload'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
+import { bytesToMB } from '@client/utils/imageUtils'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@mui/material'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
+import { ISelectOption, Select } from '@opencrvs/components/lib/Select'
+import imageCompression from 'browser-image-compression'
+import { clone, remove } from 'lodash'
 import React, { useState } from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
-import { remove, clone } from 'lodash'
-import { formMessages } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/imageUpload'
-import imageCompression from 'browser-image-compression'
-import { bytesToMB } from '@client/utils/imageUtils'
 
 const DEFAULT_MAX_SIZE_MB = 5
 
@@ -246,6 +254,18 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     )
   }
 
+  const [open, setOpen] = useState(false)
+
+  const handleClickOpen = (image: IFileValue | IAttachmentValue) => {
+    setPreviewImage(previewImage)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setPreviewImage(null)
+  }
+
   const onDelete = (image: IFileValue | IAttachmentValue) => {
     const previewImage = image as IFileValue
     const addableOption = props.options.find(
@@ -254,6 +274,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     setDropdownOptions((options) => options.concat(addableOption))
     props.onComplete(props.files.filter((file) => file !== previewImage))
     closePreviewSection()
+    setOpen(false)
   }
 
   const closePreviewSection = () => {
@@ -289,7 +310,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
         documents={props.files}
         onSelect={selectForPreview}
         dropdownOptions={props.options}
-        onDelete={onDelete}
+        onDelete={handleClickOpen}
       />
       {props.hideOnEmptyOption && dropdownOptions.length === 0 ? null : props
           .options.length === 1 ? (
@@ -322,6 +343,23 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
         </Flex>
       )}
 
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this Document?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => onDelete} color="secondary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {previewImage && (
         <DocumentPreview
           previewImage={previewImage}
@@ -329,7 +367,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
             previewImage.optionValues[1] as string
           )}
           goBack={closePreviewSection}
-          onDelete={onDelete}
+          onDelete={handleClickOpen}
         />
       )}
     </UploadWrapper>
