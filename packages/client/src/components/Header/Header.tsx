@@ -67,6 +67,7 @@ type IDispatchProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToCreateNewUser: typeof goToCreateNewUser
   goToAdvancedSearch: typeof goToAdvancedSearch
+  goToSearchResult: typeof goToSearchResult
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
@@ -146,6 +147,7 @@ export const HeaderComponent = (props: IFullProps) => {
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
     goToAdvancedSearch,
+    goToSearchResult,
     setAdvancedSearchParam,
     mapPerformanceClickHandler,
     changeTeamLocation
@@ -484,7 +486,8 @@ export const Header = connect(
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
     goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam
+    setAdvancedSearchParam: setAdvancedSearchParam,
+    goToSearchResult
   }
 )(injectIntl(withRouter(HeaderComponent)))
 
