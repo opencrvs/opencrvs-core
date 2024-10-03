@@ -121,7 +121,7 @@ class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
   transformSectionData = () => {
-    const { intl, userFormSection } = this.props
+    const { intl, userFormSection, userDetails } = this.props
     let nameJoined = false,
       fieldValue
     const sections: ISectionData[] = []
@@ -144,7 +144,8 @@ class UserReviewFormComponent extends React.Component<
               field,
               this.props.formData,
               this.props.offlineCountryConfiguration,
-              { user: this.props.formData }
+              { user: this.props.formData },
+              userDetails
             ).includes('hide')
           ) {
             fieldValue = this.getValue(field)
