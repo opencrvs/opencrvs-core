@@ -11,27 +11,30 @@
 
 import { Db, MongoClient } from 'mongodb'
 
+const dropCollectionsExcept = async (db: Db, collectionToKeep: string) => {
+  const allCollections = await db.listCollections().toArray()
+  const collectionNames = allCollections.map((col) => col.name)
+  const filteredCollectionNames = collectionNames.filter(
+    (c) => c !== collectionToKeep
+  )
+
+  for (const collection of filteredCollectionNames) {
+    await db
+      .collection(collection)
+      .drop()
+      .catch((error) => {
+        console.error(`Error dropping collection ${collection}:`, error)
+      })
+  }
+
+  console.log(`Removed collections: ${filteredCollectionNames.toString()}`)
+}
+
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const collectionToKeep = 'changelog' as const
-      const allCollections = await db.listCollections().toArray()
-      const collectionNames = allCollections.map((col) => col.name)
-      const filteredCollectionNames = collectionNames.filter(
-        (c) => c !== collectionToKeep
-      )
-
-      for (const collection of filteredCollectionNames) {
-        await db
-          .collection(collection)
-          .drop()
-          .catch((error) => {
-            console.error(`Error dropping collection ${collection}:`, error)
-          })
-      }
-
-      console.log(`Removed collections: ${filteredCollectionNames.toString()}`)
+      await dropCollectionsExcept(db, 'changelog')
     })
   } finally {
     await session.endSession()
