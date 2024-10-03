@@ -67,7 +67,7 @@ export const up = async (db: Db, client: MongoClient) => {
             const operationHistoriesData =
               searchResult &&
               searchResult.body.hits.hits.length > 0 &&
-              searchResult.body.hits.hits[0]._source?.operationHistories
+              searchResult.body.hits.hits?.[0]?._source?.operationHistories
             const lastOperationHistory =
               operationHistoriesData &&
               operationHistoriesData.length > 0 &&
