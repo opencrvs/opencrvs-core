@@ -40,7 +40,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int
@@ -139,8 +138,6 @@ type Query {
     sort: String
   ): EventProgressResultSet
   getUserRoles: [UserRole!]!
-  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   getOIDPUserInfo(
     code: String!
@@ -250,7 +247,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  updateRole(systemRole: SystemRoleInput): Response!
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -416,7 +412,7 @@ type User {
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -740,17 +736,6 @@ input AvatarInput {
   data: String!
 }
 
-type Response {
-  roleIdMap: Map!
-}
-
-input SystemRoleInput {
-  id: ID!
-  value: String
-  active: Boolean
-  roles: [RoleInput!]
-}
-
 type SystemSecret {
   system: System!
   clientSecret: ID!
@@ -963,7 +948,7 @@ enum Status {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: SystemRoleType!
+  role: UserRole!
   signature: Signature
 }
 
@@ -1041,6 +1026,12 @@ interface EventSearchSet {
   type: String
   registration: RegistrationSearchSet
   operationHistories: [OperationHistorySearchSet]
+}
+
+enum Event {
+  birth
+  death
+  marriage
 }
 
 type EventProgressSet {
@@ -1286,11 +1277,6 @@ input SignatureInput {
   type: String
 }
 
-input RoleInput {
-  _id: ID
-  labels: [LabelInput!]!
-}
-
 input SystemSettingsInput {
   dailyQuota: Int
   webhook: [WebhookInput]
@@ -1329,6 +1315,7 @@ enum RegistrationType {
 
 type Certificate {
   collector: RelatedPerson
+  certifier: User
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
@@ -1385,11 +1372,6 @@ type Payment {
   outcome: PaymentOutcomeType!
   date: Date!
   attachmentURL: String
-}
-
-type RoleLabel {
-  lang: String!
-  label: String!
 }
 
 type AdvancedSeachParameters {
@@ -1682,11 +1664,6 @@ enum Gender {
 input DeceasedInput {
   deceased: Boolean
   deathDate: PlainDate
-}
-
-input LabelInput {
-  lang: String!
-  label: String!
 }
 
 interface AuditLogItemBase {

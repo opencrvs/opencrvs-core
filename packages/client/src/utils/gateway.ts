@@ -69,11 +69,10 @@ export const scopes = [
   'record.read-audit',
   'record.read-comments',
   'record.create-comments',
-  'profile.electronic-signature',
-  'profile.update-name',
-  'profile.update-phone-number',
-  'profile.update-profile-image',
   'profile.update-signature',
+  'profile.update-phone-number',
+  'profile.update-name',
+  'profile.update-profile-image',
   'performance.read:my-office',
   'performance.read',
   'performance.read-dashboards',
@@ -458,6 +457,7 @@ export type BookmarkedSeachItem = {
 
 export type Certificate = {
   __typename?: 'Certificate'
+  certifier?: Maybe<User>
   collector?: Maybe<RelatedPerson>
   data?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
@@ -850,15 +850,10 @@ export enum IntegratingSystemType {
   Other = 'OTHER'
 }
 
-export type LabelInput = {
-  label: Scalars['String']
-  lang: Scalars['String']
-}
-
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: SystemRoleType
+  role: UserRole
   signature?: Maybe<Signature>
 }
 
@@ -1936,28 +1931,6 @@ export type RemoveBookmarkedSeachInput = {
   userId: Scalars['String']
 }
 
-export type Response = {
-  __typename?: 'Response'
-  roleIdMap: Scalars['Map']
-}
-
-export type Role = {
-  __typename?: 'Role'
-  _id: Scalars['ID']
-  labels: Array<RoleLabel>
-}
-
-export type RoleInput = {
-  _id?: InputMaybe<Scalars['ID']>
-  labels: Array<LabelInput>
-}
-
-export type RoleLabel = {
-  __typename?: 'RoleLabel'
-  label: Scalars['String']
-  lang: Scalars['String']
-}
-
 export type SearchFieldAgentResponse = {
   __typename?: 'SearchFieldAgentResponse'
   avatar?: Maybe<Avatar>
@@ -2041,16 +2014,6 @@ export type SystemInput = {
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
-}
-
-export enum SystemRoleType {
-  FieldAgent = 'FIELD_AGENT',
-  LocalRegistrar = 'LOCAL_REGISTRAR',
-  LocalSystemAdmin = 'LOCAL_SYSTEM_ADMIN',
-  NationalRegistrar = 'NATIONAL_REGISTRAR',
-  NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
-  PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
-  RegistrationAgent = 'REGISTRATION_AGENT'
 }
 
 export type SystemSecret = {
@@ -2404,6 +2367,7 @@ export type GetUserRolesQuery = {
   getUserRoles: Array<{
     __typename?: 'UserRole'
     id: string
+    scopes: Array<string>
     label: {
       __typename?: 'I18nMessage'
       id: string
@@ -2660,13 +2624,21 @@ export type FetchUserQuery = {
     }
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
-      role: SystemRoleType
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
       } | null>
+      role: {
+        __typename?: 'UserRole'
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
+      }
       signature?: {
         __typename?: 'Signature'
         data?: string | null
@@ -3510,6 +3482,25 @@ export type FetchBirthRegistrationForReviewQuery = {
             use?: string | null
           } | null> | null
         } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
+        } | null
       } | null> | null
     } | null> | null
   } | null
@@ -3828,6 +3819,25 @@ export type FetchBirthRegistrationForCertificateQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4311,6 +4321,25 @@ export type FetchDeathRegistrationForReviewQuery = {
             use?: string | null
           } | null> | null
         } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
+        } | null
       } | null> | null
     } | null> | null
   } | null
@@ -4618,6 +4647,25 @@ export type FetchDeathRegistrationForCertificationQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -5027,6 +5075,25 @@ export type FetchMarriageRegistrationForReviewQuery = {
             use?: string | null
           } | null> | null
         } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
+        } | null
       } | null> | null
     } | null> | null
   } | null
@@ -5364,6 +5431,25 @@ export type FetchMarriageRegistrationForCertificateQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -7229,82 +7315,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            role: {
+              __typename?: 'UserRole'
+              id: string
+              label: {
+                __typename?: 'I18nMessage'
+                id: string
+                defaultMessage: string
+                description: string
+              }
+            }
+            primaryOffice: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            }
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 

@@ -23,16 +23,6 @@ input SignatureInput {
   type: String
 }
 
-enum SystemRoleType {
-  FIELD_AGENT
-  REGISTRATION_AGENT
-  LOCAL_REGISTRAR
-  LOCAL_SYSTEM_ADMIN
-  NATIONAL_SYSTEM_ADMIN
-  PERFORMANCE_MANAGEMENT
-  NATIONAL_REGISTRAR
-}
-
 enum Status {
   active
   deactivated
@@ -63,7 +53,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: SystemRoleType!
+  role: UserRole!
   signature: Signature
 }
 

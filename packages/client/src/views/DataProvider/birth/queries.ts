@@ -309,6 +309,21 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               use
             }
           }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
+            }
+          }
         }
         duplicateOf
         potentialDuplicates
@@ -583,6 +598,21 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
               system
               value
               use
+            }
+          }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
           }
         }

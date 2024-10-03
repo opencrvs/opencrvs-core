@@ -52,7 +52,13 @@ const FETCH_USER = gql`
           firstNames
           familyName
         }
-        role
+        role {
+          label {
+            id
+            defaultMessage
+            description
+          }
+        }
         signature {
           data
           type

@@ -215,9 +215,9 @@ export function createCorrectionProofOfLegalCorrectionDocument(
 
 export function createDocumentReferenceEntryForCertificate(
   temporaryDocumentReferenceId: UUID,
-  temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
+  collectorReference: ResourceIdentifier | URNReference,
   attachmentUrl?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
@@ -233,7 +233,7 @@ export function createDocumentReferenceEntryForCertificate(
         {
           url: 'http://opencrvs.org/specs/extension/collector',
           valueReference: {
-            reference: `urn:uuid:${temporaryRelatedPersonId}`
+            reference: collectorReference
           }
         },
         {
@@ -288,7 +288,7 @@ export function createRelatedPersonEntries(
   collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
   record: RegisteredRecord | CertifiedRecord
-): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] {
+): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] | [] {
   const knownRelationships = z.enum([
     'MOTHER',
     'FATHER',
@@ -303,6 +303,7 @@ export function createRelatedPersonEntries(
     `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
 
   if ('otherRelationship' in collectorDetails) {
+    if (collectorDetails.relationship === 'PRINT_IN_ADVANCE') return []
     const temporaryPatientId = getUUID()
     return [
       {

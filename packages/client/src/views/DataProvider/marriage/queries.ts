@@ -312,6 +312,21 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
               use
             }
           }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
+            }
+          }
         }
       }
     }
@@ -593,7 +608,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
           collector {
             relationship
             otherRelationship
-
             name {
               use
               firstNames
@@ -603,6 +617,21 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
               system
               value
               use
+            }
+          }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
           }
         }

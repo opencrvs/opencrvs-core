@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { App } from '@client/App'
-import { Event, SystemRoleType, Status, Scope } from '@client/utils/gateway'
+import { Event, Status, Scope } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -392,7 +392,13 @@ export const userDetails: UserDetails = {
     status: 'active'
   },
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR' as SystemRoleType,
+    role: {
+      label: {
+        defaultMessage: 'Local Registrar',
+        description: 'Name for user role Field Agent',
+        id: 'userRole.fieldAgent'
+      }
+    },
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -1119,7 +1125,13 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: SystemRoleType.LocalRegistrar,
+            role: {
+              label: {
+                defaultMessage: 'Local Registrar',
+                description: 'Name for user role Field Agent',
+                id: 'userRole.fieldAgent'
+              }
+            },
             signature: undefined
           }
         }

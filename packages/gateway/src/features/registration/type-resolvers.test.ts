@@ -519,15 +519,9 @@ test('getting role at a specific time from roleHistory', async () => {
   */
 
   const lastModified = '2024-08-30T13:14:33.704Z'
-  const expectedRole =
-    '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
-  const expectedSystemRole = 'NATIONAL_REGISTRAR'
+  const expectedRole = 'NATIONAL_REGISTRAR'
 
-  const { role, systemRole } = getUserRoleFromHistory(
-    practitionerRoleHistory,
-    lastModified
-  )
+  const role = getUserRoleFromHistory(practitionerRoleHistory, lastModified)
 
   expect(role).toEqual(expectedRole)
-  expect(systemRole).toEqual(expectedSystemRole)
 })
