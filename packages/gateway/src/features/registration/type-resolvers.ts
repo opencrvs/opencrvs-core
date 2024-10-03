@@ -1258,51 +1258,45 @@ export const typeResolvers: GQLResolver = {
         )
 
       if (
-        practitionerRef &&
-        practitionerRef.valueReference &&
-        practitionerRef.valueReference.reference &&
-        practitionerRef.valueReference.reference.startsWith('Practitioner')
-      ) {
-        const practitionerId = resourceIdentifierToUUID(
-          practitionerRef.valueReference.reference as ResourceIdentifier
-        )
-        const practitionerRoleBundle =
-          await context.dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
-            practitionerId
-          )
+        !practitionerRef?.valueReference?.reference?.startsWith('Practitioner')
+      )
+        return null
 
-        const practitionerRoleId =
-          practitionerRoleBundle.entry?.[0].resource?.id
-
-        const practitionerRoleHistory =
-          await context.dataSources.fhirAPI.getPractionerRoleHistory(
-            practitionerRoleId
-          )
-        const result = practitionerRoleHistory.find(
-          (it) =>
-            it?.meta?.lastUpdated &&
-            task.lastModified &&
-            it?.meta?.lastUpdated <= task.lastModified!
+      const practitionerId = resourceIdentifierToUUID(
+        practitionerRef.valueReference.reference as ResourceIdentifier
+      )
+      const practitionerRoleBundle =
+        await context.dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
+          practitionerId
         )
 
-        const targetCode = result?.code?.find((element) => {
-          return (
-            element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
-          )
-        })
+      const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
 
-        const roleId = targetCode?.coding?.[0].code
-        const userResponse =
-          await context.dataSources.usersAPI.getUserByPractitionerId(
-            practitionerId
-          )
+      const practitionerRoleHistory =
+        await context.dataSources.fhirAPI.getPractionerRoleHistory(
+          practitionerRoleId
+        )
+      const result = practitionerRoleHistory.find(
+        (it) =>
+          it?.meta?.lastUpdated &&
+          task.lastModified &&
+          it?.meta?.lastUpdated <= task.lastModified!
+      )
 
-        const allRoles = await context.dataSources.countryConfigAPI.getRoles()
-        const role = allRoles.find((role) => role.id === roleId)?.id
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
+      })
 
-        return { ...userResponse, role }
-      }
-      return null
+      const roleId = targetCode?.coding?.[0].code
+      const userResponse =
+        await context.dataSources.usersAPI.getUserByPractitionerId(
+          practitionerId
+        )
+
+      const allRoles = await context.dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
+
+      return { ...userResponse, role }
     }
   },
   Identifier: {

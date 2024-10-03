@@ -51,7 +51,6 @@ import {
   RegistrationStatus,
   getResourceFromBundleById,
   TransactionResponse,
-  findExtension,
   TaskIdentifierSystem,
   Location
 } from '@opencrvs/commons/types'
@@ -216,24 +215,12 @@ export function createCorrectionProofOfLegalCorrectionDocument(
 
 export function createDocumentReferenceEntryForCertificate(
   temporaryDocumentReferenceId: UUID,
-  temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
-  collectorDetails: CertifyInput['collector'],
-  currentTask: SavedTask,
+  collectorReference: ResourceIdentifier | URNReference,
   attachmentUrl?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
-  /* For 'PRINT_IN_ADVANCE' records, there will be no related person entry to add. Thus the
-  related person id should not be referenced rather the regLastUser Practitioner is referenced.*/
-  const collectorReference =
-    collectorDetails.relationship !== 'PRINT_IN_ADVANCE'
-      ? (`urn:uuid:${temporaryRelatedPersonId}` as const)
-      : findExtension(
-          'http://opencrvs.org/specs/extension/regLastUser',
-          currentTask.extension
-        )!.valueReference.reference
-
   return {
     fullUrl: `urn:uuid:${temporaryDocumentReferenceId}`,
     resource: {

@@ -17,12 +17,6 @@ import {
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
-import {
-  isPractitionerRole,
-  Resource,
-  SavedBundle,
-  SavedPractitioner
-} from '@opencrvs/commons/types'
 
 export async function getPresignedUrlFromUri(
   fileUri: string,
@@ -68,21 +62,4 @@ export async function setCollectorForPrintInAdvance(
   })
 
   return details
-}
-
-export function getPractitionerRoleFromPractitioner(
-  practitioner: SavedPractitioner,
-  bundle: SavedBundle<Resource>
-) {
-  const bundleEntries = bundle.entry
-  for (const entry of bundleEntries) {
-    if (
-      isPractitionerRole(entry.resource) &&
-      //@ts-ignore
-      entry.resource.practitioner.reference.includes(practitioner.id)
-    ) {
-      return entry.resource.code?.[0]?.coding?.[0].code
-    }
-  }
-  return null
 }
