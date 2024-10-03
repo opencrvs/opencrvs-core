@@ -87,7 +87,8 @@ import {
   findLastOfficeFromSavedBundle,
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
-  findResourceFromBundleById
+  findResourceFromBundleById,
+  getUserRoleFromHistory
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1552,19 +1553,11 @@ export const typeResolvers: GQLResolver = {
 
       const practitionerRoleHistory =
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
-      const result = practitionerRoleHistory.find(
-        (it) =>
-          it?.meta?.lastUpdated &&
-          task.lastModified &&
-          it?.meta?.lastUpdated <= task.lastModified!
+
+      const roleId = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
       )
-
-      const targetCode = result?.code?.find((element) => {
-        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
-      })
-
-      const roleId = targetCode?.coding?.[0].code
-
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
