@@ -48,7 +48,7 @@ export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
 export const ISSUE_VERIFY_COLLECTOR =
   '/issue/check/:registrationId/:eventType/:collector'
 export const VERIFY_COLLECTOR =
-  '/print/check/:registrationId/:eventType/:collector'
+  '/print/check/:registrationId/:certTemplateId/:collector'
 export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
 
 export const PRINT_CERTIFICATE_PAYMENT =

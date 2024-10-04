@@ -302,7 +302,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.writeDeclaration(draft)
 
       if (isCertificateForPrintInAdvance(draft)) {
-        this.props.goToReviewCertificate(declarationId, event)
+        this.props.goToReviewCertificate(
+          declarationId,
+          collector.certTemplateId as string
+        )
       } else {
         this.props.goToVerifyCollector(
           declarationId,
@@ -507,7 +510,10 @@ const mapStateToProps = (
 
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const certFormSection = getCertificateCollectorFormSection(declaration)
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration,
+    state.offline.offlineData.templates?.certificates
+  )
 
   const isAllowPrintInAdvance =
     event === Event.Birth

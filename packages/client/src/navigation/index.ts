@@ -360,11 +360,14 @@ export function goToVerifyCorrector(declarationId: string, corrector: string) {
   )
 }
 
-export function goToReviewCertificate(registrationId: string, event: Event) {
+export function goToReviewCertificate(
+  registrationId: string,
+  certTemplateId: string
+) {
   return push(
     formatUrl(REVIEW_CERTIFICATE, {
-      registrationId: registrationId.toString(),
-      eventType: event
+      registrationId,
+      certTemplateId
     }),
     { isNavigatedInsideApp: true }
   )
