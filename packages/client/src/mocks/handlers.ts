@@ -84,6 +84,22 @@ const contentHandler = http.get('http://localhost:3040/content/client', () => {
   return HttpResponse.json(content)
 })
 
+const certificateConfigurationHandler = http.get(
+  'http://localhost:3040/certificate-configuration',
+  () => {
+    return HttpResponse.json({
+      fonts: {
+        'Noto Sans': {
+          normal: `http://localhost:3040/fonts/NotoSans-Regular.ttf`,
+          bold: `http://localhost:3040/fonts/NotoSans-Bold.ttf`,
+          italics: `http://localhost:3040/fonts/NotoSans-Regular.ttf`,
+          bolditalics: `http://localhost:3040/fonts/NotoSans-Regular.ttf`
+        }
+      }
+    })
+  }
+)
+
 const certificatesHandler = http.get(
   'http://localhost:3535/certificates/:event',
   ({ params }) => {
@@ -105,6 +121,7 @@ const handlers = [
   configHandler,
   formsHandler,
   contentHandler,
+  certificateConfigurationHandler,
   certificatesHandler,
   systemRolesHandler
 ]
