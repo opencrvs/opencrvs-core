@@ -14,6 +14,7 @@ interface ICertificateMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   certificateCollectionTitle: MessageDescriptor
   addAnotherSignature: MessageDescriptor
+  certificateTemplateSelectLabel: MessageDescriptor
   certificateConfirmationTxt: MessageDescriptor
   certificateIsCorrect: MessageDescriptor
   certificateReceiptHeader: MessageDescriptor
@@ -94,6 +95,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Certify record',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
+  },
+  certificateTemplateSelectLabel: {
+    defaultMessage: 'Select certificate template',
+    description: 'The title of select certificate template action',
+    id: 'certificate.selectTemplate'
   },
   certificateConfirmationTxt: {
     defaultMessage: 'Edit',
