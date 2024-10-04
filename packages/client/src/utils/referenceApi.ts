@@ -18,7 +18,7 @@ import {
   ILocation
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { Event, System } from '@client/utils/gateway'
+import { System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
 import { IntlShape } from 'react-intl'
 
@@ -77,9 +77,23 @@ interface ILoginBackground {
   backgroundImage?: string
   imageFit?: string
 }
-export interface ICertificateTemplateData {
-  event: Event
-  svgCode: string
+export interface ICertificateConfigData {
+  id: string
+  event: string
+  label: {
+    id: string
+    defaultMessage: string
+    description: string
+  }
+  svgUrl: string
+  fonts: {
+    [fontName: string]: {
+      normal: string
+      bold: string
+      italics: string
+      bolditalics: string
+    }
+  }
 }
 export interface ICurrency {
   isoCode: string
@@ -143,7 +157,7 @@ export interface IApplicationConfig {
 }
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
-  certificates: ICertificateTemplateData[]
+  certificates: ICertificateConfigData[]
   systems: System[]
 }
 
@@ -249,33 +263,6 @@ async function importHandlebarHelpers(): Promise<LoadHandlebarHelpersResponse> {
   } catch (error) {
     return {}
   }
-}
-async function loadCertificateConfiguration(): Promise<CertificateConfiguration> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/certificate-configuration`
-
-  const res = await fetch(url, {
-    method: 'GET'
-  })
-
-  // for backward compatibility, if the endpoint is unimplemented
-  if (res.status === 404) {
-    return {
-      fonts: {
-        notosans: {
-          normal: 'NotoSans-Light.ttf',
-          bold: 'NotoSans-Regular.ttf',
-          italics: 'NotoSans-Light.ttf',
-          bolditalics: 'NotoSans-Regular.ttf'
-        }
-      }
-    }
-  }
-
-  if (!res.ok) {
-    throw Error(res.statusText)
-  }
-
-  return res.json()
 }
 
 async function loadContent(): Promise<IContentResponse> {
@@ -415,7 +402,6 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 export const referenceApi = {
   loadLocations,
   loadFacilities,
-  loadCertificateConfiguration,
   loadContent,
   loadConfig,
   loadForms,
