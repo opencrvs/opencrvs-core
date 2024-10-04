@@ -1666,33 +1666,6 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'nid',
-                      type: 'TEXT',
-                      label: {
-                        defaultMessage: 'NID',
-                        description: 'National ID',
-                        id: 'form.field.label.NID'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [
-                        {
-                          operation: 'validIDNumber',
-                          parameters: ['NATIONAL_ID']
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'fieldToIdentifierWithTypeTransformer',
-                          parameters: ['NATIONAL_ID']
-                        },
-                        query: {
-                          operation: 'identifierWithTypeToFieldTransformer',
-                          parameters: ['NATIONAL_ID']
-                        }
-                      }
-                    },
-                    {
                       name: 'accountDetails',
                       type: 'FIELD_GROUP_TITLE',
                       label: {

@@ -69,11 +69,6 @@ export const messages = {
     description: 'Input label for email address',
     id: 'form.field.label.email'
   },
-  NID: {
-    defaultMessage: 'NID',
-    description: 'National ID',
-    id: 'form.field.label.NID'
-  },
   accountDetails: {
     defaultMessage: 'Account details',
     description: 'Account details section',

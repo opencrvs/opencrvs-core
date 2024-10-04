@@ -36,11 +36,6 @@ export interface IUserName {
   family: string
   given: string[]
 }
-
-interface IIdentifier {
-  system: string
-  value: string
-}
 export interface ISecurityQuestionAnswer {
   questionKey: string
   answerHash: string
@@ -132,7 +127,6 @@ export interface IAvatar {
 export interface IUser {
   name: IUserName[]
   username: string
-  identifiers: IIdentifier[]
   email: string
   mobile?: string
   emailForNotification?: string

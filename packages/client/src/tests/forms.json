@@ -12265,33 +12265,6 @@
                 }
               },
               {
-                "name": "nid",
-                "type": "TEXT",
-                "label": {
-                  "defaultMessage": "NID",
-                  "description": "National ID",
-                  "id": "form.field.label.NID"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": [
-                  {
-                    "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                ],
-                "mapping": {
-                  "mutation": {
-                    "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  },
-                  "query": {
-                    "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                }
-              },
-              {
                 "name": "seperator",
                 "type": "SUBSECTION",
                 "label": {
@@ -12613,33 +12586,6 @@
                   "query": {
                     "operation": "localPhoneTransformer",
                     "parameters": ["user.mobile"]
-                  }
-                }
-              },
-              {
-                "name": "nid",
-                "type": "TEXT",
-                "label": {
-                  "defaultMessage": "NID",
-                  "description": "National ID",
-                  "id": "form.field.label.NID"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": [
-                  {
-                    "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                ],
-                "mapping": {
-                  "mutation": {
-                    "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  },
-                  "query": {
-                    "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
                   }
                 }
               },

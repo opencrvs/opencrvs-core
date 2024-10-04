@@ -18,7 +18,6 @@ import {
   UserSection
 } from '@client/forms/index'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { NATIONAL_ID } from '@client/utils/constants'
 
 export function userSectionFormType(): ISerializedFormSection {
   return {
@@ -151,29 +150,6 @@ export function userSectionFormType(): ISerializedFormSection {
               window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
             initialValue: '',
             validator: [{ operation: 'emailAddressFormat' }]
-          },
-          {
-            name: 'nid',
-            type: TEXT,
-            label: userFormMessages.NID,
-            required: false,
-            initialValue: '',
-            validator: [
-              {
-                operation: 'validIDNumber',
-                parameters: [NATIONAL_ID]
-              }
-            ],
-            mapping: {
-              mutation: {
-                operation: 'fieldToIdentifierWithTypeTransformer',
-                parameters: [NATIONAL_ID]
-              },
-              query: {
-                operation: 'identifierWithTypeToFieldTransformer',
-                parameters: [NATIONAL_ID]
-              }
-            }
           },
           {
             name: 'seperator',
