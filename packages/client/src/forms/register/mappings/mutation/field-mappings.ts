@@ -274,7 +274,7 @@ export const eventLocationMutationTransformer =
       field.name === 'birthLocation' ||
       field.name === 'deathLocation'
     ) {
-      transformedData.eventLocation._fhir3ID = draftData[sectionId][field.name]
+      transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
       if (transformedData.eventLocation.address) {
         delete transformedData.eventLocation.address
       }

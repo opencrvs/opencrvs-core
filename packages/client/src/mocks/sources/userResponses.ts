@@ -1,3 +1,13 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
 import { SystemRoleType, Status, FetchUserQuery } from '@client/utils/gateway'
 
 export const registrar: FetchUserQuery = {
@@ -33,60 +43,6 @@ export const registrar: FetchUserQuery = {
         firstNames: 'Kennedy',
         familyName: 'Mweene',
         __typename: 'HumanName'
-      }
-    ],
-    catchmentArea: [
-      {
-        id: '6293dd20-7040-43c1-b2e3-d9764316f265',
-        name: 'Ibombo District Office',
-        alias: ['Ibombo District Office'],
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/internal-id',
-            value: 'CRVS_OFFICE_JWMRGwDBXK',
-            __typename: 'Identifier'
-          }
-        ],
-        __typename: 'Location'
-      },
-      {
-        id: 'fb8e19a3-a191-404c-a6ad-58e7963c1d57',
-        name: 'Ibombo',
-        alias: ['Ibombo'],
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/statistical-code',
-            value: 'ADMIN_STRUCTURE_oEBf29y8JP8',
-            __typename: 'Identifier'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'DISTRICT',
-            __typename: 'Identifier'
-          }
-        ],
-        __typename: 'Location'
-      },
-      {
-        id: '019f9e08-4180-4ce6-a842-47bbc0c40037',
-        name: 'Central',
-        alias: ['Central'],
-        status: 'active',
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/statistical-code',
-            value: 'ADMIN_STRUCTURE_AWn3s2RqgAN',
-            __typename: 'Identifier'
-          },
-          {
-            system: 'http://opencrvs.org/specs/id/jurisdiction-type',
-            value: 'STATE',
-            __typename: 'Identifier'
-          }
-        ],
-        __typename: 'Location'
       }
     ],
     primaryOffice: {
