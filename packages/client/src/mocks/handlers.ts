@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { rest, graphql } from 'msw'
+import { http, HttpResponse, graphql } from 'msw'
 import {
   FetchUserQuery,
   FetchUserQueryVariables,
@@ -26,61 +26,74 @@ import systemRoles from './sources/systemRoles'
 
 const userHandler = graphql.query<FetchUserQuery, FetchUserQueryVariables>(
   'fetchUser',
-  (_, res, ctx) => {
-    return res(ctx.data(registrar))
+  () => {
+    return HttpResponse.json(
+      {
+        data: registrar
+      },
+      {
+        headers: {
+          'X-Version': '1.5.0'
+        }
+      }
+    )
   }
 )
 
 const systemRolesHandler = graphql.query<
   GetSystemRolesQuery,
   GetSystemRolesQueryVariables
->('getSystemRoles', (_, res, ctx) => {
-  return res(ctx.data(systemRoles))
+>('getSystemRoles', () => {
+  return HttpResponse.json(
+    {
+      data: systemRoles
+    },
+    {
+      headers: {
+        'X-Version': '1.5.0'
+      }
+    }
+  )
 })
 
-const locationHandler = rest.get(
+const locationHandler = http.get(
   'http://localhost:7070/location',
-  (req, res, ctx) => {
-    const type = req.url.searchParams.get('type')
+  ({ request }) => {
+    const url = new URL(request.url)
+    const type = url.searchParams.get('type')
     if (type === 'CRVS_OFFICE') {
-      return res(ctx.json(offices))
+      return HttpResponse.json(offices)
     } else if (type === 'ADMIN_STRUCTURE') {
-      return res(ctx.json(adminStructures))
+      return HttpResponse.json(adminStructures)
     } else if (type === 'HEALTH_FACILITY') {
-      return res(ctx.json(healthFacilities))
+      return HttpResponse.json(healthFacilities)
     }
     throw new Error('Unimplemented')
   }
 )
 
-const configHandler = rest.get(
-  'http://localhost:2021/config',
-  (_, res, ctx) => {
-    return res(ctx.json(config))
-  }
-)
-
-const formsHandler = rest.get('http://localhost:2021/forms', (_, res, ctx) => {
-  return res(ctx.status(201), ctx.json(forms))
+const configHandler = http.get('http://localhost:2021/config', () => {
+  return HttpResponse.json(config)
 })
 
-const contentHandler = rest.get(
-  'http://localhost:3040/content/client',
-  (_, res, ctx) => {
-    return res(ctx.json(content))
-  }
-)
+const formsHandler = http.get('http://localhost:2021/forms', () => {
+  return HttpResponse.json(forms, { status: 201 })
+})
 
-const certificatesHandler = rest.get(
+const contentHandler = http.get('http://localhost:3040/content/client', () => {
+  return HttpResponse.json(content)
+})
+
+const certificatesHandler = http.get(
   'http://localhost:3535/certificates/:event',
-  (req, res, ctx) => {
-    const { event } = req.params
+  ({ params }) => {
+    const { event } = params
     if (event === 'birth') {
-      return res(ctx.text('dummy'))
+      return new HttpResponse('dummy')
     } else if (event === 'death') {
-      return res(ctx.text('dummy'))
+      return new HttpResponse('dummy')
     } else if (event === 'marriage') {
-      return res(ctx.text('dummy'))
+      return new HttpResponse('dummy')
     }
     throw new Error('Unimplemented')
   }
