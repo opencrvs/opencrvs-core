@@ -452,10 +452,16 @@ export const up = async (db: Db, client: MongoClient) => {
             districtName: '$district.name',
             stateName: '$state.name',
             createdAt: {
-              $dateFromString: { dateString: '$firstTask.lastModified' }
+              $dateFromString: {
+                dateString: '$firstTask.lastModified',
+                onError: new Date(0).toISOString()
+              }
             },
             registeredAt: {
-              $dateFromString: { dateString: '$registerTask.lastModified' }
+              $dateFromString: {
+                dateString: '$registerTask.lastModified',
+                onError: new Date(0).toISOString()
+              }
             },
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
@@ -631,7 +637,10 @@ export const up = async (db: Db, client: MongoClient) => {
             stateName: '$state.name',
             event: 'Birth',
             createdAt: {
-              $dateFromString: { dateString: '$lastModified' }
+              $dateFromString: {
+                dateString: '$lastModified',
+                onError: new Date(0).toISOString()
+              }
             }
           }
         },
