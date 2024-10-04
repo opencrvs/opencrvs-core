@@ -59,6 +59,7 @@ const config = {
 }
 
 vi.stubGlobal('config', config)
+vi.stubGlobal('scrollTo', vi.fn)
 
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
