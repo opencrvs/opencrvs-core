@@ -14,7 +14,8 @@ import {
   validToken,
   getItem,
   flushPromises,
-  setItem
+  setItem,
+  userDetails
 } from '@client/tests/util'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 import {
@@ -99,7 +100,9 @@ describe('when draft data is transformed to graphql', () => {
         draftToGqlTransformer(
           form,
           data,
-          '9633042c-ca34-4b9f-959b-9d16909fd85c'
+          '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          userDetails,
+          mockOfflineData
         ).eventLocation.type
       ).toBe('PRIVATE_HOME')
     })
@@ -114,11 +117,25 @@ describe('when draft data is transformed to graphql', () => {
         documents: { imageUploader: '' }
       }
 
-      expect(draftToGqlTransformer(form, data).father).toEqual({
+      expect(
+        draftToGqlTransformer(
+          form,
+          data,
+          '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          userDetails,
+          mockOfflineData
+        ).father
+      ).toEqual({
         detailsExist: false
       })
       expect(
-        draftToGqlTransformer(form, data).registration.inCompleteFields
+        draftToGqlTransformer(
+          form,
+          data,
+          '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          userDetails,
+          mockOfflineData
+        ).registration.inCompleteFields
       ).toContain('father/father-view-group/reasonNotApplying')
     })
     it('Sends inCompleteFields if in-complete data is given', () => {
@@ -130,7 +147,13 @@ describe('when draft data is transformed to graphql', () => {
         documents: {}
       }
       expect(
-        draftToGqlTransformer(form, data).registration.inCompleteFields
+        draftToGqlTransformer(
+          form,
+          data,
+          '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          userDetails,
+          mockOfflineData
+        ).registration.inCompleteFields
       ).toContain('child/child-view-group/placeOfBirth')
     })
     it('Sends inCompleteFields when registration data is also missing', () => {
@@ -142,7 +165,13 @@ describe('when draft data is transformed to graphql', () => {
         registration: {}
       }
       expect(
-        draftToGqlTransformer(form, data).registration.inCompleteFields
+        draftToGqlTransformer(
+          form,
+          data,
+          '9633042c-ca34-4b9f-959b-9d16909fd85c',
+          userDetails,
+          mockOfflineData
+        ).registration.inCompleteFields
       ).toBeDefined()
     })
   })

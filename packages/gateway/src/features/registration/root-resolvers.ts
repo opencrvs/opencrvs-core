@@ -24,7 +24,6 @@ import {
   Patient,
   Saved,
   Task,
-  buildFHIRBundle,
   getComposition,
   getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
@@ -377,22 +376,6 @@ export const resolvers: GQLResolver = {
       }
 
       return createRegistration(details, EVENT_TYPE.MARRIAGE, authHeader)
-    },
-    async updateBirthRegistration(_, { details }, { headers: authHeader }) {
-      if (
-        hasScope(authHeader, 'register') ||
-        hasScope(authHeader, 'validate')
-      ) {
-        const doc = buildFHIRBundle(details, EVENT_TYPE.BIRTH)
-
-        const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
-        // return composition-id
-        return getIDFromResponse(res)
-      } else {
-        return await Promise.reject(
-          new Error('User does not have a register or validate scope')
-        )
-      }
     },
     async markBirthAsValidated(_, { id, details }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)

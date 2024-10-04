@@ -44,7 +44,8 @@ import {
 } from '@client/declarations'
 import {
   FormFieldGenerator,
-  ITouchedNestedFields
+  ITouchedNestedFields,
+  mapFieldsToValues
 } from '@client/components/form'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
 import {
@@ -55,10 +56,9 @@ import {
   IFormSectionGroup,
   IFormData,
   CorrectionSection,
-  IFormFieldValue,
   SubmissionAction
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, RegStatus } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -80,7 +80,8 @@ import {
   hasFormError,
   getSectionFields,
   getNextSectionIds,
-  VIEW_TYPE
+  VIEW_TYPE,
+  handleInitialValue
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
@@ -105,6 +106,8 @@ import { client } from '@client/utils/apolloClient'
 import { Stack, ToggleMenu } from '@client/../../components/lib'
 import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -178,6 +181,7 @@ type Props = {
   isWritingDraft: boolean
   userDetails: UserDetails | null
   scope: Scope | null
+  config: IOfflineData
 }
 
 export type FullProps = IFormProps &
@@ -314,7 +318,7 @@ function FormAppBar({
     }
     const [exitModalTitle, exitModalDescription] =
       isCorrection(declaration) ||
-      declaration.registrationStatus === SUBMISSION_STATUS.CORRECTION_REQUESTED
+      declaration.registrationStatus === RegStatus.CorrectionRequested
         ? [
             intl.formatMessage(
               messages.exitWithoutSavingModalForCorrectionRecordTitle
@@ -452,7 +456,7 @@ function FormAppBar({
                 {!duplicate &&
                   !isCorrection(declaration) &&
                   declaration.registrationStatus !==
-                    SUBMISSION_STATUS.CORRECTION_REQUESTED && (
+                    RegStatus.CorrectionRequested && (
                     <>
                       <Button
                         id="save-exit-btn"
@@ -752,28 +756,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
         hash: newHash + '-form-input'
       })
     }
-    if (prevProps.activeSection.id !== this.props.activeSection.id) {
-      const sectionValues =
-        this.props.declaration.data[this.props.activeSection.id] || {}
-      this.props.activeSectionGroup.fields.forEach((field) => {
-        const initialValue =
-          isUndefined(sectionValues[field.name]) ||
-          isNull(sectionValues[field.name])
-            ? getInitialValue(field, this.props.declaration.data || {})
-            : sectionValues[field.name]
-        sectionValues[field.name] = initialValue as IFormFieldValue
-      })
-      this.props.modifyDeclaration({
-        ...this.props.declaration,
-        data: {
-          ...this.props.declaration.data,
-          [this.props.activeSection.id]: {
-            ...this.props.declaration.data[this.props.activeSection.id],
-            ...sectionValues
-          }
-        }
-      })
-    }
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {
@@ -920,7 +902,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
         const activeSectionFields = this.props.activeSectionGroup.fields
         const activeSectionValues =
           this.props.declaration.data[this.props.activeSection.id]
-        groupHasError = hasFormError(activeSectionFields, activeSectionValues)
+        groupHasError = hasFormError(
+          activeSectionFields,
+          activeSectionValues,
+          this.props.config,
+          this.props.declaration.data,
+          this.props.userDetails
+        )
       }
       if (groupHasError) {
         this.showAllValidationErrors()
@@ -929,6 +917,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     this.updateVisitedGroups()
+    this.modifyDeclaration(
+      this.getFormValues(),
+      this.props.activeSection,
+      this.props.declaration
+    )
 
     this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
   }
@@ -977,6 +970,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
         visitedGroup.sectionId === this.props.activeSection.id &&
         visitedGroup.groupId === this.props.activeSectionGroup.id
     ) ?? false
+
+  getFormValues = () => {
+    const { activeSectionGroup, declaration, activeSection } = this.props
+    return {
+      ...mapFieldsToValues(
+        activeSectionGroup.fields,
+        declaration.data[activeSection.id],
+        this.props.config,
+        declaration.data,
+        this.props.userDetails
+      ),
+      ...declaration.data[activeSection.id]
+    }
+  }
 
   render() {
     const {
@@ -1211,6 +1218,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 fieldsToShowValidationErrors={
                                   fieldsToShowValidationErrors
                                 }
+                                initialValues={this.getFormValues()}
                                 fields={getVisibleGroupFields(
                                   activeSectionGroup
                                 )}
@@ -1358,28 +1366,34 @@ function getValidSectionGroup(
     activeSectionGroup: currentGroup
   }
 }
-
-function getInitialValue(field: IFormField, data: IFormData) {
+function getInitialValue(
+  field: IFormField,
+  form: IFormSectionData,
+  draft: IFormData,
+  config: IOfflineData,
+  user: UserDetails | null
+) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
-    fieldInitialValue = get(data, field.initialValueKey, '')
+    fieldInitialValue = get(draft, field.initialValueKey, '')
   }
 
-  return fieldInitialValue
+  return handleInitialValue(fieldInitialValue!, form, config, draft, user)
 }
 
 export function replaceInitialValues(
   fields: IFormField[],
-  sectionValues: any,
-  data?: IFormData
+  form: IFormSectionData,
+  draft: IFormData,
+  config: IOfflineData,
+  user: UserDetails | null
 ) {
   return fields.map((field) => ({
     ...field,
     initialValue:
-      isUndefined(sectionValues[field.name]) ||
-      isNull(sectionValues[field.name])
-        ? getInitialValue(field, data || {})
-        : sectionValues[field.name]
+      isUndefined(form[field.name]) || isNull(form[field.name])
+        ? getInitialValue(field, form, draft, config, user)
+        : form[field.name]
   }))
 }
 
@@ -1391,14 +1405,15 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const { match, registerForm, declaration } = props
   const sectionId =
     match.params.pageId || findFirstVisibleSection(registerForm.sections).id
-  const userDetails = getUserDetails(state)
+  const user = getUserDetails(state)
+  const config = getOfflineData(state)
   const groupId = match.params.groupId
   const { activeSection, activeSectionGroup } = getValidSectionGroup(
     registerForm.sections,
     declaration,
     sectionId,
     groupId,
-    userDetails
+    user
   )
 
   if (!activeSectionGroup) {
@@ -1416,11 +1431,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
       ) > -1) ||
     false
 
-  const fields = replaceInitialValues(
-    activeSectionGroup.fields,
-    declaration.data[activeSection.id] || {},
-    declaration.data
-  )
+  const fields = activeSectionGroup.fields
 
   let updatedFields: IFormField[] = []
 
@@ -1439,7 +1450,8 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     fieldsToShowValidationErrors: updatedFields,
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state),
-    userDetails
+    config,
+    userDetails: user
   }
 }
 

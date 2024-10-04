@@ -22,7 +22,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { LANG_EN } from '@client/utils/constants'
 import { IUserAuditForm } from '@client/user/user-audit'
 import { IStoreState } from '@client/store'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { FormFieldGenerator } from '@client/components/form'
 import styled from 'styled-components'
 import { IFormSectionData } from '@client/forms'
@@ -38,6 +38,7 @@ import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
 import { UserDetails } from '@client/utils/userUtils'
+import { getOfflineData } from '@client/offline/selectors'
 
 const { useState, useEffect } = React
 
@@ -98,6 +99,7 @@ function UserAuditActionModalComponent(
   const [formValues, setFormValues] = useState<IFormSectionData>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isErrorVisible, makeErrorVisible] = useState<boolean>(false)
+  const config = useSelector(getOfflineData)
 
   let name = ''
   let modalTitle = ''
@@ -118,7 +120,7 @@ function UserAuditActionModalComponent(
     if (!props.form?.fields) return
 
     if (
-      hasFormError(props.form.fields, formValues, undefined, { formValues })
+      hasFormError(props.form.fields, formValues, config, { formValues }, user)
     ) {
       if (user && user.status === 'active') {
         const auditAction = 'deactivating'
@@ -130,7 +132,7 @@ function UserAuditActionModalComponent(
     } else {
       setFormError(null)
     }
-  }, [props.form?.fields, formValues, intl, user])
+  }, [props.form?.fields, formValues, intl, user, config])
 
   useEffect(() => {
     function cleanUpFormState() {

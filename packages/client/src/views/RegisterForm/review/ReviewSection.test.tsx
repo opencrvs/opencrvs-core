@@ -23,7 +23,7 @@ import {
   IForm
   // MarriageSection
 } from '@client/forms'
-import { Event as DeclarationEvent } from '@client/utils/gateway'
+import { Event as DeclarationEvent, RegStatus } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { createStore } from '@client/store'
@@ -33,9 +33,9 @@ import {
   getRegisterFormFromStore,
   mockOfflineData,
   mockOfflineDataDispatch,
-  resizeWindow
+  resizeWindow,
+  userDetails
 } from '@client/tests/util'
-import { REJECTED } from '@client/utils/constants'
 import {
   renderSelectDynamicLabel,
   ReviewSection
@@ -79,19 +79,19 @@ const rejectedDraftBirth = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Birth,
-  REJECTED
+  RegStatus.Rejected
 )
 const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Death,
-  REJECTED
+  RegStatus.Rejected
 )
 const rejectedDraftMarriage = createReviewDeclaration(
   uuid(),
   draft.data,
   DeclarationEvent.Marriage,
-  REJECTED
+  RegStatus.Rejected
 )
 
 describe('when in device of large viewport', () => {
@@ -100,6 +100,7 @@ describe('when in device of large viewport', () => {
 
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
     form = await getRegisterFormFromStore(store, DeclarationEvent.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
@@ -121,6 +122,7 @@ describe('when in device of large viewport', () => {
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
           onChangeReviewForm={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -236,6 +238,7 @@ describe('when in device of large viewport', () => {
           draft={rejectedDraftBirth}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -260,6 +263,7 @@ describe('when in device of large viewport', () => {
           draft={rejectedDraftDeath}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -284,6 +288,7 @@ describe('when in device of large viewport', () => {
           draft={rejectedDraftMarriage}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -309,6 +314,7 @@ describe('when in device of large viewport', () => {
           draft={declaredBirthDeclaration}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -471,6 +477,7 @@ describe('when in device of large viewport', () => {
           draft={simpleDraft}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -614,6 +621,7 @@ describe('when in device of small viewport', () => {
         rejectDeclarationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
         onChangeReviewForm={mockHandler}
+        userDetails={userDetails}
       />,
       { store, history }
     )

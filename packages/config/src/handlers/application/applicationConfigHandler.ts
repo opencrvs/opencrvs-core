@@ -9,18 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import ApplicationConfig, {
-  IApplicationConfigurationModel
-} from '@config/models/config'
 import { logger } from '@opencrvs/commons'
-import { badData, internal } from '@hapi/boom'
+import { badData } from '@hapi/boom'
 import * as Joi from 'joi'
-import { merge, pick } from 'lodash'
-import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
+import { pick } from 'lodash'
 import getSystems from '@config/handlers/system/systemHandler'
-import { getDocumentUrl } from '@config/services/documents'
-import { COUNTRY_CONFIG_URL } from '@config/config/constants'
+import { env } from '@config/environment'
 import fetch from 'node-fetch'
+import { getToken } from '@config/utils/auth'
+import { pipe } from 'fp-ts/lib/function'
+import { verifyToken } from '@config/utils/verifyToken'
+import { RouteScope } from '@config/config/routes'
 
 export const SystemRoleType = [
   'FIELD_AGENT',
@@ -36,16 +35,7 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      getActiveCertificatesHandler(request, h).then((certs) =>
-        Promise.all(
-          certs.map(async (cert) => ({
-            ...cert,
-            svgCode: await getDocumentUrl(cert.svgCode, {
-              Authorization: request.headers.authorization
-            })
-          }))
-        )
-      ),
+      getCertificates(request, h),
       getApplicationConfig(request, h),
       getSystems(request, h)
     ])
@@ -63,69 +53,74 @@ export default async function configHandler(
   }
 }
 
-async function getConfigFromCountry(authToken?: string) {
-  const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
+async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+  const authToken = getToken(request)
+  const decodedOrError = pipe(authToken, verifyToken)
+  if (decodedOrError._tag === 'Left') {
+    return []
+  }
+  const { scope } = decodedOrError.right
 
-  const res = await fetch(url, {
-    headers: authToken
-      ? {
-          Authorization: `Bearer ${authToken}`
-        }
-      : {}
-  })
+  if (
+    scope &&
+    (scope.includes(RouteScope.CERTIFY) ||
+      scope.includes(RouteScope.VALIDATE) ||
+      scope.includes(RouteScope.NATLSYSADMIN))
+  ) {
+    return Promise.all(
+      (['birth', 'death', 'marriage'] as const).map(async (event) => {
+        const response = await getEventCertificate(event, getToken(request))
+        return response
+      })
+    )
+  }
+  return []
+}
+async function getConfigFromCountry(authToken?: string) {
+  const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
+
+  const res = await fetch(url)
   if (!res.ok) {
     throw new Error(`Expected to get the application config from ${url}`)
   }
   return res.json()
 }
 
-function stripIdFromApplicationConfig(config: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(config).map(([key, value]) => {
-      let rest = value
-      if (
-        typeof value === 'object' &&
-        value !== null &&
-        '_id' in value &&
-        key !== '_id'
-      ) {
-        const { _id, ...remaining } = value as { _id: any }
-        rest = remaining
-      }
-      return [key, rest]
-    })
-  )
+async function getEventCertificate(
+  event: 'birth' | 'death' | 'marriage',
+  authToken: string
+) {
+  const url = new URL(
+    `/certificates/${event}.svg`,
+    env.COUNTRY_CONFIG_URL
+  ).toString()
+
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${authToken}` }
+  })
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
+  }
+  const responseText = await res.text()
+
+  return { svgCode: responseText, event }
 }
 
-export async function getApplicationConfig(
+async function getApplicationConfig(
   request?: Hapi.Request,
   h?: Hapi.ResponseToolkit
 ) {
-  const configFromCountryConfig = await getConfigFromCountry(
-    request?.headers?.authorization
-  )
-  const stripApplicationConfig = stripIdFromApplicationConfig(
-    configFromCountryConfig
-  )
-  const { error, value } = applicationConfigResponseValidation.validate(
-    stripApplicationConfig,
-    { allowUnknown: true }
-  )
+  const configFromCountryConfig = await getConfigFromCountry()
+  const { error, value: updatedConfigFromCountryConfig } =
+    applicationConfigResponseValidation.validate(configFromCountryConfig, {
+      allowUnknown: true
+    })
   if (error) {
     throw badData(error.details[0].message)
   }
-  const updatedConfigFromCountryConfig = value
 
-  try {
-    const configFromDB = await ApplicationConfig.findOne({})
-    const finalConfig = merge(
-      updatedConfigFromCountryConfig,
-      configFromDB?.toObject()
-    )
-    return finalConfig
-  } catch (error) {
-    throw internal('Error when fetching application config from Mongo', error)
-  }
+  return updatedConfigFromCountryConfig
 }
 
 export async function getLoginConfigHandler(
@@ -143,33 +138,6 @@ export async function getLoginConfigHandler(
   return { config: refineConfigResponse }
 }
 
-export async function updateApplicationConfigHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  try {
-    let applicationConfig
-    const configFromDB = await ApplicationConfig.findOne({})
-    const changeConfig = request.payload as IApplicationConfigurationModel
-
-    if (configFromDB !== null) {
-      applicationConfig = merge(configFromDB, changeConfig)
-    }
-    applicationConfig = changeConfig
-    await ApplicationConfig.findOneAndUpdate(
-      {},
-      { $set: applicationConfig },
-      { upsert: true }
-    )
-
-    return h.response(await getApplicationConfig()).code(201)
-  } catch (err) {
-    logger.error(err)
-    // return 400 if there is a validation error when saving to mongo
-    return h.response().code(400)
-  }
-}
-
 const searchCriteria = [
   'TRACKING_ID',
   'REGISTRATION_NUMBER',
@@ -178,51 +146,6 @@ const searchCriteria = [
   'PHONE_NUMBER',
   'EMAIL'
 ]
-
-export const updateApplicationConfig = Joi.object({
-  APPLICATION_NAME: Joi.string(),
-  COUNTRY_LOGO: Joi.object().keys({
-    fileName: Joi.string(),
-    file: Joi.string()
-  }),
-  LOGIN_BACKGROUND: Joi.object({
-    backgroundColor: Joi.string().allow('').optional(),
-    backgroundImage: Joi.string().allow('').optional(),
-    imageFit: Joi.string().allow('').optional()
-  }),
-  CURRENCY: Joi.object().keys({
-    isoCode: Joi.string(),
-    languagesAndCountry: Joi.array().items(Joi.string())
-  }),
-  PHONE_NUMBER_PATTERN: Joi.string(),
-  NID_NUMBER_PATTERN: Joi.string(),
-  BIRTH: Joi.object().keys({
-    REGISTRATION_TARGET: Joi.number(),
-    LATE_REGISTRATION_TARGET: Joi.number(),
-    FEE: {
-      ON_TIME: Joi.number(),
-      LATE: Joi.number(),
-      DELAYED: Joi.number()
-    },
-    PRINT_IN_ADVANCE: Joi.boolean()
-  }),
-  DEATH: Joi.object().keys({
-    REGISTRATION_TARGET: Joi.number(),
-    FEE: {
-      ON_TIME: Joi.number(),
-      DELAYED: Joi.number()
-    },
-    PRINT_IN_ADVANCE: Joi.boolean()
-  }),
-  MARRIAGE: Joi.object().keys({
-    REGISTRATION_TARGET: Joi.number(),
-    FEE: {
-      ON_TIME: Joi.number(),
-      DELAYED: Joi.number()
-    },
-    PRINT_IN_ADVANCE: Joi.boolean()
-  })
-})
 
 const applicationConfigResponseValidation = Joi.object({
   APPLICATION_NAME: Joi.string().required(),

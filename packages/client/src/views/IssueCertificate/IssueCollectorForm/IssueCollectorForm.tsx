@@ -18,7 +18,7 @@ import {
   IPrintableDeclaration,
   ICertificate
 } from '@client/declarations'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button } from '@client/../../components/lib/Button'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import {
@@ -32,6 +32,8 @@ import { getIssueCertCollectorGroupForEvent } from '@client/forms/certificate/fi
 import { Redirect } from 'react-router'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export function IssueCollectorForm({
   declaration
@@ -40,6 +42,8 @@ export function IssueCollectorForm({
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const config = useSelector(getOfflineData)
+  const user = useSelector(getUserDetails)
 
   const handleChange = (
     sectionData: ICertificate['collector'],
@@ -106,7 +110,10 @@ export function IssueCollectorForm({
           onClick={continueButtonHandler}
           disabled={groupHasError(
             { id: 'collector', fields },
-            declaration.data.registration.certificates?.[0]?.collector ?? {}
+            declaration.data.registration.certificates?.[0]?.collector ?? {},
+            config,
+            declaration.data,
+            user
           )}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
@@ -129,7 +136,9 @@ export function IssueCollectorForm({
               declaration.data.registration.certificates.length - 1
             ].collector) ||
             {},
-          declaration && declaration.data
+          declaration && declaration.data,
+          config,
+          user
         )}
         draftData={declaration.data}
       />

@@ -36,7 +36,6 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CERTIFICATE_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
@@ -50,7 +49,6 @@ import {
   PERFORMANCE_STATISTICS,
   PERFORMANCE_DASHBOARD,
   ORGANISATIONS_INDEX,
-  INFORMANT_NOTIFICATION,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
@@ -156,14 +154,6 @@ export function goForward() {
 
 export function goToHome() {
   return push(HOME)
-}
-
-export function goToCertificateConfig() {
-  return push(CERTIFICATE_CONFIG)
-}
-
-export function goToInformantNotification() {
-  return push(INFORMANT_NOTIFICATION)
 }
 
 export function goToAllUserEmail() {

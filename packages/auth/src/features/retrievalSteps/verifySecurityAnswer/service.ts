@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@auth/constants'
+import { env } from '@auth/environment'
 import { resolve } from 'url'
 
 export interface IVerifySecurityAnswerResponse {
@@ -22,7 +22,7 @@ export async function verifySecurityAnswer(
   questionKey: string,
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> {
-  const url = resolve(USER_MANAGEMENT_URL, '/verifySecurityAnswer')
+  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySecurityAnswer')
 
   const res = await fetch(url, {
     method: 'POST',

@@ -13,6 +13,9 @@ on: [pull_request]
 
 jobs:
   setup:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -20,8 +23,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - uses: mskelton/changelog-reminder-action@v3
+        # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
+        # to fail
+        continue-on-error: true
         with:
           message: >
             Oops! Looks like you forgot to update the changelog.
@@ -139,7 +145,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.23.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: 'fs'
           scan-ref: '.'

@@ -56,7 +56,6 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
   it('Converts registrationStatus to a transformed list of registration statuses ', () => {
     expect(transformedStoreState.registrationStatuses).toStrictEqual([
       'WAITING_VALIDATION',
-      'VALIDATED',
       'DECLARED'
     ])
   })
@@ -98,7 +97,7 @@ describe('Transforms advancedSearch local state to advancedSearch store state pr
 describe('Transforms advancedSearch store state to advancedSearch local state  properly', () => {
   const mockStoreState: IAdvancedSearchParamState = {
     event: 'birth',
-    registrationStatuses: ['WAITING_VALIDATION', 'VALIDATED', 'DECLARED'],
+    registrationStatuses: ['WAITING_VALIDATION', 'DECLARED'],
     declarationLocationId:
       mockOfflineData.offices['0d8474da-0361-4d32-979e-af91f012340a'].id,
     eventLocationId: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',

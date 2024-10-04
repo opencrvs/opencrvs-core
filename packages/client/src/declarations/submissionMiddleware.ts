@@ -49,6 +49,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
+import { getReviewForm } from '@client/forms/register/review-selectors'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -172,28 +173,43 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       }
     }
 
-    const form = getRegisterForm(getState())[event]
+    const isUpdateAction =
+      isValidationAction(submissionAction) ||
+      isRegisterAction(submissionAction) ||
+      isCorrectionAction(submissionAction)
+
+    const form = isUpdateAction
+      ? getReviewForm(getState())[event]
+      : getRegisterForm(getState())[event]
+
     const offlineData = getOfflineData(getState())
     const graphqlPayload = getGqlDetails(
-      getRegisterForm(getState())[event],
+      form,
       declaration,
       getOfflineData(getState()),
       getState().offline.userDetails as UserDetails
     )
 
     if (isCorrectionAction(submissionAction)) {
-      const changedValues = getChangedValues(form, declaration, offlineData)
+      const changedValues = getChangedValues(
+        form,
+        declaration,
+        offlineData,
+        getState().offline.userDetails as UserDetails
+      )
       graphqlPayload.registration ??= {}
       graphqlPayload.registration.correction =
         declaration.data.registration.correction ?? {}
       graphqlPayload.registration.correction.values = changedValues
     }
 
-    if (
-      isValidationAction(submissionAction) ||
-      isRegisterAction(submissionAction)
-    ) {
-      const changedValues = getChangedValues(form, declaration, offlineData)
+    if (isUpdateAction && !isCorrectionAction(submissionAction)) {
+      const changedValues = getChangedValues(
+        form,
+        declaration,
+        offlineData,
+        getState().offline.userDetails as UserDetails
+      )
       graphqlPayload.registration ??= {}
       graphqlPayload.registration.changedValues = changedValues
     }

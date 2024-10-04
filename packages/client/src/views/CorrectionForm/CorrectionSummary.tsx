@@ -93,8 +93,7 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
-  userPrimaryOffice?: UserDetails['primaryOffice']
-  userRole?: UserDetails['systemRole']
+  userDetails: UserDetails | null
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
@@ -147,7 +146,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       intl,
       goBack,
       declaration: { event },
-      userRole
+      userDetails,
+      offlineResources
     } = this.props
 
     const currencySymbol = getCurrencySymbol(
@@ -160,7 +160,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       fields: replaceInitialValues(
         section.groups[0].fields,
         this.props.declaration.data[section.id] || {},
-        this.props.declaration.data
+        this.props.declaration.data,
+        offlineResources,
+        userDetails
       )
     }
 
@@ -192,12 +194,18 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         size="large"
         onClick={this.togglePrompt}
         disabled={
-          sectionHasError(group, section, declaration) ||
-          this.state.isFileUploading
+          sectionHasError(
+            group,
+            section,
+            declaration,
+            this.props.offlineResources,
+            this.props.declaration.data,
+            userDetails
+          ) || this.state.isFileUploading
         }
       >
         <Check />
-        {userRole === ROLE_REGISTRATION_AGENT
+        {userDetails?.systemRole === ROLE_REGISTRATION_AGENT
           ? intl.formatMessage(buttonMessages.sendForApproval)
           : intl.formatMessage(buttonMessages.makeCorrection)}
       </Button>
@@ -374,7 +382,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           id="withoutCorrectionForApprovalPrompt"
           isOpen={showPrompt}
           title={intl.formatMessage(
-            this.props.userRole === ROLE_REGISTRATION_AGENT
+            this.props.userDetails?.systemRole === ROLE_REGISTRATION_AGENT
               ? messages.correctionForApprovalDialogTitle
               : messages.correctRecordDialogTitle
           )}
@@ -395,7 +403,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               id="send"
               key="continue"
               onClick={() => {
-                this.makeCorrection(userRole)
+                this.makeCorrection(this.props.userDetails?.systemRole)
                 this.togglePrompt()
               }}
             >
@@ -406,7 +414,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           <p>
             <Text element="p" variant="reg16">
               {intl.formatMessage(
-                this.props.userRole === ROLE_REGISTRATION_AGENT
+                this.props.userDetails?.systemRole === ROLE_REGISTRATION_AGENT
                   ? messages.correctionForApprovalDialogDescription
                   : messages.correctRecordDialogDescription
               )}
@@ -527,7 +535,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) => {
-    const { declaration, intl, offlineResources, language } = this.props
+    const { declaration, intl, offlineResources, language, userDetails } =
+      this.props
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -535,7 +544,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
         if (
-          isVisibleField(field, section, declaration, offlineResources) &&
+          isVisibleField(
+            field,
+            section,
+            declaration,
+            offlineResources,
+            userDetails
+          ) &&
           !isViewOnly(field)
         ) {
           if (field.previewGroup === baseTag) {
@@ -548,7 +563,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   tempField,
                   section,
                   declaration,
-                  offlineResources
+                  offlineResources,
+                  userDetails
                 ) &&
                 !isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
@@ -746,11 +762,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   }
 
   getChanges = (formSections: IFormSection[]) => {
-    const { declaration, offlineResources } = this.props
+    const { declaration, offlineResources, userDetails } = this.props
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
       declaration,
-      offlineResources
+      offlineResources,
+      userDetails
     )
     let tempItem: any
 
@@ -766,8 +783,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         group.fields
           .filter(
             (field) =>
-              isVisibleField(field, section, declaration, offlineResources) &&
-              !isViewOnly(field)
+              isVisibleField(
+                field,
+                section,
+                declaration,
+                offlineResources,
+                userDetails
+              ) && !isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
@@ -998,7 +1020,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     const correction = updateDeclarationRegistrationWithCorrection(
       declaration.data,
       {
-        userPrimaryOffice: this.props.userPrimaryOffice
+        userPrimaryOffice: this.props.userDetails?.primaryOffice
       }
     )
 
@@ -1032,8 +1054,7 @@ export const CorrectionSummary = connect(
     registerForm: getRegisterForm(state),
     offlineResources: getOfflineData(state),
     language: getLanguage(state),
-    userPrimaryOffice: getUserDetails(state)?.primaryOffice,
-    userRole: getUserDetails(state)?.systemRole
+    userDetails: getUserDetails(state)
   }),
   {
     modifyDeclaration,

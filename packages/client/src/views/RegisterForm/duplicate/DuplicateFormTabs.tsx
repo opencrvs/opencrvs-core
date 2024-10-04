@@ -122,6 +122,12 @@ export const getVisibleSections = (
   )
 }
 
+function getStatusFromHistory(history: ReadonlyArray<History>) {
+  return [...history]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .find((entry) => entry.action == null)?.regStatus as RegStatus
+}
+
 const getViewableSection = (
   registerForm: IForm,
   declaration: IDeclaration
@@ -299,7 +305,13 @@ export const DuplicateFormTabs = (props: IProps) => {
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
         if (
-          isVisibleField(field, section, declaration, offlineData) &&
+          isVisibleField(
+            field,
+            section,
+            declaration,
+            offlineData,
+            userDetails
+          ) &&
           !isViewOnly(field)
         ) {
           if (field.previewGroup === baseTag) {
@@ -308,7 +320,13 @@ export const DuplicateFormTabs = (props: IProps) => {
           for (const index in field.nestedFields) {
             field.nestedFields[index].forEach((tempField) => {
               if (
-                isVisibleField(tempField, section, declaration, offlineData) &&
+                isVisibleField(
+                  tempField,
+                  section,
+                  declaration,
+                  offlineData,
+                  userDetails
+                ) &&
                 !isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
               ) {
@@ -503,7 +521,8 @@ export const DuplicateFormTabs = (props: IProps) => {
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
       declaration,
-      offlineData
+      offlineData,
+      userDetails
     )
     let tempItem: any
     return formSections.map((section) => {
@@ -518,8 +537,13 @@ export const DuplicateFormTabs = (props: IProps) => {
         group.fields
           .filter(
             (field) =>
-              isVisibleField(field, section, declaration, offlineData) &&
-              !isViewOnly(field)
+              isVisibleField(
+                field,
+                section,
+                declaration,
+                offlineData,
+                userDetails
+              ) && !isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
@@ -623,7 +647,8 @@ export const DuplicateFormTabs = (props: IProps) => {
       const actualDeclarationerrorsOnFields = getErrorsOnFieldsBySection(
         actualDeclarationFormSections,
         offlineData,
-        props.declaration
+        props.declaration,
+        userDetails
       )
       const actualDeclarationTransformData = transformSectionData(
         actualDeclarationFormSections,
@@ -638,7 +663,8 @@ export const DuplicateFormTabs = (props: IProps) => {
       const duplicateDeclarationerrorsOnFields = getErrorsOnFieldsBySection(
         duplicateDeclarationFormSections,
         offlineData,
-        { data: duplicateDeclarationData } as IDeclaration
+        { data: duplicateDeclarationData } as IDeclaration,
+        userDetails
       )
       const duplicateDeclarationTransformData = transformSectionData(
         duplicateDeclarationFormSections,
@@ -647,8 +673,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       )
 
       const duplicateRegData = {
-        status: eventData.history.find((data: History) => data.action === null)
-          .regStatus as RegStatus,
+        status: getStatusFromHistory(eventData.history),
         type: capitalize(eventData.registration.type),
         trackingId: eventData.registration.trackingId,
         registrationNumber: eventData.registration?.registrationNumber,
@@ -666,9 +691,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       }
 
       const actualRegData = {
-        status: (props.declaration.data.history as unknown as History[]).find(
-          (data) => data.action === null
-        )?.regStatus,
+        status: props.declaration.registrationStatus,
         type: capitalize(String(props.declaration.data.registration.type)),
         trackingId: props.declaration.data.registration.trackingId,
         registrationNumber:
@@ -695,6 +718,7 @@ export const DuplicateFormTabs = (props: IProps) => {
               {intl.formatMessage(constantsMessages.status)}
             </Text>
           ),
+
           heading: {
             right: String(duplicateRegData.trackingId),
             left: String(actualRegData.trackingId)

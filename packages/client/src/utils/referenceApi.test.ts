@@ -549,24 +549,10 @@ const mockFetchConfig = {
   },
   certificates: [
     {
-      _id: '620bdfb896974e7de5a91624',
-      svgCode: '<svg></svg>',
-      svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-      user: 'jonathan.campbell',
-      event: 'birth',
-      status: 'ACTIVE',
-      svgDateUpdated: 1643292458812,
-      svgDateCreated: 1640696680593
+      svgCode: '<svg></svg>'
     },
     {
-      _id: '620bdfb896974e7de5a91625',
-      svgCode: '<svg></svg>',
-      svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
-      user: 'jonathan.campbell',
-      event: 'death',
-      status: 'ACTIVE',
-      svgDateUpdated: 1643292520393,
-      svgDateCreated: 1640696804785
+      svgCode: '<svg></svg>'
     }
   ],
   systems: [
@@ -579,24 +565,10 @@ const mockFetchConfig = {
 
 const certificates = [
   {
-    id: '620bdfb896974e7de5a91624',
-    svgCode: '<svg></svg>',
-    svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
-    user: 'jonathan.campbell',
-    event: 'birth',
-    status: 'ACTIVE',
-    svgDateUpdated: 1643292458812,
-    svgDateCreated: 1640696680593
+    svgCode: '<svg></svg>'
   },
   {
-    id: '620bdfb896974e7de5a91625',
-    svgCode: '<svg></svg>',
-    svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
-    user: 'jonathan.campbell',
-    event: 'death',
-    status: 'ACTIVE',
-    svgDateUpdated: 1643292520393,
-    svgDateCreated: 1640696804785
+    svgCode: '<svg></svg>'
   }
 ]
 

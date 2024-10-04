@@ -1392,72 +1392,7 @@ describe('Registration root resolvers', () => {
       ).rejects.toThrowError('User does not have a register scope')
     })
   })
-  describe('updateBirthRegistration()', () => {
-    const details = {
-      child: {
-        name: [{ use: 'en', firstNames: 'অনিক', familyName: 'হক' }]
-      },
-      mother: {
-        name: [{ use: 'en', firstNames: 'তাহসিনা', familyName: 'হক' }],
-        telecom: [{ system: 'phone', value: '+8801622688231' }]
-      },
-      registration: {
-        informantType: 'MOTHER',
-        draftId: 'cd168e0b-0817-4880-a67f-35de777460a5'
-      }
-    }
-    it('posts a fhir bundle', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      )
-      const result = await resolvers.Mutation!.updateBirthRegistration(
-        {},
-        { details },
-        { headers: authHeaderRegCert }
-      )
 
-      expect(result).toBeDefined()
-      expect(result).toBe('1')
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({ method: 'POST' })
-      )
-    })
-
-    it("throws error when user doesn't have a register scope", async () => {
-      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
-      await expect(
-        resolvers.Mutation!.updateBirthRegistration(
-          {},
-          { details },
-          { headers: authHeaderNotRegCert }
-        )
-      ).rejects.toThrowError('User does not have a register or validate scope')
-    })
-
-    it("throws an error when the response isn't what we expect", async () => {
-      fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
-      fetch.mockResponse(
-        JSON.stringify({
-          refUrl: '/ocrvs/3d3623fa-333d-11ed-a261-0242ac120002.png'
-        })
-      )
-      await expect(
-        resolvers.Mutation!.updateBirthRegistration(
-          {},
-          { details },
-          { headers: authHeaderRegCert }
-        )
-      ).rejects.toThrowError('FHIR did not send a valid response')
-    })
-  })
   describe('markBirthAsCertified()', () => {
     const details = {
       child: {

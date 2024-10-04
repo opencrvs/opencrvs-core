@@ -9,11 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import {
-  COUNTRY_CONFIG_HOST,
-  GATEWAY_HOST,
-  OPENCRVS_SPECIFICATION_URL
-} from './constants'
+import { OPENCRVS_SPECIFICATION_URL } from './constants'
+import { env } from './environment'
 import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { inspect } from 'util'
@@ -156,7 +153,7 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
 }
 
 async function getLocations() {
-  const url = new URL('locations', COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('locations', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url)
   if (!res.ok) {
     raise(`Expected to get the locations from ${url}`)
@@ -211,7 +208,7 @@ export async function seedLocations(token: string) {
   const savedLocations = (
     await Promise.all(
       ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
-        fetch(`${GATEWAY_HOST}/locations?type=${type}&_count=0`, {
+        fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
           headers: {
             'Content-Type': 'application/fhir+json'
           }
@@ -227,7 +224,7 @@ export async function seedLocations(token: string) {
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)
   })
-  const res = await fetch(`${GATEWAY_HOST}/locations?`, {
+  const res = await fetch(`${env.GATEWAY_HOST}/locations?`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
