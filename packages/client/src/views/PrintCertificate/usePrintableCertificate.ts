@@ -44,6 +44,8 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { printPDF } from '@client/pdfRenderer'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -100,10 +102,14 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = (declarationId: string) => {
+export const usePrintableCertificate = () => {
+  const { registrationId, certTemplateId } = useParams<{
+    registrationId: string
+    certTemplateId: string
+  }>()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
-  >(declarationId)
+  >(registrationId)
   const userDetails = useSelector(getUserDetails)
   const offlineData = useSelector(getOfflineData)
   const declaration = withEnhancedTemplateVariables(
@@ -120,28 +126,37 @@ export const usePrintableCertificate = (declarationId: string) => {
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
-  let svg = undefined
-  const certificateTemplate =
-    declaration &&
-    offlineData.templates.certificates?.[declaration.event].definition
-  if (certificateTemplate) {
-    const svgWithoutFonts = compileSvg(
-      certificateTemplate,
-      { ...declaration.data.template, preview: true },
-      state
-    )
-    const svgWithFonts = addFontsToSvg(
-      svgWithoutFonts,
-      offlineData.templates.fonts ?? {}
-    )
-    svg = svgWithFonts
-  }
+  const [svgCode, setSvgCode] = useState<string>()
+  const certificateConfig = offlineData.templates.certificates?.find(
+    (x) => x.id === certTemplateId
+  )
+  const certificateFonts = certificateConfig?.fonts ?? {}
+
+  useEffect(() => {
+    const certificateUrl =
+      declaration &&
+      offlineData.templates.certificates?.find((x) => x.id === certTemplateId)
+        ?.svgUrl
+
+    if (certificateUrl) {
+      fetch(certificateUrl)
+        .then((res) => res.text())
+        .then((certificateTemplate) => {
+          if (!certificateTemplate) return
+          const svgWithoutFonts = compileSvg(
+            certificateTemplate,
+            { ...declaration.data.template, preview: true },
+            state
+          )
+          const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
+          setSvgCode(svgWithFonts)
+        })
+    }
+    // eslint-disable-next-line
+  }, [])
 
   const handleCertify = async () => {
-    if (
-      !declaration ||
-      !offlineData.templates.certificates?.[declaration.event].definition
-    ) {
+    if (!declaration || !certificateConfig) {
       return
     }
     const draft = cloneDeep(declaration)
@@ -169,8 +184,11 @@ export const usePrintableCertificate = (declarationId: string) => {
       }
     }
 
+    const svgTemplate = await fetch(certificateConfig.svgUrl).then((res) =>
+      res.text()
+    )
     const svg = await compileSvg(
-      offlineData.templates.certificates[draft.event].definition,
+      svgTemplate,
       { ...draft.data.template, preview: false },
       state
     )
@@ -185,7 +203,7 @@ export const usePrintableCertificate = (declarationId: string) => {
       ]
     }
 
-    const pdfTemplate = svgToPdfTemplate(svg, offlineData)
+    const pdfTemplate = svgToPdfTemplate(svg, certificateFonts)
 
     printPDF(pdfTemplate, draft.id)
 
@@ -214,12 +232,12 @@ export const usePrintableCertificate = (declarationId: string) => {
     }
 
     dispatch(
-      goToCertificateCorrection(declarationId, CorrectionSection.Corrector)
+      goToCertificateCorrection(registrationId, CorrectionSection.Corrector)
     )
   }
 
   return {
-    svg,
+    svgCode,
     handleCertify,
     isPrintInAdvance,
     canUserEditRecord,

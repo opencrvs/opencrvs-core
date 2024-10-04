@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/components'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation, useParams } from 'react-router'
+import { useLocation } from 'react-router'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -110,19 +110,17 @@ const ReviewCertificateFrame = ({
 }
 
 export const ReviewCertificate = () => {
-  const { registrationId } = useParams<{ registrationId: string }>()
-
   const {
-    svg,
+    svgCode,
     handleCertify,
     isPrintInAdvance,
     canUserEditRecord,
     handleEdit
-  } = usePrintableCertificate(registrationId)
+  } = usePrintableCertificate()
   const intl = useIntl()
   const [modal, openModal] = useModal()
 
-  if (!svg) {
+  if (!svgCode) {
     return (
       <ReviewCertificateFrame>
         <Frame.LayoutCentered>
@@ -183,7 +181,7 @@ export const ReviewCertificate = () => {
           <Box>
             <CertificateContainer
               id="print"
-              dangerouslySetInnerHTML={{ __html: svg }}
+              dangerouslySetInnerHTML={{ __html: svgCode }}
             />
           </Box>
           <Content

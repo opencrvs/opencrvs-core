@@ -36,6 +36,7 @@ import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 interface INameField {
   firstNamesField: string
@@ -1012,7 +1013,8 @@ const marriageIssueCollectorFormOptions = [
 ]
 
 function getCertCollectorGroupForEvent(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  certificates?: ICertificateConfigData[]
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1055,13 +1057,26 @@ function getCertCollectorGroupForEvent(
         initialValue: '',
         validator: [],
         options: finalOptions
+      },
+      {
+        name: 'certTemplateId',
+        type: 'SELECT_WITH_OPTIONS',
+        label: certificateMessages.certificateConfirmationTxt,
+        required: true,
+        initialValue: '',
+        validator: [],
+        options:
+          certificates
+            ?.filter((x) => x.event === declaration.event)
+            .map((x) => ({ label: x.label, value: x.id })) || []
       }
     ]
   }
 }
 
 export function getCertificateCollectorFormSection(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  certificates?: ICertificateConfigData[]
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
@@ -1069,7 +1084,7 @@ export function getCertificateCollectorFormSection(
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(declaration),
+      getCertCollectorGroupForEvent(declaration, certificates),
       otherCertCollectorFormGroup(declaration.event),
       affidavitCertCollectorGroup
     ]
