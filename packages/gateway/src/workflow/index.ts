@@ -22,7 +22,8 @@ import {
   getBusinessStatus,
   IssuedRecord,
   ValidRecord,
-  getComposition
+  getComposition,
+  SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
@@ -366,5 +367,27 @@ export async function createHospitalNotification(
     `/records/event-notification`,
     authHeader,
     bundle
+  )
+}
+
+type ConfirmRegistrationDetails = {
+  compositionId: string
+  registrationNumber: string
+  error?: string
+  childIdentifiers?: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
+}
+
+export async function confirmRegistration(
+  authHeader: IAuthHeader,
+  details: ConfirmRegistrationDetails
+) {
+  return await createRequest(
+    'POST',
+    `/confirm/registration`,
+    authHeader,
+    details
   )
 }

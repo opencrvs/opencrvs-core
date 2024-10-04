@@ -10,7 +10,11 @@
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
-import { hasScope, inScope } from '@gateway/features/user/utils'
+import {
+  hasRecordAccess,
+  hasScope,
+  inScope
+} from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
@@ -55,7 +59,8 @@ import {
   duplicateRegistration,
   viewDeclaration,
   verifyRegistration,
-  markNotADuplicate
+  markNotADuplicate,
+  confirmRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
@@ -648,6 +653,22 @@ export const resolvers: GQLResolver = {
       )
 
       return taskEntry.resource.id
+    },
+    async confirmRegistration(_, { id, details }, { headers: authHeader }) {
+      if (!inScope(authHeader, ['record.confirm-registration'])) {
+        throw new Error(
+          'User does not have a "record.confirm-registration" scope'
+        )
+      }
+
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      return await confirmRegistration(authHeader, {
+        compositionId: id,
+        ...details
+      })
     }
   }
 }

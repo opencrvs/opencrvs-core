@@ -66,7 +66,7 @@ import changePasswordHandler, {
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
-import { tokenHandler } from '@auth/features/system/handler'
+import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {

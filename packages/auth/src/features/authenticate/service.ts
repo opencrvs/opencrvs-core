@@ -17,7 +17,7 @@ import {
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
   PRODUCTION,
   QA_ENV,
-  METRICS_URL
+  JWT_ISSUER
 } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -31,7 +31,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import { chainW, tryCatch } from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
@@ -140,6 +140,33 @@ export async function createToken(
     audience,
     issuer
   })
+}
+
+export async function createTokenForRecordValidation(
+  userId: UUID,
+  recordId: UUID
+) {
+  return sign(
+    {
+      scope: ['record.confirm-registration', 'record.reject-registration'],
+      recordId
+    },
+    cert,
+    {
+      subject: userId,
+      algorithm: 'RS256',
+      expiresIn: '7 days',
+      audience: [
+        'opencrvs:gateway-user', // to get to the gateway
+        'opencrvs:workflow-user', // to get to the workflow
+        'opencrvs:user-mgnt-user', // to allow the gateway to connect the 'sub' to an actual user
+        'opencrvs:search-user', // to allow the confirm-registration to index the record
+        'opencrvs:metrics-user', // to allow the confirm-registration to index the record to metrics
+        'opencrvs:config-user' // to allow metrics to fetch the application config with this token... (does this make any sense anymore?)
+      ],
+      issuer: JWT_ISSUER
+    }
+  )
 }
 
 export async function storeUserInformation(

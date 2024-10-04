@@ -89,7 +89,9 @@ export default function getRoutes(): ServerRoute[] {
             RouteScope.CERTIFY,
             RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            RouteScope.VALIDATE,
+            // @TODO: Refer to an enum / constant
+            'record.confirm-registration'
           ]
         },
         tags: ['api'],
