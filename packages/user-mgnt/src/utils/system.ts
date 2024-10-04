@@ -85,8 +85,8 @@ const convertClaimsToUserInfoClaims = ({
   openIdProviderEssentialClaims,
   openIdProviderVoluntaryClaims
 }: {
-  openIdProviderEssentialClaims: string | null
-  openIdProviderVoluntaryClaims: string | null
+  openIdProviderEssentialClaims?: string
+  openIdProviderVoluntaryClaims?: string
 }) => {
   const userinfo: Record<string, { essential: boolean }> = {}
 
