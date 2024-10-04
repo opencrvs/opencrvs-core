@@ -1061,7 +1061,7 @@ function getCertCollectorGroupForEvent(
       {
         name: 'certTemplateId',
         type: 'SELECT_WITH_OPTIONS',
-        label: certificateMessages.certificateConfirmationTxt,
+        label: certificateMessages.certificateTemplateSelectLabel,
         required: true,
         initialValue: '',
         validator: [],
