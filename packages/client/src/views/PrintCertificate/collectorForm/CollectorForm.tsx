@@ -76,6 +76,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getRegisteringOfficeId } from '@client/utils/draftUtils'
+import { UserDetails } from '@client/utils/userUtils'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -91,10 +92,12 @@ type PropsWhenDeclarationIsFound = {
   formSection: IFormSection
   formGroup: IFormSectionGroup
   offlineCountryConfiguration: IOfflineData
+  userDetails: UserDetails | null
 }
 type PropsWhenDeclarationIsNotFound = {
   declaration: undefined
   offlineCountryConfiguration: IOfflineData
+  userDetails: UserDetails | null
 }
 
 interface IBaseProps {
@@ -145,7 +148,8 @@ const getErrorsOnFieldsBySection = (
   sectionId: keyof IPrintableDeclaration['data'],
   fields: IFormField[],
   draft: IPrintableDeclaration,
-  config: IOfflineData
+  config: IOfflineData,
+  user: UserDetails | null
 ) => {
   const certificates = draft.data.registration.certificates
   const certificate = (certificates && certificates[0]) || {}
@@ -154,7 +158,8 @@ const getErrorsOnFieldsBySection = (
     (certificate[sectionId as keyof typeof certificate] as IFormSectionData) ||
       {},
     config,
-    draft.data
+    draft.data,
+    user
   )
 
   return {
@@ -238,7 +243,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       sectionId,
       fields,
       draft,
-      this.props.offlineCountryConfiguration
+      this.props.offlineCountryConfiguration,
+      this.props.userDetails
     )
     const errorValues = Object.values(errors).map(Object.values)
     const errLength = flatten(errorValues).filter(
@@ -484,6 +490,8 @@ const mapStateToProps = (
 ): PropsWhenDeclarationIsFound | PropsWhenDeclarationIsNotFound => {
   const { registrationId, eventType, groupId } = props.match.params
   const event = getEvent(eventType)
+  const userDetails = getUserDetails(state)
+  const offlineCountryConfiguration = getOfflineData(state)
 
   const declaration = state.declarationsState.declarations.find(
     (declaration) => declaration.id === registrationId
@@ -492,11 +500,11 @@ const mapStateToProps = (
   if (!declaration) {
     return {
       declaration: undefined,
-      offlineCountryConfiguration: getOfflineData(state)
+      offlineCountryConfiguration: getOfflineData(state),
+      userDetails
     }
   }
 
-  const userDetails = getUserDetails(state)
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const certFormSection = getCertificateCollectorFormSection(declaration)
@@ -539,7 +547,9 @@ const mapStateToProps = (
         declaration.data.registration.certificates.length - 1
       ].collector) ||
       {},
-    declaration && declaration.data
+    declaration && declaration.data,
+    offlineCountryConfiguration,
+    userDetails
   )
 
   return {
@@ -553,7 +563,8 @@ const mapStateToProps = (
       ...formGroup,
       fields
     },
-    offlineCountryConfiguration: getOfflineData(state)
+    userDetails,
+    offlineCountryConfiguration
   }
 }
 
