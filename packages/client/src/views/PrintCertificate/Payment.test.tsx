@@ -82,7 +82,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.Birth
+              certTemplateId: 'birth.certificate.copy'
             },
             isExact: true,
             path: '',
@@ -103,43 +103,15 @@ describe('verify collector tests', () => {
       testComponent.find('#Continue').hostNodes().simulate('click')
     })
 
-    /*
-
-    // Commenting out this test because receipt templates are not currently configurable
-
-    it('print payment receipt', async () => {
-      const printMoneyReceiptSpy = vi.spyOn(PDFUtils, 'printMoneyReceipt')
-      const testComponent = await createTestComponent(
-        <Payment
-          location={mockLocation}
-          history={history}
-          match={{
-            params: {
-              registrationId: 'mockBirth1234',
-              eventType: Event.Birth
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-
-      testComponent.find('#print-receipt').hostNodes().simulate('click')
-
-      expect(printMoneyReceiptSpy).toBeCalled()
-    })*/
-
     it('invalid declaration id', async () => {
-      await createTestComponent(
+      const payments = await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
           match={{
             params: {
               registrationId: 'mockBirth',
-              eventType: Event.Birth
+              certTemplateId: 'birth.certificate.copy'
             },
             isExact: true,
             path: '',
@@ -171,7 +143,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockDeath1234',
-              eventType: Event.Death
+              certTemplateId: 'death-certificate'
             },
             isExact: true,
             path: '',

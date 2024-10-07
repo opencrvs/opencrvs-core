@@ -51,7 +51,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IMatchParams {
   registrationId: string
-  certTemplateId: Event
+  certTemplateId: string
   collector: string
 }
 
