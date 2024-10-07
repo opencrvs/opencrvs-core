@@ -70,7 +70,7 @@ async function getCertificatesConfig(
       scope.includes(RouteScope.VALIDATE) ||
       scope.includes(RouteScope.NATLSYSADMIN))
   ) {
-    const url = new URL(`/certificates`, COUNTRY_CONFIG_URL).toString()
+    const url = new URL(`/certificates`, env.COUNTRY_CONFIG_URL).toString()
 
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${authToken}` }
