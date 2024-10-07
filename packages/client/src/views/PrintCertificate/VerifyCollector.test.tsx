@@ -67,7 +67,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.Birth,
+              certTemplateId: 'birth.certificate.copy',
               collector: 'mother'
             },
             isExact: true,
@@ -89,7 +89,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.Birth,
+              certTemplateId: 'birth.certificate.copy',
               collector: 'mother'
             },
             isExact: true,
@@ -128,7 +128,7 @@ describe('verify collector tests', () => {
             match={{
               params: {
                 registrationId: 'mockDeath1234',
-                eventType: Event.Death,
+                certTemplateId: 'death.certificate',
                 collector: 'informant'
               },
               isExact: true,
@@ -168,7 +168,7 @@ describe('verify collector tests', () => {
               match={{
                 params: {
                   registrationId: 'mockBirth1234',
-                  eventType: Event.Death,
+                  certTemplateId: 'birth.certificate.copy',
                   collector: 'father'
                 },
                 isExact: true,
@@ -251,7 +251,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockDeath1234',
-              eventType: Event.Death,
+              certTemplateId: 'death.certificate',
               collector: 'informant'
             },
             isExact: true,

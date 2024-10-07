@@ -837,6 +837,24 @@ const mockFetchCertificatesTemplatesDefinition = [
         bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
       }
     }
+  },
+  {
+    id: 'death-certificate',
+    event: 'death',
+    label: {
+      id: 'certificates.death.certificate',
+      defaultMessage: 'Death Certificate',
+      description: 'The label for a death certificate'
+    },
+    svgUrl: '/api/countryconfig/certificates/death-certificate.svg',
+    fonts: {
+      'Noto Sans': {
+        normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+        italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+      }
+    }
   }
 ]
 
