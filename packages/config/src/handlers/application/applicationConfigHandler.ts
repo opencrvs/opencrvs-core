@@ -35,7 +35,7 @@ export default async function configHandler(
 ) {
   try {
     const [certificates, config, systems] = await Promise.all([
-      getCertificates(request, h),
+      getCertificatesConfig(request, h),
       getApplicationConfig(request, h),
       getSystems(request, h)
     ])
@@ -53,7 +53,10 @@ export default async function configHandler(
   }
 }
 
-async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+async function getCertificatesConfig(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
   const authToken = getToken(request)
   const decodedOrError = pipe(authToken, verifyToken)
   if (decodedOrError._tag === 'Left') {
@@ -67,12 +70,18 @@ async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
       scope.includes(RouteScope.VALIDATE) ||
       scope.includes(RouteScope.NATLSYSADMIN))
   ) {
-    return Promise.all(
-      (['birth', 'death', 'marriage'] as const).map(async (event) => {
-        const response = await getEventCertificate(event, getToken(request))
-        return response
-      })
-    )
+    const url = new URL(`/certificates`, COUNTRY_CONFIG_URL).toString()
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${authToken}` }
+    })
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch certificates configuration: ${res.statusText} ${url}`
+      )
+    }
+    return res.json()
   }
   return []
 }
@@ -84,27 +93,6 @@ async function getConfigFromCountry(authToken?: string) {
     throw new Error(`Expected to get the application config from ${url}`)
   }
   return res.json()
-}
-
-async function getEventCertificate(
-  event: 'birth' | 'death' | 'marriage',
-  authToken: string
-) {
-  const url = new URL(
-    `/certificates/${event}.svg`,
-    env.COUNTRY_CONFIG_URL
-  ).toString()
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${authToken}` }
-  })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${event} certificate: ${res.statusText}`)
-  }
-  const responseText = await res.text()
-
-  return { svgCode: responseText, event }
 }
 
 async function getApplicationConfig(
