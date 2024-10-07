@@ -705,7 +705,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { declaration } = this.props
     const informantTypeChanged =
       prevProps.declaration?.data?.informant?.informantType !==
-      declaration?.data?.informant?.informantType
+        declaration?.data?.informant?.informantType &&
+      Boolean(declaration?.data?.informant?.informantType)
 
     // see https://github.com/opencrvs/opencrvs-core/issues/5820
     if (informantTypeChanged) {
