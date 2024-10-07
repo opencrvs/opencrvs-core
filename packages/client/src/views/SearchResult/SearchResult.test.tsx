@@ -43,7 +43,14 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      systemRole: 'DISTRICT_REGISTRAR'
+      role: {
+        id: 'DISTRICT_REGISTRAR',
+        label: {
+          defaultMessage: 'District Registrar',
+          description: 'Name for user role Field Agent',
+          id: 'userRole.fieldAgent'
+        }
+      }
     }
   }
 }

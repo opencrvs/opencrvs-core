@@ -1897,7 +1897,6 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  systemRole: SystemRoleType!
   role: Role!
   email: String
   status: Status!

@@ -361,7 +361,7 @@ function RegistrationListComponent(props: IProps) {
           width: 20
         },
         {
-          key: 'systemRole',
+          key: 'role',
           label: intl.formatMessage(messages.typeColumnHeader),
           width: 20
         },
@@ -452,9 +452,11 @@ function RegistrationListComponent(props: IProps) {
         )}
       </>
     ),
-    systemRole: getFieldAgentTypeLabel(
-      result.registrarPractitioner?.systemRole as string
-    ),
+    role:
+      result.registrarPractitioner &&
+      getFieldAgentTypeLabel(
+        intl.formatMessage(result.registrarPractitioner.role.label) as string
+      ),
     total: String(result.total),
     delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
     delayed_num: getPercentage(result.total, result.delayed),
