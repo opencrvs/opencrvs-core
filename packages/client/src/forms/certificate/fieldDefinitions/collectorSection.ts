@@ -1041,7 +1041,14 @@ function getCertCollectorGroupForEvent(
     birthCertCollectorOptions,
     marriageCertCollectorOptions
   )
-
+  const certificateTemplateOptions =
+    certificates
+      ?.filter((x) => x.event === declaration.event)
+      .map((x) => ({ label: x.label, value: x.id })) || []
+  const certTemplateDefaultValue =
+    certificateTemplateOptions.length > 0
+      ? certificateTemplateOptions[0].value
+      : ''
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
@@ -1063,12 +1070,9 @@ function getCertCollectorGroupForEvent(
         type: 'SELECT_WITH_OPTIONS',
         label: certificateMessages.certificateTemplateSelectLabel,
         required: true,
-        initialValue: '',
+        initialValue: certTemplateDefaultValue,
         validator: [],
-        options:
-          certificates
-            ?.filter((x) => x.event === declaration.event)
-            .map((x) => ({ label: x.label, value: x.id })) || []
+        options: certificateTemplateOptions
       }
     ]
   }

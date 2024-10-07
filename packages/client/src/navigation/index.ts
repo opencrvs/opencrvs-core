@@ -293,13 +293,13 @@ export function goToBirthRegistrationAsParent(declarationId: string) {
 
 export function goToPrintCertificate(
   registrationId: string,
-  event: string,
+  certTemplateId: string,
   groupId?: string
 ) {
   return push(
     formatUrl(CERTIFICATE_COLLECTOR, {
-      registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString(),
+      registrationId,
+      certTemplateId,
       groupId: groupId || 'certCollector'
     })
   )
@@ -375,13 +375,13 @@ export function goToReviewCertificate(
 
 export function goToVerifyCollector(
   registrationId: string,
-  event: string,
+  certTemplateId: string,
   collector: string
 ) {
   return push(
     formatUrl(VERIFY_COLLECTOR, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString(),
+      certTemplateId: certTemplateId.toLowerCase().toString(),
       collector: collector.toLowerCase().toString()
     })
   )
@@ -389,24 +389,24 @@ export function goToVerifyCollector(
 
 export function goToPrintCertificatePayment(
   registrationId: string,
-  event: Event
+  certTemplateId: string
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
-      registrationId: registrationId.toString(),
-      eventType: event
+      registrationId,
+      certTemplateId
     })
   )
 }
 
 export function goToIssueCertificatePayment(
   registrationId: string,
-  event: Event
+  certTemplateId: string
 ) {
   return push(
     formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
-      registrationId: registrationId.toString(),
-      eventType: event
+      registrationId,
+      certTemplateId
     })
   )
 }

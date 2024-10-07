@@ -43,18 +43,18 @@ export const VERIFY_CORRECTOR = '/correction/:declarationId/verify/:corrector'
 export const SEARCH = '/search'
 export const SEARCH_RESULT = '/search-result'
 export const CERTIFICATE_COLLECTOR =
-  '/cert/collector/:registrationId/:eventType/:groupId'
+  '/cert/collector/:registrationId/:certTemplateId/:groupId'
 export const ISSUE_COLLECTOR = '/issue/:registrationId/:pageId'
 export const ISSUE_VERIFY_COLLECTOR =
   '/issue/check/:registrationId/:eventType/:collector'
 export const VERIFY_COLLECTOR =
   '/print/check/:registrationId/:certTemplateId/:collector'
-export const REVIEW_CERTIFICATE = '/review/:registrationId/:eventType'
+export const REVIEW_CERTIFICATE = '/review/:registrationId/:certTemplateId'
 
 export const PRINT_CERTIFICATE_PAYMENT =
-  '/print/payment/:registrationId/:eventType'
+  '/print/payment/:registrationId/:certTemplateId'
 export const ISSUE_CERTIFICATE_PAYMENT =
-  '/issue/payment/:registrationId/:eventType'
+  '/issue/payment/:registrationId/:certTemplateId'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
