@@ -51,7 +51,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IMatchParams {
   registrationId: string
-  eventType: Event
+  certTemplateId: Event
   collector: string
 }
 
@@ -104,24 +104,24 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       if (!isIssueUrl) {
         this.props.goToReviewCertificate(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       } else {
         this.props.goToIssueCertificatePayment(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       }
     } else {
       if (!isIssueUrl) {
         this.props.goToPrintCertificatePayment(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       } else {
         this.props.goToIssueCertificatePayment(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       }
     }
