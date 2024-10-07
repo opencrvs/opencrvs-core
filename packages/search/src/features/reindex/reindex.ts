@@ -74,9 +74,7 @@ export const reindex = async () => {
         }
       }),
       onDrop(doc) {
-        throw new Error(
-          `Document ${doc.document.compositionId} couldn't be inserted`
-        )
+        console.log('dropping id', doc.document.compositionId)
       }
     },
     {
