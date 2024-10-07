@@ -14,7 +14,6 @@ import {
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { usePermissions } from '@client/hooks/useAuthorization'
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -65,6 +64,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
+import ScopedComponent from '@client/components/ScopedComponent'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -242,7 +242,6 @@ const NavigationView = (props: IFullProps) => {
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
-  const { hasScope, hasAnyScope } = usePermissions()
 
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -311,53 +310,6 @@ const NavigationView = (props: IFullProps) => {
     ).length
   }
 
-  const hasInProgress = hasAnyScope([
-    'record.declare-birth',
-    'record.declare-birth:my-jurisdiction',
-    'record.declare-death',
-    'record.declare-death:my-jurisdiction',
-    'record.declare-marriage',
-    'record.declare-marriage:my-jurisdiction'
-  ])
-
-  const hasSentForReview = hasAnyScope(['record.submit-for-review'])
-
-  const hasReadyForReview = hasScope('record.declaration-review')
-  const hasSentForApproval = hasScope('record.submit-for-approval')
-  const hasRequiresUpdates = hasScope('record.declaration-review')
-  const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
-  const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
-
-  const hasOutbox = !hasAnyScope(['sysadmin', 'natlsysadmin'])
-
-  const hasAnyOrganisation = hasAnyScope([
-    'organisation.read',
-    'organisation.read-locations',
-    'organisation.read-locations:my-office'
-  ])
-  const hasOrganisation = hasScope('organisation.read')
-  const hasOrganisationTeam = hasAnyScope([
-    'organisation.read-locations',
-    'organisation.read-locations:my-office'
-  ])
-
-  const hasAnyPerformance = hasAnyScope([
-    'performance.read',
-    'performance.export-vital-statistics',
-    'performance.read-dashboards'
-  ])
-  const canRegister = hasScope('record.register')
-  const hasPerformanceDashboards = hasScope('performance.read-dashboards')
-  const hasPerformanceStatistics = hasScope('performance.read')
-  const hasPerformanceLeaderboards = hasScope('performance.read')
-  const hasPerformanceVitalStatisticsExports = hasScope(
-    'performance.export-vital-statistics'
-  )
-  const hasPerformance = hasScope('performance.read')
-
-  const hasSystemsConfig = hasAnyScope(['sysadmin', 'natlsysadmin'])
-  const hasEmailAllUsers = hasAnyScope(['sysadmin', 'natlsysadmin'])
-
   return (
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
@@ -368,119 +320,125 @@ const NavigationView = (props: IFullProps) => {
       avatar={() => userInfo && userInfo.avatar}
       className={className}
     >
-      <>
-        <NavigationGroup>
-          {hasInProgress && (
-            <>
-              <NavigationItem
-                icon={() => <DeclarationIconSmall color={'purple'} />}
-                id={`navigation_${WORKQUEUE_TABS.inProgress}`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.inProgress]
-                )}
-                count={declarationCount.inProgress}
-                isSelected={tabId === WORKQUEUE_TABS.inProgress}
-                onClick={() => {
-                  props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-                  menuCollapse && menuCollapse()
-                }}
-              />
-            </>
-          )}
-          {hasSentForReview && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.sentForReview]
-              )}
-              count={declarationCount.readyForReview}
-              isSelected={tabId === WORKQUEUE_TABS.sentForReview}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
-          {hasSentForApproval && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
-              id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.sentForApproval]
-              )}
-              count={declarationCount.sentForApproval}
-              isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
-          {hasRequiresUpdates && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
-              id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.requiresUpdate]
-              )}
-              count={declarationCount.requiresUpdate}
-              isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
-          {hasReadyForReview && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.readyForReview]
-              )}
-              count={declarationCount.readyForReview}
-              isSelected={tabId === WORKQUEUE_TABS.readyForReview}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
-
-          {hasReadyToPrint && (
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'green'} />}
-              id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.readyToPrint]
-              )}
-              count={declarationCount.readyToPrint}
-              isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
-          {canRegister &&
-            window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
-              <NavigationItem
-                icon={() => <DeclarationIconSmall color={'teal'} />}
-                id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.externalValidation]
-                )}
-                count={declarationCount.externalValidation}
-                isSelected={tabId === WORKQUEUE_TABS.externalValidation}
-                onClick={() => {
-                  props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
-                  menuCollapse && menuCollapse()
-                }}
-              />
+      <NavigationGroup>
+        <ScopedComponent
+          scopes={[
+            'record.declare-birth',
+            'record.declare-birth:my-jurisdiction',
+            'record.declare-death',
+            'record.declare-death:my-jurisdiction',
+            'record.declare-marriage',
+            'record.declare-marriage:my-jurisdiction'
+          ]}
+        >
+          <NavigationItem
+            icon={() => <DeclarationIconSmall color={'purple'} />}
+            id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.inProgress]
             )}
-
-          {isOnePrintInAdvanceOn && hasReadyToIssue && (
+            count={declarationCount.inProgress}
+            isSelected={tabId === WORKQUEUE_TABS.inProgress}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+        <ScopedComponent scopes={['record.submit-for-review']}>
+          <NavigationItem
+            icon={() => <DeclarationIconSmall color={'orange'} />}
+            id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.sentForReview]
+            )}
+            count={declarationCount.readyForReview}
+            isSelected={tabId === WORKQUEUE_TABS.sentForReview}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+        <ScopedComponent scopes={['record.submit-for-approval']}>
+          <NavigationItem
+            icon={() => <DeclarationIconSmall color={'grey'} />}
+            id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.sentForApproval]
+            )}
+            count={declarationCount.sentForApproval}
+            isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+        <ScopedComponent scopes={['record.declaration-review']}>
+          <NavigationItem
+            icon={() => <DeclarationIconSmall color={'red'} />}
+            id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+            )}
+            count={declarationCount.requiresUpdate}
+            isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+        <ScopedComponent scopes={['record.declaration-review']}>
+          <NavigationItem
+            icon={() => <DeclarationIconSmall color={'orange'} />}
+            id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.readyForReview]
+            )}
+            count={declarationCount.readyForReview}
+            isSelected={tabId === WORKQUEUE_TABS.readyForReview}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+        <ScopedComponent scopes={['record.print-issue-certified-copies']}>
+          <NavigationItem
+            icon={() => <DeclarationIconSmall color={'green'} />}
+            id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.readyToPrint]
+            )}
+            count={declarationCount.readyToPrint}
+            isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+        {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+          <ScopedComponent scopes={['record.register']}>
+            <NavigationItem
+              icon={() => <DeclarationIconSmall color={'teal'} />}
+              id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.externalValidation]
+              )}
+              count={declarationCount.externalValidation}
+              isSelected={tabId === WORKQUEUE_TABS.externalValidation}
+              onClick={() => {
+                props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
+                menuCollapse && menuCollapse()
+              }}
+            />
+          </ScopedComponent>
+        )}
+        {isOnePrintInAdvanceOn && (
+          <ScopedComponent scopes={['record.print-issue-certified-copies']}>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'teal'} />}
               id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
@@ -494,199 +452,231 @@ const NavigationView = (props: IFullProps) => {
                 menuCollapse && menuCollapse()
               }}
             />
-          )}
-          {hasOutbox && (
-            <NavigationItem
-              icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.outbox}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.outbox]
-              )}
-              count={declarationCount.outbox}
-              isSelected={tabId === WORKQUEUE_TABS.outbox}
-              onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.outbox)
-                menuCollapse && menuCollapse()
-              }}
-            />
-          )}
-        </NavigationGroup>
-      </>
+          </ScopedComponent>
+        )}
+        <ScopedComponent denyScopes={['sysadmin', 'natlsysadmin']}>
+          <NavigationItem
+            icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
+            id={`navigation_${WORKQUEUE_TABS.outbox}`}
+            label={intl.formatMessage(
+              navigationMessages[WORKQUEUE_TABS.outbox]
+            )}
+            count={declarationCount.outbox}
+            isSelected={tabId === WORKQUEUE_TABS.outbox}
+            onClick={() => {
+              props.goToHomeTab(WORKQUEUE_TABS.outbox)
+              menuCollapse && menuCollapse()
+            }}
+          />
+        </ScopedComponent>
+      </NavigationGroup>
 
-      {hasAnyOrganisation && (
+      <ScopedComponent
+        scopes={[
+          'organisation.read',
+          'organisation.read-locations',
+          'organisation.read-locations:my-office'
+        ]}
+      >
         <NavigationGroup>
-          {hasPerformance && userDetails && (
-            <NavigationItem
-              icon={() => <Icon name="Activity" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.performance}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.performance]
-              )}
-              onClick={() => {
-                props.goToPerformanceViewAction()
-              }}
-              isSelected={
-                enableMenuSelection &&
-                activeMenuItem === WORKQUEUE_TABS.performance
-              }
-            />
-          )}
-          {hasOrganisation && userDetails && (
-            <NavigationItem
-              icon={() => <Icon name="Buildings" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.organisation}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.organisation]
-              )}
-              onClick={() => props.goToOrganisationViewAction(userDetails)}
-              isSelected={
-                enableMenuSelection &&
-                activeMenuItem === WORKQUEUE_TABS.organisation
-              }
-            />
-          )}
-          {hasOrganisationTeam && userDetails && (
-            <NavigationItem
-              icon={() => <Icon name="Users" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.team}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.team]
-              )}
-              onClick={() => props.goToTeamViewAction(userDetails)}
-              isSelected={
-                enableMenuSelection && activeMenuItem === WORKQUEUE_TABS.team
-              }
-            />
-          )}
-
-          {hasSystemsConfig && (
+          {userDetails && (
             <>
-              <NavigationItem
-                icon={() => <Icon name="Compass" size="medium" />}
-                id={`navigation_${WORKQUEUE_TABS.config}_main`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.config]
-                )}
-                onClick={() => setIsConfigExpanded(!isConfigExpanded)}
-                isSelected={
-                  enableMenuSelection && configTab.includes(activeMenuItem)
-                }
-                expandableIcon={() =>
-                  isConfigExpanded || configTab.includes(activeMenuItem) ? (
-                    <Expandable selected={true} />
-                  ) : (
-                    <Expandable />
-                  )
-                }
-              />
-              {(isConfigExpanded || configTab.includes(activeMenuItem)) && (
-                <NavigationSubItem
-                  id={`navigation_${WORKQUEUE_TABS.systems}`}
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.systems]
-                  )}
-                  onClick={goToSystemViewAction}
-                  isSelected={
-                    enableMenuSelection &&
-                    activeMenuItem === WORKQUEUE_TABS.systems
-                  }
-                />
-              )}
-            </>
-          )}
-
-          {hasEmailAllUsers && (
-            <>
-              <NavigationItem
-                icon={() => <Icon name="ChatCircle" size="medium" />}
-                id={`navigation_${WORKQUEUE_TABS.communications}_main`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.communications]
-                )}
-                onClick={() => setIsCommunationExpanded(!isCommunationExpanded)}
-                isSelected={
-                  enableMenuSelection &&
-                  conmmunicationTab.includes(activeMenuItem)
-                }
-                expandableIcon={() =>
-                  isCommunationExpanded ||
-                  conmmunicationTab.includes(activeMenuItem) ? (
-                    <Expandable selected={true} />
-                  ) : (
-                    <Expandable />
-                  )
-                }
-              />
-              {(isCommunationExpanded ||
-                conmmunicationTab.includes(activeMenuItem)) && (
-                <NavigationSubItem
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.emailAllUsers]
-                  )}
-                  id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
-                  onClick={goToAllUserEmail}
-                  isSelected={
-                    enableMenuSelection &&
-                    activeMenuItem === WORKQUEUE_TABS.emailAllUsers
-                  }
-                />
-              )}
-            </>
-          )}
-        </NavigationGroup>
-      )}
-      {hasAnyPerformance && (
-        <NavigationGroup>
-          {
-            <>
-              {showRegDashboard && hasPerformanceDashboards && (
-                <NavigationItem
-                  icon={() => <Icon name="ChartLine" size="medium" />}
-                  label={intl.formatMessage(navigationMessages['dashboard'])}
-                  onClick={goToDashboardView}
-                  id={`navigation_${WORKQUEUE_TABS.dashboard}`}
-                  isSelected={
-                    enableMenuSelection && activeMenuItem === 'dashboard'
-                  }
-                />
-              )}
-              {showStatistics && hasPerformanceStatistics && (
+              <ScopedComponent scopes={['performance.read']}>
                 <NavigationItem
                   icon={() => <Icon name="Activity" size="medium" />}
-                  label={intl.formatMessage(navigationMessages['statistics'])}
-                  onClick={goToPerformanceStatistics}
-                  id={`navigation_${WORKQUEUE_TABS.statistics}`}
-                  isSelected={
-                    enableMenuSelection && activeMenuItem === 'statistics'
-                  }
-                />
-              )}
-              {showLeaderboard && hasPerformanceLeaderboards && (
-                <NavigationItem
-                  icon={() => <Icon name="Medal" size="medium" />}
-                  label={intl.formatMessage(navigationMessages['leaderboards'])}
-                  onClick={goToLeaderBoardsView}
-                  id={`navigation_${WORKQUEUE_TABS.leaderboards}`}
-                  isSelected={
-                    enableMenuSelection && activeMenuItem === 'leaderboards'
-                  }
-                />
-              )}
-              {hasPerformance && userDetails && (
-                <NavigationItem
-                  icon={() => <Icon name="ChartBar" size="medium" />}
-                  label={intl.formatMessage(navigationMessages['performance'])}
-                  onClick={() => props.goToPerformanceViewAction()}
-                  id={`navigation_${WORKQUEUE_TABS.report}`}
+                  id={`navigation_${WORKQUEUE_TABS.performance}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.performance]
+                  )}
+                  onClick={() => {
+                    props.goToPerformanceViewAction()
+                  }}
                   isSelected={
                     enableMenuSelection &&
                     activeMenuItem === WORKQUEUE_TABS.performance
                   }
                 />
+              </ScopedComponent>
+
+              <ScopedComponent scopes={['organisation.read']}>
+                <NavigationItem
+                  icon={() => <Icon name="Buildings" size="medium" />}
+                  id={`navigation_${WORKQUEUE_TABS.organisation}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.organisation]
+                  )}
+                  onClick={() => props.goToOrganisationViewAction(userDetails)}
+                  isSelected={
+                    enableMenuSelection &&
+                    activeMenuItem === WORKQUEUE_TABS.organisation
+                  }
+                />
+              </ScopedComponent>
+
+              <ScopedComponent
+                scopes={[
+                  'organisation.read-locations',
+                  'organisation.read-locations:my-office'
+                ]}
+              >
+                <NavigationItem
+                  icon={() => <Icon name="Users" size="medium" />}
+                  id={`navigation_${WORKQUEUE_TABS.team}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.team]
+                  )}
+                  onClick={() => props.goToTeamViewAction(userDetails)}
+                  isSelected={
+                    enableMenuSelection &&
+                    activeMenuItem === WORKQUEUE_TABS.team
+                  }
+                />
+              </ScopedComponent>
+            </>
+          )}
+
+          <ScopedComponent scopes={['sysadmin', 'natlsysadmin']}>
+            <NavigationItem
+              icon={() => <Icon name="Compass" size="medium" />}
+              id={`navigation_${WORKQUEUE_TABS.config}_main`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.config]
+              )}
+              onClick={() => setIsConfigExpanded(!isConfigExpanded)}
+              isSelected={
+                enableMenuSelection && configTab.includes(activeMenuItem)
+              }
+              expandableIcon={() =>
+                isConfigExpanded || configTab.includes(activeMenuItem) ? (
+                  <Expandable selected={true} />
+                ) : (
+                  <Expandable />
+                )
+              }
+            />
+            {(isConfigExpanded || configTab.includes(activeMenuItem)) && (
+              <NavigationSubItem
+                id={`navigation_${WORKQUEUE_TABS.systems}`}
+                label={intl.formatMessage(
+                  navigationMessages[WORKQUEUE_TABS.systems]
+                )}
+                onClick={goToSystemViewAction}
+                isSelected={
+                  enableMenuSelection &&
+                  activeMenuItem === WORKQUEUE_TABS.systems
+                }
+              />
+            )}
+          </ScopedComponent>
+
+          <ScopedComponent scopes={['sysadmin', 'natlsysadmin']}>
+            <NavigationItem
+              icon={() => <Icon name="ChatCircle" size="medium" />}
+              id={`navigation_${WORKQUEUE_TABS.communications}_main`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.communications]
+              )}
+              onClick={() => setIsCommunationExpanded(!isCommunationExpanded)}
+              isSelected={
+                enableMenuSelection &&
+                conmmunicationTab.includes(activeMenuItem)
+              }
+              expandableIcon={() =>
+                isCommunationExpanded ||
+                conmmunicationTab.includes(activeMenuItem) ? (
+                  <Expandable selected={true} />
+                ) : (
+                  <Expandable />
+                )
+              }
+            />
+            {(isCommunationExpanded ||
+              conmmunicationTab.includes(activeMenuItem)) && (
+              <NavigationSubItem
+                label={intl.formatMessage(
+                  navigationMessages[WORKQUEUE_TABS.emailAllUsers]
+                )}
+                id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
+                onClick={goToAllUserEmail}
+                isSelected={
+                  enableMenuSelection &&
+                  activeMenuItem === WORKQUEUE_TABS.emailAllUsers
+                }
+              />
+            )}
+          </ScopedComponent>
+        </NavigationGroup>
+      </ScopedComponent>
+      <ScopedComponent
+        scopes={[
+          'performance.read',
+          'performance.export-vital-statistics',
+          'performance.read-dashboards'
+        ]}
+      >
+        <NavigationGroup>
+          {
+            <>
+              {showRegDashboard && (
+                <ScopedComponent scopes={['performance.read-dashboards']}>
+                  <NavigationItem
+                    icon={() => <Icon name="ChartLine" size="medium" />}
+                    label={intl.formatMessage(navigationMessages['dashboard'])}
+                    onClick={goToDashboardView}
+                    id={`navigation_${WORKQUEUE_TABS.dashboard}`}
+                    isSelected={
+                      enableMenuSelection && activeMenuItem === 'dashboard'
+                    }
+                  />
+                </ScopedComponent>
+              )}
+              {showStatistics && (
+                <ScopedComponent scopes={['performance.read']}>
+                  <NavigationItem
+                    icon={() => <Icon name="Activity" size="medium" />}
+                    label={intl.formatMessage(navigationMessages['statistics'])}
+                    onClick={goToPerformanceStatistics}
+                    id={`navigation_${WORKQUEUE_TABS.statistics}`}
+                    isSelected={
+                      enableMenuSelection && activeMenuItem === 'statistics'
+                    }
+                  />
+                </ScopedComponent>
+              )}
+              {showLeaderboard && (
+                <ScopedComponent scopes={['performance.read']}>
+                  <NavigationItem
+                    icon={() => <Icon name="Medal" size="medium" />}
+                    label={intl.formatMessage(
+                      navigationMessages['leaderboards']
+                    )}
+                    onClick={goToLeaderBoardsView}
+                    id={`navigation_${WORKQUEUE_TABS.leaderboards}`}
+                    isSelected={
+                      enableMenuSelection && activeMenuItem === 'leaderboards'
+                    }
+                  />
+                </ScopedComponent>
+              )}
+              {userDetails && (
+                <ScopedComponent scopes={['performance.read']}>
+                  <NavigationItem
+                    icon={() => <Icon name="ChartBar" size="medium" />}
+                    label={intl.formatMessage(
+                      navigationMessages['performance']
+                    )}
+                    onClick={() => props.goToPerformanceViewAction()}
+                    id={`navigation_${WORKQUEUE_TABS.report}`}
+                    isSelected={
+                      enableMenuSelection &&
+                      activeMenuItem === WORKQUEUE_TABS.performance
+                    }
+                  />
+                </ScopedComponent>
               )}
             </>
           }
-          {hasPerformanceVitalStatisticsExports && (
+          <ScopedComponent scopes={['performance.export-vital-statistics']}>
             <NavigationItem
               icon={() => <Icon name="Export" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.vsexports}`}
@@ -699,9 +689,9 @@ const NavigationView = (props: IFullProps) => {
                 activeMenuItem === WORKQUEUE_TABS.vsexports
               }
             />
-          )}
+          </ScopedComponent>
         </NavigationGroup>
-      )}
+      </ScopedComponent>
 
       <NavigationGroup>
         {userDetails?.searches && userDetails.searches.length > 0 ? (
