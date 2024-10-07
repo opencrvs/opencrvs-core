@@ -183,9 +183,11 @@ const PaymentComponent = ({
 }
 
 const getEvent = (state: IStoreState, certTemplateId: string | undefined) => {
-  return state.offline.offlineData.templates?.certificates?.find(
-    (x) => x.id === certTemplateId
-  )?.event
+  return (
+    state.offline.offlineData.templates?.certificates?.find(
+      (x) => x.id === certTemplateId
+    )?.event || ''
+  )
 }
 
 function mapStatetoProps(
