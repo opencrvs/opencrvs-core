@@ -452,16 +452,10 @@ export const up = async (db: Db, client: MongoClient) => {
             districtName: '$district.name',
             stateName: '$state.name',
             createdAt: {
-              $dateFromString: {
-                dateString: '$firstTask.lastModified',
-                onError: new Date(0).toISOString()
-              }
+              $dateFromString: { dateString: '$firstTask.lastModified' }
             },
             registeredAt: {
-              $dateFromString: {
-                dateString: '$registerTask.lastModified',
-                onError: new Date(0).toISOString()
-              }
+              $dateFromString: { dateString: '$registerTask.lastModified' }
             },
             status: '$latestTask.businessStatus.coding.code',
             childsAgeInDaysAtDeclaration: 1,
@@ -637,10 +631,7 @@ export const up = async (db: Db, client: MongoClient) => {
             stateName: '$state.name',
             event: 'Birth',
             createdAt: {
-              $dateFromString: {
-                dateString: '$lastModified',
-                onError: new Date(0).toISOString()
-              }
+              $dateFromString: { dateString: '$lastModified' }
             }
           }
         },
@@ -776,7 +767,7 @@ export const up = async (db: Db, client: MongoClient) => {
             _id: { $concat: [{ $toString: '$id' }, '_', '$daysInYear.date'] },
             name: 1,
             date: {
-              $dateFromString: { dateString: '$daysInYear.date', onError: null }
+              $dateFromString: { dateString: '$daysInYear.date' }
             },
             estimatedNumberOfBirths: '$daysInYear.estimatedNumberOfBirths',
             event: 'Birth'
