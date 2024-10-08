@@ -117,7 +117,7 @@ export function getPersonName(
   if (!name) {
     error(record, `name not found in patient resource for ${compositionCode}`)
   }
-  return [name.given?.join(' '), name.family].join(' ').trim()
+  return [name.given?.join(' ').trim(), name.family].join(' ').trim()
 }
 
 export function getRegistrationLocation(
