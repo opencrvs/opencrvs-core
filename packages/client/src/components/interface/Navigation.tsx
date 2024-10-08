@@ -95,7 +95,11 @@ export const WORKQUEUE_TABS = {
   communications: 'communications',
   informantNotification: 'informantnotification',
   emailAllUsers: 'emailAllUsers',
-  readyToIssue: 'readyToIssue'
+  readyToIssue: 'readyToIssue',
+  dashboard: 'dashboard',
+  statistics: 'statistics',
+  leaderboards: 'leaderboards',
+  report: 'report'
 } as const
 
 interface ICount {
@@ -640,7 +644,7 @@ const NavigationView = (props: IFullProps) => {
                   icon={() => <Icon name="ChartLine" size="medium" />}
                   label={intl.formatMessage(navigationMessages['dashboard'])}
                   onClick={goToDashboardView}
-                  id="navigation_dashboard"
+                  id={`navigation_${WORKQUEUE_TABS.dashboard}`}
                   isSelected={
                     enableMenuSelection && activeMenuItem === 'dashboard'
                   }
@@ -651,7 +655,7 @@ const NavigationView = (props: IFullProps) => {
                   icon={() => <Icon name="Activity" size="medium" />}
                   label={intl.formatMessage(navigationMessages['statistics'])}
                   onClick={goToPerformanceStatistics}
-                  id="navigation_statistics"
+                  id={`navigation_${WORKQUEUE_TABS.statistics}`}
                   isSelected={
                     enableMenuSelection && activeMenuItem === 'statistics'
                   }
@@ -662,7 +666,7 @@ const NavigationView = (props: IFullProps) => {
                   icon={() => <Icon name="Medal" size="medium" />}
                   label={intl.formatMessage(navigationMessages['leaderboards'])}
                   onClick={goToLeaderBoardsView}
-                  id="navigation_leaderboards"
+                  id={`navigation_${WORKQUEUE_TABS.leaderboards}`}
                   isSelected={
                     enableMenuSelection && activeMenuItem === 'leaderboards'
                   }
@@ -673,7 +677,7 @@ const NavigationView = (props: IFullProps) => {
                   icon={() => <Icon name="ChartBar" size="medium" />}
                   label={intl.formatMessage(navigationMessages['performance'])}
                   onClick={() => props.goToPerformanceViewAction()}
-                  id="navigation_report"
+                  id={`navigation_${WORKQUEUE_TABS.report}`}
                   isSelected={
                     enableMenuSelection &&
                     activeMenuItem === WORKQUEUE_TABS.performance
