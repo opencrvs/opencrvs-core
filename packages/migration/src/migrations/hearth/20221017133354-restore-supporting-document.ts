@@ -56,7 +56,7 @@ export const up = async (db: Db, client: MongoClient) => {
           const immediatePrevComp = compositionHistory[correctionIndex - 1]
           const hasDocumentSection = immediatePrevComp?.section?.find(
             (section: fhir.CompositionSection) =>
-              section?.code?.coding?.[0].code === 'supporting-documents'
+              section?.code?.coding?.[0]?.code === 'supporting-documents'
           )
           if (hasDocumentSection) {
             await db

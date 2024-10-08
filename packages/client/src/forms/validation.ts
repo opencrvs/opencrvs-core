@@ -24,6 +24,7 @@ import {
 import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
 import { httpErrorResponseValidator } from '@client/components/form/http'
+import { UserDetails } from '@client/utils/userUtils'
 
 export interface IFieldErrors {
   errors: IValidationResult[]
@@ -42,6 +43,7 @@ const getValidationErrors = {
     values: IFormSectionData,
     offlineCountryConfig: IOfflineData,
     drafts: IFormData,
+    user: UserDetails | null,
     requiredErrorMessage?: MessageDescriptor,
     checkValidationErrorsOnly?: boolean
   ) {
@@ -53,7 +55,8 @@ const getValidationErrors = {
       field,
       values,
       offlineCountryConfig,
-      drafts
+      drafts,
+      user
     )
     if (
       conditionalActions.includes('hide') ||
@@ -92,6 +95,7 @@ const getValidationErrors = {
         values,
         offlineCountryConfig,
         drafts,
+        user,
         requiredErrorMessage
       )
     }
@@ -101,6 +105,7 @@ const getValidationErrors = {
     values: IFormSectionData,
     resource: IOfflineData,
     drafts: IFormData,
+    user: UserDetails | null,
     requiredErrorMessage?: MessageDescriptor
   ): {
     [fieldName: string]: IValidationResult[]
@@ -117,6 +122,7 @@ const getValidationErrors = {
             .nestedFields as IFormSectionData,
           resource,
           drafts,
+          user,
           requiredErrorMessage
         ).errors
 
@@ -135,6 +141,7 @@ export function getValidationErrorsForForm(
   values: IFormSectionData,
   resource: IOfflineData,
   drafts: IFormData,
+  user: UserDetails | null,
   requiredErrorMessage?: MessageDescriptor,
   checkValidationErrorsOnly?: boolean
 ) {
@@ -150,6 +157,7 @@ export function getValidationErrorsForForm(
               values,
               resource,
               drafts,
+              user,
               requiredErrorMessage,
               checkValidationErrorsOnly
             )

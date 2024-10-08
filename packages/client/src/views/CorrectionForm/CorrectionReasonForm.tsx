@@ -36,6 +36,9 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { UserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 type IProps = {
   declaration: IDeclaration
@@ -53,7 +56,9 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function getGroupWithInitialValues(
   section: IFormSection,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  config: IOfflineData,
+  user: UserDetails | null
 ) {
   const group = section.groups[0]
 
@@ -62,7 +67,9 @@ function getGroupWithInitialValues(
     fields: replaceInitialValues(
       group.fields,
       declaration.data[section.id] || {},
-      declaration.data
+      declaration.data,
+      config,
+      user
     )
   }
 }
@@ -70,11 +77,12 @@ function getGroupWithInitialValues(
 function CorrectionReasonFormComponent(props: IFullProps) {
   const { declaration, intl } = props
   const config = useSelector(getOfflineData)
+  const user = useSelector(getUserDetails)
 
   const section = correctReasonSection
 
   const group = React.useMemo(
-    () => getGroupWithInitialValues(section, declaration),
+    () => getGroupWithInitialValues(section, declaration, config, user),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
@@ -110,7 +118,8 @@ function CorrectionReasonFormComponent(props: IFullProps) {
         group,
         declaration.data[section.id],
         config,
-        props.declaration.data
+        props.declaration.data,
+        user
       )}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
