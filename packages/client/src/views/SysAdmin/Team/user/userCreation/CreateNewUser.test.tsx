@@ -230,7 +230,7 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#familyNameEng_error')
+          .find('#familyName_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
@@ -339,11 +339,6 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            identifier: {
-              system: 'NATIONAL_ID',
-              value: '101488192',
-              __typename: 'Identifier'
-            },
             systemRole: 'NATIONAL_REGISTRAR',
             role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',

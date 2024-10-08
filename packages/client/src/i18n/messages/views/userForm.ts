@@ -54,10 +54,10 @@ export const messages = {
     description: "User's English first name",
     id: 'form.field.label.firstNameEN'
   },
-  lastNameEn: {
+  lastName: {
     defaultMessage: "User's surname",
     description: "User's English surname",
-    id: 'form.field.label.lastNameEN'
+    id: 'form.field.label.lastName'
   },
   phoneNumber: {
     defaultMessage: 'Phone number',

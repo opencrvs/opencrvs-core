@@ -78,9 +78,9 @@ export function userSectionFormType(): ISerializedFormSection {
         title: userFormMessages.userDetails,
         fields: [
           {
-            name: 'familyNameEng',
+            name: 'familyName',
             type: TEXT,
-            label: userFormMessages.lastNameEn,
+            label: userFormMessages.lastName,
             required: true,
             initialValue: '',
             validator: [{ operation: 'englishOnlyNameFormat' }],
