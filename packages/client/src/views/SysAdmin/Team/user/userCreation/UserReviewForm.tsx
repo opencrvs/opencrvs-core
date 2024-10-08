@@ -80,7 +80,7 @@ interface IUserReviewFormProps {
 interface IDispatchProps {
   goToCreateUserSection: typeof goToCreateUserSection
   goToUserReviewForm: typeof goToUserReviewForm
-  submitForm: (userFormSection: IFormSection) => void
+  submitForm: (variables: Record<string, any>) => void
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
@@ -121,7 +121,7 @@ class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
   transformSectionData = () => {
-    const { intl, userFormSection } = this.props
+    const { intl, userFormSection, userDetails } = this.props
     let nameJoined = false,
       fieldValue
     const sections: ISectionData[] = []
@@ -140,9 +140,13 @@ class UserReviewFormComponent extends React.Component<
           if (field.name === 'username' && !this.getValue(field)) return
           let label = intl.formatMessage(field.label)
           if (
-            !getConditionalActionsForField(field, this.props.formData).includes(
-              'hide'
-            )
+            !getConditionalActionsForField(
+              field,
+              this.props.formData,
+              this.props.offlineCountryConfiguration,
+              { user: this.props.formData },
+              userDetails
+            ).includes('hide')
           ) {
             fieldValue = this.getValue(field)
 
@@ -253,12 +257,31 @@ class UserReviewFormComponent extends React.Component<
     )}`
   }
 
+  handleSubmit = () => {
+    const variables = draftToGqlTransformer(
+      { sections: [this.props.userFormSection] },
+      { user: this.props.formData },
+      '',
+      this.props.userDetails,
+      this.props.offlineCountryConfiguration
+    )
+    if (variables.user._fhirID) {
+      variables.user.id = variables.user._fhirID
+      delete variables.user._fhirID
+    }
+
+    if (variables.user.signature) {
+      delete variables.user.signature.name
+      delete variables.user.signature.__typename //to fix updating registrar bug
+    }
+    this.props.submitForm(variables)
+  }
+
   render() {
     const {
       intl,
       section,
       userId,
-      userFormSection,
       formData,
       goToTeamUserList,
       userDetails,
@@ -281,7 +304,7 @@ class UserReviewFormComponent extends React.Component<
               this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
-          onClick={() => this.props.submitForm(userFormSection)}
+          onClick={this.handleSubmit}
           icon={() => <Check />}
           align={ICON_ALIGNMENT.LEFT}
         >
@@ -301,7 +324,7 @@ class UserReviewFormComponent extends React.Component<
               this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
-          onClick={() => this.props.submitForm(userFormSection)}
+          onClick={this.handleSubmit}
         >
           {intl.formatMessage(messages.createUser)}
         </Button>
@@ -360,21 +383,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
     goBack: () => dispatch(goBack()),
     goToTeamUserList: (id: string) => dispatch(goToTeamUserList(id)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
-    submitForm: (userFormSection: IFormSection) => {
-      const variables = draftToGqlTransformer(
-        { sections: [userFormSection] },
-        { user: props.formData }
-      )
-      if (variables.user._fhirID) {
-        variables.user.id = variables.user._fhirID
-        delete variables.user._fhirID
-      }
-
-      if (variables.user.signature) {
-        delete variables.user.signature.name
-        delete variables.user.signature.__typename //to fix updating registrar bug
-      }
-
+    submitForm: (variables: Record<string, any>) => {
       dispatch(
         submitUserFormData(
           props.client,

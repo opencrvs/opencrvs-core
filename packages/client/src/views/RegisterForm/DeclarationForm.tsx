@@ -40,14 +40,12 @@ const pageRoute: { [key in Event]: string } = {
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-class DeclarationFormView extends React.Component<IFormProps & RouteProps> {
-  render() {
-    const { declaration, ...rest } = this.props
-    if (!declaration) {
-      return <Redirect to={HOME} />
-    }
-    return <RegisterForm declaration={declaration} {...rest} />
+const DeclarationFormView = (props: IFormProps & RouteProps) => {
+  const { declaration, ...rest } = props
+  if (!declaration) {
+    return <Redirect to={HOME} />
   }
+  return <RegisterForm declaration={declaration} {...rest} />
 }
 
 function mapStatetoProps(state: IStoreState, props: RouteProps) {

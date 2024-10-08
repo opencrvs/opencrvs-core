@@ -74,9 +74,18 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 
 export function groupHasError(
   group: IFormSectionGroup,
-  sectionData: IFormSectionData
+  sectionData: IFormSectionData,
+  config: IOfflineData,
+  draft: IFormData,
+  user: UserDetails | null
 ) {
-  const errors = getValidationErrorsForForm(group.fields, sectionData || {})
+  const errors = getValidationErrorsForForm(
+    group.fields,
+    sectionData || {},
+    config,
+    draft,
+    user
+  )
 
   for (const field of group.fields) {
     const fieldErrors = errors[field.name].errors
@@ -268,11 +277,17 @@ export function updateDeclarationRegistrationWithCorrection(
 export function sectionHasError(
   group: IFormSectionGroup,
   section: IFormSection,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  config: IOfflineData,
+  draft: IFormData,
+  user: UserDetails | null
 ) {
   const errors = getValidationErrorsForForm(
     group.fields,
-    declaration.data[section.id] || {}
+    declaration.data[section.id] || {},
+    config,
+    draft,
+    user
   )
 
   for (const field of group.fields) {
@@ -645,7 +660,8 @@ export function isVisibleField(
   field: IFormField,
   section: IFormSection,
   draft: IDeclaration,
-  offlineResources: IOfflineData
+  config: IOfflineData,
+  user: UserDetails | null
 ) {
   if (field.type === HIDDEN) {
     return false
@@ -653,8 +669,9 @@ export function isVisibleField(
   const conditionalActions = getConditionalActionsForField(
     field,
     draft.data[section.id] || {},
-    offlineResources,
-    draft.data
+    config,
+    draft.data,
+    user
   )
   return (
     !conditionalActions.includes('hide') &&
@@ -665,7 +682,8 @@ export function isVisibleField(
 export function getOverriddenFieldsListForPreview(
   formSections: IFormSection[],
   draft: IDeclaration,
-  offlineResources: IOfflineData
+  offlineResources: IOfflineData,
+  userDetails: UserDetails | null
 ): IFormField[] {
   const overriddenFields = formSections
     .map((section) => {
@@ -685,14 +703,21 @@ export function getOverriddenFieldsListForPreview(
                 tempField,
                 draft.data[residingSection] || {},
                 offlineResources,
-                draft.data
+                draft.data,
+                userDetails
               ).includes('hide')
               return isVisible ? field : ({} as IFormField)
             })
             .filter((field) => !Boolean(field.hideInPreview))
             .filter((field) => Boolean(field.reviewOverrides))
             .filter((field) =>
-              isVisibleField(field, section, draft, offlineResources)
+              isVisibleField(
+                field,
+                section,
+                draft,
+                offlineResources,
+                userDetails
+              )
             )
         })
         .filter((item) => item.length)

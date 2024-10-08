@@ -8,26 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-const proxy = require('http-proxy-middleware')
-module.exports = function (app) {
-  app.use(
-    '/gateway',
-    proxy({
-      target: 'http://localhost:7070',
-      changeOrigin: true,
-      pathRewrite: {
-        '^/gateway': '/'
-      }
-    })
-  )
-  app.use(
-    '/countryconfig',
-    proxy({
-      target: 'http://localhost:3040/bgd',
-      changeOrigin: true,
-      pathRewrite: {
-        '^/countryconfig': '/'
-      }
-    })
-  )
-}
+import { cleanEnv, str, port, url } from 'envalid'
+
+export const env = cleanEnv(process.env, {
+  HOST: str({ devDefault: 'localhost' }),
+  PORT: port({ default: 2020 }),
+  CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
+  SENTRY_DSN: str({ default: undefined }),
+  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
+  MONGO_URL: str({ devDefault: 'mongodb://localhost/notification' })
+})

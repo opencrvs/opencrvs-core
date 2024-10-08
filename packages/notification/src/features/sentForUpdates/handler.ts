@@ -14,6 +14,7 @@ import { sendNotification } from '@notification/features/sms/utils'
 import { messageKeys } from '@notification/i18n/messages'
 import {
   getOfficeName,
+  getPersonName,
   getRegistrationLocation
 } from '@notification/features/utils'
 import {
@@ -41,7 +42,8 @@ export async function birthSentForUpdatesNotification(
       trackingId: getTrackingId(rejectedRecord),
       crvsOffice: getOfficeName(rejectedRecord),
       registrationLocation: getRegistrationLocation(rejectedRecord),
-      informantName: getInformantName(rejectedRecord)
+      informantName: getInformantName(rejectedRecord),
+      name: getPersonName(rejectedRecord, 'child')
     }
   )
   return h.response().code(200)
@@ -66,7 +68,8 @@ export async function deathSentForUpdatesNotification(
       trackingId: getTrackingId(rejectedRecord),
       crvsOffice: getOfficeName(rejectedRecord),
       registrationLocation: getRegistrationLocation(rejectedRecord),
-      informantName: getInformantName(rejectedRecord)
+      informantName: getInformantName(rejectedRecord),
+      name: getPersonName(rejectedRecord, 'deceased')
     }
   )
   return h.response().code(200)

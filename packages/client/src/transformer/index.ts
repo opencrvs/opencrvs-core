@@ -24,6 +24,8 @@ import {
   getConditionalActionsForField,
   getSelectedRadioOptionWithNestedFields,
   getVisibleSectionGroupsBasedOnConditions,
+  isFieldHttp,
+  isFieldRedirect,
   isRadioGroupWithNestedField,
   serializeFieldValue
 } from '@client/forms/utils'
@@ -162,10 +164,14 @@ const toCorrectionValue = (
   return changedValues
 }
 
+function isMetaTypeField(field: IFormField): boolean {
+  return isFieldHttp(field) || isFieldRedirect(field)
+}
 export function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
-  offlineCountryConfig?: IOfflineData
+  offlineCountryConfig: IOfflineData,
+  userDetails: UserDetails | null
 ) {
   const draftData = declaration.data
   const originalDraftData = declaration.originalData || {}
@@ -190,7 +196,8 @@ export function getChangedValues(
           fieldDef,
           draftData[section.id],
           offlineCountryConfig,
-          draftData
+          draftData,
+          userDetails
         )
 
         originalDraftData[section.id] ??= {}
@@ -198,6 +205,7 @@ export function getChangedValues(
         if (
           !conditionalActions.includes('hide') &&
           !conditionalActions.includes('disable') &&
+          !isMetaTypeField(fieldDef) &&
           hasFieldChanged(
             fieldDef,
             draftData[section.id],
@@ -223,9 +231,9 @@ export function getChangedValues(
 export const draftToGqlTransformer = (
   formDefinition: IForm,
   draftData: IFormData,
-  draftId?: string,
-  userDetails?: UserDetails | null,
-  offlineCountryConfig?: IOfflineData
+  draftId: string,
+  userDetails: UserDetails | null,
+  offlineCountryConfig: IOfflineData
 ) => {
   if (!formDefinition.sections) {
     throw new Error('Sections are missing in form definition')
@@ -251,7 +259,8 @@ export const draftToGqlTransformer = (
           fieldDef,
           draftData[section.id],
           offlineCountryConfig,
-          draftData
+          draftData,
+          userDetails
         )
         if (
           fieldDef.required &&

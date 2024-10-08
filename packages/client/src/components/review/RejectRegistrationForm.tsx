@@ -33,6 +33,10 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { isEmpty } from 'lodash'
 import { goToHome } from '@client/navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -44,6 +48,8 @@ interface IState {
 }
 interface IProps {
   draftId: string
+  config: IOfflineData
+  user: UserDetails | null
   declaration: IDeclaration
   event: Event
   duplicate?: boolean
@@ -79,7 +85,10 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             this.shouldEnableSendForUpdateBtn(rejectionFormData),
           enableArchiveBtn: !hasFormError(
             this.props.form.fields,
-            rejectionFormData
+            rejectionFormData,
+            this.props.config,
+            this.props.declaration.data,
+            this.props.user
           )
         }))
     )
@@ -88,7 +97,13 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   shouldEnableSendForUpdateBtn = (rejectionFormData: IFormSectionData) => {
     return (
       rejectionFormData &&
-      !hasFormError(this.props.form.fields, rejectionFormData) &&
+      !hasFormError(
+        this.props.form.fields,
+        rejectionFormData,
+        this.props.config,
+        this.props.declaration.data,
+        this.props.user
+      ) &&
       isEmpty(rejectionFormData.rejectionReason)
     )
   }
@@ -185,6 +200,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             fields={fields}
             onChange={this.storeData}
             setAllFieldsDirty={false}
+            draftData={declaration.data}
           />
         </ResponsiveModal>
       </div>
@@ -194,7 +210,9 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
 
 export const RejectRegistrationForm = connect(
   (state: IStoreState) => ({
-    form: rejectRegistration
+    form: rejectRegistration,
+    config: getOfflineData(state),
+    user: getUserDetails(state)
   }),
   {
     archiveDeclaration,

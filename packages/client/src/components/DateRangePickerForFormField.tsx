@@ -41,10 +41,14 @@ const DateRangePickerContainer = styled.div`
 
 const DateRangeBody = styled.div`
   display: flex;
-  gap: 15px;
+  justify-content: space-between;
   ${({ theme }) => theme.fonts.bold14};
   align-items: center;
   margin-top: 8px;
+`
+
+const NoShrinkLink = styled(Link)`
+  flex-shrink: 0;
 `
 
 function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
@@ -120,14 +124,14 @@ function DateRangePickerForFormFieldComponent(props: IDateRangePickerProps) {
           />
         )}
 
-        <Link
+        <NoShrinkLink
           id={props.inputProps.id + '-date_range_button'}
           onClick={handleLinkOnClick}
         >
           {props.value.isDateRangeActive
             ? intl.formatMessage(buttonMessages.edit)
             : intl.formatMessage(buttonMessages.exactDateUnknown)}
-        </Link>
+        </NoShrinkLink>
 
         {modalVisible && (
           <DateRangePicker

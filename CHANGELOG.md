@@ -27,7 +27,9 @@
 
 ## Bug fixes
 
-- TBC
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+- "Choose a new password" form now allows the user to submit the form using the "Enter/Return" key [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
+- Dropdown options now flow to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
 
 ## 1.6.0 Release candidate
 
@@ -35,12 +37,18 @@
 
 - Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
 - Remove the leftover features from the application config pages, such as certificates and informant notification. [#7156](https://github.com/opencrvs/opencrvs-core/issues/7156)
+- **PDF page size** The generated PDF used to be defaulted to A4 size. Now it respects the SVG dimensions if specified
 
 ## Bug fixes
 
 - Custom form field validators from country config will work offline. [#7478](https://github.com/opencrvs/opencrvs-core/issues/7478)
 - Registrar had to retry from outbox every time they corrected a record. [#7583](https://github.com/opencrvs/opencrvs-core/issues/7583)
+- Local environment setup command (`bash setup.sh`) could fail in machines that didn't have a unrelated `compose` binary. Fixed to check for Docker Compose. [#7609](https://github.com/opencrvs/opencrvs-core/pull/7609)
 - Fix wrong status shown in the Comparison View page of the duplicate record [#7439](https://github.com/opencrvs/opencrvs-core/issues/7439)
+- Fix date validation not working correctly in Firefox [#7615](https://github.com/opencrvs/opencrvs-core/issues/7615)
+- Fix layout issue that was causing the edit button on the AdvancedSearch's date range picker to not show on mobile view. [#7417](https://github.com/opencrvs/opencrvs-core/issues/7417)
+- Fix hardcoded placeholder copy of input when saving a query in advanced search
+- Handle label params used in form inputs when rendering in action details modal
 
 ### Breaking changes
 
