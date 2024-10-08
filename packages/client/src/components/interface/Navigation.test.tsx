@@ -31,7 +31,6 @@ import { merge } from 'lodash'
 import * as React from 'react'
 import { vi } from 'vitest'
 import { scopes as allScopes, Scope } from '@client/utils/gateway'
-import { te } from 'date-fns/locale'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -46,8 +45,7 @@ const nameObj = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      systemRole: 'REGISTRATION_AGENT'
+      ]
     }
   }
 }
@@ -63,8 +61,7 @@ const nameObjNatlSysAdmin = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      systemRole: 'NATIONAL_SYSTEM_ADMIN'
+      ]
     }
   }
 }
