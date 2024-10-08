@@ -802,7 +802,7 @@ export const mockDeathRegistrationSectionData = {
 
 const mockFetchCertificatesTemplatesDefinition = [
   {
-    id: 'birth.certificate',
+    id: 'birth-certificate',
     event: 'birth',
     label: {
       id: 'certificates.birth.certificate',
@@ -820,10 +820,10 @@ const mockFetchCertificatesTemplatesDefinition = [
     }
   },
   {
-    id: 'birth.certificate.copy',
+    id: 'birth-certificate-copy',
     event: 'birth',
     label: {
-      id: 'certificates.birth.certificate.copy',
+      id: 'certificates.birth-certificate-copy',
       defaultMessage: 'Birth Certificate certified copy',
       description: 'The label for a birth certificate'
     },
@@ -847,6 +847,24 @@ const mockFetchCertificatesTemplatesDefinition = [
       description: 'The label for a death certificate'
     },
     svgUrl: '/api/countryconfig/certificates/death-certificate.svg',
+    fonts: {
+      'Noto Sans': {
+        normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+        italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+      }
+    }
+  },
+  {
+    id: 'marriage-certificate',
+    event: 'marriage',
+    label: {
+      id: 'certificates.marriage.certificate',
+      defaultMessage: 'Marriage Certificate',
+      description: 'The label for a marriage certificate'
+    },
+    svgUrl: '/api/countryconfig/certificates/marriage-certificate.svg',
     fonts: {
       'Noto Sans': {
         normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
