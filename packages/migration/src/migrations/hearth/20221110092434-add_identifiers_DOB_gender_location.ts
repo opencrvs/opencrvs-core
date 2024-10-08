@@ -53,7 +53,7 @@ export const up = async (db: Db, client: MongoClient) => {
           const compositionDoc =
             (await compositionCursor.next()) as unknown as fhir.Composition
 
-          await setInformantDeceasedAndLocationDetails(db, body, compositionDoc) // <-- this one throws the error
+          await setInformantDeceasedAndLocationDetails(db, body, compositionDoc)
         }
         skip += limit
         processedDocCount += count
