@@ -47,6 +47,8 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
+import { UserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -59,8 +61,9 @@ type IProps = {
   activeGroup: IFormSectionGroup
   nextSectionId: string
   nextGroupId: string
-  offlineCountryConfig: IOfflineData
+  config: IOfflineData
   systemRoleMap: ISystemRolesMap
+  user: UserDetails | null
 }
 
 type IState = {
@@ -89,8 +92,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   handleFormAction = () => {
-    const { formData, activeGroup, offlineCountryConfig } = this.props
-    if (hasFormError(activeGroup.fields, formData, offlineCountryConfig, {})) {
+    const { formData, activeGroup, config, user } = this.props
+    if (hasFormError(activeGroup.fields, formData, config, {}, user)) {
       this.showAllValidationErrors()
     } else {
       this.props.userId
@@ -203,10 +206,15 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
 const mapStateToProps = (
   state: IStoreState
-): { offlineCountryConfig: IOfflineData; systemRoleMap: ISystemRolesMap } => {
+): {
+  config: IOfflineData
+  systemRoleMap: ISystemRolesMap
+  user: UserDetails | null
+} => {
   return {
     systemRoleMap: selectSystemRoleMap(state),
-    offlineCountryConfig: getOfflineData(state)
+    config: getOfflineData(state),
+    user: getUserDetails(state)
   }
 }
 

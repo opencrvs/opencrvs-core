@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { COUNTRY_CONFIG_HOST, GATEWAY_HOST } from './constants'
+import { env } from './environment'
 import { raise, parseGQLResponse } from './utils'
 import fetch from 'node-fetch'
 import { z } from 'zod'
@@ -94,7 +94,7 @@ const getSystemRolesQuery = print(gql`
 `)
 
 async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
-  const res = await fetch(`${GATEWAY_HOST}/graphql`, {
+  const res = await fetch(`${env.GATEWAY_HOST}/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ async function updateRoles(
   let roleIdMap: RoleIdMap = {}
   await Promise.all(
     systemRoles.map((systemRole) =>
-      fetch(`${GATEWAY_HOST}/graphql`, {
+      fetch(`${env.GATEWAY_HOST}/graphql`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ async function updateRoles(
 }
 
 async function fetchCountryRoles(token: string) {
-  const url = new URL('roles', COUNTRY_CONFIG_HOST).toString()
+  const url = new URL('roles', env.COUNTRY_CONFIG_HOST).toString()
   const res = await fetch(url, {
     method: 'GET',
     headers: {

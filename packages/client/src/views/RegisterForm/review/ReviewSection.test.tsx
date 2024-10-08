@@ -33,7 +33,8 @@ import {
   getRegisterFormFromStore,
   mockOfflineData,
   mockOfflineDataDispatch,
-  resizeWindow
+  resizeWindow,
+  userDetails
 } from '@client/tests/util'
 import {
   renderSelectDynamicLabel,
@@ -121,6 +122,7 @@ describe('when in device of large viewport', () => {
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
           onChangeReviewForm={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -236,6 +238,7 @@ describe('when in device of large viewport', () => {
           draft={rejectedDraftBirth}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -260,6 +263,7 @@ describe('when in device of large viewport', () => {
           draft={rejectedDraftDeath}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -284,6 +288,7 @@ describe('when in device of large viewport', () => {
           draft={rejectedDraftMarriage}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -309,6 +314,7 @@ describe('when in device of large viewport', () => {
           draft={declaredBirthDeclaration}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -471,6 +477,7 @@ describe('when in device of large viewport', () => {
           draft={simpleDraft}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
@@ -733,6 +740,7 @@ describe('when in device of small viewport', () => {
         rejectDeclarationClickEvent={mockHandler}
         submitClickEvent={mockHandler}
         onChangeReviewForm={mockHandler}
+        userDetails={userDetails}
       />,
       { store, history }
     )

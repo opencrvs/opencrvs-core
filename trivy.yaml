@@ -26,3 +26,5 @@ scan:
 ignorefile: .trivyignore.yaml
 vulnerability:
   ignore-unfixed: true
+db:
+  repository: 'public.ecr.aws/aquasecurity/trivy-db'
