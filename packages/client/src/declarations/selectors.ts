@@ -12,8 +12,9 @@ import { IDeclaration, IDeclarationsState } from '@client/declarations/index'
 import { IStoreState } from '@client/store'
 import { useSelector } from 'react-redux'
 
-export const getDraftsState = (store: IStoreState): IDeclarationsState =>
-  store.declarationsState
+export const getDraftsState = (store: IStoreState): IDeclarationsState => {
+  return store.declarationsState
+}
 
 function getKey<K extends keyof IDeclarationsState>(
   store: IStoreState,
@@ -29,11 +30,16 @@ export const getInitialDeclarationsLoaded = (
 
 export const selectDeclaration =
   <T extends IDeclaration | undefined>(declarationId: string) =>
-  (store: IStoreState) =>
-    getKey(store, 'declarations').find(({ id }) => declarationId === id) as T
+  (store: IStoreState) => {
+    const bar = getKey(store, 'declarations').find(
+      ({ id }) => declarationId === id
+    ) as T
+    return bar
+  }
 
 export const useDeclaration = <T extends IDeclaration | undefined>(
   declarationId: string
 ) => {
-  return useSelector(selectDeclaration<T>(declarationId))
+  const foo = useSelector(selectDeclaration<T>(declarationId))
+  return foo
 }

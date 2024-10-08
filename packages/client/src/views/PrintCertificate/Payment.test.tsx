@@ -82,7 +82,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              certTemplateId: 'birth.certificate.copy'
+              certTemplateId: 'birth-certificate-copy'
             },
             isExact: true,
             path: '',
@@ -111,7 +111,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth',
-              certTemplateId: 'birth.certificate.copy'
+              certTemplateId: 'birth-certificate-copy'
             },
             isExact: true,
             path: '',
