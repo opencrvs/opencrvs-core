@@ -15,8 +15,8 @@ import { PrimaryButton } from '../../src/buttons'
 
 const Template = (args: {
   position: IDropdownPosition
-  offset_x: number
-  offset_y: number
+  offsetX: number
+  offsetY: number
 }) => (
   <div
     style={{
@@ -68,8 +68,8 @@ const Template = (args: {
 export const DropdownView = Template.bind({})
 DropdownView.args = {
   position: 'bottom-left',
-  offset_x: 0,
-  offset_y: 10
+  offsetX: 0,
+  offsetY: 10
 }
 
 export default {

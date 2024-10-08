@@ -27,8 +27,8 @@ const StyledWrapper = styled.nav`
 
 const StyledContent = styled.ul<{
   position: string
-  offset_x: number
-  offset_y: number
+  offsetX: number
+  offsetY: number
 }>`
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -43,7 +43,7 @@ const StyledContent = styled.ul<{
   display: flex;
   flex-direction: column;
   padding: 8px 0;
-  margin: ${({ offset_x, offset_y }) => `${offset_y}px ${offset_x}px`};
+  margin: ${({ offsetX, offsetY }) => `${offsetY}px ${offsetX}px`};
   list-style: none;
 
   ${({ position }) => {
@@ -164,14 +164,14 @@ DropdownMenu.Trigger = Trigger
 
 const Content: React.FC<{
   position?: string
-  offset_x?: number
-  offset_y?: number
+  offsetX?: number
+  offsetY?: number
   children: ReactNode
-}> = ({ position = 'bottom-left', offset_x = 0, offset_y = 10, children }) => {
+}> = ({ position = 'bottom-left', offsetX = 0, offsetY = 10, children }) => {
   const { isOpen } = useDropdown()
 
   return isOpen ? (
-    <StyledContent position={position} offset_x={offset_x} offset_y={offset_y}>
+    <StyledContent position={position} offsetX={offsetX} offsetY={offsetY}>
       {children}
     </StyledContent>
   ) : null
