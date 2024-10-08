@@ -65,6 +65,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import ScopedComponent from '@client/components/ScopedComponent'
+import { SCOPES } from '@opencrvs/commons/scopes'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -323,12 +324,12 @@ const NavigationView = (props: IFullProps) => {
       <NavigationGroup>
         <ScopedComponent
           scopes={[
-            'record.declare-birth',
-            'record.declare-birth:my-jurisdiction',
-            'record.declare-death',
-            'record.declare-death:my-jurisdiction',
-            'record.declare-marriage',
-            'record.declare-marriage:my-jurisdiction'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
           ]}
         >
           <NavigationItem
@@ -345,7 +346,7 @@ const NavigationView = (props: IFullProps) => {
             }}
           />
         </ScopedComponent>
-        <ScopedComponent scopes={['record.submit-for-review']}>
+        <ScopedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_REVIEW]}>
           <NavigationItem
             icon={() => <DeclarationIconSmall color={'orange'} />}
             id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
@@ -360,7 +361,7 @@ const NavigationView = (props: IFullProps) => {
             }}
           />
         </ScopedComponent>
-        <ScopedComponent scopes={['record.submit-for-approval']}>
+        <ScopedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_APPROVAL]}>
           <NavigationItem
             icon={() => <DeclarationIconSmall color={'grey'} />}
             id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
@@ -375,7 +376,7 @@ const NavigationView = (props: IFullProps) => {
             }}
           />
         </ScopedComponent>
-        <ScopedComponent scopes={['record.declaration-review']}>
+        <ScopedComponent scopes={[SCOPES.RECORD_DECLARATION_REVIEW]}>
           <NavigationItem
             icon={() => <DeclarationIconSmall color={'red'} />}
             id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
@@ -390,7 +391,7 @@ const NavigationView = (props: IFullProps) => {
             }}
           />
         </ScopedComponent>
-        <ScopedComponent scopes={['record.declaration-review']}>
+        <ScopedComponent scopes={[SCOPES.RECORD_DECLARATION_REVIEW]}>
           <NavigationItem
             icon={() => <DeclarationIconSmall color={'orange'} />}
             id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
@@ -405,7 +406,7 @@ const NavigationView = (props: IFullProps) => {
             }}
           />
         </ScopedComponent>
-        <ScopedComponent scopes={['record.print-issue-certified-copies']}>
+        <ScopedComponent scopes={[SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]}>
           <NavigationItem
             icon={() => <DeclarationIconSmall color={'green'} />}
             id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
@@ -421,7 +422,7 @@ const NavigationView = (props: IFullProps) => {
           />
         </ScopedComponent>
         {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
-          <ScopedComponent scopes={['record.register']}>
+          <ScopedComponent scopes={[SCOPES.RECORD_REGISTER]}>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'teal'} />}
               id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
@@ -438,7 +439,9 @@ const NavigationView = (props: IFullProps) => {
           </ScopedComponent>
         )}
         {isOnePrintInAdvanceOn && (
-          <ScopedComponent scopes={['record.print-issue-certified-copies']}>
+          <ScopedComponent
+            scopes={[SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]}
+          >
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'teal'} />}
               id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
@@ -454,7 +457,7 @@ const NavigationView = (props: IFullProps) => {
             />
           </ScopedComponent>
         )}
-        <ScopedComponent denyScopes={['sysadmin', 'natlsysadmin']}>
+        <ScopedComponent denyScopes={[SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]}>
           <NavigationItem
             icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
             id={`navigation_${WORKQUEUE_TABS.outbox}`}
@@ -473,15 +476,15 @@ const NavigationView = (props: IFullProps) => {
 
       <ScopedComponent
         scopes={[
-          'organisation.read',
-          'organisation.read-locations',
-          'organisation.read-locations:my-office'
+          SCOPES.ORGANISATION_READ,
+          SCOPES.ORGANISATION_READ_LOCATIONS,
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
         ]}
       >
         <NavigationGroup>
           {userDetails && (
             <>
-              <ScopedComponent scopes={['performance.read']}>
+              <ScopedComponent scopes={[SCOPES.PERFORMANCE_READ]}>
                 <NavigationItem
                   icon={() => <Icon name="Activity" size="medium" />}
                   id={`navigation_${WORKQUEUE_TABS.performance}`}
@@ -498,7 +501,7 @@ const NavigationView = (props: IFullProps) => {
                 />
               </ScopedComponent>
 
-              <ScopedComponent scopes={['organisation.read']}>
+              <ScopedComponent scopes={[SCOPES.ORGANISATION_READ]}>
                 <NavigationItem
                   icon={() => <Icon name="Buildings" size="medium" />}
                   id={`navigation_${WORKQUEUE_TABS.organisation}`}
@@ -515,8 +518,8 @@ const NavigationView = (props: IFullProps) => {
 
               <ScopedComponent
                 scopes={[
-                  'organisation.read-locations',
-                  'organisation.read-locations:my-office'
+                  SCOPES.ORGANISATION_READ_LOCATIONS,
+                  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
                 ]}
               >
                 <NavigationItem
@@ -535,7 +538,7 @@ const NavigationView = (props: IFullProps) => {
             </>
           )}
 
-          <ScopedComponent scopes={['sysadmin', 'natlsysadmin']}>
+          <ScopedComponent scopes={[SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]}>
             <NavigationItem
               icon={() => <Icon name="Compass" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.config}_main`}
@@ -569,7 +572,7 @@ const NavigationView = (props: IFullProps) => {
             )}
           </ScopedComponent>
 
-          <ScopedComponent scopes={['sysadmin', 'natlsysadmin']}>
+          <ScopedComponent scopes={[SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]}>
             <NavigationItem
               icon={() => <Icon name="ChatCircle" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.communications}_main`}
@@ -609,16 +612,16 @@ const NavigationView = (props: IFullProps) => {
       </ScopedComponent>
       <ScopedComponent
         scopes={[
-          'performance.read',
-          'performance.export-vital-statistics',
-          'performance.read-dashboards'
+          SCOPES.PERFORMANCE_READ,
+          SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS,
+          SCOPES.PERFORMANCE_READ_DASHBOARDS
         ]}
       >
         <NavigationGroup>
           {
             <>
               {showRegDashboard && (
-                <ScopedComponent scopes={['performance.read-dashboards']}>
+                <ScopedComponent scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
                   <NavigationItem
                     icon={() => <Icon name="ChartLine" size="medium" />}
                     label={intl.formatMessage(navigationMessages['dashboard'])}
@@ -631,7 +634,7 @@ const NavigationView = (props: IFullProps) => {
                 </ScopedComponent>
               )}
               {showStatistics && (
-                <ScopedComponent scopes={['performance.read']}>
+                <ScopedComponent scopes={[SCOPES.PERFORMANCE_READ]}>
                   <NavigationItem
                     icon={() => <Icon name="Activity" size="medium" />}
                     label={intl.formatMessage(navigationMessages['statistics'])}
@@ -644,7 +647,7 @@ const NavigationView = (props: IFullProps) => {
                 </ScopedComponent>
               )}
               {showLeaderboard && (
-                <ScopedComponent scopes={['performance.read']}>
+                <ScopedComponent scopes={[SCOPES.PERFORMANCE_READ]}>
                   <NavigationItem
                     icon={() => <Icon name="Medal" size="medium" />}
                     label={intl.formatMessage(
@@ -659,7 +662,7 @@ const NavigationView = (props: IFullProps) => {
                 </ScopedComponent>
               )}
               {userDetails && (
-                <ScopedComponent scopes={['performance.read']}>
+                <ScopedComponent scopes={[SCOPES.PERFORMANCE_READ]}>
                   <NavigationItem
                     icon={() => <Icon name="ChartBar" size="medium" />}
                     label={intl.formatMessage(
@@ -676,7 +679,9 @@ const NavigationView = (props: IFullProps) => {
               )}
             </>
           }
-          <ScopedComponent scopes={['performance.export-vital-statistics']}>
+          <ScopedComponent
+            scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}
+          >
             <NavigationItem
               icon={() => <Icon name="Export" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.vsexports}`}
