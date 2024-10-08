@@ -23,6 +23,14 @@ import { formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
 import { bytesToMB } from '@client/utils/imageUtils'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@mui/material'
 
 const DEFAULT_MAX_SIZE_MB = 5
 
@@ -243,6 +251,18 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     )
   }
 
+  const [open, setOpen] = useState(false)
+
+  const handleClickOpen = (image: IFileValue | IAttachmentValue) => {
+    setPreviewImage(previewImage)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setPreviewImage(null)
+  }
+
   const onDelete = (image: IFileValue | IAttachmentValue) => {
     const previewImage = image as IFileValue
     const addableOption = props.options.find(
@@ -339,6 +359,23 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       {props.hideOnEmptyOption && dropdownOptions.length === 0
         ? null
         : renderDocumentUploaderWithDocumentTypeBlock()}
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this Document?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => onDelete} color="secondary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {previewImage && (
         <DocumentPreview
