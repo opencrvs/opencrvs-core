@@ -51,7 +51,7 @@ export function getContactEmail(
 }
 
 function error(
-  record: ReadyForReviewRecord | RegisteredRecord,
+  record: ReadyForReviewRecord | RegisteredRecord | RejectedRecord,
   message: string
 ): never {
   const task = getTaskFromSavedBundle(record)
@@ -97,7 +97,7 @@ export function getInformantName(
 }
 
 export function getPersonName(
-  record: ReadyForReviewRecord | RegisteredRecord,
+  record: ReadyForReviewRecord | RegisteredRecord | RejectedRecord,
   personType: 'deceased' | 'child'
 ) {
   const compositionCode: Extract<
