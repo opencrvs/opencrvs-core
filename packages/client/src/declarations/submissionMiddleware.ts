@@ -352,7 +352,6 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
         captureException(error)
         return
       }
-      console.log(error)
 
       updateDeclaration(dispatch, {
         ...declaration,
