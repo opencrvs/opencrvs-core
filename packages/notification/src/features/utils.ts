@@ -117,6 +117,7 @@ export function getPersonName(
   if (!name) {
     error(record, `name not found in patient resource for ${compositionCode}`)
   }
+  // the trim used in given name handles the case when a country does not have middlename
   return [name.given?.join(' ').trim(), name.family].join(' ').trim()
 }
 
