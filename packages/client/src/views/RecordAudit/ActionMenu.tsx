@@ -87,13 +87,18 @@ export const ActionMenu: React.FC<{
     return
   }
   const handleUnassign = async () => {
-    const unassignConfirm = await openModal<boolean | null>((close) => (
-      <UnassignModal
-        assignment={assignment}
-        close={close}
-        isDownloaded={isDownloaded}
-      ></UnassignModal>
-    ))
+    const { firstName, lastName, officeName } = assignment || {}
+    const unassignConfirm = await openModal<boolean | null>(
+      (close) =>
+        assignment && (
+          <UnassignModal
+            close={close}
+            isDownloaded={isDownloaded}
+            name={firstName + ' ' + lastName}
+            officeName={officeName}
+          ></UnassignModal>
+        )
+    )
     if (unassignConfirm) {
       dispatch(unassignDeclaration(id, client))
     }
@@ -572,46 +577,45 @@ const UnassignAction: React.FC<{
 
 const UnassignModal: React.FC<{
   close: (result: boolean | null) => void
-  assignment?: GQLAssignmentData
   isDownloaded: boolean
-}> = ({ close, assignment, isDownloaded }) => {
+  name: string
+  officeName?: string
+}> = ({ close, isDownloaded, name, officeName }) => {
   const intl = useIntl()
   return (
-    assignment && (
-      <ResponsiveModal
-        autoHeight
-        responsive={false}
-        title={intl.formatMessage(conflictsMessages.unassignTitle)}
-        actions={[
-          <TertiaryButton
-            id="cancel_unassign"
-            key="cancel_unassign"
-            onClick={() => {
-              close(null)
-            }}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          <DangerButton
-            key="confirm_unassign"
-            id="confirm_unassign"
-            onClick={() => {
-              close(true)
-            }}
-          >
-            {intl.formatMessage(buttonMessages.unassign)}
-          </DangerButton>
-        ]}
-        show={true}
-        handleClose={() => close(null)}
-      >
-        {isDownloaded
-          ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
-          : intl.formatMessage(conflictsMessages.regUnassignDesc, {
-              name: assignment.firstName + ' ' + assignment.lastName,
-              officeName: assignment.officeName
-            })}
-      </ResponsiveModal>
-    )
+    <ResponsiveModal
+      autoHeight
+      responsive={false}
+      title={intl.formatMessage(conflictsMessages.unassignTitle)}
+      actions={[
+        <TertiaryButton
+          id="cancel_unassign"
+          key="cancel_unassign"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(buttonMessages.cancel)}
+        </TertiaryButton>,
+        <DangerButton
+          key="confirm_unassign"
+          id="confirm_unassign"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(buttonMessages.unassign)}
+        </DangerButton>
+      ]}
+      show={true}
+      handleClose={() => close(null)}
+    >
+      {isDownloaded
+        ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
+        : intl.formatMessage(conflictsMessages.regUnassignDesc, {
+            name,
+            officeName
+          })}
+    </ResponsiveModal>
   )
 }
