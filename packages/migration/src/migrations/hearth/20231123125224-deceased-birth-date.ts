@@ -50,7 +50,7 @@ export const up = async (db: Db, client: MongoClient) => {
         })
       let processed = 0
       for await (const patient of patientIterator) {
-        const age = parseInt(patient.extension[0].valueString, 10)
+        const age = parseInt(patient.extension?.[0]?.valueString, 10)
         const birthDate = subYears(new Date(patient.deceasedDateTime), age)
         db.collection('Patient').updateOne(
           { id: patient.id },
