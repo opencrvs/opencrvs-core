@@ -13,20 +13,14 @@ import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import {
-  goBack,
-  goForward,
   goToEvents as goToEventsAction,
-  goToPerformanceHome,
   goToSearch,
   goToSearchResult,
   goToSettings,
-  goToTeamSearch,
-  goToTeamUserList,
   goToCreateNewUserWithLocationId,
   goToCreateNewUser,
   goToAdvancedSearch
 } from '@client/navigation'
-import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -68,19 +62,12 @@ type IStateProps = {
 }
 
 type IDispatchProps = {
-  redirectToAuthentication: typeof redirectToAuthentication
-  goToSearchResult: typeof goToSearchResult
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
-  goToSettings: typeof goToSettings
-  goBack: typeof goBack
-  goForward: typeof goForward
-  goToPerformanceHomeAction: typeof goToPerformanceHome
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToCreateNewUser: typeof goToCreateNewUser
-  goToTeamSearchAction: typeof goToTeamSearch
-  goToTeamUserListAction: typeof goToTeamUserList
   goToAdvancedSearch: typeof goToAdvancedSearch
+  goToSearchResult: typeof goToSearchResult
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
@@ -147,20 +134,23 @@ const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
 export const HeaderComponent = (props: IFullProps) => {
   const {
     location,
-    mapPerformanceClickHandler,
-    goToCreateNewUserWithLocationId,
-    changeTeamLocation,
-    goToCreateNewUser,
     userDetails,
     mobileSearchBar,
-    goToSearch,
     offlineData,
     className,
     intl,
     activeMenuItem,
     title,
     mobileRight,
-    goToEvents
+    goToSearch,
+    goToEvents,
+    goToCreateNewUserWithLocationId,
+    goToCreateNewUser,
+    goToAdvancedSearch,
+    goToSearchResult,
+    setAdvancedSearchParam,
+    mapPerformanceClickHandler,
+    changeTeamLocation
   } = props
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
@@ -365,9 +355,7 @@ export const HeaderComponent = (props: IFullProps) => {
             ? undefined
             : navigationList
         }
-        searchHandler={(text, type) =>
-          props.goToSearchResult(text, type, isMobile)
-        }
+        searchHandler={(text, type) => goToSearchResult(text, type, isMobile)}
       />
     )
   }
@@ -492,20 +480,14 @@ export const Header = connect(
       .map((field) => field.name)
   }),
   {
-    redirectToAuthentication,
-    goToSearchResult,
     goToSearch,
     goToSettings,
-    goBack,
-    goForward,
     goToEvents: goToEventsAction,
-    goToPerformanceHomeAction: goToPerformanceHome,
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
-    goToTeamSearchAction: goToTeamSearch,
-    goToTeamUserListAction: goToTeamUserList,
     goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam
+    setAdvancedSearchParam: setAdvancedSearchParam,
+    goToSearchResult
   }
 )(injectIntl(withRouter(HeaderComponent)))
 

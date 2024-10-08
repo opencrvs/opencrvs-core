@@ -79,7 +79,8 @@ jobs:
                 .trim()
                 .replace(/\s+/g, '-')
                 .replace(/-+/g, '-')
-                .substr(0, 35);
+                .substr(0, 35)
+                .replace(/[^a-zA-Z0-9]+$/g, '');
             }
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
