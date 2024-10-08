@@ -354,7 +354,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
         documents={props.files}
         onSelect={selectForPreview}
         dropdownOptions={props.options}
-        onDelete={onDelete}
+        onDelete={handleClickOpen}
       />
       {props.hideOnEmptyOption && dropdownOptions.length === 0
         ? null
