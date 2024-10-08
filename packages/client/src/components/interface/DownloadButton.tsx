@@ -258,7 +258,11 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   // field agents can only retrieve declarations
   const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
 
-  const onClickDownload = useCallback(
+  const isDownloadable =
+    status !== DOWNLOAD_STATUS.DOWNLOADED &&
+    (!assignment || assignment.practitionerId === practitionerId)
+
+  const onDownloadClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
         (assignment?.practitionerId !== practitionerId ||
@@ -337,12 +341,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       <DownloadAction
         type="icon"
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
-        onClick={
-          status === DOWNLOAD_STATUS.DOWNLOADED ||
-          (assignment && assignment.practitionerId !== practitionerId)
-            ? () => {}
-            : onClickDownload
-        }
+        onClick={isDownloadable ? onDownloadClick : undefined}
         className={className}
         aria-label={intl.formatMessage(constantsMessages.assignRecord)}
       >
