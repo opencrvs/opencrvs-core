@@ -8,24 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IActionMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  action: MessageDescriptor
-  assignedTo: MessageDescriptor
-  view: MessageDescriptor
-  correctRecord: MessageDescriptor
-  archiveRecord: MessageDescriptor
-  reinstateRecord: MessageDescriptor
-  reviewCorrection: MessageDescriptor
-  reviewDeclaration: MessageDescriptor
-  updateDeclaration: MessageDescriptor
-  printDeclaration: MessageDescriptor
-  issueCertificate: MessageDescriptor
-}
-
-const messagesToDefine: IActionMessages = {
+const messagesToDefine = {
   action: {
     defaultMessage: 'Action',
     description: 'Label for action button in dropdown menu',
@@ -83,4 +68,4 @@ const messagesToDefine: IActionMessages = {
     id: 'action.issue'
   }
 }
-export const messages: IActionMessages = defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)
