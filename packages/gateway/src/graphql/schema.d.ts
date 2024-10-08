@@ -607,8 +607,12 @@ export interface GQLMarriageRegistrationInput {
 export type GQLVoid = any
 
 export const enum GQLRejectionReason {
-  other = 'other',
-  duplicate = 'duplicate'
+  DUPLICATE = 'DUPLICATE',
+  CLERICAL_ERROR = 'CLERICAL_ERROR',
+  MATERIAL_ERROR = 'MATERIAL_ERROR',
+  MATERIAL_OMISSION = 'MATERIAL_OMISSION',
+  JUDICIAL_ORDER = 'JUDICIAL_ORDER',
+  OTHER = 'OTHER'
 }
 
 export interface GQLReinstated {

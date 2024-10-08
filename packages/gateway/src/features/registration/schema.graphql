@@ -594,8 +594,12 @@ input ConfirmRegistrationInput {
 }
 
 enum RejectionReason {
-  other
-  duplicate
+  DUPLICATE
+  CLERICAL_ERROR
+  MATERIAL_ERROR
+  MATERIAL_OMISSION
+  JUDICIAL_ORDER
+  OTHER
 }
 
 input RejectRegistrationInput {

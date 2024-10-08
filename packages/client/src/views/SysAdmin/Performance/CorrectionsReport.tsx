@@ -21,7 +21,7 @@ import {
 import type { GQLCorrectionMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { CorrectionReason } from '@client/forms/correction/reason'
+import { RejectionReason } from '@client/utils/gateway'
 import { useIntl } from 'react-intl'
 
 interface CorrectionsReportProps {
@@ -65,7 +65,7 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
             <PerformanceValue>
               {calculateTotal(
                 data.filter(
-                  ({ reason }) => reason === CorrectionReason.CLERICAL_ERROR
+                  ({ reason }) => reason === RejectionReason.ClericalError
                 )
               )}
             </PerformanceValue>
@@ -81,7 +81,7 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
             <PerformanceValue>
               {calculateTotal(
                 data.filter(
-                  ({ reason }) => reason === CorrectionReason.MATERIAL_ERROR
+                  ({ reason }) => reason === RejectionReason.MaterialError
                 )
               )}
             </PerformanceValue>
@@ -97,7 +97,7 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
             <PerformanceValue>
               {calculateTotal(
                 data.filter(
-                  ({ reason }) => reason === CorrectionReason.MATERIAL_OMISSION
+                  ({ reason }) => reason === RejectionReason.MaterialOmission
                 )
               )}
             </PerformanceValue>
@@ -113,7 +113,7 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
             <PerformanceValue>
               {calculateTotal(
                 data.filter(
-                  ({ reason }) => reason === CorrectionReason.JUDICIAL_ORDER
+                  ({ reason }) => reason === RejectionReason.JudicialOrder
                 )
               )}
             </PerformanceValue>
@@ -128,7 +128,7 @@ export function CorrectionsReport({ data }: CorrectionsReportProps) {
           value={
             <PerformanceValue>
               {calculateTotal(
-                data.filter(({ reason }) => reason === CorrectionReason.OTHER)
+                data.filter(({ reason }) => reason === RejectionReason.Other)
               )}
             </PerformanceValue>
           }

@@ -1856,8 +1856,12 @@ export type RejectRegistrationInput = {
 }
 
 export enum RejectionReason {
-  Duplicate = 'duplicate',
-  Other = 'other'
+  ClericalError = 'CLERICAL_ERROR',
+  JudicialOrder = 'JUDICIAL_ORDER',
+  MaterialError = 'MATERIAL_ERROR',
+  MaterialOmission = 'MATERIAL_OMISSION',
+  Duplicate = 'DUPLICATE',
+  Other = 'OTHER'
 }
 
 export type RelatedPerson = {
