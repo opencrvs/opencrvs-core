@@ -92,8 +92,8 @@ export const reindex = async () => {
   )
 
   if (droppedCompositionIds.length) {
-    logger.warn(`Could not index ${droppedCompositionIds.length} document(s)`)
-    logger.warn(droppedCompositionIds.join(', '))
+    logger.error(`Could not index ${droppedCompositionIds.length} document(s)`)
+    logger.error(droppedCompositionIds.join(', '))
   }
 
   return { index }
