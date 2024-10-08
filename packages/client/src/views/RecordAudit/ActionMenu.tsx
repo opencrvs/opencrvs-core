@@ -25,10 +25,9 @@ import {
   goToIssueCertificate,
   goToPage,
   goToPrintCertificate,
-  goToUserProfile,
   goToViewRecordPage
 } from '@client/navigation'
-import { IntlShape } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { Scope } from '@sentry/react'
 import { IDeclarationData } from './utils'
 import {
@@ -41,7 +40,6 @@ import {
 } from '@client/declarations'
 import { CorrectionSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
-import { UserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/workqueue'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -60,32 +58,15 @@ import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
-  intl: IntlShape
   scope: Scope
   draft: IDeclaration | null
-  userDetails: UserDetails | null
   duplicates?: string[]
   toggleDisplayDialog: () => void
-  clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-  goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToIssueCertificate: typeof goToIssueCertificate
-  goToUserProfile: typeof goToUserProfile
-}> = ({
-  declaration,
-  intl,
-  scope,
-  draft,
-  userDetails,
-  toggleDisplayDialog,
-  goToPage,
-  clearCorrectionAndPrintChanges,
-  goToPrintCertificate,
-  goToIssueCertificate,
-  duplicates
-}) => {
+}> = ({ declaration, scope, draft, toggleDisplayDialog, duplicates }) => {
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
+
+  const intl = useIntl()
 
   const { id, type, assignment, status } = declaration
 
@@ -108,7 +89,6 @@ export const ActionMenu: React.FC<{
   const handleUnassign = async () => {
     const unassignConfirm = await openModal<boolean | null>((close) => (
       <UnassignModal
-        intl={intl}
         assignment={assignment}
         close={close}
         isDownloaded={isDownloaded}
@@ -140,19 +120,13 @@ export const ActionMenu: React.FC<{
               <DropdownMenu.Separator />
             </>
           )}
-          <ViewAction
-            declarationId={id}
-            declarationStatus={status}
-            intl={intl}
-          />
+          <ViewAction declarationId={id} declarationStatus={status} />
           <ReviewAction
             declarationId={id}
             declarationStatus={status}
             type={type}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
-            goToPage={goToPage}
             isDuplicate={isDuplicate}
           />
           <UpdateAction
@@ -160,21 +134,17 @@ export const ActionMenu: React.FC<{
             declarationStatus={status}
             type={type}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
-            goToPage={goToPage}
           />
           <ArchiveAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
             declarationStatus={status}
           />
           <ReinstateAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
             declarationStatus={status}
           />
@@ -183,16 +153,12 @@ export const ActionMenu: React.FC<{
             declarationId={id}
             type={type}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
-            clearCorrectionAndPrintChanges={clearCorrectionAndPrintChanges}
-            goToPrintCertificate={goToPrintCertificate}
           />
           <IssueAction
             declarationStatus={status}
             declarationId={id}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
           />
           <CorrectRecordAction
@@ -200,17 +166,14 @@ export const ActionMenu: React.FC<{
             declarationStatus={status}
             type={type}
             isDownloaded={isDownloaded}
-            intl={intl}
             scope={scope}
           />
           <DeleteAction
             handleDelete={handleDelete}
-            intl={intl}
             declarationStatus={status}
           />
           <UnassignAction
             handleUnassign={handleUnassign}
-            intl={intl}
             isDownloaded={isDownloaded}
             scope={scope}
             assignment={assignment}
@@ -224,7 +187,6 @@ export const ActionMenu: React.FC<{
 
 interface IActionItemCommonProps {
   isDownloaded: boolean
-  intl: IntlShape
   scope: Scope
   declarationStatus?: string
 }
@@ -235,10 +197,10 @@ interface IDeclarationProps {
 }
 
 const ViewAction: React.FC<{
-  intl: IntlShape
   declarationStatus?: string
   declarationId: string
-}> = ({ declarationStatus, declarationId, intl }) => {
+}> = ({ declarationStatus, declarationId }) => {
+  const intl = useIntl()
   const dispatch = useDispatch()
 
   const recordOrDeclaration = [
@@ -263,8 +225,9 @@ const ViewAction: React.FC<{
 
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
-> = ({ declarationId, declarationStatus, type, isDownloaded, intl, scope }) => {
+> = ({ declarationId, declarationStatus, type, isDownloaded, scope }) => {
   const dispatch = useDispatch()
+  const intl = useIntl()
 
   const isBirthOrDeathEvent =
     type && [Event.Birth, Event.Death].includes(type.toLowerCase() as Event)
@@ -308,7 +271,8 @@ const CorrectRecordAction: React.FC<
 
 const ArchiveAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, intl, isDownloaded, declarationStatus, scope }) => {
+> = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
+  const intl = useIntl()
   const isArchivable =
     declarationStatus &&
     [
@@ -340,7 +304,8 @@ const ArchiveAction: React.FC<
 
 const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, intl, declarationStatus, scope }) => {
+> = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
+  const intl = useIntl()
   const isArchived = declarationStatus === SUBMISSION_STATUS.ARCHIVED
 
   // @ToDo use: `record.registration-reinstate` after configurable role pr is merged
@@ -362,18 +327,18 @@ const ReinstateAction: React.FC<
 }
 
 const ReviewAction: React.FC<
-  IActionItemCommonProps &
-    IDeclarationProps & { isDuplicate: boolean; goToPage: typeof goToPage }
+  IActionItemCommonProps & IDeclarationProps & { isDuplicate: boolean }
 > = ({
   declarationId,
   declarationStatus,
   type,
   scope,
   isDownloaded,
-  isDuplicate,
-  intl,
-  goToPage
+  isDuplicate
 }) => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+
   const isPendingCorrection =
     declarationStatus === EVENT_STATUS.CORRECTION_REQUESTED
 
@@ -390,11 +355,13 @@ const ReviewAction: React.FC<
   return isPendingCorrection && userHasReviewScope ? (
     <DropdownMenu.Item
       onClick={() => {
-        goToPage(
-          REVIEW_CORRECTION,
-          declarationId as string,
-          'review',
-          type as string
+        dispatch(
+          goToPage(
+            REVIEW_CORRECTION,
+            declarationId as string,
+            'review',
+            type as string
+          )
         )
       }}
       disabled={!isDownloaded}
@@ -406,11 +373,13 @@ const ReviewAction: React.FC<
     isReviewableDeclaration && userHasReviewScope && (
       <DropdownMenu.Item
         onClick={() => {
-          goToPage(
-            REVIEW_EVENT_PARENT_FORM_PAGE,
-            declarationId as string,
-            'review',
-            type as string
+          dispatch(
+            goToPage(
+              REVIEW_EVENT_PARENT_FORM_PAGE,
+              declarationId as string,
+              'review',
+              type as string
+            )
           )
         }}
         disabled={!isDownloaded}
@@ -422,17 +391,16 @@ const ReviewAction: React.FC<
   )
 }
 
-const UpdateAction: React.FC<
-  IActionItemCommonProps & IDeclarationProps & { goToPage: typeof goToPage }
-> = ({
+const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   declarationStatus,
   type,
   scope,
-  isDownloaded,
-  intl,
-  goToPage
+  isDownloaded
 }) => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+
   const isUpdatableDeclaration =
     declarationStatus &&
     [
@@ -469,13 +437,14 @@ const UpdateAction: React.FC<
     userHasUpdateScope && (
       <DropdownMenu.Item
         onClick={() => {
-          goToPage &&
+          dispatch(
             goToPage(
               PAGE_ROUTE,
               declarationId as string,
               PAGE_ID,
               type as string
             )
+          )
         }}
         disabled={!isDownloaded}
       >
@@ -486,22 +455,16 @@ const UpdateAction: React.FC<
   )
 }
 
-const PrintAction: React.FC<
-  IActionItemCommonProps &
-    IDeclarationProps & {
-      clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-      goToPrintCertificate: typeof goToPrintCertificate
-    }
-> = ({
+const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   declarationStatus,
   scope,
   type,
-  isDownloaded,
-  intl,
-  clearCorrectionAndPrintChanges,
-  goToPrintCertificate
+  isDownloaded
 }) => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+
   const isPrintable =
     declarationStatus &&
     [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.ISSUED].includes(
@@ -519,10 +482,12 @@ const PrintAction: React.FC<
     userHasPrintScope && (
       <DropdownMenu.Item
         onClick={() => {
-          clearCorrectionAndPrintChanges(declarationId as string)
-          goToPrintCertificate(
-            declarationId as string,
-            (type as string).toLocaleLowerCase()
+          dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+          dispatch(
+            goToPrintCertificate(
+              declarationId as string,
+              (type as string).toLocaleLowerCase()
+            )
           )
         }}
         disabled={!isDownloaded}
@@ -538,9 +503,9 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   isDownloaded,
   declarationStatus,
-  scope,
-  intl
+  scope
 }) => {
+  const intl = useIntl()
   const dispatch = useDispatch()
 
   const isCertified = declarationStatus === SUBMISSION_STATUS.CERTIFIED
@@ -569,23 +534,26 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 }
 
 const DeleteAction: React.FC<{
-  intl: IntlShape
   handleDelete: () => void
   declarationStatus?: string
-}> = ({ intl, handleDelete, declarationStatus }) =>
-  declarationStatus === SUBMISSION_STATUS.DRAFT && (
-    <DropdownMenu.Item onClick={handleDelete}>
-      <Icon name="Trash" color="currentColor" size="large" />
-      {intl.formatMessage(buttonMessages.deleteDeclaration)}
-    </DropdownMenu.Item>
+}> = ({ handleDelete, declarationStatus }) => {
+  const intl = useIntl()
+  return (
+    declarationStatus === SUBMISSION_STATUS.DRAFT && (
+      <DropdownMenu.Item onClick={handleDelete}>
+        <Icon name="Trash" color="currentColor" size="large" />
+        {intl.formatMessage(buttonMessages.deleteDeclaration)}
+      </DropdownMenu.Item>
+    )
   )
+}
 const UnassignAction: React.FC<{
-  intl: IntlShape
   handleUnassign: () => void
   isDownloaded: boolean
   assignment?: GQLAssignmentData
   scope: Scope
-}> = ({ intl, handleUnassign, isDownloaded, assignment, scope }) => {
+}> = ({ handleUnassign, isDownloaded, assignment, scope }) => {
+  const intl = useIntl()
   const isAssignedToSomeoneElse = !isDownloaded && assignment
 
   // @ToDo use: appropriate scope after configurable role pr is merged
@@ -603,44 +571,47 @@ const UnassignAction: React.FC<{
 }
 
 const UnassignModal: React.FC<{
-  intl: IntlShape
   close: (result: boolean | null) => void
   assignment?: GQLAssignmentData
   isDownloaded: boolean
-}> = ({ intl, close, assignment, isDownloaded }) =>
-  assignment && (
-    <ResponsiveModal
-      autoHeight
-      responsive={false}
-      title={intl.formatMessage(conflictsMessages.unassignTitle)}
-      actions={[
-        <TertiaryButton
-          id="cancel_unassign"
-          key="cancel_unassign"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(buttonMessages.cancel)}
-        </TertiaryButton>,
-        <DangerButton
-          key="confirm_unassign"
-          id="confirm_unassign"
-          onClick={() => {
-            close(true)
-          }}
-        >
-          {intl.formatMessage(buttonMessages.unassign)}
-        </DangerButton>
-      ]}
-      show={true}
-      handleClose={() => close(null)}
-    >
-      {isDownloaded
-        ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
-        : intl.formatMessage(conflictsMessages.regUnassignDesc, {
-            name: assignment.firstName + ' ' + assignment.lastName,
-            officeName: assignment.officeName
-          })}
-    </ResponsiveModal>
+}> = ({ close, assignment, isDownloaded }) => {
+  const intl = useIntl()
+  return (
+    assignment && (
+      <ResponsiveModal
+        autoHeight
+        responsive={false}
+        title={intl.formatMessage(conflictsMessages.unassignTitle)}
+        actions={[
+          <TertiaryButton
+            id="cancel_unassign"
+            key="cancel_unassign"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.cancel)}
+          </TertiaryButton>,
+          <DangerButton
+            key="confirm_unassign"
+            id="confirm_unassign"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(buttonMessages.unassign)}
+          </DangerButton>
+        ]}
+        show={true}
+        handleClose={() => close(null)}
+      >
+        {isDownloaded
+          ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
+          : intl.formatMessage(conflictsMessages.regUnassignDesc, {
+              name: assignment.firstName + ' ' + assignment.lastName,
+              officeName: assignment.officeName
+            })}
+      </ResponsiveModal>
+    )
   )
+}

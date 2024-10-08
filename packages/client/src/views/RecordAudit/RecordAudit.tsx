@@ -29,8 +29,7 @@ import {
   goToCertificateCorrection,
   goToPrintCertificate,
   goToUserProfile,
-  goToTeamUserList,
-  goToIssueCertificate
+  goToTeamUserList
 } from '@client/navigation'
 import {
   injectIntl,
@@ -250,13 +249,10 @@ function ReinstateButton({
 
 function RecordAuditBody({
   archiveDeclaration,
-  clearCorrectionAndPrintChanges,
   declaration,
   draft,
   duplicates,
   intl,
-  goToPrintCertificate,
-  goToPage,
   goToHomeTab,
   scope,
   refetchDeclarationInfo,
@@ -307,16 +303,9 @@ function RecordAuditBody({
     <ActionMenu
       declaration={declaration}
       duplicates={duplicates}
-      intl={intl}
       scope={scope as any}
       draft={draft}
-      userDetails={userDetails}
       toggleDisplayDialog={toggleDisplayDialog}
-      goToPage={goToPage}
-      goToPrintCertificate={goToPrintCertificate}
-      clearCorrectionAndPrintChanges={clearCorrectionAndPrintChanges}
-      goToIssueCertificate={goToIssueCertificate}
-      goToUserProfile={goToUserProfile}
     />
   )
   desktopActionsView.push(actions[actions.length - 1])
