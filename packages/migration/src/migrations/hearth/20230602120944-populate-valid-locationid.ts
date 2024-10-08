@@ -144,14 +144,14 @@ async function updateEventLocationIdOrJurisdictionIds(db: Db, elasticDoc: any) {
         ''
       )
 
-    const locationDoc = await getCollectionDocuments(
-      db,
-      COLLECTION_NAMES.LOCATION,
-      [locationId]
-    )
+    const locationDoc = locationId
+      ? await getCollectionDocuments(db, COLLECTION_NAMES.LOCATION, [
+          locationId
+        ])
+      : []
 
     if (locationDoc.length > 0) {
-      if (locationDoc?.[0]?.type?.coding?.[0]?.code === 'HEALTH_FACILITY') {
+      if (locationDoc[0].type?.coding?.[0]?.code === 'HEALTH_FACILITY') {
         body.eventLocationId = locationDoc[0]?.id
       } else {
         const address = locationDoc[0]?.address
