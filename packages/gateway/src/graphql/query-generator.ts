@@ -14,7 +14,8 @@ import {
   isListType,
   isNonNullType,
   isObjectType,
-  isScalarType
+  isScalarType,
+  isNamedType
 } from 'graphql'
 
 export function generateQueryForType(
@@ -47,6 +48,8 @@ export function generateQueryForType(
       if (isObjectType(fieldType)) {
         fieldStr += `${fieldName} { ${buildFields(fieldType)} } `
       } else if (isScalarType(fieldType)) {
+        fieldStr += `${fieldName} `
+      } else if (isNamedType(fieldType)) {
         fieldStr += `${fieldName} `
       }
     }
