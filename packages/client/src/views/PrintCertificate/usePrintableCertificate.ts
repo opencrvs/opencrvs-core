@@ -134,11 +134,12 @@ export const usePrintableCertificate = () => {
 
   useEffect(() => {
     const certificateUrl =
-      declaration &&
-      offlineData.templates.certificates?.find((x) => x.id === certTemplateId)
-        ?.svgUrl
+      (declaration &&
+        offlineData.templates.certificates?.find((x) => x.id === certTemplateId)
+          ?.svgUrl) ||
+      ''
 
-    if (certificateUrl) {
+    if (certificateUrl && declaration) {
       fetch(certificateUrl)
         .then((res) => res.text())
         .then((certificateTemplate) => {
@@ -153,7 +154,7 @@ export const usePrintableCertificate = () => {
         })
     }
     // eslint-disable-next-line
-  }, [])
+  }, [declaration])
 
   const handleCertify = async () => {
     if (!declaration || !certificateConfig) {

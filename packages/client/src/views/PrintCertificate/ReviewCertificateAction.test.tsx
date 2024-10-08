@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Mock } from 'vitest'
+import { vi, Mock } from 'vitest'
 import * as React from 'react'
 import { createStore } from '@client/store'
 import { storeDeclaration, IDeclaration } from '@client/declarations'
@@ -45,35 +45,74 @@ const deathDeclaration = {
   event: Event.Death
 }
 
+const mockBirthDeclaration = {
+  id: 'mockBirth1234',
+  data: {
+    ...mockDeclarationData,
+    history: [
+      {
+        date: '2022-03-21T08:16:24.467+00:00',
+        regStatus: 'REGISTERED',
+        reinstated: false
+      }
+    ] as unknown as IFormSectionData
+  },
+  event: Event.Birth
+}
+const mockMarriageDeclaration = {
+  id: 'mockMarriage1234',
+  data: {
+    ...mockMarriageDeclarationData,
+    history: [
+      {
+        date: '2022-03-21T08:16:24.467+00:00',
+        regStatus: 'REGISTERED',
+        reinstated: false
+      }
+    ]
+  },
+  event: Event.Marriage
+}
+
 describe('when user wants to review death certificate', () => {
-  it('displays the "Confirm & Print" button', async () => {
+  let component: ReactWrapper<{}, {}>
+  beforeEach(async () => {
+    const mockSvgTemplate = '<svg><text>Sample Certificate</text></svg>'
+    global.fetch = vi.fn().mockImplementation((url) => {
+      return Promise.resolve({
+        text: vi.fn().mockResolvedValue(mockSvgTemplate)
+      })
+    })
     const { history, match } = createRouterProps(
       '/',
       { isNavigatedInsideApp: false },
       {
         matchParams: {
           registrationId: 'mockDeath1234',
-          eventType: Event.Death
+          certTemplateId: 'death-certificate'
         }
       }
     )
     ;(useParams as Mock).mockImplementation(() => match.params)
-
-    const { store } = createStore()
-
+    const { store } = createStore(history)
     loginAsFieldAgent(store)
+    const clonedMockDeathDeclarationData = cloneDeep(deathDeclaration)
+    await flushPromises()
+    // @ts-ignore
+    store.dispatch(storeDeclaration(clonedMockDeathDeclarationData))
 
-    const component = await createTestComponent(<ReviewCertificate />, {
+    component = await createTestComponent(<ReviewCertificate />, {
       store,
       history
     })
-
-    // @ts-ignore
-    store.dispatch(storeDeclaration(deathDeclaration))
+    await flushPromises()
     component.update()
+  })
 
-    const confirmBtn = component.find('#confirm-print')
-    const confirmBtnExist = !!confirmBtn.hostNodes().length
+  it('displays the "Confirm & Print" button', async () => {
+    const confirmBtnExist = !!(
+      await waitForElement(component, '#confirm-print')
+    ).hostNodes().length
     expect(confirmBtnExist).toBe(true)
   })
 })
@@ -118,7 +157,7 @@ describe('back button behavior tests of review certificate action', () => {
     const birthDeclaration = {
       id: 'asdhdqe2472487jsdfsdf',
       data: mockBirthDeclarationData,
-      event: Event.Birth
+      certTemplateId: 'birth-certificate-copy'
     }
     store.dispatch(
       // @ts-ignore
@@ -153,7 +192,7 @@ describe('back button behavior tests of review certificate action', () => {
       storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockBirthDeclarationData,
-        event: Event.Birth
+        certTemplateId: 'birth-certificate-copy'
       } as IDeclaration)
     )
     component = await createTestComponent(<ReviewCertificate />, {
@@ -169,45 +208,31 @@ describe('back button behavior tests of review certificate action', () => {
 
 describe('when user wants to review birth certificate', () => {
   let component: ReactWrapper<{}, {}>
-
   beforeEach(async () => {
+    const mockSvgTemplate = '<svg><text>Sample Certificate</text></svg>'
+    global.fetch = vi.fn().mockImplementation((url) => {
+      return Promise.resolve({
+        text: vi.fn().mockResolvedValue(mockSvgTemplate)
+      })
+    })
     const { history, match } = createRouterProps(
       '/',
       { isNavigatedInsideApp: false },
       {
         matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.Birth
+          registrationId: 'mockBirth1234',
+          certTemplateId: 'birth-certificate'
         }
       }
     )
     ;(useParams as Mock).mockImplementation(() => match.params)
     const { store } = createStore(history)
-
-    const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
-    mockBirthDeclarationData.registration.certificates[0] = {
-      collector: {
-        type: 'PRINT_IN_ADVANCE'
-      }
-    }
     loginAsFieldAgent(store)
     await flushPromises()
-    store.dispatch(
-      storeDeclaration({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: {
-          ...mockBirthDeclarationData,
-          history: [
-            {
-              date: '2022-03-21T08:16:24.467+00:00',
-              regStatus: 'REGISTERED',
-              reinstated: false
-            }
-          ] as unknown as IFormSectionData
-        },
-        event: Event.Birth
-      })
-    )
+
+    const clonedMockBirthDeclaration = cloneDeep(mockBirthDeclaration)
+    // @ts-ignore
+    store.dispatch(storeDeclaration(clonedMockBirthDeclaration))
 
     component = await createTestComponent(<ReviewCertificate />, {
       store,
@@ -216,20 +241,18 @@ describe('when user wants to review birth certificate', () => {
     await flushPromises()
     component.update()
   })
-
-  it('displays have the Continue and print Button', () => {
-    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
-      .length
+  it('displays have the Continue and print Button', async () => {
+    const confirmBtn = await waitForElement(component, '#confirm-print')
+    const confirmBtnExist = !!confirmBtn.hostNodes().length
     expect(confirmBtnExist).toBe(true)
   })
 
-  it('shows the Confirm Print Modal', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
-    confirmBtn.simulate('click')
+  it('shows the Confirm Print Modal', async () => {
+    const confirmBtn = await waitForElement(component, '#confirm-print')
+    confirmBtn.hostNodes().simulate('click')
     component.update()
-    const modalIsDisplayed = !!component
-      .find('#confirm-print-modal')
-      .hostNodes().length
+    const modal = await waitForElement(component, '#confirm-print-modal')
+    const modalIsDisplayed = !!modal.hostNodes().length
     expect(modalIsDisplayed).toBe(true)
   })
 
@@ -245,19 +268,29 @@ describe('when user wants to review birth certificate', () => {
 
     expect(modalIsClosed).toBe(false)
   })
+
+  afterAll(() => {
+    flushPromises()
+  })
 })
 
 describe('when user wants to review marriage certificate', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
+    const mockSvgTemplate = '<svg><text>Sample Certificate</text></svg>'
+    global.fetch = vi.fn().mockImplementation((url) => {
+      return Promise.resolve({
+        text: vi.fn().mockResolvedValue(mockSvgTemplate)
+      })
+    })
     const { history, match } = createRouterProps(
       '/',
       { isNavigatedInsideApp: false },
       {
         matchParams: {
           registrationId: '1234896128934719',
-          eventType: Event.Birth
+          certTemplateId: 'marriage-certificate'
         }
       }
     )
@@ -293,19 +326,22 @@ describe('when user wants to review marriage certificate', () => {
     component.update()
   })
 
-  it('displays have the Continue and print Button', () => {
-    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
-      .length
+  it('displays have the Continue and print Button toot', async () => {
+    const confirmBtnExist = !!(
+      await waitForElement(component, '#confirm-print')
+    ).hostNodes().length
     expect(confirmBtnExist).toBe(true)
   })
 
-  it('shows the Confirm Print Modal', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
+  it('shows the Confirm Print Modal', async () => {
+    const confirmBtn = (
+      await waitForElement(component, '#confirm-print')
+    ).hostNodes()
     confirmBtn.simulate('click')
     component.update()
-    const modalIsDisplayed = !!component
-      .find('#confirm-print-modal')
-      .hostNodes().length
+    const modalIsDisplayed = !!(
+      await waitForElement(component, '#confirm-print-modal')
+    ).hostNodes().length
     expect(modalIsDisplayed).toBe(true)
   })
 
