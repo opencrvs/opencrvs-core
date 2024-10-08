@@ -31,7 +31,6 @@ import { merge } from 'lodash'
 import * as React from 'react'
 import { vi } from 'vitest'
 import { scopes as allScopes, Scope } from '@client/utils/gateway'
-import { te } from 'date-fns/locale'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -356,6 +355,28 @@ describe('Given a user with scopes views Navigation', () => {
     const id = `#navigation_${WORKQUEUE_TABS.readyForReview}`
 
     const requiredScopes = ['record.declaration-review']
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Ready to print', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.readyToPrint}`
+
+    const requiredScopes = ['record.print-issue-certified-copies']
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
