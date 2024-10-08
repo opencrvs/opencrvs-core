@@ -11,7 +11,7 @@
 import { Meta } from '@storybook/react'
 import { DropdownMenu, IDropdownPosition } from './Dropdown'
 import React from 'react'
-import { PrimaryButton } from '../../src/buttons'
+import { Button } from '../Button'
 
 const Template = (args: {
   position: IDropdownPosition
@@ -30,7 +30,7 @@ const Template = (args: {
   >
     <DropdownMenu>
       <DropdownMenu.Trigger>
-        <PrimaryButton>Click Me</PrimaryButton>
+        <Button type="primary">Click Me</Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content {...args}>
         <div>

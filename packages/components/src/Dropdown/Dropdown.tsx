@@ -20,7 +20,6 @@ const StyledWrapper = styled.nav`
   display: flex;
 
   button {
-    padding: 0;
     height: auto;
   }
 `
