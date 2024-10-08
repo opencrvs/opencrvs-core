@@ -33,34 +33,30 @@ const Template = (args: {
         <Button type="primary">Click Me</Button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content {...args}>
-        <div>
-          <DropdownMenu.Label>City</DropdownMenu.Label>
-          <DropdownMenu.Separator />
-          <DropdownMenu.Item
-            onClick={() => alert('Dhaka is the capital of Bangladesh')}
-          >
-            Dhaka
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onClick={() => alert('Helsinki is the capital of Finland')}
-          >
-            Helsinki
-          </DropdownMenu.Item>
-        </div>
+        <DropdownMenu.Label>City</DropdownMenu.Label>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item
+          onClick={() => alert('Dhaka is the capital of Bangladesh')}
+        >
+          Dhaka
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onClick={() => alert('Helsinki is the capital of Finland')}
+        >
+          Helsinki
+        </DropdownMenu.Item>
         <DropdownMenu.Separator weight={2} />
-        <div>
-          <DropdownMenu.Label>Season</DropdownMenu.Label>
-          <DropdownMenu.Separator />
-          <DropdownMenu.Item
-            onClick={() => alert('Winter is cold')}
-            disabled={true}
-          >
-            Winter
-          </DropdownMenu.Item>
-          <DropdownMenu.Item onClick={() => alert('Summer is hot')}>
-            Summer
-          </DropdownMenu.Item>
-        </div>
+        <DropdownMenu.Label>Season</DropdownMenu.Label>
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item
+          onClick={() => alert('Winter is cold')}
+          disabled={true}
+        >
+          Winter
+        </DropdownMenu.Item>
+        <DropdownMenu.Item onClick={() => alert('Summer is hot')}>
+          Summer
+        </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu>
   </div>
