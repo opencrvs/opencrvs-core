@@ -10,8 +10,6 @@
  */
 import { http, HttpResponse, graphql } from 'msw'
 import {
-  FetchUserQuery,
-  FetchUserQueryVariables,
   GetSystemRolesQuery,
   GetSystemRolesQueryVariables
 } from '@client/utils/gateway'
@@ -21,24 +19,7 @@ import offices from './sources/offices'
 import config from './sources/config'
 import forms from './sources/forms'
 import content from './sources/content'
-import { registrar } from './sources/userResponses'
 import systemRoles from './sources/systemRoles'
-
-const userHandler = graphql.query<FetchUserQuery, FetchUserQueryVariables>(
-  'fetchUser',
-  () => {
-    return HttpResponse.json(
-      {
-        data: registrar
-      },
-      {
-        headers: {
-          'X-Version': '1.5.0'
-        }
-      }
-    )
-  }
-)
 
 const systemRolesHandler = graphql.query<
   GetSystemRolesQuery,
@@ -117,7 +98,6 @@ const certificatesHandler = http.get(
 
 const handlers = [
   locationHandler,
-  userHandler,
   configHandler,
   formsHandler,
   contentHandler,

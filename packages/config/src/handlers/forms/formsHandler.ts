@@ -32,7 +32,7 @@ export default async function getForm(
   h: Hapi.ResponseToolkit
 ) {
   const token = request.headers.authorization
-  const response = await fetch(`${env.COUNTRY_CONFIG_URL}/forms`, {
+  const response = await fetch(new URL('/forms', env.COUNTRY_CONFIG_URL), {
     headers: {
       Authorization: token
     }

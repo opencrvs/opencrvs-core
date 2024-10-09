@@ -8,18 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createStore } from './store'
-import { render, screen } from '@testing-library/react'
-import { App } from './App'
-import React from 'react'
-import { registerScopeToken } from './mocks/tokens'
-import { createClient } from './utils/apolloClient'
+import { screen } from '@testing-library/react'
+import { loginAs } from './tests/rtl-util'
 
 test('App loads', async () => {
-  const { store, history } = createStore()
-  const apolloClient = createClient(store)
-  window.history.replaceState('', '', '?token=' + registerScopeToken)
-  render(<App store={store} history={history} client={apolloClient} />)
-  await screen.findByRole('heading')
-  expect(screen.getByRole('heading')).toHaveTextContent(/create a pin/i)
+  await loginAs('registrar')
+  await screen.findByText(/Farajaland CRS/)
 })
