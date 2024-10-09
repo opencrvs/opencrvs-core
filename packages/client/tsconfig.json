@@ -28,8 +28,8 @@
     "typings",
     "codegen.ts",
     "vite.config.ts",
+    "vite.rtl-config.ts",
     "__mocks__"
   ],
-  "exclude": ["src/**/*.test.ts*", "src/tests/util.tsx"],
   "extends": "./tsconfig.paths.json"
 }
