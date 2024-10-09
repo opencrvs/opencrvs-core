@@ -261,7 +261,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
     this.setState({
       ...this.state,
-      certTemplateId: collector.certTemplateId as string
+      certTemplateId: collector?.certTemplateId as string
     })
     if (errLength > 0) {
       this.setState({
@@ -310,19 +310,19 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       if (isCertificateForPrintInAdvance(draft)) {
         this.props.goToReviewCertificate(
           declarationId,
-          collector.certTemplateId as string
+          collector?.certTemplateId as string
         )
       } else {
         this.props.goToVerifyCollector(
           declarationId,
-          collector.certTemplateId as string,
+          collector?.certTemplateId as string,
           collector.type as string
         )
       }
     } else {
       this.props.goToPrintCertificate(
         declarationId,
-        collector.certTemplateId as string,
+        collector?.certTemplateId as string,
         nextGroup
       )
     }
