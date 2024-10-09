@@ -13,7 +13,7 @@ import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { rest } from 'msw'
-import { server as mswServer } from '@test/setupServer'
+import { handlers, useRequestMocks } from '@test/setupServer'
 import { bundleWithAssignedTask } from '@test/mocks/unassignedTask'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 import { registrar } from '@test/mocks/user'
@@ -25,6 +25,8 @@ function checkForUnassignExtenstion(task: Task) {
 }
 
 describe('unassign record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

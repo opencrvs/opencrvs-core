@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { server as mswServer } from '@test/setupServer'
+import { handlers, useRequestMocks } from '@test/setupServer'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
@@ -51,6 +51,8 @@ function findDuplicateTrackingId(task: SavedTask) {
 }
 
 describe('duplicate record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

@@ -12,7 +12,7 @@ import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
-import { server as mswServer } from '@test/setupServer'
+import { handlers, useRequestMocks } from '@test/setupServer'
 import {
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -24,6 +24,8 @@ import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 
 describe('Register record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

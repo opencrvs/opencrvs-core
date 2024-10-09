@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { rest } from 'msw'
-import { server as mswServer } from '@test/setupServer'
+import { handlers, useRequestMocks } from '@test/setupServer'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { createServer } from '@workflow/server'
 
 function checkForViewedExtenstion(task: Task) {
   return task.extension.find(
@@ -24,6 +24,8 @@ function checkForViewedExtenstion(task: Task) {
 }
 
 describe('View record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

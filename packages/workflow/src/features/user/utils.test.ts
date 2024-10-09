@@ -19,12 +19,14 @@ import * as jwt from 'jsonwebtoken'
 import * as fetchAny from 'jest-fetch-mock'
 import { Practitioner } from '@opencrvs/commons/types'
 import { rest } from 'msw'
-import { server as mswServer } from '@test/setupServer'
+import { useRequestMocks } from '@test/setupServer'
 import { USER_MANAGEMENT_URL } from '@workflow/__mocks__/constants'
 
 const fetch = fetchAny as any
 
 describe('Verify getLoggedInPractitionerResource', () => {
+  const mswServer = useRequestMocks()
+
   it('Returns Location properly', async () => {
     mswServer.use(
       rest.post('http://localhost:3030/getUser', (_, res, ctx) =>
@@ -111,6 +113,8 @@ describe('Verify getLoggedInPractitionerResource', () => {
   })
 })
 describe('Verify getUser', () => {
+  const mswServer = useRequestMocks()
+
   it('get user mobile throw an error in case of an bad response', async () => {
     mswServer.use(
       rest.post(`${USER_MANAGEMENT_URL}getUser`, (_, res, ctx) =>

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { server as mswServer } from '@test/setupServer'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
@@ -21,8 +20,11 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { handlers, useRequestMocks } from '@test/setupServer'
 
 describe('archive record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

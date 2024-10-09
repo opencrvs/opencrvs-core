@@ -12,7 +12,7 @@ import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { rest } from 'msw'
-import { server as mswServer } from '@test/setupServer'
+import { handlers, useRequestMocks } from '@test/setupServer'
 import {
   getTaskFromSavedBundle,
   REGISTERED_RECORD,
@@ -33,6 +33,8 @@ function findVerificationIp(task: Task) {
 }
 
 describe('verify record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

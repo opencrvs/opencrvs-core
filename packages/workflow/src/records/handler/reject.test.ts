@@ -11,7 +11,7 @@
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { server as mswServer } from '@test/setupServer'
+import { handlers, useRequestMocks } from '@test/setupServer'
 import { rest } from 'msw'
 import {
   getStatusFromTask,
@@ -28,6 +28,8 @@ function getReasonFromTask(task: SavedTask) {
 }
 
 describe('Reject record endpoint', () => {
+  const mswServer = useRequestMocks(...handlers)
+
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {
