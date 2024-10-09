@@ -205,7 +205,6 @@ export function getChangedValues(
 
         if (
           !conditionalActions.includes('hide') &&
-          !conditionalActions.includes('disable') &&
           !isMetaTypeField(fieldDef) &&
           hasFieldChanged(
             fieldDef,
