@@ -47,11 +47,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { Scope } from '@client/utils/authUtils'
 import { SEARCH_RESULT_SORT } from '@client/utils/constants'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
-import {
-  SearchEventsQuery,
-  SystemRoleType,
-  RejectionReason
-} from '@client/utils/gateway'
+import { SearchEventsQuery, SystemRoleType } from '@client/utils/gateway'
 
 import {
   ColumnContentAlignment,
@@ -89,15 +85,19 @@ const ErrorText = styled.div`
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-
-export function getRejectionReasonDisplayValue(reason: RejectionReason) {
-  switch (reason) {
-    case RejectionReason.Duplicate:
+// @TODO: Get rid of these magic strings - they are outdated and will get more outdated as time passes
+export function getRejectionReasonDisplayValue(reason: string) {
+  switch (reason.toLowerCase()) {
+    case 'duplicate':
       return rejectMessages.rejectionReasonDuplicate
-    case RejectionReason.Other:
+    case 'misspelling':
+      return rejectMessages.rejectionReasonMisspelling
+    case 'missing_supporting_doc':
+      return rejectMessages.rejectionReasonMissingSupportingDoc
+    case 'other':
       return rejectMessages.rejectionReasonOther
     default:
-      return reason satisfies never
+      return rejectMessages.rejectionReasonOther
   }
 }
 
