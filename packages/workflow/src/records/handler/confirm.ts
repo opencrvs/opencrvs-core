@@ -12,7 +12,7 @@ import * as z from 'zod'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { useExternalValidationQueue } from '@opencrvs/commons/message-queue'
-import { REDIS_HOST } from '@workflow/constants'
+import { REDIS_HOST, REDIS_PORT } from '@workflow/constants'
 import { SUPPORTED_PATIENT_IDENTIFIER_CODES } from '@opencrvs/commons/types'
 import * as Hapi from '@hapi/hapi'
 
@@ -31,7 +31,7 @@ const requestSchema = z.object({
 
 const { recordValidated } = useExternalValidationQueue({
   host: REDIS_HOST,
-  port: 6379
+  port: REDIS_PORT
 })
 
 export async function confirmRegistrationHandler(
