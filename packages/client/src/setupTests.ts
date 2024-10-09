@@ -67,6 +67,7 @@ fetchMock.enableMocks()
 vi.mock('./storage')
 vi.mock('http://localhost:3040/conditionals.js', () => ({ conditionals: {} }))
 vi.mock('http://localhost:3040/validators.js', () => ({}))
+vi.mock('http://localhost:3040/handlebars.js', () => ({}))
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'error' })
