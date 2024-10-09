@@ -8,23 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { createBirthRegistrationPayload } from '@test/mocks/createBirthRecord'
-import { handlers, useRequestMocks } from '@test/setupServer'
+import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import {
   SavedBundle,
   SavedTask,
   TransactionResponse,
   URLReference,
-  SavedLocation,
-  EVENT_TYPE
+  SavedLocation
 } from '@opencrvs/commons/types'
-import { PlainToken, UUID } from '@opencrvs/commons'
-import { startContainer, stopContainer } from '@workflow/test/redis'
-import { StartedTestContainer } from 'testcontainers'
-import { registerRecordHandler } from './create'
+import { UUID } from '@opencrvs/commons'
 
 const existingTaskBundle: SavedBundle<SavedTask> = {
   resourceType: 'Bundle',
@@ -47,18 +44,17 @@ const existingLocationBundle: SavedBundle<SavedLocation> = {
   ]
 }
 
-let container: StartedTestContainer
-
-beforeAll(async () => {
-  container = await startContainer()
-})
-
-afterAll(async () => {
-  await stopContainer(container)
-})
-
 describe('Create record endpoint', () => {
-  const mswServer = useRequestMocks(...handlers)
+  let server: Awaited<ReturnType<typeof createServer>>
+
+  beforeAll(async () => {
+    server = await createServer()
+    await server.start()
+  })
+
+  afterAll(async () => {
+    await server.stop()
+  })
 
   it('returns OK for a correctly authenticated user with birth declaration', async () => {
     const token = jwt.sign(
@@ -69,7 +65,7 @@ describe('Create record endpoint', () => {
         issuer: 'opencrvs:auth-service',
         audience: 'opencrvs:workflow-user'
       }
-    ) as PlainToken
+    )
 
     // used for checking already created composition with
     // the same draftId
@@ -154,12 +150,22 @@ describe('Create record endpoint', () => {
       })
     )
 
-    const record = await registerRecordHandler(
-      createBirthRegistrationPayload,
-      EVENT_TYPE.BIRTH,
-      token
-    )
-
-    expect(record).toBeDefined()
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/create-record',
+      payload: {
+        event: 'BIRTH',
+        record: createBirthRegistrationPayload
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+    expect(JSON.parse(res.payload)).toMatchObject({
+      trackingId: 'BYW6MFW',
+      compositionId: '3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
+      isPotentiallyDuplicate: false
+    })
   })
 })

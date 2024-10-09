@@ -8,29 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { RestHandler, MockedRequest, DefaultBodyType } from 'msw'
 import { setupServer } from 'msw/node'
 import handlers from './handlers'
 
-/** Setups a test server with mock request handlers */
-export const useRequestMocks = (
-  ...handlers: RestHandler<MockedRequest<DefaultBodyType>>[]
-) => {
-  const server = setupServer(...handlers)
-
-  // Establish API mocking before all tests.
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: 'error' })
-  })
-
-  // Reset any request handlers that we may add during the tests,
-  // so they don't affect other tests.
-  afterEach(() => server.resetHandlers())
-
-  // Clean up after the tests are finished.
-  afterAll(() => server.close())
-
-  return server
-}
-
-export { handlers }
+// This configures a request mocking server with the given request handlers.
+export const server = setupServer(...handlers)

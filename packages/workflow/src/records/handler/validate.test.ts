@@ -12,7 +12,7 @@ import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { rest } from 'msw'
-import { handlers, useRequestMocks } from '@test/setupServer'
+import { server as mswServer } from '@test/setupServer'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
 import {
   getStatusFromTask,
@@ -23,8 +23,6 @@ import {
 } from '@opencrvs/commons/types'
 
 describe('Validate record endpoint', () => {
-  const mswServer = useRequestMocks(...handlers)
-
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

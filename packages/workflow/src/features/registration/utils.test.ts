@@ -20,15 +20,13 @@ import {
 import * as fetchAny from 'jest-fetch-mock'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { Bundle } from '@opencrvs/commons/types'
+import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
-import { useRequestMocks } from '@test/setupServer'
 
 const fetch = fetchAny as any
 
 describe('Verify utility functions', () => {
-  const mswServer = useRequestMocks()
-
   beforeEach(async () => {
     fetch.resetMocks()
   })
@@ -92,8 +90,6 @@ describe('Verify utility functions', () => {
 })
 
 describe('getMosipUINToken functions', () => {
-  const mswServer = useRequestMocks()
-
   beforeAll(() => {
     fetch.mockClear()
   })

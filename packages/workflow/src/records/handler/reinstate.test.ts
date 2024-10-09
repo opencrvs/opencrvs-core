@@ -11,7 +11,7 @@
 
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
-import { handlers, useRequestMocks } from '@test/setupServer'
+import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import * as jwt from 'jsonwebtoken'
 import {
@@ -29,8 +29,6 @@ function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
 }
 
 describe('reinstate record endpoint', () => {
-  const mswServer = useRequestMocks(...handlers)
-
   let server: Awaited<ReturnType<typeof createServer>>
 
   beforeAll(async () => {

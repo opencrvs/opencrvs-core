@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useRequestMocks } from '@test/setupServer'
+import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
 import {
   setupRegistrationWorkflow,
@@ -219,8 +219,6 @@ describe('Verify fhir bundle modifier functions', () => {
 })
 
 describe('validateDeceasedDetails functions', () => {
-  const mswServer = useRequestMocks()
-
   let token: string
   let authHeader: { Authorization: string }
   beforeEach(async () => {
