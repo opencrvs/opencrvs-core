@@ -14,7 +14,6 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
