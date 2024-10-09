@@ -14,7 +14,8 @@ import {
   HOST,
   PORT,
   CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
+  DEFAULT_TIMEOUT,
+  REDIS_HOST
 } from '@workflow/constants'
 import getPlugins from '@workflow/config/plugins'
 import { getRoutes } from '@workflow/config/routes'
@@ -62,7 +63,7 @@ export async function createServer() {
 
   async function start() {
     await server.start()
-    await register()
+    await register({ host: REDIS_HOST, port: 6379 })
     server.log('info', `Workflow server started on ${HOST}:${PORT}`)
   }
 

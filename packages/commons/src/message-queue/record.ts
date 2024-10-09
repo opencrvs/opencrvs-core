@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Job, Processor, Queue, Worker } from 'bullmq'
+import { ConnectionOptions, Job, Processor, Queue, Worker } from 'bullmq'
 import { PlainToken } from '../http'
 import { logger } from '../logger'
 import {
@@ -142,7 +142,7 @@ export function useRecordQueue(redisHost: string) {
 }
 
 export async function registerRecordWorker(
-  redisHost: string,
+  connection: ConnectionOptions,
   processJob: Processor<Payload>
 ) {
   const worker = new Worker<Payload>(
@@ -151,7 +151,7 @@ export async function registerRecordWorker(
       return processJob(job)
     },
     {
-      connection: { host: redisHost, port: 6379 }
+      connection
     }
   )
 
@@ -167,7 +167,7 @@ export async function registerRecordWorker(
 }
 
 export async function registerExternalValidationsWorker(
-  redisHost: string,
+  connection: ConnectionOptions,
   processJob: (
     job:
       | Job<ExternalValidationPayload, any, 'send-to-external-validation'>
@@ -184,7 +184,7 @@ export async function registerExternalValidationsWorker(
       return processJob(job)
     },
     {
-      connection: { host: redisHost, port: 6379 }
+      connection
     }
   )
 

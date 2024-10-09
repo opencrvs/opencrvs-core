@@ -13,7 +13,6 @@ import {
   registerExternalValidationsWorker,
   registerRecordWorker
 } from '@opencrvs/commons/message-queue'
-import { REDIS_HOST } from './constants'
 import { invokeRegistrationValidation } from './features/registration/fhir/fhir-bundle-modifier'
 import { markEventAsRegistered } from './features/registration/handler'
 import {
@@ -22,8 +21,8 @@ import {
   validateRecordHandler
 } from './records/handler/create'
 
-export async function register() {
-  await registerExternalValidationsWorker(REDIS_HOST, async (job) => {
+export async function register(connection: { host: string; port: number }) {
+  await registerExternalValidationsWorker(connection, async (job) => {
     if (job.name === 'send-to-external-validation') {
       const { token, record } = job.data
       return invokeRegistrationValidation(
@@ -36,7 +35,7 @@ export async function register() {
       return markEventAsRegistered(job.data)
     }
   })
-  await registerRecordWorker(REDIS_HOST, async (job) => {
+  await registerRecordWorker(connection, async (job) => {
     if (job.name === 'create-registration') {
       return registerRecordHandler(
         job.data.payload,
