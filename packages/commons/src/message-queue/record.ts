@@ -52,12 +52,10 @@ type Payload =
       token: PlainToken
     }
 
-export function useExternalValidationQueue(redisHost: string) {
+export function useExternalValidationQueue(connection: ConnectionOptions) {
   const queue = new Queue<ExternalValidationPayload | RecordValidatedPayload>(
     'external-validations',
-    {
-      connection: { host: redisHost, port: 6379 }
-    }
+    { connection }
   )
 
   async function sendForExternalValidation(payload: ExternalValidationPayload) {
@@ -90,10 +88,8 @@ export function useExternalValidationQueue(redisHost: string) {
     sendForExternalValidation
   }
 }
-export function useRecordQueue(redisHost: string) {
-  const queue = new Queue<Payload>('records', {
-    connection: { host: redisHost, port: 6379 }
-  })
+export function useRecordQueue(connection: ConnectionOptions) {
+  const queue = new Queue<Payload>('records', { connection })
 
   async function createDeclaration(payload: Payload) {
     await queue.waitUntilReady()

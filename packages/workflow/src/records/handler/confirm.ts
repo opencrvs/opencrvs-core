@@ -29,7 +29,10 @@ const requestSchema = z.object({
   trackingId: z.string()
 })
 
-const { recordValidated } = useExternalValidationQueue(REDIS_HOST)
+const { recordValidated } = useExternalValidationQueue({
+  host: REDIS_HOST,
+  port: 6379
+})
 
 export async function confirmRegistrationHandler(
   request: Hapi.Request,

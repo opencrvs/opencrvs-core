@@ -19,7 +19,10 @@ import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
-const { sendForExternalValidation } = useExternalValidationQueue(REDIS_HOST)
+const { sendForExternalValidation } = useExternalValidationQueue({
+  host: REDIS_HOST,
+  port: 6379
+})
 
 export const registerRoute = createRoute({
   method: 'POST',

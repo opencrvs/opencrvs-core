@@ -88,7 +88,10 @@ const requestSchema = z.object({
   >()
 })
 
-const { sendForExternalValidation } = useExternalValidationQueue(REDIS_HOST)
+const { sendForExternalValidation } = useExternalValidationQueue({
+  host: REDIS_HOST,
+  port: 6379
+})
 
 function findTask(bundle: Bundle) {
   const task = bundle.entry.map((e) => e.resource).find(isTask)
