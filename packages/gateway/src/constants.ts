@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
+export const REDIS_PORT = process.env.REDIS_PORT
+  ? Number(process.env.REDIS_PORT)
+  : 6379
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 7070
 export const HOSTNAME = process.env.DOMAIN || '*'

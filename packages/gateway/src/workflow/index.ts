@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { REDIS_HOST, WORKFLOW_URL } from '@gateway/constants'
+import { REDIS_HOST, REDIS_PORT, WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
@@ -126,7 +126,10 @@ export function rejectRegistrationCorrection(
   )
 }
 
-const recordQueue = useRecordQueue(REDIS_HOST)
+const recordQueue = useRecordQueue({
+  host: REDIS_HOST,
+  port: REDIS_PORT
+})
 
 export async function createRegistration(
   record:
