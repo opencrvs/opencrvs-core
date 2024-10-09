@@ -155,7 +155,7 @@ type History {
   action: RegAction
   note: String
   statusReason: StatusReason
-  reason: RejectionReason
+  reason: String
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
@@ -594,17 +594,12 @@ input ConfirmRegistrationInput {
 }
 
 enum RejectionReason {
-  DUPLICATE
-  CLERICAL_ERROR
-  MATERIAL_ERROR
-  MATERIAL_OMISSION
-  JUDICIAL_ORDER
   OTHER
 }
 
 input RejectRegistrationInput {
-  reason: RejectionReason!
-  comment: String!
+  reason: RejectionReason! # Rejection type
+  comment: String! # Free text comment for audit log
 }
 
 type Mutation {
@@ -649,11 +644,7 @@ type Mutation {
   markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
-  markEventAsVoided(
-    id: String!
-    reason: RejectionReason!
-    comment: String!
-  ): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsVoided(id: String!, reason: String!, comment: String!): ID! # updated status to 'voided' - the registration was captured in error
   markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
   markEventAsNotDuplicate(id: String!): ID! # removes duplicates from composition
   markEventAsArchived(

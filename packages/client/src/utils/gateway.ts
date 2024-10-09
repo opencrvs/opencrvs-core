@@ -707,7 +707,7 @@ export type History = {
   output?: Maybe<Array<Maybe<InputOutput>>>
   payment?: Maybe<Payment>
   potentialDuplicates?: Maybe<Array<Scalars['String']>>
-  reason?: Maybe<RejectionReason>
+  reason?: Maybe<Scalars['String']>
   regStatus?: Maybe<RegStatus>
   requester?: Maybe<Scalars['String']>
   requesterOther?: Maybe<Scalars['String']>
@@ -1158,7 +1158,7 @@ export type MutationMarkEventAsUnassignedArgs = {
 export type MutationMarkEventAsVoidedArgs = {
   comment: Scalars['String']
   id: Scalars['String']
-  reason: RejectionReason
+  reason: Scalars['String']
 }
 
 export type MutationMarkMarriageAsCertifiedArgs = {
@@ -1856,11 +1856,6 @@ export type RejectRegistrationInput = {
 }
 
 export enum RejectionReason {
-  ClericalError = 'CLERICAL_ERROR',
-  JudicialOrder = 'JUDICIAL_ORDER',
-  MaterialError = 'MATERIAL_ERROR',
-  MaterialOmission = 'MATERIAL_OMISSION',
-  Duplicate = 'DUPLICATE',
   Other = 'OTHER'
 }
 
@@ -3128,7 +3123,7 @@ export type MarkBirthAsRegisteredMutation = {
 
 export type MarkEventAsVoidedMutationVariables = Exact<{
   id: Scalars['String']
-  reason: RejectionReason
+  reason: Scalars['String']
   comment: Scalars['String']
 }>
 
@@ -3424,7 +3419,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
-      reason?: RejectionReason | null
+      reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
       documents: Array<{
@@ -3758,7 +3753,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
-      reason?: RejectionReason | null
+      reason?: string | null
       otherReason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
@@ -4220,7 +4215,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
       ipAddress?: string | null
-      reason?: RejectionReason | null
+      reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
       documents: Array<{
@@ -4939,7 +4934,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
-      reason?: RejectionReason | null
+      reason?: string | null
       documents: Array<{
         __typename?: 'Attachment'
         id: string
@@ -5293,7 +5288,7 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       action?: RegAction | null
       regStatus?: RegStatus | null
       dhis2Notification?: boolean | null
-      reason?: RejectionReason | null
+      reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -8052,7 +8047,7 @@ export type FetchViewRecordByCompositionQuery = {
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
           ipAddress?: string | null
-          reason?: RejectionReason | null
+          reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
             text?: string | null
@@ -8438,7 +8433,7 @@ export type FetchViewRecordByCompositionQuery = {
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
           ipAddress?: string | null
-          reason?: RejectionReason | null
+          reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
             text?: string | null
@@ -8756,7 +8751,7 @@ export type FetchViewRecordByCompositionQuery = {
           regStatus?: RegStatus | null
           dhis2Notification?: boolean | null
           ipAddress?: string | null
-          reason?: RejectionReason | null
+          reason?: string | null
           statusReason?: {
             __typename?: 'StatusReason'
             text?: string | null

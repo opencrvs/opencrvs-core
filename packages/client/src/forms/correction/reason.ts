@@ -21,7 +21,14 @@ import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
 import { required as requiredValidation } from '@opencrvs/client/src/utils/validate'
 import { validationMessages } from '@client/i18n/messages'
-import { RejectionReason } from '@client/utils/gateway'
+
+export enum CorrectionReason {
+  CLERICAL_ERROR = 'CLERICAL_ERROR',
+  MATERIAL_ERROR = 'MATERIAL_ERROR',
+  MATERIAL_OMISSION = 'MATERIAL_OMISSION',
+  JUDICIAL_ORDER = 'JUDICIAL_ORDER',
+  OTHER = 'OTHER'
+}
 
 export const correctRecordReasonSectionGroup: IFormSectionGroup = {
   id: 'recordCorrection',
@@ -39,23 +46,23 @@ export const correctRecordReasonSectionGroup: IFormSectionGroup = {
       validator: [],
       options: [
         {
-          value: RejectionReason.ClericalError,
+          value: CorrectionReason.CLERICAL_ERROR,
           label: messages.clericalError
         },
         {
-          value: RejectionReason.MaterialError,
+          value: CorrectionReason.MATERIAL_ERROR,
           label: messages.materialError
         },
         {
-          value: RejectionReason.MaterialOmission,
+          value: CorrectionReason.MATERIAL_OMISSION,
           label: messages.materialOmission
         },
         {
-          value: RejectionReason.JudicialOrder,
+          value: CorrectionReason.JUDICIAL_ORDER,
           label: messages.judicialOrder
         },
         {
-          value: RejectionReason.Other,
+          value: CorrectionReason.OTHER,
           label: formMessages.otherOption
         }
       ],

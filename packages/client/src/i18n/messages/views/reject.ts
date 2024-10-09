@@ -17,6 +17,8 @@ interface IRejectMessages
   rejectionForm: MessageDescriptor
   rejectionReason: MessageDescriptor
   rejectionReasonDuplicate: MessageDescriptor
+  rejectionReasonMisspelling: MessageDescriptor
+  rejectionReasonMissingSupportingDoc: MessageDescriptor
   rejectionReasonOther: MessageDescriptor
   rejectionCommentForHealthWorkerLabel: MessageDescriptor
   rejectionFormInstruction: MessageDescriptor
@@ -60,6 +62,16 @@ const messagesToDefine: IRejectMessages = {
     id: 'review.rejection.form.reasons.markDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'Label for rejection option duplicate'
+  },
+  rejectionReasonMisspelling: {
+    id: 'review.rejection.form.reasons.misspelling',
+    defaultMessage: 'Misspelling',
+    description: 'Label for rejection option misspelling'
+  },
+  rejectionReasonMissingSupportingDoc: {
+    id: 'review.rej.form.reasons.missSupDoc',
+    defaultMessage: 'Missing supporting documents',
+    description: 'Label for rejection option missing supporting doc'
   },
   rejectionReasonOther: {
     id: 'review.rejection.form.reasons.other',

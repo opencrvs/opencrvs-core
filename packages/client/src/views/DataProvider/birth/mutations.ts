@@ -35,7 +35,7 @@ const REGISTER_BIRTH_DECLARATION = gql`
 const REJECT_BIRTH_DECLARATION = gql`
   mutation markEventAsVoided(
     $id: String!
-    $reason: RejectionReason!
+    $reason: String!
     $comment: String!
   ) {
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)

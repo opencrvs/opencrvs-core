@@ -26,11 +26,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { useSelector } from 'react-redux'
-import {
-  CorrectionInput,
-  History,
-  RejectionReason
-} from '@client/utils/gateway'
+import { CorrectionInput, History } from '@client/utils/gateway'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { IStoreState } from '@client/store'
 
@@ -56,6 +52,7 @@ import { rejectCorrection } from '@client/review/reject-correction'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { messages } from '@client/i18n/messages/views/correction'
+import { CorrectionReason } from '@client/forms/correction/reason'
 import { Text } from '@opencrvs/components/lib/Text'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import {
@@ -188,15 +185,15 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
 
   const getReasonForRequest = () => {
     switch (correctionRequestTask.reason) {
-      case RejectionReason.ClericalError:
+      case CorrectionReason.CLERICAL_ERROR:
         return intl.formatMessage(messages.clericalError)
-      case RejectionReason.MaterialError:
+      case CorrectionReason.MATERIAL_ERROR:
         return intl.formatMessage(messages.materialError)
-      case RejectionReason.MaterialOmission:
+      case CorrectionReason.MATERIAL_OMISSION:
         return intl.formatMessage(messages.materialOmission)
-      case RejectionReason.JudicialOrder:
+      case CorrectionReason.JUDICIAL_ORDER:
         return intl.formatMessage(messages.judicialOrder)
-      case RejectionReason.Other:
+      case CorrectionReason.OTHER:
         return (
           intl.formatMessage(messages.otherReason) +
           ' - ' +

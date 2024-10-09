@@ -6743,8 +6743,8 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "ENUM",
-              "name": "RejectionReason",
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -10494,8 +10494,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "ENUM",
-                    "name": "RejectionReason",
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   }
                 },
@@ -16643,43 +16643,7 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "CLERICAL_ERROR",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "JUDICIAL_ORDER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MATERIAL_ERROR",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MATERIAL_OMISSION",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "OTHER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "duplicate",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "other",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
