@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState, useEffect } from 'react'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
@@ -57,67 +57,55 @@ function isFormPage(pathname: string): boolean {
   return false
 }
 
-let locationKey = 'locationkey'
-
 function setLocationKey(currLocation: Location, prevLocation: Location) {
+  const locationKey = 'locationkey'
   const prevLocPathname = prevLocation.pathname
   const currLocPathname = currLocation.pathname
 
-  if (currLocPathname === routes.SELECT_VITAL_EVENT) {
-    if (isUserHome(prevLocPathname)) {
-      locationKey = currLocation.key as string
-    }
-  } else if (isUserHome(currLocPathname)) {
-    if (isFormPage(prevLocPathname)) {
-      locationKey = currLocation.key as string
-    }
+  if (
+    currLocPathname === routes.SELECT_VITAL_EVENT &&
+    isUserHome(prevLocPathname)
+  ) {
+    return currLocation.key as string
   }
+
+  if (isUserHome(currLocPathname) && isFormPage(prevLocPathname)) {
+    return currLocation.key as string
+  }
+  return locationKey
 }
+
 interface IProps {
   location: Location
   children: React.ReactNode
 }
-interface IState {
-  locations: Location[]
+
+const TransitionWrapper = ({ location, children }: IProps) => {
+  const [locations, setLocations] = useState<Location[]>([location, location])
+
+  useEffect(() => {
+    setLocations([location, locations[0]])
+  }, [location])
+
+  const [currLocation, prevLocation] = locations
+
+  const locationKey = setLocationKey(currLocation, prevLocation)
+
+  return (
+    <TransitionGroup component={null}>
+      <CSSTransition
+        unmountOnExit
+        timeout={{
+          enter: PAGE_TRANSITIONS_ENTER_TIME,
+          exit: PAGE_TRANSITIONS_EXIT_TIME
+        }}
+        classNames={PAGE_TRANSITIONS_CLASSNAME}
+        key={locationKey}
+      >
+        {children}
+      </CSSTransition>
+    </TransitionGroup>
+  )
 }
-export default class TransitionWrapper extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props)
 
-    this.state = {
-      locations: [this.props.location, this.props.location]
-    }
-  }
-
-  static getDerivedStateFromProps(
-    { location: currLocation }: IProps,
-    { locations: [prevLocation] }: IState
-  ) {
-    return { locations: [currLocation, prevLocation] }
-  }
-
-  render() {
-    const { children } = this.props
-    const {
-      locations: [currLocation, prevLocation]
-    } = this.state
-
-    setLocationKey(currLocation, prevLocation)
-
-    return (
-      <TransitionGroup component={null}>
-        <CSSTransition
-          unmountOnExit
-          timeout={{
-            enter: PAGE_TRANSITIONS_ENTER_TIME,
-            exit: PAGE_TRANSITIONS_EXIT_TIME
-          }}
-          classNames={PAGE_TRANSITIONS_CLASSNAME}
-          key={locationKey}
-        >
-          {children}
-        </CSSTransition>
-      </TransitionGroup>
-    )
-  }
-}
+export default TransitionWrapper
