@@ -13,255 +13,220 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockDeclarationData,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  flushPromises
 } from '@client/tests/util'
 import { VerifyCollector } from './VerifyCollector'
 import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 
+// Common mock data
+const birthDeclaration = {
+  id: 'mockBirth1234',
+  data: {
+    ...mockDeclarationData,
+    history: [
+      {
+        date: '2022-03-21T08:16:24.467+00:00',
+        regStatus: 'REGISTERED',
+        reinstated: false
+      }
+    ]
+  },
+  event: Event.Birth
+}
+
+const deathDeclaration = {
+  id: 'mockDeath1234',
+  data: {
+    ...mockDeathDeclarationData,
+    history: [
+      {
+        date: '2022-03-21T08:16:24.467+00:00',
+        regStatus: 'REGISTERED',
+        reinstated: false
+      }
+    ]
+  },
+  event: Event.Death
+}
+
+// Helper function for setting up tests
+async function setupTest({
+  registrationId,
+  certTemplateId,
+  collector,
+  declaration,
+  store,
+  history
+}: {
+  registrationId: string
+  certTemplateId: string
+  collector: string
+  declaration: any
+  store: any
+  history: any
+}) {
+  store.dispatch(storeDeclaration(declaration))
+  await flushPromises()
+
+  const testComponent = await createTestComponent(
+    // @ts-ignore
+    <VerifyCollector
+      history={history}
+      match={{
+        params: {
+          registrationId,
+          certTemplateId,
+          collector
+        },
+        isExact: true,
+        path: '',
+        url: ''
+      }}
+    />,
+    { store, history }
+  )
+
+  return testComponent
+}
+
 describe('verify collector tests', () => {
   const { store, history } = createStore()
 
-  const birthDeclaration = {
-    id: 'mockBirth1234',
-    data: {
-      ...mockDeclarationData,
-      history: [
-        {
-          date: '2022-03-21T08:16:24.467+00:00',
-          regStatus: 'REGISTERED',
-          reinstated: false
-        }
-      ]
-    },
-    event: Event.Birth
-  }
-
-  const deathDeclaration = {
-    id: 'mockDeath1234',
-    data: {
-      ...mockDeathDeclarationData,
-      history: [
-        {
-          date: '2022-03-21T08:16:24.467+00:00',
-          regStatus: 'REGISTERED',
-          reinstated: false
-        }
-      ]
-    },
-    event: Event.Death
-  }
-
   describe('in case of birth declaration', () => {
+    let testComponent: ReactWrapper
+
     beforeAll(async () => {
-      // @ts-ignore
-      store.dispatch(storeDeclaration(birthDeclaration))
+      testComponent = await setupTest({
+        registrationId: 'mockBirth1234',
+        certTemplateId: 'birth-certificate-copy',
+        collector: 'mother',
+        declaration: birthDeclaration,
+        store,
+        history
+      })
     })
 
-    it('when mother is collector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <VerifyCollector
-          history={history}
-          match={{
-            params: {
-              registrationId: 'mockBirth1234',
-              certTemplateId: 'birth-certificate-copy',
-              collector: 'mother'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-
+    it('renders idVerifier component when mother is collector', () => {
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
-    it('should takes user go back', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <VerifyCollector
-          history={history}
-          match={{
-            params: {
-              registrationId: 'mockBirth1234',
-              certTemplateId: 'birth-certificate-copy',
-              collector: 'mother'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-
+    it('takes user back on clicking back button', async () => {
       testComponent
         .find('#action_page_back_button')
         .hostNodes()
         .simulate('click')
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
-
+      await flushPromises()
       testComponent.update()
 
       expect(history.location.pathname).toBe('/')
     })
+  })
 
-    describe('when informant is collector', () => {
-      let testComponent: ReactWrapper
-      beforeAll(() => {
-        // @ts-ignore
-        store.dispatch(storeDeclaration(deathDeclaration))
+  describe('when informant is collector for death declaration', () => {
+    let testComponent: ReactWrapper
+
+    beforeAll(async () => {
+      testComponent = await setupTest({
+        registrationId: 'mockDeath1234',
+        certTemplateId: 'death-certificate',
+        collector: 'informant',
+        declaration: deathDeclaration,
+        store,
+        history
       })
-      beforeEach(async () => {
-        testComponent = await createTestComponent(
-          // @ts-ignore
-          <VerifyCollector
-            history={history}
-            match={{
-              params: {
-                registrationId: 'mockDeath1234',
-                certTemplateId: 'death-certificate',
-                collector: 'informant'
-              },
-              isExact: true,
-              path: '',
-              url: ''
-            }}
-          />,
-          { store, history }
-        )
-      })
+    })
 
-      it('renders idVerifier compomnent', () => {
-        expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
-      })
+    it('renders idVerifier component', () => {
+      expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
+    })
 
-      it('clicking on yes button takes user to review certificate if there is no fee', () => {
-        testComponent
-          .find('#idVerifier')
-          .find('#verifyPositive')
-          .hostNodes()
-          .simulate('click')
+    it('redirects to review page on clicking yes button with no fee', () => {
+      testComponent
+        .find('#idVerifier #verifyPositive')
+        .hostNodes()
+        .simulate('click')
 
-        expect(history.location.pathname).toContain('review')
-      })
+      expect(history.location.pathname).toContain('review')
+    })
+    it('clicking on cancel button hides the modal', () => {
+      testComponent
+        .find('#idVerifier #verifyNegative')
+        .hostNodes()
+        .simulate('click')
 
-      describe('when father is collector', () => {
-        let testComponent: ReactWrapper
-        beforeAll(() => {
-          // @ts-ignore
-          store.dispatch(storeDeclaration(birthDeclaration))
-        })
-        beforeEach(async () => {
-          testComponent = await createTestComponent(
-            // @ts-ignore
-            <VerifyCollector
-              history={history}
-              match={{
-                params: {
-                  registrationId: 'mockBirth1234',
-                  certTemplateId: 'birth-certificate-copy',
-                  collector: 'father'
-                },
-                isExact: true,
-                path: '',
-                url: ''
-              }}
-            />,
-            { store, history }
-          )
-        })
+      testComponent.update()
+      testComponent
+        .find('#withoutVerificationPrompt #cancel')
+        .hostNodes()
+        .simulate('click')
 
-        it('clicking on send button on modal takes user to payment if there is fee', () => {
-          testComponent
-            .find('#idVerifier')
-            .find('#verifyNegative')
-            .hostNodes()
-            .simulate('click')
+      testComponent.update()
+      expect(
+        testComponent.find('#withoutVerificationPrompt').hostNodes()
+      ).toHaveLength(0)
+    })
+    it('shows modal on clicking no button', () => {
+      testComponent
+        .find('#idVerifier #verifyNegative')
+        .hostNodes()
+        .simulate('click')
 
-          testComponent.update()
-
-          testComponent
-            .find('#withoutVerificationPrompt')
-            .find('#send')
-            .hostNodes()
-            .simulate('click')
-
-          expect(history.location.pathname).toContain('payment')
-        })
-      })
-
-      it('clicking on no button shows up modal', () => {
-        testComponent
-          .find('#idVerifier')
-          .find('#verifyNegative')
-          .hostNodes()
-          .simulate('click')
-
-        testComponent.update()
-
-        expect(
-          testComponent.find('#withoutVerificationPrompt').hostNodes()
-        ).toHaveLength(1)
-      })
-
-      it('clicking on cancel button hides the modal', () => {
-        testComponent
-          .find('#idVerifier')
-          .find('#verifyNegative')
-          .hostNodes()
-          .simulate('click')
-
-        testComponent.update()
-
-        testComponent
-          .find('#withoutVerificationPrompt')
-          .find('#cancel')
-          .hostNodes()
-          .simulate('click')
-
-        testComponent.update()
-
-        expect(
-          testComponent.find('#withoutVerificationPrompt').hostNodes()
-        ).toHaveLength(0)
-      })
+      testComponent.update()
+      expect(
+        testComponent.find('#withoutVerificationPrompt').hostNodes()
+      ).toHaveLength(1)
     })
   })
 
-  describe('in case of death declaration renders idVerifier component', () => {
-    beforeAll(() => {
-      // @ts-ignore
-      store.dispatch(storeDeclaration(deathDeclaration))
+  describe('when father is collector for birth declaration', () => {
+    let testComponent: ReactWrapper
+
+    beforeAll(async () => {
+      testComponent = await setupTest({
+        registrationId: 'mockBirth1234',
+        certTemplateId: 'birth-certificate-copy',
+        collector: 'father',
+        declaration: birthDeclaration,
+        store,
+        history
+      })
     })
 
-    it('when informant is collector', async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <VerifyCollector
-          history={history}
-          match={{
-            params: {
-              registrationId: 'mockDeath1234',
-              certTemplateId: 'death-certificate',
-              collector: 'informant'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+    it('takes user to payment page on clicking send button when there is fee', () => {
+      testComponent
+        .find('#idVerifier #verifyNegative')
+        .hostNodes()
+        .simulate('click')
 
+      testComponent.update()
+      testComponent
+        .find('#withoutVerificationPrompt #send')
+        .hostNodes()
+        .simulate('click')
+
+      expect(history.location.pathname).toContain('payment')
+    })
+  })
+
+  describe('in case of death declaration with informant as collector', () => {
+    let testComponent: ReactWrapper
+
+    beforeAll(async () => {
+      testComponent = await setupTest({
+        registrationId: 'mockDeath1234',
+        certTemplateId: 'death-certificate',
+        collector: 'informant',
+        declaration: deathDeclaration,
+        store,
+        history
+      })
+    })
+
+    it('renders idVerifier component', () => {
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
   })
