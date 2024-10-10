@@ -85,7 +85,7 @@ const TransitionWrapper = ({ location, children }: IProps) => {
 
   useEffect(() => {
     setLocations([location, locations[0]])
-  }, [location])
+  }, [location, locations])
 
   const [currLocation, prevLocation] = locations
 
