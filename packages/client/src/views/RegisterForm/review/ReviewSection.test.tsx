@@ -749,6 +749,7 @@ describe('when in device of large viewport', () => {
           draft={simpleDraft}
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )
