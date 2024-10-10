@@ -179,7 +179,7 @@ describe('Search type resolvers', () => {
               {
                 operatedOn: '2019-12-12T15:24:53.586Z',
                 operatorFirstNames: 'Mohammad',
-                rejectReason: 'missing_supporting_doc',
+                rejectReason: 'other',
                 operatorFamilyName: 'Ashraful',
                 rejectComment: 'No supporting documents provided.',
                 operatorOfficeName: 'Alokbali Union Parishad',
@@ -213,7 +213,7 @@ describe('Search type resolvers', () => {
           {
             operatedOn: '2019-12-12T15:24:53.586Z',
             operatorFirstNames: 'Mohammad',
-            rejectReason: 'missing_supporting_doc',
+            rejectReason: 'other',
             operatorFamilyName: 'Ashraful',
             rejectComment: 'No supporting documents provided.',
             operatorOfficeName: 'Alokbali Union Parishad',
@@ -367,7 +367,7 @@ describe('Search type resolvers', () => {
               {
                 operatedOn: '2019-12-12T15:24:53.586Z',
                 operatorFirstNames: 'Mohammad',
-                rejectReason: 'missing_supporting_doc',
+                rejectReason: 'other',
                 operatorFamilyName: 'Ashraful',
                 rejectComment: 'No supporting documents provided.',
                 operatorOfficeName: 'Alokbali Union Parishad',
@@ -401,7 +401,7 @@ describe('Search type resolvers', () => {
           {
             operatedOn: '2019-12-12T15:24:53.586Z',
             operatorFirstNames: 'Mohammad',
-            rejectReason: 'missing_supporting_doc',
+            rejectReason: 'other',
             operatorFamilyName: 'Ashraful',
             rejectComment: 'No supporting documents provided.',
             operatorOfficeName: 'Alokbali Union Parishad',
@@ -593,7 +593,7 @@ describe('Search type resolvers', () => {
             {
               operatedOn: '2019-12-12T15:24:53.586Z',
               operatorFirstNames: 'Mohammad',
-              rejectReason: 'missing_supporting_doc',
+              rejectReason: 'other',
               operatorFamilyName: 'Ashraful',
               rejectComment: 'No supporting documents provided.',
               operatorOfficeName: 'Alokbali Union Parishad',

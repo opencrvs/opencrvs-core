@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { REDIS_HOST, WORKFLOW_URL } from '@gateway/constants'
+import { REDIS_HOST, REDIS_PORT, WORKFLOW_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
@@ -37,6 +37,7 @@ import {
   RejectedRecord,
   Resource,
   SavedBundle,
+  SupportedPatientIdentifierCode,
   ValidRecord
 } from '@opencrvs/commons/types'
 
@@ -125,7 +126,10 @@ export function rejectRegistrationCorrection(
   )
 }
 
-const recordQueue = useRecordQueue(REDIS_HOST)
+const recordQueue = useRecordQueue({
+  host: REDIS_HOST,
+  port: REDIS_PORT
+})
 
 export async function createRegistration(
   record:
@@ -391,5 +395,40 @@ export async function createHospitalNotification(
     `/records/event-notification`,
     authHeader,
     bundle
+  )
+}
+
+type ConfirmRegistrationDetails = {
+  childIdentifiers?: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
+}
+export async function confirmRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  details: ConfirmRegistrationDetails
+) {
+  return createRequest<undefined>(
+    'POST',
+    `/records/${id}/confirm`,
+    authHeader,
+    details
+  )
+}
+
+type RejectRegistrationDetails = {
+  error: string
+}
+export async function rejectRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  details: RejectRegistrationDetails
+) {
+  return createRequest<undefined>(
+    'POST',
+    `/records/${id}/reject`,
+    authHeader,
+    details
   )
 }

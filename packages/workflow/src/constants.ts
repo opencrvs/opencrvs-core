@@ -12,6 +12,7 @@ import { cleanEnv, str, num, url } from 'envalid'
 
 const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
+  REDIS_PORT: num({ default: 6379 }),
   HOST: str({ default: '0.0.0.0' }),
   PORT: num({ default: 5050 }),
   FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
@@ -32,6 +33,7 @@ const env = cleanEnv(process.env, {
 
 export const {
   REDIS_HOST,
+  REDIS_PORT,
   HOST,
   PORT,
   FHIR_URL,

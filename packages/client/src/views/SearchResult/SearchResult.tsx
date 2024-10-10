@@ -85,7 +85,7 @@ const ErrorText = styled.div`
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-
+// @TODO: Get rid of these magic strings - they are outdated and will get more outdated as time passes
 export function getRejectionReasonDisplayValue(reason: string) {
   switch (reason.toLowerCase()) {
     case 'duplicate':

@@ -41,6 +41,9 @@ const FETCH_RECORD_STATUS = gql`
   }
 `
 
+const waitWithIncreasingBackoff = (attemptNumber: number) =>
+  new Promise((resolve) => setTimeout(resolve, 1000 + attemptNumber * 1000))
+
 export async function submitAndWaitUntilRecordInWorkqueue(
   mutation: DocumentNode,
   graphqlPayload: TransformedData,
@@ -90,7 +93,8 @@ export async function submitAndWaitUntilRecordInWorkqueue(
       }
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1000 + nthTry * 1000))
+    await waitWithIncreasingBackoff(nthTry)
+
     nthTry++
   }
 }

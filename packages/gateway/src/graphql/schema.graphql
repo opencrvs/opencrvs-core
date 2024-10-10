@@ -223,6 +223,8 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
+  confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
+  rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -269,10 +271,6 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
-}
-
-type Dummy {
-  dummy: String!
 }
 
 type NotificationResult {
@@ -726,6 +724,17 @@ scalar Void
 type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
+}
+
+input ConfirmRegistrationInput {
+  childIdentifiers: [IdentifierInput!]
+  registrationNumber: String
+  trackingId: String
+}
+
+input RejectRegistrationInput {
+  reason: RejectionReason!
+  comment: String!
 }
 
 input UserInput {
@@ -1312,6 +1321,15 @@ enum RegStatus {
   ISSUED
 }
 
+input IdentifierInput {
+  type: SupportedPatientIdentifierCode!
+  value: String!
+}
+
+enum RejectionReason {
+  OTHER
+}
+
 input HumanNameInput {
   use: String
   firstNames: String
@@ -1727,6 +1745,25 @@ enum Gender {
 input DeceasedInput {
   deceased: Boolean
   deathDate: PlainDate
+}
+
+enum SupportedPatientIdentifierCode {
+  PASSPORT
+  NATIONAL_ID
+  MOSIP_PSUT_TOKEN_ID
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
+  DRIVING_LICENSE
+  REFUGEE_NUMBER
+  ALIEN_NUMBER
+  OTHER
+  SOCIAL_SECURITY_NO
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
+  BIRTH_CONFIGURABLE_IDENTIFIER_1
+  BIRTH_CONFIGURABLE_IDENTIFIER_2
+  BIRTH_CONFIGURABLE_IDENTIFIER_3
 }
 
 input LabelInput {

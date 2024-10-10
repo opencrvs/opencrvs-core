@@ -43,6 +43,10 @@ export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use'> & {
   use: string
 }
 
+/**
+ * If you change this, also change packages/gateway/src/features/registration/schema.graphql SupportedPatientIdentifierCode
+ */
+
 export const SUPPORTED_PATIENT_IDENTIFIER_CODES = [
   'PASSPORT',
   'NATIONAL_ID',

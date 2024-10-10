@@ -8,17 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
 import { toTokenWithBearer } from '@opencrvs/commons'
-import {
-  RecordValidatedPayload,
-  useExternalValidationQueue
-} from '@opencrvs/commons/message-queue'
-import {
-  isWaitingExternalValidation,
-  SupportedPatientIdentifierCode
-} from '@opencrvs/commons/types'
-import { REDIS_HOST } from '@workflow/constants'
+import { RecordValidatedPayload } from '@opencrvs/commons/message-queue'
+import { isWaitingExternalValidation } from '@opencrvs/commons/types'
 import { writeMetricsEvent } from '@workflow/records/audit'
 import { getRecordById } from '@workflow/records/index'
 import {
@@ -28,7 +20,6 @@ import {
 import { indexBundleWithTransaction } from '@workflow/records/search'
 import { toRegistered } from '@workflow/records/state-transitions'
 import { invokeWebhooks } from '@workflow/records/webhooks'
-import { getToken } from '@workflow/utils/auth-utils'
 import { getEventType } from './utils'
 
 export async function markEventAsRegistered({
@@ -72,32 +63,4 @@ export async function markEventAsRegistered({
   await invokeWebhooks({ bundle, token, event })
 
   return
-}
-
-const { recordValidated } = useExternalValidationQueue(REDIS_HOST)
-
-type RecordValidatedHTTPPayload = {
-  registrationNumber: string
-  childIdentifiers: { type: SupportedPatientIdentifierCode; value: string }[]
-  compositionId: string
-  trackingId: string
-}
-
-export async function markEventAsRegisteredCallbackHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const token = getToken(request)
-  const { registrationNumber, childIdentifiers, compositionId, trackingId } =
-    request.payload as RecordValidatedHTTPPayload
-
-  await recordValidated({
-    recordId: compositionId,
-    identifiers: childIdentifiers || [],
-    registrationNumber,
-    trackingId,
-    token
-  })
-
-  return h.response().code(200)
 }

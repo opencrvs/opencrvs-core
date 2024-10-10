@@ -22,6 +22,7 @@ export const NATIVE_LANGUAGE = (() => {
 export const DEFAULT_TIMEOUT = 600000
 
 export const REDIS_HOST = env.REDIS_HOST
+export const REDIS_PORT = env.REDIS_PORT
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const HOSTNAME = env.DOMAIN

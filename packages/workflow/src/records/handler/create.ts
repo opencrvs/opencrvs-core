@@ -62,7 +62,7 @@ import {
 } from '@workflow/records/fhir'
 
 import { useExternalValidationQueue } from '@opencrvs/commons/message-queue'
-import { REDIS_HOST } from '@workflow/constants'
+import { REDIS_HOST, REDIS_PORT } from '@workflow/constants'
 import { getRecordById } from '@workflow/records'
 import {
   isNotificationEnabled,
@@ -88,7 +88,10 @@ const requestSchema = z.object({
   >()
 })
 
-const { sendForExternalValidation } = useExternalValidationQueue(REDIS_HOST)
+const { sendForExternalValidation } = useExternalValidationQueue({
+  host: REDIS_HOST,
+  port: REDIS_PORT
+})
 
 function findTask(bundle: Bundle) {
   const task = bundle.entry.map((e) => e.resource).find(isTask)

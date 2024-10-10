@@ -141,8 +141,7 @@ describe('SearchResult tests', () => {
                     duplicates: null,
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
-                    reason:
-                      'duplicate,misspelling,missing_supporting_doc,other',
+                    reason: 'duplicate',
                     comment: 'Rejected'
                   },
                   dateOfDeath: '2010-01-01',
