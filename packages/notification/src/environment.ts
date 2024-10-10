@@ -8,4 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+import { cleanEnv, str, port, url } from 'envalid'
+
+export const env = cleanEnv(process.env, {
+  HOST: str({ devDefault: 'localhost' }),
+  PORT: port({ default: 2020 }),
+  CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
+  SENTRY_DSN: str({ default: undefined }),
+  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
+  MONGO_URL: str({ devDefault: 'mongodb://localhost/notification' })
+})

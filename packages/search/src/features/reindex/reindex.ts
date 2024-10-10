@@ -62,6 +62,8 @@ export const reindex = async () => {
     }
   })
 
+  const droppedCompositionIds: string[] = []
+
   await client.helpers.bulk(
     {
       retries: 3,
@@ -74,21 +76,25 @@ export const reindex = async () => {
         }
       }),
       onDrop(doc) {
-        throw new Error(
-          `Document ${doc.document.compositionId} couldn't be inserted`
-        )
+        droppedCompositionIds.push(doc.document.compositionId)
       }
     },
     {
       meta: true
     }
   )
+
   const t2 = performance.now()
   logger.info(
     `Finished reindexing to ${index} in ${((t2 - t1) / 1000).toFixed(
       2
     )} seconds`
   )
+
+  if (droppedCompositionIds.length) {
+    logger.error(`Could not index ${droppedCompositionIds.length} document(s)`)
+    logger.error(droppedCompositionIds.join(', '))
+  }
 
   return { index }
 }

@@ -116,6 +116,12 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
       })
     }
   }
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      whatNext()
+    }
+  }
 
   const continueActionButton = (
     <PrimaryButton
@@ -169,6 +175,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
                 touched={true}
                 value={newPassword}
                 onChange={checkPasswordStrength}
+                onKeyDown={handleKeyDown}
                 error={continuePressed && newPassword.length === 0}
               />
             </InputField>
@@ -207,6 +214,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
                 error={continuePressed && passwordMismatched}
                 value={confirmPassword}
                 onChange={matchPassword}
+                onKeyDown={handleKeyDown}
               />
             </InputField>
             {passwordMismatched && (
