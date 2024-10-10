@@ -18,7 +18,7 @@ import { pipe } from 'fp-ts/lib/function'
 import { UUID } from '@opencrvs/commons'
 
 /**
- * Allows creating one-time use tokens for when a 3rd party system needs to confirm a registration
+ * Allows creating record-specific tokens for when a 3rd party system needs to confirm a registration
  */
 export async function tokenExchangeHandler(
   request: Hapi.Request,
