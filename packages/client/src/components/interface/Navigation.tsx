@@ -45,7 +45,7 @@ import {
 } from '@client/SubmissionController'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { Event } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -65,7 +65,6 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import ScopedComponent from '@client/components/ScopedComponent'
-import { SCOPES } from '@opencrvs/commons/scopes'
 
 const SCREEN_LOCK = 'screenLock'
 
