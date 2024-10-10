@@ -31,6 +31,7 @@
 - "Choose a new password" form now allows the user to submit the form using the "Enter/Return" key [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
 - Dropdown options now flow to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
 - Only render units/postfix when field has a value [#7055](https://github.com/opencrvs/opencrvs-core/issues/7055)
+- Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
 
 ## 1.6.0 Release candidate
 
