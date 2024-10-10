@@ -57,6 +57,7 @@ services:
     depends_on:
       - base
     environment:
+      - HOST=0.0.0.0
       - REDIS_HOST=redis
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800

@@ -14,7 +14,7 @@ import { badData } from '@hapi/boom'
 import * as Joi from 'joi'
 import { pick } from 'lodash'
 import getSystems from '@config/handlers/system/systemHandler'
-import { COUNTRY_CONFIG_URL } from '@config/config/constants'
+import { env } from '@config/environment'
 import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
@@ -77,7 +77,7 @@ async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
   return []
 }
 async function getConfigFromCountry(authToken?: string) {
-  const url = new URL('application-config', COUNTRY_CONFIG_URL).toString()
+  const url = new URL('application-config', env.COUNTRY_CONFIG_URL).toString()
 
   const res = await fetch(url)
   if (!res.ok) {
@@ -92,7 +92,7 @@ async function getEventCertificate(
 ) {
   const url = new URL(
     `/certificates/${event}.svg`,
-    COUNTRY_CONFIG_URL
+    env.COUNTRY_CONFIG_URL
   ).toString()
 
   const res = await fetch(url, {

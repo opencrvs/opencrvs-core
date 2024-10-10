@@ -244,6 +244,10 @@ export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
   if (widthValue && heightValue) {
     const width = Number.parseInt(widthValue)
     const height = Number.parseInt(heightValue)
+    pdfTemplate.definition.pageSize = {
+      width,
+      height
+    }
     if (width > height) {
       pdfTemplate.definition.pageOrientation = 'landscape'
     }

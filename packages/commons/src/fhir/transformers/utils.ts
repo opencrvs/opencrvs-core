@@ -65,7 +65,11 @@ import {
   findEntryFromBundle
 } from '..'
 
-import { CompositionSectionTitleByCode, PartialBy } from '../../types'
+import {
+  CompositionSectionTitleByCode,
+  isHealthFacility,
+  PartialBy
+} from '../../types'
 import {
   DOWNLOADED_EXTENSION_URL,
   EVENT_TYPE,
@@ -333,14 +337,7 @@ export function selectOrCreateLocationRefResource(
 
   if (!encounter.location) {
     // create location
-    const locationRef = getUUID()
-    const locationEntry = createLocationResource(locationRef)
-    fhirBundle.entry.push(locationEntry)
-    encounter.location = []
-    encounter.location.push({
-      location: { reference: `urn:uuid:${locationRef}` as URNReference }
-    })
-    return locationEntry.resource
+    return createNewLocation(fhirBundle, encounter)
   }
 
   if (!encounter.location || !encounter.location[0]) {
@@ -358,6 +355,22 @@ export function selectOrCreateLocationRefResource(
       'Location referenced from encounter section not found in FHIR bundle'
     )
   }
+
+  if (isHealthFacility(locationEntry.resource)) {
+    return createNewLocation(fhirBundle, encounter)
+  }
+
+  return locationEntry.resource
+}
+
+function createNewLocation(fhirBundle: Bundle, encounter: Encounter): Location {
+  const locationRef = getUUID()
+  const locationEntry = createLocationResource(locationRef)
+  fhirBundle.entry.push(locationEntry)
+  encounter.location = []
+  encounter.location.push({
+    location: { reference: `urn:uuid:${locationRef}` as URNReference }
+  })
   return locationEntry.resource
 }
 

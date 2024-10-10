@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { USER_MANAGEMENT_URL } from '@config/config/constants'
+import { env } from '@config/environment'
 import fetch from 'node-fetch'
 
 interface AuthHeader {
@@ -20,7 +20,7 @@ export const fetchUserManagement = async <T = any>(
   authHeader: AuthHeader,
   method = 'GET'
 ): Promise<T> => {
-  const systemURL = new URL(suffix, USER_MANAGEMENT_URL).toString()
+  const systemURL = new URL(suffix, env.USER_MANAGEMENT_URL).toString()
   const response = await fetch(systemURL, {
     method,
     headers: {
