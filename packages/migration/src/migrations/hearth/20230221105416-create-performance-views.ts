@@ -766,7 +766,9 @@ export const up = async (db: Db, client: MongoClient) => {
           $project: {
             _id: { $concat: [{ $toString: '$id' }, '_', '$daysInYear.date'] },
             name: 1,
-            date: { $dateFromString: { dateString: '$daysInYear.date' } },
+            date: {
+              $dateFromString: { dateString: '$daysInYear.date' }
+            },
             estimatedNumberOfBirths: '$daysInYear.estimatedNumberOfBirths',
             event: 'Birth'
           }

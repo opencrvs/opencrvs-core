@@ -105,8 +105,8 @@ export const up = async (db: Db, client: MongoClient) => {
 
           if (hasSystemTypes) {
             const typeCode = practitionerRole.code?.find(
-              (c) => c.coding?.[0].system === systemTypes
-            )?.coding?.[0].code
+              (c) => c.coding?.[0]?.system === systemTypes
+            )?.coding?.[0]?.code
             await db
               .collection('PractitionerRole')
               .updateOne(
