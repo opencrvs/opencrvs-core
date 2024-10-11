@@ -62,13 +62,40 @@ const Template = (args: {
   </div>
 )
 export const DropdownView = Template.bind({})
-DropdownView.args = {
-  position: 'bottom span-left',
-  offsetX: 0,
-  offsetY: 10
-}
 
 export default {
   title: 'Controls/Dropdown',
-  component: DropdownView
+  component: DropdownView,
+  argTypes: {
+    position: {
+      options: [
+        'none',
+        'top left',
+        'start end',
+        'block-start center',
+        'inline-start block-end',
+        'x-start y-end',
+        'center y-self-end',
+        'top span-left',
+        'center span-start',
+        'inline-start span-block-end',
+        'y-start span-x-end',
+        'top span-all',
+        'block-end span-all',
+        'x-self-start span-all',
+        'top',
+        'inline-start',
+        'center',
+        'span-all',
+        'end'
+      ] as IDropdownPosition[],
+      control: { type: 'radio' }
+    },
+    offsetX: {
+      control: { default: 0, type: 'number' }
+    },
+    offsetY: {
+      control: { default: 0, type: 'number' }
+    }
+  }
 } as Meta

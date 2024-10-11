@@ -99,14 +99,25 @@ const MenuItem = styled.li<{ disabled?: boolean }>`
 `
 
 export type IDropdownPosition =
+  | 'none'
+  | 'top left'
+  | 'start end'
+  | 'block-start center'
+  | 'inline-start block-end'
+  | 'x-start y-end'
+  | 'center y-self-end'
+  | 'top span-left'
+  | 'center span-start'
+  | 'inline-start span-block-end'
+  | 'y-start span-x-end'
+  | 'top span-all'
+  | 'block-end span-all'
+  | 'x-self-start span-all'
   | 'top'
-  | 'top-left'
-  | 'top-right'
-  | 'bottom'
-  | 'bottom-left'
-  | 'bottom-right'
-  | 'left'
-  | 'right'
+  | 'inline-start'
+  | 'center'
+  | 'span-all'
+  | 'end'
 
 const DropdownWrapper: React.FC<{ children: ReactNode; id: string }> = ({
   children,
