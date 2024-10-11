@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { ReactNode, useEffect, useRef } from 'react'
+import React, { ReactNode, useEffect } from 'react'
 import { disabled } from '../Button/Button.styles'
 import styled from 'styled-components'
 import { DropdownProvider, useDropdown } from './DropdownContext'
@@ -24,8 +24,8 @@ const StyledTrigger = styled.button.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
     ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
   // Forward popovertarget prop directly
-})<{ popovertarget: string }>`
-  anchor-name: --Dropdown-Anchor;
+})<{ popovertarget: string; dropdownName: string }>`
+  anchor-name: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
   margin: 0;
   padding: 0;
   border: 0;
@@ -37,6 +37,7 @@ type StyledContentProp = {
   offsetX: number
   offsetY: number
   popover: string
+  dropdownName: string
 }
 const StyledContent = styled.ul.withConfig({
   shouldForwardProp: (prop, defaultValidatorFn) =>
@@ -52,7 +53,7 @@ const StyledContent = styled.ul.withConfig({
   width: auto;
   white-space: nowrap;
   padding: 8px 0;
-  position-anchor: --Dropdown-Anchor;
+  position-anchor: ${({ dropdownName }) => `--Dropdown-Anchor-${dropdownName}`};
   inset-area: ${({ position }) => position};
   position-area: ${({ position }) => position};
   margin: 0;
@@ -107,17 +108,15 @@ export type IDropdownPosition =
   | 'left'
   | 'right'
 
-const DropdownWrapper: React.FC<{ children: ReactNode; id?: string }> = ({
+const DropdownWrapper: React.FC<{ children: ReactNode; id: string }> = ({
   children,
   id
 }) => {
-  const rootRef = useRef<HTMLUListElement | null>(null)
+  const { setDropdownName } = useDropdown()
 
-  return (
-    <StyledWrapper id={id + '-dropdownMenu'} ref={rootRef}>
-      {children}
-    </StyledWrapper>
-  )
+  setDropdownName(id)
+
+  return <StyledWrapper id={id + '-dropdownMenu'}>{children}</StyledWrapper>
 }
 
 export const DropdownMenu = ({
@@ -125,7 +124,7 @@ export const DropdownMenu = ({
   id
 }: {
   children: ReactNode
-  id?: string
+  id: string
 }) => {
   return (
     <DropdownProvider>
@@ -135,8 +134,14 @@ export const DropdownMenu = ({
 }
 
 const Trigger: React.FC<{ children: JSX.Element }> = ({ children }) => {
+  const { dropdownName } = useDropdown()
   return (
-    <StyledTrigger popovertarget="Dropdown-Content">{children}</StyledTrigger>
+    <StyledTrigger
+      popovertarget={`${dropdownName}-Dropdown-Content`}
+      dropdownName={dropdownName}
+    >
+      {children}
+    </StyledTrigger>
   )
 }
 DropdownMenu.Trigger = Trigger
@@ -152,10 +157,10 @@ const Content: React.FC<{
   offsetY = 10,
   children
 }) => {
-  const { setFocusedIndex } = useDropdown()
+  const { dropdownName, setFocusedIndex } = useDropdown()
 
   useEffect(() => {
-    const popover = document.getElementById('Dropdown-Content')
+    const popover = document.getElementById(dropdownName + '-Dropdown-Content')
     const onTogglePopover = (event: Event & { newState: string }) => {
       if (event.newState === 'open') {
         setFocusedIndex(0)
@@ -169,7 +174,7 @@ const Content: React.FC<{
     return () => {
       popover?.removeEventListener('toggle', onTogglePopover)
     }
-  }, [setFocusedIndex])
+  }, [setFocusedIndex, dropdownName])
 
   return (
     <StyledContent
@@ -177,7 +182,8 @@ const Content: React.FC<{
       offsetX={offsetX}
       offsetY={offsetY}
       popover="auto"
-      id="Dropdown-Content"
+      id={`${dropdownName}-Dropdown-Content`}
+      dropdownName={dropdownName}
     >
       {children}
     </StyledContent>

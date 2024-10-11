@@ -28,7 +28,7 @@ const Template = (args: {
       alignItems: 'center'
     }}
   >
-    <DropdownMenu>
+    <DropdownMenu id="story">
       <DropdownMenu.Trigger>
         <Button type="primary">Click Me</Button>
       </DropdownMenu.Trigger>

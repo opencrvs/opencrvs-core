@@ -15,6 +15,8 @@ interface DropdownContextType {
   addItemRef: (item: HTMLLIElement | null) => void
   handleKeyDown: (e: React.KeyboardEvent) => void
   setFocusedIndex: (e: number) => void
+  setDropdownName: (name: string) => void
+  dropdownName: string
   closeDropdown: () => void
 }
 
@@ -33,6 +35,7 @@ export const useDropdown = () => {
 export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
+  const [dropdownName, setDropdownName] = useState('')
   const [focusedIndex, setFocusedIndex] = useState<number>(-1)
   const itemRefs = useRef<(HTMLLIElement | null)[]>([])
 
@@ -52,7 +55,11 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const closeDropdown = () =>
-    document.getElementById('Dropdown-Content')?.togglePopover()
+    (
+      document.getElementById(
+        dropdownName + '-Dropdown-Content'
+      ) as HTMLElement & { togglePopover: () => void }
+    )?.togglePopover()
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     e.preventDefault()
@@ -77,9 +84,11 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <DropdownContext.Provider
       value={{
+        dropdownName,
         addItemRef,
         handleKeyDown,
         setFocusedIndex,
+        setDropdownName,
         closeDropdown
       }}
     >
