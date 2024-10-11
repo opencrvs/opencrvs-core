@@ -40,7 +40,6 @@ import {
 } from '@client/declarations'
 import { CorrectionSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
-import { EVENT_STATUS } from '@client/workqueue'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
@@ -55,6 +54,17 @@ import { client } from '@client/utils/apolloClient'
 import { Event } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
+import {
+  canBeCorrected,
+  isArchivable,
+  isArchived,
+  isCertified,
+  isPendingCorrection,
+  isPrintable,
+  isRecordOrDeclaration,
+  isReviewableDeclaration,
+  isUpdatableDeclaration
+} from '@client/declarations/utils'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -208,14 +218,6 @@ const ViewAction: React.FC<{
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  const recordOrDeclaration = [
-    SUBMISSION_STATUS.REGISTERED,
-    SUBMISSION_STATUS.CORRECTION_REQUESTED,
-    SUBMISSION_STATUS.CERTIFIED
-  ].includes(declarationStatus as any as SUBMISSION_STATUS)
-    ? 'record'
-    : 'declaration'
-
   return (
     <DropdownMenu.Item
       onClick={() => {
@@ -223,7 +225,9 @@ const ViewAction: React.FC<{
       }}
     >
       <Icon name="Eye" color="currentColor" size="large" />
-      {intl.formatMessage(messages.view, { recordOrDeclaration })}
+      {intl.formatMessage(messages.view, {
+        recordOrDeclaration: isRecordOrDeclaration(declarationStatus)
+      })}
     </DropdownMenu.Item>
   )
 }
@@ -237,21 +241,17 @@ const CorrectRecordAction: React.FC<
   const isBirthOrDeathEvent =
     type && [Event.Birth, Event.Death].includes(type.toLowerCase() as Event)
 
-  const canBeCorrected =
-    declarationStatus &&
-    [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ].includes(declarationStatus as SUBMISSION_STATUS)
-
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
-  if (!isBirthOrDeathEvent || !canBeCorrected || !userHasRegisterScope) {
+  if (
+    !isBirthOrDeathEvent ||
+    !canBeCorrected(declarationStatus) ||
+    !userHasRegisterScope
+  ) {
     return null
   }
 
@@ -278,14 +278,6 @@ const ArchiveAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
   const intl = useIntl()
-  const isArchivable =
-    declarationStatus &&
-    [
-      SUBMISSION_STATUS.IN_PROGRESS,
-      SUBMISSION_STATUS.DECLARED,
-      SUBMISSION_STATUS.VALIDATED,
-      SUBMISSION_STATUS.REJECTED
-    ].includes(declarationStatus as SUBMISSION_STATUS)
 
   // @ToDo use: `record.registration-archive` after configurable role pr is merged
   // @Question: If user has archive scope but not register scope,
@@ -296,7 +288,7 @@ const ArchiveAction: React.FC<
       ((scope as any as string[]).includes('validate') &&
         declarationStatus !== SUBMISSION_STATUS.VALIDATED))
 
-  if (!isArchivable || !userHasArchiveScope) return null
+  if (!isArchivable(declarationStatus) || !userHasArchiveScope) return null
 
   return (
     <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
@@ -310,7 +302,6 @@ const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
   const intl = useIntl()
-  const isArchived = declarationStatus === SUBMISSION_STATUS.ARCHIVED
 
   // @ToDo use: `record.registration-reinstate` after configurable role pr is merged
   // @Question: If user has reinstate scope but not register scope,
@@ -320,7 +311,7 @@ const ReinstateAction: React.FC<
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
-  if (!isArchived || !userHasReinstateScope) return null
+  if (!isArchived(declarationStatus) || !userHasReinstateScope) return null
 
   return (
     <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
@@ -343,14 +334,6 @@ const ReviewAction: React.FC<
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  const isPendingCorrection =
-    declarationStatus === EVENT_STATUS.CORRECTION_REQUESTED
-
-  const isReviewableDeclaration =
-    declarationStatus &&
-    [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED].includes(declarationStatus)
-
-  // @ToDo use: `record.declaration-review` or other appropriate scope after configurable role pr is merged
   const userHasReviewScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
@@ -358,7 +341,7 @@ const ReviewAction: React.FC<
 
   if (!userHasReviewScope) return null
 
-  return isPendingCorrection ? (
+  return isPendingCorrection(declarationStatus) ? (
     <DropdownMenu.Item
       onClick={() => {
         dispatch(
@@ -376,7 +359,7 @@ const ReviewAction: React.FC<
       {intl.formatMessage(messages.reviewCorrection)}
     </DropdownMenu.Item>
   ) : (
-    isReviewableDeclaration && (
+    isReviewableDeclaration(declarationStatus) && (
       <DropdownMenu.Item
         onClick={() => {
           dispatch(
@@ -407,14 +390,6 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  const isUpdatableDeclaration =
-    declarationStatus &&
-    [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ].includes(declarationStatus)
-
   // @ToDo use: appropriate scope after configurable role pr is merged
   const userHasUpdateScope =
     scope &&
@@ -439,7 +414,8 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     PAGE_ID = 'review'
   }
 
-  if (!isUpdatableDeclaration || !userHasUpdateScope) return null
+  if (!isUpdatableDeclaration(declarationStatus) || !userHasUpdateScope)
+    return null
 
   return (
     <DropdownMenu.Item
@@ -466,19 +442,13 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  const isPrintable =
-    declarationStatus &&
-    [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.ISSUED].includes(
-      declarationStatus as SUBMISSION_STATUS
-    )
-
   // @ToDo use: `record.print-records` or other appropriate scope after configurable role pr is merged
   const userHasPrintScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
-  if (!isPrintable || !userHasPrintScope) return null
+  if (!isPrintable(declarationStatus) || !userHasPrintScope) return null
 
   return (
     <DropdownMenu.Item
@@ -508,15 +478,13 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  const isCertified = declarationStatus === SUBMISSION_STATUS.CERTIFIED
-
   // @ToDo use: `record.print-issue-certified-copies` or other appropriate scope after configurable role pr is merged
   const userHasIssueScope =
     scope &&
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
-  if (!isCertified || !userHasIssueScope) return null
+  if (!isCertified(declarationStatus) || !userHasIssueScope) return null
 
   return (
     <DropdownMenu.Item
