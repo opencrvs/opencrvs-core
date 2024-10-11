@@ -16,7 +16,6 @@ import { DropdownProvider, useDropdown } from './DropdownContext'
 
 const StyledWrapper = styled.nav`
   position: relative;
-  height: 40px;
   display: flex;
 `
 
@@ -29,7 +28,7 @@ const StyledTrigger = styled.button.withConfig({
   margin: 0;
   padding: 0;
   border: 0;
-  height: fit-content !important;
+  background: transparent;
 `
 
 type StyledContentProp = {
@@ -65,6 +64,7 @@ const Label = styled.li`
   ${({ theme }) => theme.fonts.reg14};
   padding: 6px 12px;
   white-space: normal;
+  max-width: 250px;
 `
 
 const Separator = styled.div<{ weight: number }>`
