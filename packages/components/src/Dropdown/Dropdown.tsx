@@ -18,10 +18,6 @@ const StyledWrapper = styled.nav`
   position: relative;
   height: 40px;
   display: flex;
-
-  button {
-    height: auto;
-  }
 `
 
 const StyledTrigger = styled.button.withConfig({
@@ -56,9 +52,9 @@ const StyledContent = styled.ul.withConfig({
   width: auto;
   white-space: nowrap;
   padding: 8px 0;
-  position: fixed;
   position-anchor: --Dropdown-Anchor;
   inset-area: ${({ position }) => position};
+  position-area: ${({ position }) => position};
   margin: 0;
   margin: ${({ offsetX, offsetY }) => `${offsetY}px ${offsetX}px`};
   list-style: none;
@@ -115,20 +111,8 @@ const DropdownWrapper: React.FC<{ children: ReactNode; id?: string }> = ({
   children,
   id
 }) => {
-  const { closeDropdown } = useDropdown()
   const rootRef = useRef<HTMLUListElement | null>(null)
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
-        closeDropdown()
-      }
-    }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [closeDropdown])
   return (
     <StyledWrapper id={id + '-dropdownMenu'} ref={rootRef}>
       {children}
@@ -168,12 +152,31 @@ const Content: React.FC<{
   offsetY = 10,
   children
 }) => {
+  const { setFocusedIndex } = useDropdown()
+
+  useEffect(() => {
+    const popover = document.getElementById('Dropdown-Content')
+    const onTogglePopover = (event: Event & { newState: string }) => {
+      if (event.newState === 'open') {
+        setFocusedIndex(0)
+      } else {
+        setFocusedIndex(-1)
+      }
+    }
+
+    popover?.addEventListener('toggle', onTogglePopover)
+
+    return () => {
+      popover?.removeEventListener('toggle', onTogglePopover)
+    }
+  }, [setFocusedIndex])
+
   return (
     <StyledContent
       position={position}
       offsetX={offsetX}
       offsetY={offsetY}
-      popover="true"
+      popover="auto"
       id="Dropdown-Content"
     >
       {children}
@@ -196,13 +199,12 @@ const Item = ({
   children: ReactNode
   disabled?: boolean
 }) => {
-  const { addItemRef, handleKeyDown, toggleDropdown, closeDropdown } =
-    useDropdown()
+  const { addItemRef, handleKeyDown, closeDropdown } = useDropdown()
 
   const keyDownhandler = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       onClickHandler()
-      toggleDropdown()
+      closeDropdown()
     } else if (e.key === 'Escape') {
       closeDropdown()
     } else handleKeyDown(e)

@@ -9,20 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import React, { createContext, useContext, useRef, useState } from 'react'
 
 interface DropdownContextType {
-  isOpen: boolean
-  toggleDropdown: () => void
-  closeDropdown: () => void
   addItemRef: (item: HTMLLIElement | null) => void
   handleKeyDown: (e: React.KeyboardEvent) => void
+  setFocusedIndex: (e: number) => void
+  closeDropdown: () => void
 }
 
 const DropdownContext = createContext<DropdownContextType | undefined>(
@@ -40,8 +33,6 @@ export const useDropdown = () => {
 export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
-
   const [focusedIndex, setFocusedIndex] = useState<number>(-1)
   const itemRefs = useRef<(HTMLLIElement | null)[]>([])
 
@@ -52,16 +43,6 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  const closeDropdown = () => isOpen && toggleDropdown()
-
-  const toggleDropdown = () => {
-    itemRefs.current = []
-    if (!isOpen) {
-      setFocusedIndex(-1)
-    }
-    setIsOpen((prev) => !prev)
-  }
-
   const getNextIndex = (last: number) => {
     return Math.min(last + 1, itemRefs.current.length - 1)
   }
@@ -70,29 +51,36 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
     return Math.max(last - 1, 0)
   }
 
+  const closeDropdown = () =>
+    document.getElementById('Dropdown-Content')?.togglePopover()
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     e.preventDefault()
     if (e.key === 'ArrowDown') {
       setFocusedIndex(getNextIndex)
     } else if (e.key === 'ArrowUp') {
       setFocusedIndex(getPreviousIndex)
+    } else if (e.key === 'Tab') {
+      if (e.shiftKey) setFocusedIndex(getPreviousIndex)
+      else setFocusedIndex(getNextIndex)
     }
   }
 
-  useEffect(() => {
-    if (focusedIndex !== null && itemRefs.current[focusedIndex]) {
-      itemRefs.current[focusedIndex]?.focus()
-    }
-  }, [focusedIndex])
+  if (
+    focusedIndex !== null &&
+    itemRefs.current[focusedIndex] &&
+    document.activeElement !== itemRefs.current[focusedIndex]
+  ) {
+    itemRefs.current[focusedIndex]?.focus()
+  }
 
   return (
     <DropdownContext.Provider
       value={{
-        isOpen,
-        toggleDropdown,
-        closeDropdown,
         addItemRef,
-        handleKeyDown
+        handleKeyDown,
+        setFocusedIndex,
+        closeDropdown
       }}
     >
       {children}
