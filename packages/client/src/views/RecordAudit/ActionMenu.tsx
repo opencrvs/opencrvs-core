@@ -219,7 +219,7 @@ const ViewAction: React.FC<{
   return (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(goToViewRecordPage(declarationId as string))
+        dispatch(goToViewRecordPage(declarationId))
       }}
     >
       <Icon name="Eye" color="currentColor" size="large" />
