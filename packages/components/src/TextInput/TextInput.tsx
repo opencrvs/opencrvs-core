@@ -29,9 +29,11 @@ export interface ICustomProps {
 export type ITextInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
-const StyledInputContainer = styled.div<
-  ICustomProps & { disabled?: boolean; error?: boolean }
->`
+const StyledInputContainer = styled.div<{
+  touched?: boolean
+  disabled?: boolean
+  error?: boolean
+}>`
   position: relative;
   display: flex;
   align-items: center;
@@ -152,7 +154,11 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     }, [focusInput])
 
     return (
-      <StyledInputContainer {...otherProps} disabled={isDisabled} error={error}>
+      <StyledInputContainer
+        touched={otherProps.touched}
+        disabled={isDisabled}
+        error={error}
+      >
         {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
           ref={$element}
