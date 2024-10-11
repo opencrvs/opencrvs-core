@@ -21,6 +21,7 @@ export interface ICustomProps {
   isDisabled?: boolean
   hasPrefix?: boolean
   hasPostfix?: boolean
+  prefixWidth?: number
   prefix?: React.ReactNode | string
   postfix?: React.ReactNode | string
   unit?: React.ReactNode | string
@@ -54,7 +55,10 @@ const StyledPostfix = styled.span`
 
 const StyledInput = styled.input<ICustomProps>`
   width: 100%;
-  padding-left: ${({ hasPrefix }) => (hasPrefix ? '48px' : '16px')};
+  padding-left: ${({ hasPrefix, prefixWidth }) =>
+    hasPrefix && prefixWidth
+      ? Math.max(48, 16 + prefixWidth + 8) + 'px'
+      : '16px'};
   padding-right: ${({ hasPostfix }) => (hasPostfix ? '4px' : '16px')};
   height: 46px;
   border-radius: 4px;
@@ -128,6 +132,8 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     ref
   ) => {
     const $element = React.useRef<HTMLInputElement>(null)
+    const prefixId = 'prefix_' + otherProps.id
+    const prefixWidth = document.getElementById(prefixId)?.clientWidth
 
     function focusField(): void {
       /*
@@ -154,7 +160,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
 
     return (
       <StyledInputContainer>
-        {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
+        {prefix && <StyledPrefix id={prefixId}>{prefix}</StyledPrefix>}
         <StyledInput
           ref={$element}
           name={otherProps.id}
@@ -166,6 +172,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
           disabled={isDisabled}
           error={error}
           hasPrefix={!!prefix}
+          prefixWidth={prefixWidth}
           hasPostfix={!!postfix}
         />
         {postfix && <StyledPostfix>{postfix}</StyledPostfix>}
