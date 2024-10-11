@@ -203,7 +203,7 @@ export const ActionMenu: React.FC<{
 interface IActionItemCommonProps {
   isDownloaded: boolean
   scope: Scope
-  declarationStatus?: string
+  declarationStatus?: SUBMISSION_STATUS
 }
 
 interface IDeclarationProps {
@@ -212,7 +212,7 @@ interface IDeclarationProps {
 }
 
 const ViewAction: React.FC<{
-  declarationStatus?: string
+  declarationStatus?: SUBMISSION_STATUS
   declarationId: string
 }> = ({ declarationStatus, declarationId }) => {
   const intl = useIntl()
@@ -502,7 +502,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
 const DeleteAction: React.FC<{
   handleDelete: () => void
-  declarationStatus?: string
+  declarationStatus?: SUBMISSION_STATUS
 }> = ({ handleDelete, declarationStatus }) => {
   const intl = useIntl()
   return (

@@ -12,7 +12,7 @@ import { IFormField, IRadioGroupFormField, ISelectOption } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
   generateLocationName,
   generateFullLocation
@@ -54,7 +54,7 @@ import { getDeclarationFullName } from '@client/utils/draftUtils'
 export interface IDeclarationData {
   id: string
   name?: string
-  status?: string
+  status?: SUBMISSION_STATUS
   trackingId?: string
   type?: string
   dateOfBirth?: string
@@ -406,7 +406,8 @@ export const getWQDeclarationData = (
     name,
     type:
       (workqueueDeclaration?.type && workqueueDeclaration.type) || EMPTY_STRING,
-    status: workqueueDeclaration?.registration?.status || EMPTY_STRING,
+    status: (workqueueDeclaration?.registration?.status ||
+      EMPTY_STRING) as SUBMISSION_STATUS,
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: EMPTY_STRING,
@@ -443,7 +444,7 @@ export const getGQLDeclaration = (
     id: data?.id,
     name,
     type: data?.registration?.type,
-    status: data?.registration?.status[0].type,
+    status: data?.registration?.status[0].type as SUBMISSION_STATUS,
     trackingId: data?.registration?.trackingId,
     assignment: data?.registration?.assignment,
     dateOfBirth: EMPTY_STRING,

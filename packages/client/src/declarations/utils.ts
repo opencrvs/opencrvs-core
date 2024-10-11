@@ -12,13 +12,13 @@
 import { EVENT_STATUS } from '@client/workqueue'
 import { SUBMISSION_STATUS } from '.'
 
-export const isPendingCorrection = (status?: string) =>
+export const isPendingCorrection = (status?: SUBMISSION_STATUS) =>
   status === EVENT_STATUS.CORRECTION_REQUESTED
 
-export const isReviewableDeclaration = (status?: string) =>
+export const isReviewableDeclaration = (status?: SUBMISSION_STATUS) =>
   status && [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED].includes(status)
 
-export const isUpdatableDeclaration = (status?: string) =>
+export const isUpdatableDeclaration = (status?: SUBMISSION_STATUS) =>
   status &&
   [
     SUBMISSION_STATUS.DRAFT,
@@ -26,40 +26,40 @@ export const isUpdatableDeclaration = (status?: string) =>
     EVENT_STATUS.REJECTED
   ].includes(status)
 
-export const isPrintable = (status?: string) =>
+export const isPrintable = (status?: SUBMISSION_STATUS) =>
   status &&
-  [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.ISSUED].includes(
-    status as SUBMISSION_STATUS
-  )
+  [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.ISSUED].includes(status)
 
-export const isCertified = (status?: string) =>
+export const isCertified = (status?: SUBMISSION_STATUS) =>
   status === SUBMISSION_STATUS.CERTIFIED
 
-export const isRecordOrDeclaration = (status?: string) =>
-  [
-    SUBMISSION_STATUS.REGISTERED,
-    SUBMISSION_STATUS.CORRECTION_REQUESTED,
-    SUBMISSION_STATUS.CERTIFIED
-  ].includes(status as any as SUBMISSION_STATUS)
-    ? 'record'
-    : 'declaration'
+export const isRecordOrDeclaration = (status?: SUBMISSION_STATUS) =>
+  status
+    ? [
+        SUBMISSION_STATUS.REGISTERED,
+        SUBMISSION_STATUS.CORRECTION_REQUESTED,
+        SUBMISSION_STATUS.CERTIFIED
+      ].includes(status)
+      ? 'record'
+      : 'declaration'
+    : ''
 
-export const canBeCorrected = (status?: string) =>
+export const canBeCorrected = (status?: SUBMISSION_STATUS) =>
   status &&
   [
     SUBMISSION_STATUS.REGISTERED,
     SUBMISSION_STATUS.CERTIFIED,
     SUBMISSION_STATUS.ISSUED
-  ].includes(status as SUBMISSION_STATUS)
+  ].includes(status)
 
-export const isArchivable = (status?: string) =>
+export const isArchivable = (status?: SUBMISSION_STATUS) =>
   status &&
   [
     SUBMISSION_STATUS.IN_PROGRESS,
     SUBMISSION_STATUS.DECLARED,
     SUBMISSION_STATUS.VALIDATED,
     SUBMISSION_STATUS.REJECTED
-  ].includes(status as SUBMISSION_STATUS)
+  ].includes(status)
 
-export const isArchived = (status?: string) =>
+export const isArchived = (status?: SUBMISSION_STATUS) =>
   status === SUBMISSION_STATUS.ARCHIVED

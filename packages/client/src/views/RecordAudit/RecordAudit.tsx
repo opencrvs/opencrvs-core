@@ -550,7 +550,8 @@ const BodyContent = ({
               )
               declaration = {
                 ...declaration,
-                status: data.fetchRegistration?.registration?.status[0].type,
+                status: data.fetchRegistration?.registration?.status[0]
+                  .type as SUBMISSION_STATUS,
                 assignment: data.fetchRegistration?.registration?.assignment
               }
             } else {
@@ -594,7 +595,8 @@ const BodyContent = ({
             language,
             trackingId
           )
-    const wqStatus = workqueueDeclaration?.registration?.status
+    const wqStatus = workqueueDeclaration?.registration
+      ?.status as SUBMISSION_STATUS
     const draftStatus =
       draft?.submissionStatus?.toString() ||
       draft?.registrationStatus?.toString() ||
