@@ -24,11 +24,29 @@ const StyledWrapper = styled.nav`
   }
 `
 
-const StyledContent = styled.ul<{
+const StyledTrigger = styled.button.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
+  // Forward popovertarget prop directly
+})<{ popovertarget: string }>`
+  anchor-name: --Dropdown-Anchor;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  height: fit-content !important;
+`
+
+type StyledContentProp = {
   position: string
   offsetX: number
   offsetY: number
-}>`
+  popover: string
+}
+const StyledContent = styled.ul.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    ['popover'].includes(prop) || defaultValidatorFn(prop)
+  // Forward popover prop directly
+})<StyledContentProp>`
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
@@ -37,36 +55,13 @@ const StyledContent = styled.ul<{
   min-width: 200px;
   width: auto;
   white-space: nowrap;
-  position: absolute;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
   padding: 8px 0;
+  position: fixed;
+  position-anchor: --Dropdown-Anchor;
+  inset-area: ${({ position }) => position};
+  margin: 0;
   margin: ${({ offsetX, offsetY }) => `${offsetY}px ${offsetX}px`};
   list-style: none;
-
-  ${({ position }) => {
-    switch (position) {
-      case 'top':
-        return 'bottom: 100%; left: 50%; transform: translateX(-50%);'
-      case 'top-right':
-        return 'bottom: 100%; left: 0;'
-      case 'top-left':
-        return 'bottom: 100%; right: 0;'
-      case 'bottom':
-        return 'top: 100%; left: 50%; transform: translateX(-50%);'
-      case 'bottom-right':
-        return 'top: 100%; left: 0;'
-      case 'bottom-left':
-        return 'top: 100%; right: 0;'
-      case 'right':
-        return 'top: 50%; left: 100%; transform: translateY(-50%);'
-      case 'left':
-        return 'top: 50%; right: 100%; transform: translateY(-50%);'
-      default:
-        return ''
-    }
-  }}
 `
 
 const Label = styled.li`
@@ -156,8 +151,9 @@ export const DropdownMenu = ({
 }
 
 const Trigger: React.FC<{ children: JSX.Element }> = ({ children }) => {
-  const { toggleDropdown } = useDropdown()
-  return React.cloneElement(children, { onClick: toggleDropdown })
+  return (
+    <StyledTrigger popovertarget="Dropdown-Content">{children}</StyledTrigger>
+  )
 }
 DropdownMenu.Trigger = Trigger
 
@@ -166,14 +162,23 @@ const Content: React.FC<{
   offsetX?: number
   offsetY?: number
   children: ReactNode
-}> = ({ position = 'bottom-left', offsetX = 0, offsetY = 10, children }) => {
-  const { isOpen } = useDropdown()
-
-  return isOpen ? (
-    <StyledContent position={position} offsetX={offsetX} offsetY={offsetY}>
+}> = ({
+  position = 'bottom span-left',
+  offsetX = 0,
+  offsetY = 10,
+  children
+}) => {
+  return (
+    <StyledContent
+      position={position}
+      offsetX={offsetX}
+      offsetY={offsetY}
+      popover="true"
+      id="Dropdown-Content"
+    >
       {children}
     </StyledContent>
-  ) : null
+  )
 }
 
 DropdownMenu.Content = Content

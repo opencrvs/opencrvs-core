@@ -63,7 +63,7 @@ const Template = (args: {
 )
 export const DropdownView = Template.bind({})
 DropdownView.args = {
-  position: 'bottom-left',
+  position: 'bottom span-left',
   offsetX: 0,
   offsetY: 10
 }
