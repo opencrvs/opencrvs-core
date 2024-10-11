@@ -251,26 +251,26 @@ const CorrectRecordAction: React.FC<
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
+  if (!isBirthOrDeathEvent || !canBeCorrected || !userHasRegisterScope) {
+    return null
+  }
+
   return (
-    isBirthOrDeathEvent &&
-    canBeCorrected &&
-    userHasRegisterScope && (
-      <DropdownMenu.Item
-        onClick={() => {
-          dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-          dispatch(
-            goToCertificateCorrection(
-              declarationId as string,
-              CorrectionSection.Corrector
-            )
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+        dispatch(
+          goToCertificateCorrection(
+            declarationId as string,
+            CorrectionSection.Corrector
           )
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="NotePencil" color="currentColor" size="large" />
-        {intl.formatMessage(messages.correctRecord)}
-      </DropdownMenu.Item>
-    )
+        )
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="NotePencil" color="currentColor" size="large" />
+      {intl.formatMessage(messages.correctRecord)}
+    </DropdownMenu.Item>
   )
 }
 
@@ -296,14 +296,13 @@ const ArchiveAction: React.FC<
       ((scope as any as string[]).includes('validate') &&
         declarationStatus !== SUBMISSION_STATUS.VALIDATED))
 
+  if (!isArchivable || !userHasArchiveScope) return null
+
   return (
-    isArchivable &&
-    userHasArchiveScope && (
-      <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
-        <Icon name="Archive" color="currentColor" size="large" />
-        {intl.formatMessage(messages.archiveRecord)}
-      </DropdownMenu.Item>
-    )
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+      <Icon name="Archive" color="currentColor" size="large" />
+      {intl.formatMessage(messages.archiveRecord)}
+    </DropdownMenu.Item>
   )
 }
 
@@ -320,14 +319,14 @@ const ReinstateAction: React.FC<
     scope &&
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
+
+  if (!isArchived || !userHasReinstateScope) return null
+
   return (
-    isArchived &&
-    userHasReinstateScope && (
-      <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
-        <Icon name="FileArrowUp" color="currentColor" size="large" />
-        {intl.formatMessage(messages.reinstateRecord)}
-      </DropdownMenu.Item>
-    )
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+      <Icon name="FileArrowUp" color="currentColor" size="large" />
+      {intl.formatMessage(messages.reinstateRecord)}
+    </DropdownMenu.Item>
   )
 }
 
@@ -357,7 +356,9 @@ const ReviewAction: React.FC<
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
-  return isPendingCorrection && userHasReviewScope ? (
+  if (!userHasReviewScope) return null
+
+  return isPendingCorrection ? (
     <DropdownMenu.Item
       onClick={() => {
         dispatch(
@@ -375,7 +376,7 @@ const ReviewAction: React.FC<
       {intl.formatMessage(messages.reviewCorrection)}
     </DropdownMenu.Item>
   ) : (
-    isReviewableDeclaration && userHasReviewScope && (
+    isReviewableDeclaration && (
       <DropdownMenu.Item
         onClick={() => {
           dispatch(
@@ -437,26 +438,21 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
     PAGE_ID = 'review'
   }
+
+  if (!isUpdatableDeclaration || !userHasUpdateScope) return null
+
   return (
-    isUpdatableDeclaration &&
-    userHasUpdateScope && (
-      <DropdownMenu.Item
-        onClick={() => {
-          dispatch(
-            goToPage(
-              PAGE_ROUTE,
-              declarationId as string,
-              PAGE_ID,
-              type as string
-            )
-          )
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="PencilCircle" color="currentColor" size="large" />
-        {intl.formatMessage(messages.updateDeclaration)}
-      </DropdownMenu.Item>
-    )
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(
+          goToPage(PAGE_ROUTE, declarationId as string, PAGE_ID, type as string)
+        )
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="PencilCircle" color="currentColor" size="large" />
+      {intl.formatMessage(messages.updateDeclaration)}
+    </DropdownMenu.Item>
   )
 }
 
@@ -482,25 +478,24 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
+  if (!isPrintable || !userHasPrintScope) return null
+
   return (
-    isPrintable &&
-    userHasPrintScope && (
-      <DropdownMenu.Item
-        onClick={() => {
-          dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-          dispatch(
-            goToPrintCertificate(
-              declarationId as string,
-              (type as string).toLocaleLowerCase()
-            )
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+        dispatch(
+          goToPrintCertificate(
+            declarationId as string,
+            (type as string).toLocaleLowerCase()
           )
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="Printer" color="currentColor" size="large" />
-        {intl.formatMessage(messages.printDeclaration)}
-      </DropdownMenu.Item>
-    )
+        )
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="Printer" color="currentColor" size="large" />
+      {intl.formatMessage(messages.printDeclaration)}
+    </DropdownMenu.Item>
   )
 }
 
@@ -521,20 +516,19 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     ((scope as any as string[]).includes('register') ||
       (scope as any as string[]).includes('validate'))
 
+  if (!isCertified || !userHasIssueScope) return null
+
   return (
-    isCertified &&
-    userHasIssueScope && (
-      <DropdownMenu.Item
-        onClick={() => {
-          dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-          dispatch(goToIssueCertificate(declarationId as string))
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="Handshake" color="currentColor" size="large" />
-        {intl.formatMessage(messages.issueCertificate)}
-      </DropdownMenu.Item>
-    )
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(clearCorrectionAndPrintChanges(declarationId as string))
+        dispatch(goToIssueCertificate(declarationId as string))
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="Handshake" color="currentColor" size="large" />
+      {intl.formatMessage(messages.issueCertificate)}
+    </DropdownMenu.Item>
   )
 }
 
@@ -565,13 +559,14 @@ const UnassignAction: React.FC<{
   const userHasUnassignScope =
     scope && (scope as any as string[]).includes('register')
 
+  if (!isDownloaded && (!isAssignedToSomeoneElse || !userHasUnassignScope))
+    return null
+
   return (
-    ((isAssignedToSomeoneElse && userHasUnassignScope) || isDownloaded) && (
-      <DropdownMenu.Item onClick={handleUnassign}>
-        <Icon name="ArrowCircleDown" color="currentColor" size="large" />
-        {intl.formatMessage(buttonMessages.unassign)}
-      </DropdownMenu.Item>
-    )
+    <DropdownMenu.Item onClick={handleUnassign}>
+      <Icon name="ArrowCircleDown" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.unassign)}
+    </DropdownMenu.Item>
   )
 }
 
