@@ -15,8 +15,6 @@ import { Select } from '../Select'
 import { TextInput } from '../TextInput/TextInput'
 import { InputField, IInputFieldProps } from './InputField'
 import { DateField } from '../DateField'
-import { VerifyingIndicator } from './VerifyingIndicator'
-import { ValidIndicator } from './ValidIndicator'
 
 export default {
   title: 'Input/Input field',
@@ -112,7 +110,6 @@ export const InputFieldWithVerifyIndicator = Template.bind({})
 InputFieldWithVerifyIndicator.args = {
   id: 'Verify-indicator',
   label: 'Is Valid?',
-  postfix: <VerifyingIndicator />,
   children: <TextInput />
 }
 
@@ -120,7 +117,6 @@ export const InputFieldWithValidityIndicator = Template.bind({})
 InputFieldWithValidityIndicator.args = {
   id: 'Validity-indicator',
   label: 'Is Valid?',
-  postfix: <ValidIndicator />,
   children: <TextInput />
 }
 

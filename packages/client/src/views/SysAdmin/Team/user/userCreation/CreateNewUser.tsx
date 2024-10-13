@@ -38,6 +38,8 @@ import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IMatchParams {
   userId?: string
@@ -198,6 +200,8 @@ function getNextSectionIds(
 }
 
 const mapStateToProps = (state: IStoreState, props: Props) => {
+  const config = getOfflineData(state)
+  const user = getUserDetails(state)
   const sectionId =
     props.match.params.sectionId || state.userForm.userForm!.sections[0].id
 
@@ -236,7 +240,13 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
     (group) => group.id === groupId
   ) as IFormSectionGroup
 
-  const fields = replaceInitialValues(group.fields, formData)
+  const fields = replaceInitialValues(
+    group.fields,
+    formData,
+    { userForm: formData },
+    config,
+    user
+  )
   const nextGroupId = getNextSectionIds(
     state.userForm.userForm!.sections,
     section,

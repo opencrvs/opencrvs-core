@@ -24,6 +24,9 @@ import {
   getConditionalActionsForField,
   getSelectedRadioOptionWithNestedFields,
   getVisibleSectionGroupsBasedOnConditions,
+  isFieldButton,
+  isFieldHttp,
+  isFieldRedirect,
   isRadioGroupWithNestedField,
   serializeFieldValue
 } from '@client/forms/utils'
@@ -162,10 +165,14 @@ const toCorrectionValue = (
   return changedValues
 }
 
+function isMetaTypeField(field: IFormField): boolean {
+  return isFieldHttp(field) || isFieldRedirect(field)
+}
 export function getChangedValues(
   formDefinition: IForm,
   declaration: IDeclaration,
-  offlineCountryConfig: IOfflineData
+  offlineCountryConfig: IOfflineData,
+  userDetails: UserDetails | null
 ) {
   const draftData = declaration.data
   const originalDraftData = declaration.originalData || {}
@@ -190,14 +197,15 @@ export function getChangedValues(
           fieldDef,
           draftData[section.id],
           offlineCountryConfig,
-          draftData
+          draftData,
+          userDetails
         )
 
         originalDraftData[section.id] ??= {}
 
         if (
           !conditionalActions.includes('hide') &&
-          !conditionalActions.includes('disable') &&
+          !isMetaTypeField(fieldDef) &&
           hasFieldChanged(
             fieldDef,
             draftData[section.id],
@@ -251,10 +259,13 @@ export const draftToGqlTransformer = (
           fieldDef,
           draftData[section.id],
           offlineCountryConfig,
-          draftData
+          draftData,
+          userDetails
         )
         if (
           fieldDef.required &&
+          // do not count value even if it is required when the field is a button
+          !isFieldButton(fieldDef) &&
           !conditionalActions.includes('hide') &&
           !conditionalActions.includes('disable') &&
           (draftData[section.id][fieldDef.name] === undefined ||

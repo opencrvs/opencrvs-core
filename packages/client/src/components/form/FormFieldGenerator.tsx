@@ -31,9 +31,9 @@ import {
   getVisibleOptions,
   getListOfLocations,
   getFieldHelperText,
-  isInitialValueDependencyInfo,
   getDependentFields,
-  evalExpressionInFieldDefinition
+  evalExpressionInFieldDefinition,
+  handleInitialValue
 } from '@client/forms/utils'
 import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -738,14 +738,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-function handleInitialValue(initialValue: InitialValue): IFormFieldValue {
-  return isInitialValueDependencyInfo(initialValue) ? '' : initialValue
-}
-
-const mapFieldsToValues = (fields: IFormField[]) =>
+export const mapFieldsToValues = (
+  fields: IFormField[],
+  ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
+) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = handleInitialValue(
-      field.initialValue as InitialValue
+      field.initialValue as InitialValue,
+      ...evalParams
     )
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
@@ -755,14 +755,18 @@ const mapFieldsToValues = (fields: IFormField[]) =>
         (nestedValues, nestedField) => ({
           ...nestedValues,
           [nestedField.name]: handleInitialValue(
-            nestedField.initialValue as InitialValue
+            nestedField.initialValue as InitialValue,
+            ...evalParams
           )
         }),
         {}
       )
 
       fieldInitialValue = {
-        value: handleInitialValue(field.initialValue as InitialValue),
+        value: handleInitialValue(
+          field.initialValue as InitialValue,
+          ...evalParams
+        ),
         nestedFields: nestedInitialValues
       }
     }
@@ -1318,7 +1322,16 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
 
   return (
     <Formik<IFormSectionData>
-      initialValues={props.initialValues ?? mapFieldsToValues(props.fields)}
+      initialValues={
+        props.initialValues ??
+        mapFieldsToValues(
+          props.fields,
+          {},
+          offlineCountryConfig,
+          props.draftData,
+          userDetails
+        )
+      }
       onSubmit={() => {}}
       validate={(values) =>
         getValidationErrorsForForm(
@@ -1326,6 +1339,7 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
           values,
           offlineCountryConfig,
           props.draftData,
+          userDetails,
           props.requiredErrorMessage
         )
       }
