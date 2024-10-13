@@ -52,7 +52,7 @@ async function migrateRegistrations(measurement: string, db: Db) {
 
     await writePoints(updatedPoints)
 
-    const startTime = registrations[0].time?.getNanoTime()
+    const startTime = registrations[0]?.time?.getNanoTime()
     const endTime = registrations[registrations.length - 1].time?.getNanoTime()
 
     const deleteQuery = `DELETE FROM ${measurement} WHERE registrarPractitionerId = '' AND time >= ${startTime} AND time <= ${endTime}`
@@ -110,7 +110,7 @@ const getUpdatedPoints = async (
           )
         }
 
-        let id: string = ''
+        let id = ''
         if (
           practitionerExtension &&
           practitionerExtension.valueReference &&
