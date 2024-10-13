@@ -833,7 +833,8 @@ const FormSectionComponent = (props: Props) => {
     onUploadingStateChanged,
     intl,
     touched,
-    setFieldValue
+    setFieldValue,
+    initialValues
   } = props
 
   const showValidationErrors = useCallback(
@@ -899,8 +900,8 @@ const FormSectionComponent = (props: Props) => {
   ])
 
   useEffect(() => {
-    const userChangedForm = !isEqual(values, props.values)
-    const sectionChanged = props.id !== id
+    const userChangedForm = !isEqual(values, initialValues)
+    const sectionChanged = id !== initialValues?.id
 
     if (userChangedForm) {
       onChange(values)
@@ -919,9 +920,8 @@ const FormSectionComponent = (props: Props) => {
     }
   }, [
     values,
-    props.values,
+    initialValues,
     id,
-    props.id,
     onChange,
     resetForm,
     fields,
