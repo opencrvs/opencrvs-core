@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Mock } from 'vitest'
+import { vi, Mock } from 'vitest'
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { storeDeclaration, IDeclaration } from '@client/declarations'
+import { storeDeclaration } from '@client/declarations'
 import {
   createTestComponent,
   mockDeclarationData,
@@ -30,6 +30,22 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
 import { useParams } from 'react-router'
 
+const mockSvgTemplate = '<svg><text>Sample Certificate</text></svg>'
+const birthDeclaration = {
+  id: 'mockBirth1234',
+  data: {
+    ...mockDeclarationData,
+    history: [
+      {
+        date: '2022-03-21T08:16:24.467+00:00',
+        regStatus: 'REGISTERED',
+        reinstated: false
+      }
+    ] as unknown as IFormSectionData
+  },
+  event: Event.Birth
+}
+
 const deathDeclaration = {
   id: 'mockDeath1234',
   data: {
@@ -40,62 +56,172 @@ const deathDeclaration = {
         regStatus: 'REGISTERED',
         reinstated: false
       }
-    ]
+    ] as unknown as IFormSectionData
   },
   event: Event.Death
 }
 
-describe('when user wants to review death certificate', () => {
-  it('displays the "Confirm & Print" button', async () => {
-    const { history, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'mockDeath1234',
-          eventType: Event.Death
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-
-    const { store } = createStore()
-
-    loginAsFieldAgent(store)
-
-    const component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
-
-    // @ts-ignore
-    store.dispatch(storeDeclaration(deathDeclaration))
-    component.update()
-
-    const confirmBtn = component.find('#confirm-print')
-    const confirmBtnExist = !!confirmBtn.hostNodes().length
-    expect(confirmBtnExist).toBe(true)
-  })
-})
-
-describe('back button behavior tests of review certificate action', () => {
-  let component: ReactWrapper
-
-  const mockBirthDeclarationData = {
-    ...cloneDeep(mockDeclarationData),
+const marriageDeclaration = {
+  id: 'mockMarriage1234',
+  data: {
+    ...mockMarriageDeclarationData,
     history: [
       {
         date: '2022-03-21T08:16:24.467+00:00',
         regStatus: 'REGISTERED',
         reinstated: false
       }
-    ]
-  }
-  mockBirthDeclarationData.registration.certificates[0] = {
-    collector: {
-      type: 'PRINT_IN_ADVANCE'
+    ] as unknown as IFormSectionData
+  },
+  event: Event.Marriage
+}
+
+async function setupTest({
+  declaration,
+  certTemplateId,
+  registrationId
+}: {
+  declaration: any
+  certTemplateId: string
+  registrationId: string
+}) {
+  global.fetch = vi.fn().mockImplementation(() =>
+    Promise.resolve({
+      text: vi.fn().mockResolvedValue(mockSvgTemplate)
+    })
+  )
+
+  const { history, match } = createRouterProps(
+    '/',
+    { isNavigatedInsideApp: false },
+    {
+      matchParams: {
+        registrationId,
+        certTemplateId
+      }
     }
-  }
+  )
+
+  ;(useParams as Mock).mockImplementation(() => match.params)
+
+  const { store } = createStore(history)
+  loginAsFieldAgent(store)
+  const clonedDeclaration = cloneDeep(declaration)
+
+  await flushPromises()
+  store.dispatch(storeDeclaration(clonedDeclaration))
+
+  const component = await createTestComponent(<ReviewCertificate />, {
+    store,
+    history
+  })
+
+  await flushPromises()
+  component.update()
+
+  return component
+}
+
+describe('Review Certificate Tests', () => {
+  let component: ReactWrapper<{}, {}>
+
+  describe('when user wants to review death certificate', () => {
+    beforeEach(async () => {
+      component = await setupTest({
+        declaration: deathDeclaration,
+        certTemplateId: 'death-certificate',
+        registrationId: 'mockDeath1234'
+      })
+    })
+
+    it('displays the "Confirm & Print" button', async () => {
+      const confirmBtnExist = !!(
+        await waitForElement(component, '#confirm-print')
+      ).hostNodes().length
+      expect(confirmBtnExist).toBe(true)
+    })
+  })
+
+  describe('when user wants to review birth certificate', () => {
+    beforeEach(async () => {
+      component = await setupTest({
+        declaration: birthDeclaration,
+        certTemplateId: 'birth-certificate',
+        registrationId: 'mockBirth1234'
+      })
+    })
+
+    it('displays the "Confirm & Print" button', async () => {
+      const confirmBtnExist = !!(
+        await waitForElement(component, '#confirm-print')
+      ).hostNodes().length
+      expect(confirmBtnExist).toBe(true)
+    })
+
+    it('shows the Confirm Print Modal', async () => {
+      const confirmBtn = await waitForElement(component, '#confirm-print')
+      confirmBtn.hostNodes().simulate('click')
+      component.update()
+      const modal = await waitForElement(component, '#confirm-print-modal')
+      const modalIsDisplayed = !!modal.hostNodes().length
+      expect(modalIsDisplayed).toBe(true)
+    })
+
+    it('closes the modal on clicking the print the button', async () => {
+      const confirmBtn = await waitForElement(component, '#confirm-print')
+      confirmBtn.hostNodes().simulate('click')
+      component.update()
+      component.find('#print-certificate').hostNodes().simulate('click')
+      component.update()
+
+      const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
+        .length
+      expect(modalIsClosed).toBe(false)
+    })
+  })
+
+  describe('when user wants to review marriage certificate', () => {
+    beforeEach(async () => {
+      component = await setupTest({
+        declaration: marriageDeclaration,
+        certTemplateId: 'marriage-certificate',
+        registrationId: 'mockMarriage1234'
+      })
+    })
+
+    it('displays the "Confirm & Print" button', async () => {
+      const confirmBtnExist = !!(
+        await waitForElement(component, '#confirm-print')
+      ).hostNodes().length
+      expect(confirmBtnExist).toBe(true)
+    })
+
+    it('shows the Confirm Print Modal', async () => {
+      const confirmBtn = await waitForElement(component, '#confirm-print')
+      confirmBtn.hostNodes().simulate('click')
+      component.update()
+      const modalIsDisplayed = !!(
+        await waitForElement(component, '#confirm-print-modal')
+      ).hostNodes().length
+      expect(modalIsDisplayed).toBe(true)
+    })
+
+    it('closes the modal on clicking the print the button', async () => {
+      const confirmBtn = await waitForElement(component, '#confirm-print')
+      confirmBtn.hostNodes().simulate('click')
+      component.update()
+      component.find('#print-certificate').hostNodes().simulate('click')
+      component.update()
+
+      const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
+        .length
+      expect(modalIsClosed).toBe(false)
+    })
+  })
+})
+
+describe('Back button behavior tests of review certificate action', () => {
+  let component: ReactWrapper
 
   it('takes user history back when navigated from inside app', async () => {
     const { history, match } = createRouterProps(
@@ -113,17 +239,10 @@ describe('back button behavior tests of review certificate action', () => {
     const { store } = createStore(history)
 
     store.dispatch(push('/new-route', { isNavigatedInsideApp: true }))
-
     loginAsFieldAgent(store)
-    const birthDeclaration = {
-      id: 'asdhdqe2472487jsdfsdf',
-      data: mockBirthDeclarationData,
-      event: Event.Birth
-    }
-    store.dispatch(
-      // @ts-ignore
-      storeDeclaration(birthDeclaration)
-    )
+
+    store.dispatch(storeDeclaration(birthDeclaration))
+
     component = await createTestComponent(<ReviewCertificate />, {
       store,
       history
@@ -139,7 +258,7 @@ describe('back button behavior tests of review certificate action', () => {
       { isNavigatedInsideApp: false },
       {
         matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
+          registrationId: 'mockBirth1234',
           eventType: Event.Birth
         }
       }
@@ -148,177 +267,16 @@ describe('back button behavior tests of review certificate action', () => {
     const { store } = createStore(history)
 
     loginAsFieldAgent(store)
-    store.dispatch(
-      // @ts-ignore
-      storeDeclaration({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthDeclarationData,
-        event: Event.Birth
-      } as IDeclaration)
-    )
+
+    store.dispatch(storeDeclaration(birthDeclaration))
+
     component = await createTestComponent(<ReviewCertificate />, {
       store,
       history
     })
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
-    await flushPromises()
+
     expect(history.location.pathname).toContain('/registration-home/print/')
-  })
-})
-
-describe('when user wants to review birth certificate', () => {
-  let component: ReactWrapper<{}, {}>
-
-  beforeEach(async () => {
-    const { history, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.Birth
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-    const { store } = createStore(history)
-
-    const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
-    mockBirthDeclarationData.registration.certificates[0] = {
-      collector: {
-        type: 'PRINT_IN_ADVANCE'
-      }
-    }
-    loginAsFieldAgent(store)
-    await flushPromises()
-    store.dispatch(
-      storeDeclaration({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: {
-          ...mockBirthDeclarationData,
-          history: [
-            {
-              date: '2022-03-21T08:16:24.467+00:00',
-              regStatus: 'REGISTERED',
-              reinstated: false
-            }
-          ] as unknown as IFormSectionData
-        },
-        event: Event.Birth
-      })
-    )
-
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
-    await flushPromises()
-    component.update()
-  })
-
-  it('displays have the Continue and print Button', () => {
-    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
-      .length
-    expect(confirmBtnExist).toBe(true)
-  })
-
-  it('shows the Confirm Print Modal', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
-    confirmBtn.simulate('click')
-    component.update()
-    const modalIsDisplayed = !!component
-      .find('#confirm-print-modal')
-      .hostNodes().length
-    expect(modalIsDisplayed).toBe(true)
-  })
-
-  it('closes the modal on clicking the print the button', async () => {
-    const confirmBtn = await waitForElement(component, '#confirm-print')
-    confirmBtn.hostNodes().simulate('click')
-    component.update()
-    component.find('#print-certificate').hostNodes().simulate('click')
-    component.update()
-
-    const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
-      .length
-
-    expect(modalIsClosed).toBe(false)
-  })
-})
-
-describe('when user wants to review marriage certificate', () => {
-  let component: ReactWrapper<{}, {}>
-
-  beforeEach(async () => {
-    const { history, match } = createRouterProps(
-      '/',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: '1234896128934719',
-          eventType: Event.Birth
-        }
-      }
-    )
-    ;(useParams as Mock).mockImplementation(() => match.params)
-    const { store } = createStore(history)
-
-    const mockMarriageData = cloneDeep(mockMarriageDeclarationData)
-
-    loginAsFieldAgent(store)
-    await flushPromises()
-    store.dispatch(
-      storeDeclaration({
-        id: '1234896128934719',
-        data: {
-          ...mockMarriageData,
-          history: [
-            {
-              date: '2022-03-21T08:16:24.467+00:00',
-              regStatus: 'REGISTERED',
-              reinstated: false
-            }
-          ] as unknown as IFormSectionData
-        },
-        event: Event.Marriage
-      })
-    )
-
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
-    })
-    await flushPromises()
-    component.update()
-  })
-
-  it('displays have the Continue and print Button', () => {
-    const confirmBtnExist = !!component.find('#confirm-print').hostNodes()
-      .length
-    expect(confirmBtnExist).toBe(true)
-  })
-
-  it('shows the Confirm Print Modal', () => {
-    const confirmBtn = component.find('#confirm-print').hostNodes()
-    confirmBtn.simulate('click')
-    component.update()
-    const modalIsDisplayed = !!component
-      .find('#confirm-print-modal')
-      .hostNodes().length
-    expect(modalIsDisplayed).toBe(true)
-  })
-
-  it('closes the modal on clicking the print the button', async () => {
-    const confirmBtn = await waitForElement(component, '#confirm-print')
-    confirmBtn.hostNodes().simulate('click')
-    component.update()
-    component.find('#print-certificate').hostNodes().simulate('click')
-    component.update()
-
-    const modalIsClosed = !!component.find('#confirm-print-modal').hostNodes()
-      .length
-
-    expect(modalIsClosed).toBe(false)
   })
 })

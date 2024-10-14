@@ -32,7 +32,7 @@ export default async function getForm(
   h: Hapi.ResponseToolkit
 ) {
   const token = request.headers.authorization
-  const response = await fetch(`${env.COUNTRY_CONFIG_URL}/forms`, {
+  const response = await fetch(`${env.COUNTRY_CONFIG_URL}forms`, {
     headers: {
       Authorization: token
     }
@@ -40,7 +40,7 @@ export default async function getForm(
 
   if (response.status !== 200) {
     logger.error(
-      `Core failed to fetch form definition from ${env.COUNTRY_CONFIG_URL}/forms. Check country config logs for more details`
+      `Core failed to fetch form definition from ${env.COUNTRY_CONFIG_URL}forms. Check country config logs for more details`
     )
 
     return h.response().code(500)

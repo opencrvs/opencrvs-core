@@ -184,6 +184,7 @@ interface IState {
   showError: boolean
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
+  certTemplateId: string
 }
 
 class CollectorFormComponent extends React.Component<IProps, IState> {
@@ -192,7 +193,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     this.state = {
       showError: false,
       showModalForNoSignedAffidavit: false,
-      isFileUploading: false
+      isFileUploading: false,
+      certTemplateId: ''
     }
   }
 
@@ -257,6 +259,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
+    this.setState({
+      ...this.state,
+      certTemplateId: collector?.certTemplateId as string
+    })
     if (errLength > 0) {
       this.setState({
         showError: true
@@ -302,16 +308,23 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.writeDeclaration(draft)
 
       if (isCertificateForPrintInAdvance(draft)) {
-        this.props.goToReviewCertificate(declarationId, event)
+        this.props.goToReviewCertificate(
+          declarationId,
+          collector?.certTemplateId as string
+        )
       } else {
         this.props.goToVerifyCollector(
           declarationId,
-          event,
+          collector?.certTemplateId as string,
           collector.type as string
         )
       }
     } else {
-      this.props.goToPrintCertificate(declarationId, event, nextGroup)
+      this.props.goToPrintCertificate(
+        declarationId,
+        collector?.certTemplateId as string,
+        nextGroup
+      )
     }
   }
 
@@ -330,9 +343,12 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         offlineCountryConfiguration
       )
     ) {
-      this.props.goToReviewCertificate(declarationId, event)
+      this.props.goToReviewCertificate(declarationId, this.state.certTemplateId)
     } else {
-      this.props.goToPrintCertificatePayment(declarationId, event)
+      this.props.goToPrintCertificatePayment(
+        declarationId,
+        this.state.certTemplateId
+      )
     }
   }
 
@@ -507,7 +523,10 @@ const mapStateToProps = (
 
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const certFormSection = getCertificateCollectorFormSection(declaration)
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration,
+    state.offline.offlineData.templates?.certificates
+  )
 
   const isAllowPrintInAdvance =
     event === Event.Birth

@@ -89,6 +89,7 @@ import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -268,7 +269,7 @@ export type ICertificate = {
   corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
-  data?: string
+  templateConfig?: ICertificateConfigData
 }
 
 /*

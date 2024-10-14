@@ -36,6 +36,7 @@ import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 interface INameField {
   firstNamesField: string
@@ -1012,7 +1013,8 @@ const marriageIssueCollectorFormOptions = [
 ]
 
 function getCertCollectorGroupForEvent(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  certificates?: ICertificateConfigData[]
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1039,7 +1041,14 @@ function getCertCollectorGroupForEvent(
     birthCertCollectorOptions,
     marriageCertCollectorOptions
   )
-
+  const certificateTemplateOptions =
+    certificates
+      ?.filter((x) => x.event === declaration.event)
+      .map((x) => ({ label: x.label, value: x.id })) || []
+  const certTemplateDefaultValue =
+    certificateTemplateOptions.length > 0
+      ? certificateTemplateOptions[0].value
+      : ''
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
@@ -1055,13 +1064,23 @@ function getCertCollectorGroupForEvent(
         initialValue: '',
         validator: [],
         options: finalOptions
+      },
+      {
+        name: 'certTemplateId',
+        type: 'SELECT_WITH_OPTIONS',
+        label: certificateMessages.certificateTemplateSelectLabel,
+        required: true,
+        initialValue: certTemplateDefaultValue,
+        validator: [],
+        options: certificateTemplateOptions
       }
     ]
   }
 }
 
 export function getCertificateCollectorFormSection(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  certificates?: ICertificateConfigData[]
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
@@ -1069,7 +1088,7 @@ export function getCertificateCollectorFormSection(
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(declaration),
+      getCertCollectorGroupForEvent(declaration, certificates),
       otherCertCollectorFormGroup(declaration.event),
       affidavitCertCollectorGroup
     ]

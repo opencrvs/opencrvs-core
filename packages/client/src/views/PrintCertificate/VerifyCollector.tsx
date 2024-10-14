@@ -14,7 +14,6 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -51,7 +50,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IMatchParams {
   registrationId: string
-  eventType: Event
+  certTemplateId: string
   collector: string
 }
 
@@ -104,24 +103,24 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       if (!isIssueUrl) {
         this.props.goToReviewCertificate(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       } else {
         this.props.goToIssueCertificatePayment(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       }
     } else {
       if (!isIssueUrl) {
         this.props.goToPrintCertificatePayment(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       } else {
         this.props.goToIssueCertificatePayment(
           this.props.match.params.registrationId,
-          event
+          this.props.match.params.certTemplateId
         )
       }
     }
