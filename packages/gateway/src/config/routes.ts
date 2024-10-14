@@ -64,10 +64,10 @@ export const getRoutes = () => {
       path: '/sendVerifyCode',
       handler: sendVerifyCodeHandler,
       options: {
-        description: 'Send verify code to user phone number',
+        description: 'Send verify code to user contact',
         notes:
           'Generate a 6 digit verification code.' +
-          'Sends an SMS to the user mobile with verification code.',
+          'Sends an SMS/email to the user with verification code.',
         validate: {
           payload: requestSchema
         },
