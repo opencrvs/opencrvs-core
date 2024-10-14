@@ -454,7 +454,7 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
       expect(history.location.pathname).toContain(
-        '/drafts/cc66d69c-7f0a-4047-9283-f066571830f4'
+        '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       )
     })
   })
@@ -912,10 +912,10 @@ describe('In Progress tab', () => {
           new Date(birthNotificationSentDateStr)
         )
 
-        expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-        expect(data[0].name).toBe('anik hoque')
-        expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
-        expect(data[0].event).toBe('Birth')
+        expect(data[1].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
+        expect(data[1].name).toBe('anik hoque')
+        expect(data[1].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
+        expect(data[1].event).toBe('Birth')
       })
     })
   })
