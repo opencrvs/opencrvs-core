@@ -1341,7 +1341,7 @@ export interface GQLAdvancedSeachParameters {
 }
 
 export interface GQLEventMetricsByRegistrar {
-  registrarPractitioner?: GQLUser
+  registrarPractitioner: GQLUser
   total: number
   late: number
   delayed: number
