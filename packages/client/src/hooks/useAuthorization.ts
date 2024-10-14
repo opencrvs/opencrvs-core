@@ -11,7 +11,7 @@
 
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope, User, Location } from '@client/utils/gateway'
+import { Scope, User, Location, SCOPES } from '@client/utils/gateway'
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
@@ -26,32 +26,32 @@ export function usePermissions() {
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
 
   const canReadUser = (user: Pick<User, 'primaryOffice'>) => {
-    if (hasScope('user.read')) return true
-    if (hasScope('user.read:my-office'))
+    if (hasScope(SCOPES.USER_READ)) return true
+    if (hasScope(SCOPES.USER_READ_MY_OFFICE))
       return user.primaryOffice.id === userPrimaryOffice?.id
 
     return false
   }
 
   const canEditUser = (user: Pick<User, 'primaryOffice'>) => {
-    if (hasScope('user.update')) return true
-    if (hasScope('user.update:my-office'))
+    if (hasScope(SCOPES.USER_UPDATE)) return true
+    if (hasScope(SCOPES.USER_UPDATE_MY_OFFICE))
       return user.primaryOffice.id === userPrimaryOffice?.id
 
     return false
   }
 
   const canReadOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope('organisation.read-locations')) return true
-    if (hasScope('organisation.read-locations:my-office'))
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) return true
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE))
       return office.id === userPrimaryOffice?.id
 
     return false
   }
 
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope('user.create')) return true
-    if (hasScope('user.create:my-jurisdiction'))
+    if (hasScope(SCOPES.USER_CREATE)) return true
+    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION))
       return office.id === userPrimaryOffice?.id
 
     return false
