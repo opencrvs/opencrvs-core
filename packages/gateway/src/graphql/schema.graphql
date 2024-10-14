@@ -1435,7 +1435,7 @@ type AdvancedSeachParameters {
 }
 
 type EventMetricsByRegistrar {
-  registrarPractitioner: User
+  registrarPractitioner: User!
   total: Int!
   late: Int!
   delayed: Int!

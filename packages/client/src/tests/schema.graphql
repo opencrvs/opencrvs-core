@@ -1899,7 +1899,7 @@ type User {
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature

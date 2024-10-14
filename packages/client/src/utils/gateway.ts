@@ -677,7 +677,7 @@ export type EventMetricsByRegistrar = {
   __typename?: 'EventMetricsByRegistrar'
   delayed: Scalars['Int']
   late: Scalars['Int']
-  registrarPractitioner?: Maybe<User>
+  registrarPractitioner: User
   total: Scalars['Int']
 }
 
@@ -7337,7 +7337,7 @@ export type RegistrationsListByRegistrarFilter = {
     total: number
     late: number
     delayed: number
-    registrarPractitioner?: {
+    registrarPractitioner: {
       __typename?: 'User'
       id: string
       role: {
@@ -7350,11 +7350,11 @@ export type RegistrationsListByRegistrarFilter = {
           description: string
         }
       }
-      primaryOffice?: {
+      primaryOffice: {
         __typename?: 'Location'
         name?: string | null
         id: string
-      } | null
+      }
       name: Array<{
         __typename?: 'HumanName'
         firstNames?: string | null
@@ -7366,7 +7366,7 @@ export type RegistrationsListByRegistrarFilter = {
         type: string
         data: string
       } | null
-    } | null
+    }
   }>
 }
 
