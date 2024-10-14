@@ -622,14 +622,6 @@ export const mockBirthFhirBundle: SavedBundle<
                 code: 'FIELD_AGENT'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Social Worker"},{"lang":"fr","label":"Travailleur social"}]'
-              }
-            ]
           }
         ],
         location: [
@@ -2079,14 +2071,6 @@ export const mockDeathFhirBundle: SavedBundle<
               {
                 system: 'http://opencrvs.org/specs/roles',
                 code: 'REGISTRATION_AGENT'
-              }
-            ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Registration Agent"},{"lang":"fr","label":"Agent d\'enregistrement"}]'
               }
             ]
           }

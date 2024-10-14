@@ -1126,7 +1126,6 @@ type Mutation {
   resendInvite(userId: String!): String
   usernameReminder(userId: String!): String
   resetPasswordInvite(userId: String!): String
-  updateRole(systemRole: SystemRoleInput): Response!
   reactivateSystem(clientId: ID!): System
   deactivateSystem(clientId: ID!): System
   registerSystem(system: SystemInput): SystemSecret
@@ -1347,7 +1346,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     count: Int
     skip: Int
@@ -1897,7 +1895,6 @@ type User {
   name: [HumanName!]!
   username: String
   mobile: String
-  systemRole: SystemRoleType!
   role: Role!
   email: String
   status: Status!
@@ -1959,7 +1956,6 @@ input UserInput {
   mobile: String
   password: String
   status: Status
-  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String

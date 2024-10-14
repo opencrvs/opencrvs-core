@@ -7341,13 +7341,14 @@ export type RegistrationsListByRegistrarFilter = {
       __typename?: 'User'
       id: string
       role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
+        __typename?: 'UserRole'
+        id: string
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
       }
       primaryOffice: {
         __typename?: 'Location'

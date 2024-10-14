@@ -73,6 +73,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
 import { UserRole } from '@client/utils/gateway'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { draftToGqlTransformer } from '@client/transformer'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -318,6 +319,26 @@ const UserReviewFormComponent = ({
 
   const userRole = userRoles.find(({ id }) => id === formData.role)
 
+  const handleSubmit = () => {
+    const variables = draftToGqlTransformer(
+      { sections: [userFormSection] },
+      { user: formData },
+      '',
+      userDetails,
+      offlineCountryConfiguration
+    )
+    if (variables.user._fhirID) {
+      variables.user.id = variables.user._fhirID
+      delete variables.user._fhirID
+    }
+
+    if (variables.user.signature) {
+      delete variables.user.signature.name
+      delete variables.user.signature.__typename
+    }
+    submitForm(variables)
+  }
+
   if (userId) {
     title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
 
@@ -328,7 +349,7 @@ const UserReviewFormComponent = ({
           userRole?.scopes?.includes('profile.electronic-signature') &&
           !formData.signature
         }
-        onClick={() => submitForm(userFormSection)}
+        onClick={handleSubmit}
         icon={() => <Check />}
         align={ICON_ALIGNMENT.LEFT}
       >
@@ -348,7 +369,7 @@ const UserReviewFormComponent = ({
           userRole?.scopes?.includes('profile.electronic-signature') &&
           !formData.signature
         }
-        onClick={() => submitForm(userFormSection)}
+        onClick={handleSubmit}
       >
         {intl.formatMessage(messages.createUser)}
       </Button>
