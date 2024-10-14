@@ -229,7 +229,10 @@ const Item = ({
 
   return (
     <MenuItem
-      onClick={onClickHandler}
+      onClick={() => {
+        onClickHandler()
+        closeDropdown()
+      }}
       disabled={disabled}
       tabIndex={disabled ? -1 : 0}
       ref={(item) => addItemRef(item)}
