@@ -66,11 +66,13 @@ const StyledInputContainer = styled.div<{
 const StyledPrefix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.grey400};
+  user-select: none;
 `
 
 const StyledPostfix = styled.span`
   ${({ theme }) => theme.fonts.reg19};
   color: ${({ theme }) => theme.colors.grey400};
+  user-select: none;
 `
 
 const StyledInput = styled.input<ICustomProps>`
