@@ -45,8 +45,7 @@ const nameObj = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      systemRole: 'REGISTRATION_AGENT'
+      ]
     }
   }
 }
@@ -62,8 +61,7 @@ const nameObjNatlSysAdmin = {
           __typename: 'HumanName'
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      systemRole: 'NATIONAL_SYSTEM_ADMIN'
+      ]
     }
   }
 }
