@@ -56,7 +56,7 @@ export const SCOPES = {
   // register
   RECORD_REGISTER: 'record.register',
 
-  //   // certify
+  // certify
   RECORD_PRINT_RECORDS: 'record.print-records',
   RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
     'record.print-records-supporting-documents',
@@ -94,6 +94,7 @@ export const SCOPES = {
   PROFILE_UPDATE_PHONE_NUMBER: 'profile.update-phone-number',
   PROFILE_UPDATE_NAME: 'profile.update-name',
   PROFILE_UPDATE_PROFILE_IMAGE: 'profile.update-profile-image',
+  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
 
   // performance
   PERFORMANCE_READ_MY_OFFICE: 'performance.read:my-office',
