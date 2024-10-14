@@ -38,9 +38,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           PR_NUMBER=${{ github.event.inputs.pr_number }}
-          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headSha)
+          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
           BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
-          HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headSha' | cut -c1-7)
+          HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headRefOid' | cut -c1-7)
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
           echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
 
