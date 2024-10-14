@@ -78,7 +78,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   isMarriageEvent,
   isBirthEvent,

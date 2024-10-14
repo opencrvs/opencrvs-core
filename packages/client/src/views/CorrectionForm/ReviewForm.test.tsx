@@ -26,7 +26,7 @@ import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
 import { History } from 'history'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 let wrapper: ReactWrapper<{}, {}>

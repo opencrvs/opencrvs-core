@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'

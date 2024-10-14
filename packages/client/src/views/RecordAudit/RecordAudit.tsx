@@ -11,10 +11,8 @@
 import React from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import styled from 'styled-components'
 import {
   DeclarationIcon,

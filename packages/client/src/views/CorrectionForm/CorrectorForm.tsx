@@ -36,7 +36,7 @@ import { messages } from '@client/i18n/messages/views/correction'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 

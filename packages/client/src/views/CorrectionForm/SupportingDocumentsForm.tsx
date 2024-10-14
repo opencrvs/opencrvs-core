@@ -35,7 +35,7 @@ import { connect } from 'react-redux'
 import { supportingDocumentsSection } from '@client/forms/correction/supportDocument'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 type IProps = {
   declaration: IDeclaration

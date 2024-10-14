@@ -33,7 +33,7 @@ import {
 import { Event } from '@client/utils/gateway'
 import { Redirect } from 'react-router'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { getOfflineData } from '@client/offline/selectors'
 
 function collectorFormFieldsForOthers(event: Event) {

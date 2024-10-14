@@ -33,7 +33,7 @@ import {
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { History } from 'history'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDraftData } from '@client/tests/mock-drafts'
 import { vi, Mock } from 'vitest'
 
