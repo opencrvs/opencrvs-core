@@ -318,19 +318,19 @@ export const removeUnderscore = (word: string): string => {
 const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
-  return (declaration && declaration.type === 'Birth') || false
+  return (declaration && declaration.type === Event.Birth) || false
 }
 
 const isDeathDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLDeathEventSearchSet => {
-  return (declaration && declaration.type === 'Death') || false
+  return (declaration && declaration.type === Event.Death) || false
 }
 
 const isMarriageDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLMarriageEventSearchSet => {
-  return (declaration && declaration.type === 'Marriage') || false
+  return (declaration && declaration.type === Event.Marriage) || false
 }
 
 export const getName = (names: (HumanName | null)[], language: string) => {
@@ -347,7 +347,7 @@ export const getDraftDeclarationData = (
   return {
     id: declaration.id,
     name: getDeclarationFullName(declaration),
-    type: declaration.event || EMPTY_STRING,
+    type: declaration.event,
     registrationNo:
       declaration.data?.registration?.registrationNumber?.toString() ||
       EMPTY_STRING,

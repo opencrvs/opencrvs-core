@@ -338,7 +338,7 @@ function RecordAuditBody({
   const eventType = declaration.type
   if (eventType in registerForm.registerForm)
     regForm = get(registerForm.registerForm, eventType)
-  else regForm = registerForm.registerForm['birth']
+  else regForm = registerForm.registerForm[Event.Birth]
 
   const actionDetailsModalProps = {
     show: showActionDetails,

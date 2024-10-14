@@ -239,7 +239,7 @@ const CorrectRecordAction: React.FC<
   const intl = useIntl()
 
   const isBirthOrDeathEvent =
-    type && [Event.Birth, Event.Death].includes(type.toLowerCase() as Event)
+    type && [Event.Birth, Event.Death].includes(type as Event)
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =

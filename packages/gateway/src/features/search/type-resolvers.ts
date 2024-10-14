@@ -19,6 +19,7 @@ import {
   GQLResolver
 } from '@gateway/graphql/schema'
 import { getFullName } from '@gateway/features/user/utils'
+import { EVENT } from '@opencrvs/commons'
 
 interface ISearchEventDataTemplate {
   _type: string
@@ -191,13 +192,13 @@ const getGroomName = (source: ISearchDataTemplate) => {
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
     __resolveType(obj: ISearchEventDataTemplate) {
-      if (obj._source.event === 'Birth') {
+      if (obj._source.event === EVENT.BIRTH) {
         return 'BirthEventSearchSet'
       }
-      if (obj._source.event === 'Death') {
+      if (obj._source.event === EVENT.DEATH) {
         return 'DeathEventSearchSet'
       }
-      if (obj._source.event === 'Marriage') {
+      if (obj._source.event === EVENT.MARRIAGE) {
         return 'MarriageEventSearchSet'
       }
       return null as never
