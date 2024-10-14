@@ -18,7 +18,24 @@ export const CertifyRequestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
   certificate: z.object({
     hasShowedVerifiedDocument: z.boolean(),
-    data: z.string(),
+    templateConfig: z.object({
+      id: z.string(),
+      event: z.custom<EVENT_TYPE>(),
+      label: z.object({
+        id: z.string(),
+        defaultMessage: z.string(),
+        description: z.string()
+      }),
+      registrationTarget: z.number(),
+      lateRegistrationTarget: z.number(),
+      printInAdvance: z.boolean(),
+      fee: z.object({
+        onTime: z.number(),
+        late: z.number(),
+        delayed: z.number()
+      }),
+      svgUrl: z.string()
+    }),
     collector: z
       .object({
         relationship: z.string(),
@@ -64,7 +81,7 @@ const PaymentSchema = z.object({
 export const IssueRequestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
   certificate: CertifyRequestSchema.shape.certificate
-    .omit({ data: true })
+    .omit({ templateConfig: true })
     .and(z.object({ payment: PaymentSchema }))
 })
 

@@ -46,6 +46,7 @@ import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { printPDF } from '@client/pdfRenderer'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -127,10 +128,9 @@ export const usePrintableCertificate = () => {
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
   const [svgCode, setSvgCode] = useState<string>()
-  const certificateConfig = offlineData.templates.certificates?.find(
-    (x) => x.id === certTemplateId
-  )
-  const certificateFonts = certificateConfig?.fonts ?? {}
+  const certificateTemplateConfig: ICertificateConfigData | undefined =
+    offlineData.templates.certificates?.find((x) => x.id === certTemplateId)
+  const certificateFonts = certificateTemplateConfig?.fonts ?? {}
 
   useEffect(() => {
     const certificateUrl =
@@ -157,7 +157,7 @@ export const usePrintableCertificate = () => {
   }, [declaration])
 
   const handleCertify = async () => {
-    if (!declaration || !certificateConfig) {
+    if (!declaration || !certificateTemplateConfig) {
       return
     }
     const draft = cloneDeep(declaration)
@@ -185,8 +185,8 @@ export const usePrintableCertificate = () => {
       }
     }
 
-    const svgTemplate = await fetch(certificateConfig.svgUrl).then((res) =>
-      res.text()
+    const svgTemplate = await fetch(certificateTemplateConfig.svgUrl).then(
+      (res) => res.text()
     )
     const svg = await compileSvg(
       svgTemplate,
@@ -194,12 +194,13 @@ export const usePrintableCertificate = () => {
       state
     )
 
+    const { fonts, ...templateConfig } = certificateTemplateConfig
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
           ...certificate,
-          data: svg || ''
+          templateConfig
         }
       ]
     }

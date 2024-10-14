@@ -85,15 +85,16 @@ export interface ICertificateConfigData {
     defaultMessage: string
     description: string
   }
-  svgUrl: string
-  fonts: {
-    [fontName: string]: {
-      normal: string
-      bold: string
-      italics: string
-      bolditalics: string
-    }
+  registrationTarget: number
+  lateRegistrationTarget: number
+  printInAdvance: boolean
+  fee: {
+    onTime: number
+    late: number
+    delayed: number
   }
+  svgUrl: string
+  fonts?: Record<string, FontFamilyTypes>
 }
 export interface ICurrency {
   isoCode: string

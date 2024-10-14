@@ -383,16 +383,55 @@ export type BookmarkedSeachItem = {
 export type Certificate = {
   __typename?: 'Certificate'
   collector?: Maybe<RelatedPerson>
-  data?: Maybe<Scalars['String']>
+  templateConfig?: Maybe<TemplateConfig> // Changed from data to templateConfig
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   payments?: Maybe<Array<Maybe<Payment>>>
 }
 
 export type CertificateInput = {
   collector?: InputMaybe<RelatedPersonInput>
-  data?: InputMaybe<Scalars['String']>
+  templateConfig?: InputMaybe<TemplateConfigInput> // Changed from data to templateConfig
   hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
+}
+
+// Define the TemplateConfig type
+export type TemplateConfig = {
+  id: Scalars['String']
+  event: Scalars['String']
+  label: {
+    id: Scalars['String']
+    defaultMessage: Scalars['String']
+    description: Scalars['String']
+  }
+  registrationTarget: Scalars['Int']
+  lateRegistrationTarget: Scalars['Int']
+  printInAdvance: Scalars['Boolean']
+  fee: {
+    onTime: Scalars['Float']
+    late: Scalars['Float']
+    delayed: Scalars['Float']
+  }
+  svgUrl: Scalars['String']
+}
+
+export type TemplateConfigInput = {
+  id: Scalars['String']
+  event: Scalars['String']
+  label: {
+    id: Scalars['String']
+    defaultMessage: Scalars['String']
+    description: Scalars['String']
+  }
+  registrationTarget: Scalars['Int']
+  lateRegistrationTarget: Scalars['Int']
+  printInAdvance: Scalars['Boolean']
+  fee: {
+    onTime: Scalars['Float']
+    late: Scalars['Float']
+    delayed: Scalars['Float']
+  }
+  svgUrl: Scalars['String']
 }
 
 export type CertificationMetric = {

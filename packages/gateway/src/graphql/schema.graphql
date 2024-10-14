@@ -1365,7 +1365,7 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  data: String
+  templateConfig: CertificateConfigData
 }
 
 type DuplicatesInfo {
@@ -1696,7 +1696,7 @@ input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
+  templateConfig: CertificateConfigDataInput
 }
 
 input IdentityInput {
@@ -1721,6 +1721,17 @@ input DeceasedInput {
 input LabelInput {
   lang: String!
   label: String!
+}
+
+type CertificateConfigData {
+  id: String!
+  event: String!
+  label: CertificateLabel!
+  registrationTarget: Int!
+  lateRegistrationTarget: Int!
+  printInAdvance: Boolean!
+  fee: CertificateFee!
+  svgUrl: String!
 }
 
 interface AuditLogItemBase {
@@ -1782,4 +1793,39 @@ input PaymentInput {
   outcome: PaymentOutcomeType
   date: Date
   data: String
+}
+
+input CertificateConfigDataInput {
+  id: String!
+  event: String!
+  label: CertificateLabelInput!
+  registrationTarget: Int!
+  lateRegistrationTarget: Int!
+  printInAdvance: Boolean!
+  fee: CertificateFeeInput!
+  svgUrl: String!
+}
+
+type CertificateLabel {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
+type CertificateFee {
+  onTime: Float!
+  late: Float!
+  delayed: Float!
+}
+
+input CertificateLabelInput {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
+input CertificateFeeInput {
+  onTime: Float!
+  late: Float!
+  delayed: Float!
 }

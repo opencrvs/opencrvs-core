@@ -809,6 +809,14 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Birth Certificate',
       description: 'The label for a birth certificate'
     },
+    registrationTarget: 30,
+    lateRegistrationTarget: 365,
+    printInAdvance: false,
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
+    },
     svgUrl: '/api/countryconfig/certificates/birth-certificate.svg',
     fonts: {
       'Noto Sans': {
@@ -826,6 +834,14 @@ const mockFetchCertificatesTemplatesDefinition = [
       id: 'certificates.birth-certificate-copy',
       defaultMessage: 'Birth Certificate certified copy',
       description: 'The label for a birth certificate'
+    },
+    registrationTarget: 30,
+    lateRegistrationTarget: 365,
+    printInAdvance: false,
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
     },
     svgUrl:
       '/api/countryconfig/certificates/birth-certificate-certified-copy.svg',
@@ -846,6 +862,14 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Death Certificate',
       description: 'The label for a death certificate'
     },
+    registrationTarget: 30,
+    lateRegistrationTarget: 365,
+    printInAdvance: false,
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
+    },
     svgUrl: '/api/countryconfig/certificates/death-certificate.svg',
     fonts: {
       'Noto Sans': {
@@ -863,6 +887,14 @@ const mockFetchCertificatesTemplatesDefinition = [
       id: 'certificates.marriage.certificate',
       defaultMessage: 'Marriage Certificate',
       description: 'The label for a marriage certificate'
+    },
+    registrationTarget: 30,
+    lateRegistrationTarget: 365,
+    printInAdvance: false,
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
     },
     svgUrl: '/api/countryconfig/certificates/marriage-certificate.svg',
     fonts: {

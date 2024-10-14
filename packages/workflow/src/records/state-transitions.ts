@@ -960,8 +960,7 @@ export async function toCertified(
     temporaryDocumentReferenceId,
     temporaryRelatedPersonId,
     eventType,
-    certificateDetails.hasShowedVerifiedDocument,
-    certificateDetails.data
+    certificateDetails.hasShowedVerifiedDocument
   )
 
   const certificateSection: CompositionSection = {

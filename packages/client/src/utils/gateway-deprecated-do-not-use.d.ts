@@ -6953,7 +6953,7 @@ export interface GQLCertificateTypeResolver<TParent = any> {
   collector?: CertificateToCollectorResolver<TParent>
   hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<TParent>
   payments?: CertificateToPaymentsResolver<TParent>
-  data?: CertificateToDataResolver<TParent>
+  templateConfig?: CertificateToTemplateConfigResolver<TParent>
 }
 
 export interface CertificateToCollectorResolver<TParent = any, TResult = any> {
@@ -6971,7 +6971,10 @@ export interface CertificateToPaymentsResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface CertificateToDataResolver<TParent = any, TResult = any> {
+export interface CertificateToTemplateConfigResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

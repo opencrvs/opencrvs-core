@@ -26,26 +26,31 @@ export const certifyRoute = createRoute({
   action: 'CERTIFY',
   includeHistoryResources: true,
   handler: async (request, record): Promise<CertifiedRecord> => {
-    const token = getToken(request)
-    const { certificate: certificateDetailsWithRawAttachments, event } =
-      validateRequest(CertifyRequestSchema, request.payload)
+    try {
+      const token = getToken(request)
+      console.log(CertifyRequestSchema, request.payload)
+      const { certificate: certificateDetailsWithRawAttachments, event } =
+        validateRequest(CertifyRequestSchema, request.payload)
 
-    const certificateDetails =
-      await uploadCertificateAttachmentsToDocumentsStore(
-        certificateDetailsWithRawAttachments,
-        getAuthHeader(request)
+      const certificateDetails =
+        await uploadCertificateAttachmentsToDocumentsStore(
+          certificateDetailsWithRawAttachments,
+          getAuthHeader(request)
+        )
+
+      const certifiedRecord = await toCertified(
+        record,
+        token,
+        event,
+        certificateDetails
       )
 
-    const certifiedRecord = await toCertified(
-      record,
-      token,
-      event,
-      certificateDetails
-    )
-
-    await indexBundle(certifiedRecord, token)
-    await auditEvent('certified', certifiedRecord, token)
-
-    return certifiedRecord
+      await indexBundle(certifiedRecord, token)
+      await auditEvent('certified', certifiedRecord, token)
+      return certifiedRecord
+    } catch (error) {
+      console.trace(error)
+      return error
+    }
   }
 })
