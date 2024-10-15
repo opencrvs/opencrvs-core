@@ -88,7 +88,7 @@ export default {
         'center',
         'span-all',
         'end'
-      ] as IDropdownPosition[],
+      ] satisfies IDropdownPosition[],
       control: { type: 'radio' }
     },
     offsetX: {

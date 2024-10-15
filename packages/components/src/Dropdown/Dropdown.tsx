@@ -119,17 +119,6 @@ export type IDropdownPosition =
   | 'span-all'
   | 'end'
 
-const DropdownWrapper: React.FC<{ children: ReactNode; id: string }> = ({
-  children,
-  id
-}) => {
-  const { setDropdownName } = useDropdown()
-
-  setDropdownName(id)
-
-  return <StyledWrapper id={id + '-dropdownMenu'}>{children}</StyledWrapper>
-}
-
 export const DropdownMenu = ({
   children,
   id
@@ -138,8 +127,8 @@ export const DropdownMenu = ({
   id: string
 }) => {
   return (
-    <DropdownProvider>
-      <DropdownWrapper id={id}>{children}</DropdownWrapper>
+    <DropdownProvider id={id}>
+      <StyledWrapper id={id + '-dropdownMenu'}>{children}</StyledWrapper>
     </DropdownProvider>
   )
 }

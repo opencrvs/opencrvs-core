@@ -15,7 +15,6 @@ interface DropdownContextType {
   addItemRef: (item: HTMLLIElement | null) => void
   handleKeyDown: (e: React.KeyboardEvent) => void
   setFocusedIndex: (e: number) => void
-  setDropdownName: (name: string) => void
   dropdownName: string
   closeDropdown: () => void
 }
@@ -32,12 +31,14 @@ export const useDropdown = () => {
   return context
 }
 
-export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
-  children
-}) => {
-  const [dropdownName, setDropdownName] = useState('')
+export const DropdownProvider: React.FC<{
+  children: React.ReactNode
+  id: string
+}> = ({ children, id }) => {
   const [focusedIndex, setFocusedIndex] = useState<number>(-1)
   const itemRefs = useRef<(HTMLLIElement | null)[]>([])
+
+  const dropdownName = id
 
   const addItemRef = (item: HTMLLIElement | null) => {
     if (item && item.tabIndex === 0 && !itemRefs.current.includes(item)) {
@@ -88,7 +89,6 @@ export const DropdownProvider: React.FC<{ children: React.ReactNode }> = ({
         addItemRef,
         handleKeyDown,
         setFocusedIndex,
-        setDropdownName,
         closeDropdown
       }}
     >
