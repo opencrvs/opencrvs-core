@@ -149,6 +149,48 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        certificates {
+          hasShowedVerifiedDocument
+          templateConfig {
+            id
+            event
+            label {
+              id
+              defaultMessage
+              description
+              __typename
+            }
+            registrationTarget
+            lateRegistrationTarget
+            printInAdvance
+            fee {
+              onTime
+              late
+              delayed
+              __typename
+            }
+            svgUrl
+            __typename
+          }
+          collector {
+            relationship
+            otherRelationship
+            name {
+              use
+              firstNames
+              familyName
+              __typename
+            }
+            telecom {
+              system
+              value
+              use
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
         duplicates {
           compositionId
           trackingId
@@ -207,6 +249,27 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         requesterOther
         noSupportingDocumentationRequired
         hasShowedVerifiedDocument
+        templateConfig {
+          id
+          event
+          label {
+            id
+            defaultMessage
+            description
+            __typename
+          }
+          registrationTarget
+          lateRegistrationTarget
+          printInAdvance
+          fee {
+            onTime
+            late
+            delayed
+            __typename
+          }
+          svgUrl
+          __typename
+        }
         date
         action
         regStatus

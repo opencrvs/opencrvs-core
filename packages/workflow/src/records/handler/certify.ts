@@ -28,7 +28,6 @@ export const certifyRoute = createRoute({
   handler: async (request, record): Promise<CertifiedRecord> => {
     try {
       const token = getToken(request)
-      console.log(CertifyRequestSchema, request.payload)
       const { certificate: certificateDetailsWithRawAttachments, event } =
         validateRequest(CertifyRequestSchema, request.payload)
 

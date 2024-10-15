@@ -879,6 +879,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  templateConfig: CertificateConfigData
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   system: IntegratedSystem
@@ -1393,6 +1394,17 @@ type StatusReason {
   text: String
 }
 
+type CertificateConfigData {
+  id: String!
+  event: String!
+  label: CertificateLabel!
+  registrationTarget: Int!
+  lateRegistrationTarget: Int!
+  printInAdvance: Boolean!
+  fee: CertificateFee!
+  svgUrl: String!
+}
+
 type IntegratedSystem {
   name: String
   username: String
@@ -1723,15 +1735,16 @@ input LabelInput {
   label: String!
 }
 
-type CertificateConfigData {
+type CertificateLabel {
   id: String!
-  event: String!
-  label: CertificateLabel!
-  registrationTarget: Int!
-  lateRegistrationTarget: Int!
-  printInAdvance: Boolean!
-  fee: CertificateFee!
-  svgUrl: String!
+  defaultMessage: String!
+  description: String!
+}
+
+type CertificateFee {
+  onTime: Float!
+  late: Float!
+  delayed: Float!
 }
 
 interface AuditLogItemBase {
@@ -1804,18 +1817,6 @@ input CertificateConfigDataInput {
   printInAdvance: Boolean!
   fee: CertificateFeeInput!
   svgUrl: String!
-}
-
-type CertificateLabel {
-  id: String!
-  defaultMessage: String!
-  description: String!
-}
-
-type CertificateFee {
-  onTime: Float!
-  late: Float!
-  delayed: Float!
 }
 
 input CertificateLabelInput {

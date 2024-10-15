@@ -159,6 +159,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  templateConfig: CertificateConfigData
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   #This doesn't resolve to the System model properly rather

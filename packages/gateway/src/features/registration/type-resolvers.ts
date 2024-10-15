@@ -1242,6 +1242,15 @@ export const typeResolvers: GQLResolver = {
       }
 
       return false
+    },
+    templateConfig(docRef: DocumentReference, _) {
+      const templateConfig = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/templateConfig`,
+        docRef.extension as Extension[]
+      )
+      if (templateConfig && templateConfig.valueString)
+        return JSON.parse(templateConfig.valueString)
+      return null
     }
   },
   Identifier: {
@@ -1407,7 +1416,6 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         task.extension as Extension[]
       )
-
       if (hasShowedDocument?.valueString) {
         return Boolean(hasShowedDocument?.valueString)
       }
@@ -1418,7 +1426,24 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
+    templateConfig: (task: Task) => {
+      const templateConfig = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/templateConfig`,
+        task.extension as Extension[]
+      )
 
+      if (templateConfig && templateConfig.valueString) {
+        return JSON.parse(templateConfig.valueString)
+      }
+      console.log(
+        '************************************ task.extension ******************************************'
+      )
+      console.log(task.extension)
+      console.log(
+        '******************************************************************************'
+      )
+      return null
+    },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(
         NO_SUPPORTING_DOCUMENTATION_REQUIRED,
