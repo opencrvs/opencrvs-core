@@ -1447,8 +1447,7 @@ export const mockCompleteFormData = {
   assignedRegistrationOffice: '',
   device: '',
   familyName: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  firstName: 'Jeff',
   nid: '123456789',
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
@@ -1599,7 +1598,7 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'firstNamesEng',
+                      name: 'firstNames',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English first name',
@@ -1621,12 +1620,12 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'familyNameEng',
+                      name: 'familyName',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English last name',
                         description: 'English last name',
-                        id: 'form.field.label.lastNameEN'
+                        id: 'form.field.label.userSurname'
                       },
                       required: true,
                       initialValue: '',
@@ -1795,8 +1794,7 @@ export const mockDataWithRegistarRoleSelected = {
   assignedRegistrationOffice: '',
   device: '',
   familyName: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  firstName: 'Jeff',
   email: 'jeff@gmail.com',
   nid: '101488192',
   phoneNumber: '01662132132',

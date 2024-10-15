@@ -12203,7 +12203,7 @@
                 "label": {
                   "defaultMessage": "Last name",
                   "description": "English last name",
-                  "id": "form.field.label.lastNameEN"
+                  "id": "form.field.label.userSurname"
                 },
                 "required": true,
                 "initialValue": "",
@@ -12528,7 +12528,7 @@
                 "label": {
                   "defaultMessage": "Last name",
                   "description": "English last name",
-                  "id": "form.field.label.lastNameEN"
+                  "id": "form.field.label.userSurname"
                 },
                 "required": true,
                 "initialValue": "",

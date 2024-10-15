@@ -96,9 +96,9 @@ export function userSectionFormType(): ISerializedFormSection {
             }
           },
           {
-            name: 'firstNamesEng',
+            name: 'firstName',
             type: TEXT,
-            label: userFormMessages.firstNameEn,
+            label: userFormMessages.firstName,
             required: true,
             initialValue: '',
             validator: [{ operation: 'englishOnlyNameFormat' }],
