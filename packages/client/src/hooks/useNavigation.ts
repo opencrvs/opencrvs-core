@@ -177,8 +177,8 @@ export function useNavigation() {
       name: group.name,
       tabs: group.tabs
         .filter((tab) => hasAccess(tab.scopes, tab.denyScopes))
-        .map((x) => ({
-          name: x.name
+        .map((filteredTab) => ({
+          name: filteredTab.name
         }))
     }
     acc.push(groupAccess)
