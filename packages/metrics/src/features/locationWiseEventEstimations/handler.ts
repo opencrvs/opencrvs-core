@@ -44,8 +44,7 @@ export async function locationWiseEventEstimationsHandler(
     'x-correlation-id': request.headers['x-correlation-id']
   }
   const childLocations = await fetchChildLocationsByParentId(
-    locationId || 'Location/0',
-    authHeader
+    locationId || 'Location/0'
   )
 
   const estimations: ILocationWiseEstimation[] = []

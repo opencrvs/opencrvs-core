@@ -96,6 +96,7 @@ export interface SearchDocument {
   compositionId: string
   compositionType?: string
   event?: EVENT
+  draftId?: string
   name?: string
   lastStatusChangedAt?: string
   type?: string

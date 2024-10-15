@@ -42,10 +42,17 @@ import { getPractitionerRef } from '@workflow/features/user/utils'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
+export class RegistrationValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'RegistrationValidationError'
+  }
+}
+
 export async function invokeRegistrationValidation(
   bundle: Saved<Bundle>,
   headers: Record<string, string>
-): Promise<Bundle> {
+): Promise<void> {
   const res = await fetch(
     new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
     {
@@ -58,10 +65,14 @@ export async function invokeRegistrationValidation(
     }
   )
   if (!res.ok) {
-    const errorData = await res.json()
-    throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
+    throw new RegistrationValidationError(
+      `Registration validation failed with status ${
+        res.status
+      } and message ${await res.text()}`
+    )
   }
-  return bundle
+
+  return
 }
 
 export async function setupRegistrationWorkflow(

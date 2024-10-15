@@ -56,13 +56,15 @@ const INFORMANT_CODE = 'informant-details'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
-export async function indexRecord(record: SavedBundle) {
+export async function indexRecord(record: SavedBundle, transactionId?: string) {
   const client = getOrCreateClient()
 
   const { id: compositionId } = getComposition(record)
+
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(record, existingDocument)
-  await indexComposition(compositionId, document, client)
+
+  await indexComposition(compositionId, document, client, transactionId)
 }
 
 export const composeDocument = (
@@ -71,9 +73,13 @@ export const composeDocument = (
 ) => {
   const task = getTaskFromSavedBundle(record)
   const composition = getComposition(record)
-
+  const draftId = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/draft-id'
+  )
   const body: BirthDocument = {
     compositionId: composition.id,
+    draftId: draftId && draftId.value,
     event: EVENT.BIRTH,
     createdAt:
       existingDocument?.body?.hits?.hits?.[0]?._source?.createdAt ||

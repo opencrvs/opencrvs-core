@@ -8,23 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { Events } from '@metrics/features/metrics/constants'
 import {
   generateBirthRegPoint,
   generateDeathRegPoint,
-  generatePaymentPoint,
   generateDeclarationStartedPoint,
+  generatePaymentPoint,
   generateRejectedPoints
 } from '@metrics/features/registration/pointGenerator'
 import {
-  testDeclaration,
-  testPayload,
+  testDeathCertPayload,
   testDeathPayload,
-  testDeathCertPayload
+  testDeclaration,
+  testPayload
 } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
-import { Events } from '@metrics/features/metrics/constants'
 
 import * as api from '@metrics/api'
+import { SavedBundle } from '@opencrvs/commons/types'
 
 const fetchLocation = api.fetchLocation as jest.Mock
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
@@ -119,7 +120,7 @@ describe('Verify point generation', () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
     const point = await generateBirthRegPoint(
-      cloneDeep(testPayload),
+      cloneDeep(testPayload) as any,
       'mark-existing-declaration-registered',
       AUTH_HEADER
     )
@@ -140,7 +141,6 @@ describe('Verify point generation', () => {
   it('Only populates office location if rest of the tree is missing', async () => {
     const payload = cloneDeep(testPayload)
 
-    // @ts-ignore
     payload.entry[2].resource = {
       resourceType: 'Patient',
       active: true,
@@ -152,12 +152,12 @@ describe('Verify point generation', () => {
         }
       ],
       gender: 'male'
-    }
+    } as any
 
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
     const point = await generateBirthRegPoint(
-      payload,
+      payload as any as SavedBundle,
       'mark-existing-declaration-registered',
       AUTH_HEADER
     )
@@ -178,7 +178,7 @@ describe('Verify point generation', () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
     const point = await generateBirthRegPoint(
-      cloneDeep(testPayload),
+      cloneDeep(testPayload) as any as SavedBundle,
       'mark-existing-declaration-registered',
       AUTH_HEADER
     )
@@ -196,8 +196,8 @@ describe('Verify point generation', () => {
     })
   })
   it('Throw error when no child section found', () => {
-    const payload = cloneDeep(testPayload)
-    // @ts-ignore
+    const payload = cloneDeep(testPayload) as any
+
     payload.entry[2] = {
       fullUrl: 'urn:uuid:048d3e42-40c3-4e46-81f0-e3869251b74a'
     }
@@ -213,7 +213,7 @@ describe('Verify point generation', () => {
     Date.prototype.toISOString = jest.fn(() => '2019-03-12T07:35:42.043Z')
 
     const point = await generateDeathRegPoint(
-      cloneDeep(testDeathPayload),
+      cloneDeep(testDeathPayload) as any as SavedBundle,
       'mark-existing-declaration-registered',
       AUTH_HEADER
     )
@@ -234,7 +234,7 @@ describe('Verify point generation', () => {
     })
   })
   it('Throw error when no deceased found', () => {
-    const payload = cloneDeep(testDeathPayload)
+    const payload = cloneDeep(testDeathPayload) as any as SavedBundle
     // @ts-ignore
     payload.entry[0] = {}
     expect(
@@ -247,7 +247,7 @@ describe('Verify point generation', () => {
   })
   it('returns payment point', async () => {
     const point = await generatePaymentPoint(
-      cloneDeep(testDeathCertPayload),
+      cloneDeep(testDeathCertPayload) as any,
       AUTH_HEADER,
       'certification'
     )
@@ -265,7 +265,7 @@ describe('Verify point generation', () => {
     })
   })
   it('Throw error when no task found to attribute to event for payment point', () => {
-    const payload = cloneDeep(testDeathCertPayload)
+    const payload = cloneDeep(testDeathCertPayload) as any
     // @ts-ignore
     payload.entry[1] = {}
     expect(
@@ -273,7 +273,7 @@ describe('Verify point generation', () => {
     ).rejects.toThrowError('Task not found')
   })
   it('Throw error when no reconciliation found for payment point', () => {
-    const payload = cloneDeep(testDeathCertPayload)
+    const payload = cloneDeep(testDeathCertPayload) as any
     // @ts-ignore
     payload.entry[4] = {}
     expect(
@@ -282,8 +282,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for field agent', async () => {
     const point = await generateDeclarationStartedPoint(
-      cloneDeep(testDeclaration),
-      AUTH_HEADER,
+      cloneDeep(testDeclaration) as any,
       Events.READY_FOR_REVIEW
     )
     expect(point).toMatchObject({
@@ -302,8 +301,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for registration agent', async () => {
     const point = await generateDeclarationStartedPoint(
-      cloneDeep(testDeclaration),
-      AUTH_HEADER,
+      cloneDeep(testDeclaration) as any,
       Events.VALIDATED
     )
     expect(point).toMatchObject({
@@ -322,8 +320,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for registrar', async () => {
     const point = await generateDeclarationStartedPoint(
-      cloneDeep(testDeclaration),
-      AUTH_HEADER,
+      cloneDeep(testDeclaration) as any,
       Events.WAITING_EXTERNAL_VALIDATION
     )
     expect(point).toMatchObject({
@@ -340,8 +337,7 @@ describe('Verify point generation', () => {
   })
   it('returns declarations started point for field agent', async () => {
     const point = await generateDeclarationStartedPoint(
-      cloneDeep(testDeclaration),
-      AUTH_HEADER,
+      cloneDeep(testDeclaration) as any,
       Events.INCOMPLETE
     )
     expect(point).toMatchObject({
@@ -363,8 +359,7 @@ describe('Verify point generation', () => {
     payload.entry[0].resource.type!.coding[0].code = 'birth-notification'
 
     const point = await generateDeclarationStartedPoint(
-      cloneDeep(payload),
-      AUTH_HEADER,
+      cloneDeep(payload) as any,
       Events.INCOMPLETE
     )
     expect(point).toMatchObject({
@@ -388,7 +383,7 @@ describe('Verify point generation', () => {
     const taskHistory = require('./test-data/task-history.json')
 
     fetchTaskHistory.mockResolvedValueOnce(taskHistory)
-    const point = await generateRejectedPoints(payload, AUTH_HEADER)
+    const point = await generateRejectedPoints(payload)
     expect(point).toMatchObject({
       measurement: 'declarations_rejected',
       tags: {

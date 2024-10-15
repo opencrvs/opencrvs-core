@@ -17,6 +17,7 @@ export interface IAdvancedSearchParam {
   event?: string
   name?: string
   registrationStatuses?: string[]
+  draftId?: string
   dateOfEvent?: string
   dateOfEventStart?: string
   dateOfEventEnd?: string

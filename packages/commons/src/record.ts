@@ -101,6 +101,7 @@ export type CorrectionRequestedRecord = Nominal<
   SavedBundle,
   'CorrectionRequested'
 >
+export type DeclaredRecord = Nominal<SavedBundle, 'Declared'>
 export type CertifiedRecord = Nominal<SavedBundle, 'Certified'>
 export type IssuedRecord = Nominal<SavedBundle, 'Issued'>
 export type InProgressRecord = Nominal<SavedBundle, 'InProgress'>
@@ -132,7 +133,16 @@ export type RegistrationStatus =
   | 'VALIDATED'
   | 'WAITING_VALIDATION'
 
+/*
+ * Temporarily using this type to represent the action that can be taken on a record
+ * There is a conceptual difference however:
+ * - An action is a single event that can be taken on a record
+ * - Record state / registration status is the current state of the record, determined by the actions that have been taken on the record
+ */
+export type RecordAction = RegistrationStatus
+
 export type StateIdenfitiers = {
+  DECLARED: DeclaredRecord
   IN_PROGRESS: InProgressRecord
   READY_FOR_REVIEW: ReadyForReviewRecord
   VALIDATED: ValidatedRecord

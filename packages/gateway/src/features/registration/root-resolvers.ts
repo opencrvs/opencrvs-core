@@ -8,10 +8,43 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { checkUserAssignment } from '@gateway/authorisation'
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
+import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import { fetchFHIR } from '@gateway/features/fhir/service'
 import { hasScope, inScope } from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
+  GQLMarriageRegistrationInput,
+  GQLResolver,
+  GQLStatusWiseRegistrationCount
+} from '@gateway/graphql/schema'
+import { getRecordById } from '@gateway/records'
+import { UnassignError } from '@gateway/utils/unassignError'
+import {
+  validateBirthDeclarationAttachments,
+  validateDeathDeclarationAttachments,
+  validateMarriageDeclarationAttachments
+} from '@gateway/utils/validators'
+import {
+  archiveRegistration,
+  certifyRegistration,
+  createRegistration,
+  duplicateRegistration,
+  fetchRegistrationForDownloading,
+  issueRegistration,
+  markNotADuplicate,
+  registerDeclaration,
+  reinstateRegistration,
+  rejectDeclaration,
+  unassignRegistration,
+  updateRegistration,
+  validateRegistration,
+  verifyRegistration,
+  viewDeclaration
+} from '@gateway/workflow/index'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
@@ -23,40 +56,7 @@ import {
   getComposition,
   getTaskFromSavedBundle
 } from '@opencrvs/commons/types'
-import {
-  GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput,
-  GQLResolver,
-  GQLStatusWiseRegistrationCount
-} from '@gateway/graphql/schema'
-import { UnassignError } from '@gateway/utils/unassignError'
-import {
-  validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments,
-  validateMarriageDeclarationAttachments
-} from '@gateway/utils/validators'
-import { checkUserAssignment } from '@gateway/authorisation'
 import { UserInputError } from 'apollo-server-hapi'
-import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
-import {
-  archiveRegistration,
-  certifyRegistration,
-  createRegistration,
-  issueRegistration,
-  registerDeclaration,
-  unassignRegistration,
-  rejectDeclaration,
-  updateRegistration,
-  validateRegistration,
-  fetchRegistrationForDownloading,
-  reinstateRegistration,
-  duplicateRegistration,
-  viewDeclaration,
-  verifyRegistration,
-  markNotADuplicate
-} from '@gateway/workflow/index'
-import { getRecordById } from '@gateway/records'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -352,7 +352,8 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
+      await createRegistration(details, EVENT_TYPE.BIRTH, authHeader)
+      return {}
     },
     async createDeathRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -361,7 +362,8 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createRegistration(details, EVENT_TYPE.DEATH, authHeader)
+      await createRegistration(details, EVENT_TYPE.DEATH, authHeader)
+      return {}
     },
     async createMarriageRegistration(_, { details }, { headers: authHeader }) {
       try {
@@ -370,7 +372,8 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      return createRegistration(details, EVENT_TYPE.MARRIAGE, authHeader)
+      await createRegistration(details, EVENT_TYPE.MARRIAGE, authHeader)
+      return {}
     },
     async markBirthAsValidated(_, { id, details }, { headers: authHeader }) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)

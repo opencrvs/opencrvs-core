@@ -21,7 +21,6 @@ import { logger } from '@opencrvs/commons'
 
 export function fetchFHIR<T = any>(
   suffix: string,
-  authHeader: IAuthHeader,
   method = 'GET',
   body?: string
 ) {
@@ -29,8 +28,7 @@ export function fetchFHIR<T = any>(
   return fetch(url, {
     method,
     headers: {
-      'Content-Type': 'application/fhir+json',
-      ...authHeader
+      'Content-Type': 'application/fhir+json'
     },
     body
   })
@@ -42,36 +40,25 @@ export function fetchFHIR<T = any>(
     })
 }
 
-export function fetchTaskHistory(taskId: string, authHeader: IAuthHeader) {
-  return fetchFHIR<fhir.Bundle>(`Task/${taskId}/_history`, authHeader)
+export function fetchTaskHistory(taskId: string) {
+  return fetchFHIR<fhir.Bundle>(`Task/${taskId}/_history`)
 }
 
-export const fetchLocation = async (
-  locationId: string,
-  authHeader: IAuthHeader
-) => {
+export const fetchLocation = async (locationId: string) => {
   return await fetchFHIR<fhir.Location & { id: string }>(
-    locationId.startsWith('Location/') ? locationId : `Location/${locationId}`,
-    authHeader
+    locationId.startsWith('Location/') ? locationId : `Location/${locationId}`
   )
 }
 
 export async function fetchLocationsByType(
-  type: string,
-  authHeader: IAuthHeader
+  type: string
 ): Promise<(fhir.Location & { id: string })[]> {
-  const bundle = await fetchFHIR(`Location?_count=0&type=${type}`, authHeader)
+  const bundle = await fetchFHIR(`Location?_count=0&type=${type}`)
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
 
-export async function fetchTaskIdByCompositionID(
-  compositionId: string,
-  authHeader: IAuthHeader
-) {
-  const taskBundle = await fetchFHIR(
-    `Task?focus=Composition/${compositionId}`,
-    authHeader
-  )
+export async function fetchTaskIdByCompositionID(compositionId: string) {
+  const taskBundle = await fetchFHIR(`Task?focus=Composition/${compositionId}`)
   if (!taskBundle.entry[0] || !taskBundle.entry[0].resource) {
     return null
   }
@@ -79,32 +66,25 @@ export async function fetchTaskIdByCompositionID(
 }
 
 export async function totalOfficesInCountry(authHeader: IAuthHeader) {
-  const bundle: fhir.Bundle = await fetchFHIR(
-    'Location?type=CRVS_OFFICE',
-    authHeader
-  )
+  const bundle: fhir.Bundle = await fetchFHIR('Location?type=CRVS_OFFICE')
   return bundle.total ?? 0
 }
 
 export async function fetchChildLocationsByParentId(
-  locationId: string,
-  authHeader: IAuthHeader
+  locationId: string
 ): Promise<fhir.Location[]> {
   const bundle = await fetchFHIR(
-    `Location?_count=0&type=ADMIN_STRUCTURE&partof=${locationId}`,
-    authHeader
+    `Location?_count=0&type=ADMIN_STRUCTURE&partof=${locationId}`
   )
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
 
 export async function fetchChildLocationsWithTypeByParentId(
   locationId: string,
-  locationType: string,
-  authHeader: IAuthHeader
+  locationType: string
 ): Promise<fhir.Location[]> {
   const bundle = await fetchFHIR(
-    `Location?_count=0&type=${locationType}&partof=${locationId}`,
-    authHeader
+    `Location?_count=0&type=${locationType}&partof=${locationId}`
   )
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
@@ -151,13 +131,9 @@ export function fetchAllFromSearch(authHeader: IAuthHeader) {
     })
 }
 
-export const fetchPractitionerRole = async (
-  practitionerId: string,
-  authHeader: IAuthHeader
-) => {
+export const fetchPractitionerRole = async (practitionerId: string) => {
   const roleBundle: fhir.Bundle = await fetchFHIR(
-    `PractitionerRole?practitioner=${practitionerId}`,
-    authHeader
+    `PractitionerRole?practitioner=${practitionerId}`
   )
   const practitionerRole =
     roleBundle &&

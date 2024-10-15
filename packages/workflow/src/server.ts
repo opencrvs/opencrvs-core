@@ -19,6 +19,7 @@ import {
 import getPlugins from '@workflow/config/plugins'
 import { getRoutes } from '@workflow/config/routes'
 import { readFileSync } from 'fs'
+import { register } from './workers'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -61,6 +62,7 @@ export async function createServer() {
 
   async function start() {
     await server.start()
+    await register()
     server.log('info', `Workflow server started on ${HOST}:${PORT}`)
   }
 

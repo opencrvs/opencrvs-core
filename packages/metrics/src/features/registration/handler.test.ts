@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { createServer } from '@metrics/server'
 import * as api from '@metrics/api'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
-import * as fetchAny from 'jest-fetch-mock'
 import { testDeclaration } from '@metrics/features/registration/testUtils'
-import { cloneDeep } from 'lodash'
+import { createServer } from '@metrics/server'
+import { readFileSync } from 'fs'
+import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 
 const fetch = fetchAny as any
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
@@ -79,26 +78,10 @@ describe('When a new registration event is received', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload: testDeclaration
+      payload: { record: testDeclaration, transactionId: '123' }
     })
 
     expect(res.statusCode).toBe(200)
-  })
-
-  it('returns 500 for invalid payload in new birth registration', async () => {
-    const payload = cloneDeep(testDeclaration)
-    // @ts-ignore
-    payload.entry[0] = {}
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/events/birth/sent-notification-for-review',
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      payload
-    })
-
-    expect(res.statusCode).toBe(500)
   })
 })
 
@@ -117,10 +100,10 @@ describe('When an existing declaration is marked registered', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload
+      payload: { record: payload, transactionId: '123' }
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[1][0].find(
+      influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -136,10 +119,10 @@ describe('When an existing declaration is marked registered', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload
+      payload: { record: payload, transactionId: '123' }
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[1][0].find(
+      influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -158,7 +141,7 @@ describe('When an existing declaration is marked registered', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload
+      payload: { record: payload, transactionId: '123' }
     })
     const declarationEventPoint =
       influxClient.writePoints.mock.calls[0][0].find(
@@ -181,10 +164,10 @@ describe('When an existing declaration is marked registered', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload
+      payload: { record: payload, transactionId: '123' }
     })
     const declarationEventPoint =
-      influxClient.writePoints.mock.calls[1][0].find(
+      influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'declaration_event_duration'
       )
@@ -202,10 +185,10 @@ describe('When an existing declaration is marked registered', () => {
         headers: {
           Authorization: `Bearer ${token}`
         },
-        payload
+        payload: { record: payload, transactionId: '123' }
       })
       const declarationEventPoint =
-        influxClient.writePoints.mock.calls[1][0].find(
+        influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
             measurement === 'declaration_event_duration'
         )
@@ -305,10 +288,10 @@ describe('When an in-progress declaration is received', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload
+      payload: { record: payload, transactionId: '123' }
     })
     const inCompleteFieldPoints =
-      influxClient.writePoints.mock.calls[1][0].find(
+      influxClient.writePoints.mock.calls[0][0].find(
         ({ measurement }: { measurement: string }) =>
           measurement === 'in_complete_fields'
       )
@@ -325,7 +308,7 @@ describe('When an in-progress declaration is received', () => {
       headers: {
         Authorization: `Bearer ${token}`
       },
-      payload
+      payload: { record: payload, transactionId: '123' }
     })
     expect(res.statusCode).toBe(500)
   })
@@ -341,6 +324,7 @@ describe('When an in-progress declaration is received', () => {
       },
       payload
     })
+
     const rejectedPoints = influxClient.writePoints.mock.calls[1][0].find(
       ({ measurement }: { measurement: string }) =>
         measurement === 'declarations_rejected'

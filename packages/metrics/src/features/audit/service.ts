@@ -10,17 +10,18 @@
  */
 import * as Hapi from '@hapi/hapi'
 
-import { query, writePoints } from '@metrics/influxdb/client'
-import {
-  generateAuditPoint,
-  toInfluxTimestamp
-} from '@metrics/features/registration/pointGenerator'
 import {
   getCompositionIdFromCompositionOrTask,
   getPractitionerIdFromBundle,
   getTask,
   getTrackingId
 } from '@metrics/features/registration/fhirUtils'
+import {
+  generateAuditPoint,
+  toInfluxTimestamp
+} from '@metrics/features/registration/pointGenerator'
+import { query, writePoints } from '@metrics/influxdb/client'
+import { ValidRecord } from '@opencrvs/commons/types'
 
 type UserAuditAction =
   | 'DECLARED'
@@ -95,25 +96,34 @@ type UserAuditDataPoint =
 
 export async function createUserAuditPointFromFHIR(
   action: UserAuditAction,
-  request: Hapi.Request
+  {
+    record,
+    headers,
+    transactionId
+  }: {
+    record: ValidRecord
+    headers: Hapi.Request['headers']
+    transactionId?: string
+  }
 ) {
-  const ipAddress = request.headers['x-real-ip'] || request.info.remoteAddress
-  const userAgent =
-    request.headers['x-real-user-agent'] || request.headers['user-agent']
+  const ipAddress = headers['x-real-ip'] || 'UNKNOWN'
+  const userAgent = headers['x-real-user-agent'] || 'UNKNOWN'
 
-  const bundle = request.payload as fhir.Bundle
-  return writePoints([
-    generateAuditPoint(
-      getPractitionerIdFromBundle(bundle)!,
-      action,
-      ipAddress,
-      userAgent,
-      {
-        compositionId: getCompositionIdFromCompositionOrTask(bundle),
-        trackingId: getTrackingId(getTask(bundle)!)
-      }
-    )
-  ])
+  return writePoints(
+    [
+      generateAuditPoint(
+        getPractitionerIdFromBundle(record)!,
+        action,
+        ipAddress,
+        userAgent,
+        {
+          compositionId: getCompositionIdFromCompositionOrTask(record),
+          trackingId: getTrackingId(getTask(record)!)
+        }
+      )
+    ],
+    transactionId
+  )
 }
 
 export async function getUserAuditEvents(

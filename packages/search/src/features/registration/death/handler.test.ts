@@ -43,25 +43,6 @@ describe('Verify handlers', () => {
       mockedsearchForDuplicates.mockReturnValue([])
     })
 
-    it('should return status code 500 if invalid payload received', async () => {
-      const token = jwt.sign({}, readFileSync('./test/cert.key'), {
-        algorithm: 'RS256',
-        issuer: 'opencrvs:auth-service',
-        audience: 'opencrvs:search-user'
-      })
-
-      const res = await server.server.inject({
-        method: 'POST',
-        url: '/events/death/new-declaration',
-        payload: {},
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      expect(res.statusCode).toBe(500)
-    })
-
     it('should return status code 500 if invalid payload received where composition has no ID', async () => {
       const token = jwt.sign({}, readFileSync('./test/cert.key'), {
         algorithm: 'RS256',

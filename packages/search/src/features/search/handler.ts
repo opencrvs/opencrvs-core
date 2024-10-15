@@ -8,30 +8,30 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { badRequest, internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import {
-  logger,
-  SearchDocument,
   EVENT,
-  getSearchTotalCount
+  getSearchTotalCount,
+  logger,
+  SearchDocument
 } from '@opencrvs/commons'
-import { badRequest, internal } from '@hapi/boom'
-import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
-import { ISearchCriteria } from '@search/features/search/types'
+import { RouteScope } from '@search/config/routes'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getOrCreateClient } from '@search/elasticsearch/client'
+import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import {
   BirthDocument,
   DeathDocument,
   findDuplicateIds
 } from '@search/elasticsearch/utils'
-import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
-import { OPENCRVS_INDEX_NAME } from '@search/constants'
-import { getTokenPayload } from '@search/utils/authUtils'
-import { RouteScope } from '@search/config/routes'
 import {
-  searchForDeathDuplicates,
-  searchForBirthDuplicates
+  searchForBirthDuplicates,
+  searchForDeathDuplicates
 } from '@search/features/registration/deduplicate/service'
+import { advancedSearch, DEFAULT_SIZE } from '@search/features/search/service'
+import { ISearchCriteria } from '@search/features/search/types'
+import { getTokenPayload } from '@search/utils/authUtils'
 import { capitalize } from 'lodash'
 
 type IAssignmentPayload = {
@@ -231,11 +231,15 @@ export async function searchForBirthDeDuplication(
   h: Hapi.ResponseToolkit
 ) {
   const client = getOrCreateClient()
-
+  const { criteria, transactionId } = request.payload as {
+    criteria: BirthDocument
+    transactionId: string
+  }
   try {
     const result = await searchForBirthDuplicates(
-      request.payload as BirthDocument,
-      client
+      criteria,
+      client,
+      transactionId
     )
     const duplicateIds = findDuplicateIds(result)
     return h.response(duplicateIds).code(200)
@@ -250,11 +254,15 @@ export async function searchForDeathDeDuplication(
   h: Hapi.ResponseToolkit
 ) {
   const client = getOrCreateClient()
-
+  const { criteria, transactionId } = request.payload as {
+    criteria: DeathDocument
+    transactionId: string
+  }
   try {
     const result = await searchForDeathDuplicates(
-      request.payload as DeathDocument,
-      client
+      criteria,
+      client,
+      transactionId
     )
     const duplicateIds = findDuplicateIds(result)
     return h.response(duplicateIds).code(200)

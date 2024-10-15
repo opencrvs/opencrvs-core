@@ -268,7 +268,7 @@ export const fetchEstimateForTargetDaysByLocationId = async (
   timeTo: string
 ): Promise<IEstimation> => {
   if (locationId) {
-    const locationData: Location = await fetchFHIR(locationId, authHeader)
+    const locationData: Location = await fetchFHIR(locationId)
     return await fetchEstimateByLocation(
       locationData,
       event,
@@ -278,8 +278,7 @@ export const fetchEstimateForTargetDaysByLocationId = async (
     )
   } else {
     const locationData = (await fetchChildLocationsByParentId(
-      'Location/0',
-      authHeader
+      'Location/0'
     )) as Location[]
 
     const total = {
@@ -307,12 +306,11 @@ export const fetchEstimateForTargetDaysByLocationId = async (
 }
 
 export const getDistrictLocation = async (
-  locationId: string,
-  authHeader: IAuthHeader
+  locationId: string
 ): Promise<Location> => {
   let lId = locationId
 
-  let locationBundle = await fetchLocation(lId, authHeader)
+  let locationBundle = await fetchLocation(lId)
 
   let locationType = getJurisdictionType(locationBundle)
   while (
@@ -325,7 +323,7 @@ export const getDistrictLocation = async (
         locationBundle.partOf.reference &&
         locationBundle.partOf.reference.split('/')[1]) ||
       ''
-    locationBundle = await fetchLocation(lId, authHeader)
+    locationBundle = await fetchLocation(lId)
     locationType = getJurisdictionType(locationBundle)
   }
 
@@ -376,14 +374,10 @@ export function fillEmptyDataArrayByKey(
 export async function fetchChildLocationIdsByParentId(
   parentLocationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string,
-  authHeader: IAuthHeader
+  lowerLocationLevel: string
 ) {
   if (currentLocationLevel !== lowerLocationLevel) {
-    const bundle = await fetchFHIR(
-      `Location?partof=${parentLocationId}`,
-      authHeader
-    )
+    const bundle = await fetchFHIR(`Location?partof=${parentLocationId}`)
 
     return (
       (bundle &&

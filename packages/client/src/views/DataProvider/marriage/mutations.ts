@@ -14,10 +14,7 @@ import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 const SUBMIT_MARRIAGE_DECLARATION = gql`
   mutation createMarriageRegistration($details: MarriageRegistrationInput!) {
-    createMarriageRegistration(details: $details) {
-      trackingId
-      compositionId
-    }
+    createMarriageRegistration(details: $details)
   }
 `
 const APPROVE_MARRIAGE_DECLARATION = gql`

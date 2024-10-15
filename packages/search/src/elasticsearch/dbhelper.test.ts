@@ -78,7 +78,8 @@ describe('elasticsearch db helper', () => {
 
     const result = await searchForBirthDuplicates(
       mockCompositionBody,
-      t.elasticClient
+      t.elasticClient,
+      ''
     )
 
     expect(result).toHaveLength(2)

@@ -8,105 +8,108 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as Hapi from '@hapi/hapi'
 import {
+  getAuthorizationHeaderFromToken,
+  getUUID,
+  PlainToken,
+  UUID
+} from '@opencrvs/commons'
+import {
+  ArchivedRecord,
+  Attachment,
+  Bundle,
   BundleEntry,
   CertifiedRecord,
   changeState,
+  Composition,
+  CompositionSection,
   CorrectionRequestedRecord,
+  DocumentReference,
+  Encounter,
+  EVENT_TYPE,
   Extension,
   findExtension,
+  getComposition,
   getCorrectionRequestedTask,
   getTaskFromSavedBundle,
-  IssuedRecord,
+  InProgressRecord,
   isPaymentReconciliationBundleEntry,
+  IssuedRecord,
+  Patient,
   PaymentReconciliation,
   Practitioner,
-  RegisteredRecord,
-  Task,
-  sortTasksDescending,
-  RecordWithPreviousTask,
-  ValidatedRecord,
-  Attachment,
-  InProgressRecord,
   ReadyForReviewRecord,
-  Encounter,
-  SavedBundleEntry,
-  CompositionSection,
-  DocumentReference,
-  Composition,
-  RelatedPerson,
-  Patient,
-  ValidRecord,
-  Bundle,
-  SavedTask,
-  ArchivedRecord,
-  RegistrationStatus,
-  WaitingForValidationRecord,
-  EVENT_TYPE,
-  getComposition,
+  RecordWithPreviousTask,
+  RegisteredRecord,
   RegistrationNumber,
+  RegistrationStatus,
+  RejectedRecord,
+  RelatedPerson,
   resourceToBundleEntry,
-  toHistoryResource,
+  SavedBundleEntry,
+  SavedTask,
+  sortTasksDescending,
+  Task,
   TaskHistory,
-  RejectedRecord
+  toHistoryResource,
+  ValidatedRecord,
+  ValidRecord,
+  WaitingForValidationRecord
 } from '@opencrvs/commons/types'
-import { getUUID, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
 } from '@workflow/features/events/utils'
 import {
-  invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
   updatePatientIdentifierWithRN,
   validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { EventRegistrationPayload } from '@workflow/features/registration/handler'
+
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   getTaskEventType,
   removeDuplicatesFromComposition
 } from '@workflow/features/task/fhir/utils'
 import {
-  CertifyInput,
-  IssueInput,
-  ApproveRequestInput,
-  CorrectionRejectionInput,
-  CorrectionRequestInput,
-  MakeCorrectionRequestInput,
-  ChangedValuesInput
-} from './validations'
-import {
   createArchiveTask,
+  createCertifiedTask,
   createCorrectedTask,
   createCorrectionEncounter,
-  createPaymentResources,
   createCorrectionProofOfLegalCorrectionDocument,
   createCorrectionRequestTask,
+  createDocumentReferenceEntryForCertificate,
   createDownloadTask,
   createDuplicateTask,
+  createIssuedTask,
   createNotDuplicateTask,
+  createPaymentResources,
   createRegisterTask,
+  createReinstateTask,
   createRejectTask,
+  createRelatedPersonEntries,
   createUnassignedTask,
   createUpdatedTask,
   createValidateTask,
-  createViewTask,
   createVerifyRecordTask,
+  createViewTask,
   createWaitingForValidationTask,
   getTaskHistory,
-  createRelatedPersonEntries,
-  createDocumentReferenceEntryForCertificate,
-  createIssuedTask,
-  createCertifiedTask,
-  withPractitionerDetails,
+  mergeBundles,
   mergeChangedResourcesIntoRecord,
-  createReinstateTask,
-  mergeBundles
+  withPractitionerDetails
 } from '@workflow/records/fhir'
-import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
+import {
+  ApproveRequestInput,
+  CertifyInput,
+  ChangedValuesInput,
+  CorrectionRejectionInput,
+  CorrectionRequestInput,
+  IssueInput,
+  MakeCorrectionRequestInput
+} from './validations'
+import { RecordValidatedPayload } from '@opencrvs/commons/message-queue'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -433,7 +436,7 @@ export async function toWaitingForExternalValidationState(
     entry: [{ resource: waitingExternalValidationTask }]
   }
 
-  return changeState(
+  const newBundle = changeState(
     await mergeChangedResourcesIntoRecord(
       record,
       unsavedChangedResources,
@@ -441,30 +444,14 @@ export async function toWaitingForExternalValidationState(
     ),
     'WAITING_VALIDATION'
   )
-}
-
-export async function initiateRegistration(
-  record: WaitingForValidationRecord,
-  headers: Record<string, string>,
-  token: string
-): Promise<WaitingForValidationRecord | RejectedRecord> {
-  try {
-    await invokeRegistrationValidation(record, headers)
-  } catch (error) {
-    const statusReason: fhir3.CodeableConcept = {
-      text: REG_NUMBER_GENERATION_FAILED
-    }
-    return toRejected(record, token, statusReason)
-  }
-  return record
+  return newBundle
 }
 
 export async function toRegistered(
-  request: Hapi.Request,
   record: WaitingForValidationRecord,
-  registrationNumber: EventRegistrationPayload['registrationNumber'],
-  token: string,
-  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
+  registrationNumber: RecordValidatedPayload['registrationNumber'],
+  childIdentifiers: RecordValidatedPayload['identifiers'],
+  token: PlainToken
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTaskWithoutPractitionerExtensions =
@@ -526,9 +513,7 @@ export async function toRegistered(
     /** using first patient because for death event there is only one patient */
     patientsWithRegNumber[0] = await validateDeceasedDetails(
       patientsWithRegNumber[0],
-      {
-        Authorization: request.headers.authorization
-      }
+      getAuthorizationHeaderFromToken(token)
     )
   }
 

@@ -63,9 +63,15 @@ export const composeDocument = (
 ) => {
   const task = getTaskFromSavedBundle(bundle)
   const composition = getComposition(bundle)
+  const draftId = findTaskIdentifier(
+    task,
+    'http://opencrvs.org/specs/id/draft-id'
+  )
+
   const body: SearchDocument = {
     compositionId: composition.id,
     event: EVENT.MARRIAGE,
+    draftId: draftId && draftId.value,
     createdAt:
       existingDocument?.body?.hits?.hits?.[0]?._source?.createdAt ||
       Date.now().toString(),
@@ -102,13 +108,13 @@ export const composeDocument = (
   return body
 }
 
-export async function indexRecord(bundle: SavedBundle) {
+export async function indexRecord(bundle: SavedBundle, transactionId?: string) {
   const client = getOrCreateClient()
 
   const { id: compositionId } = getComposition(bundle)
   const existingDocument = await searchByCompositionId(compositionId, client)
   const document = composeDocument(bundle, existingDocument)
-  await indexComposition(compositionId, document, client)
+  await indexComposition(compositionId, document, client, transactionId)
 }
 
 function createIndexBody(

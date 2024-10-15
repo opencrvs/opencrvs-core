@@ -9,51 +9,54 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { USER_MANAGEMENT_URL } from '@metrics/constants'
+import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
+import { IUserAuditBody } from '@metrics/features/registration'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
-import { internal } from '@hapi/boom'
-import { IUserAuditBody } from '@metrics/features/registration'
-import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
-import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
 import fetch from 'node-fetch'
-import { USER_MANAGEMENT_URL } from '@metrics/constants'
+import { countUserAuditEvents, getUserAuditEvents } from './service'
 
 export async function newAuditHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   const points = []
-  try {
-    const remoteAddress =
-      request.headers['x-real-ip'] || request.info.remoteAddress
-    const userAgent =
-      request.headers['x-real-user-agent'] || request.headers['user-agent']
-    const payload = request.payload as IUserAuditBody
-    let practitionerId
-    if (payload.practitionerId) {
-      practitionerId = payload.practitionerId!
-    } else {
-      const userId = getClientIdFromToken(request.headers.authorization)
-      const user = await getUser(userId, {
-        Authorization: request.headers.authorization
-      })
-      practitionerId = user.practitionerId
-    }
 
-    points.push(
-      generateAuditPoint(
-        practitionerId,
-        payload.action,
-        remoteAddress,
-        userAgent,
-        payload.additionalData
-      )
-    )
-    await writePoints(points)
-  } catch (err) {
-    return internal(err)
+  const remoteAddress =
+    request.headers['x-real-ip'] || request.info.remoteAddress
+
+  const userAgent =
+    request.headers['x-real-user-agent'] || request.headers['user-agent']
+
+  const payload = request.payload as IUserAuditBody
+
+  const transactionId = payload.transactionId
+
+  let practitionerId
+  if (payload.practitionerId) {
+    practitionerId = payload.practitionerId!
+  } else {
+    const userId = getClientIdFromToken(request.headers.authorization)
+    const user = await getUser(userId, {
+      Authorization: request.headers.authorization
+    })
+    practitionerId = user.practitionerId
   }
+
+  points.push(
+    generateAuditPoint(
+      practitionerId,
+      payload.action,
+      remoteAddress,
+      userAgent,
+      payload.additionalData
+    )
+  )
+
+  await writePoints(points, transactionId)
+
   return h.response().code(201)
 }
 

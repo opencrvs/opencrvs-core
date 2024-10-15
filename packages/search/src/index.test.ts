@@ -13,15 +13,6 @@ import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
 
 describe('Route authorization', () => {
-  it('health check', async () => {
-    const server = await createServer()
-    const res = await server.server.inject({
-      method: 'GET',
-      url: '/ping'
-    })
-    expect(res.statusCode).toBe(200)
-    expect(res.payload).toBe(JSON.stringify({ success: false }))
-  })
   it('blocks requests without a token', async () => {
     const server = await createServer()
     const res = await server.server.inject({

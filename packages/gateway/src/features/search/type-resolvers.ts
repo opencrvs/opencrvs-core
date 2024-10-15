@@ -16,7 +16,8 @@ import {
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import {
   GQLOperationHistorySearchSet,
-  GQLResolver
+  GQLResolver,
+  GQLRecordStatus
 } from '@gateway/graphql/schema'
 import { getFullName } from '@gateway/features/user/utils'
 
@@ -189,6 +190,14 @@ const getGroomName = (source: ISearchDataTemplate) => {
 }
 
 export const searchTypeResolvers: GQLResolver = {
+  RecordStatus: {
+    __resolveType(obj: GQLRecordStatus) {
+      if (obj.processed) {
+        return 'RecordProcessed'
+      }
+      return 'RecordProcessing'
+    }
+  },
   EventSearchSet: {
     __resolveType(obj: ISearchEventDataTemplate) {
       if (obj._source.event === 'Birth') {

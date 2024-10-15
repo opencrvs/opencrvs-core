@@ -243,8 +243,7 @@ describe('verify metrics util', () => {
     it('Returns the district location', async () => {
       fetchLocation.mockResolvedValueOnce(location)
       const result = await getDistrictLocation(
-        'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5',
-        { Authorization: 'bearer token' }
+        'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5'
       )
       expect(result.id).toEqual('0eaa73dd-2a21-4998-b1e6-b08430595201')
     })
@@ -302,9 +301,7 @@ describe('verify metrics util', () => {
         .mockResolvedValueOnce(null)
 
       expect(
-        getDistrictLocation('b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5', {
-          Authorization: 'bearer token'
-        })
+        getDistrictLocation('b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5')
       ).rejects.toThrowError('No district location found')
     })
   })

@@ -36,6 +36,7 @@ export type Scalars = {
   FieldValue: any
   Map: any
   PlainDate: PlainDate
+  Void: never
 }
 
 export type AdditionalIdWithCompositionId = {
@@ -187,6 +188,7 @@ export type AdvancedSearchParametersInput = {
   deceasedIdentifier?: InputMaybe<Scalars['String']>
   declarationJurisdictionId?: InputMaybe<Scalars['String']>
   declarationLocationId?: InputMaybe<Scalars['String']>
+  draftId?: InputMaybe<Scalars['String']>
   event?: InputMaybe<Event>
   eventCountry?: InputMaybe<Scalars['String']>
   eventLocationId?: InputMaybe<Scalars['String']>
@@ -478,13 +480,6 @@ export type CorrectionValueInput = {
   newValue: Scalars['FieldValue']
   oldValue?: InputMaybe<Scalars['FieldValue']>
   section: Scalars['String']
-}
-
-export type CreatedIds = {
-  __typename?: 'CreatedIds'
-  compositionId?: Maybe<Scalars['String']>
-  isPotentiallyDuplicate?: Maybe<Scalars['Boolean']>
-  trackingId?: Maybe<Scalars['String']>
 }
 
 export type DeathEventSearchSet = EventSearchSet & {
@@ -932,11 +927,11 @@ export type Mutation = {
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
-  createBirthRegistration: CreatedIds
+  createBirthRegistration: Scalars['Void']
   createBirthRegistrationCorrection: Scalars['ID']
-  createDeathRegistration: CreatedIds
+  createDeathRegistration: Scalars['Void']
   createDeathRegistrationCorrection: Scalars['ID']
-  createMarriageRegistration: CreatedIds
+  createMarriageRegistration: Scalars['Void']
   createMarriageRegistrationCorrection: Scalars['ID']
   createOrUpdateUser: User
   deactivateSystem?: Maybe<System>
@@ -1391,6 +1386,7 @@ export type Query = {
   fetchMarriageRegistration?: Maybe<MarriageRegistration>
   fetchMonthWiseEventMetrics?: Maybe<Array<MonthWiseEstimationMetric>>
   fetchRecordDetailsForVerification?: Maybe<RecordDetails>
+  fetchRecordStatus: RecordStatus
   fetchRegistration?: Maybe<EventRegistration>
   fetchRegistrationCountByStatus?: Maybe<RegistrationCountResult>
   fetchRegistrationForViewing?: Maybe<EventRegistration>
@@ -1456,6 +1452,10 @@ export type QueryFetchMonthWiseEventMetricsArgs = {
 
 export type QueryFetchRecordDetailsForVerificationArgs = {
   id: Scalars['String']
+}
+
+export type QueryFetchRecordStatusArgs = {
+  draftId: Scalars['ID']
 }
 
 export type QueryFetchRegistrationArgs = {
@@ -1667,6 +1667,21 @@ export type QuestionnaireQuestionInput = {
 }
 
 export type RecordDetails = BirthRegistration | DeathRegistration
+
+export type RecordProcessed = {
+  __typename?: 'RecordProcessed'
+  hasPotentialDuplicates: Scalars['Boolean']
+  processed: Scalars['Boolean']
+  recordId: Scalars['ID']
+  trackingId: Scalars['String']
+}
+
+export type RecordProcessing = {
+  __typename?: 'RecordProcessing'
+  processed: Scalars['Boolean']
+}
+
+export type RecordStatus = RecordProcessed | RecordProcessing
 
 export enum RegAction {
   ApprovedCorrection = 'APPROVED_CORRECTION',
@@ -2205,6 +2220,23 @@ export type WebhookPermission = {
   __typename?: 'WebhookPermission'
   event: Scalars['String']
   permissions: Array<Scalars['String']>
+}
+
+export type FetchRecordStatusQueryVariables = Exact<{
+  draftId: Scalars['ID']
+}>
+
+export type FetchRecordStatusQuery = {
+  __typename?: 'Query'
+  fetchRecordStatus:
+    | {
+        __typename?: 'RecordProcessed'
+        processed: boolean
+        trackingId: string
+        hasPotentialDuplicates: boolean
+        recordId: string
+      }
+    | { __typename?: 'RecordProcessing'; processed: boolean }
 }
 
 export type CreateBirthRegistrationCorrectionMutationVariables = Exact<{
@@ -3020,12 +3052,7 @@ export type CreateBirthRegistrationMutationVariables = Exact<{
 
 export type CreateBirthRegistrationMutation = {
   __typename?: 'Mutation'
-  createBirthRegistration: {
-    __typename?: 'CreatedIds'
-    trackingId?: string | null
-    compositionId?: string | null
-    isPotentiallyDuplicate?: boolean | null
-  }
+  createBirthRegistration: never
 }
 
 export type MarkBirthAsValidatedMutationVariables = Exact<{
@@ -3789,12 +3816,7 @@ export type CreateDeathRegistrationMutationVariables = Exact<{
 
 export type CreateDeathRegistrationMutation = {
   __typename?: 'Mutation'
-  createDeathRegistration: {
-    __typename?: 'CreatedIds'
-    trackingId?: string | null
-    compositionId?: string | null
-    isPotentiallyDuplicate?: boolean | null
-  }
+  createDeathRegistration: never
 }
 
 export type MarkDeathAsValidatedMutationVariables = Exact<{
@@ -4579,11 +4601,7 @@ export type CreateMarriageRegistrationMutationVariables = Exact<{
 
 export type CreateMarriageRegistrationMutation = {
   __typename?: 'Mutation'
-  createMarriageRegistration: {
-    __typename?: 'CreatedIds'
-    trackingId?: string | null
-    compositionId?: string | null
-  }
+  createMarriageRegistration: never
 }
 
 export type MarkMarriageAsValidatedMutationVariables = Exact<{
@@ -7454,82 +7472,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 

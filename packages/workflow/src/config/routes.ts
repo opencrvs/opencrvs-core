@@ -9,26 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { markEventAsRegisteredCallbackHandler } from '@workflow/features/registration/handler'
-import { certifyRoute } from '@workflow/records/handler/certify'
 import { archiveRoute } from '@workflow/records/handler/archive'
-import createRecordHandler from '@workflow/records/handler/create'
-import { unassignRecordHandler } from '@workflow/records/handler/unassign'
+import { certifyRoute } from '@workflow/records/handler/certify'
+import { approveCorrectionRoute } from '@workflow/records/handler/correction/approve'
+import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
+import { rejectCorrectionRoute } from '@workflow/records/handler/correction/reject'
+import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
 import { downloadRecordHandler } from '@workflow/records/handler/download'
-import { issueRoute } from '@workflow/records/handler/issue'
 import { duplicateRecordHandler } from '@workflow/records/handler/duplicate'
+import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
+import { issueRoute } from '@workflow/records/handler/issue'
+import { markAsNotDuplicateHandler } from '@workflow/records/handler/not-duplicate'
 import { registerRoute } from '@workflow/records/handler/register'
-import { rejectRoute } from '@workflow/records/handler/reject'
 import { reinstateRoute } from '@workflow/records/handler/reinstate'
+import { rejectRoute } from '@workflow/records/handler/reject'
+import { unassignRecordHandler } from '@workflow/records/handler/unassign'
 import { updateRoute } from '@workflow/records/handler/update'
 import { validateRoute } from '@workflow/records/handler/validate'
-import { viewRecordHandler } from '@workflow/records/handler/view'
 import { verifyRecordHandler } from '@workflow/records/handler/verify'
-import { markAsNotDuplicateHandler } from '@workflow/records/handler/not-duplicate'
-import { rejectCorrectionRoute } from '@workflow/records/handler/correction/reject'
-import { approveCorrectionRoute } from '@workflow/records/handler/correction/approve'
-import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
-import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
-import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
+import { viewRecordHandler } from '@workflow/records/handler/view'
 
 export const getRoutes = () => {
   const routes = [
@@ -67,15 +66,6 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Register event based on tracking id and registration number.'
-      }
-    },
-    {
-      method: 'POST',
-      path: '/create-record',
-      handler: createRecordHandler,
-      config: {
-        tags: ['api'],
-        description: 'Create record endpoint'
       }
     },
     {

@@ -669,6 +669,13 @@ export async function advancedQueryBuilder(
     })
   }
 
+  if (params.draftId) {
+    must.push({
+      match: {
+        draftId: params.draftId
+      }
+    })
+  }
   if (params.recordId) {
     must.push({
       match: {

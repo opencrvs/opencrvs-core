@@ -131,7 +131,9 @@ type RecordStateChangeRouteHandler<
   includeHistoryResources: boolean
   handler: (
     request: Request,
-    record: StateIdenfitiers[T[number]]
+    record: StateIdenfitiers[T[number]] extends never
+      ? StateIdenfitiers[keyof StateIdenfitiers]
+      : StateIdenfitiers[T[number]]
   ) => PromiseOrValue<
     GetEndState<
       StateIdenfitiers[T[number]],
@@ -148,7 +150,7 @@ export function createRoute<
     path: params.path,
     method: params.method,
     handler: async (request: Request) => {
-      const record = await getRecordById(
+      const record = await getRecordById<T>(
         request.params.recordId,
         request.headers.authorization,
         params.allowedStartStates,

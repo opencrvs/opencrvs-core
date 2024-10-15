@@ -107,6 +107,7 @@ async function fetchSystemRoles(token: string): Promise<SystemRole[]> {
       }
     })
   })
+
   if (!res.ok) {
     raise(`Failed to fetch roles from gateway`)
   }

@@ -9,23 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { badRequest, Boom } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import {
-  HOST,
-  PORT,
-  CERT_PUBLIC_KEY_PATH,
-  DEFAULT_TIMEOUT
-} from '@metrics/constants'
+import * as database from '@metrics/config/database'
 import getPlugins from '@metrics/config/plugins'
 import { getRoutes } from '@metrics/config/routes'
-import { readFileSync } from 'fs'
+import {
+  CERT_PUBLIC_KEY_PATH,
+  DEFAULT_TIMEOUT,
+  HOST,
+  PORT
+} from '@metrics/constants'
 import { influx } from '@metrics/influxdb/client'
 import {
   INFLUX_DB,
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
-import * as database from '@metrics/config/database'
+import { logger } from '@opencrvs/commons'
+import { readFileSync } from 'fs'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -35,7 +37,22 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
-      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT },
+      response: {
+        failAction: async (req, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`Response validationError: ${err.message}`)
+            throw badRequest(`Invalid response payload returned from handler`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(
+              `${req.path} response has a validation error: ${err.message}`
+            )
+            throw err
+          }
+        }
+      }
     }
   })
 

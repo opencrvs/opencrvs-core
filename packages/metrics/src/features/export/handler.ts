@@ -61,9 +61,7 @@ export async function monthlyExportHandler(
   if (monthlyMetrics.genderBasisMetrics) {
     const stream = []
     for (const genderBaseData of monthlyMetrics.genderBasisMetrics) {
-      const loc = await fetchLocation(genderBaseData.location, {
-        Authorization: `Bearer ${auth.token}`
-      })
+      const loc = await fetchLocation(genderBaseData.location)
       stream.push({
         Location: loc.name,
         'Male Under 18': `${genderBaseData.maleUnder18} (${getPercentage(
@@ -94,9 +92,7 @@ export async function monthlyExportHandler(
   if (monthlyMetrics.timeFrames) {
     const stream = []
     for (const timeFrameData of monthlyMetrics.timeFrames) {
-      const loc = await fetchLocation(timeFrameData.locationId, {
-        Authorization: `Bearer ${auth.token}`
-      })
+      const loc = await fetchLocation(timeFrameData.locationId)
       stream.push({
         Location: loc.name,
         [`Within ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: `${
@@ -133,9 +129,7 @@ export async function monthlyExportHandler(
   if (monthlyMetrics.estimatedTargetDayMetrics) {
     const stream = []
     for (const estimatedTargetDayData of monthlyMetrics.estimatedTargetDayMetrics) {
-      const loc = await fetchLocation(estimatedTargetDayData.locationId, {
-        Authorization: `Bearer ${auth.token}`
-      })
+      const loc = await fetchLocation(estimatedTargetDayData.locationId)
       stream.push({
         Location: loc.name,
         'Estimated no. of registrations':
@@ -154,9 +148,7 @@ export async function monthlyExportHandler(
   if (monthlyMetrics.payments) {
     const stream = []
     for (const paymentData of monthlyMetrics.payments) {
-      const loc = await fetchLocation(paymentData.locationId, {
-        Authorization: `Bearer ${auth.token}`
-      })
+      const loc = await fetchLocation(paymentData.locationId)
       stream.push({
         Location: loc.name,
         Total: paymentData.total

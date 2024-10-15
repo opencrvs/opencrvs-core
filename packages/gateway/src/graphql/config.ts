@@ -120,6 +120,19 @@ export const resolvers: StringIndexed<IResolvers> = merge(
         }
       }
     }),
+    Void: new GraphQLScalarType({
+      name: 'Void',
+      description: 'Represents a value that is null or has no meaningful value',
+      serialize() {
+        return {}
+      },
+      parseValue() {
+        return null
+      },
+      parseLiteral() {
+        return null
+      }
+    }),
     PlainDate: new GraphQLScalarType({
       name: 'PlainDate',
       description: 'A date string such as 2024-04-15',

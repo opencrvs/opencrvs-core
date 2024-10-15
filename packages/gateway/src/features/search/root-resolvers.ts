@@ -15,7 +15,7 @@ import {
   hasScope,
   inScope
 } from '@gateway/features/user/utils'
-import { GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver, GQLRecordStatus } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
@@ -75,6 +75,39 @@ export interface ISearchResponse<T> {
 
 export const resolvers: GQLResolver = {
   Query: {
+    async fetchRecordStatus(
+      _,
+      { draftId },
+      { headers: authHeader }
+    ): Promise<GQLRecordStatus> {
+      if (
+        !inScope(authHeader, ['register', 'validate', 'certify', 'declare'])
+      ) {
+        return await Promise.reject(
+          new Error(
+            'Record status check is only allowed for user roles able to submit records'
+          )
+        )
+      }
+
+      const searchResult: ApiResponse<ISearchResponse<any>> =
+        await postAdvancedSearch(authHeader, { parameters: { draftId } })
+
+      if (searchResult.body.hits.total.value === 0) {
+        return {
+          processed: false
+        }
+      }
+
+      const record = searchResult.body.hits.hits[0]._source
+
+      return {
+        processed: true,
+        recordId: record.compositionId,
+        trackingId: record.trackingId,
+        hasPotentialDuplicates: record.relatesTo?.length > 0
+      }
+    },
     async searchEvents(
       _,
       {

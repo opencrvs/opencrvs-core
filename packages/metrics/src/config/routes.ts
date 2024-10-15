@@ -21,31 +21,45 @@ import { getEventDurationHandler } from '@metrics/features/getEventDuration/hand
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
 import {
-  metricsDeleteMeasurementHandler,
   deletePerformanceHandler,
+  metricsDeleteMeasurementHandler,
   metricsHandler
 } from '@metrics/features/metrics/handler'
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 
+import * as Hapi from '@hapi/hapi'
+import { PRODUCTION, QA_ENV } from '@metrics/constants'
 import {
-  sentNotificationHandler,
-  markCertifiedHandler,
-  sentForUpdatesHandler,
-  sentNotificationForReviewHandler,
-  sentForApprovalHandler,
-  declarationAssignedHandler,
-  declarationUnassignedHandler,
-  waitingExternalValidationHandler,
-  declarationViewedHandler,
-  declarationDownloadedHandler,
+  getUserAuditsHandler,
+  newAuditHandler
+} from '@metrics/features/audit/handler'
+import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
+import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
+import { totalPaymentsHandler } from '@metrics/features/payments/handler'
+import {
+  performanceDataRefreshHandler,
+  refresh
+} from '@metrics/features/performance/viewRefresher'
+import {
+  correctionEventHandler,
   declarationArchivedHandler,
+  declarationAssignedHandler,
+  declarationDownloadedHandler,
   declarationReinstatedHandler,
+  declarationUnassignedHandler,
   declarationUpdatedHandler,
-  markEventRegisteredHandler,
-  markIssuedHandler,
+  declarationViewedHandler,
+  markCertifiedHandler,
   markedAsDuplicate,
   markedAsNotDuplicate,
-  correctionEventHandler
+  markEventRegisteredHandler,
+  markIssuedHandler,
+  sentForApprovalHandler,
+  sentForUpdatesHandler,
+  sentNotificationForReviewHandler,
+  sentNotificationHandler,
+  waitingExternalValidationHandler
 } from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
@@ -58,25 +72,11 @@ import {
   totalMetricsByTime,
   totalMetricsHandler
 } from '@metrics/features/totalMetrics/handler'
-import { totalPaymentsHandler } from '@metrics/features/payments/handler'
-import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
-import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
-import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
-import {
-  getUserAuditsHandler,
-  newAuditHandler
-} from '@metrics/features/audit/handler'
-import * as Joi from 'joi'
 import {
   getAllVSExport,
   vsExportHandler
 } from '@metrics/features/vsExport/handler'
-import {
-  performanceDataRefreshHandler,
-  refresh
-} from '@metrics/features/performance/viewRefresher'
-import { PRODUCTION, QA_ENV } from '@metrics/constants'
-import * as Hapi from '@hapi/hapi'
+import * as Joi from 'joi'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'

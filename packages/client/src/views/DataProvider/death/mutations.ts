@@ -19,11 +19,7 @@ import { SubmissionAction } from '@client/forms'
 
 const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {
-    createDeathRegistration(details: $details) {
-      trackingId
-      compositionId
-      isPotentiallyDuplicate
-    }
+    createDeathRegistration(details: $details)
   }
 `
 const APPROVE_DEATH_DECLARATION = gql`

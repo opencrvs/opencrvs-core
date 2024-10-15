@@ -9,20 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  getTask,
-  getComposition
-} from '@metrics/features/registration/fhirUtils'
-import { fetchFHIR } from '@metrics/api'
+  EVENT_TYPE,
+  getRegistrationLateTargetDays,
+  getRegistrationTargetDays
+} from '@metrics/features/metrics/utils'
 import {
   differenceInDays,
   differenceInSeconds,
   differenceInYears
 } from 'date-fns'
-import {
-  EVENT_TYPE,
-  getRegistrationTargetDays,
-  getRegistrationLateTargetDays
-} from '@metrics/features/metrics/utils'
 
 type YYYY_MM_DD = string
 type ISO_DATE = string
@@ -68,78 +63,6 @@ export function getDurationInYears(from: ISO_DATE, to: ISO_DATE) {
  *
  * The encounter and observations are not populated at this time.
  */
-export async function populateBundleFromPayload(
-  payload: fhir.Bundle | fhir.Task,
-  authHeader: string
-) {
-  let bundle: fhir.Bundle | null = null
-  if (payload.resourceType === 'Bundle') {
-    bundle = payload as fhir.Bundle
-
-    const composition = getComposition(bundle)
-    const hasBundleBeenPopulated = composition !== undefined
-    if (hasBundleBeenPopulated) {
-      // Assume that if the bundle already has a fhir.Composition, it has already been populated
-      return bundle
-    }
-  }
-
-  if (payload.resourceType === 'Task') {
-    bundle = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: [{ resource: payload }]
-    }
-  }
-
-  if (!bundle || !bundle.entry) {
-    throw new Error('Bundle not properly formed')
-  }
-
-  const task = getTask(bundle)
-
-  if (!task) {
-    throw new Error('No task resource available')
-  }
-
-  let composition = getComposition(bundle)
-  if (!composition) {
-    if (!task.focus || !task.focus.reference) {
-      throw new Error(
-        "Could not fetch composition as the task didn't have a focus reference"
-      )
-    }
-    composition = await fetchFHIR(task.focus.reference, {
-      Authorization: authHeader
-    })
-
-    if (!composition) {
-      throw new Error(
-        `Composition ${task.focus.reference} not found on FHIR store`
-      )
-    }
-
-    bundle.entry.unshift({
-      fullUrl: task.focus.reference,
-      resource: composition
-    }) // we expect the composition to be in position 0
-  }
-
-  for (const section of composition.section || []) {
-    if (section.entry && section.entry[0] && section.entry[0].reference) {
-      const referencedResource = await fetchFHIR(section.entry[0].reference, {
-        Authorization: authHeader
-      })
-
-      bundle.entry.push({
-        fullUrl: section.entry[0].reference,
-        resource: referencedResource
-      })
-    }
-  }
-
-  return bundle
-}
 
 export async function getTimeLabel(
   timeInDays: number,

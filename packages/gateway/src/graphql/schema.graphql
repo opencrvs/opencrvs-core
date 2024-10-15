@@ -121,6 +121,7 @@ type Query {
     timeStart: String
     timeEnd: String
   ): UserAuditLogResultSet
+  fetchRecordStatus(draftId: ID!): RecordStatus!
   searchEvents(
     userId: String
     advancedSearchParameters: AdvancedSearchParametersInput!
@@ -182,7 +183,7 @@ type Mutation {
     id: ID!
     details: MarriageRegistrationInput!
   ): ID!
-  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
+  createBirthRegistration(details: BirthRegistrationInput!): Void!
   markBirthAsVerified(
     id: ID!
     details: BirthRegistrationInput
@@ -200,7 +201,7 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
-  createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
+  createDeathRegistration(details: DeathRegistrationInput!): Void!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsVerified(
     id: ID!
@@ -211,7 +212,7 @@ type Mutation {
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
   markEventAsUnassigned(id: String!): ID!
-  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
+  createMarriageRegistration(details: MarriageRegistrationInput!): Void!
   markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
   markMarriageAsRegistered(id: ID!, details: MarriageRegistrationInput!): ID!
   markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
@@ -516,6 +517,8 @@ type UserAuditLogResultSet {
   results: [UserAuditLogResultItem!]!
 }
 
+union RecordStatus = RecordProcessing | RecordProcessed
+
 type EventSearchResultSet {
   results: [EventSearchSet]
   totalItems: Int
@@ -525,6 +528,7 @@ input AdvancedSearchParametersInput {
   event: Event
   name: String
   registrationStatuses: [String]
+  draftId: String
   dateOfEvent: String
   dateOfEventStart: String
   dateOfEventEnd: String
@@ -717,11 +721,7 @@ input MarriageRegistrationInput {
   updatedAt: Date
 }
 
-type CreatedIds {
-  compositionId: String
-  trackingId: String
-  isPotentiallyDuplicate: Boolean
-}
+scalar Void
 
 type Reinstated {
   taskEntryResourceID: ID!
@@ -1069,6 +1069,17 @@ type VSExport {
 union UserAuditLogResultItem =
     UserAuditLogItemWithComposition
   | UserAuditLogItem
+
+type RecordProcessing {
+  processed: Boolean!
+}
+
+type RecordProcessed {
+  recordId: ID!
+  processed: Boolean!
+  trackingId: String!
+  hasPotentialDuplicates: Boolean!
+}
 
 interface EventSearchSet {
   id: ID!

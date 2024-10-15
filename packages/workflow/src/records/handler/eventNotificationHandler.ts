@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import {
   addExtensionsToTask,
@@ -18,19 +19,18 @@ import {
   StringExtensionType,
   Task
 } from '@opencrvs/commons/types'
-import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
-import { indexBundle } from '@workflow/records/search'
-import { sendBundleToHearth } from '@workflow/records/fhir'
-import { getSystem } from '@workflow/features/user/utils'
-import { internal } from '@hapi/boom'
 import { getTaskResourceFromFhirBundle } from '@workflow/features/registration/fhir/fhir-template'
-import { auditEvent } from '@workflow/records/audit'
+import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateTrackingIdForEvents,
   getEventType
 } from '@workflow/features/registration/utils'
-import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
+import { getSystem } from '@workflow/features/user/utils'
 import { getValidRecordById } from '@workflow/records'
+import { writeMetricsEvent } from '@workflow/records/audit'
+import { sendBundleToHearth } from '@workflow/records/fhir'
+import { indexBundle } from '@workflow/records/search'
+import { getToken, getTokenPayload } from '@workflow/utils/auth-utils'
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -119,7 +119,14 @@ export async function eventNotificationHandler(
   const updatedBundle = await getValidRecordById(compositionId!, token, true)
 
   await indexBundle(updatedBundle, token)
-  await auditEvent('sent-notification', updatedBundle, token)
+  await writeMetricsEvent('sent-notification', {
+    record: updatedBundle,
+    authToken: token,
+    /*
+     * @todo transactionality should be created using a transaction id provided by the caller
+     */
+    transactionId: 'event_notification_' + trackingId
+  })
 
   return h.response(updatedBundle).code(200)
 }
