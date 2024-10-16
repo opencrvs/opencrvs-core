@@ -52,7 +52,7 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { Scope } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@client/utils/gateway'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
@@ -144,12 +144,12 @@ class HeaderComp extends React.Component<IFullProps> {
     return this.props.scopes?.some((scope) =>
       (
         [
-          'search.birth',
-          'search.birth:my-jurisdiction',
-          'search.death',
-          'search.death:my-jurisdiction',
-          'search.marriage',
-          'search.marriage:my-jurisdiction'
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ] as Scope[]
       ).includes(scope)
     )

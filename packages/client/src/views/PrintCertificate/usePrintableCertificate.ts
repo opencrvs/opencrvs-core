@@ -34,7 +34,7 @@ import {
   getEventDate,
   calculatePrice
 } from './utils'
-import { Event } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
 import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
@@ -115,7 +115,7 @@ export const usePrintableCertificate = (declarationId: string) => {
   const { hasScope } = usePermissions()
   const canUserCorrectRecord =
     declaration?.event !== Event.Marriage &&
-    hasScope('record.registration-correct')
+    hasScope(SCOPES.RECORD_REGISTRATION_CORRECT)
 
   let svg = undefined
   const certificateTemplate =

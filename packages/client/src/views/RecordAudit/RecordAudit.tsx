@@ -80,7 +80,8 @@ import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
   Event,
-  History
+  History,
+  SCOPES
 } from '@client/utils/gateway'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { get } from 'lodash'
@@ -333,7 +334,7 @@ function RecordAuditBody({
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (
-    hasScope('record.registration-correct') &&
+    hasScope(SCOPES.RECORD_REGISTRATION_CORRECT) &&
     isDownloaded &&
     declaration.type !== Event.Marriage &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
@@ -358,7 +359,7 @@ function RecordAuditBody({
   }
 
   if (
-    hasScope('record.declaration-archive') &&
+    hasScope(SCOPES.RECORD_DECLARATION_ARCHIVE) &&
     isDownloaded &&
     declaration.status &&
     ARCHIVABLE_STATUSES.includes(declaration.status)
@@ -379,7 +380,7 @@ function RecordAuditBody({
   }
 
   if (
-    hasScope('record.declaration-archive') &&
+    hasScope(SCOPES.RECORD_DECLARATION_ARCHIVE) &&
     isDownloaded &&
     declaration.status &&
     ARCHIVED.includes(declaration.status)
@@ -400,7 +401,7 @@ function RecordAuditBody({
   }
 
   if (
-    hasScope('record.read') &&
+    hasScope(SCOPES.RECORD_READ) &&
     declaration.status !== SUBMISSION_STATUS.DRAFT
   ) {
     actions.push(
@@ -428,7 +429,7 @@ function RecordAuditBody({
       SUBMISSION_STATUS.VALIDATED,
       SUBMISSION_STATUS.CORRECTION_REQUESTED
     ].includes(declaration.status as SUBMISSION_STATUS) &&
-    hasScope('record.declaration-review')
+    hasScope(SCOPES.RECORD_DECLARATION_REVIEW)
   ) {
     actions.push(
       ShowReviewButton({
@@ -451,7 +452,7 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.DRAFT ||
     ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
       declaration.status === SUBMISSION_STATUS.REJECTED) &&
-      hasScope('record.submit-for-updates'))
+      hasScope(SCOPES.RECORD_SUBMIT_FOR_UPDATES))
   ) {
     actions.push(
       ShowUpdateButton({
@@ -570,7 +571,7 @@ function RecordAuditBody({
 
   const isValidatedOnReview =
     declaration.status === SUBMISSION_STATUS.VALIDATED &&
-    hasScope('record.register')
+    hasScope(SCOPES.RECORD_REGISTER)
 
   const hasDuplicates = !!(
     duplicates &&
