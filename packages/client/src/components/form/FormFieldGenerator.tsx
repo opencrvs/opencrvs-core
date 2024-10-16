@@ -19,6 +19,7 @@ import { TimeField } from '@opencrvs/components/lib/TimeField'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
+import { usePrevious } from '@client/hooks/usePrevious'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -837,9 +838,9 @@ const FormSectionComponent = (props: Props) => {
     onUploadingStateChanged,
     intl,
     touched,
-    setFieldValue,
-    initialValues
+    setFieldValue
   } = props
+  const prevProps = usePrevious(props)
 
   const showValidationErrors = useCallback(
     (fields: IFormField[]) => {
@@ -904,8 +905,8 @@ const FormSectionComponent = (props: Props) => {
   ])
 
   useEffect(() => {
-    const userChangedForm = !isEqual(values, initialValues)
-    const sectionChanged = id !== initialValues?.id
+    const userChangedForm = !isEqual(values, prevProps?.values)
+    const sectionChanged = prevProps?.id !== id
 
     if (userChangedForm) {
       onChange(values)
@@ -924,14 +925,14 @@ const FormSectionComponent = (props: Props) => {
     }
   }, [
     values,
-    initialValues,
     id,
     onChange,
     resetForm,
     fields,
     setAllFieldsDirty,
     fieldsToShowValidationErrors,
-    showValidationErrors
+    showValidationErrors,
+    prevProps
   ])
 
   const setFieldValuesWithDependency = (
