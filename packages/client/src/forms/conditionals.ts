@@ -75,7 +75,6 @@ export interface BuiltInConditionals {
   between46daysTo5yrs: Conditional
   after5yrs: Conditional
   deceasedNationIdSelected: Conditional
-  isRegistrarRoleSelected: Conditional
   certCollectorOther: Conditional
   userAuditReasonSpecified: Conditional
   userAuditReasonOther: Conditional
@@ -89,10 +88,6 @@ export const builtInConditionals: BuiltInConditionals = {
     action: 'hide',
     expression:
       '(!draftData || !draftData.registration || draftData.registration.informantType !== "OTHER" || draftData.registration.informantType === "BOTH_PARENTS" )'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.systemRole!=="LOCAL_REGISTRAR"'
   },
   isOfficePreSelected: {
     action: 'hide',

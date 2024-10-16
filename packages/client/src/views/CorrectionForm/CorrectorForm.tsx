@@ -39,6 +39,7 @@ import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 type IProps = {
   declaration: IDeclaration
@@ -58,6 +59,7 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 function CorrectorFormComponent(props: IFullProps) {
   const { declaration, intl } = props
   const config = useSelector(getOfflineData)
+  const user = useSelector(getUserDetails)
   const section = getCorrectorSection(declaration)
 
   const group = React.useMemo(
@@ -66,7 +68,9 @@ function CorrectorFormComponent(props: IFullProps) {
       fields: replaceInitialValues(
         section.groups[0].fields,
         declaration.data[section.id] || {},
-        declaration.data
+        declaration.data,
+        config,
+        user
       )
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,7 +138,8 @@ function CorrectorFormComponent(props: IFullProps) {
         group,
         declaration.data[section.id],
         config,
-        declaration.data
+        declaration.data,
+        user
       )}
     >
       {intl.formatMessage(buttonMessages.continueButton)}

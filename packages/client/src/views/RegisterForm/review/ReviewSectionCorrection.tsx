@@ -31,6 +31,8 @@ import { hasFormError } from '@client/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import { UserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IChildrenProps {
   toggleRejectModal: () => void
@@ -44,6 +46,7 @@ interface IProps {
 
 interface IConnectProps {
   config: IOfflineData
+  user: UserDetails | null
 }
 
 type DispatchProps = {
@@ -139,7 +142,8 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
             this.props.form.fields,
             rejectionFormData,
             this.props.config,
-            this.props.declaration.data
+            this.props.declaration.data,
+            this.props.user
           )
         }))
     )
@@ -234,7 +238,7 @@ export const ReviewSectionCorrection = connect<
   DispatchProps,
   {},
   IStoreState
->((state) => ({ config: getOfflineData(state) }), {
+>((state) => ({ config: getOfflineData(state), user: getUserDetails(state) }), {
   writeDeclaration,
   goToHomeTab,
   modifyDeclaration

@@ -386,14 +386,6 @@ test('getting role at a specific time from roleHistory', async () => {
               code: 'NATIONAL_REGISTRAR'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
-            }
-          ]
         }
       ],
       location: [
@@ -418,14 +410,6 @@ test('getting role at a specific time from roleHistory', async () => {
             {
               system: 'http://opencrvs.org/specs/roles',
               code: 'LOCAL_REGISTRAR'
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
             }
           ]
         }
@@ -454,14 +438,6 @@ test('getting role at a specific time from roleHistory', async () => {
               code: 'NATIONAL_REGISTRAR'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
-            }
-          ]
         }
       ],
       location: [
@@ -486,14 +462,6 @@ test('getting role at a specific time from roleHistory', async () => {
             {
               system: 'http://opencrvs.org/specs/roles',
               code: 'LOCAL_SYSTEM_ADMIN'
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"Local System Admin"},{"lang":"fr","label":"Administrateur système local"}]'
             }
           ]
         }

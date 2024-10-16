@@ -112,7 +112,6 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  updateRole: GQLResponse
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
@@ -2786,7 +2785,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  updateRole?: MutationToUpdateRoleResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>

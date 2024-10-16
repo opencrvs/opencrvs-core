@@ -33,19 +33,18 @@ export const verifyToken = async (token: string, authUrl: string) => {
 export const validateFunc = async (
   payload: any,
   request: Hapi.Request,
-  checkInvalidToken: string,
+  checkInvalidToken: boolean,
   authUrl: string
 ) => {
-  let valid
-
-  if (checkInvalidToken === 'true') {
+  let valid = false
+  if (checkInvalidToken) {
     valid = await verifyToken(
       request.headers.authorization.replace('Bearer ', ''),
       authUrl
     )
   }
 
-  if (valid === true || checkInvalidToken !== 'true') {
+  if (valid || !checkInvalidToken) {
     return {
       isValid: true,
       credentials: payload

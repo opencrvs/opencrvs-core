@@ -6,7 +6,6 @@
   "private": true,
   "scripts": {
     "postinstall": "patch-package",
-    "precommit": "lint-staged",
     "start": "vite --port=3000",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
@@ -29,7 +28,8 @@
       "eslint --fix",
       "stylelint",
       "yarn extract:translations"
-    ]
+    ],
+    "src/**/*.json": "prettier --write"
   },
   "dependencies": {
     "@apollo/client": "^3.7.0",
@@ -70,7 +70,6 @@
     "iframe-resizer-react": "^1.1.0",
     "jsdom-worker": "^0.3.0",
     "jwt-decode": "^2.2.0",
-    "lint-staged": "^15.2.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "patch-package": "^6.1.2",

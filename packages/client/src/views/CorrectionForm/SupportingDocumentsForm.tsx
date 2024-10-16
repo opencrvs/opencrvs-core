@@ -31,11 +31,13 @@ import {
 } from '@client/navigation'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { supportingDocumentsSection } from '@client/forms/correction/supportDocument'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 type IProps = {
   declaration: IDeclaration
@@ -54,7 +56,8 @@ type IFullProps = IProps & IDispatchProps & IntlShapeProps
 function SupportingDocumentsFormComoponent(props: IFullProps) {
   const { intl, declaration } = props
   const [isFileUploading, setIsFileUploading] = React.useState<boolean>(false)
-
+  const config = useSelector(getOfflineData)
+  const user = useSelector(getUserDetails)
   const section = supportingDocumentsSection
 
   const group = {
@@ -62,7 +65,9 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
     fields: replaceInitialValues(
       section.groups[0].fields,
       declaration.data[section.id] || {},
-      declaration.data
+      declaration.data,
+      config,
+      user
     )
   }
 

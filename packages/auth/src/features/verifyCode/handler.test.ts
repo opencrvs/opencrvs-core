@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createServerWithEnvironment } from '@auth/tests/util'
+import { createProductionEnvironmentServer } from '@auth/tests/util'
 import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
 import * as fetchMock from 'jest-fetch-mock'
 
@@ -18,9 +18,7 @@ describe('authenticate handler receives a request', () => {
   let server: any
 
   beforeEach(async () => {
-    server = await createServerWithEnvironment({
-      NODE_ENV: 'production'
-    })
+    server = await createProductionEnvironmentServer()
   })
 
   describe('user management service says credentials are valid', () => {

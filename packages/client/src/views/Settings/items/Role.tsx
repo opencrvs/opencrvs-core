@@ -23,7 +23,7 @@ import { useSelector } from 'react-redux'
 
 export function Role() {
   const intl = useIntl()
-  const systemRole = useSelector<IStoreState, string>((state) => {
+  const role = useSelector<IStoreState, string>((state) => {
     const userDetails = getUserDetails(state)
     return (userDetails && intl.formatMessage(userDetails.role.label)) || ''
   })
@@ -34,7 +34,7 @@ export function Role() {
           {intl.formatMessage(constantsMessages.labelRole)}
         </LabelContainer>
       }
-      value={<ValueContainer>{systemRole}</ValueContainer>}
+      value={<ValueContainer>{role}</ValueContainer>}
       actions={
         <DynamicHeightLinkButton disabled>
           {intl.formatMessage(buttonMessages.change)}

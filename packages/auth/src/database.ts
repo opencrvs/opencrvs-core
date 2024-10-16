@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as redis from 'redis'
-import { REDIS_HOST } from '@auth/constants'
+import { env } from '@auth/environment'
 import { promisify } from 'util'
 import { logger } from '@opencrvs/commons'
 
@@ -29,9 +29,9 @@ export async function stop() {
 }
 
 export async function start() {
-  logger.info(`REDIS_HOST, ${JSON.stringify(REDIS_HOST)}`)
+  logger.info(`REDIS_HOST, ${JSON.stringify(env.REDIS_HOST)}`)
   redisClient = redis.createClient({
-    host: REDIS_HOST,
+    host: env.REDIS_HOST,
     retry_strategy: (options) => 1000
   })
 }

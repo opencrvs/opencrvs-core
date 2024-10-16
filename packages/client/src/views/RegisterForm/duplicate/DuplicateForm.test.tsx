@@ -17,7 +17,8 @@ import {
   createTestComponent,
   createTestStore,
   getRegisterFormFromStore,
-  selectOption
+  selectOption,
+  userDetails
 } from '@client/tests/util'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { ReactWrapper } from 'enzyme'
@@ -79,6 +80,7 @@ describe('when in device of large viewport', () => {
           rejectDeclarationClickEvent={mockHandler}
           submitClickEvent={mockHandler}
           onChangeReviewForm={mockHandler}
+          userDetails={userDetails}
         />,
         { store, history }
       )

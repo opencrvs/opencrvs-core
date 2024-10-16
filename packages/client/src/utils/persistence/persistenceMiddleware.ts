@@ -10,18 +10,17 @@
  */
 import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
 import { IStoreState } from '@client/store'
-import {
-  CORRECTION_TOTALS,
-  PERFORMANCE_METRICS,
-  PERFORMANCE_STATS
-} from '@client/views/SysAdmin/Performance/metricsQuery'
+// import {
+//   CORRECTION_TOTALS,
+//   PERFORMANCE_METRICS,
+//   PERFORMANCE_STATS
+// } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Action, Middleware } from 'redux'
-import { client } from '@client/utils/apolloClient'
-import startOfMonth from 'date-fns/startOfMonth'
-import subMonths from 'date-fns/subMonths'
-import { QueryOptions } from '@apollo/client/core'
+// import startOfMonth from 'date-fns/startOfMonth'
+// import subMonths from 'date-fns/subMonths'
+// import { QueryOptions } from '@apollo/client/core'
 
-function getQueriesToPrefetch(
+/*function getQueriesToPrefetch(
   locationId: string,
   officeSelected: boolean
 ): QueryOptions[] {
@@ -72,7 +71,8 @@ function getQueriesToPrefetch(
       fetchPolicy: 'network-only'
     }
   ]
-}
+}*/
+
 export const persistenceMiddleware: Middleware<{}, IStoreState> =
   ({ dispatch, getState }) =>
   (next) =>
@@ -80,7 +80,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
     next(action)
     if (import.meta.env.MODE === 'test') return
     if (action.type === USER_DETAILS_AVAILABLE) {
-      const userDetails = getState().profile.userDetails
+      // const userDetails = getState().profile.userDetails
       const scopes = getState().profile.tokenPayload!.scope!
 
       if (

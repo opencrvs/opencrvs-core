@@ -8,7 +8,7 @@
   "scripts": {
     "start": "yarn build && ./run-migrations.sh",
     "revert": "./revert-migrations.sh",
-    "start:prod": "./run-migrations.sh",
+    "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-migrations.sh hearth",
     "create:openhim": "./create-migrations.sh openhim",
     "create:performance": "./create-migrations.sh performance",
@@ -19,7 +19,6 @@
     "status:user-mgnt": "migrate-mongo status -f ./src/migrate-mongo-config-user-mgnt.js",
     "status:application-config": "migrate-mongo status -f ./src/migrate-mongo-config-application-config.js",
     "reindex-search": "NODE_OPTIONS=--dns-result-order=ipv4first tsx src/reindex-search.ts",
-    "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "rimraf build && tsc"
   },
@@ -48,7 +47,7 @@
     "typescript": "4.9.5"
   },
   "lint-staged": {
-    "src/**/*.{ts}": [
+    "src/**/*.ts": [
       "prettier --write"
     ]
   },

@@ -385,13 +385,18 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         'user',
         'user-view-group',
         'role',
-        (field: IFormField) => ({
-          ...field,
-          options: userRoles.map((role) => ({
-            value: role.id,
-            label: role.label
-          }))
-        })
+        (field: IFormField) => {
+          if (field.type === 'SELECT_WITH_OPTIONS') {
+            return {
+              ...field,
+              options: userRoles.map((role) => ({
+                value: role.id,
+                label: role.label
+              }))
+            }
+          }
+          return field
+        }
       )
 
       return {

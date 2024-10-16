@@ -68,6 +68,7 @@ import { getLanguage } from '@client/i18n/selectors'
 import { getName } from '@opencrvs/client/src/views/RecordAudit/utils'
 import format from '@client/utils/date-formatting'
 import { IOfflineData } from '@client/offline/reducer'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 type URLParams = { declarationId: string }
 
@@ -125,6 +126,7 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
   const offlineResources = useSelector((state: IStoreState) =>
     getOfflineData(state)
   )
+  const userDetails = useSelector(getUserDetails)
 
   const language = useSelector((state: IStoreState) => getLanguage(state))
 
@@ -302,7 +304,13 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
         if (
-          isVisibleField(field, section, declaration, offlineResources) &&
+          isVisibleField(
+            field,
+            section,
+            declaration,
+            offlineResources,
+            userDetails
+          ) &&
           !isViewOnly(field)
         ) {
           if (field.previewGroup === baseTag) {
@@ -315,7 +323,8 @@ const ReviewSummarySection = ({ declaration }: IPropsReviewSummarySection) => {
                   tempField,
                   section,
                   declaration,
-                  offlineResources
+                  offlineResources,
+                  userDetails
                 ) &&
                 !isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag

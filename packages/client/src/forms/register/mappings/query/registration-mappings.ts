@@ -14,7 +14,6 @@ import {
   IFormField,
   IFormSectionData
 } from '@client/forms'
-import { userMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { VIEW_VERIFY_CERTIFICATE } from '@client/navigation/routes'
 import {
@@ -60,10 +59,7 @@ export const roleUserTransformer = (
   )
 
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    history?.user?.systemRole
-      ? (userMessages[history.user.systemRole] as MessageDescriptor &
-          Record<string, string>)
-      : ''
+    history?.user.role.label ?? ''
 }
 export function registrationNumberTransformer(
   transformedData: IFormData,
