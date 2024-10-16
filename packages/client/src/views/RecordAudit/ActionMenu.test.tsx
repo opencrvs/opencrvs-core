@@ -16,7 +16,6 @@ import { ReactWrapper } from 'enzyme'
 import {
   DOWNLOAD_STATUS,
   IDeclaration,
-  storeDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { ActionMenu } from './ActionMenu'
@@ -90,42 +89,72 @@ enum ACTION {
 const actionStatus = (
   component: ReactWrapper<{}, {}>,
   targetAction: string
-): ACTION_STATUS => {
+): { status: ACTION_STATUS; node?: ReactWrapper<{}, {}> } => {
   const target = component
     .find('li')
     .map((a) => a)
     .filter((a) => a.text() === targetAction)
 
-  if (target.length === 0) return ACTION_STATUS.HIDDEN
+  if (target.length === 0) return { status: ACTION_STATUS.HIDDEN }
 
   return target[0].prop('disabled')
-    ? ACTION_STATUS.DISABLED
-    : ACTION_STATUS.ENABLED
+    ? { status: ACTION_STATUS.DISABLED }
+    : { status: ACTION_STATUS.ENABLED, node: target[0] }
 }
 
 describe('View action', () => {
-  it('Can view record', async () => {
+  it('Draft', async () => {
     const { store, history } = createStore()
-    store.dispatch(storeDeclaration(defaultDeclaration))
     const component = await createTestComponent(
       <ActionMenu
-        declaration={defaultDeclaration}
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DRAFT
+        }}
         scope={scopes}
         draft={draftBirthDownloaded}
-        toggleDisplayDialog={function (): void {
-          throw new Error('Function not implemented.')
-        }}
+        toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
-    expect(actionStatus(component, ACTION.VIEW_RECORD)).toBe(
-      ACTION_STATUS.ENABLED
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
     )
   })
 
-  it('Can view declaration', async () => {
+  it('In progress', async () => {
     const { store, history } = createStore()
-    store.dispatch(storeDeclaration(defaultDeclaration))
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={scopes}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('In review', async () => {
+    const { store, history } = createStore()
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -133,15 +162,195 @@ describe('View action', () => {
           status: SUBMISSION_STATUS.DECLARED
         }}
         scope={scopes}
-        draft={draftBirthDownloaded}
-        toggleDisplayDialog={function (): void {
-          throw new Error('Function not implemented.')
-        }}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
-    expect(actionStatus(component, ACTION.VIEW_DECLARATION)).toBe(
-      ACTION_STATUS.ENABLED
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Potential duplicate', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={scopes}
+        draft={draftDeathNotDownloaded}
+        duplicates={['duplicate1']}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Requires update', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={scopes}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Validated', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.VALIDATED
+        }}
+        scope={scopes}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Archived', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.ARCHIVED
+        }}
+        scope={scopes}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Registered', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.REGISTERED
+        }}
+        scope={scopes}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_RECORD)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Registered + Printed in advance', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.CERTIFIED
+        }}
+        scope={scopes}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_RECORD)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
+    )
+  })
+
+  it('Pending correction', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.CORRECTION_REQUESTED
+        }}
+        scope={scopes}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, ACTION.VIEW_RECORD)
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    expect(window.location.href).toContain(
+      defaultDeclaration.id + '/viewRecord'
     )
   })
 })
