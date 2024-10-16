@@ -21,6 +21,7 @@ import {
 import { ActionMenu } from './ActionMenu'
 import { Scope } from '@sentry/react'
 import { Event } from '@client/utils/gateway'
+import { vi } from 'vitest'
 
 const defaultDeclaration = {
   id: '65c48a2b-68dd-4a7e-8868-d2bb1fd27844',
@@ -92,7 +93,9 @@ enum ACTION {
   REVIEW_DECLARATION = 'Review declaration',
   REVIEW_POTENTIAL_DUPLICATE = 'Review potential duplicate',
   REVIEW_CORRECTION_REQUEST = 'Review correction request',
-  UPDATE_DECLARATION = 'Update declaration'
+  UPDATE_DECLARATION = 'Update declaration',
+  ARCHIVE_RECORD = 'Archive Record',
+  REINSTATE_RECORD = 'Reinstate Record'
 }
 
 const actionStatus = (
@@ -939,6 +942,271 @@ describe('Update action', () => {
     )
 
     const { status } = actionStatus(component, [ACTION.UPDATE_DECLARATION])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+})
+
+describe('Archive action', () => {
+  it('Draft', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DRAFT
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('In progress - Downloaded', async () => {
+    const { store, history } = createStore()
+    const toggleDisplayDialogMock = vi.fn()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={toggleDisplayDialogMock}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+    node?.simulate('click')
+
+    expect(toggleDisplayDialogMock).toHaveBeenCalled()
+  })
+
+  it('In progress - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('In review - Downloaded', async () => {
+    const { store, history } = createStore()
+    const toggleDisplayDialogMock = vi.fn()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={toggleDisplayDialogMock}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+    node?.simulate('click')
+
+    expect(toggleDisplayDialogMock).toHaveBeenCalled()
+  })
+
+  it('In review - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('Requires update - Downloaded', async () => {
+    const { store, history } = createStore()
+    const toggleDisplayDialogMock = vi.fn()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.REJECTED
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={toggleDisplayDialogMock}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+    node?.simulate('click')
+
+    expect(toggleDisplayDialogMock).toHaveBeenCalled()
+  })
+
+  it('Requires update - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.REJECTED
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('Validated - Downloaded', async () => {
+    const { store, history } = createStore()
+    const toggleDisplayDialogMock = vi.fn()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.VALIDATED
+        }}
+        scope={SCOPES.REGISTRAR}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={toggleDisplayDialogMock}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+    node?.simulate('click')
+
+    expect(toggleDisplayDialogMock).toHaveBeenCalled()
+  })
+
+  it('Validated - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.VALIDATED
+        }}
+        scope={SCOPES.REGISTRAR}
+        draft={draftDeathNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('Archived', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.ARCHIVED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Registered', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.REGISTERED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Registered + Printed in advance', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.CERTIFIED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Pending correction - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.CORRECTION_REQUESTED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.ARCHIVE_RECORD])
     expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
 })
