@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { COUNTRY_CONFIG_URL } from '@auth/constants'
+import { env } from '@auth/environment'
 import { fetchJSON, joinURL, logger, Roles } from '@opencrvs/commons'
 import {
   DEFAULT_ROLES_DEFINITION,
@@ -17,7 +17,9 @@ import {
 } from '@opencrvs/commons/authentication'
 
 export async function getUserRoleScopeMapping() {
-  const roles = await fetchJSON<Roles>(joinURL(COUNTRY_CONFIG_URL, '/roles'))
+  const roles = await fetchJSON<Roles>(
+    joinURL(env.COUNTRY_CONFIG_URL, '/roles')
+  )
 
   logger.info(
     'Country config implements the new /roles response format. Custom scopes apply'
