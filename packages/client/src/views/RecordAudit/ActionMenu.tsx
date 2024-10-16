@@ -344,14 +344,8 @@ const ReviewAction: React.FC<
   return isPendingCorrection(declarationStatus) ? (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(
-          goToPage(
-            REVIEW_CORRECTION,
-            declarationId as string,
-            'review',
-            type as string
-          )
-        )
+        type &&
+          dispatch(goToPage(REVIEW_CORRECTION, declarationId, 'review', type))
       }}
       disabled={!isDownloaded}
     >
