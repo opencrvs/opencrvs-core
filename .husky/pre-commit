@@ -1,0 +1,2 @@
+yarn check:license
+yarn lerna run --stream --parallel precommit
