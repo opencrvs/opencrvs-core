@@ -33,7 +33,7 @@
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
-      "eslint --fix",
+      "eslint --fix"
     ]
   },
   "keywords": [
