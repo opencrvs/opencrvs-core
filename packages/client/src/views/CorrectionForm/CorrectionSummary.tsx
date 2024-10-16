@@ -93,6 +93,7 @@ const SupportingDocument = styled.div`
 `
 interface IProps {
   userPrimaryOffice?: UserDetails['primaryOffice']
+  userDetails: UserDetails | null
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
@@ -145,12 +146,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       declaration,
       intl,
       goBack,
-      declaration: { event }
+      declaration: { event },
+      userDetails,
+      offlineResources
     } = this.props
 
-    const currencySymbol = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
+    const currencySymbol = getCurrencySymbol(offlineResources.config.CURRENCY)
     const section = correctionFeesPaymentSection(currencySymbol)
 
     const group = {
@@ -158,7 +159,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       fields: replaceInitialValues(
         section.groups[0].fields,
         this.props.declaration.data[section.id] || {},
-        this.props.declaration.data
+        this.props.declaration.data,
+        offlineResources,
+        userDetails
       )
     }
 
@@ -195,7 +198,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             section,
             declaration,
             this.props.offlineResources,
-            this.props.declaration.data
+            this.props.declaration.data,
+            userDetails
           ) || this.state.isFileUploading
         }
       >
@@ -534,7 +538,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) => {
-    const { declaration, intl, offlineResources, language } = this.props
+    const { declaration, intl, offlineResources, language, userDetails } =
+      this.props
     if (field.previewGroup && !visitedTags.includes(field.previewGroup)) {
       visitedTags.push(field.previewGroup)
 
@@ -542,7 +547,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       const taggedFields: IFormField[] = []
       group.fields.forEach((field) => {
         if (
-          isVisibleField(field, section, declaration, offlineResources) &&
+          isVisibleField(
+            field,
+            section,
+            declaration,
+            offlineResources,
+            userDetails
+          ) &&
           !isViewOnly(field)
         ) {
           if (field.previewGroup === baseTag) {
@@ -555,7 +566,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   tempField,
                   section,
                   declaration,
-                  offlineResources
+                  offlineResources,
+                  userDetails
                 ) &&
                 !isViewOnly(tempField) &&
                 tempField.previewGroup === baseTag
@@ -753,11 +765,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   }
 
   getChanges = (formSections: IFormSection[]) => {
-    const { declaration, offlineResources } = this.props
+    const { declaration, offlineResources, userDetails } = this.props
     const overriddenFields = getOverriddenFieldsListForPreview(
       formSections,
       declaration,
-      offlineResources
+      offlineResources,
+      userDetails
     )
     let tempItem: any
 
@@ -773,8 +786,13 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         group.fields
           .filter(
             (field) =>
-              isVisibleField(field, section, declaration, offlineResources) &&
-              !isViewOnly(field)
+              isVisibleField(
+                field,
+                section,
+                declaration,
+                offlineResources,
+                userDetails
+              ) && !isViewOnly(field)
           )
           .filter((field) => !Boolean(field.hideInPreview))
           .filter((field) => !Boolean(field.reviewOverrides))
@@ -1005,7 +1023,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     const correction = updateDeclarationRegistrationWithCorrection(
       declaration.data,
       {
-        userPrimaryOffice: this.props.userPrimaryOffice
+        userPrimaryOffice: this.props.userDetails?.primaryOffice
       }
     )
 
@@ -1040,7 +1058,8 @@ export const CorrectionSummary = connect(
     offlineResources: getOfflineData(state),
     language: getLanguage(state),
     userPrimaryOffice: getUserDetails(state)?.primaryOffice,
-    scopes: getScope(state)
+    scopes: getScope(state),
+    userDetails: getUserDetails(state)
   }),
   {
     modifyDeclaration,

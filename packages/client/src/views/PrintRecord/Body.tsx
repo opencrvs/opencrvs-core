@@ -79,6 +79,7 @@ import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
 import { Event, History, RegStatus } from '@client/utils/gateway'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
@@ -402,7 +403,7 @@ function renderValue(
       : intl.formatMessage(buttonMessages.no)
   }
 
-  if (typeof value === 'string' || typeof value === 'number') {
+  if (value && (typeof value === 'string' || typeof value === 'number')) {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
@@ -415,6 +416,7 @@ function renderValue(
 
 export function PrintRecordBody(props: PrintRecordTableProps) {
   const offlineCountryConfiguration = useSelector(getOfflineData)
+  const user = useSelector(getUserDetails)
   const intl = useIntl()
   const registerForm = useSelector(getRegisterForm)
   function getLabelForDoc(
@@ -653,7 +655,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
       field,
       draft.data[section.id] || {},
       offlineCountryConfiguration,
-      draft.data
+      draft.data,
+      user
     )
     return (
       !conditionalActions.includes('hide') &&
@@ -682,7 +685,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
                   tempField,
                   draft.data[residingSection] || {},
                   offlineCountryConfiguration,
-                  draft.data
+                  draft.data,
+                  user
                 ).includes('hide')
 
                 return isVisible ? field : ({} as IFormField)
@@ -772,7 +776,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
               field,
               draft.data[section.id] || {},
               offlineCountryConfiguration,
-              draft.data
+              draft.data,
+              user
             )
 
             tempItem = field.previewGroup

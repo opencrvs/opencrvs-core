@@ -187,7 +187,12 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     )
 
     if (isCorrectionAction(submissionAction)) {
-      const changedValues = getChangedValues(form, declaration, offlineData)
+      const changedValues = getChangedValues(
+        form,
+        declaration,
+        offlineData,
+        getState().offline.userDetails as UserDetails
+      )
       graphqlPayload.registration ??= {}
       graphqlPayload.registration.correction =
         declaration.data.registration.correction ?? {}
@@ -195,7 +200,12 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     }
 
     if (isUpdateAction && !isCorrectionAction(submissionAction)) {
-      const changedValues = getChangedValues(form, declaration, offlineData)
+      const changedValues = getChangedValues(
+        form,
+        declaration,
+        offlineData,
+        getState().offline.userDetails as UserDetails
+      )
       graphqlPayload.registration ??= {}
       graphqlPayload.registration.changedValues = changedValues
     }

@@ -8,6 +8,8 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
+set -e # fail if any of the commands fails
+
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js

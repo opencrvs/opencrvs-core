@@ -46,7 +46,7 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -62,7 +62,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getLanguage } from '@client/i18n/selectors'
 
 const ToolTipContainer = styled.span`
   text-align: center;

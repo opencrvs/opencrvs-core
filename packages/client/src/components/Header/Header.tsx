@@ -9,34 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import {
-  goBack,
-  goForward,
   goToEvents as goToEventsAction,
-  goToPerformanceHome,
   goToSearch,
   goToSearchResult,
   goToSettings,
-  goToTeamSearch,
-  goToTeamUserList,
   goToCreateNewUserWithLocationId,
   goToCreateNewUser,
   goToAdvancedSearch
 } from '@client/navigation'
-import { redirectToAuthentication } from '@client/profile/profileActions'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { storage } from '@client/storage'
+import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
-
-import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
-
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -59,7 +48,6 @@ import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
 
 type IStateProps = {
-  userDetails: UserDetails | null
   scopes: Scope[] | null
   fieldNames: string[]
   language: string
@@ -67,19 +55,12 @@ type IStateProps = {
 }
 
 type IDispatchProps = {
-  redirectToAuthentication: typeof redirectToAuthentication
-  goToSearchResult: typeof goToSearchResult
   goToEvents: typeof goToEventsAction
   goToSearch: typeof goToSearch
-  goToSettings: typeof goToSettings
-  goBack: typeof goBack
-  goForward: typeof goForward
-  goToPerformanceHomeAction: typeof goToPerformanceHome
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToCreateNewUser: typeof goToCreateNewUser
-  goToTeamSearchAction: typeof goToTeamSearch
-  goToTeamUserListAction: typeof goToTeamUserList
   goToAdvancedSearch: typeof goToAdvancedSearch
+  goToSearchResult: typeof goToSearchResult
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
@@ -138,10 +119,30 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-class HeaderComp extends React.Component<IFullProps> {
-  hasSearch() {
+export const HeaderComponent = (props: IFullProps) => {
+  const {
+    location,
+    mobileSearchBar,
+    offlineData,
+    className,
+    intl,
+    activeMenuItem,
+    mobileRight,
+    goToSearch,
+    goToEvents,
+    goToCreateNewUserWithLocationId,
+    goToCreateNewUser,
+    goToAdvancedSearch,
+    goToSearchResult,
+    setAdvancedSearchParam,
+    scopes,
+    mapPerformanceClickHandler,
+    changeTeamLocation
+  } = props
+
+  function hasSearch() {
     // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
-    return this.props.scopes?.some((scope) =>
+    return scopes?.some((scope) =>
       (
         [
           'search.birth',
@@ -155,10 +156,8 @@ class HeaderComp extends React.Component<IFullProps> {
     )
   }
 
-  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
-    const locationId = new URLSearchParams(this.props.location.search).get(
-      'locationId'
-    )
+  const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
+    const locationId = new URLSearchParams(location.search).get('locationId')
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [
@@ -170,14 +169,12 @@ class HeaderComp extends React.Component<IFullProps> {
         mobileRight: [
           {
             icon: () => <Icon name="Activity" size="medium" color="primary" />,
-            handler: () =>
-              this.props.mapPerformanceClickHandler &&
-              this.props.mapPerformanceClickHandler()
+            handler: () => mapPerformanceClickHandler?.()
           }
         ]
       }
     } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      if (this.props.changeTeamLocation) {
+      if (changeTeamLocation) {
         return {
           mobileLeft: [
             {
@@ -190,8 +187,7 @@ class HeaderComp extends React.Component<IFullProps> {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: () =>
-                this.props.changeTeamLocation && this.props.changeTeamLocation()
+              handler: changeTeamLocation
             },
             {
               icon: () => (
@@ -199,15 +195,15 @@ class HeaderComp extends React.Component<IFullProps> {
               ),
               handler: () => {
                 if (locationId) {
-                  this.props.goToCreateNewUserWithLocationId(locationId)
+                  goToCreateNewUserWithLocationId(locationId)
                 } else {
-                  this.props.goToCreateNewUser()
+                  goToCreateNewUser()
                 }
               }
             }
           ]
         }
-      } else if (this.props.scopes?.includes('user.create')) {
+      } else if (scopes?.includes('user.create')) {
         return {
           mobileLeft: [
             {
@@ -222,9 +218,9 @@ class HeaderComp extends React.Component<IFullProps> {
               ),
               handler: () => {
                 if (locationId) {
-                  this.props.goToCreateNewUserWithLocationId(locationId)
+                  goToCreateNewUserWithLocationId(locationId)
                 } else {
-                  this.props.goToCreateNewUser()
+                  goToCreateNewUser()
                 }
               }
             }
@@ -240,7 +236,7 @@ class HeaderComp extends React.Component<IFullProps> {
           ]
         }
       }
-    } else if (!this.hasSearch()) {
+    } else if (!hasSearch()) {
       return {
         mobileLeft: [
           {
@@ -250,7 +246,7 @@ class HeaderComp extends React.Component<IFullProps> {
         ]
       }
     } else {
-      if (this.props.mobileSearchBar) {
+      if (mobileSearchBar) {
         return {
           mobileLeft: [
             {
@@ -258,7 +254,7 @@ class HeaderComp extends React.Component<IFullProps> {
               handler: () => {}
             }
           ],
-          mobileBody: this.renderSearchInput(this.props, true)
+          mobileBody: renderSearchInput(props, true)
         }
       } else {
         return {
@@ -273,7 +269,7 @@ class HeaderComp extends React.Component<IFullProps> {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: () => this.props.goToSearch()
+              handler: goToSearch
             }
           ]
         }
@@ -281,12 +277,7 @@ class HeaderComp extends React.Component<IFullProps> {
     }
   }
 
-  logout = () => {
-    storage.removeItem(SCREEN_LOCK)
-    this.props.redirectToAuthentication()
-  }
-
-  renderSearchInput(props: IFullProps, isMobile?: boolean) {
+  function renderSearchInput(props: IFullProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
@@ -345,8 +336,8 @@ class HeaderComp extends React.Component<IFullProps> {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
-          this.props.setAdvancedSearchParam(advancedSearchInitialState)
-          this.props.goToAdvancedSearch()
+          setAdvancedSearchParam(advancedSearchInitialState)
+          goToAdvancedSearch()
         }
       }
     ]
@@ -357,120 +348,98 @@ class HeaderComp extends React.Component<IFullProps> {
         language={language}
         searchText={searchText}
         selectedSearchType={
-          selectedSearchType ??
-          this.props.offlineData.config.SEARCH_DEFAULT_CRITERIA
+          selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
         // @TODO: How to hide the navigation list from field agents? Ask JPF
         navigationList={navigationList}
-        searchHandler={(text, type) =>
-          props.goToSearchResult(text, type, isMobile)
-        }
+        searchHandler={(text, type) => goToSearchResult(text, type, isMobile)}
       />
     )
   }
 
-  goToTeamView(props: IFullProps) {
-    const {
-      userDetails,
-      goToTeamUserListAction,
-      goToTeamSearchAction,
-      scopes
-    } = props
-    if (scopes?.includes('organisation.read')) {
-      return goToTeamSearchAction()
-    } else {
-      return goToTeamUserListAction(userDetails?.primaryOffice.id || '')
-    }
-  }
+  const title =
+    props.title ||
+    intl.formatMessage(
+      activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
+        ? constantsMessages.performanceTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
+          activeMenuItem === ACTIVE_MENU_ITEM.USERS
+        ? messages.teamTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
+        ? constantsMessages.certificateTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
+        ? constantsMessages.applicationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.FORM
+        ? constantsMessages.formDeclarationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+        ? constantsMessages.integrationTitle
+        : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
+        ? constantsMessages.vsExportTitle
+        : constantsMessages.declarationTitle
+    )
 
-  render() {
-    const { className, intl, activeMenuItem } = this.props
+  let rightMenu = [
+    {
+      element: <HistoryNavigator />
+    },
+    {
+      element: (
+        <>
+          {hasSearch() && (
+            <HeaderCenter>
+              <Button
+                type="iconPrimary"
+                size="medium"
+                key="newEvent"
+                id="header_new_event"
+                onClick={goToEvents}
+              >
+                <Icon name="Plus" size="medium" />
+              </Button>
 
-    const title =
-      this.props.title ||
-      intl.formatMessage(
-        activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
-          ? constantsMessages.performanceTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
-            activeMenuItem === ACTIVE_MENU_ITEM.USERS
-          ? messages.teamTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
-          ? constantsMessages.certificateTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
-          ? constantsMessages.applicationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.FORM
-          ? constantsMessages.formDeclarationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
-          ? constantsMessages.integrationTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
-          ? constantsMessages.vsExportTitle
-          : constantsMessages.declarationTitle
+              {renderSearchInput(props)}
+            </HeaderCenter>
+          )}
+        </>
       )
+    },
+    {
+      element: (
+        <HeaderRight>
+          <ProfileMenu key="profileMenu" />
+        </HeaderRight>
+      )
+    }
+  ]
 
-    let rightMenu = [
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !hasSearch()) {
+    rightMenu = [
       {
         element: <HistoryNavigator />
       },
       {
-        element: (
-          <>
-            {this.hasSearch() && (
-              <HeaderCenter>
-                <Button
-                  type="iconPrimary"
-                  size="medium"
-                  key="newEvent"
-                  id="header_new_event"
-                  onClick={this.props.goToEvents}
-                >
-                  <Icon name="Plus" size="medium" />
-                </Button>
-
-                {this.renderSearchInput(this.props)}
-              </HeaderCenter>
-            )}
-          </>
-        )
-      },
-      {
-        element: (
-          <HeaderRight>
-            <ProfileMenu key="profileMenu" />
-          </HeaderRight>
-        )
+        element: <ProfileMenu key="profileMenu" />
       }
     ]
-
-    if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !this.hasSearch()) {
-      rightMenu = [
-        {
-          element: <HistoryNavigator />
-        },
-        {
-          element: <ProfileMenu key="profileMenu" />
-        }
-      ]
-    }
-
-    const mobileHeaderActionProps =
-      this.getMobileHeaderActionProps(activeMenuItem)
-
-    const mobileHeaderActionPropsWithDefaults = {
-      mobileRight: this.props.mobileRight,
-      ...mobileHeaderActionProps
-    }
-
-    return (
-      <AppHeader
-        id="register_app_header"
-        desktopRightMenu={rightMenu}
-        className={className}
-        title={title}
-        {...mobileHeaderActionPropsWithDefaults}
-      />
-    )
   }
+
+  const mobileHeaderActionProps = getMobileHeaderActionProps(activeMenuItem)
+
+  const mobileHeaderActionPropsWithDefaults = {
+    mobileRight: mobileRight,
+    ...mobileHeaderActionProps
+  }
+
+  return (
+    <AppHeader
+      id="register_app_header"
+      desktopRightMenu={rightMenu}
+      className={className}
+      title={title}
+      {...mobileHeaderActionPropsWithDefaults}
+    />
+  )
 }
 
 export const Header = connect(
@@ -493,7 +462,6 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
-    userDetails: getUserDetails(store),
     scopes: getScope(store),
     offlineData: getOfflineData(store),
     fieldNames: Object.values(getRegisterForm(store))
@@ -503,22 +471,16 @@ export const Header = connect(
       .map((field) => field.name)
   }),
   {
-    redirectToAuthentication,
-    goToSearchResult,
     goToSearch,
     goToSettings,
-    goBack,
-    goForward,
     goToEvents: goToEventsAction,
-    goToPerformanceHomeAction: goToPerformanceHome,
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
-    goToTeamSearchAction: goToTeamSearch,
-    goToTeamUserListAction: goToTeamUserList,
     goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam
+    setAdvancedSearchParam: setAdvancedSearchParam,
+    goToSearchResult
   }
-)(injectIntl(withRouter(HeaderComp)))
+)(injectIntl(withRouter(HeaderComponent)))
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`

@@ -35,6 +35,8 @@ import { isEmpty } from 'lodash'
 import { goToHome } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { UserDetails } from '@client/utils/userUtils'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -47,6 +49,7 @@ interface IState {
 interface IProps {
   draftId: string
   config: IOfflineData
+  user: UserDetails | null
   declaration: IDeclaration
   event: Event
   duplicate?: boolean
@@ -84,7 +87,8 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             this.props.form.fields,
             rejectionFormData,
             this.props.config,
-            this.props.declaration.data
+            this.props.declaration.data,
+            this.props.user
           )
         }))
     )
@@ -97,7 +101,8 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
         this.props.form.fields,
         rejectionFormData,
         this.props.config,
-        this.props.declaration.data
+        this.props.declaration.data,
+        this.props.user
       ) &&
       isEmpty(rejectionFormData.rejectionReason)
     )
@@ -206,7 +211,8 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
 export const RejectRegistrationForm = connect(
   (state: IStoreState) => ({
     form: rejectRegistration,
-    config: getOfflineData(state)
+    config: getOfflineData(state),
+    user: getUserDetails(state)
   }),
   {
     archiveDeclaration,

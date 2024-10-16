@@ -129,6 +129,7 @@ interface ICommonProps {
   offlineCountryConfiguration: IOfflineData
   formData: IFormSectionData
   userRoles: UserRole[]
+  userDetails: UserDetails | null
   intl: IntlShape
 }
 interface ISectionDataProps {
@@ -171,7 +172,8 @@ const transformSectionData = ({
               field,
               props.formData,
               props.offlineCountryConfiguration,
-              { user: props.formData }
+              { user: props.formData },
+              props.userDetails
             ).includes('hide')
           ) {
             fieldValue = getValue({ ...props, field })
@@ -398,6 +400,7 @@ const UserReviewFormComponent = ({
             hasUpdateUserScope,
             hasCreateUserScope,
             userRoles,
+            userDetails,
             offlineCountryConfiguration,
             goToCreateUserSection,
             goToUserReviewForm

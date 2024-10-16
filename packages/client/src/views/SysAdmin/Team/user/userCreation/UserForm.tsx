@@ -23,26 +23,28 @@ import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import {
   goBack,
   goToCreateUserSection,
   goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
-import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import styled from 'styled-components'
 import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
 import { UserRole } from '@client/utils/gateway'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { UserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -57,6 +59,7 @@ type IProps = {
   nextGroupId: string
   offlineCountryConfig: IOfflineData
   userRoles: UserRole[]
+  user: UserDetails | null
 }
 
 type IState = {
@@ -85,8 +88,10 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   handleFormAction = () => {
-    const { formData, activeGroup, offlineCountryConfig } = this.props
-    if (hasFormError(activeGroup.fields, formData, offlineCountryConfig, {})) {
+    const { formData, activeGroup, offlineCountryConfig, user } = this.props
+    if (
+      hasFormError(activeGroup.fields, formData, offlineCountryConfig, {}, user)
+    ) {
       this.showAllValidationErrors()
     } else {
       this.props.userId
@@ -204,7 +209,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 const mapStateToProps = (state: IStoreState) => {
   return {
     offlineCountryConfig: getOfflineData(state),
-    userRoles: state.userForm.userRoles
+    userRoles: state.userForm.userRoles,
+    user: getUserDetails(state)
   }
 }
 

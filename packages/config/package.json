@@ -10,7 +10,6 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0",
-    "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "build:clean": "rm -rf build",
@@ -20,8 +19,9 @@
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.2.1",
     "@opencrvs/commons": "^1.3.0",
-    "fast-csv": "^4.3.6",
     "cross-env": "^7.0.0",
+    "envalid": "^8.0.0",
+    "fast-csv": "^4.3.6",
     "fp-ts": "^2.12.3",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-pino": "^9.0.0",
@@ -40,8 +40,8 @@
   "devDependencies": {
     "@types/boom": "^7.3.1",
     "@types/fhir": "^0.0.30",
-    "@types/jwt-decode": "^2.2.1",
     "@types/jsonwebtoken": "^9.0.0",
+    "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.126",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
@@ -53,12 +53,12 @@
     "mockingoose": "^2.15.2",
     "nodemon": "^3.0.0",
     "prettier": "^2.5.0",
-    "ts-node": "^6.1.1",
     "ts-jest": "27.1.4",
+    "ts-node": "^6.1.1",
     "typescript": "4.9.5"
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
+    "src/**/*.ts": [
       "prettier --write",
       "eslint -c .eslintrc.js --fix"
     ]
