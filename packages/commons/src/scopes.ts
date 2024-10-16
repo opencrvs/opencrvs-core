@@ -114,7 +114,10 @@ export const SCOPES = {
   USER_CREATE: 'user.create',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
   USER_UPDATE_MY_OFFICE: 'user.update:my-office',
-  USER_UPDATE: 'user.update'
+  USER_UPDATE: 'user.update',
+
+  // config
+  CONFIG_UPDATE_ALL: 'config.update:all'
 } as const
 
 export type Scope = (typeof SCOPES)[keyof typeof SCOPES]

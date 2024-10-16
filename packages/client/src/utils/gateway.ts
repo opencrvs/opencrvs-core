@@ -73,6 +73,7 @@ export const scopes = [
   'profile.update-phone-number',
   'profile.update-name',
   'profile.update-profile-image',
+  'profile.electronic-signature',
   'performance.read:my-office',
   'performance.read',
   'performance.read-dashboards',
@@ -85,7 +86,8 @@ export const scopes = [
   'user.create',
   'user.create:my-jurisdiction',
   'user.update:my-office',
-  'user.update'
+  'user.update',
+  'config.update:all'
 ] as const
 export type Scope = (typeof scopes)[number]
 
@@ -154,6 +156,7 @@ export const SCOPES = {
   PROFILE_UPDATE_PHONE_NUMBER: 'profile.update-phone-number',
   PROFILE_UPDATE_NAME: 'profile.update-name',
   PROFILE_UPDATE_PROFILE_IMAGE: 'profile.update-profile-image',
+  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
   PERFORMANCE_READ_MY_OFFICE: 'performance.read:my-office',
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
@@ -167,7 +170,8 @@ export const SCOPES = {
   USER_CREATE: 'user.create',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
   USER_UPDATE_MY_OFFICE: 'user.update:my-office',
-  USER_UPDATE: 'user.update'
+  USER_UPDATE: 'user.update',
+  CONFIG_UPDATE_ALL: 'config.update:all'
 } as const
 
 export type Maybe<T> = T | null
