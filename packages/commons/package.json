@@ -37,7 +37,6 @@
     "elastic-apm-node": "^3.29.0",
     "jest": "27.5.1",
     "jwt-decode": "^2.2.0",
-    "lint-staged": "^15.2.2",
     "lodash": "^4.17.10",
     "node-fetch": "^2.6.7",
     "pkg-up": "^3.1.0",
@@ -57,8 +56,9 @@
     "ts-jest": "27.1.4"
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
-      "prettier --write"
+    "src/**/*.ts": [
+      "prettier --write",
+      "eslint --fix"
     ]
   },
   "jest": {

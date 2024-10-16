@@ -1,2 +1,2 @@
 yarn check:license
-yarn lerna run --stream --parallel precommit
+yarn lint-staged
