@@ -10,7 +10,7 @@
  */
 
 import * as React from 'react'
-import { createTestComponent } from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import {
@@ -73,29 +73,38 @@ const draftDeathNotDownloaded = {
   downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
 } as unknown as IDeclaration
 
-const scopes = ['validate'] as any as Scope
+const SCOPES = {
+  FA: ['declare'] as any as Scope,
+  RA: ['validate'] as any as Scope,
+  REGISTRAR: ['register'] as any as Scope
+}
 
 enum ACTION_STATUS {
   HIDDEN = 'Hidden',
   ENABLED = 'Enabled',
-  DISABLED = 'Disabled'
+  DISABLED = 'Disabled',
+  MULTIPLE = 'Multiple'
 }
 
 enum ACTION {
   VIEW_RECORD = 'View record',
-  VIEW_DECLARATION = 'View declaration'
+  VIEW_DECLARATION = 'View declaration',
+  REVIEW_DECLARATION = 'Review declaration',
+  REVIEW_POTENTIAL_DUPLICATE = 'Review potential duplicate',
+  REVIEW_CORRECTION_REQUEST = 'Review correction request'
 }
 
 const actionStatus = (
   component: ReactWrapper<{}, {}>,
-  targetAction: string
+  targetAction: string[]
 ): { status: ACTION_STATUS; node?: ReactWrapper<{}, {}> } => {
   const target = component
     .find('li')
     .map((a) => a)
-    .filter((a) => a.text() === targetAction)
+    .filter((a) => targetAction.includes(a.text()))
 
   if (target.length === 0) return { status: ACTION_STATUS.HIDDEN }
+  if (target.length > 1) return { status: ACTION_STATUS.MULTIPLE }
 
   return target[0].prop('disabled')
     ? { status: ACTION_STATUS.DISABLED }
@@ -111,14 +120,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -136,14 +145,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -161,14 +170,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -184,9 +193,9 @@ describe('View action', () => {
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
-          status: SUBMISSION_STATUS.IN_PROGRESS
+          status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -194,7 +203,7 @@ describe('View action', () => {
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -210,16 +219,16 @@ describe('View action', () => {
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
-          status: SUBMISSION_STATUS.IN_PROGRESS
+          status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -237,14 +246,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -262,14 +271,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_DECLARATION)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -287,14 +296,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_RECORD)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_RECORD])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -312,14 +321,14 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_RECORD)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_RECORD])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
@@ -337,20 +346,352 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={scopes}
+        scope={SCOPES.RA}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, ACTION.VIEW_RECORD)
+    const { status, node } = actionStatus(component, [ACTION.VIEW_RECORD])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
 
     expect(window.location.href).toContain(
       defaultDeclaration.id + '/viewRecord'
+    )
+  })
+})
+
+describe('Review action', () => {
+  it('Draft', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DRAFT
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION,
+      ACTION.REVIEW_CORRECTION_REQUEST,
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('In progress', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION,
+      ACTION.REVIEW_CORRECTION_REQUEST,
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('In review - Downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION
+    ])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    await flushPromises()
+
+    expect(window.location.href).toContain('reviews/' + defaultDeclaration.id)
+  })
+
+  it('In review - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.REVIEW_DECLARATION])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('Potential duplicate - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathNotDownloaded}
+        duplicates={['duplicate1']}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+  it('Potential duplicate - Downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftDeathDownloaded}
+        duplicates={['duplicate1']}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    await flushPromises()
+
+    expect(window.location.href).toContain('reviews/' + defaultDeclaration.id)
+  })
+
+  it('Requires update - Downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION
+    ])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    await flushPromises()
+
+    expect(window.location.href).toContain('reviews/' + defaultDeclaration.id)
+  })
+
+  it('Requires update - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.REVIEW_DECLARATION])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('Validated - Downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.VALIDATED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION
+    ])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+
+    await flushPromises()
+
+    expect(window.location.href).toContain('reviews/' + defaultDeclaration.id)
+  })
+
+  it('Validated - Not downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.VALIDATED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.REVIEW_DECLARATION])
+    expect(status).toBe(ACTION_STATUS.DISABLED)
+  })
+
+  it('Archived', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.ARCHIVED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION,
+      ACTION.REVIEW_CORRECTION_REQUEST,
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Registered', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.REGISTERED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION,
+      ACTION.REVIEW_CORRECTION_REQUEST,
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Registered + Printed in advance', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.CERTIFIED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [
+      ACTION.REVIEW_DECLARATION,
+      ACTION.REVIEW_CORRECTION_REQUEST,
+      ACTION.REVIEW_POTENTIAL_DUPLICATE
+    ])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Pending correction - Downloaded', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.CORRECTION_REQUESTED
+        }}
+        scope={SCOPES.RA}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [
+      ACTION.REVIEW_CORRECTION_REQUEST
+    ])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+    await flushPromises()
+
+    expect(window.location.href).toContain(
+      'review-correction/' + defaultDeclaration.id
     )
   })
 })
