@@ -25,6 +25,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
+import { Event } from '@client/utils/gateway'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
 const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)
@@ -42,7 +43,7 @@ const getItem = window.localStorage.getItem as Mock
 
 const birthEventSearchSet: GQLBirthEventSearchSet = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-  type: 'Birth',
+  type: Event.Birth,
   registration: {
     status: 'WAITING_VALIDATION',
     contactNumber: '01622688231',

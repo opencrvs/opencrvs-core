@@ -73,7 +73,7 @@ const nameObj = {
 
 const mockUserData = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-  type: 'Birth',
+  type: Event.Birth,
   registration: {
     status: 'REGISTERED',
     contactNumber: '01622688231',
@@ -155,7 +155,7 @@ const mockPrintTabData = {
   results: [
     {
       id: '956281c9-1f47-4c26-948a-970dd23c4094',
-      type: 'Death',
+      type: Event.Death,
       registration: {
         status: 'REGISTERED',
         contactNumber: undefined,
@@ -204,7 +204,7 @@ const mockPrintTabData = {
     } as GQLDeathEventSearchSet,
     {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-      type: 'Death',
+      type: Event.Death,
       registration: {
         status: 'REGISTERED',
         trackingId: 'DW0UTHR',
@@ -252,7 +252,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const birthEventRegisteredDate = '2019-10-20T11:03:20.660Z'
     const birthEventSearchSet: GQLBirthEventSearchSet = {
       id: '956281c9-1f47-4c26-948a-970dd23c4094',
-      type: 'Birth',
+      type: Event.Birth,
       registration: {
         status: 'REGISTERED',
         contactNumber: '01622688231',
@@ -302,7 +302,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const deathEventSearchSet: GQLDeathEventSearchSet = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-      type: 'Death',
+      type: Event.Death,
       registration: {
         status: 'REGISTERED',
         trackingId: 'DW0UTHR',

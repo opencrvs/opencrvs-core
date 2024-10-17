@@ -65,6 +65,13 @@ ToggleMenuView.args = {
 }
 
 export default {
-  title: 'Controls/Toggle menu',
-  component: ToggleMenu
+  title: 'Deprecated/Toggle menu',
+  component: ToggleMenu,
+  parameters: {
+    docs: {
+      description: {
+        component: `<b>Note! Deprecated in favor of \`<DropdownMenu/>\` component.</b>`
+      }
+    }
+  }
 } as Meta

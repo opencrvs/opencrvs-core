@@ -78,7 +78,7 @@ const TIME_STAMP = '1544188309380'
 
 const mockUserData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-  type: 'Birth',
+  type: Event.Birth,
   registration: {
     status: 'REJECTED',
     contactNumber: '01622688231',
@@ -181,7 +181,7 @@ describe('OfficeHome sent for update tab related tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
+                type: Event.Birth,
                 registration: {
                   status: 'REJECTED',
                   contactNumber: '01622688231',
@@ -230,7 +230,7 @@ describe('OfficeHome sent for update tab related tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
+                type: Event.Death,
                 registration: {
                   status: 'REJECTED',
                   trackingId: 'DW0UTHR',
@@ -338,7 +338,7 @@ describe('OfficeHome sent for update tab related tests', () => {
               results: [
                 {
                   id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-                  type: 'Birth',
+                  type: Event.Birth,
                   registration: {
                     status: 'REJECTED',
                     contactNumber: '01622688231',
@@ -369,7 +369,7 @@ describe('OfficeHome sent for update tab related tests', () => {
                 },
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
+                  type: Event.Death,
                   registration: {
                     status: 'REJECTED',
                     trackingId: 'DW0UTHR',
@@ -510,7 +510,7 @@ describe('Tablet tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
+                type: Event.Birth,
                 registration: {
                   status: 'REJECTED',
                   contactNumber: '01622688231',
@@ -538,7 +538,7 @@ describe('Tablet tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
+                type: Event.Death,
                 registration: {
                   status: 'REJECTED',
                   trackingId: 'DW0UTHR',

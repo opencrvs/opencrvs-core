@@ -474,7 +474,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-                  type: 'Death',
+                  type: Event.Death,
                   registration: {
                     status: 'IN_PROGRESS',
                     contactNumber: undefined,
@@ -610,7 +610,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-                  type: 'Death',
+                  type: Event.Death,
                   registration: {
                     status: 'IN_PROGRESS',
                     contactNumber: undefined,
@@ -706,7 +706,7 @@ describe('In Progress tab', () => {
             results: [
               {
                 id: declarationId,
-                type: 'Birth',
+                type: Event.Birth,
                 registration: {
                   trackingId: 'BQ2IDOP',
                   modifiedAt: TIME_STAMP
@@ -797,7 +797,7 @@ describe('In Progress tab', () => {
           formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId,
             pageId: 'review',
-            event: 'birth'
+            event: Event.Birth
           })
         )
       })
@@ -836,7 +836,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
-                  type: 'Birth',
+                  type: Event.Birth,
                   registration: {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP
@@ -872,7 +872,7 @@ describe('In Progress tab', () => {
                 } as GQLBirthEventSearchSet,
                 {
                   id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
-                  type: 'Death',
+                  type: Event.Death,
                   registration: {
                     trackingId: 'DZECJZC',
                     modifiedAt: TIME_STAMP
@@ -951,7 +951,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: declarationId,
-                  type: 'Birth',
+                  type: Event.Birth,
                   registration: {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP

@@ -10,9 +10,9 @@
  */
 
 export const enum EVENT {
-  BIRTH = 'Birth',
-  DEATH = 'Death',
-  MARRIAGE = 'Marriage'
+  BIRTH = 'birth',
+  DEATH = 'death',
+  MARRIAGE = 'marriage'
 }
 
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'

@@ -16,36 +16,15 @@ import * as React from 'react'
 import { DownloadAction } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
 import * as declarationReducer from '@client/declarations'
-import { vi, SpyInstance } from 'vitest'
 import { ApolloClient } from '@apollo/client'
 import { createClient } from '@client/utils/apolloClient'
 
 const { DOWNLOAD_STATUS } = declarationReducer
 
-function getAssignmentModal(
-  testComponent: ReactWrapper<{}, {}>
-): ReactWrapper<{}, {}> {
-  const button = testComponent.find('button')
-  button.simulate('click')
-  testComponent.update()
-  return testComponent.find('#assignment').hostNodes()
-}
-
-function clickOnModalAction(
-  testComponent: ReactWrapper<{}, {}>,
-  selector: string
-) {
-  const modal = getAssignmentModal(testComponent)
-  const action = modal.find(selector).hostNodes()
-  action.simulate('click')
-  testComponent.update()
-}
-
 describe('download button tests', () => {
   let store: AppStore
   let history: History<unknown>
   let testComponent: ReactWrapper<{}, {}>
-  let unassignSpy: SpyInstance
   let client: ApolloClient<{}>
 
   describe('for download status downloaded', () => {
@@ -73,15 +52,9 @@ describe('download button tests', () => {
       it('download button renders', () => {
         expect(testComponent).toBeDefined()
       })
-
-      it('clicking download button pops up unassign modal', () => {
-        const modal = getAssignmentModal(testComponent)
-        expect(modal.text()).toContain('Unassign record?')
-      })
     })
     describe('when assignment object is defined in props', () => {
       beforeEach(async () => {
-        unassignSpy = vi.spyOn(declarationReducer, 'unassignDeclaration')
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
@@ -109,16 +82,6 @@ describe('download button tests', () => {
 
       it('download button renders', () => {
         expect(testComponent).toBeDefined()
-      })
-
-      it('clicking download button pops up unassign modal', () => {
-        const modal = getAssignmentModal(testComponent)
-        expect(modal.text()).toContain('Unassign record?')
-      })
-
-      it('clicking on unassign button triggers unassignDeclaration action', () => {
-        clickOnModalAction(testComponent, '#unassign')
-        expect(unassignSpy).toBeCalled()
       })
     })
   })

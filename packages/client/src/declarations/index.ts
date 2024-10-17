@@ -1373,7 +1373,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const orignalAppliation: IDeclaration = {
         ...correction,
         data: {
-          ...correction.originalData
+          ...correction?.originalData
         }
       }
 

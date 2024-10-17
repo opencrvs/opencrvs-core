@@ -143,24 +143,30 @@ describe('when user has starts a new declaration', () => {
           expect(window.location.href).toContain('/')
         })
         it('check toggle menu toggle button handler', async () => {
-          app.find('#eventToggleMenuToggleButton').hostNodes().simulate('click')
+          app
+            .find('#eventToggleMenu-Dropdown-Content')
+            .hostNodes()
+            .simulate('click')
           await flushPromises()
           app.update()
           expect(
-            app.find('#eventToggleMenuToggleButton').hostNodes().length
+            app.find('#eventToggleMenu-Dropdown-Content').hostNodes().length
           ).toEqual(1)
         })
         it('check toggle menu item handler', async () => {
           const menuLink = await waitForElement(
             app,
-            '#eventToggleMenuToggleButton'
+            '#eventToggleMenu-Dropdown-Content'
           )
           menuLink.hostNodes().simulate('click')
           await flushPromises()
           app.update()
 
-          await waitForElement(app, '#eventToggleMenuItem0')
-          app.find('#eventToggleMenuItem0').hostNodes().simulate('click')
+          await waitForElement(app, '#eventToggleMenu-Dropdown-Content')
+          app
+            .find('#eventToggleMenu-Dropdown-Content')
+            .hostNodes()
+            .simulate('click')
           await flushPromises()
           app.update()
 
