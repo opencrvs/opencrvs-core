@@ -84,7 +84,7 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
       const scopes = getState().profile.tokenPayload!.scope!
 
       if (
-        scopes.includes('organisation.read-locations') ||
+        scopes.includes('organisation.read-locations:all') ||
         scopes.includes('organisation.read-locations:my-office')
       ) {
         /*

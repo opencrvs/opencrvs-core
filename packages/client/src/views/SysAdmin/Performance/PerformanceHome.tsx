@@ -373,7 +373,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       this.isOfficeSelected(selectedLocation) &&
       this.props.userDetails
     ) {
-      if (this.props.scopes?.includes('organisation.read-locations')) {
+      if (this.props.scopes?.includes('organisation.read-locations:all')) {
         return true
       } else if (
         this.props.scopes?.includes('organisation.read-locations:my-office') &&
@@ -706,7 +706,7 @@ function mapStateToProps(
   if (
     userDetails &&
     !locationId &&
-    !scopes?.includes('organisation.read-locations')
+    !scopes?.includes('organisation.read-locations:all')
   ) {
     locationId = userDetails.primaryOffice.id
   }

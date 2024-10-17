@@ -443,9 +443,8 @@ describe('Given a user with scopes views Navigation', () => {
   })
 
   describe('and user has organisation scopes', async () => {
-    const orgScopes = [
-      'organisation.read',
-      'organisation.read-locations',
+    const orgScopes: Scope[] = [
+      'organisation.read-locations:all',
       'organisation.read-locations:my-office'
     ]
 
@@ -480,7 +479,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Organisation', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.organisation}`
 
-      const requiredScopes = ['organisation.read']
+      const requiredScopes: Scope[] = ['organisation.read-locations:all']
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)

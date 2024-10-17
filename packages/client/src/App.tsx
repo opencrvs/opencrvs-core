@@ -256,29 +256,33 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin
-                                              // ]}
+                                              scopes={['config.update:all']}
                                               path={routes.ALL_USER_EMAIL}
                                               component={AllUserEmail}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'search.birth:my-jurisdiction',
+                                                'search.birth',
+                                                'search.death:my-jurisdiction',
+                                                'search.death',
+                                                'search.marriage:my-jurisdiction',
+                                                'search.marriage'
+                                              ]}
                                               path={routes.ADVANCED_SEARCH}
                                               component={AdvancedSearchConfig}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'search.birth:my-jurisdiction',
+                                                'search.birth',
+                                                'search.death:my-jurisdiction',
+                                                'search.death',
+                                                'search.marriage:my-jurisdiction',
+                                                'search.marriage'
+                                              ]}
                                               path={
                                                 routes.ADVANCED_SEARCH_RESULT
                                               }
@@ -346,34 +350,39 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement
-                                              // ]}
+                                              scopes={[
+                                                'user.read:all',
+                                                'user.read:my-jurisdiction',
+                                                'user.read:my-office'
+                                                /*
+                                                 * or is it
+                                                 * 'organisation.read-locations:all',
+                                                 * 'organisation.read-locations:my-jurisdiction',
+                                                 * 'organisation.read-locations:my-office'
+                                                 */
+                                              ]}
                                               path={routes.TEAM_SEARCH}
                                               component={TeamSearch}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalRegistrar,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement
-                                              // ]}
+                                              scopes={[
+                                                'user.read:all',
+                                                'user.read:my-jurisdiction',
+                                                'user.read:my-office'
+                                                /*
+                                                 * or is it
+                                                 * 'organisation.read-locations:all',
+                                                 * 'organisation.read-locations:my-jurisdiction',
+                                                 * 'organisation.read-locations:my-office'
+                                                 */
+                                              ]}
                                               path={routes.TEAM_USER_LIST}
                                               component={UserList}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin
-                                              // ]}
+                                              scopes={['config.update:all']}
                                               path={routes.SYSTEM_LIST}
                                               component={SystemList}
                                             />
@@ -406,25 +415,18 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'performance.read',
+                                                'performance.read:my-office'
+                                              ]}
                                               path={routes.PERFORMANCE_HOME}
                                               component={PerformanceHome}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'performance.read-dashboards'
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_STATISTICS
                                               }
@@ -432,12 +434,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'performance.read-dashboards'
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_LEADER_BOARDS
                                               }
@@ -445,12 +444,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'performance.read-dashboards'
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_DASHBOARD
                                               }
@@ -458,10 +454,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'performance.export-vital-statistics'
+                                              ]}
                                               path={routes.VS_EXPORTS}
                                               component={VSExport}
                                             />
@@ -503,14 +498,11 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                'organisation.read-locations:all',
+                                                'organisation.read-locations:my-jurisdiction',
+                                                'organisation.read-locations:my-office'
+                                              ]}
                                               path={routes.ORGANISATIONS_INDEX}
                                               component={AdministrativeLevels}
                                             />

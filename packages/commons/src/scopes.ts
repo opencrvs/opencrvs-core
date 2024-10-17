@@ -94,17 +94,22 @@ export const scopes = [
   'performance.export-vital-statistics',
 
   // organisation
-  'organisation.read',
+  'organisation.read-locations:all',
+  'organisation.read-locations:my-jurisdiction',
   'organisation.read-locations:my-office',
-  'organisation.read-locations',
 
   // user
+  'user.read:all',
+  'user.read:my-jurisdiction',
   'user.read:my-office',
-  'user.read',
+  'user.read:only-my-audit',
   'user.create',
   'user.create:my-jurisdiction',
   'user.update:my-office',
-  'user.update'
+  'user.update',
+
+  // config
+  'config.update:all'
 ] as const
 
 export type Scope = (typeof scopes)[number]

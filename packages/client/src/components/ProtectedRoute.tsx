@@ -21,18 +21,18 @@ interface IProps extends RouteProps {
   scopes?: Scope[]
 }
 
-export const ProtectedRoute: React.FC<IProps> = ({ scopes = [], ...rest }) => {
+export const ProtectedRoute: React.FC<IProps> = ({ scopes, ...rest }) => {
   const authenticated = useSelector(getAuthenticated)
   const userDetailsFetched = useSelector(
     (state: IStoreState) => state.profile.userDetailsFetched
   )
-  const { hasScopes } = usePermissions()
+  const { hasAnyScope } = usePermissions()
 
   if (!authenticated && !userDetailsFetched) {
     return <div />
   }
 
-  if (!hasScopes(scopes)) {
+  if (scopes && !hasAnyScope(scopes)) {
     return <Redirect to={HOME} />
   }
 
