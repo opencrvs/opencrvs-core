@@ -337,7 +337,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       .props as PropsWhenDeclarationIsFound
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         getEventDate(declaration.data, event),
         getRegisteredDate(declaration.data),
         offlineCountryConfiguration
@@ -564,7 +564,7 @@ const mapStateToProps = (
       declaration.data.registration.certificates &&
       declaration.data.registration.certificates[
         declaration.data.registration.certificates.length - 1
-      ].collector) ||
+      ]?.collector) ||
       {},
     declaration && declaration.data,
     offlineCountryConfiguration,

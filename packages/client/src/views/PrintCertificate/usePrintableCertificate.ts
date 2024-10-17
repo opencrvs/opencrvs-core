@@ -63,7 +63,8 @@ const withEnhancedTemplateVariables = (
     declaration.event,
     eventDate,
     registeredDate,
-    offlineData
+    offlineData,
+    declaration.data.registration.certificates[0]
   )
 
   const locationKey = userDetails?.primaryOffice?.id
@@ -175,7 +176,8 @@ export const usePrintableCertificate = () => {
         draft.event,
         eventDate,
         registeredDate,
-        offlineData
+        offlineData,
+        declaration.data.registration.certificates[0]
       )
       certificate.payments = {
         type: 'MANUAL' as const,

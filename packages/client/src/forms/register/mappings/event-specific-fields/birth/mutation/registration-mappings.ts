@@ -51,7 +51,7 @@ export function setBirthRegistrationSectionTransformer(
   if (draftData[sectionId].certificates) {
     transformCertificateData(
       transformedData,
-      (draftData[sectionId].certificates as ICertificate[])[0],
+      (draftData[sectionId].certificates as ICertificate[]).slice(-1),
       sectionId
     )
   }

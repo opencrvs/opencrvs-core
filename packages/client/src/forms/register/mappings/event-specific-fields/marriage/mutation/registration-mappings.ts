@@ -50,10 +50,18 @@ export function setMarriageRegistrationSectionTransformer(
       })
     }
 
+    if (
+      Array.isArray(draftData[sectionId].certificates) &&
+      draftData[sectionId].certificates.length > 0
+    ) {
+      transformedData[sectionId].certificates =
+        draftData[sectionId].certificates.slice(-1)
+    }
+
     if (draftData[sectionId].certificates) {
       transformCertificateData(
         transformedData,
-        (draftData[sectionId].certificates as ICertificate[])[0],
+        (draftData[sectionId].certificates as ICertificate[]).slice(-1),
         sectionId
       )
     }

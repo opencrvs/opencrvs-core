@@ -33,6 +33,14 @@ export function getBirthRegistrationSectionTransformer(
   if (queryData[sectionId].status) {
     transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
+
+  if (
+    Array.isArray(queryData[sectionId].certificates) &&
+    queryData[sectionId].certificates.length > 0
+  ) {
+    transformedData[sectionId].certificates =
+      queryData[sectionId].certificates.slice(-1)
+  }
 }
 
 export function mosipAidTransformer(

@@ -42,6 +42,14 @@ export function getDeathRegistrationSectionTransformer(
     transformedData['registration'].type = Event.Death
   }
 
+  if (
+    Array.isArray(queryData['registration'].certificates) &&
+    queryData['registration'].certificates.length > 0
+  ) {
+    transformedData['registration'].certificates =
+      queryData['registration'].certificates.slice(-1)
+  }
+
   if (queryData['registration'].status) {
     transformStatusData(
       transformedData,

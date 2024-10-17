@@ -15,9 +15,10 @@ import { omit } from 'lodash'
 
 export function transformCertificateData(
   transformedData: TransformedData,
-  certificateData: ICertificate,
+  certificates: ICertificate[],
   sectionId: string
 ) {
+  const certificateData = certificates[0]
   transformedData[sectionId].certificates = [
     {
       ...omit(certificateData, 'collector')

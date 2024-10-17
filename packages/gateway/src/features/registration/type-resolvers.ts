@@ -1250,7 +1250,6 @@ export const typeResolvers: GQLResolver = {
       )
       if (templateConfig && templateConfig.valueString)
         return JSON.parse(templateConfig.valueString)
-      return null
     }
   },
   Identifier: {
@@ -1435,14 +1434,6 @@ export const typeResolvers: GQLResolver = {
       if (templateConfig && templateConfig.valueString) {
         return JSON.parse(templateConfig.valueString)
       }
-      console.log(
-        '************************************ task.extension ******************************************'
-      )
-      console.log(task.extension)
-      console.log(
-        '******************************************************************************'
-      )
-      return null
     },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(

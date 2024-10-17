@@ -63,7 +63,8 @@ export function IssueCollectorForm({
             certificates: [
               {
                 collector: collector,
-                hasShowedVerifiedDocument: false
+                hasShowedVerifiedDocument: false,
+                templateConfig: certificate.templateConfig
               }
             ]
           }
