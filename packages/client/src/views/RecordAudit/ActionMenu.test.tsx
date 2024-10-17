@@ -2345,6 +2345,7 @@ describe('Delete declaration action', () => {
 
 describe('Unassign action', () => {
   const UNASSIGN_SCOPES = SCOPES.REGISTRAR
+  const Assignment = 'Assigned to Kennedy Mweene at Ibombo District Office'
   it('Has scope - assigned to someone else', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -2359,6 +2360,9 @@ describe('Unassign action', () => {
       />,
       { store, history }
     )
+
+    const { status: assignmentStatus } = actionStatus(component, [Assignment])
+    expect(assignmentStatus).toBe(ACTION_STATUS.ENABLED)
 
     const { status, node } = actionStatus(component, [ACTION.UNASSIGN])
     expect(status).toBe(ACTION_STATUS.ENABLED)
@@ -2382,6 +2386,9 @@ describe('Unassign action', () => {
       { store, history }
     )
 
+    const { status: assignmentStatus } = actionStatus(component, [Assignment])
+    expect(assignmentStatus).toBe(ACTION_STATUS.ENABLED)
+
     const { status } = actionStatus(component, [ACTION.UNASSIGN])
     expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
@@ -2400,6 +2407,10 @@ describe('Unassign action', () => {
       />,
       { store, history }
     )
+
+    const { status: assignmentStatus } = actionStatus(component, [Assignment])
+    expect(assignmentStatus).toBe(ACTION_STATUS.HIDDEN)
+
     const { status, node } = actionStatus(component, [ACTION.UNASSIGN])
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
@@ -2422,6 +2433,10 @@ describe('Unassign action', () => {
       />,
       { store, history }
     )
+
+    const { status: assignmentStatus } = actionStatus(component, [Assignment])
+    expect(assignmentStatus).toBe(ACTION_STATUS.HIDDEN)
+
     const { status } = actionStatus(component, [ACTION.UNASSIGN])
     expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
