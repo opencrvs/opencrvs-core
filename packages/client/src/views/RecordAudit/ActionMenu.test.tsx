@@ -118,6 +118,7 @@ const actionStatus = (
 }
 
 describe('View action', () => {
+  const VIEW_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -126,7 +127,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -151,7 +152,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -176,7 +177,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -201,7 +202,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -227,7 +228,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -252,7 +253,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -277,7 +278,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -302,7 +303,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -327,7 +328,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -352,7 +353,7 @@ describe('View action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={VIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -371,6 +372,7 @@ describe('View action', () => {
 })
 
 describe('Review action', () => {
+  const REVIEW_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -379,7 +381,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -402,7 +404,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -425,7 +427,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -452,7 +454,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -471,7 +473,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -492,7 +494,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftDeathDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -520,7 +522,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -539,7 +541,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -566,7 +568,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -585,7 +587,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -608,7 +610,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -631,7 +633,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -654,7 +656,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -681,7 +683,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={REVIEW_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -696,6 +698,7 @@ describe('Review action', () => {
 })
 
 describe('Update action', () => {
+  const UPDATE_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -704,7 +707,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -730,7 +733,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -756,7 +759,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -775,7 +778,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -794,7 +797,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -814,7 +817,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -841,7 +844,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -860,7 +863,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -879,7 +882,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -898,7 +901,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -917,7 +920,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -936,7 +939,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={UPDATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -949,6 +952,7 @@ describe('Update action', () => {
 })
 
 describe('Archive action', () => {
+  const ARCHIVE_SCOPES = ['validate', 'register'] as any as Scope
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -957,7 +961,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -977,7 +981,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={toggleDisplayDialogMock}
       />,
@@ -999,7 +1003,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1019,7 +1023,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={toggleDisplayDialogMock}
       />,
@@ -1041,7 +1045,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1061,7 +1065,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={toggleDisplayDialogMock}
       />,
@@ -1083,7 +1087,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1103,7 +1107,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.REGISTRAR}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={toggleDisplayDialogMock}
       />,
@@ -1125,7 +1129,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.REGISTRAR}
+        scope={ARCHIVE_SCOPES}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1144,7 +1148,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1163,7 +1167,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1182,7 +1186,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1201,7 +1205,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={ARCHIVE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1214,6 +1218,7 @@ describe('Archive action', () => {
 })
 
 describe('Reinstate action', () => {
+  const REINSTATE_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1222,7 +1227,7 @@ describe('Reinstate action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={REINSTATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1242,7 +1247,7 @@ describe('Reinstate action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={REINSTATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={toggleDisplayDialogMock}
       />,
@@ -1263,7 +1268,7 @@ describe('Reinstate action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={REINSTATE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1282,7 +1287,7 @@ describe('Reinstate action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={REINSTATE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1295,6 +1300,7 @@ describe('Reinstate action', () => {
 })
 
 describe('Print action', () => {
+  const PRINT_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1303,7 +1309,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1322,7 +1328,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1341,7 +1347,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1360,7 +1366,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -1380,7 +1386,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1399,7 +1405,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1418,7 +1424,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1437,7 +1443,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1463,7 +1469,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1482,7 +1488,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1501,7 +1507,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={PRINT_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1514,6 +1520,7 @@ describe('Print action', () => {
 })
 
 describe('Issue action', () => {
+  const ISSUE_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1522,7 +1529,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1541,7 +1548,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1560,7 +1567,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1579,7 +1586,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -1599,7 +1606,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1618,7 +1625,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1637,7 +1644,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1656,7 +1663,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1675,7 +1682,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1699,7 +1706,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1718,7 +1725,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.RA}
+        scope={ISSUE_SCOPES}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
