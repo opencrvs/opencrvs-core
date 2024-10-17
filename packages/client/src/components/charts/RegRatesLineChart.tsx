@@ -134,37 +134,29 @@ function LegendDot(props: React.HTMLAttributes<SVGElement>) {
 }
 
 function RegRatesLineChartComponent(props: IProps) {
-  const getStatePropertiesForChart = () => {
-    if (window.innerWidth > props.theme.grid.breakpoints.md) {
-      return getStatePropertiesForLargeWindowChart()
-    } else {
-      return getStatePropertiesForSmallWindowChart()
-    }
-  }
-
-  const getLatestData = () => {
-    const { data, theme } = props
-    const latestData = data && data[data.length - 1]
-    return {
-      activeLabel: (latestData && latestData.label) || '',
-      activeRegisteredInTargetDays: {
-        value: (latestData && latestData.registeredInTargetDays) || 0,
-        stroke: theme.colors.teal
-      },
-      activeTotalRegistered: {
-        value: (latestData && latestData.totalRegistered) || 0,
-        stroke: theme.colors.tealLight
-      },
-      activeTotalEstimate: {
-        value: (latestData && latestData.totalEstimate) || 0,
-        stroke: theme.colors.grey300
-      }
-    }
-  }
 
   const [state, setState] = useState<IState>({
-    ...getStatePropertiesForChart(),
-    ...getLatestData()
+    legendMarginTop: 0,
+    legendMarginLeft: 0,
+    chartTop: 0,
+    chartRight: 0,
+    chartBottom: 0,
+    chartLeft: 0,
+    maximizeXAxisInterval: false,
+    legendLayout: 'horizontal',
+    activeLabel: '',
+    activeRegisteredInTargetDays: {
+      value: 0,
+      stroke: props.theme.colors.teal
+    },
+    activeTotalRegistered: {
+      value: 0,
+      stroke: props.theme.colors.tealLight
+    },
+    activeTotalEstimate: {
+      value: 0,
+      stroke: props.theme.colors.grey300
+    }
   })
 
   useEffect(() => {
@@ -197,6 +189,34 @@ function RegRatesLineChartComponent(props: IProps) {
       chartLeft: 10,
       maximizeXAxisInterval: false,
       legendLayout: 'vertical' as const
+    }
+  }
+
+  const getStatePropertiesForChart = () => {
+    if (window.innerWidth > props.theme.grid.breakpoints.md) {
+      return getStatePropertiesForLargeWindowChart()
+    } else {
+      return getStatePropertiesForSmallWindowChart()
+    }
+  }
+
+  const getLatestData = () => {
+    const { data, theme } = props
+    const latestData = data && data[data.length - 1]
+    return {
+      activeLabel: (latestData && latestData.label) || '',
+      activeRegisteredInTargetDays: {
+        value: (latestData && latestData.registeredInTargetDays) || 0,
+        stroke: theme.colors.teal
+      },
+      activeTotalRegistered: {
+        value: (latestData && latestData.totalRegistered) || 0,
+        stroke: theme.colors.tealLight
+      },
+      activeTotalEstimate: {
+        value: (latestData && latestData.totalEstimate) || 0,
+        stroke: theme.colors.grey300
+      }
     }
   }
 
