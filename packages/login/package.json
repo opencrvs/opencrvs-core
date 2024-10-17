@@ -99,7 +99,7 @@
     "jwt-decode": "^2.2.0",
     "msw": "0.22.0",
     "opener": "^1.5.1",
-    "prettier": "2.8.8",
+    "prettier": "3.3.3",
     "redux-mock-store": "^1.5.3",
     "serve": "^14.2.0",
     "stylelint": "^14.11.0",
