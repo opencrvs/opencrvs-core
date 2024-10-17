@@ -99,7 +99,8 @@ enum ACTION {
   REINSTATE_RECORD = 'Reinstate Record',
   PRINT_RECORD = 'Print certified copy',
   ISSUE_CERTIFICATE = 'Issue certificate',
-  CORRECT_RECORD = 'Correct Record'
+  CORRECT_RECORD = 'Correct Record',
+  DELETE_DECLARATION = 'Delete Declaration'
 }
 
 const actionStatus = (
@@ -2273,6 +2274,70 @@ describe('Correct action', () => {
     )
 
     const { status } = actionStatus(component, [ACTION.CORRECT_RECORD])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+})
+
+describe('Delete declaration action', () => {
+  it('Draft', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DRAFT
+        }}
+        scope={SCOPES.NONE}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [
+      ACTION.DELETE_DECLARATION
+    ])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+    expect(component.find('h1').hostNodes().text()).toEqual('Delete draft?')
+  })
+
+  it('In progress', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.IN_PROGRESS
+        }}
+        scope={SCOPES.NONE}
+        draft={draftDeathDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.DELETE_DECLARATION])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('In review', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.NONE}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.DELETE_DECLARATION])
     expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
 })
