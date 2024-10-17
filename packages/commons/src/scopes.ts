@@ -104,7 +104,10 @@ export const scopes = [
   'user.create',
   'user.create:my-jurisdiction',
   'user.update:my-office',
-  'user.update'
+  'user.update',
+
+  // config
+  'config.update:all'
 ] as const
 
 export type Scope = (typeof scopes)[number]
