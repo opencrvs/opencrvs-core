@@ -29,41 +29,20 @@ export interface ICustomProps {
 export type ITextInputProps = ICustomProps &
   React.InputHTMLAttributes<HTMLInputElement>
 
-const StyledInputContainer = styled.div`
+const StyledInputContainer = styled.div<{
+  touched?: boolean
+  disabled?: boolean
+  error?: boolean
+}>`
   position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
-`
-
-const StyledPrefix = styled.span`
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme }) => theme.colors.grey400};
-`
-
-const StyledPostfix = styled.span`
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme }) => theme.colors.grey400};
-`
-
-const StyledInput = styled.input<ICustomProps>`
-  width: 100%;
-  padding-left: ${({ hasPrefix }) => (hasPrefix ? '48px' : '16px')};
-  padding-right: ${({ hasPostfix }) => (hasPostfix ? '4px' : '16px')};
-  height: 46px;
+  padding: 0 16px;
   border-radius: 4px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
-  outline: none;
-  ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  overflow: hidden;
 
   ${({ error, touched, disabled, theme }) => `
     border: 1.5px solid ${
@@ -76,12 +55,36 @@ const StyledInput = styled.input<ICustomProps>`
     &:hover {
       box-shadow: 0 0 0 4px ${theme.colors.grey200};
     }
-    &:focus {
+    &:focus-within {
       outline: 0.5px solid ${theme.colors.grey600};
       border: 1.5px solid ${theme.colors.grey600};
       box-shadow: 0 0 0px 4px ${theme.colors.yellow};
     }
   `}
+`
+
+const StyledPrefix = styled.span`
+  ${({ theme }) => theme.fonts.reg19};
+  color: ${({ theme }) => theme.colors.grey400};
+  user-select: none;
+`
+
+const StyledPostfix = styled.span`
+  ${({ theme }) => theme.fonts.reg19};
+  color: ${({ theme }) => theme.colors.grey400};
+  user-select: none;
+`
+
+const StyledInput = styled.input<ICustomProps>`
+  width: 100%;
+  padding-left: ${({ hasPrefix }) => (hasPrefix ? '8px' : '0')};
+  padding-right: ${({ hasPostfix }) => (hasPostfix ? '4px' : '0')};
+  height: 46px;
+  outline: none;
+  border: none;
+  ${({ theme }) => theme.fonts.reg19};
+  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.white};
 
   &::-webkit-input-placeholder {
     color: ${({ theme }) => theme.colors.placeholderCopy};
@@ -153,7 +156,11 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     }, [focusInput])
 
     return (
-      <StyledInputContainer>
+      <StyledInputContainer
+        touched={otherProps.touched}
+        disabled={isDisabled}
+        error={error}
+      >
         {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
           ref={$element}

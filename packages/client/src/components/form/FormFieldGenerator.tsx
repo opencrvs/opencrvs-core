@@ -256,8 +256,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             isDisabled={fieldDefinition.disabled}
             value={value as string}
             onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
               setFieldValue(fieldDefinition.name, val)
+              resetDependentSelectValues(fieldDefinition.name)
             }}
             onFocus={() =>
               handleSelectFocus(
