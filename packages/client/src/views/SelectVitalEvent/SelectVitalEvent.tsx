@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import React, { useState } from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -36,8 +36,10 @@ import {
   createDeclaration
 } from '@client/declarations'
 
-class SelectVitalEventView extends React.Component<
-  IntlShapeProps & {
+type GoToType = '' | Event
+
+const SelectVitalEventView = (
+  props: IntlShapeProps & {
     goBack: typeof goBack
     goToHome: typeof goToHome
     storeDeclaration: typeof storeDeclaration
@@ -45,145 +47,149 @@ class SelectVitalEventView extends React.Component<
     goToDeathInformant: typeof goToDeathInformant
     goToMarriageInformant: typeof goToMarriageInformant
   }
-> {
-  state = {
-    goTo: '',
-    noEventSelectedError: false
-  }
-  handleContinue = () => {
-    if (this.state.goTo === '') {
-      this.setState({ noEventSelectedError: true })
-    } else {
-      let declaration: IDeclaration
-      switch (this.state.goTo as Event) {
-        case Event.Birth:
-          declaration = createDeclaration(Event.Birth)
-          this.props.storeDeclaration(declaration)
-          this.props.goToBirthRegistrationAsParent(declaration.id)
-          break
-        case Event.Death:
-          declaration = createDeclaration(Event.Death)
-          this.props.storeDeclaration(declaration)
-          this.props.goToDeathInformant(declaration.id)
-          break
-        case Event.Marriage:
-          declaration = createDeclaration(Event.Marriage)
-          this.props.storeDeclaration(declaration)
-          this.props.goToMarriageInformant(declaration.id)
-          break
-        default:
-          throw new Error(`Unknown eventType ${this.state.goTo}`)
-      }
+) => {
+  const {
+    intl,
+    goToHome,
+    storeDeclaration,
+    goToBirthRegistrationAsParent,
+    goToDeathInformant,
+    goToMarriageInformant
+  } = props
+
+  const [goTo, setGoTo] = useState<GoToType>('')
+  const [noEventSelectedError, setNoEventSelectedError] = useState(false)
+
+  const handleContinue = () => {
+    if (goTo === '') {
+      return setNoEventSelectedError(true)
+    }
+    let declaration: IDeclaration
+    switch (goTo as Event) {
+      case Event.Birth:
+        declaration = createDeclaration(Event.Birth)
+        storeDeclaration(declaration)
+        goToBirthRegistrationAsParent(declaration.id)
+        break
+      case Event.Death:
+        declaration = createDeclaration(Event.Death)
+        storeDeclaration(declaration)
+        goToDeathInformant(declaration.id)
+        break
+      case Event.Marriage:
+        declaration = createDeclaration(Event.Marriage)
+        storeDeclaration(declaration)
+        goToMarriageInformant(declaration.id)
+        break
+      default:
+        throw new Error(`Unknown eventType ${goTo}`)
     }
   }
 
-  render() {
-    const { intl } = this.props
-    return (
-      <Frame
-        header={
-          <AppBar
-            desktopLeft={<Icon name="Draft" size="large" />}
-            desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
-            desktopRight={
-              <Button
-                id="goBack"
-                type="secondary"
-                size="small"
-                onClick={this.props.goToHome}
-              >
-                <Icon name="X" />
-                {intl.formatMessage(buttonMessages.exitButton)}
-              </Button>
-            }
-            mobileLeft={<Icon name="Draft" size="large" />}
-            mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
-            mobileRight={
-              <Button type="icon" size="medium" onClick={this.props.goToHome}>
-                <Icon name="X" />
-              </Button>
-            }
-          />
-        }
-        skipToContentText={intl.formatMessage(
-          constantsMessages.skipToMainContent
-        )}
-      >
-        <Content
-          size={ContentSize.SMALL}
-          title={intl.formatMessage(messages.registerNewEventHeading)}
-          bottomActionButtons={[
+  return (
+    <Frame
+      header={
+        <AppBar
+          desktopLeft={<Icon name="Draft" size="large" />}
+          desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
+          desktopRight={
             <Button
-              key="select-vital-event-continue"
-              id="continue"
-              type="primary"
-              size="large"
-              fullWidth
-              onClick={this.handleContinue}
+              id="goBack"
+              type="secondary"
+              size="small"
+              onClick={goToHome}
             >
-              {intl.formatMessage(buttonMessages.continueButton)}
+              <Icon name="X" />
+              {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
-          ]}
-        >
-          {this.state.noEventSelectedError && (
-            <ErrorText id="require-error">
-              {intl.formatMessage(messages.errorMessage)}
-            </ErrorText>
-          )}
-          <Stack
-            id="select_vital_event_view"
-            direction="column"
-            alignItems="left"
-            gap={0}
+          }
+          mobileLeft={<Icon name="Draft" size="large" />}
+          mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
+          mobileRight={
+            <Button type="icon" size="medium" onClick={goToHome}>
+              <Icon name="X" />
+            </Button>
+          }
+        />
+      }
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      <Content
+        size={ContentSize.SMALL}
+        title={intl.formatMessage(messages.registerNewEventHeading)}
+        bottomActionButtons={[
+          <Button
+            key="select-vital-event-continue"
+            id="continue"
+            type="primary"
+            size="large"
+            fullWidth
+            onClick={handleContinue}
           >
+            {intl.formatMessage(buttonMessages.continueButton)}
+          </Button>
+        ]}
+      >
+        {noEventSelectedError && (
+          <ErrorText id="require-error">
+            {intl.formatMessage(messages.errorMessage)}
+          </ErrorText>
+        )}
+        <Stack
+          id="select_vital_event_view"
+          direction="column"
+          alignItems="left"
+          gap={0}
+        >
+          <RadioButton
+            size="large"
+            key="birthevent"
+            name="birthevent"
+            label={intl.formatMessage(constantsMessages.birth)}
+            value={Event.Birth}
+            id="select_birth_event"
+            selected={goTo === Event.Birth ? Event.Birth : ''}
+            onChange={() => {
+              setGoTo(Event.Birth)
+              setNoEventSelectedError(false)
+            }}
+          />
+          {window.config.FEATURES.DEATH_REGISTRATION && (
             <RadioButton
               size="large"
-              key="birthevent"
-              name="birthevent"
-              label={intl.formatMessage(constantsMessages.birth)}
-              value="birth"
-              id="select_birth_event"
-              selected={this.state.goTo === 'birth' ? 'birth' : ''}
-              onChange={() =>
-                this.setState({ goTo: 'birth', noEventSelectedError: false })
-              }
+              key="deathevent"
+              name="deathevent"
+              label={intl.formatMessage(constantsMessages.death)}
+              value={Event.Death}
+              id="select_death_event"
+              selected={goTo === Event.Death ? Event.Death : ''}
+              onChange={() => {
+                setGoTo(Event.Death)
+                setNoEventSelectedError(false)
+              }}
             />
-            {window.config.FEATURES.DEATH_REGISTRATION && (
-              <RadioButton
-                size="large"
-                key="deathevent"
-                name="deathevent"
-                label={intl.formatMessage(constantsMessages.death)}
-                value="death"
-                id="select_death_event"
-                selected={this.state.goTo === 'death' ? 'death' : ''}
-                onChange={() =>
-                  this.setState({ goTo: 'death', noEventSelectedError: false })
-                }
-              />
-            )}
-            {window.config.FEATURES.MARRIAGE_REGISTRATION && (
-              <RadioButton
-                size="large"
-                key="marriagevent"
-                name="marriageevent"
-                label={intl.formatMessage(constantsMessages.marriage)}
-                value="marriage"
-                id="select_marriage_event"
-                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-                onChange={() =>
-                  this.setState({
-                    goTo: 'marriage',
-                    noEventSelectedError: false
-                  })
-                }
-              />
-            )}
-          </Stack>
-        </Content>
-      </Frame>
-    )
-  }
+          )}
+          {window.config.FEATURES.MARRIAGE_REGISTRATION && (
+            <RadioButton
+              size="large"
+              key="marriagevent"
+              name="marriageevent"
+              label={intl.formatMessage(constantsMessages.marriage)}
+              value={Event.Marriage}
+              id="select_marriage_event"
+              selected={goTo === Event.Marriage ? Event.Marriage : ''}
+              onChange={() => {
+                setGoTo(Event.Marriage)
+                setNoEventSelectedError(false)
+              }}
+            />
+          )}
+        </Stack>
+      </Content>
+    </Frame>
+  )
 }
 
 export const SelectVitalEvent = connect(null, {
