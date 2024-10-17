@@ -15,7 +15,6 @@ import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
   Bundle,
-  Composition,
   EVENT_TYPE,
   Patient,
   Saved,
@@ -73,60 +72,6 @@ export const resolvers: GQLResolver = {
     }
   },
   Query: {
-    async searchBirthRegistrations(
-      _,
-      { fromDate, toDate },
-      { headers: authHeader }
-    ): Promise<Saved<Bundle>[]> {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        return await Promise.reject(
-          new Error('User does not have a sysadmin scope')
-        )
-      }
-      const res = await fetchFHIR<Saved<Bundle<Saved<Composition>>>>(
-        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
-        authHeader
-      )
-
-      const compositions = res.entry.map(({ resource }) => resource)
-
-      return Promise.all(
-        compositions
-          .filter(({ type }) =>
-            type.coding?.some(({ code }) => code === 'birth-declaration')
-          )
-          .map((composition) =>
-            getRecordById(composition.id, authHeader.Authorization)
-          )
-      )
-    },
-    async searchDeathRegistrations(
-      _,
-      { fromDate, toDate },
-      { headers: authHeader }
-    ): Promise<Saved<Bundle>[]> {
-      if (!hasScope(authHeader, 'sysadmin')) {
-        return await Promise.reject(
-          new Error('User does not have a sysadmin scope')
-        )
-      }
-      const res = await fetchFHIR<Saved<Bundle<Saved<Composition>>>>(
-        `/Composition?date=gt${fromDate.toISOString()}&date=lte${toDate.toISOString()}&_count=0`,
-        authHeader
-      )
-
-      const compositions = res.entry.map(({ resource }) => resource)
-
-      return Promise.all(
-        compositions
-          .filter(({ type }) =>
-            type.coding?.some(({ code }) => code === 'death-declaration')
-          )
-          .map((composition) =>
-            getRecordById(composition.id, authHeader.Authorization)
-          )
-      )
-    },
     async fetchBirthRegistration(_, { id }, context): Promise<Saved<Bundle>> {
       if (
         hasScope(context.headers, 'register') ||

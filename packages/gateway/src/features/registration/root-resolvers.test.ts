@@ -62,16 +62,6 @@ const certifyToken = jwt.sign(
   }
 )
 
-const sysAdminToken = jwt.sign(
-  { scope: ['sysadmin'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
-
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
@@ -85,14 +75,6 @@ const authHeaderCertify = {
 }
 
 const authHeaderNotRegCert = {
-  Authorization: `Bearer ${declareToken}`
-}
-
-const authHeaderSysAdmin = {
-  Authorization: `Bearer ${sysAdminToken}`
-}
-
-const authHeaderNotSysAdmin = {
   Authorization: `Bearer ${declareToken}`
 }
 
@@ -177,148 +159,6 @@ beforeEach(() => {
 })
 
 describe('Registration root resolvers', () => {
-  describe('searchBirthRegistrations()', () => {
-    it('throws an error if the user does not have sysadmin scope', async () => {
-      return expect(
-        resolvers.Query!.searchBirthRegistrations(
-          {},
-          {
-            fromDate: new Date('05 October 2011 14:48 UTC'),
-            toDate: new Date('05 October 2012 14:48 UTC')
-          },
-          authHeaderNotSysAdmin
-        )
-      ).rejects.toThrowError('User does not have a sysadmin scope')
-    })
-
-    it('returns an array of records', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'birth-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'birth-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const compositions = await resolvers.Query!.searchBirthRegistrations(
-        {},
-        {
-          fromDate: new Date('05 October 2011 14:48 UTC'),
-          toDate: new Date('05 October 2012 14:48 UTC')
-        },
-        { headers: authHeaderSysAdmin }
-      )
-
-      expect(compositions[0].entry[0].resource.id).toBe(
-        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      )
-    })
-  })
-
-  describe('searchDeathRegistrations()', () => {
-    it('throws an error if the user does not have sysadmin scope', async () => {
-      return expect(
-        resolvers.Query!.searchDeathRegistrations(
-          {},
-          {
-            fromDate: new Date('05 October 2011 14:48 UTC'),
-            toDate: new Date('05 October 2012 14:48 UTC')
-          },
-          authHeaderNotSysAdmin
-        )
-      ).rejects.toThrowError('User does not have a sysadmin scope')
-    })
-
-    it('returns an array of records', async () => {
-      fetch.mockResponses(
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'death-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ],
-        [
-          JSON.stringify({
-            entry: [
-              {
-                resource: {
-                  id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
-                  type: {
-                    coding: [
-                      {
-                        code: 'death-declaration'
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }),
-          { status: 200 }
-        ]
-      )
-
-      const compositions = await resolvers.Query!.searchDeathRegistrations(
-        {},
-        {
-          fromDate: new Date('05 October 2011 14:48 UTC'),
-          toDate: new Date('05 October 2012 14:48 UTC')
-        },
-        { headers: authHeaderSysAdmin }
-      )
-
-      expect(compositions[0].entry[0].resource.id).toBe(
-        '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-      )
-    })
-  })
-
   describe('fetchBirthRegistration()', () => {
     it('returns the record in the OpenCRVS format', async () => {
       const mockTaskOfComposition = JSON.stringify({

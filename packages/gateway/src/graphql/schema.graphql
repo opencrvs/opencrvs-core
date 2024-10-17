@@ -6,8 +6,6 @@ type Query {
     type: NotificationType = EMAIL
   ): NotificationResult
   fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
   queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
   queryPersonByIdentifier(identifier: ID!): Person
   listBirthRegistrations(
@@ -296,32 +294,6 @@ type BirthRegistration implements EventRegistration {
   history: [History]
 }
 
-scalar Date
-
-type DeathRegistration implements EventRegistration {
-  id: ID!
-  _fhirIDMap: Map
-  registration: Registration
-  deceased: Person
-  informant: RelatedPerson
-  mother: Person
-  father: Person
-  spouse: Person
-  eventLocation: Location
-  questionnaire: [QuestionnaireQuestion]
-  mannerOfDeath: String
-  deathDescription: String
-  causeOfDeathMethod: String
-  causeOfDeathEstablished: String
-  causeOfDeath: String
-  maleDependentsOfDeceased: Float
-  femaleDependentsOfDeceased: Float
-  medicalPractitioner: MedicalPractitioner
-  createdAt: Date
-  updatedAt: Date
-  history: [History]
-}
-
 type Person {
   id: ID
   _fhirID: ID
@@ -349,6 +321,32 @@ type Person {
 type BirthRegResultSet {
   results: [BirthRegistration]
   totalItems: Int
+}
+
+scalar Date
+
+type DeathRegistration implements EventRegistration {
+  id: ID!
+  _fhirIDMap: Map
+  registration: Registration
+  deceased: Person
+  informant: RelatedPerson
+  mother: Person
+  father: Person
+  spouse: Person
+  eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
+  mannerOfDeath: String
+  deathDescription: String
+  causeOfDeathMethod: String
+  causeOfDeathEstablished: String
+  causeOfDeath: String
+  maleDependentsOfDeceased: Float
+  femaleDependentsOfDeceased: Float
+  medicalPractitioner: MedicalPractitioner
+  createdAt: Date
+  updatedAt: Date
+  history: [History]
 }
 
 interface EventRegistration {
@@ -862,12 +860,6 @@ type History {
   potentialDuplicates: [String!]
 }
 
-type MedicalPractitioner {
-  name: String
-  qualification: String
-  lastVisitDate: Date
-}
-
 type IdentityType {
   id: ID
   type: String
@@ -927,6 +919,12 @@ type Attachment {
 type Deceased {
   deceased: Boolean
   deathDate: PlainDate
+}
+
+type MedicalPractitioner {
+  name: String
+  qualification: String
+  lastVisitDate: Date
 }
 
 type StatusWiseRegistrationCount {
