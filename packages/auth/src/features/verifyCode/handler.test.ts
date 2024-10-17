@@ -72,7 +72,7 @@ describe('authenticate handler receives a request', () => {
         'sysadmin',
         'natlsysadmin',
         'user.create',
-        'user.read',
+        'user.read:all',
         'user.update',
         'organisation.read',
         'organisation.read-locations',

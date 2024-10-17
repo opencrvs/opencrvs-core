@@ -26,7 +26,7 @@ export function usePermissions() {
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
 
   const canReadUser = (user: Pick<User, 'primaryOffice'>) => {
-    if (hasScope('user.read')) return true
+    if (hasScope('user.read:all')) return true
     if (hasScope('user.read:my-office'))
       return user.primaryOffice.id === userPrimaryOffice?.id
 

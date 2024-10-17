@@ -99,8 +99,10 @@ export const scopes = [
   'organisation.read-locations',
 
   // user
+  'user.read:all',
+  'user.read:my-jurisdiction',
   'user.read:my-office',
-  'user.read',
+  'user.read:only-my-audit',
   'user.create',
   'user.create:my-jurisdiction',
   'user.update:my-office',

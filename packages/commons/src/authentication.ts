@@ -167,7 +167,7 @@ export const DEFAULT_ROLES_DEFINITION = [
       'natlsysadmin',
 
       'user.create',
-      'user.read',
+      'user.read:all',
       'user.update',
       'organisation.read',
       'organisation.read-locations',

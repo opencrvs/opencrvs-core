@@ -77,7 +77,7 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   'natlsysadmin',
 
   'user.create',
-  'user.read',
+  'user.read:all',
   'user.update',
   'organisation.read',
   'organisation.read-locations',
