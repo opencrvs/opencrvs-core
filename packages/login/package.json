@@ -29,7 +29,6 @@
     "focus-visible": "^5.0.2",
     "google-libphonenumber": "^3.2.32",
     "history": "^4.7.2",
-    "lint-staged": "^15.2.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "lodash-es": "^4.17.0",
@@ -49,7 +48,6 @@
   },
   "scripts": {
     "postinstall": "patch-package",
-    "precommit": "lint-staged",
     "start": "vite --port=3020",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
@@ -67,12 +65,13 @@
     "extract:translations": "bash extract-translations.sh"
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json}": [
+    "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "yarn lint:ts",
+      "eslint --fix",
       "stylelint",
       "yarn extract:translations"
-    ]
+    ],
+    "src/**/*.json": "prettier --write"
   },
   "devDependencies": {
     "@types/csv2json": "^1.4.5",
