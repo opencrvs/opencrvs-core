@@ -60,7 +60,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { RegStatus, Scope } from '@client/utils/gateway'
+import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { usePermissions } from '@client/hooks/useAuthorization'
 
@@ -178,7 +178,7 @@ const ReadyForReviewComponent = ({
         ''
       const isValidatedOnReview =
         reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-        hasScope('record.register')
+        hasScope(SCOPES.RECORD_REGISTER)
       const dateOfEvent =
         (reg.dateOfEvent &&
           reg.dateOfEvent.length > 0 &&

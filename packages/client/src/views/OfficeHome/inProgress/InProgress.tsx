@@ -54,7 +54,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event, RegStatus, Scope } from '@client/utils/gateway'
+import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
@@ -78,7 +78,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   isMarriageEvent,
   isBirthEvent,
@@ -536,21 +536,27 @@ class InProgressComponent extends React.Component<
 
   hasDrafts() {
     return (
-      this.props.scopes?.includes('record.declare-birth') ||
-      this.props.scopes?.includes('record.declare-death') ||
-      this.props.scopes?.includes('record.declare-marriage') ||
-      this.props.scopes?.includes('record.declare-birth:my-jurisdiction') ||
-      this.props.scopes?.includes('record.declare-death:my-jurisdiction') ||
-      this.props.scopes?.includes('record.declare-marriage:my-jurisdiction')
+      this.props.scopes?.includes(SCOPES.RECORD_DECLARE_BIRTH) ||
+      this.props.scopes?.includes(SCOPES.RECORD_DECLARE_DEATH) ||
+      this.props.scopes?.includes(SCOPES.RECORD_DECLARE_MARRIAGE) ||
+      this.props.scopes?.includes(
+        SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
+      ) ||
+      this.props.scopes?.includes(
+        SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+      ) ||
+      this.props.scopes?.includes(
+        SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+      )
     )
   }
 
   hasFieldAgents() {
-    return this.props.scopes?.includes('record.declaration-review')
+    return this.props.scopes?.includes(SCOPES.RECORD_DECLARATION_REVIEW)
   }
 
   hasHealthSystem() {
-    return this.props.scopes?.includes('record.declaration-review')
+    return this.props.scopes?.includes(SCOPES.RECORD_DECLARATION_REVIEW)
   }
 
   getTabs(

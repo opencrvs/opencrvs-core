@@ -44,7 +44,7 @@ import type {
 import { formattedDuration } from '@client/utils/date-formatting'
 import { REGISTRAR_HOME } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
 import { vi, Mock } from 'vitest'
 

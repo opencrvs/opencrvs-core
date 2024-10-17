@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   IDeclaration,
   modifyDeclaration,
@@ -49,7 +49,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { Scope } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
@@ -204,7 +204,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         }
       >
         <Check />
-        {this.props.scopes?.includes('record.registration-request-correction')
+        {this.props.scopes?.includes(
+          SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+        )
           ? intl.formatMessage(buttonMessages.sendForApproval)
           : intl.formatMessage(buttonMessages.makeCorrection)}
       </Button>
@@ -382,7 +384,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           isOpen={showPrompt}
           title={intl.formatMessage(
             this.props.scopes?.includes(
-              'record.registration-request-correction'
+              SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
             )
               ? messages.correctionForApprovalDialogTitle
               : messages.correctRecordDialogTitle
@@ -416,7 +418,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             <Text element="p" variant="reg16">
               {intl.formatMessage(
                 this.props.scopes?.includes(
-                  'record.registration-request-correction'
+                  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
                 )
                   ? messages.correctionForApprovalDialogDescription
                   : messages.correctRecordDialogDescription
@@ -1011,7 +1013,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
   makeCorrection = () => {
     const declaration = this.props.declaration
-    if (this.props.scopes?.includes('record.registration-request-correction')) {
+    if (
+      this.props.scopes?.includes(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION)
+    ) {
       declaration.action = SubmissionAction.REQUEST_CORRECTION
       declaration.submissionStatus =
         SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -1034,7 +1038,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
     this.props.writeDeclaration(declaration)
 
-    if (this.props.scopes?.includes('record.registration-request-correction')) {
+    if (
+      this.props.scopes?.includes(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION)
+    ) {
       this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
     } else {
       this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)

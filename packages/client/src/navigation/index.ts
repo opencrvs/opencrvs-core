@@ -69,7 +69,7 @@ import {
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
 import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IWORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { UserDetails } from '@client/utils/userUtils'

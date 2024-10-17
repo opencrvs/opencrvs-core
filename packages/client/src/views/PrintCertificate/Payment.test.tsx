@@ -24,7 +24,7 @@ import { Event } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
 import { vi, Mock } from 'vitest'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)

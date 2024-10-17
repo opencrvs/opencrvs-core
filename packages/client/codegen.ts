@@ -10,7 +10,7 @@
  */
 import type { CodegenConfig } from '@graphql-codegen/cli'
 // @ts-expect-error @TODO: When we update to TypeScript 5.0, we can directly import scopes from commons and set `moduleResolution` to `bundler` in tsconfig.json
-import { scopes } from '@opencrvs/commons/authentication'
+import { scopes, SCOPES } from '@opencrvs/commons/authentication'
 
 const config: CodegenConfig = {
   schema: [
@@ -51,6 +51,8 @@ const config: CodegenConfig = {
 
             export const scopes = ${JSON.stringify(scopes)} as const
             export type Scope = (typeof scopes)[number]
+
+            export const SCOPES = ${JSON.stringify(SCOPES)} as const
             `
           }
         }

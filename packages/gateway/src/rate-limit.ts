@@ -91,7 +91,7 @@ export const rateLimitedRoute =
     if (
       hasScope(
         { Authorization: args[0].headers.authorization },
-        SCOPES.bypassRateLimit
+        SCOPES.BYPASSRATELIMIT
       )
     ) {
       return fn(...args)
@@ -125,7 +125,7 @@ export const rateLimitedResolver =
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
-    if (hasScope(args[2].headers, SCOPES.bypassRateLimit)) {
+    if (hasScope(args[2].headers, SCOPES.BYPASSRATELIMIT)) {
       return fn(...args)
     }
 
