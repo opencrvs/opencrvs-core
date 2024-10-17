@@ -23,6 +23,7 @@ import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { GraphQLError } from 'graphql'
 import { match } from 'react-router'
 import { vi } from 'vitest'
+import { Event } from '@client/utils/gateway'
 
 describe('Workflow status tests', () => {
   let store: AppStore
