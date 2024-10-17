@@ -352,26 +352,24 @@ const ReviewAction: React.FC<
       <Icon name="PencilLine" color="currentColor" size="large" />
       {intl.formatMessage(messages.reviewCorrection)}
     </DropdownMenu.Item>
-  ) : (
-    isReviewableDeclaration(declarationStatus) && (
-      <DropdownMenu.Item
-        onClick={() => {
-          dispatch(
-            goToPage(
-              REVIEW_EVENT_PARENT_FORM_PAGE,
-              declarationId as string,
-              'review',
-              type as string
-            )
+  ) : isReviewableDeclaration(declarationStatus) ? (
+    <DropdownMenu.Item
+      onClick={() => {
+        dispatch(
+          goToPage(
+            REVIEW_EVENT_PARENT_FORM_PAGE,
+            declarationId as string,
+            'review',
+            type as string
           )
-        }}
-        disabled={!isDownloaded}
-      >
-        <Icon name="PencilLine" color="currentColor" size="large" />
-        {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
-      </DropdownMenu.Item>
-    )
-  )
+        )
+      }}
+      disabled={!isDownloaded}
+    >
+      <Icon name="PencilLine" color="currentColor" size="large" />
+      {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
+    </DropdownMenu.Item>
+  ) : null
 }
 
 const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
@@ -499,13 +497,12 @@ const DeleteAction: React.FC<{
   declarationStatus?: SUBMISSION_STATUS
 }> = ({ handleDelete, declarationStatus }) => {
   const intl = useIntl()
+  if (declarationStatus !== SUBMISSION_STATUS.DRAFT) return null
   return (
-    declarationStatus === SUBMISSION_STATUS.DRAFT && (
-      <DropdownMenu.Item onClick={handleDelete}>
-        <Icon name="Trash" color="currentColor" size="large" />
-        {intl.formatMessage(buttonMessages.deleteDeclaration)}
-      </DropdownMenu.Item>
-    )
+    <DropdownMenu.Item onClick={handleDelete}>
+      <Icon name="Trash" color="currentColor" size="large" />
+      {intl.formatMessage(buttonMessages.deleteDeclaration)}
+    </DropdownMenu.Item>
   )
 }
 const UnassignAction: React.FC<{
