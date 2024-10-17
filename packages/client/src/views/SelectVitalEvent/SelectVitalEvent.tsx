@@ -19,7 +19,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { Event } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
@@ -35,6 +35,7 @@ import {
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 
 class SelectVitalEventView extends React.Component<
   IntlShapeProps & {
@@ -136,48 +137,72 @@ class SelectVitalEventView extends React.Component<
             alignItems="left"
             gap={0}
           >
-            <RadioButton
-              size="large"
-              key="birthevent"
-              name="birthevent"
-              label={intl.formatMessage(constantsMessages.birth)}
-              value="birth"
-              id="select_birth_event"
-              selected={this.state.goTo === 'birth' ? 'birth' : ''}
-              onChange={() =>
-                this.setState({ goTo: 'birth', noEventSelectedError: false })
-              }
-            />
-            {window.config.FEATURES.DEATH_REGISTRATION && (
+            <ProtectedComponent
+              scopes={[
+                SCOPES.RECORD_DECLARE_BIRTH,
+                SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
+              ]}
+            >
               <RadioButton
                 size="large"
-                key="deathevent"
-                name="deathevent"
-                label={intl.formatMessage(constantsMessages.death)}
-                value="death"
-                id="select_death_event"
-                selected={this.state.goTo === 'death' ? 'death' : ''}
+                key="birthevent"
+                name="birthevent"
+                label={intl.formatMessage(constantsMessages.birth)}
+                value="birth"
+                id="select_birth_event"
+                selected={this.state.goTo === 'birth' ? 'birth' : ''}
                 onChange={() =>
-                  this.setState({ goTo: 'death', noEventSelectedError: false })
+                  this.setState({ goTo: 'birth', noEventSelectedError: false })
                 }
               />
+            </ProtectedComponent>
+            {window.config.FEATURES.DEATH_REGISTRATION && (
+              <ProtectedComponent
+                scopes={[
+                  SCOPES.RECORD_DECLARE_DEATH,
+                  SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+                ]}
+              >
+                <RadioButton
+                  size="large"
+                  key="deathevent"
+                  name="deathevent"
+                  label={intl.formatMessage(constantsMessages.death)}
+                  value="death"
+                  id="select_death_event"
+                  selected={this.state.goTo === 'death' ? 'death' : ''}
+                  onChange={() =>
+                    this.setState({
+                      goTo: 'death',
+                      noEventSelectedError: false
+                    })
+                  }
+                />
+              </ProtectedComponent>
             )}
             {window.config.FEATURES.MARRIAGE_REGISTRATION && (
-              <RadioButton
-                size="large"
-                key="marriagevent"
-                name="marriageevent"
-                label={intl.formatMessage(constantsMessages.marriage)}
-                value="marriage"
-                id="select_marriage_event"
-                selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
-                onChange={() =>
-                  this.setState({
-                    goTo: 'marriage',
-                    noEventSelectedError: false
-                  })
-                }
-              />
+              <ProtectedComponent
+                scopes={[
+                  SCOPES.RECORD_DECLARE_MARRIAGE,
+                  SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+                ]}
+              >
+                <RadioButton
+                  size="large"
+                  key="marriagevent"
+                  name="marriageevent"
+                  label={intl.formatMessage(constantsMessages.marriage)}
+                  value="marriage"
+                  id="select_marriage_event"
+                  selected={this.state.goTo === 'marriage' ? 'marriage' : ''}
+                  onChange={() =>
+                    this.setState({
+                      goTo: 'marriage',
+                      noEventSelectedError: false
+                    })
+                  }
+                />
+              </ProtectedComponent>
             )}
           </Stack>
         </Content>
