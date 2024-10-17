@@ -31,6 +31,7 @@ import {
   REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION
 } from '@client/profile/mutations'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import { Event } from '@client/utils/gateway'
 
 const graphqlMock = [
   {
