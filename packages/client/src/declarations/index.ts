@@ -265,7 +265,7 @@ type RelationForCertificateCorrection =
   | 'CHILD'
 
 export type ICertificate = {
-  collector?: Partial<{ type: Relation | string }>
+  collector?: Partial<{ type: Relation | string; certTemplateId?: string }>
   corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment

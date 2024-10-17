@@ -158,7 +158,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               id
               defaultMessage
               description
-              __typename
             }
             registrationTarget
             lateRegistrationTarget
@@ -167,10 +166,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               onTime
               late
               delayed
-              __typename
             }
             svgUrl
-            __typename
           }
           collector {
             relationship
@@ -179,17 +176,13 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               use
               firstNames
               familyName
-              __typename
             }
             telecom {
               system
               value
               use
-              __typename
             }
-            __typename
           }
-          __typename
         }
         duplicates {
           compositionId
@@ -256,7 +249,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             id
             defaultMessage
             description
-            __typename
           }
           registrationTarget
           lateRegistrationTarget
@@ -265,10 +257,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             onTime
             late
             delayed
-            __typename
           }
           svgUrl
-          __typename
         }
         date
         action

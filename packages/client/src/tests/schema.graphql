@@ -403,14 +403,14 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  data: String
+  templateConfig: CertificateConfigData
 }
 
 input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
+  templateConfig: CertificateConfigDataInput
 }
 
 enum CertificateStatus {
@@ -1992,4 +1992,50 @@ input WebhookInput {
 type WebhookPermission {
   event: String!
   permissions: [String!]!
+}
+
+type CertificateConfigData {
+  id: String!
+  event: String!
+  label: CertificateLabel!
+  registrationTarget: Int!
+  lateRegistrationTarget: Int!
+  printInAdvance: Boolean!
+  fee: CertificateFee!
+  svgUrl: String!
+}
+
+type CertificateLabel {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
+type CertificateFee {
+  onTime: Float!
+  late: Float!
+  delayed: Float!
+}
+
+input CertificateConfigDataInput {
+  id: String!
+  event: String!
+  label: CertificateLabelInput!
+  registrationTarget: Int!
+  lateRegistrationTarget: Int!
+  printInAdvance: Boolean!
+  fee: CertificateFeeInput!
+  svgUrl: String!
+}
+
+input CertificateLabelInput {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
+input CertificateFeeInput {
+  onTime: Float!
+  late: Float!
+  delayed: Float!
 }

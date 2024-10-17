@@ -212,7 +212,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const certificates = declaration.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
-
+    const selectedTemplatedConfig =
+      this.props.offlineCountryConfiguration.templates.certificates?.find(
+        (x) => x.id === (collector.certTemplateId as string)
+      )
     this.props.modifyDeclaration({
       ...declaration,
       data: {
@@ -222,7 +225,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           certificates: [
             {
               collector: collector,
-              hasShowedVerifiedDocument: false
+              hasShowedVerifiedDocument: false,
+              templateConfig: selectedTemplatedConfig
             }
           ]
         }

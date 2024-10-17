@@ -383,55 +383,65 @@ export type BookmarkedSeachItem = {
 export type Certificate = {
   __typename?: 'Certificate'
   collector?: Maybe<RelatedPerson>
-  templateConfig?: Maybe<TemplateConfig> // Changed from data to templateConfig
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   payments?: Maybe<Array<Maybe<Payment>>>
+  templateConfig?: Maybe<CertificateConfigData>
+}
+
+export type CertificateConfigData = {
+  __typename?: 'CertificateConfigData'
+  event: Scalars['String']
+  fee: CertificateFee
+  id: Scalars['String']
+  label: CertificateLabel
+  lateRegistrationTarget: Scalars['Int']
+  printInAdvance: Scalars['Boolean']
+  registrationTarget: Scalars['Int']
+  svgUrl: Scalars['String']
+}
+
+export type CertificateConfigDataInput = {
+  event: Scalars['String']
+  fee: CertificateFeeInput
+  id: Scalars['String']
+  label: CertificateLabelInput
+  lateRegistrationTarget: Scalars['Int']
+  printInAdvance: Scalars['Boolean']
+  registrationTarget: Scalars['Int']
+  svgUrl: Scalars['String']
+}
+
+export type CertificateFee = {
+  __typename?: 'CertificateFee'
+  delayed: Scalars['Float']
+  late: Scalars['Float']
+  onTime: Scalars['Float']
+}
+
+export type CertificateFeeInput = {
+  delayed: Scalars['Float']
+  late: Scalars['Float']
+  onTime: Scalars['Float']
 }
 
 export type CertificateInput = {
   collector?: InputMaybe<RelatedPersonInput>
-  templateConfig?: InputMaybe<TemplateConfigInput> // Changed from data to templateConfig
   hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
+  templateConfig?: InputMaybe<CertificateConfigDataInput>
 }
 
-// Define the TemplateConfig type
-export type TemplateConfig = {
+export type CertificateLabel = {
+  __typename?: 'CertificateLabel'
+  defaultMessage: Scalars['String']
+  description: Scalars['String']
   id: Scalars['String']
-  event: Scalars['String']
-  label: {
-    id: Scalars['String']
-    defaultMessage: Scalars['String']
-    description: Scalars['String']
-  }
-  registrationTarget: Scalars['Int']
-  lateRegistrationTarget: Scalars['Int']
-  printInAdvance: Scalars['Boolean']
-  fee: {
-    onTime: Scalars['Float']
-    late: Scalars['Float']
-    delayed: Scalars['Float']
-  }
-  svgUrl: Scalars['String']
 }
 
-export type TemplateConfigInput = {
+export type CertificateLabelInput = {
+  defaultMessage: Scalars['String']
+  description: Scalars['String']
   id: Scalars['String']
-  event: Scalars['String']
-  label: {
-    id: Scalars['String']
-    defaultMessage: Scalars['String']
-    description: Scalars['String']
-  }
-  registrationTarget: Scalars['Int']
-  lateRegistrationTarget: Scalars['Int']
-  printInAdvance: Scalars['Boolean']
-  fee: {
-    onTime: Scalars['Float']
-    late: Scalars['Float']
-    delayed: Scalars['Float']
-  }
-  svgUrl: Scalars['String']
 }
 
 export type CertificationMetric = {
@@ -757,6 +767,7 @@ export type History = {
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   system?: Maybe<IntegratedSystem>
+  templateConfig?: Maybe<CertificateConfigData>
   user?: Maybe<User>
 }
 
@@ -3320,6 +3331,48 @@ export type FetchBirthRegistrationForReviewQuery = {
       trackingId?: string | null
       registrationNumber?: string | null
       mosipAid?: string | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        templateConfig?: {
+          __typename?: 'CertificateConfigData'
+          id: string
+          event: string
+          registrationTarget: number
+          lateRegistrationTarget: number
+          printInAdvance: boolean
+          svgUrl: string
+          label: {
+            __typename?: 'CertificateLabel'
+            id: string
+            defaultMessage: string
+            description: string
+          }
+          fee: {
+            __typename?: 'CertificateFee'
+            onTime: number
+            late: number
+            delayed: number
+          }
+        } | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+      } | null> | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -3388,6 +3441,27 @@ export type FetchBirthRegistrationForReviewQuery = {
       reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
+      templateConfig?: {
+        __typename?: 'CertificateConfigData'
+        id: string
+        event: string
+        registrationTarget: number
+        lateRegistrationTarget: number
+        printInAdvance: boolean
+        svgUrl: string
+        label: {
+          __typename?: 'CertificateLabel'
+          id: string
+          defaultMessage: string
+          description: string
+        }
+        fee: {
+          __typename?: 'CertificateFee'
+          onTime: number
+          late: number
+          delayed: number
+        }
+      } | null
       documents: Array<{
         __typename?: 'Attachment'
         id: string
@@ -7493,82 +7567,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 

@@ -64,7 +64,7 @@ function getDayRanges(
   switch (certificate.templateConfig?.event) {
     case Event.Birth: {
       const BIRTH_REGISTRATION_TARGET =
-        offlineData.config.BIRTH.REGISTRATION_TARGET
+        certificate.templateConfig?.registrationTarget
       const BIRTH_LATE_REGISTRATION_TARGET =
         certificate.templateConfig?.lateRegistrationTarget || 0 // offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       const BIRTH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime //offlineData.config.BIRTH.FEE.ON_TIME

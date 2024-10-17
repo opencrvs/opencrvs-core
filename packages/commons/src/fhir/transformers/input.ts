@@ -208,7 +208,7 @@ interface Certificate {
   collector?: RelatedPerson
   hasShowedVerifiedDocument?: boolean
   payments?: Array<Payment | null>
-  data?: string
+  templateConfig?: CertificateConfigData
 }
 interface Deceased {
   deceased?: boolean
@@ -271,6 +271,29 @@ interface RelatedPerson {
   nationality?: Array<string | null>
   educationalAttainment?: string
   ageOfIndividualInYears?: number
+}
+
+interface CertificateConfigData {
+  id: string
+  event: string
+  label: CertificateLabelInput
+  registrationTarget: number
+  lateRegistrationTarget: number
+  printInAdvance: boolean
+  fee: CertificateFeeInput
+  svgUrl: string
+}
+
+interface CertificateLabelInput {
+  id: string
+  defaultMessage: string
+  description: string
+}
+
+interface CertificateFeeInput {
+  onTime: number
+  late: number
+  delayed: number
 }
 interface CorrectionPayment {
   _fhirID?: string
