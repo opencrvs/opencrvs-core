@@ -23,7 +23,7 @@ import {
   deleteDeclaration as deleteDeclarationAction
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event, Scope } from '@client/utils/gateway'
+import { Event, Scope, SCOPES } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
@@ -136,7 +136,7 @@ function getAssignModalOptions(
       actions: [cancelAction, unassignAction]
     }
   } else if (assignment) {
-    if (scopes.includes('record.unassign-others')) {
+    if (scopes.includes(SCOPES.RECORD_UNASSIGN_OTHERS)) {
       return {
         title: conflictsMessages.unassignTitle,
         content: conflictsMessages.regUnassignDesc,

@@ -39,7 +39,7 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
 import { vi } from 'vitest'
 
