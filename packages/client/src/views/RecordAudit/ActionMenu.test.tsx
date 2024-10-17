@@ -100,7 +100,8 @@ enum ACTION {
   PRINT_RECORD = 'Print certified copy',
   ISSUE_CERTIFICATE = 'Issue certificate',
   CORRECT_RECORD = 'Correct Record',
-  DELETE_DECLARATION = 'Delete Declaration'
+  DELETE_DECLARATION = 'Delete Declaration',
+  UNASSIGN = 'Unassign'
 }
 
 const actionStatus = (
@@ -2338,6 +2339,90 @@ describe('Delete declaration action', () => {
     )
 
     const { status } = actionStatus(component, [ACTION.DELETE_DECLARATION])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+})
+
+describe('Unassign action', () => {
+  const UNASSIGN_SCOPES = SCOPES.REGISTRAR
+  it('Has scope - assigned to someone else', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={UNASSIGN_SCOPES}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status, node } = actionStatus(component, [ACTION.UNASSIGN])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+    expect(component.find('h1').hostNodes().text()).toEqual('Unassign record?')
+  })
+
+  it('Does not have scope - assigned to someone else', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.NONE}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+
+    const { status } = actionStatus(component, [ACTION.UNASSIGN])
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
+  })
+
+  it('Assigned to self', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED
+        }}
+        scope={SCOPES.NONE}
+        draft={draftBirthDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+    const { status, node } = actionStatus(component, [ACTION.UNASSIGN])
+    expect(status).toBe(ACTION_STATUS.ENABLED)
+
+    node?.simulate('click')
+    expect(component.find('h1').hostNodes().text()).toEqual('Unassign record?')
+  })
+
+  it('Not assigned', async () => {
+    const { store, history } = createStore()
+    const component = await createTestComponent(
+      <ActionMenu
+        declaration={{
+          ...defaultDeclaration,
+          status: SUBMISSION_STATUS.DECLARED,
+          assignment: undefined
+        }}
+        scope={UNASSIGN_SCOPES}
+        draft={draftBirthNotDownloaded}
+        toggleDisplayDialog={() => {}}
+      />,
+      { store, history }
+    )
+    const { status } = actionStatus(component, [ACTION.UNASSIGN])
     expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
 })
