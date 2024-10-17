@@ -384,17 +384,17 @@ export const searchTypeResolvers: GQLResolver = {
       return searchData._source.event
     },
     name(searchData: ISearchEventDataTemplate) {
-      if (searchData._source.event === 'Birth') {
+      if (searchData._source.event === EVENT.BIRTH) {
         return getChildName(searchData._source)
-      } else if (searchData._source.event === 'Death') {
+      } else if (searchData._source.event === EVENT.DEATH) {
         return getDeceasedName(searchData._source)
       }
       return null
     },
     dateOfEvent(searchData: ISearchEventDataTemplate) {
-      if (searchData._source.event === 'Birth') {
+      if (searchData._source.event === EVENT.BIRTH) {
         return (searchData._source && searchData._source.childDoB) || null
-      } else if (searchData._source.event === 'Death') {
+      } else if (searchData._source.event === EVENT.DEATH) {
         return (searchData._source && searchData._source.deathDate) || null
       }
       return null
