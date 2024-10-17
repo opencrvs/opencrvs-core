@@ -29,18 +29,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
-import {
-  LANG_EN,
-  NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
+import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  getAddressName,
-  getUserRoleIntlKey,
-  UserStatus
-} from '@client/views/SysAdmin/Team/utils'
+import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Pill } from '@opencrvs/components/lib/Pill'
@@ -82,6 +74,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { HOME } from '@client/navigation/routes'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -250,11 +243,7 @@ function UserListComponent(props: IProps) {
     offlineCountryConfig,
     location: { search }
   } = props
-  const isNatlSysAdmin = userDetails?.systemRole
-    ? NATL_ADMIN_ROLES.includes(userDetails.systemRole)
-      ? true
-      : false
-    : false
+  const { canEditUser, canAddOfficeUsers } = usePermissions()
 
   const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
@@ -458,31 +447,6 @@ function UserListComponent(props: IProps) {
     ]
   )
 
-  function getViewOnly(
-    locationId: string,
-    userDetails: UserDetails | null,
-    onlyNational: boolean
-  ) {
-    if (
-      userDetails &&
-      userDetails.systemRole &&
-      userDetails.primaryOffice &&
-      SYS_ADMIN_ROLES.includes(userDetails.systemRole) &&
-      locationId === userDetails.primaryOffice.id &&
-      !onlyNational
-    ) {
-      return false
-    } else if (
-      userDetails &&
-      userDetails.systemRole &&
-      NATL_ADMIN_ROLES.includes(userDetails.systemRole)
-    ) {
-      return false
-    } else {
-      return true
-    }
-  }
-
   const getUserName = (user: User) => {
     const userName =
       (user &&
@@ -495,8 +459,6 @@ function UserListComponent(props: IProps) {
 
   const StatusMenu = useCallback(
     function StatusMenu({
-      userDetails,
-      locationId,
       user,
       index,
       status,
@@ -509,12 +471,6 @@ function UserListComponent(props: IProps) {
       status?: string
       underInvestigation?: boolean
     }) {
-      const canEditUserDetails =
-        userDetails?.systemRole === 'NATIONAL_SYSTEM_ADMIN' ||
-        (userDetails?.systemRole === 'LOCAL_SYSTEM_ADMIN' &&
-          userDetails?.primaryOffice?.id === locationId)
-          ? true
-          : false
       return (
         <Stack
           alignItems="center"
@@ -524,7 +480,7 @@ function UserListComponent(props: IProps) {
         >
           {underInvestigation && <SearchRed />}
           <Status status={status || 'pending'} />
-          {canEditUserDetails && (
+          {canEditUser(user) && (
             <ToggleMenu
               id={`user-item-${index}-menu`}
               toggleButton={
@@ -536,7 +492,7 @@ function UserListComponent(props: IProps) {
         </Stack>
       )
     },
-    [getMenuItems]
+    [canEditUser, getMenuItems]
   )
 
   const generateUserContents = useCallback(
@@ -558,9 +514,7 @@ function UserListComponent(props: IProps) {
                 ((createNamesMap(user.name)[intl.locale] as string) ||
                   (createNamesMap(user.name)[LANG_EN] as string))) ||
               ''
-            const role = intl.formatMessage({
-              id: getUserRoleIntlKey(user.role._id)
-            })
+            const role = intl.formatMessage(user.role.label)
             const avatar = user.avatar
 
             return {
@@ -623,13 +577,9 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  const LocationButton = (
-    locationId: string,
-    userDetails: UserDetails | null,
-    onlyNational: boolean
-  ) => {
+  const LocationButton = (locationId: string) => {
     const buttons: React.ReactElement[] = []
-    if (!getViewOnly(locationId, userDetails, onlyNational)) {
+    if (canAddOfficeUsers({ id: locationId })) {
       buttons.push(
         <LocationPicker
           key={`location-picker-${locationId}`}
@@ -833,8 +783,7 @@ function UserListComponent(props: IProps) {
   return (
     <SysAdminContentWrapper
       changeTeamLocation={
-        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
-        undefined
+        (canAddOfficeUsers({ id: locationId }) && onChangeLocation) || undefined
       }
       isCertificatesConfigPage={true}
       hideBackground={true}
@@ -860,11 +809,7 @@ function UserListComponent(props: IProps) {
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.NORMAL}
-                topActionButtons={LocationButton(
-                  locationId,
-                  userDetails,
-                  isNatlSysAdmin
-                )}
+                topActionButtons={LocationButton(locationId)}
               >
                 {error ? (
                   <ErrorText id="user_loading_error">

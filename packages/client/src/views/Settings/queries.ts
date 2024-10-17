@@ -17,9 +17,8 @@ export const GET_USER_BY_MOBILE = gql`
       username
       mobile
       email
-      systemRole
       role {
-        _id
+        id
       }
       status
     }
@@ -33,9 +32,8 @@ export const GET_USER_BY_EMAIL = gql`
       username
       mobile
       email
-      systemRole
       role {
-        _id
+        id
       }
       status
     }

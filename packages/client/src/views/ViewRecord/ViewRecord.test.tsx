@@ -235,8 +235,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -274,8 +280,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -313,8 +325,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -352,8 +370,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -391,8 +415,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -430,8 +460,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -469,8 +505,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -508,8 +550,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -547,8 +595,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -586,8 +640,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -625,8 +685,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -664,8 +730,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -703,8 +775,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -742,8 +820,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -781,8 +865,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -820,8 +910,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -859,8 +955,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -898,8 +1000,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -941,8 +1049,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -980,8 +1094,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '62b99cd98f113a700cc19a1a',
-                    role: '',
-                    systemRole: 'LOCAL_REGISTRAR',
+                    role: {
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Kennedy',
@@ -1019,8 +1139,14 @@ describe('View Record for loading and success state', () => {
                   },
                   user: {
                     id: '635fd1c82ef11238798ad666',
-                    role: 'LOCAL_LEADER',
-                    systemRole: 'FIELD_AGENT',
+                    role: {
+                      id: 'FIELD_AGENT',
+                      label: {
+                        defaultMessage: 'Field Agent',
+                        description: 'Name for user role Field Agent',
+                        id: 'userRole.fieldAgent'
+                      }
+                    },
                     name: [
                       {
                         firstNames: 'Terrance',

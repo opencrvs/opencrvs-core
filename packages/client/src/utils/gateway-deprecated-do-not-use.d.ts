@@ -58,7 +58,7 @@ export interface GQLQuery {
   getUserAuditLog?: GQLUserAuditLogResultSet
   searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
-  getSystemRoles?: Array<GQLSystemRole>
+  getUserRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
   getActiveCertificatesSVG?: Array<GQLCertificateSVG>
   fetchSystem?: GQLSystem
@@ -112,7 +112,6 @@ export interface GQLMutation {
   resendInvite?: string
   usernameReminder?: string
   resetPasswordInvite?: string
-  updateRole: GQLResponse
   reactivateSystem?: GQLSystem
   deactivateSystem?: GQLSystem
   registerSystem?: GQLSystemSecret
@@ -295,7 +294,6 @@ export interface GQLUser {
   name: Array<GQLHumanName>
   username?: string
   mobile?: string
-  systemRole: GQLSystemRoleType
   role: GQLRole
   email?: string
   status: GQLStatus
@@ -664,7 +662,6 @@ export interface GQLUserInput {
   mobile?: string
   password?: string
   status?: GQLStatus
-  systemRole: GQLSystemRoleType
   role?: string
   email?: string
   primaryOffice?: string
@@ -689,13 +686,6 @@ export interface GQLAvatarInput {
 
 export interface GQLResponse {
   roleIdMap: GQLMap
-}
-
-export interface GQLSystemRoleInput {
-  id: string
-  value?: string
-  active?: boolean
-  roles?: Array<GQLRoleInput>
 }
 
 export interface GQLCertificateSVGInput {
@@ -965,8 +955,12 @@ export const enum GQLSystemRoleType {
 }
 
 export interface GQLRole {
-  _id: string
-  labels: Array<GQLRoleLabel>
+  id: string
+  label: {
+    id: string
+    defaultMessage: string
+    description: string
+  }
 }
 
 export const enum GQLStatus {
@@ -2073,7 +2067,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getUserAuditLog?: QueryToGetUserAuditLogResolver<TParent>
   searchEvents?: QueryToSearchEventsResolver<TParent>
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
-  getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
+  getUserRoles?: QueryTogetUserRolesResolver<TParent>
   getCertificateSVG?: QueryToGetCertificateSVGResolver<TParent>
   getActiveCertificatesSVG?: QueryToGetActiveCertificatesSVGResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
@@ -2403,7 +2397,6 @@ export interface QueryToSearchUsersArgs {
   mobile?: string
   email?: string
   status?: string
-  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count?: number
@@ -2672,7 +2665,7 @@ export interface QueryToGetEventsWithProgressResolver<
   ): TResult
 }
 
-export interface QueryToGetSystemRolesArgs {
+export interface QueryTogetUserRolesArgs {
   title?: string
   value?: GQLComparisonInput
   role?: string
@@ -2680,10 +2673,10 @@ export interface QueryToGetSystemRolesArgs {
   sortBy?: string
   sortOrder?: string
 }
-export interface QueryToGetSystemRolesResolver<TParent = any, TResult = any> {
+export interface QueryTogetUserRolesResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetSystemRolesArgs,
+    args: QueryTogetUserRolesArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -2792,7 +2785,6 @@ export interface GQLMutationTypeResolver<TParent = any> {
   resendInvite?: MutationToResendInviteResolver<TParent>
   usernameReminder?: MutationToUsernameReminderResolver<TParent>
   resetPasswordInvite?: MutationToResetPasswordInviteResolver<TParent>
-  updateRole?: MutationToUpdateRoleResolver<TParent>
   reactivateSystem?: MutationToReactivateSystemResolver<TParent>
   deactivateSystem?: MutationToDeactivateSystemResolver<TParent>
   registerSystem?: MutationToRegisterSystemResolver<TParent>
@@ -3501,18 +3493,6 @@ export interface MutationToResetPasswordInviteResolver<
   (
     parent: TParent,
     args: MutationToResetPasswordInviteArgs,
-    context: any,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface MutationToUpdateRoleArgs {
-  systemRole?: GQLSystemRoleInput
-}
-export interface MutationToUpdateRoleResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: MutationToUpdateRoleArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -4424,7 +4404,6 @@ export interface GQLUserTypeResolver<TParent = any> {
   name?: UserToNameResolver<TParent>
   username?: UserToUsernameResolver<TParent>
   mobile?: UserToMobileResolver<TParent>
-  systemRole?: UserToSystemRoleResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
   status?: UserToStatusResolver<TParent>

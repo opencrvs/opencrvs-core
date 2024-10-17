@@ -15,23 +15,25 @@ import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { inspect } from 'util'
+import { joinURL } from '@opencrvs/commons'
 
 const MAX_RETRY = 5
 const RETRY_DELAY_IN_MILLISECONDS = 5000
+
+type Roles = {
+  id: string
+  label: {
+    defaultMessage: string
+    description: string
+    id: string
+  }
+  scopes: string[]
+}
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
   givenNames: z.string(),
   familyName: z.string(),
-  systemRole: z.enum([
-    'FIELD_AGENT',
-    'REGISTRATION_AGENT',
-    'LOCAL_REGISTRAR',
-    'LOCAL_SYSTEM_ADMIN',
-    'NATIONAL_SYSTEM_ADMIN',
-    'PERFORMANCE_MANAGEMENT',
-    'NATIONAL_REGISTRAR'
-  ]),
   role: z.string(),
   username: z.string(),
   password: z.string()
@@ -77,7 +79,9 @@ async function getUsers(token: string) {
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
+
   const parsedUsers = UserSchema.safeParse(await res.json())
+
   if (!parsedUsers.success) {
     raise(
       `Error when getting users metadata from country-config: ${inspect(
@@ -85,14 +89,29 @@ async function getUsers(token: string) {
       )}`
     )
   }
-  if (
-    parsedUsers.data.every(
-      ({ systemRole }) => systemRole !== 'NATIONAL_SYSTEM_ADMIN'
-    )
-  ) {
-    raise(
-      `At least one user with "NATIONAL_SYSTEM_ADMIN" systemRole must be created`
-    )
+
+  const userRoles = parsedUsers.data.map((user) => user.role)
+
+  const rolesUrl = joinURL(COUNTRY_CONFIG_HOST, 'roles')
+
+  const response = await fetch(rolesUrl)
+
+  if (!response.ok) raise(`Error fetching roles: ${response.status}`)
+
+  const allRoles: Roles[] = await response.json()
+
+  let isNationalSysAdminScopeAvailable = false
+
+  for (const userRole of userRoles) {
+    const currRole = allRoles.find((role: Roles) => role.id === userRole)
+    if (!currRole)
+      raise(`Role with id ${userRole} is not found in roles.json file`)
+    if (currRole.scopes.includes('natlsysadmin'))
+      isNationalSysAdminScopeAvailable = true
+  }
+
+  if (!isNationalSysAdminScopeAvailable) {
+    raise(`At least one user with "natlsysadmin" scope must be created`)
   }
   return parsedUsers.data
 }
@@ -157,26 +176,25 @@ async function callCreateUserMutation(token: string, userPayload: unknown) {
   })
 }
 
-export async function seedUsers(
-  token: string,
-  roleIdMap: Record<string, string | undefined>
-) {
+export async function seedUsers(token: string) {
   const rawUsers = await getUsers(token)
+
   for (const userMetadata of rawUsers) {
     const {
       givenNames,
       familyName,
-      role,
       primaryOfficeId: officeIdentifier,
       username,
       ...user
     } = userMetadata
+
     if (await userAlreadyExists(token, username)) {
       console.log(
         `User with the username "${username}" already exists. Skipping user "${username}"`
       )
       continue
     }
+
     const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
     if (!primaryOffice) {
       console.log(
@@ -184,15 +202,9 @@ export async function seedUsers(
       )
       continue
     }
-    if (!roleIdMap[role]) {
-      console.log(
-        `Role "${role}" is not recognized by system. Skipping user "${username}"`
-      )
-      continue
-    }
+
     const userPayload = {
       ...user,
-      role: roleIdMap[role],
       name: [
         {
           use: 'en',
@@ -207,6 +219,7 @@ export async function seedUsers(
     let tryNumber = 0
     let jsonRes
     let res
+
     do {
       ++tryNumber
       if (tryNumber > 1) {
@@ -220,6 +233,7 @@ export async function seedUsers(
       'errors' in jsonRes &&
       jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
     )
+
     parseGQLResponse(jsonRes)
   }
 }

@@ -8,54 +8,69 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import { FormFieldGenerator } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
-  modifyDeclaration,
   IDeclaration,
+  modifyDeclaration,
   SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
-import { connect } from 'react-redux'
-import { get } from 'lodash'
 import {
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  IntlShape
-} from 'react-intl'
+  CorrectionSection,
+  IForm,
+  IFormData,
+  IFormField,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
+  IPreviewGroup,
+  REVIEW_OVERRIDE_POSITION,
+  ReviewSection,
+  SubmissionAction
+} from '@client/forms'
+import { CorrectorRelationship } from '@client/forms/correction/corrector'
+import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
+import { CorrectionReason } from '@client/forms/correction/reason'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/correction'
+import { messages as registerMessages } from '@client/i18n/messages/views/register'
+import { getLanguage } from '@client/i18n/selectors'
 import {
   goBack,
   goToCertificateCorrection,
   goToHomeTab,
   goToPageGroup
 } from '@client/navigation'
-import { messages as registerMessages } from '@client/i18n/messages/views/register'
-import { messages } from '@client/i18n/messages/views/correction'
-import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
-  IFormSection,
-  IFormField,
-  IForm,
-  IFormSectionGroup,
-  IFormSectionData,
-  CorrectionSection,
-  ReviewSection,
-  IFormData,
-  IPreviewGroup,
-  REVIEW_OVERRIDE_POSITION,
-  SubmissionAction
-} from '@client/forms'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Text } from '@opencrvs/components/lib/Text'
-import { SecondaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Check, PaperClip } from '@opencrvs/components/lib/icons'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
+import { Scope } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
+import { Table } from '@opencrvs/components/lib/Table'
+import { Text } from '@opencrvs/components/lib/Text'
+import { LinkButton, SecondaryButton } from '@opencrvs/components/lib/buttons'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
+import { Check, PaperClip } from '@opencrvs/components/lib/icons'
+import { get } from 'lodash'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
+import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { FormFieldGenerator } from '@client/components/form'
-import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
 import {
   getNestedFieldValue,
   getOverriddenFieldsListForPreview,
@@ -68,22 +83,6 @@ import {
   sectionHasError,
   updateDeclarationRegistrationWithCorrection
 } from './utils'
-import { IStoreState } from '@client/store'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getLanguage } from '@client/i18n/selectors'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { CorrectorRelationship } from '@client/forms/correction/corrector'
-import { CorrectionReason } from '@client/forms/correction/reason'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import { UserDetails } from '@client/utils/userUtils'
-import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
-import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SystemRoleType } from '@client/utils/gateway'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -93,10 +92,12 @@ const SupportingDocument = styled.div`
   }
 `
 interface IProps {
+  userPrimaryOffice?: UserDetails['primaryOffice']
   userDetails: UserDetails | null
   registerForm: { [key: string]: IForm }
   offlineResources: IOfflineData
   language: string
+  scopes: Scope[] | null
 }
 
 type IStateProps = {
@@ -150,9 +151,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       offlineResources
     } = this.props
 
-    const currencySymbol = getCurrencySymbol(
-      this.props.offlineResources.config.CURRENCY
-    )
+    const currencySymbol = getCurrencySymbol(offlineResources.config.CURRENCY)
     const section = correctionFeesPaymentSection(currencySymbol)
 
     const group = {
@@ -205,7 +204,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         }
       >
         <Check />
-        {userDetails?.systemRole === ROLE_REGISTRATION_AGENT
+        {this.props.scopes?.includes('record.registration-request-correction')
           ? intl.formatMessage(buttonMessages.sendForApproval)
           : intl.formatMessage(buttonMessages.makeCorrection)}
       </Button>
@@ -382,7 +381,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           id="withoutCorrectionForApprovalPrompt"
           isOpen={showPrompt}
           title={intl.formatMessage(
-            this.props.userDetails?.systemRole === ROLE_REGISTRATION_AGENT
+            this.props.scopes?.includes(
+              'record.registration-request-correction'
+            )
               ? messages.correctionForApprovalDialogTitle
               : messages.correctRecordDialogTitle
           )}
@@ -403,7 +404,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               id="send"
               key="continue"
               onClick={() => {
-                this.makeCorrection(this.props.userDetails?.systemRole)
+                this.makeCorrection()
                 this.togglePrompt()
               }}
             >
@@ -414,7 +415,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           <p>
             <Text element="p" variant="reg16">
               {intl.formatMessage(
-                this.props.userDetails?.systemRole === ROLE_REGISTRATION_AGENT
+                this.props.scopes?.includes(
+                  'record.registration-request-correction'
+                )
                   ? messages.correctionForApprovalDialogDescription
                   : messages.correctRecordDialogDescription
               )}
@@ -1006,9 +1009,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     )
   }
 
-  makeCorrection = (userRole: SystemRoleType | undefined) => {
+  makeCorrection = () => {
     const declaration = this.props.declaration
-    if (userRole === ROLE_REGISTRATION_AGENT) {
+    if (this.props.scopes?.includes('record.registration-request-correction')) {
       declaration.action = SubmissionAction.REQUEST_CORRECTION
       declaration.submissionStatus =
         SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
@@ -1031,7 +1034,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
     this.props.writeDeclaration(declaration)
 
-    if (userRole === ROLE_REGISTRATION_AGENT) {
+    if (this.props.scopes?.includes('record.registration-request-correction')) {
       this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
     } else {
       this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
@@ -1054,6 +1057,8 @@ export const CorrectionSummary = connect(
     registerForm: getRegisterForm(state),
     offlineResources: getOfflineData(state),
     language: getLanguage(state),
+    userPrimaryOffice: getUserDetails(state)?.primaryOffice,
+    scopes: getScope(state),
     userDetails: getUserDetails(state)
   }),
   {

@@ -116,7 +116,7 @@ export const ReviewCertificate = () => {
     svg,
     handleCertify,
     isPrintInAdvance,
-    canUserEditRecord,
+    canUserCorrectRecord,
     handleEdit
   } = usePrintableCertificate(registrationId)
   const intl = useIntl()
@@ -190,7 +190,7 @@ export const ReviewCertificate = () => {
             title={intl.formatMessage(certificateMessages.reviewTitle)}
             bottomActionDirection="row"
             bottomActionButtons={[
-              canUserEditRecord ? (
+              canUserCorrectRecord ? (
                 <Button
                   key="edit-record"
                   type="negative"

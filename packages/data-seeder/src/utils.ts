@@ -10,8 +10,8 @@
  */
 import { inspect } from 'util'
 
-export function raise(msg: string): never {
-  console.log(msg)
+export function raise(...params: Parameters<typeof console.error>): never {
+  console.error(...params)
   process.exit(1)
 }
 

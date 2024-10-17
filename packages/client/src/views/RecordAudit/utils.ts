@@ -34,11 +34,7 @@ import {
   regActionMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
-import {
-  EMPTY_STRING,
-  FIELD_AGENT_ROLES,
-  LANG_EN
-} from '@client/utils/constants'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import {
   Event,
   Maybe,
@@ -483,9 +479,10 @@ export function getStatusLabel(
   }
   if (
     regStatus === RegStatus.Declared &&
-    performedBy?.id === loggedInUser?.userMgntUserID &&
-    loggedInUser?.systemRole &&
-    FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
+    performedBy?.id === loggedInUser?.userMgntUserID
+    // @TODO: How do we handle this specific case with scopes?
+    // && loggedInUser?.systemRole &&
+    // FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }

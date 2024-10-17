@@ -39,7 +39,6 @@ interface IUserModelData {
   emailForNotification?: string
   mobile?: string
   status: string
-  systemRole: string
   role: IUserRole
   creationDate?: string
   practitionerId: string

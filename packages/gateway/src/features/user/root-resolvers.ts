@@ -8,8 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { USER_MANAGEMENT_URL } from '@gateway/constants'
-
+import { COUNTRY_CONFIG_URL, USER_MANAGEMENT_URL } from '@gateway/constants'
+import {
+  Roles,
+  logger,
+  isBase64FileString,
+  joinURL,
+  fetchJSON
+} from '@opencrvs/commons'
 import {
   IUserModelData,
   IUserPayload,
@@ -29,7 +35,6 @@ import {
   GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
-import { logger, isBase64FileString } from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
 import { UserInputError } from 'apollo-server-hapi'
 import fetch from '@gateway/fetch'
@@ -69,7 +74,6 @@ export const resolvers: GQLResolver = {
         {
           username = null,
           mobile = null,
-          systemRole = null,
           status = null,
           primaryOfficeId = null,
           locationId = null,
@@ -98,9 +102,6 @@ export const resolvers: GQLResolver = {
         }
         if (mobile) {
           payload = { ...payload, mobile }
-        }
-        if (systemRole) {
-          payload = { ...payload, systemRole }
         }
         if (locationId) {
           payload = { ...payload, locationId }
@@ -139,7 +140,7 @@ export const resolvers: GQLResolver = {
           skip = 0,
           sort = 'desc'
         },
-        { headers: authHeader }
+        { headers: authHeader, dataSources }
       ) => {
         // Only sysadmin or registrar or registration agent should be able to search field agents
         if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
@@ -159,7 +160,6 @@ export const resolvers: GQLResolver = {
         }
 
         let payload: IUserSearchPayload = {
-          systemRole: 'FIELD_AGENT',
           count,
           skip,
           sortOrder: sort
@@ -208,8 +208,12 @@ export const resolvers: GQLResolver = {
           authHeader
         )
 
+        const roles = await dataSources.countryConfigAPI.getRoles()
+
         const fieldAgentList: GQLSearchFieldAgentResponse[] =
           userResponse.results.map((user: IUserModelData) => {
+            const role = roles.find((role) => role.id === user.role)
+
             const metricsData = metricsForPractitioners.find(
               (metricsForPractitioner: { practitionerId: string }) =>
                 metricsForPractitioner.practitionerId === user.practitionerId
@@ -217,7 +221,7 @@ export const resolvers: GQLResolver = {
             return {
               practitionerId: user.practitionerId,
               fullName: getFullName(user, language),
-              role: user.role,
+              role: role,
               status: user.status,
               avatar: user.avatar,
               primaryOfficeId: user.primaryOfficeId,
@@ -280,9 +284,13 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      const userPayload: IUserPayload = createOrUpdateUserPayload(user)
-      const action = userPayload.id ? 'update' : 'create'
-      const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
+      const roles = await fetchJSON<Roles>(
+        joinURL(COUNTRY_CONFIG_URL, '/roles')
+      )
+      const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles)
+      const action = userPayload.id ? 'updateUser' : 'createUser'
+
+      const res = await fetch(joinURL(USER_MANAGEMENT_URL, action), {
         method: 'POST',
         body: JSON.stringify(userPayload),
         headers: {
@@ -315,7 +323,7 @@ export const resolvers: GQLResolver = {
       } else if (res.status !== 201) {
         return await Promise.reject(
           new Error(
-            `Something went wrong on user-mgnt service. Couldn't ${action} user`
+            `Something went wrong on user-mgnt service. Couldn't perform ${action}`
           )
         )
       }
@@ -629,14 +637,16 @@ export const resolvers: GQLResolver = {
   }
 }
 
-function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
+function createOrUpdateUserPayload(
+  user: GQLUserInput,
+  roles: Roles
+): IUserPayload {
   const userPayload: IUserPayload = {
     name: user.name.map((name: GQLHumanNameInput) => ({
       use: name.use as string,
       family: name.familyName?.trim() as string,
       given: [name.firstNames?.trim() || ''] as string[]
     })),
-    systemRole: user.systemRole as string,
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),

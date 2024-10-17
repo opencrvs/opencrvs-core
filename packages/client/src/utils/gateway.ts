@@ -14,6 +14,81 @@
  */
 import { PlainDate } from '@client/utils/date-formatting'
 
+export const scopes = [
+  'natlsysadmin',
+  'bypassratelimit',
+  'demo',
+  'declare',
+  'register',
+  'certify',
+  'performance',
+  'sysadmin',
+  'validate',
+  'teams',
+  'config',
+  'webhook',
+  'nationalId',
+  'notification-api',
+  'recordsearch',
+  'record.declare-birth:my-jurisdiction',
+  'record.declare-birth',
+  'record.declare-death:my-jurisdiction',
+  'record.declare-death',
+  'record.declare-marriage:my-jurisdiction',
+  'record.declare-marriage',
+  'record.submit-incomplete',
+  'record.submit-for-review',
+  'record.assign-unassign-myself',
+  'record.unassign-others',
+  'record.declaration-review',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
+  'record.review-duplicates',
+  'record.submit-for-approval',
+  'record.submit-for-updates',
+  'record.registration-verify-certified-copies',
+  'record.register',
+  'record.print-records',
+  'record.print-records-supporting-documents',
+  'record.export-records',
+  'record.print-issue-certified-copies',
+  'record.bulk-print-certified-copies',
+  'record.registration-request-correction',
+  'record.registration-correct',
+  'record.registration-request-revocation',
+  'record.registration-revoke',
+  'record.registration-request-reinstatement',
+  'record.registration-reinstate',
+  'search.birth:my-jurisdiction',
+  'search.birth',
+  'search.death:my-jurisdiction',
+  'search.death',
+  'search.marriage:my-jurisdiction',
+  'search.marriage',
+  'record.read',
+  'record.read-audit',
+  'record.read-comments',
+  'record.create-comments',
+  'profile.update-signature',
+  'profile.update-phone-number',
+  'profile.update-name',
+  'profile.update-profile-image',
+  'performance.read:my-office',
+  'performance.read',
+  'performance.read-dashboards',
+  'performance.export-vital-statistics',
+  'organisation.read',
+  'organisation.read-locations:my-office',
+  'organisation.read-locations',
+  'user.read:my-office',
+  'user.read',
+  'user.create',
+  'user.create:my-jurisdiction',
+  'user.update:my-office',
+  'user.update'
+] as const
+export type Scope = (typeof scopes)[number]
+
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -382,6 +457,7 @@ export type BookmarkedSeachItem = {
 
 export type Certificate = {
   __typename?: 'Certificate'
+  certifier?: Maybe<User>
   collector?: Maybe<RelatedPerson>
   data?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
@@ -413,17 +489,6 @@ export type CommentInput = {
   comment?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
   user?: InputMaybe<UserInput>
-}
-
-export type ComparisonInput = {
-  eq?: InputMaybe<Scalars['String']>
-  gt?: InputMaybe<Scalars['String']>
-  gte?: InputMaybe<Scalars['String']>
-  in?: InputMaybe<Array<Scalars['String']>>
-  lt?: InputMaybe<Scalars['String']>
-  lte?: InputMaybe<Scalars['String']>
-  ne?: InputMaybe<Scalars['String']>
-  nin?: InputMaybe<Array<Scalars['String']>>
 }
 
 export type ContactPoint = {
@@ -612,7 +677,7 @@ export type EventMetricsByRegistrar = {
   __typename?: 'EventMetricsByRegistrar'
   delayed: Scalars['Int']
   late: Scalars['Int']
-  registrarPractitioner?: Maybe<User>
+  registrarPractitioner: User
   total: Scalars['Int']
 }
 
@@ -738,6 +803,13 @@ export type HumanNameInput = {
   use?: InputMaybe<Scalars['String']>
 }
 
+export type I18nMessage = {
+  __typename?: 'I18nMessage'
+  defaultMessage: Scalars['String']
+  description: Scalars['String']
+  id: Scalars['String']
+}
+
 export type Identifier = {
   __typename?: 'Identifier'
   system?: Maybe<Scalars['String']>
@@ -778,15 +850,10 @@ export enum IntegratingSystemType {
   Other = 'OTHER'
 }
 
-export type LabelInput = {
-  label: Scalars['String']
-  lang: Scalars['String']
-}
-
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: SystemRoleType
+  role: UserRole
   signature?: Maybe<Signature>
 }
 
@@ -971,7 +1038,6 @@ export type Mutation = {
   resetPasswordInvite?: Maybe<Scalars['String']>
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
-  updateRole: Response
   usernameReminder?: Maybe<Scalars['String']>
 }
 
@@ -1216,10 +1282,6 @@ export type MutationUpdatePermissionsArgs = {
   setting: UpdatePermissionsInput
 }
 
-export type MutationUpdateRoleArgs = {
-  systemRole?: InputMaybe<SystemRoleInput>
-}
-
 export type MutationUsernameReminderArgs = {
   userId: Scalars['String']
 }
@@ -1400,7 +1462,6 @@ export type Query = {
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getOIDPUserInfo?: Maybe<UserInfo>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
-  getSystemRoles?: Maybe<Array<SystemRole>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
   getTotalMetrics?: Maybe<TotalMetricsResult>
@@ -1409,6 +1470,7 @@ export type Query = {
   getUserAuditLog?: Maybe<UserAuditLogResultSet>
   getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
+  getUserRoles: Array<UserRole>
   getVSExports?: Maybe<TotalVsExport>
   hasChildLocation?: Maybe<Location>
   listBirthRegistrations?: Maybe<BirthRegResultSet>
@@ -1511,15 +1573,6 @@ export type QueryGetRegistrationsListByFilterArgs = {
   skip: Scalars['Int']
   timeEnd: Scalars['String']
   timeStart: Scalars['String']
-}
-
-export type QueryGetSystemRolesArgs = {
-  active?: InputMaybe<Scalars['Boolean']>
-  role?: InputMaybe<Scalars['String']>
-  sortBy?: InputMaybe<Scalars['String']>
-  sortOrder?: InputMaybe<Scalars['String']>
-  title?: InputMaybe<Scalars['String']>
-  value?: InputMaybe<ComparisonInput>
 }
 
 export type QueryGetTotalCertificationsArgs = {
@@ -1639,7 +1692,6 @@ export type QuerySearchUsersArgs = {
   skip?: InputMaybe<Scalars['Int']>
   sort?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
-  systemRole?: InputMaybe<Scalars['String']>
   username?: InputMaybe<Scalars['String']>
 }
 
@@ -1879,28 +1931,6 @@ export type RemoveBookmarkedSeachInput = {
   userId: Scalars['String']
 }
 
-export type Response = {
-  __typename?: 'Response'
-  roleIdMap: Scalars['Map']
-}
-
-export type Role = {
-  __typename?: 'Role'
-  _id: Scalars['ID']
-  labels: Array<RoleLabel>
-}
-
-export type RoleInput = {
-  _id?: InputMaybe<Scalars['ID']>
-  labels: Array<LabelInput>
-}
-
-export type RoleLabel = {
-  __typename?: 'RoleLabel'
-  label: Scalars['String']
-  lang: Scalars['String']
-}
-
 export type SearchFieldAgentResponse = {
   __typename?: 'SearchFieldAgentResponse'
   avatar?: Maybe<Avatar>
@@ -1909,7 +1939,7 @@ export type SearchFieldAgentResponse = {
   fullName?: Maybe<Scalars['String']>
   practitionerId?: Maybe<Scalars['String']>
   primaryOfficeId?: Maybe<Scalars['String']>
-  role?: Maybe<Role>
+  role?: Maybe<UserRole>
   status?: Maybe<Status>
   totalNumberOfDeclarationStarted?: Maybe<Scalars['Int']>
   totalNumberOfInProgressAppStarted?: Maybe<Scalars['Int']>
@@ -1984,31 +2014,6 @@ export type SystemInput = {
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
   type: SystemType
-}
-
-export type SystemRole = {
-  __typename?: 'SystemRole'
-  active: Scalars['Boolean']
-  id: Scalars['ID']
-  roles: Array<Role>
-  value: SystemRoleType
-}
-
-export type SystemRoleInput = {
-  active?: InputMaybe<Scalars['Boolean']>
-  id: Scalars['ID']
-  roles?: InputMaybe<Array<RoleInput>>
-  value?: InputMaybe<Scalars['String']>
-}
-
-export enum SystemRoleType {
-  FieldAgent = 'FIELD_AGENT',
-  LocalRegistrar = 'LOCAL_REGISTRAR',
-  LocalSystemAdmin = 'LOCAL_SYSTEM_ADMIN',
-  NationalRegistrar = 'NATIONAL_REGISTRAR',
-  NationalSystemAdmin = 'NATIONAL_SYSTEM_ADMIN',
-  PerformanceManagement = 'PERFORMANCE_MANAGEMENT',
-  RegistrationAgent = 'REGISTRATION_AGENT'
 }
 
 export type SystemSecret = {
@@ -2107,12 +2112,11 @@ export type User = {
   mobile?: Maybe<Scalars['String']>
   name: Array<HumanName>
   practitionerId: Scalars['String']
-  primaryOffice?: Maybe<Location>
-  role: Role
+  primaryOffice: Location
+  role: UserRole
   searches?: Maybe<Array<BookmarkedSeachItem>>
   signature?: Maybe<Signature>
   status: Status
-  systemRole: SystemRoleType
   underInvestigation?: Maybe<Scalars['Boolean']>
   userMgntUserID: Scalars['ID']
   username?: Maybe<Scalars['String']>
@@ -2173,8 +2177,14 @@ export type UserInput = {
   role?: InputMaybe<Scalars['String']>
   signature?: InputMaybe<SignatureInput>
   status?: InputMaybe<Status>
-  systemRole: SystemRoleType
   username?: InputMaybe<Scalars['String']>
+}
+
+export type UserRole = {
+  __typename?: 'UserRole'
+  id: Scalars['ID']
+  label: I18nMessage
+  scopes: Array<Scalars['String']>
 }
 
 export type VsExport = {
@@ -2350,31 +2360,21 @@ export type CreateOrUpdateUserMutation = {
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
 }
 
-export type GetSystemRolesQueryVariables = Exact<{
-  value?: InputMaybe<ComparisonInput>
-}>
+export type GetUserRolesQueryVariables = Exact<{ [key: string]: never }>
 
-export type GetSystemRolesQuery = {
+export type GetUserRolesQuery = {
   __typename?: 'Query'
-  getSystemRoles?: Array<{
-    __typename?: 'SystemRole'
+  getUserRoles: Array<{
+    __typename?: 'UserRole'
     id: string
-    value: SystemRoleType
-    roles: Array<{
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
-    }>
-  }> | null
-}
-
-export type UpdateRoleMutationVariables = Exact<{
-  systemRole?: InputMaybe<SystemRoleInput>
-}>
-
-export type UpdateRoleMutation = {
-  __typename?: 'Mutation'
-  updateRole: { __typename?: 'Response'; roleIdMap: any }
+    scopes: Array<string>
+    label: {
+      __typename?: 'I18nMessage'
+      id: string
+      defaultMessage: string
+      description: string
+    }
+  }>
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -2599,12 +2599,15 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
     role: {
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
+      __typename?: 'UserRole'
+      label: {
+        __typename?: 'I18nMessage'
+        id: string
+        defaultMessage: string
+        description: string
+      }
     }
     name: Array<{
       __typename?: 'HumanName'
@@ -2612,22 +2615,30 @@ export type FetchUserQuery = {
       firstNames?: string | null
       familyName?: string | null
     }>
-    primaryOffice?: {
+    primaryOffice: {
       __typename?: 'Location'
       id: string
       name?: string | null
       alias?: Array<string> | null
       status?: string | null
-    } | null
+    }
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
-      role: SystemRoleType
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
       } | null>
+      role: {
+        __typename?: 'UserRole'
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
+      }
       signature?: {
         __typename?: 'Signature'
         data?: string | null
@@ -2883,7 +2894,6 @@ export type SearchUsersQuery = {
       __typename?: 'User'
       id: string
       username?: string | null
-      systemRole: SystemRoleType
       mobile?: string | null
       email?: string | null
       status: Status
@@ -2894,7 +2904,16 @@ export type SearchUsersQuery = {
         firstNames?: string | null
         familyName?: string | null
       }>
-      role: { __typename?: 'Role'; _id: string }
+      role: {
+        __typename?: 'UserRole'
+        id: string
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
+      }
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
   } | null
@@ -2951,7 +2970,6 @@ export type GetUserQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
@@ -2969,16 +2987,21 @@ export type GetUserQuery = {
       value?: string | null
     } | null
     role: {
-      __typename?: 'Role'
-      _id: string
-      labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
+      __typename?: 'UserRole'
+      id: string
+      label: {
+        __typename?: 'I18nMessage'
+        id: string
+        defaultMessage: string
+        description: string
+      }
     }
-    primaryOffice?: {
+    primaryOffice: {
       __typename?: 'Location'
       id: string
       name?: string | null
       alias?: Array<string> | null
-    } | null
+    }
     signature?: {
       __typename?: 'Signature'
       type?: string | null
@@ -3393,15 +3416,15 @@ export type FetchBirthRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -3458,6 +3481,25 @@ export type FetchBirthRegistrationForReviewQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -3712,15 +3754,15 @@ export type FetchBirthRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -3777,6 +3819,25 @@ export type FetchBirthRegistrationForCertificateQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4194,15 +4255,15 @@ export type FetchDeathRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -4259,6 +4320,25 @@ export type FetchDeathRegistrationForReviewQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4502,15 +4582,15 @@ export type FetchDeathRegistrationForCertificationQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -4567,6 +4647,25 @@ export type FetchDeathRegistrationForCertificationQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -4910,15 +5009,15 @@ export type FetchMarriageRegistrationForReviewQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -4975,6 +5074,25 @@ export type FetchMarriageRegistrationForReviewQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -5248,15 +5366,15 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       user?: {
         __typename?: 'User'
         id: string
-        systemRole: SystemRoleType
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
         name: Array<{
           __typename?: 'HumanName'
@@ -5313,6 +5431,25 @@ export type FetchMarriageRegistrationForCertificateQuery = {
             value?: string | null
             use?: string | null
           } | null> | null
+        } | null
+        certifier?: {
+          __typename?: 'User'
+          name: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          }>
+          role: {
+            __typename?: 'UserRole'
+            id: string
+            label: {
+              __typename?: 'I18nMessage'
+              id: string
+              defaultMessage: string
+              description: string
+            }
+          }
         } | null
       } | null> | null
     } | null> | null
@@ -6577,280 +6714,6 @@ export type RegistrationHomeQuery = {
   } | null
 }
 
-export type FieldAgentHomeQueryVariables = Exact<{
-  userId?: InputMaybe<Scalars['String']>
-  declarationLocationId: Scalars['String']
-  pageSize?: InputMaybe<Scalars['Int']>
-  reviewSkip?: InputMaybe<Scalars['Int']>
-  rejectSkip?: InputMaybe<Scalars['Int']>
-}>
-
-export type FieldAgentHomeQuery = {
-  __typename?: 'Query'
-  reviewTab?: {
-    __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
-      | {
-          __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: PlainDate | null
-          id: string
-          type?: string | null
-          childName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | {
-          __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: PlainDate | null
-          id: string
-          type?: string | null
-          deceasedName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | {
-          __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: PlainDate | null
-          id: string
-          type?: string | null
-          brideName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          groomName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | null
-    > | null
-  } | null
-  rejectTab?: {
-    __typename?: 'EventSearchResultSet'
-    totalItems?: number | null
-    results?: Array<
-      | {
-          __typename?: 'BirthEventSearchSet'
-          dateOfBirth?: PlainDate | null
-          id: string
-          type?: string | null
-          childName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | {
-          __typename?: 'DeathEventSearchSet'
-          dateOfDeath?: PlainDate | null
-          id: string
-          type?: string | null
-          deceasedName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | {
-          __typename?: 'MarriageEventSearchSet'
-          dateOfMarriage?: PlainDate | null
-          id: string
-          type?: string | null
-          brideName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          groomName?: Array<{
-            __typename?: 'HumanName'
-            firstNames?: string | null
-            middleName?: string | null
-            familyName?: string | null
-            use?: string | null
-          } | null> | null
-          registration?: {
-            __typename?: 'RegistrationSearchSet'
-            status?: string | null
-            contactRelationship?: string | null
-            contactNumber?: string | null
-            trackingId?: string | null
-            eventLocationId?: string | null
-            registrationNumber?: string | null
-            registeredLocationId?: string | null
-            duplicates?: Array<string | null> | null
-            createdAt?: string | null
-            modifiedAt?: string | null
-            assignment?: {
-              __typename?: 'AssignmentData'
-              practitionerId?: string | null
-              firstName?: string | null
-              lastName?: string | null
-              officeName?: string | null
-              avatarURL: string
-            } | null
-          } | null
-          operationHistories?: Array<{
-            __typename?: 'OperationHistorySearchSet'
-            operationType?: string | null
-            operatedOn?: any | null
-          } | null> | null
-        }
-      | null
-    > | null
-  } | null
-}
-
 export type MarkEventAsReinstatedMutationVariables = Exact<{
   id: Scalars['String']
 }>
@@ -7056,9 +6919,8 @@ export type GetUserByMobileQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
-    role: { __typename?: 'Role'; _id: string }
+    role: { __typename?: 'UserRole'; id: string }
   } | null
 }
 
@@ -7074,9 +6936,8 @@ export type GetUserByEmailQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
-    systemRole: SystemRoleType
     status: Status
-    role: { __typename?: 'Role'; _id: string }
+    role: { __typename?: 'UserRole'; id: string }
   } | null
 }
 
@@ -7414,7 +7275,6 @@ export type GetEventsWithProgressQuery = {
       } | null
       startedBy?: {
         __typename?: 'User'
-        systemRole: SystemRoleType
         name: Array<{
           __typename?: 'HumanName'
           use?: string | null
@@ -7422,13 +7282,14 @@ export type GetEventsWithProgressQuery = {
           familyName?: string | null
         }>
         role: {
-          __typename?: 'Role'
-          _id: string
-          labels: Array<{
-            __typename?: 'RoleLabel'
-            lang: string
-            label: string
-          }>
+          __typename?: 'UserRole'
+          id: string
+          label: {
+            __typename?: 'I18nMessage'
+            id: string
+            defaultMessage: string
+            description: string
+          }
         }
       } | null
       progressReport?: {
@@ -7476,24 +7337,24 @@ export type RegistrationsListByRegistrarFilter = {
     total: number
     late: number
     delayed: number
-    registrarPractitioner?: {
+    registrarPractitioner: {
       __typename?: 'User'
       id: string
-      systemRole: SystemRoleType
       role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
+        __typename?: 'UserRole'
+        id: string
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
       }
-      primaryOffice?: {
+      primaryOffice: {
         __typename?: 'Location'
         name?: string | null
         id: string
-      } | null
+      }
       name: Array<{
         __typename?: 'HumanName'
         firstNames?: string | null
@@ -7505,7 +7366,7 @@ export type RegistrationsListByRegistrarFilter = {
         type: string
         data: string
       } | null
-    } | null
+    }
   }>
 }
 
@@ -7563,8 +7424,13 @@ export type SearchFieldAgentsQuery = {
       totalNumberOfRejectedDeclarations?: number | null
       averageTimeForDeclaredDeclarations?: number | null
       role?: {
-        __typename?: 'Role'
-        labels: Array<{ __typename?: 'RoleLabel'; label: string; lang: string }>
+        __typename?: 'UserRole'
+        label: {
+          __typename?: 'I18nMessage'
+          id: string
+          defaultMessage: string
+          description: string
+        }
       } | null
       avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
     } | null> | null
@@ -7682,7 +7548,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           date?: any | null
           user?: {
             __typename?: 'User'
-            primaryOffice?: {
+            primaryOffice: {
               __typename?: 'Location'
               hierarchy?: Array<{
                 __typename?: 'Location'
@@ -7690,7 +7556,7 @@ export type FetchRecordDetailsForVerificationQuery = {
                 name?: string | null
                 alias?: Array<string> | null
               }> | null
-            } | null
+            }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -7744,7 +7610,7 @@ export type FetchRecordDetailsForVerificationQuery = {
           date?: any | null
           user?: {
             __typename?: 'User'
-            primaryOffice?: {
+            primaryOffice: {
               __typename?: 'Location'
               hierarchy?: Array<{
                 __typename?: 'Location'
@@ -7752,7 +7618,7 @@ export type FetchRecordDetailsForVerificationQuery = {
                 name?: string | null
                 alias?: Array<string> | null
               }> | null
-            } | null
+            }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8007,8 +7873,7 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
-            role: { __typename?: 'Role'; _id: string }
+            role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8393,8 +8258,7 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
-            role: { __typename?: 'Role'; _id: string }
+            role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -8711,8 +8575,7 @@ export type FetchViewRecordByCompositionQuery = {
           user?: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
-            role: { __typename?: 'Role'; _id: string }
+            role: { __typename?: 'UserRole'; id: string }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null

@@ -44,7 +44,6 @@ const dummyUserList = [
     passwordHash:
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
-    systemRole: 'FIELD_AGENT',
     role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
@@ -65,7 +64,6 @@ const dummyUserList = [
     passwordHash:
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
-    systemRole: 'FIELD_AGENT',
     role: new Types.ObjectId('6348acd2e1a47ca32e79f46f'),
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
@@ -86,7 +84,6 @@ const dummyUserList = [
     passwordHash:
       'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
     salt: '12345',
-    systemRole: 'LOCAL_REGISTRAR',
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -136,7 +133,6 @@ describe('searchUsers tests', () => {
         sortOrder: 'asc',
         username: 'mohammad.ashraful',
         mobile: '+8801733333333',
-        systemRole: 'LOCAL_REGISTRAR',
         primaryOfficeId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         status: 'active'
       },

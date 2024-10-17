@@ -20,6 +20,7 @@ import { Request } from '@hapi/hapi'
 import { Bundle, Saved } from '@opencrvs/commons/types'
 import { UsersAPI } from '@gateway/features/user/usersAPI'
 import MetricsAPI from '@gateway/features/fhir/metricsAPI'
+import CountryConfigAPI from '@gateway/features/fhir/countryConfigAPI'
 
 export interface Context {
   request: Request
@@ -27,6 +28,7 @@ export interface Context {
   presignDocumentUrls?: boolean
   dataSources: {
     locationsAPI: LocationsAPI
+    countryConfigAPI: CountryConfigAPI
     documentsAPI: DocumentsAPI
     usersAPI: UsersAPI
     paymentsAPI: PaymentsAPI

@@ -10,14 +10,60 @@
  */
 
 import { useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { PERFORMANCE_MANAGEMENT_ROLES } from '@client/utils/constants'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { Scope, User, Location } from '@client/utils/gateway'
 
-export function useAuthorization() {
-  const userDetails = useSelector(getUserDetails)
-  const isPerformanceManager =
-    userDetails?.systemRole &&
-    PERFORMANCE_MANAGEMENT_ROLES.includes(userDetails.systemRole)
+export function usePermissions() {
+  const userScopes = useSelector(getScope)
+  const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
 
-  return { isPerformanceManager }
+  const hasScopes = (neededScopes: Scope[]) =>
+    neededScopes.every((scope) => userScopes?.includes(scope))
+
+  const hasAnyScope = (neededScopes: Scope[]) =>
+    neededScopes.some((scope) => userScopes?.includes(scope))
+
+  const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
+
+  const canReadUser = (user: Pick<User, 'primaryOffice'>) => {
+    if (hasScope('user.read')) return true
+    if (hasScope('user.read:my-office'))
+      return user.primaryOffice.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  const canEditUser = (user: Pick<User, 'primaryOffice'>) => {
+    if (hasScope('user.update')) return true
+    if (hasScope('user.update:my-office'))
+      return user.primaryOffice.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  const canReadOfficeUsers = (office: Pick<Location, 'id'>) => {
+    if (hasScope('organisation.read-locations')) return true
+    if (hasScope('organisation.read-locations:my-office'))
+      return office.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
+    if (hasScope('user.create')) return true
+    if (hasScope('user.create:my-jurisdiction'))
+      return office.id === userPrimaryOffice?.id
+
+    return false
+  }
+
+  return {
+    hasScopes,
+    hasScope,
+    hasAnyScope,
+    canReadUser,
+    canEditUser,
+    canReadOfficeUsers,
+    canAddOfficeUsers
+  }
 }

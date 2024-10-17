@@ -22,7 +22,6 @@ export default class MetricsAPI extends RESTDataSource {
     super()
     this.baseURL = `${METRICS_URL}`
   }
-
   protected willSendRequest(request: RequestOptions): void | Promise<void> {
     const { headers } = this.context
     const headerKeys = Object.keys(headers)

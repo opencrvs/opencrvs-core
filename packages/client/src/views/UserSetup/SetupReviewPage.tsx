@@ -8,41 +8,38 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
-import styled from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import { Loader } from '@opencrvs/components/lib/Loader'
+import { Mutation } from '@apollo/client/react/components'
 import {
-  ProtectedAccoutStep,
   IProtectedAccountSetupData,
-  ISecurityQuestionAnswer
+  ISecurityQuestionAnswer,
+  ProtectedAccoutStep
 } from '@client/components/ProtectedAccount'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages,
+  userMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/userSetup'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
 import {
   SubmitActivateUserMutation,
   SubmitActivateUserMutationVariables
 } from '@client/utils/gateway'
-import { Mutation } from '@apollo/client/react/components'
-import {
-  userMessages,
-  buttonMessages,
-  constantsMessages,
-  errorMessages
-} from '@client/i18n/messages'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
-import { messages } from '@client/i18n/messages/views/userSetup'
-import { Content } from '@opencrvs/components/lib/Content'
-
-import { getLanguage } from '@client/i18n/selectors'
 import { ErrorText } from '@opencrvs/components/lib/'
-import { getUserRole } from '@client/utils'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Button } from '@opencrvs/components/lib/Button'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { Loader } from '@opencrvs/components/lib/Loader'
+import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
+import * as React from 'react'
+import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -65,8 +62,8 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
   const email = (userDetails && (userDetails.email as string)) || ''
-  const language = useSelector(getLanguage)
-  const role = userDetails && getUserRole(language, userDetails.role)
+  const role = userDetails && intl.formatMessage(userDetails.role.label)
+
   const primaryOffice =
     (userDetails &&
       userDetails.primaryOffice &&

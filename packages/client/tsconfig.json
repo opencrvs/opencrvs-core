@@ -2,12 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "baseUrl": "src",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "WebWorker",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "WebWorker", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,11 +17,6 @@
     "jsx": "react",
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "typings",
-    "codegen.ts",
-    "vite.config.ts"
-  ],
+  "include": ["src", "typings", "codegen.ts", "vite.config.ts"],
   "extends": "./tsconfig.paths.json"
 }

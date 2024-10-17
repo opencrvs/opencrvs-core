@@ -17,8 +17,6 @@ import {
   WEB_USER_JWT_AUDIENCES,
   JWT_ISSUER,
   NOTIFICATION_API_USER_AUDIENCE,
-  VALIDATOR_API_USER_AUDIENCE,
-  AGE_VERIFICATION_USER_AUDIENCE,
   NATIONAL_ID_USER_AUDIENCE
 } from '@auth/constants'
 
@@ -98,8 +96,6 @@ export async function tokenHandler(
   }
 
   const isNotificationAPIUser = result.scope.includes('notification-api')
-  const isValidatorAPIUser = result.scope.includes('validator-api')
-  const isAgeVerificationAPIUser = result.scope.includes('age-verification-api')
   const isNationalIDAPIUser = result.scope.includes('nationalId')
 
   const token = await createToken(
@@ -107,10 +103,6 @@ export async function tokenHandler(
     result.scope,
     isNotificationAPIUser
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
-      : isValidatorAPIUser
-      ? WEB_USER_JWT_AUDIENCES.concat([VALIDATOR_API_USER_AUDIENCE])
-      : isAgeVerificationAPIUser
-      ? WEB_USER_JWT_AUDIENCES.concat([AGE_VERIFICATION_USER_AUDIENCE])
       : isNationalIDAPIUser
       ? WEB_USER_JWT_AUDIENCES.concat([NATIONAL_ID_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,

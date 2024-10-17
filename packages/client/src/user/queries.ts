@@ -23,11 +23,15 @@ export const SEARCH_USERS = gql`
           familyName
         }
         username
-        systemRole
         mobile
         email
         role {
-          _id
+          id
+          label {
+            id
+            defaultMessage
+            description
+          }
         }
         status
         underInvestigation
@@ -96,12 +100,12 @@ export const GET_USER = gql`
         system
         value
       }
-      systemRole
       role {
-        _id
-        labels {
-          lang
-          label
+        id
+        label {
+          id
+          defaultMessage
+          description
         }
       }
       status

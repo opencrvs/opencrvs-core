@@ -10,7 +10,7 @@
  */
 export function createServerWithEnvironment(env: any) {
   jest.resetModules()
-  process.env = { ...process.env, ...env }
+  process.env = { ...process.env, ...env, LOG_LEVEL: 'error' }
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   return require('../server').createServer()
 }

@@ -318,13 +318,14 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
-          systemRole
+
           name {
             firstNames
             familyName
@@ -375,6 +376,21 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               system
               value
               use
+            }
+          }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
           }
         }
@@ -583,13 +599,13 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         user {
           id
           role {
-            _id
-            labels {
-              lang
-              label
+            id
+            label {
+              id
+              defaultMessage
+              description
             }
           }
-          systemRole
           name {
             firstNames
             familyName
@@ -640,6 +656,21 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
               system
               value
               use
+            }
+          }
+          certifier {
+            name {
+              use
+              firstNames
+              familyName
+            }
+            role {
+              id
+              label {
+                id
+                defaultMessage
+                description
+              }
             }
           }
         }

@@ -8,8 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IStoreState } from '@client/store'
+import { REGISTRAR_HOME } from '@client/navigation/routes'
+import { useLocation } from 'react-router'
 
-export function selectSystemRoleMap(store: IStoreState) {
-  return store.userForm.systemRoleMap
+// @TODO: Create a logic for figuring out which page the user needs to be redirected to
+export const useHomePage = () => {
+  const { pathname } = useLocation()
+
+  return {
+    path: REGISTRAR_HOME,
+    isCurrentPageHome: pathname.startsWith(REGISTRAR_HOME)
+  }
 }

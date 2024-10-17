@@ -56,8 +56,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
-import { getScope } from '@client/profile/profileSelectors'
-import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   PrimaryButton,
   TertiaryButton,
@@ -70,7 +68,6 @@ import {
   DECLARED,
   VALIDATED,
   REJECTED,
-  FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
 import { IQueryData } from '@client/workqueue'
@@ -125,6 +122,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 
 const DesktopHeader = styled(Header)`
@@ -172,7 +170,6 @@ interface IStateProps {
   userDetails: UserDetails | null
   language: string
   resources: IOfflineData
-  scope: Scope | null
   declarationId: string
   draft: IDeclaration | null
   tab: IRecordAuditTabs
@@ -290,7 +287,6 @@ function RecordAuditBody({
   goToPrintCertificate,
   goToPage,
   goToHomeTab,
-  scope,
   refetchDeclarationInfo,
   userDetails,
   registerForm,
@@ -304,7 +300,6 @@ function RecordAuditBody({
   draft: IDeclaration | null
   duplicates?: string[]
   intl: IntlShape
-  scope: Scope | null
   userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
@@ -320,6 +315,7 @@ function RecordAuditBody({
 
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
+  const { hasScope } = usePermissions()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -330,9 +326,6 @@ function RecordAuditBody({
   }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
 
-  const userHasRegisterScope = scope && scope.includes('register')
-  const userHasValidateScope = scope && scope.includes('validate')
-
   const actions: React.ReactElement[] = []
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
@@ -342,9 +335,9 @@ function RecordAuditBody({
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (
+    hasScope('record.registration-correct') &&
     isDownloaded &&
     declaration.type !== Event.Marriage &&
-    (userHasRegisterScope || userHasValidateScope) &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.CERTIFIED ||
       declaration.status === SUBMISSION_STATUS.ISSUED)
@@ -367,11 +360,10 @@ function RecordAuditBody({
   }
 
   if (
+    hasScope('record.declaration-archive') &&
     isDownloaded &&
     declaration.status &&
-    ARCHIVABLE_STATUSES.includes(declaration.status) &&
-    (userHasRegisterScope ||
-      (userHasValidateScope && declaration.status !== VALIDATED))
+    ARCHIVABLE_STATUSES.includes(declaration.status)
   ) {
     actions.push(
       <Button
@@ -389,8 +381,8 @@ function RecordAuditBody({
   }
 
   if (
+    hasScope('record.declaration-archive') &&
     isDownloaded &&
-    (userHasValidateScope || userHasRegisterScope) &&
     declaration.status &&
     ARCHIVED.includes(declaration.status)
   ) {
@@ -410,8 +402,8 @@ function RecordAuditBody({
   }
 
   if (
-    declaration.status !== SUBMISSION_STATUS.DRAFT &&
-    (userHasRegisterScope || userHasValidateScope)
+    hasScope('record.read') &&
+    declaration.status !== SUBMISSION_STATUS.DRAFT
   ) {
     actions.push(
       <Button
@@ -438,8 +430,7 @@ function RecordAuditBody({
       SUBMISSION_STATUS.VALIDATED,
       SUBMISSION_STATUS.CORRECTION_REQUESTED
     ].includes(declaration.status as SUBMISSION_STATUS) &&
-    userDetails?.systemRole &&
-    !FIELD_AGENT_ROLES.includes(userDetails.systemRole)
+    hasScope('record.declaration-review')
   ) {
     actions.push(
       ShowReviewButton({
@@ -462,8 +453,7 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.DRAFT ||
     ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
       declaration.status === SUBMISSION_STATUS.REJECTED) &&
-      userDetails?.systemRole &&
-      !FIELD_AGENT_ROLES.includes(userDetails.systemRole))
+      hasScope('record.submit-for-updates'))
   ) {
     actions.push(
       ShowUpdateButton({
@@ -582,9 +572,7 @@ function RecordAuditBody({
 
   const isValidatedOnReview =
     declaration.status === SUBMISSION_STATUS.VALIDATED &&
-    hasRegisterScope(scope)
-      ? true
-      : false
+    hasScope('record.register')
 
   const hasDuplicates = !!(
     duplicates &&
@@ -704,7 +692,6 @@ const BodyContent = ({
   draft,
   intl,
   language,
-  scope,
   resources,
   tab,
   userDetails,
@@ -779,7 +766,6 @@ const BodyContent = ({
                 duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
                 refetchDeclarationInfo={refetch}
                 intl={intl}
-                scope={scope}
                 userDetails={userDetails}
                 goBack={goBack}
               />
@@ -826,7 +812,6 @@ const BodyContent = ({
         duplicates={getPotentialDuplicateIds(workqueueDeclaration)}
         tab={tab}
         intl={intl}
-        scope={scope}
         userDetails={userDetails}
         goBack={goBack}
       />
@@ -860,7 +845,6 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
       ) || null,
     language: getLanguage(state),
     resources: getOfflineData(state),
-    scope: getScope(state),
     tab,
     userDetails: state.profile.userDetails,
     registerForm: state.registerForm,

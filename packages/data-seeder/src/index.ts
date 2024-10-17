@@ -11,7 +11,7 @@
 import { env } from './environment'
 import fetch from 'node-fetch'
 import { seedLocations } from './locations'
-import { seedRoles } from './roles'
+
 import { seedUsers } from './users'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
@@ -31,7 +31,11 @@ async function getToken(): Promise<string> {
     }
   })
   if (!res.ok) {
-    raise('Could not login as the super user')
+    raise(
+      'Could not login as the super user. This might because you have seeded the database already and the account has now been deactivated',
+      res.status,
+      res.statusText
+    )
   }
   const body = await res.json()
   return body.token
@@ -90,12 +94,11 @@ async function deactivateSuperuser(token: string) {
 
 async function main() {
   const token = await getToken()
-  console.log('Seeding roles')
-  const roleIdMap = await seedRoles(token)
+
   console.log('Seeding locations')
   await seedLocations(token)
   console.log('Seeding users')
-  await seedUsers(token, roleIdMap)
+  await seedUsers(token)
   await deactivateSuperuser(token)
 }
 

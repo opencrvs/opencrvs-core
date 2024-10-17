@@ -73,7 +73,7 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Event, RegStatus, Scope } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -104,7 +104,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { Scope } from '@client/utils/authUtils'
+
 import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import {
   formatPlainDate,
@@ -277,7 +277,7 @@ interface IProps {
     submissionStatus: string,
     action: SubmissionAction
   ) => void
-  scope: Scope | null
+  scope: Scope[] | null
   offlineCountryConfiguration: IOfflineData
   language: string
   onChangeReviewForm?: onChangeReviewForm

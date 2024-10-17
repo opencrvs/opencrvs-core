@@ -80,7 +80,6 @@ const BoldContent = styled.div`
 interface IBaseProp {
   practitionerId: string
   practitionerName: string | null | undefined
-  loggedInUserRole: string | null | undefined
 }
 
 interface DispatchProps {
@@ -251,8 +250,8 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
       const actionMessage = this.getActionMessage(userAuditItem)
 
       const isSystemAdmin =
-        this.props.loggedInUserRole === 'NATIONAL_SYSTEM_ADMIN' ||
-        this.props.loggedInUserRole === 'LOCAL_SYSTEM_ADMIN'
+        ('@TODO: Handle these cases' as any) === 'NATIONAL_SYSTEM_ADMIN' ||
+        ('@TODO: Handle these cases' as any) === 'LOCAL_SYSTEM_ADMIN'
 
       return {
         actionDescription:

@@ -56,19 +56,7 @@ const MOCK_USER: IUserModelData = {
   device: 'Samsung Galaxy S9',
   emailForNotification: 'kalushabw.alya17@gmail.com',
   mobile: '0934343434',
-  systemRole: 'LOCAL_REGISTRAR',
-  role: {
-    labels: [
-      {
-        lang: 'en',
-        label: 'Local Registrar'
-      },
-      {
-        lang: 'fr',
-        label: 'Registraire local'
-      }
-    ]
-  },
+  role: 'LOCAL_REGISTRAR',
   practitionerId: '48455871-1636-46a1-8279-aaa76dec03d4',
   primaryOfficeId: '5faf414c-99e8-47a7-b4d9-d07a02dbc97e',
   scope: ['register', 'performance', 'certify', 'demo'],
@@ -398,14 +386,6 @@ test('getting role at a specific time from roleHistory', async () => {
               code: 'NATIONAL_REGISTRAR'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
-            }
-          ]
         }
       ],
       location: [
@@ -430,14 +410,6 @@ test('getting role at a specific time from roleHistory', async () => {
             {
               system: 'http://opencrvs.org/specs/roles',
               code: 'LOCAL_REGISTRAR'
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
             }
           ]
         }
@@ -466,14 +438,6 @@ test('getting role at a specific time from roleHistory', async () => {
               code: 'NATIONAL_REGISTRAR'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
-            }
-          ]
         }
       ],
       location: [
@@ -500,14 +464,6 @@ test('getting role at a specific time from roleHistory', async () => {
               code: 'LOCAL_SYSTEM_ADMIN'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: '[{"lang":"en","label":"Local System Admin"},{"lang":"fr","label":"Administrateur système local"}]'
-            }
-          ]
         }
       ],
       location: [
@@ -531,15 +487,9 @@ test('getting role at a specific time from roleHistory', async () => {
   */
 
   const lastModified = '2024-08-30T13:14:33.704Z'
-  const expectedRole =
-    '[{"lang":"en","label":"National Registrar"},{"lang":"fr","label":"Registraire national"}]'
-  const expectedSystemRole = 'NATIONAL_REGISTRAR'
+  const expectedRole = 'NATIONAL_REGISTRAR'
 
-  const { role, systemRole } = getUserRoleFromHistory(
-    practitionerRoleHistory,
-    lastModified
-  )
+  const role = getUserRoleFromHistory(practitionerRoleHistory, lastModified)
 
   expect(role).toEqual(expectedRole)
-  expect(systemRole).toEqual(expectedSystemRole)
 })

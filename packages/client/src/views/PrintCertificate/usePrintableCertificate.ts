@@ -23,12 +23,8 @@ import {
 } from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
-import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import {
-  hasRegisterScope,
-  hasRegistrationClerkScope
-} from '@client/utils/authUtils'
 import { cloneDeep } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
@@ -44,6 +40,7 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { printPDF } from '@client/pdfRenderer'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -115,10 +112,10 @@ export const usePrintableCertificate = (declarationId: string) => {
   const state = useSelector((store: IStoreState) => store)
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const dispatch = useDispatch()
-  const scope = useSelector(getScope)
-  const canUserEditRecord =
+  const { hasScope } = usePermissions()
+  const canUserCorrectRecord =
     declaration?.event !== Event.Marriage &&
-    (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
+    hasScope('record.registration-correct')
 
   let svg = undefined
   const certificateTemplate =
@@ -222,7 +219,7 @@ export const usePrintableCertificate = (declarationId: string) => {
     svg,
     handleCertify,
     isPrintInAdvance,
-    canUserEditRecord,
+    canUserCorrectRecord,
     handleEdit
   }
 }

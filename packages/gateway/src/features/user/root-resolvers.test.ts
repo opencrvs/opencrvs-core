@@ -18,6 +18,7 @@ const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
+import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
 
 let container: StartedTestContainer
 
@@ -80,7 +81,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -100,7 +100,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -120,7 +119,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'LOCAL_REGISTRAR',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -180,7 +178,6 @@ describe('User root resolvers', () => {
           username: 'mohammad.ashraful',
           mobile: '+8801733333333',
           email: 'test@test.org',
-          systemRole: 'LOCAL_REGISTRAR',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
@@ -244,8 +241,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
-        role: 'HA',
+        role: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -262,11 +258,10 @@ describe('User root resolvers', () => {
         username: 'mdariful.islam',
         mobile: '+8801740012994',
         email: 'test@test.org',
-        role: 'HA',
+        role: 'FIELD_AGENT',
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'pending',
         practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -299,7 +294,12 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin },
+        {
+          headers: authHeaderSysAdmin,
+          dataSources: {
+            countryConfigAPI: { getRoles: () => DEFAULT_ROLES_DEFINITION }
+          }
+        },
         { fieldName: 'searchFieldAgents' }
       )
 
@@ -308,7 +308,28 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
+          },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -320,7 +341,28 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
+          },
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -357,7 +399,12 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin },
+        {
+          headers: authHeaderSysAdmin,
+          dataSources: {
+            countryConfigAPI: { getRoles: () => DEFAULT_ROLES_DEFINITION }
+          }
+        },
         { fieldName: 'searchFieldAgents' }
       )
 
@@ -366,7 +413,28 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
+          },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -378,7 +446,28 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
+          },
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -439,7 +528,12 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        { headers: authHeaderSysAdmin },
+        {
+          headers: authHeaderSysAdmin,
+          dataSources: {
+            countryConfigAPI: { getRoles: () => DEFAULT_ROLES_DEFINITION }
+          }
+        },
         { fieldName: 'searchFieldAgents' }
       )
 
@@ -448,7 +542,28 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              'declare',
+              'record.declare-birth',
+              'record.declare-death',
+              'record.declare-marriage',
+              'record.submit-incomplete',
+              'record.submit-for-review',
+              'search.birth',
+              'search.death',
+              'search.marriage',
+              'record.read',
+              'record.read-audit',
+              'record.read-comments'
+            ]
+          },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -944,13 +1059,15 @@ describe('User root resolvers', () => {
       username: 'mohammad.ashraful',
       mobile: '+8801733333333',
       email: 'test@test.org',
-      systemRole: 'LOCAL_REGISTRAR',
-      role: 'HOSPITAL',
+      role: 'LOCAL_REGISTRAR',
       status: 'active',
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
     }
 
     it('creates user for sysadmin', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -970,6 +1087,9 @@ describe('User root resolvers', () => {
     })
 
     it('updates an user for sysadmin', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -1001,6 +1121,9 @@ describe('User root resolvers', () => {
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       fetch.mockResponseOnce(
         JSON.stringify({
           statusCode: '201'
@@ -1015,7 +1138,7 @@ describe('User root resolvers', () => {
           { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
-        "Something went wrong on user-mgnt service. Couldn't create user"
+        "Something went wrong on user-mgnt service. Couldn't perform createUser"
       )
     })
   })

@@ -29,7 +29,6 @@ interface IVerifyPayload {
 interface IVerifyResponse {
   name: IUserName[]
   mobile?: string
-  scope: string[]
   status: string
   securityQuestionKey: string
   id: string
@@ -71,7 +70,6 @@ export default async function verifyUserHandler(
   const response: IVerifyResponse = {
     name: user.name,
     mobile: user.mobile,
-    scope: user.scope,
     status: user.status,
     securityQuestionKey: getRandomQuestionKey(user.securityQuestionAnswers),
     id: user.id,
@@ -111,7 +109,6 @@ export const responseSchema = Joi.object({
   ),
   mobile: Joi.string(),
   email: Joi.string(),
-  scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
   securityQuestionKey: Joi.string(),
   id: Joi.string(),

@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
-    "paths": { "@client/*": ["./*"] }
+    "paths": {
+      "@client/*": ["./*"]
+    }
   }
 }

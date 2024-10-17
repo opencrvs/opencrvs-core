@@ -17,7 +17,6 @@ import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
   Workqueue,
@@ -61,15 +60,16 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { RegStatus } from '@client/utils/gateway'
+import { RegStatus, Scope } from '@client/utils/gateway'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 interface IBaseReviewTabProps {
   theme: ITheme
-  scope: Scope | null
+  scope: Scope[] | null
   goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
@@ -102,10 +102,7 @@ const ReadyForReviewComponent = ({
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_REVIEW)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
-
-  const userHasRegisterScope = () => {
-    return scope && hasRegisterScope(scope)
-  }
+  const { hasScope } = usePermissions()
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -181,9 +178,7 @@ const ReadyForReviewComponent = ({
         ''
       const isValidatedOnReview =
         reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-        userHasRegisterScope()
-          ? true
-          : false
+        hasScope('record.register')
       const dateOfEvent =
         (reg.dateOfEvent &&
           reg.dateOfEvent.length > 0 &&

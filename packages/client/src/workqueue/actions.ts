@@ -43,7 +43,6 @@ export interface UpdateRegistrarWorkqueueAction {
   payload: {
     pageSize: number
     userId?: string
-    isFieldAgent: boolean
   }
 }
 

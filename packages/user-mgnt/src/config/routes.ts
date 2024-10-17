@@ -18,9 +18,6 @@ import changeAvatarHandler, {
   changeAvatarRequestSchema
 } from '@user-mgnt/features/changeAvatar/handler'
 import createUser from '@user-mgnt/features/createUser/handler'
-import getSystemRoles, {
-  searchRoleSchema
-} from '@user-mgnt/features/getRoles/handler'
 import getUser, {
   getUserRequestSchema
 } from '@user-mgnt/features/getUser/handler'
@@ -93,10 +90,7 @@ import {
 import resetPasswordInviteHandler, {
   requestSchema as resetPasswordRequestSchema
 } from '@user-mgnt/features/resetPassword/handler'
-import updateRole, {
-  systemRoleResponseSchema,
-  systemRolesRequestSchema
-} from '@user-mgnt/features/updateRole/handler'
+
 import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
@@ -115,7 +109,7 @@ const enum RouteScope {
   VERIFY = 'verify'
 }
 
-export const getRoutes: () => Hapi.ServerRoute[] = () => {
+export const getRoutes = () => {
   return [
     // add ping route by default for health check
     {
@@ -132,7 +126,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
           }
         }
       },
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
@@ -142,7 +136,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/verifyPassword',
       handler: verifyPassHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Verify user password',
@@ -159,7 +153,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/verifyPasswordById',
       handler: verifyPassByIdHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Verify user password',
@@ -176,7 +170,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/verifySecurityAnswer',
       handler: verifySecurityAnswer,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description:
@@ -194,7 +188,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/changePassword',
       handler: changePasswordHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Change user password',
@@ -216,7 +210,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/changeUserPassword',
       handler: changePasswordHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
         auth: {
@@ -241,7 +235,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/changeUserPhone',
       handler: changePhoneHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
         auth: {
@@ -266,7 +260,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/changeUserEmail',
       handler: changeEmailHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Changes email for logged-in user',
         auth: {
@@ -291,7 +285,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/changeUserAvatar',
       handler: changeAvatarHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Changes avatar for logged-in user',
         auth: {
@@ -316,7 +310,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/getUserMobile',
       handler: getUserMobile,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Retrieves a user mobile number',
         auth: {
@@ -341,7 +335,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/searchUsers',
       handler: searchUsers,
-      config: {
+      options: {
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -362,7 +356,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/getUser',
       handler: getUser,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Retrieves a user',
         auth: {
@@ -386,7 +380,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/createUser',
       handler: createUser,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
@@ -398,7 +392,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/updateUser',
       handler: updateUser,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
@@ -410,7 +404,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/activateUser',
       handler: activateUser,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Activate an existing pending user',
         auth: {
@@ -430,30 +424,9 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
     },
     {
       method: 'POST',
-      path: '/getSystemRoles',
-      handler: getSystemRoles,
-      config: {
-        auth: {
-          scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
-          ]
-        },
-        validate: {
-          payload: searchRoleSchema
-        },
-        tags: ['api']
-      }
-    },
-    {
-      method: 'POST',
       path: '/verifyUser',
       handler: verifyUserHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description:
@@ -472,7 +445,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/auditUser',
       handler: userAuditHandler,
-      config: {
+      options: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
@@ -486,7 +459,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/searches',
       handler: createSearchHandler,
-      config: {
+      options: {
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -507,7 +480,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'DELETE',
       path: '/searches',
       handler: removeSearchHandler,
-      config: {
+      options: {
         auth: {
           scope: [
             RouteScope.DECLARE,
@@ -528,7 +501,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/resendInvite',
       handler: resendInviteHandler,
-      config: {
+      options: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
@@ -543,7 +516,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/usernameReminder',
       handler: usernameReminderHandler,
-      config: {
+      options: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
@@ -558,7 +531,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/resetPasswordInvite',
       handler: resetPasswordInviteHandler,
-      config: {
+      options: {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
@@ -573,7 +546,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/registerSystem',
       handler: registerSystem,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Creates a new system client',
         auth: {
@@ -591,7 +564,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/updatePermissions',
       handler: updatePermissions,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Update system permissions',
         auth: {
@@ -606,7 +579,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/deactivateSystem',
       handler: deactivateSystem,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Deactivates a new system client',
         auth: {
@@ -624,7 +597,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/reactivateSystem',
       handler: reactivateSystem,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Reactivates a new system client',
         auth: {
@@ -642,7 +615,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/verifySystem',
       handler: verifySystemHandler,
-      config: {
+      options: {
         auth: false,
         tags: ['api'],
         description: 'Verify system',
@@ -660,7 +633,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/getSystem',
       handler: getSystemHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Verify system',
         notes: 'Verify system exist and access details are correct',
@@ -676,7 +649,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'GET',
       path: '/getAllSystems',
       handler: getAllSystemsHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Returns all systems'
       }
@@ -686,7 +659,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/countUsersByLocation',
       handler: countUsersByLocationHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Gets count of users group by office ids',
         auth: {
@@ -700,7 +673,6 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
         },
         validate: {
           payload: Joi.object({
-            systemRole: Joi.string().required(),
             locationId: Joi.string()
           })
         }
@@ -710,7 +682,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/refreshSystemSecret',
       handler: refreshSystemSecretHandler,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Refresh client secret ',
         notes: 'Refresh client secret',
@@ -729,7 +701,7 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
       method: 'POST',
       path: '/deleteSystem',
       handler: deleteSystem,
-      config: {
+      options: {
         tags: ['api'],
         description: 'Delete system ',
         notes: 'This is responsible for system deletion',
@@ -743,25 +715,6 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
           schema: SystemSchema
         }
       }
-    },
-    {
-      method: 'POST',
-      path: '/updateRole',
-      handler: updateRole,
-      options: {
-        tags: ['api'],
-        description: 'Update user role for particular system role',
-        notes: 'This is responsible for update userRole',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: systemRolesRequestSchema
-        },
-        response: {
-          schema: systemRoleResponseSchema
-        }
-      }
     }
-  ]
+  ] satisfies Hapi.ServerRoute[]
 }

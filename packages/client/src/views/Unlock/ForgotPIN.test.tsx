@@ -22,7 +22,7 @@ import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { History } from 'history'
 import { vi, Mock } from 'vitest'
-import { SystemRoleType, Status } from '@client/utils/gateway'
+import { Status } from '@client/utils/gateway'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
@@ -47,15 +47,12 @@ describe('ForgotPIN tests', () => {
             userMgntUserID: '5eba726866458970cf2e23c2',
             practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
             mobile: '+8801711111111',
-            systemRole: SystemRoleType.FieldAgent,
             role: {
-              _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'CHA'
-                }
-              ]
+              label: {
+                id: 'userRoles.cha',
+                defaultMessage: 'CHA',
+                description: 'CHA'
+              }
             },
             status: Status.Active,
             name: [
@@ -65,7 +62,11 @@ describe('ForgotPIN tests', () => {
                 familyName: 'Al Hasan'
               }
             ],
-            primaryOffice: undefined,
+            primaryOffice: {
+              id: '895cc945-94a9-4195-9a29-22e9310f3385',
+              name: 'Narsingdi Paurasabha',
+              alias: ['নরসিংদী পৌরসভা']
+            },
             localRegistrar: {
               name: [
                 {
@@ -74,7 +75,13 @@ describe('ForgotPIN tests', () => {
                   familyName: 'Ashraful'
                 }
               ],
-              role: SystemRoleType.LocalRegistrar,
+              role: {
+                label: {
+                  defaultMessage: 'Local Registrar',
+                  description: 'Name for user role Local Registrar',
+                  id: 'userRole.localRegistrar'
+                }
+              },
               signature: undefined
             }
           }

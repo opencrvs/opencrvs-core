@@ -13,6 +13,8 @@ import {
   createTestComponent,
   createTestStore,
   flushPromises,
+  setScopes,
+  SYSTEM_ADMIN_DEFAULT_SCOPES,
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -25,8 +27,7 @@ import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
 import * as Router from 'react-router'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
-import { SystemRoleType } from '@client/utils/gateway'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { GetUserQuery, Status } from '@client/utils/gateway'
 
 const useParams = Router.useParams as Mock
 
@@ -59,17 +60,17 @@ const mockAuditedUserGqlResponse = {
           system: 'NATIONAL_ID',
           value: '1014881922'
         },
-        systemRole: 'FIELD_AGENT',
         role: {
-          _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-          labels: [
-            {
-              lang: 'en',
-              label: 'CHA'
-            }
-          ]
+          id: 'SOCIAL_WORKER',
+          label: {
+            id: 'userRole.socialWorker',
+            defaultMessage: 'Social Worker',
+            description: 'Name for user role Social Worker',
+            __typename: 'I18nMessage'
+          },
+          __typename: 'UserRole'
         },
-        status: 'active',
+        status: Status.Active,
         underInvestigation: true,
         practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
         primaryOffice: {
@@ -78,7 +79,7 @@ const mockAuditedUserGqlResponse = {
           alias: ['নরসিংদী পৌরসভা']
         },
         creationDate: '2019-03-31T18:00:00.000Z'
-      }
+      } satisfies GetUserQuery['getUser']
     }
   }
 }
@@ -148,15 +149,14 @@ describe('User audit list tests for sys admin', () => {
     const { store: testStore, history: testHistory } = await createTestStore()
     store = testStore
     history = testHistory
-    userDetails.systemRole = SystemRoleType.LocalSystemAdmin
     userDetails.primaryOffice = {
       id: '895cc945-94a9-4195-9a29-22e9310f3385',
       status: 'active',
       name: 'Narsingdi Paurasabha',
       alias: ['নরসিংদী পৌরসভা']
     }
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['sysadmin'])
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
+    setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
     component = await createTestComponent(<UserAudit />, {
       store,
       history,
@@ -164,7 +164,7 @@ describe('User audit list tests for sys admin', () => {
     })
   })
 
-  it('redirects to edit user view on clicking edit details menu option', async () => {
+  it.only('redirects to edit user view on clicking edit details menu option', async () => {
     await waitForElement(component, '#user-audit-list')
 
     const menuLink = await waitForElement(

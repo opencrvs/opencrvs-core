@@ -1210,7 +1210,8 @@ export const typeResolvers: GQLResolver = {
     }
   },
   Certificate: {
-    async collector(docRef: DocumentReference, _, context) {
+    async collector(parent: { docRef: DocumentReference }, _, context) {
+      const { docRef } = parent
       const relatedPersonRef =
         docRef.extension &&
         findExtension(
@@ -1228,7 +1229,8 @@ export const typeResolvers: GQLResolver = {
         )
       )
     },
-    async hasShowedVerifiedDocument(docRef: DocumentReference, _) {
+    async hasShowedVerifiedDocument(parent: { docRef: DocumentReference }, _) {
+      const { docRef } = parent
       const hasShowedDocument = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         docRef.extension as Extension[]
@@ -1243,6 +1245,60 @@ export const typeResolvers: GQLResolver = {
       }
 
       return false
+    },
+    async certifier(
+      parent: { docRef: DocumentReference; task: Saved<Task> },
+      _,
+      context
+    ) {
+      const { docRef, task } = parent
+      const practitionerRef =
+        docRef.extension &&
+        findExtension(
+          `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
+          docRef.extension
+        )
+
+      if (
+        !practitionerRef?.valueReference?.reference?.startsWith('Practitioner')
+      )
+        return null
+
+      const practitionerId = resourceIdentifierToUUID(
+        practitionerRef.valueReference.reference as ResourceIdentifier
+      )
+      const practitionerRoleBundle =
+        await context.dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
+          practitionerId
+        )
+
+      const practitionerRoleId = practitionerRoleBundle.entry?.[0].resource?.id
+
+      const practitionerRoleHistory =
+        await context.dataSources.fhirAPI.getPractionerRoleHistory(
+          practitionerRoleId
+        )
+      const result = practitionerRoleHistory.find(
+        (it) =>
+          it?.meta?.lastUpdated &&
+          task.lastModified &&
+          it?.meta?.lastUpdated <= task.lastModified!
+      )
+
+      const targetCode = result?.code?.find((element) => {
+        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
+      })
+
+      const roleId = targetCode?.coding?.[0].code
+      const userResponse =
+        await context.dataSources.usersAPI.getUserByPractitionerId(
+          practitionerId
+        )
+
+      const allRoles = await context.dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
+
+      return { ...userResponse, role }
     }
   },
   Identifier: {
@@ -1499,27 +1555,18 @@ export const typeResolvers: GQLResolver = {
       const practitionerRoleHistory =
         await dataSources.fhirAPI.getPractionerRoleHistory(practitionerRoleId)
 
+      const roleId = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
+      )
       const userResponse = await dataSources.usersAPI.getUserByPractitionerId(
         resourceIdentifierToUUID(user.valueReference.reference)
       )
 
-      const { role, systemRole } = getUserRoleFromHistory(
-        practitionerRoleHistory,
-        task.lastModified
-      )
+      const allRoles = await dataSources.countryConfigAPI.getRoles()
+      const role = allRoles.find((role) => role.id === roleId)?.id
 
-      if (role && systemRole) {
-        return {
-          ...userResponse,
-          role: {
-            ...userResponse.role,
-            labels: JSON.parse(role)
-          },
-          systemRole
-        }
-      }
-
-      return userResponse
+      return { ...userResponse, role }
     },
     system: async (task: Task, _: any) => {
       const systemIdentifier = task.identifier?.find(
@@ -2129,8 +2176,11 @@ async function resolveCertificates(
       return null
     }
 
-    return dataSources.fhirAPI.getDocumentReference(
-      resourceIdentifierToUUID(certSection.entry[0].reference)
-    )
+    return {
+      task,
+      docRef: dataSources.fhirAPI.getDocumentReference(
+        resourceIdentifierToUUID(certSection.entry[0].reference)
+      )
+    }
   })
 }

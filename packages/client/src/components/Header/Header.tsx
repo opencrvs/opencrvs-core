@@ -21,20 +21,11 @@ import {
   goToCreateNewUser,
   goToAdvancedSearch
 } from '@client/navigation'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
-import {
-  FIELD_AGENT_ROLES,
-  NATL_ADMIN_ROLES,
-  ADVANCED_SEARCH_TEXT,
-  SYS_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
-} from '@client/utils/constants'
-import { UserDetails } from '@client/utils/userUtils'
 import { Button } from '@opencrvs/components/lib/Button'
-
 import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import {
   SearchTool,
@@ -50,12 +41,14 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { Scope } from '@client/utils/gateway'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
+import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
 
 type IStateProps = {
-  userDetails: UserDetails | null
+  scopes: Scope[] | null
   fieldNames: string[]
   language: string
   offlineData: IOfflineData
@@ -126,21 +119,14 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
-  NATL_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES
-)
-
 export const HeaderComponent = (props: IFullProps) => {
   const {
     location,
-    userDetails,
     mobileSearchBar,
     offlineData,
     className,
     intl,
     activeMenuItem,
-    title,
     mobileRight,
     goToSearch,
     goToEvents,
@@ -149,9 +135,26 @@ export const HeaderComponent = (props: IFullProps) => {
     goToAdvancedSearch,
     goToSearchResult,
     setAdvancedSearchParam,
+    scopes,
     mapPerformanceClickHandler,
     changeTeamLocation
   } = props
+
+  function hasSearch() {
+    // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
+    return scopes?.some((scope) =>
+      (
+        [
+          'search.birth',
+          'search.birth:my-jurisdiction',
+          'search.death',
+          'search.death:my-jurisdiction',
+          'search.marriage',
+          'search.marriage:my-jurisdiction'
+        ] as Scope[]
+      ).includes(scope)
+    )
+  }
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = new URLSearchParams(location.search).get('locationId')
@@ -166,65 +169,74 @@ export const HeaderComponent = (props: IFullProps) => {
         mobileRight: [
           {
             icon: () => <Icon name="Activity" size="medium" color="primary" />,
-            handler: () =>
-              mapPerformanceClickHandler && mapPerformanceClickHandler()
+            handler: () => mapPerformanceClickHandler?.()
           }
         ]
       }
-    }
-    if (activeMenuItem === ACTIVE_MENU_ITEM.USERS && changeTeamLocation) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <Hamburger />,
-            handler: () => {}
-          }
-        ],
-        mobileRight: [
-          {
-            icon: () => (
-              <Icon name="MagnifyingGlass" size="medium" color="primary" />
-            ),
-            handler: () => changeTeamLocation && changeTeamLocation()
-          },
-          {
-            icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
-            handler: () => {
-              if (locationId) {
-                return goToCreateNewUserWithLocationId(locationId)
-              }
-              goToCreateNewUser()
+    } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+      if (changeTeamLocation) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
             }
-          }
-        ]
-      }
-    }
-    if (
-      activeMenuItem === ACTIVE_MENU_ITEM.USERS &&
-      userDetails?.systemRole &&
-      SYS_ADMIN_ROLES.includes(userDetails?.systemRole)
-    ) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <Hamburger />,
-            handler: () => {}
-          }
-        ],
-        mobileRight: [
-          {
-            icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
-            handler: () => {
-              if (locationId) {
-                return goToCreateNewUserWithLocationId(locationId)
+          ],
+          mobileRight: [
+            {
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
+              handler: changeTeamLocation
+            },
+            {
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
+              handler: () => {
+                if (locationId) {
+                  goToCreateNewUserWithLocationId(locationId)
+                } else {
+                  goToCreateNewUser()
+                }
               }
-              goToCreateNewUser()
             }
-          }
-        ]
+          ]
+        }
+      } else if (scopes?.includes('user.create')) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => (
+                <Icon name="UserPlus" size="medium" color="primary" />
+              ),
+              handler: () => {
+                if (locationId) {
+                  goToCreateNewUserWithLocationId(locationId)
+                } else {
+                  goToCreateNewUser()
+                }
+              }
+            }
+          ]
+        }
+      } else {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ]
+        }
       }
-    }
-    if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+    } else if (!hasSearch()) {
       return {
         mobileLeft: [
           {
@@ -233,50 +245,39 @@ export const HeaderComponent = (props: IFullProps) => {
           }
         ]
       }
-    }
-    if (
-      userDetails?.systemRole &&
-      USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
-    ) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <Hamburger />,
-            handler: () => {}
-          }
-        ]
-      }
-    }
-    if (mobileSearchBar) {
-      return {
-        mobileLeft: [
-          {
-            icon: () => <HistoryNavigator hideForward />,
-            handler: () => {}
-          }
-        ],
-        mobileBody: renderSearchInput(props, true)
-      }
-    }
-    return {
-      mobileLeft: [
-        {
-          icon: () => <Hamburger />,
-          handler: () => {}
+    } else {
+      if (mobileSearchBar) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <HistoryNavigator hideForward />,
+              handler: () => {}
+            }
+          ],
+          mobileBody: renderSearchInput(props, true)
         }
-      ],
-      mobileRight: [
-        {
-          icon: () => (
-            <Icon name="MagnifyingGlass" size="medium" color="primary" />
-          ),
-          handler: () => goToSearch()
+      } else {
+        return {
+          mobileLeft: [
+            {
+              icon: () => <Hamburger />,
+              handler: () => {}
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => (
+                <Icon name="MagnifyingGlass" size="medium" color="primary" />
+              ),
+              handler: goToSearch
+            }
+          ]
         }
-      ]
+      }
     }
   }
 
-  const renderSearchInput = (props: IFullProps, isMobile?: boolean) => {
+  function renderSearchInput(props: IFullProps, isMobile?: boolean) {
     const { intl, searchText, selectedSearchType, language, fieldNames } = props
 
     const searchTypeList: ISearchType[] = [
@@ -350,18 +351,15 @@ export const HeaderComponent = (props: IFullProps) => {
           selectedSearchType ?? offlineData.config.SEARCH_DEFAULT_CRITERIA
         }
         searchTypeList={searchTypeList}
-        navigationList={
-          FIELD_AGENT_ROLES.includes(userDetails?.systemRole as string)
-            ? undefined
-            : navigationList
-        }
+        // @TODO: How to hide the navigation list from field agents? Ask JPF
+        navigationList={navigationList}
         searchHandler={(text, type) => goToSearchResult(text, type, isMobile)}
       />
     )
   }
 
-  const headerTitle =
-    title ||
+  const title =
+    props.title ||
     intl.formatMessage(
       activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
         ? constantsMessages.performanceTitle
@@ -388,10 +386,7 @@ export const HeaderComponent = (props: IFullProps) => {
     {
       element: (
         <>
-          {!(
-            userDetails?.systemRole &&
-            USERS_WITHOUT_SEARCH.includes(userDetails?.systemRole)
-          ) && (
+          {hasSearch() && (
             <HeaderCenter>
               <Button
                 type="iconPrimary"
@@ -418,11 +413,7 @@ export const HeaderComponent = (props: IFullProps) => {
     }
   ]
 
-  if (
-    activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS &&
-    (NATL_ADMIN_ROLES.includes(userDetails?.systemRole as string) ||
-      SYS_ADMIN_ROLES.includes(userDetails?.systemRole as string))
-  ) {
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !hasSearch()) {
     rightMenu = [
       {
         element: <HistoryNavigator />
@@ -445,7 +436,7 @@ export const HeaderComponent = (props: IFullProps) => {
       id="register_app_header"
       desktopRightMenu={rightMenu}
       className={className}
-      title={headerTitle}
+      title={title}
       {...mobileHeaderActionPropsWithDefaults}
     />
   )
@@ -471,7 +462,7 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
-    userDetails: getUserDetails(store),
+    scopes: getScope(store),
     offlineData: getOfflineData(store),
     fieldNames: Object.values(getRegisterForm(store))
       .flatMap((form) => form.sections)

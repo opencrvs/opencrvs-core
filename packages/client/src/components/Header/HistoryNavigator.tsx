@@ -11,21 +11,10 @@
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { useHistory } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import {
-  FIELD_AGENT_ROLES,
-  NATL_ADMIN_ROLES,
-  REGISTRAR_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
-import {
-  HOME,
-  PERFORMANCE_HOME,
-  REGISTRAR_HOME
-} from '@client/navigation/routes'
+import { useDispatch } from 'react-redux'
 import { goBack, goForward } from '@client/navigation'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { useHomePage } from '@client/hooks/useHomePage'
 
 export function HistoryNavigator({
   hideForward = false
@@ -34,24 +23,8 @@ export function HistoryNavigator({
 }) {
   const history = useHistory()
   const dispatch = useDispatch()
-  const userDetails = useSelector(getUserDetails)
-  const role = userDetails && userDetails.systemRole
-  const location = history.location.pathname
-  const isLandingPage = () => {
-    if (
-      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
-      (NATL_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
-      (SYS_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
-      (REGISTRAR_ROLES.includes(role as string) &&
-        REGISTRAR_HOME.includes(location))
-    ) {
-      return true
-    } else {
-      return false
-    }
-  }
+  const { isCurrentPageHome } = useHomePage()
+
   return (
     <div>
       <Button
@@ -60,7 +33,7 @@ export function HistoryNavigator({
         size="medium"
         disabled={
           (history.action === 'POP' || history.action === 'REPLACE') &&
-          isLandingPage()
+          isCurrentPageHome
         }
         onClick={() => dispatch(goBack())}
       >

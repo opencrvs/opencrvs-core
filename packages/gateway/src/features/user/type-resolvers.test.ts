@@ -52,22 +52,15 @@ describe('User type resolvers', () => {
     mobile: '+8801711111111',
     email: 'test@test.org',
     identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
-    systemRole: 'REGISTRATION_AGENT',
-    scope: ['certify'],
+    scope: ['certify', 'profile.electronic-signature'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
     primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
     creationDate: '1559054406433',
-    role: {
-      labels: [
-        {
-          lang: 'en',
-          label: 'MAYOR'
-        }
-      ]
-    },
+    role: 'REGISTRATION_AGENT',
     device: ''
   }
+
   it('return id type', () => {
     const res = userTypeResolvers.User!.id(mockResponse)
     expect(res).toEqual('ba7022f0ff4822')
@@ -230,6 +223,7 @@ describe('User type resolvers', () => {
       'http://minio.farajaland-dev.opencrvs.org/ocrvs/cbf7c3cd-1b59-40b0-b8f9-2cd1310fe85b.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240726%2Flocal%2Fs3%2Faws4_request&X-Amz-Date=20240726T094242Z&X-Amz-Expires=259200&X-Amz-SignedHeaders=host&X-Amz-Signature=2eb6a0cdfb9d25f347771b3f10cba442946d09de035f3294d8edec49e09ec1a6'
 
     const practitioner = {
+      // role: 'REGISTRATION_AGENT',
       resourceType: 'Practitioner',
       extension: [
         {

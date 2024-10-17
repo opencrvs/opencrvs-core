@@ -23,8 +23,10 @@ import {
 } from '@auth/features/verifyCode/service'
 import { logger } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
-import { chainW, tryCatch } from 'fp-ts/Either'
-import { pipe } from 'fp-ts/function'
+import * as F from 'fp-ts'
+import { Scope } from '@opencrvs/commons/authentication'
+const { chainW, tryCatch } = F.either
+const { pipe } = F.function
 import { env } from '@auth/environment'
 
 const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
@@ -46,14 +48,14 @@ export interface IAuthentication {
   mobile?: string
   userId: string
   status: string
-  scope: string[]
   email?: string
+  role: string
 }
 
 export interface ISystemAuthentication {
   systemId: string
   status: string
-  scope: string[]
+  scope: Scope[]
 }
 
 export class UserInfoNotFoundError extends Error {}
@@ -77,11 +79,13 @@ export async function authenticate(
   if (res.status !== 200) {
     throw Error(res.statusText)
   }
+
   const body = await res.json()
+
   return {
     name: body.name,
     userId: body.id,
-    scope: body.scope,
+    role: body.role,
     status: body.status,
     mobile: body.mobile,
     email: body.email
@@ -119,9 +123,6 @@ export async function createToken(
   issuer: string,
   temporary?: boolean
 ): Promise<string> {
-  if (typeof userId === undefined) {
-    throw new Error('Invalid userId found for token creation')
-  }
   return sign({ scope }, cert, {
     subject: userId,
     algorithm: 'RS256',
@@ -165,12 +166,7 @@ export async function generateAndSendVerificationCode(
   email?: string
 ) {
   const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
-  logger.info(
-    `isDemoUser,
-      ${JSON.stringify({
-        isDemoUser: isDemoUser
-      })}`
-  )
+  logger.info(`Is demo user: ${isDemoUser}. Scopes: ${scope.join(', ')}`)
   let verificationCode
   if (isDemoUser) {
     verificationCode = '000000'

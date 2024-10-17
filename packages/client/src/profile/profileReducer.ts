@@ -193,10 +193,11 @@ export const profileReducer: LoopReducer<
       const userDetailsCollection: UserDetails | null = JSON.parse(
         userDetailsString ? userDetailsString : 'null'
       )
-      // if the user detail cannot be found or they don't match the user specified in the token
+      // if the user detail cannot be found or they don't match the user specified in the token or the user has deprecated systemRole
       if (
         state.tokenPayload &&
         (!userDetailsCollection ||
+          'systemRole' in userDetailsCollection ||
           userDetailsCollection.userMgntUserID !== state.tokenPayload.sub)
       ) {
         return loop(
