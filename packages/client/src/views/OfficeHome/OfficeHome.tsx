@@ -56,7 +56,8 @@ import { ArrayElement } from '@client/SubmissionController'
 import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { Event } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -425,13 +426,24 @@ class OfficeHomeView extends React.Component<
           rejectTab
         )}
 
-        <FABContainer>
-          <FloatingActionButton
-            id="new_event_declaration"
-            onClick={this.props.goToEvents}
-            icon={() => <PlusTransparentWhite />}
-          />
-        </FABContainer>
+        <ProtectedComponent
+          scopes={[
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+            SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+            SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+          ]}
+        >
+          <FABContainer>
+            <FloatingActionButton
+              id="new_event_declaration"
+              onClick={this.props.goToEvents}
+              icon={() => <PlusTransparentWhite />}
+            />
+          </FABContainer>
+        </ProtectedComponent>
 
         {this.state.showCertificateToast && (
           <Toast

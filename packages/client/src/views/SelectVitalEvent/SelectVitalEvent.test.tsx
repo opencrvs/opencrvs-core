@@ -126,11 +126,11 @@ describe('when user is selecting the vital event', () => {
       [[SCOPES.RECORD_DECLARE_BIRTH, SCOPES.RECORD_DECLARE_MARRIAGE], false]
     ]
 
-    tests.forEach(([scopes, length]) => {
+    tests.forEach(([scopes, exists]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
         await waitForElement(app, '#select_vital_event_view')
-        expect(app.exists('#select_death_event')).toBe(length)
+        expect(app.exists('#select_death_event')).toBe(exists)
       })
     })
   })
@@ -146,11 +146,11 @@ describe('when user is selecting the vital event', () => {
       [[SCOPES.RECORD_DECLARE_BIRTH, SCOPES.RECORD_DECLARE_DEATH], false]
     ]
 
-    tests.forEach(([scopes, length]) => {
+    tests.forEach(([scopes, exists]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
         await waitForElement(app, '#select_vital_event_view')
-        expect(app.exists('#select_marriage_event')).toBe(length)
+        expect(app.exists('#select_marriage_event')).toBe(exists)
       })
     })
   })
