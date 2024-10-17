@@ -114,7 +114,7 @@ describe('Workflow status tests', () => {
                 },
                 {
                   id: 'd78d29a1-8521-4582-9f4e-902907ca369a',
-                  type: 'Birth',
+                  type: Event.Birth,
                   name: [
                     {
                       use: 'en',
@@ -168,7 +168,7 @@ describe('Workflow status tests', () => {
                 },
                 {
                   id: '8a1d92b8-18a6-4074-83fb-cc57134e6dbf',
-                  type: 'Birth',
+                  type: Event.Birth,
                   name: [
                     {
                       use: 'en',

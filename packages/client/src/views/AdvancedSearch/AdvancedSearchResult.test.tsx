@@ -54,7 +54,7 @@ const graphqlMock = [
           results: [
             {
               id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-              type: 'Death',
+              type: Event.Death,
               __typename: 'X',
               registration: {
                 __typename: 'X',

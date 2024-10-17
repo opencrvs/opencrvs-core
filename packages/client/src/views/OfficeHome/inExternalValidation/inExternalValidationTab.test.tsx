@@ -42,7 +42,7 @@ const getItem = window.localStorage.getItem as Mock
 
 const birthEventSearchSet: GQLBirthEventSearchSet = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-  type: 'Birth',
+  type: Event.Birth,
   registration: {
     status: 'WAITING_VALIDATION',
     contactNumber: '01622688231',
