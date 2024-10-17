@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
+import {
+  DEFAULT_ROLES_DEFINITION,
+  Scope
+} from '@opencrvs/commons/authentication'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 
@@ -78,12 +81,11 @@ describe('authenticate handler receives a request', () => {
         'user.create',
         'user.read:all',
         'user.update',
-        'organisation.read',
-        'organisation.read-locations',
+        'organisation.read-locations:all',
         'performance.read',
         'performance.read-dashboards',
         'performance.export-vital-statistics'
-      ])
+      ] satisfies Scope[])
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {

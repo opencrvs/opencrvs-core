@@ -331,13 +331,12 @@ const NavigationView = (props: IFullProps) => {
   const hasOutbox = !hasAnyScope(['sysadmin', 'natlsysadmin'])
 
   const hasAnyOrganisation = hasAnyScope([
-    'organisation.read',
-    'organisation.read-locations',
+    'organisation.read-locations:all',
+    'organisation.read-locations:my-jurisdiction',
     'organisation.read-locations:my-office'
   ])
-  const hasOrganisation = hasScope('organisation.read')
   const hasOrganisationTeam = hasAnyScope([
-    'organisation.read-locations',
+    'organisation.read-locations:all',
     'organisation.read-locations:my-office'
   ])
 
@@ -513,7 +512,11 @@ const NavigationView = (props: IFullProps) => {
         </NavigationGroup>
       </>
 
-      {hasAnyOrganisation && (
+      {(hasAnyOrganisation ||
+        hasOrganisationTeam ||
+        hasPerformance ||
+        hasSystemsConfig ||
+        hasEmailAllUsers) && (
         <NavigationGroup>
           {hasPerformance && userDetails && (
             <NavigationItem
@@ -531,7 +534,7 @@ const NavigationView = (props: IFullProps) => {
               }
             />
           )}
-          {hasOrganisation && userDetails && (
+          {hasAnyOrganisation && userDetails && (
             <NavigationItem
               icon={() => <Icon name="Buildings" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.organisation}`}

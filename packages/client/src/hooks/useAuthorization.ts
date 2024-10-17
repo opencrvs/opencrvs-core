@@ -42,7 +42,7 @@ export function usePermissions() {
   }
 
   const canReadOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope('organisation.read-locations')) return true
+    if (hasScope('organisation.read-locations:all')) return true
     if (hasScope('organisation.read-locations:my-office'))
       return office.id === userPrimaryOffice?.id
 

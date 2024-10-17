@@ -94,9 +94,9 @@ export const scopes = [
   'performance.export-vital-statistics',
 
   // organisation
-  'organisation.read',
+  'organisation.read-locations:all',
+  'organisation.read-locations:my-jurisdiction',
   'organisation.read-locations:my-office',
-  'organisation.read-locations',
 
   // user
   'user.read:all',
