@@ -26,13 +26,12 @@ export const ProtectedRoute: React.FC<IProps> = ({ scopes = [], ...rest }) => {
   const userDetailsFetched = useSelector(
     (state: IStoreState) => state.profile.userDetailsFetched
   )
-  const { hasScopes } = usePermissions()
+  const { hasAnyScope } = usePermissions()
 
   if (!authenticated && !userDetailsFetched) {
     return <div />
   }
-
-  if (!hasScopes(scopes)) {
+  if (!hasAnyScope(scopes)) {
     return <Redirect to={HOME} />
   }
 
