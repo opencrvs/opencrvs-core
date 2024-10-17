@@ -11,7 +11,6 @@
 
 import { UUID, logger } from '@opencrvs/commons'
 import {
-  Bundle,
   Composition,
   Patient,
   Practitioner,
@@ -25,7 +24,6 @@ import {
   resourceIdentifierToUUID,
   SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
-import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -33,36 +31,10 @@ import {
 import { getSectionEntryBySectionCode } from '@workflow/features/registration/fhir/fhir-template'
 import {
   fetchExistingRegStatusCode,
-  getFromFhir,
-  getRegStatusCode,
-  updateResourceInHearth
+  getRegStatusCode
 } from '@workflow/features/registration/fhir/fhir-utils'
-import { getMosipUINToken } from '@workflow/features/registration/utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
-import fetch from 'node-fetch'
-
-export async function invokeRegistrationValidation(
-  bundle: Saved<Bundle>,
-  headers: Record<string, string>
-): Promise<Bundle> {
-  const res = await fetch(
-    new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
-    {
-      method: 'POST',
-      body: JSON.stringify(bundle),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    }
-  )
-  if (!res.ok) {
-    const errorData = await res.json()
-    throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
-  }
-  return bundle
-}
 
 export async function setupRegistrationWorkflow(
   taskResource: Task,
@@ -204,167 +176,4 @@ export function updatePatientIdentifierWithRN(
     }
     return patient
   })
-}
-
-interface Integration {
-  name: string
-  status: string
-  integratingSystemType: 'MOSIP' | 'OTHER'
-}
-
-const statuses = {
-  PENDING: 'pending',
-  ACTIVE: 'active',
-  DISABLED: 'disabled',
-  DEACTIVATED: 'deactivated'
-}
-
-export async function validateDeceasedDetails(
-  patient: Saved<Patient>,
-  authHeader: { Authorization: string }
-): Promise<Saved<Patient>> {
-  /*
-    In OCRVS-1637 https://github.com/opencrvs/opencrvs-core/pull/964 we attempted to create a longitudinal
-    record of life events by an attempt to use an existing person in gateway if an identifier is supplied that we already
-    have a record of in our system, rather than creating a new patient every time.
-
-    However this supplied identifier cannot be trusted. This could lead to links between persons being abused or the wrong indivdual
-    being marked as deceased.
-
-    Any external identifier must be justifiably verified as authentic by a National ID system such as MOSIP or equivalent
-  */
-
-  const configResponse: Integration[] | undefined = await fetch(
-    `${APPLICATION_CONFIG_URL}integrationConfig`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
-    }
-  )
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Config request failed: ${error.message}`)
-      )
-    })
-  logger.info('validateDeceasedDetails response successful')
-  if (configResponse?.length) {
-    const mosipIntegration = configResponse.filter((integration) => {
-      return integration.integratingSystemType === 'MOSIP'
-    })[0]
-    if (mosipIntegration && mosipIntegration.status === statuses.ACTIVE) {
-      logger.info('validateDeceasedDetails: MOSIP ENABLED')
-      try {
-        const mosipTokenSeederResponse = await getMosipUINToken(patient)
-        logger.info(`MOSIP responded successfully`)
-        if (
-          (mosipTokenSeederResponse.errors &&
-            mosipTokenSeederResponse.errors.length) ||
-          !mosipTokenSeederResponse.response.authToken
-        ) {
-          logger.info(
-            `MOSIP token request failed with errors: ${JSON.stringify(
-              mosipTokenSeederResponse.errors
-            )}`
-          )
-        } else if (mosipTokenSeederResponse.response.authStatus === false) {
-          logger.info(
-            `MOSIP token request failed with false authStatus: ${JSON.stringify(
-              mosipTokenSeederResponse.errors
-            )}`
-          )
-        } else {
-          const birthPatientBundle: Bundle = await getFromFhir(
-            `/Patient?identifier=${mosipTokenSeederResponse.response.authToken}`
-          )
-          logger.info(
-            `Patient bundle returned by MOSIP Token Seeder search. Bundle id: ${birthPatientBundle.id}`
-          )
-          let birthPatient: Partial<Patient> & Pick<Patient, 'resourceType'> = {
-            resourceType: 'Patient'
-          }
-          if (
-            birthPatientBundle &&
-            birthPatientBundle.entry &&
-            birthPatientBundle.entry.length
-          ) {
-            birthPatientBundle.entry.forEach((entry) => {
-              const bundlePatient = entry.resource as Patient
-              const selectedIdentifier = bundlePatient.identifier?.filter(
-                (identifier) => {
-                  return (
-                    identifier.type?.coding?.[0].code ===
-                      'MOSIP_PSUT_TOKEN_ID' &&
-                    identifier.value ===
-                      mosipTokenSeederResponse.response.authToken
-                  )
-                }
-              )[0]
-              if (selectedIdentifier) {
-                birthPatient = bundlePatient
-              }
-            })
-          }
-          logger.info(`birthPatient id: ${JSON.stringify(birthPatient.id)}`)
-          if (
-            birthPatient &&
-            birthPatient.identifier &&
-            birthPatient.resourceType
-          ) {
-            // If existing patient can be found
-            // mark existing OpenCRVS birth patient as deceased with link to this patient
-            // Keep both Patient copies as a history of name at birth, may not be that recorde for name at death etc ...
-            // One should not overwrite the other
-            birthPatient.deceasedBoolean = true
-            birthPatient.identifier.push({
-              type: {
-                coding: [
-                  {
-                    system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
-                    code: 'DECEASED_PATIENT_ENTRY'
-                  }
-                ]
-              },
-              value: patient.id
-            })
-
-            await updateResourceInHearth(birthPatient)
-            // mark patient with link to the birth patient
-            patient.identifier?.push({
-              type: {
-                coding: [
-                  {
-                    system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
-                    code: 'BIRTH_PATIENT_ENTRY'
-                  }
-                ]
-              },
-              value: birthPatient.id!
-            })
-          }
-        }
-      } catch (err) {
-        logger.info(`MOSIP token seeder request failed: ${JSON.stringify(err)}`)
-      }
-    }
-  } else {
-    // mosip not enabled
-    /*
-      TODO: Any internal OpenCRVS identifier (BRN) must be justifiably verified as authentic.
-
-      If the form is enabled to submit a BRN in deceased form ...
-      OpenCRVS needs a robust MOSIP-like verification model on the BRN
-      We have to validate the bundle carefully against internal checks to find a legitimate birth patient.
-
-      Ensure patient has link to the birth record if it exists.
-
-    */
-    //
-  }
-  return patient
 }

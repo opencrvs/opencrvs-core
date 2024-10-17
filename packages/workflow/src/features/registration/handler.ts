@@ -23,9 +23,8 @@ import { invokeWebhooks } from '@workflow/records/webhooks'
 import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 
 export interface EventRegistrationPayload {
-  trackingId: string
   registrationNumber: string
-  error: string
+  error?: string
   compositionId: string
   childIdentifiers?: {
     type: SupportedPatientIdentifierCode
@@ -52,11 +51,11 @@ export async function markEventAsRegisteredCallbackHandler(
     true
   )
   if (!savedRecord) {
+    // @TODO: This should not ever happen? Also; it's not ElasticSearch we're actually searching.
     throw new Error('Could not find record in elastic search!')
   }
 
   const bundle = await toRegistered(
-    request,
     savedRecord,
     registrationNumber,
     token,

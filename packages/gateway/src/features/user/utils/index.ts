@@ -115,6 +115,15 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   return decoded
 }
 
+export const hasRecordAccess = (authHeader: IAuthHeader, recordId: string) => {
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
+  // @TODO: Implement this
+  console.log(tokenPayload, recordId)
+
+  return true
+}
+
 export const getUserId = (authHeader: IAuthHeader): string => {
   if (!authHeader || !authHeader.Authorization) {
     throw new Error(`getUserId: Error occurred during token decode`)
