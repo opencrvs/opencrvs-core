@@ -37,7 +37,6 @@ const mockUser = {
     }
   ],
   username: 'jw.doe',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
@@ -193,7 +192,6 @@ describe('updateUser handler', () => {
             family: 'Doe'
           }
         ],
-        identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'REGISTRATION_AGENT',
@@ -237,7 +235,6 @@ describe('updateUser handler', () => {
             family: 'Doe'
           }
         ],
-        identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123111111',
         systemRole: 'FIELD_AGENT',
@@ -352,7 +349,6 @@ describe('updateUser handler', () => {
             family: 'Doe'
           }
         ],
-        identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         systemRole: 'FIELD_AGENT',
