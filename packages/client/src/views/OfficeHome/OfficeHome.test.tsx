@@ -29,6 +29,7 @@ import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './inProgress/InProgress'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
+import { Scope, SCOPES, scopes } from '@client/utils/gateway'
 
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
@@ -535,6 +536,53 @@ describe('OfficeHome related tests', () => {
       })
       testComponent.update()
       await waitForElement(testComponent, '#search-result-error-text-count')
+    })
+  })
+
+  describe('new event button should be visible when the user has the correct scopes', () => {
+    const build = async () =>
+      await createTestComponent(
+        <OfficeHome
+          match={{
+            params: { tabId: WORKQUEUE_TABS.inProgress },
+            isExact: true,
+            path: '',
+            url: ''
+          }}
+          history={history}
+          location={history.location}
+        />,
+        { store, history, apolloClient: client }
+      )
+
+    const requiredScopes = [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+    ] as Scope[]
+
+    const allOtherScopes = scopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [[requiredScopes[0]], true],
+      [[requiredScopes[1]], true],
+      [[requiredScopes[2]], true],
+      [[requiredScopes[3]], true],
+      [[requiredScopes[4]], true],
+      [[requiredScopes[5]], true],
+      [allOtherScopes, false]
+    ]
+    tests.forEach(([scopes, visible]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        const testComponent = await build()
+
+        expect(testComponent.exists('#new_event_declaration')).toBe(visible)
+      })
     })
   })
 })
