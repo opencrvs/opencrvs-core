@@ -20,7 +20,7 @@ import { VerifyCorrector } from './VerifyCorrector'
 import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
 
 describe('verify corrector tests', () => {

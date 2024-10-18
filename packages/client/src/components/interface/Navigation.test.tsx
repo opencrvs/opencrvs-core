@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
@@ -353,6 +351,28 @@ describe('Given a user with scopes views Navigation', () => {
     const id = `#navigation_${WORKQUEUE_TABS.readyForReview}`
 
     const requiredScopes = ['record.declaration-review']
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Ready to print', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.readyToPrint}`
+
+    const requiredScopes = ['record.print-issue-certified-copies']
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)

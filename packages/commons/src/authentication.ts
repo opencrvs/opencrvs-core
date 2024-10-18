@@ -12,21 +12,21 @@
 import { IAuthHeader } from './http'
 import * as decode from 'jwt-decode'
 
-import { Scope } from './scopes'
-export { scopes, Scope } from './scopes'
+import { Scope, SCOPES } from './scopes'
+export { scopes, Scope, SCOPES } from './scopes'
 
 /** All the scopes system/integration can be assigned to */
 export const SYSTEM_INTEGRATION_SCOPES = {
-  recordsearch: 'recordsearch',
-  declare: 'declare',
-  webhook: 'webhook',
-  nationalId: 'nationalId'
+  recordsearch: SCOPES.RECORDSEARCH,
+  declare: SCOPES.DECLARE,
+  webhook: SCOPES.WEBHOOK,
+  nationalId: SCOPES.NATIONALID
 } as const
 
 export const SUPER_ADMIN_SCOPES = [
-  'natlsysadmin',
-  'bypassratelimit',
-  'sysadmin'
+  SCOPES.NATLSYSADMIN,
+  SCOPES.BYPASSRATELIMIT,
+  SCOPES.SYSADMIN
 ] satisfies Scope[]
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -39,20 +39,20 @@ export const DEFAULT_ROLES_DEFINITION = [
     },
     scopes: [
       // old scope for bw compability
-      'declare',
+      SCOPES.DECLARE,
 
       // new scopes
-      'record.declare-birth',
-      'record.declare-death',
-      'record.declare-marriage',
-      'record.submit-incomplete',
-      'record.submit-for-review',
-      'search.birth',
-      'search.death',
-      'search.marriage',
-      'record.read',
-      'record.read-audit',
-      'record.read-comments'
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE,
+      SCOPES.RECORD_READ,
+      SCOPES.RECORD_READ_AUDIT,
+      SCOPES.RECORD_READ_COMMENTS
     ]
   },
   {
@@ -63,35 +63,34 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.registrationAgent'
     },
     scopes: [
-      'validate',
-      'performance',
-      'certify',
-
-      'record.declare-birth',
-      'record.declare-death',
-      'record.declare-marriage',
-      'record.declaration-review',
-      'record.submit-for-approval',
-      'record.submit-for-updates',
-      'record.declaration-archive',
-      'record.declaration-reinstate',
-      'record.registration-request-correction',
-      'record.print-records',
-      'record.print-records-supporting-documents',
-      'record.export-records',
-      'record.print-issue-certified-copies',
-      'record.registration-verify-certified-copies',
-      'record.create-comments',
-      'performance.read',
-      'performance.read-dashboards',
-      'organisation.read',
-      'organisation.read-locations:my-office',
-      'search.birth',
-      'search.death',
-      'search.marriage',
-      'record.read',
-      'record.read-audit',
-      'record.read-comments'
+      SCOPES.VALIDATE,
+      SCOPES.PERFORMANCE,
+      SCOPES.CERTIFY,
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARATION_REVIEW,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_DECLARATION_ARCHIVE,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+      SCOPES.RECORD_PRINT_RECORDS,
+      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+      SCOPES.RECORD_EXPORT_RECORDS,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+      SCOPES.RECORD_CREATE_COMMENTS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.ORGANISATION_READ,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE,
+      SCOPES.RECORD_READ,
+      SCOPES.RECORD_READ_AUDIT,
+      SCOPES.RECORD_READ_COMMENTS
     ]
   },
   {
@@ -102,36 +101,35 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      'register',
-      'performance',
-      'certify',
-
-      'record.declare-birth',
-      'record.declare-death',
-      'record.declare-marriage',
-      'record.declaration-review',
-      'record.submit-for-updates',
-      'record.review-duplicates',
-      'record.declaration-archive',
-      'record.declaration-reinstate',
-      'record.register',
-      'record.registration-correct',
-      'record.print-records',
-      'record.print-records-supporting-documents',
-      'record.export-records',
-      'record.print-issue-certified-copies',
-      'record.registration-verify-certified-copies',
-      'record.create-comments',
-      'performance.read',
-      'performance.read-dashboards',
-      'organisation.read',
-      'organisation.read-locations:my-office',
-      'search.birth',
-      'search.death',
-      'search.marriage',
-      'record.read',
-      'record.read-audit',
-      'record.read-comments'
+      SCOPES.REGISTER,
+      SCOPES.PERFORMANCE,
+      SCOPES.CERTIFY,
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARATION_REVIEW,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REVIEW_DUPLICATES,
+      SCOPES.RECORD_DECLARATION_ARCHIVE,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_PRINT_RECORDS,
+      SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+      SCOPES.RECORD_EXPORT_RECORDS,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+      SCOPES.RECORD_CREATE_COMMENTS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.ORGANISATION_READ,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE,
+      SCOPES.RECORD_READ,
+      SCOPES.RECORD_READ_AUDIT,
+      SCOPES.RECORD_READ_COMMENTS
     ]
   },
   {
@@ -142,17 +140,16 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localSystemAdmin'
     },
     scopes: [
-      'sysadmin',
-
-      'user.read:my-office',
-      'user.create:my-jurisdiction',
-      'user.update:my-office',
-      'organisation.read',
-      'organisation.read-locations',
+      SCOPES.SYSADMIN,
+      SCOPES.USER_READ_MY_OFFICE,
+      SCOPES.USER_CREATE_MY_JURISDICTION,
+      SCOPES.USER_UPDATE_MY_OFFICE,
+      SCOPES.ORGANISATION_READ,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
       // 'organisation.read-users' ?
-      'performance.read',
-      'performance.read-dashboards',
-      'performance.export-vital-statistics'
     ]
   },
   {
@@ -163,18 +160,17 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.nationalSystemAdmin'
     },
     scopes: [
-      'sysadmin',
-      'natlsysadmin',
-
-      'user.create',
-      'user.read',
-      'user.update',
-      'organisation.read',
-      'organisation.read-locations',
+      SCOPES.SYSADMIN,
+      SCOPES.NATLSYSADMIN,
+      SCOPES.USER_CREATE,
+      SCOPES.USER_READ,
+      SCOPES.USER_UPDATE,
+      SCOPES.ORGANISATION_READ,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
       // 'organisation.read-users' ?
-      'performance.read',
-      'performance.read-dashboards',
-      'performance.export-vital-statistics'
     ]
   },
   {
@@ -185,10 +181,10 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.performanceManager'
     },
     scopes: [
-      'performance',
-      'performance.read',
-      'performance.read-dashboards',
-      'performance.export-vital-statistics'
+      SCOPES.PERFORMANCE,
+      SCOPES.PERFORMANCE_READ,
+      SCOPES.PERFORMANCE_READ_DASHBOARDS,
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
     ]
   }
 ] satisfies Array<{
@@ -198,10 +194,10 @@ export const DEFAULT_ROLES_DEFINITION = [
 }>
 
 export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
-  HEALTH: ['declare', 'notification-api'],
-  NATIONAL_ID: ['nationalId'],
-  RECORD_SEARCH: ['recordsearch'],
-  WEBHOOK: ['webhook']
+  HEALTH: [SCOPES.DECLARE, SCOPES.NOTIFICATION_API],
+  NATIONAL_ID: [SCOPES.NATIONALID],
+  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
+  WEBHOOK: [SCOPES.WEBHOOK]
 } satisfies Record<string, Scope[]>
 
 /*
@@ -209,24 +205,24 @@ export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-export const SCOPES = {
-  demo: 'demo',
-  declare: 'declare',
-  register: 'register',
-  certify: 'certify',
-  performance: 'performance',
-  systemAdmin: 'sysadmin',
-  validate: 'validate',
-  nationalSystemAdmin: 'natlsysadmin',
+export const LEGACY_SCOPES = {
+  demo: SCOPES.DEMO,
+  declare: SCOPES.DECLARE,
+  register: SCOPES.REGISTER,
+  certify: SCOPES.CERTIFY,
+  performance: SCOPES.PERFORMANCE,
+  systemAdmin: SCOPES.SYSADMIN,
+  validate: SCOPES.VALIDATE,
+  nationalSystemAdmin: SCOPES.NATLSYSADMIN,
   /** Bypasses the rate limiting in gateway. Useful for data seeder. */
-  bypassRateLimit: 'bypassratelimit',
-  teams: 'teams',
-  config: 'config'
+  bypassRateLimit: SCOPES.BYPASSRATELIMIT,
+  teams: SCOPES.TEAMS,
+  config: SCOPES.CONFIG
 } as const
 
 /** All the scopes user can be assigned to – old & new */
 export type UserScope =
-  | (typeof SCOPES)[keyof typeof SCOPES]
+  | (typeof LEGACY_SCOPES)[keyof typeof LEGACY_SCOPES]
   | 'profile.electronic-signature'
 
 export type SystemScope =

@@ -28,7 +28,7 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { goToHomeTab, goBack } from '@client/navigation'
 import { useModal } from '@client/hooks/useModal'
 
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import styled from 'styled-components'
 import { constantsMessages } from '@client/i18n/messages'
 import { usePrintableCertificate } from './usePrintableCertificate'

@@ -24,7 +24,8 @@ import {
   Event,
   History,
   Query,
-  RegStatus
+  RegStatus,
+  SCOPES
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
@@ -1057,7 +1058,7 @@ function requestWithStateWrapper(
     try {
       const data = await mainRequest
       const scopes = getScope(getState())
-      if (scopes?.includes('record.review-duplicates')) {
+      if (scopes?.includes(SCOPES.RECORD_REVIEW_DUPLICATES)) {
         await fetchAllDuplicateDeclarations(data.data)
       }
       const duplicateDeclarations = await fetchAllDuplicateDeclarations(

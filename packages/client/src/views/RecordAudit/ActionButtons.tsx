@@ -43,6 +43,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import { useDispatch } from 'react-redux'
 import { Button } from '@client/../../components/src/Button'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { SCOPES } from '@client/utils/gateway'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -73,12 +74,12 @@ export const ShowDownloadButton = ({
   const downloadStatus = draft?.downloadStatus || undefined
   let refetchQueries: InternalRefetchQueriesInclude = []
   if (
-    !hasScope('record.register') &&
+    !hasScope(SCOPES.RECORD_REGISTER) &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
 
-  if (declaration.assignment && hasScope('record.register')) {
+  if (declaration.assignment && hasScope(SCOPES.RECORD_REGISTER)) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
     ]
@@ -117,7 +118,7 @@ export const ShowUpdateButton = ({
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
   // @TODO: Here in "ShowUpdateButton", is submit-for-updates correct?
-  const showActionButton = hasScope('record.submit-for-updates')
+  const showActionButton = hasScope(SCOPES.RECORD_SUBMIT_FOR_UPDATES)
 
   if (!showActionButton && !isDownloaded) {
     return <></>
@@ -178,7 +179,7 @@ export const ShowPrintButton = ({
   const { id, type } = declaration || {}
   const { hasScope } = usePermissions()
 
-  const showActionButton = hasScope('record.print-records')
+  const showActionButton = hasScope(SCOPES.RECORD_PRINT_RECORDS)
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -224,7 +225,7 @@ export const ShowIssueButton = ({
   const dispatch = useDispatch()
   const { hasScope } = usePermissions()
   const { id, type } = declaration || {}
-  const showActionButton = hasScope('record.print-issue-certified-copies')
+  const showActionButton = hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
@@ -272,7 +273,7 @@ export const ShowReviewButton = ({
   const { hasScope } = usePermissions()
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-  const showActionButton = hasScope('record.declaration-review')
+  const showActionButton = hasScope(SCOPES.RECORD_DECLARATION_REVIEW)
 
   if (type && showActionButton) {
     if (!isDownloaded) {

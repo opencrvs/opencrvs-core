@@ -10,8 +10,7 @@
  */
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchJSON, joinURL } from '@opencrvs/commons'
-import { Roles } from '@opencrvs/commons'
+import { fetchJSON, joinURL, Roles } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {

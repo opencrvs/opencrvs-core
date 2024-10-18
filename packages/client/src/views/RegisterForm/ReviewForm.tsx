@@ -31,7 +31,7 @@ import {
 } from '@client/navigation/routes'
 import { errorMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 interface IReviewProps {
   theme: ITheme
