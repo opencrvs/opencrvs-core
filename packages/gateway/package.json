@@ -81,7 +81,7 @@
     "@types/jsonwebtoken": "^9.0.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
-    "@types/node": "18.11.18",
+    "@types/node": "20.16.13",
     "@types/node-fetch": "^2.5.12",
     "@types/redis": "^2.8.6",
     "@types/uuid": "^3.4.3",

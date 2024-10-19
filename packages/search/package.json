@@ -51,7 +51,7 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.149",
     "@types/node-fetch": "^2.5.12",
-    "@types/node": "18.11.18",
+    "@types/node": "20.16.13",
     "@types/uuid": "^3.4.4",
     "cross-env": "^7.0.0",
     "jest": "27.5.1",
