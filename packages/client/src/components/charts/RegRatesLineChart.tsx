@@ -133,20 +133,6 @@ function LegendDot(props: React.HTMLAttributes<SVGElement>) {
 
 const RegRatesLineChartComponent = (props: IProps) => {
   const { theme, data, intl, eventType, completenessRateTime } = props
-  const [state, setState] = useState<IState>(() => ({
-    ...getStatePropertiesForChart(),
-    ...getLatestData()
-  }))
-  const {
-    chartTop,
-    chartRight,
-    chartBottom,
-    chartLeft,
-    maximizeXAxisInterval,
-    legendLayout,
-    legendMarginLeft,
-    legendMarginTop
-  } = state
 
   const getStatePropertiesForSmallWindowChart = () => {
     return {
@@ -180,21 +166,6 @@ const RegRatesLineChartComponent = (props: IProps) => {
     return getStatePropertiesForSmallWindowChart()
   }, [theme])
 
-  useEffect(() => {
-    const recordWindowWidth = () => {
-      const latesProperties = getStatePropertiesForChart()
-      setState((prev) => ({
-        ...prev,
-        ...latesProperties
-      }))
-    }
-
-    window.addEventListener('resize', recordWindowWidth)
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
-    }
-  }, [getStatePropertiesForChart])
-
   const getLatestData = () => {
     const latestData = data && data[data.length - 1]
     return {
@@ -213,6 +184,37 @@ const RegRatesLineChartComponent = (props: IProps) => {
       }
     }
   }
+
+  const [state, setState] = useState<IState>(() => ({
+    ...getStatePropertiesForChart(),
+    ...getLatestData()
+  }))
+  const {
+    chartTop,
+    chartRight,
+    chartBottom,
+    chartLeft,
+    maximizeXAxisInterval,
+    legendLayout,
+    legendMarginLeft,
+    legendMarginTop
+  } = state
+
+  useEffect(() => {
+    const recordWindowWidth = () => {
+      const latesProperties = getStatePropertiesForChart()
+      setState((prev) => ({
+        ...prev,
+        ...latesProperties
+      }))
+    }
+
+    window.addEventListener('resize', recordWindowWidth)
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
+    }
+  }, [getStatePropertiesForChart])
+
   const customizedLegend = () => {
     const {
       activeLabel,
