@@ -210,9 +210,8 @@ const VerifyCorrectorComponent = ({
 
   const logTime = (timeMs: number) => {
     const updatedDeclaration = { ...declaration }
-    if (!declaration.timeLoggedMS) {
-      updatedDeclaration.timeLoggedMS = 0
-    }
+
+    updatedDeclaration.timeLoggedMS = updatedDeclaration.timeLoggedMS ?? 0
     updatedDeclaration.timeLoggedMS += timeMs
     modifyDeclaration(updatedDeclaration)
   }
