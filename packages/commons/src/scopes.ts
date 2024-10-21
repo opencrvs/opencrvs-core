@@ -58,6 +58,7 @@ export const scopes = [
   'record.export-records',
   'record.print-issue-certified-copies',
   'record.bulk-print-certified-copies',
+  'record.certify',
 
   // correct
   'record.registration-request-correction',

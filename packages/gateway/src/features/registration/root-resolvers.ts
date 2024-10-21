@@ -491,7 +491,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'record.print-issue-certified-copies')) {
+      if (!hasScope(authHeader, 'record.certify')) {
         return Promise.reject(new Error('User does not have enough scope'))
       }
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
@@ -503,7 +503,7 @@ export const resolvers: GQLResolver = {
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'record.print-issue-certified-copies')) {
+      if (!hasScope(authHeader, 'record.certify')) {
         return Promise.reject(new Error('User does not have enough scope'))
       }
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
@@ -515,7 +515,7 @@ export const resolvers: GQLResolver = {
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'record.print-issue-certified-copies')) {
+      if (!hasScope(authHeader, 'record.certify')) {
         return Promise.reject(new Error('User does not have enough scope'))
       }
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
