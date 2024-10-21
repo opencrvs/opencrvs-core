@@ -105,9 +105,8 @@ const withEnhancedTemplateVariables = (
 }
 
 export const usePrintableCertificate = () => {
-  const { registrationId, certTemplateId } = useParams<{
+  const { registrationId } = useParams<{
     registrationId: string
-    certTemplateId: string
   }>()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
@@ -130,13 +129,13 @@ export const usePrintableCertificate = () => {
 
   const [svgCode, setSvgCode] = useState<string>()
   const certificateTemplateConfig: ICertificateConfigData | undefined =
-    offlineData.templates.certificates?.find((x) => x.id === certTemplateId)
+    declaration?.data.registration.certificates.slice(-1)[0].templateConfig
   const certificateFonts = certificateTemplateConfig?.fonts ?? {}
 
   useEffect(() => {
     const certificateUrl =
       (declaration &&
-        offlineData.templates.certificates?.find((x) => x.id === certTemplateId)
+        declaration?.data.registration.certificates.slice(-1)[0].templateConfig
           ?.svgUrl) ||
       ''
 

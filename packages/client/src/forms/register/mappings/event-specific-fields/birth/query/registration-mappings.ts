@@ -38,8 +38,15 @@ export function getBirthRegistrationSectionTransformer(
     Array.isArray(queryData[sectionId].certificates) &&
     queryData[sectionId].certificates.length > 0
   ) {
-    transformedData[sectionId].certificates =
-      queryData[sectionId].certificates.slice(-1)
+    const certificate = queryData[sectionId].certificates.slice(-1)[0]
+    // since we shall need this certificate only for ready to issue tab, to calculate certificate fee
+    transformedData[sectionId].certificates = certificate?.templateConfig
+      ? [
+          {
+            templateConfig: certificate.templateConfig
+          }
+        ]
+      : []
   }
 }
 

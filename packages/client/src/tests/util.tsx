@@ -547,7 +547,29 @@ export const mockDeclarationData = {
       officeAddressLevel3: 'Gazipur',
       officeAddressLevel4: 'Dhaka'
     },
-    certificates: [{}]
+    certificates: [
+      {
+        templateConfig: {
+          id: 'certified-birth-certificate',
+          event: 'birth',
+          label: {
+            id: 'certificates.birth.certificate.copy',
+            defaultMessage: 'Birth Certificate certified copy',
+            description: 'The label for a birth certificate'
+          },
+          registrationTarget: 30,
+          lateRegistrationTarget: 365,
+          printInAdvance: true,
+          fee: {
+            onTime: 10,
+            late: 500,
+            delayed: 150
+          },
+          svgUrl:
+            '/api/countryconfig/certificates/birth-certificate-certified-copy.svg'
+        }
+      }
+    ]
   },
   documents: {}
 }
@@ -647,7 +669,26 @@ export const mockDeathDeclarationData = {
         collector: {
           type: 'MOTHER'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        templateConfig: {
+          id: 'certified-death-certificate',
+          event: 'death',
+          label: {
+            id: 'certificates.death.certificate.copy',
+            defaultMessage: 'Death Certificate certified copy',
+            description: 'The label for a death certificate'
+          },
+          registrationTarget: 30,
+          lateRegistrationTarget: 365,
+          printInAdvance: true,
+          fee: {
+            onTime: 0,
+            late: 5.5,
+            delayed: 15
+          },
+          svgUrl:
+            '/api/countryconfig/certificates/death-certificate-certified-copy.svg'
+        }
       }
     ]
   }
@@ -676,7 +717,26 @@ export const mockMarriageDeclarationData = {
         collector: {
           type: 'BRIDE'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        templateConfig: {
+          id: 'certified-marriage-certificate',
+          event: 'marriage',
+          label: {
+            id: 'certificates.marriage.certificate.copy',
+            defaultMessage: 'Marriage Certificate certified copy',
+            description: 'The label for a marriage certificate'
+          },
+          registrationTarget: 30,
+          lateRegistrationTarget: 365,
+          printInAdvance: true,
+          fee: {
+            onTime: 0,
+            late: 5.5,
+            delayed: 15
+          },
+          svgUrl:
+            '/api/countryconfig/certificates/marriage-certificate-certified-copy.svg'
+        }
       }
     ]
   },

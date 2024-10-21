@@ -82,7 +82,14 @@ export function IssueCollectorForm({
     if (relationship === 'OTHER') {
       dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
     } else {
-      dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
+      dispatch(
+        goToVerifyIssueCollector(
+          declaration.id,
+          declaration.data.registration.certificates[0].templateConfig
+            ?.id as string,
+          relationship
+        )
+      )
     }
   }
 

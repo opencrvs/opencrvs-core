@@ -79,7 +79,8 @@ export const IssueCollectorFormForOthers = ({
             certificates: [
               {
                 collector: collector,
-                hasShowedVerifiedDocument: false
+                hasShowedVerifiedDocument: false,
+                templateConfig: certificate.templateConfig
               }
             ]
           }

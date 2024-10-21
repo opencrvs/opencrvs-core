@@ -27,18 +27,16 @@ export function stripTypename(obj: any): any {
   }
   return obj
 }
-
-export function transformCertificateData(
-  transformedData: TransformedData,
-  certificates: ICertificate[],
-  sectionId: string
-) {
+export function transformCertificateData(certificates: ICertificate[]) {
   const certificateData = certificates[0]
-  transformedData[sectionId].certificates = [
+
+  // Prepare the base certificate data
+  const updatedCertificates: ICertificate[] = [
     {
       ...omit(certificateData, 'collector', 'templateConfig')
     }
   ]
+
   // for collector mapping
   if (certificateData && certificateData.collector) {
     let collector: GQLRelatedPersonInput = {}
@@ -74,13 +72,16 @@ export function transformCertificateData(
         }
       ]
     }
-    transformedData[sectionId].certificates[0].collector = collector
+    updatedCertificates[0].collector = collector as any
   }
 
   // for templateConfig mapping
   if (certificateData && certificateData.templateConfig) {
-    transformedData[sectionId].certificates[0].templateConfig = stripTypename(
+    updatedCertificates[0].templateConfig = stripTypename(
       certificateData.templateConfig
     )
   }
+
+  // Return the processed certificates array
+  return updatedCertificates
 }

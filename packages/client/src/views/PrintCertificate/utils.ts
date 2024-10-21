@@ -126,7 +126,7 @@ function getValue(
       ? check >= range.start && check <= range.end
       : check >= range.start
   )
-  return foundRange ? foundRange.value : rangeByEvent[0].value
+  return foundRange ? foundRange.value : rangeByEvent[0]?.value || 0
 }
 
 export function calculateDaysFromToday(doE: string) {

@@ -55,14 +55,14 @@ const deathDeclaration = {
 // Helper function for setting up tests
 async function setupTest({
   registrationId,
-  certTemplateId,
+  event,
   collector,
   declaration,
   store,
   history
 }: {
   registrationId: string
-  certTemplateId: string
+  event: string
   collector: string
   declaration: any
   store: any
@@ -78,7 +78,7 @@ async function setupTest({
       match={{
         params: {
           registrationId,
-          certTemplateId,
+          eventType: event as Event,
           collector
         },
         isExact: true,
@@ -101,7 +101,7 @@ describe('verify collector tests', () => {
     beforeAll(async () => {
       testComponent = await setupTest({
         registrationId: 'mockBirth1234',
-        certTemplateId: 'birth-certificate-copy',
+        event: 'birth',
         collector: 'mother',
         declaration: birthDeclaration,
         store,
@@ -132,7 +132,7 @@ describe('verify collector tests', () => {
     beforeAll(async () => {
       testComponent = await setupTest({
         registrationId: 'mockDeath1234',
-        certTemplateId: 'death-certificate',
+        event: 'death',
         collector: 'informant',
         declaration: deathDeclaration,
         store,
@@ -188,7 +188,7 @@ describe('verify collector tests', () => {
     beforeAll(async () => {
       testComponent = await setupTest({
         registrationId: 'mockBirth1234',
-        certTemplateId: 'birth-certificate-copy',
+        event: 'birth',
         collector: 'father',
         declaration: birthDeclaration,
         store,
@@ -218,7 +218,7 @@ describe('verify collector tests', () => {
     beforeAll(async () => {
       testComponent = await setupTest({
         registrationId: 'mockDeath1234',
-        certTemplateId: 'death-certificate',
+        event: 'death',
         collector: 'informant',
         declaration: deathDeclaration,
         store,

@@ -293,13 +293,13 @@ export function goToBirthRegistrationAsParent(declarationId: string) {
 
 export function goToPrintCertificate(
   registrationId: string,
-  certTemplateId: string,
+  event: string,
   groupId?: string
 ) {
   return push(
     formatUrl(CERTIFICATE_COLLECTOR, {
       registrationId,
-      certTemplateId,
+      event,
       groupId: groupId || 'certCollector'
     })
   )
@@ -325,7 +325,7 @@ export function goToVerifyIssueCollector(
   return push(
     formatUrl(ISSUE_VERIFY_COLLECTOR, {
       registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString(),
+      event,
       collector: collector.toLowerCase().toString()
     })
   )
@@ -360,14 +360,11 @@ export function goToVerifyCorrector(declarationId: string, corrector: string) {
   )
 }
 
-export function goToReviewCertificate(
-  registrationId: string,
-  certTemplateId: string
-) {
+export function goToReviewCertificate(registrationId: string, event: string) {
   return push(
     formatUrl(REVIEW_CERTIFICATE, {
       registrationId,
-      certTemplateId
+      event
     }),
     { isNavigatedInsideApp: true }
   )
@@ -375,13 +372,13 @@ export function goToReviewCertificate(
 
 export function goToVerifyCollector(
   registrationId: string,
-  certTemplateId: string,
+  event: string,
   collector: string
 ) {
   return push(
     formatUrl(VERIFY_COLLECTOR, {
       registrationId: registrationId.toString(),
-      certTemplateId: certTemplateId.toLowerCase().toString(),
+      event: event.toLowerCase().toString(),
       collector: collector.toLowerCase().toString()
     })
   )
@@ -389,24 +386,24 @@ export function goToVerifyCollector(
 
 export function goToPrintCertificatePayment(
   registrationId: string,
-  certTemplateId: string
+  event: string
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
       registrationId,
-      certTemplateId
+      event
     })
   )
 }
 
 export function goToIssueCertificatePayment(
   registrationId: string,
-  certTemplateId: string
+  event: string
 ) {
   return push(
     formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
       registrationId,
-      certTemplateId
+      event
     })
   )
 }
