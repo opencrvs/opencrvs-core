@@ -8,15 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  createCertificateHandler,
-  getActiveCertificatesHandler,
-  getCertificateHandler,
-  requestActiveCertificate,
-  requestNewCertificate,
-  updateCertificate,
-  updateCertificateHandler
-} from '@config/handlers/certificate/certificateHandler'
 import configHandler, {
   getLoginConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
@@ -73,13 +64,14 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         auth: {
           scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'config.update-all',
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'record.submit-for-approval'
           ]
         },
         tags: ['api'],
@@ -115,76 +107,6 @@ export default function getRoutes(): ServerRoute[] {
       }
     },
     {
-      method: 'POST',
-      path: '/getCertificate',
-      handler: getCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Retrieves certificate',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.VALIDATE
-          ]
-        },
-        validate: {
-          payload: requestActiveCertificate
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/getActiveCertificates',
-      handler: getActiveCertificatesHandler,
-      options: {
-        tags: ['api'],
-        description: 'Retrieves active certificates for birth and death',
-        auth: {
-          scope: [
-            RouteScope.NATLSYSADMIN,
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
-          ]
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/createCertificate',
-      handler: createCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Creates a new Certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: requestNewCertificate
-        }
-      }
-    },
-    {
-      method: 'POST',
-      path: '/updateCertificate',
-      handler: updateCertificateHandler,
-      options: {
-        tags: ['api'],
-        description: 'Updates an existing Certificate',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: updateCertificate
-        }
-      }
-    },
-    {
       method: 'GET',
       path: '/dashboardQueries',
       handler: getDashboardQueries,
@@ -214,7 +136,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['natlsysadmin']
+          scope: ['config.update-all']
         },
         description: 'Create a location',
         validate: {
@@ -242,7 +164,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['natlsysadmin']
+          scope: ['config.update-all']
         },
         description: 'Update a location or facility',
         validate: {

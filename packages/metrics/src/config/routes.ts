@@ -78,9 +78,6 @@ import {
 import { PRODUCTION, QA_ENV } from '@metrics/constants'
 import * as Hapi from '@hapi/hapi'
 
-const enum RouteScope {
-  NATLSYSADMIN = 'natlsysadmin'
-}
 export enum EventType {
   BIRTH = 'birth',
   DEATH = 'death',
@@ -717,7 +714,7 @@ export const getRoutes = () => {
       handler: metricsDeleteMeasurementHandler,
       options: {
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         tags: ['api']
       }
@@ -729,7 +726,7 @@ export const getRoutes = () => {
       handler: deletePerformanceHandler,
       options: {
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         tags: ['api']
       }

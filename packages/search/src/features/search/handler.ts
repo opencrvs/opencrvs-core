@@ -22,7 +22,6 @@ import {
 import { searchByCompositionId } from '@search/elasticsearch/dbhelper'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { getTokenPayload } from '@search/utils/authUtils'
-import { RouteScope } from '@search/config/routes'
 import {
   searchForDeathDuplicates,
   searchForBirthDuplicates
@@ -207,7 +206,7 @@ export async function advancedRecordSearch(
   try {
     let isExternalSearch = false
     const tokenPayload = getTokenPayload(request.headers.authorization)
-    if (tokenPayload.scope.includes(RouteScope.RECORD_SEARCH)) {
+    if (tokenPayload.scope.includes('recordsearch')) {
       isExternalSearch = true
     }
     const result = await advancedSearch(

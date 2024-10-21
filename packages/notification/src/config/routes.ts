@@ -64,15 +64,6 @@ import {
   deathSentForUpdatesNotification
 } from '@notification/features/sentForUpdates/handler'
 
-const enum RouteScope {
-  DECLARE = 'declare',
-  VALIDATE = 'validate',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  SYSADMIN = 'sysadmin',
-  NATIONAL_SYSTEM_ADMIN = 'natlsysadmin'
-}
-
 const recordValidation: RouteOptionsValidate = {
   payload: Joi.object()
 }
@@ -226,10 +217,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description: 'Sends an sms to a user for birth in-progress entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -247,10 +240,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
           'Sends an sms or email to a user for birth declaration entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -267,7 +262,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms or email to a user for birth registration entry',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: ['record.register']
         },
         validate: {
           payload: registrationNotificationSchema
@@ -283,7 +278,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms or email to a user for birth declaration rejection entry',
         auth: {
-          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: ['record.submit-for-approval', 'record.register']
         },
         validate: {
           payload: rejectionNotificationSchema
@@ -300,10 +295,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
           'Sends an sms or email to a user for death in-progress entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -321,10 +318,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
           'Sends an sms or email to a user for death declaration entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -340,7 +339,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: ['record.register']
         },
         validate: {
           payload: registrationNotificationSchema
@@ -356,7 +355,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms to a user for death declaration rejection entry',
         auth: {
-          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: ['record.submit-for-approval', 'record.register']
         },
         validate: {
           payload: rejectionNotificationSchema
@@ -371,7 +370,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: userCredentialsNotificationSchema
@@ -386,7 +385,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: ['record.register']
         },
         validate: {
           payload: sendCorrectionRejectedNotificationInput
@@ -401,7 +400,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: ['record.register']
         },
         validate: {
           payload: sendCorrectionApprovedNotificationInput
@@ -416,7 +415,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: userPasswordResetNotificationSchema
@@ -454,7 +453,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]
+          scope: ['config.update-all']
         },
         description: 'Sends emails to all users given in payload',
         validate: {

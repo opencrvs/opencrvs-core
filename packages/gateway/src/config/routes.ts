@@ -47,7 +47,12 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Create a health notification',
         auth: {
-          scope: ['declare', 'notification-api']
+          scope: [
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'notification-api'
+          ]
         },
         validate: {
           payload: fhirBundleSchema,

@@ -97,18 +97,6 @@ import changeEmailHandler, {
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
 import * as mongoose from 'mongoose'
 
-const enum RouteScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  NATLSYSADMIN = 'natlsysadmin',
-  VALIDATE = 'validate',
-  RECORDSEARCH = 'recordsearch',
-  VERIFY = 'verify'
-}
-
 export const getRoutes = () => {
   return [
     // add ping route by default for health check
@@ -215,12 +203,14 @@ export const getRoutes = () => {
         description: 'Changes password for logged-in user',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -240,12 +230,14 @@ export const getRoutes = () => {
         description: 'Changes password for logged-in user',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -265,12 +257,14 @@ export const getRoutes = () => {
         description: 'Changes email for logged-in user',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -290,12 +284,14 @@ export const getRoutes = () => {
         description: 'Changes avatar for logged-in user',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -315,12 +311,14 @@ export const getRoutes = () => {
         description: 'Retrieves a user mobile number',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -338,12 +336,14 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -361,14 +361,16 @@ export const getRoutes = () => {
         description: 'Retrieves a user',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE,
-            RouteScope.VERIFY,
-            RouteScope.RECORDSEARCH
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval',
+            'record.registration-verify-certified-copies',
+            'recordsearch'
           ]
         },
         validate: {
@@ -384,7 +386,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         }
       }
     },
@@ -396,7 +398,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         }
       }
     },
@@ -409,12 +411,14 @@ export const getRoutes = () => {
         description: 'Activate an existing pending user',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -447,7 +451,7 @@ export const getRoutes = () => {
       handler: userAuditHandler,
       options: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: userAuditSchema
@@ -462,12 +466,14 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -483,12 +489,14 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.declare-birth',
+            'record.declare-death',
+            'record.declare-marriage',
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -503,7 +511,7 @@ export const getRoutes = () => {
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -518,7 +526,7 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -533,7 +541,7 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: resetPasswordRequestSchema
@@ -550,7 +558,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new system client',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: reqRegisterSystemSchema
@@ -568,7 +576,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Update system permissions',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: reqUpdateSystemSchema
@@ -583,7 +591,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Deactivates a new system client',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: clientIdSchema
@@ -601,7 +609,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Reactivates a new system client',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: clientIdSchema
@@ -664,11 +672,11 @@ export const getRoutes = () => {
         description: 'Gets count of users group by office ids',
         auth: {
           scope: [
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY,
-            RouteScope.PERFORMANCE,
-            RouteScope.SYSADMIN,
-            RouteScope.VALIDATE
+            'record.register',
+            'record.certify',
+            'performance.read',
+            'config.update-all',
+            'record.submit-for-approval'
           ]
         },
         validate: {
@@ -687,7 +695,7 @@ export const getRoutes = () => {
         description: 'Refresh client secret ',
         notes: 'Refresh client secret',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: systemSecretRequestSchema
@@ -706,7 +714,7 @@ export const getRoutes = () => {
         description: 'Delete system ',
         notes: 'This is responsible for system deletion',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: ['config.update-all']
         },
         validate: {
           payload: clientIdSchema
