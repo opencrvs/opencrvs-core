@@ -1446,10 +1446,8 @@ export const mockCompleteFormData = {
   accountDetails: '',
   assignedRegistrationOffice: '',
   device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  familyName: 'Hossain',
+  firstName: 'Jeff',
   nid: '123456789',
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
@@ -1600,7 +1598,7 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'firstNamesEng',
+                      name: 'firstNames',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English first name',
@@ -1622,12 +1620,12 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'familyNameEng',
+                      name: 'familyName',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English last name',
                         description: 'English last name',
-                        id: 'form.field.label.lastNameEN'
+                        id: 'form.field.label.userSurname'
                       },
                       required: true,
                       initialValue: '',
@@ -1662,33 +1660,6 @@ export const mockUserGraphqlOperation = {
                         query: {
                           operation: 'localPhoneTransformer',
                           parameters: ['user.mobile']
-                        }
-                      }
-                    },
-                    {
-                      name: 'nid',
-                      type: 'TEXT',
-                      label: {
-                        defaultMessage: 'NID',
-                        description: 'National ID',
-                        id: 'form.field.label.NID'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [
-                        {
-                          operation: 'validIDNumber',
-                          parameters: ['NATIONAL_ID']
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'fieldToIdentifierWithTypeTransformer',
-                          parameters: ['NATIONAL_ID']
-                        },
-                        query: {
-                          operation: 'identifierWithTypeToFieldTransformer',
-                          parameters: ['NATIONAL_ID']
                         }
                       }
                     },
@@ -1822,10 +1793,8 @@ export const mockDataWithRegistarRoleSelected = {
   accountDetails: '',
   assignedRegistrationOffice: '',
   device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  familyName: 'Hossain',
+  firstName: 'Jeff',
   email: 'jeff@gmail.com',
   nid: '101488192',
   phoneNumber: '01662132132',

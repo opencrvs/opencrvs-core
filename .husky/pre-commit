@@ -1,0 +1,2 @@
+yarn check:license
+yarn lint-staged

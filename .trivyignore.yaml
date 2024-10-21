@@ -40,7 +40,7 @@ vulnerabilities:
   - id: CVE-2022-1471
     statement: Dashboards vulns (java libs)
   - id: CVE-2024-4068
-    statement: Transitive dependency of lint-staged, jest and msw. Not running in production. Likely fixed by upgrading.
+    statement: Transitive dependency of jest and msw. Not running in production. Likely fixed by upgrading.
   - id: CVE-2024-37890
     statement: ws vulnerability, transitive dependency of jest, storybook, graphql-codegen, not running in production.
   - id: CVE-2024-45296

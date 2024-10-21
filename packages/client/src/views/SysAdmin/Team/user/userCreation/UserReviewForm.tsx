@@ -249,7 +249,7 @@ class UserReviewFormComponent extends React.Component<
       (field) => field.name === 'firstNamesEng'
     ) as IFormField
     const familyNameEngField = fields.find(
-      (field) => field.name === 'familyNameEng'
+      (field) => field.name === 'familyName'
     ) as IFormField
 
     return `${this.getValue(firstNamesEngField)} ${this.getValue(
