@@ -22,7 +22,6 @@ export function usePermissions() {
     neededScopes.every((scope) => userScopes?.includes(scope))
 
   const hasAnyScope = (neededScopes: Scope[]) =>
-    neededScopes.length === 0 ||
     neededScopes.some((scope) => userScopes?.includes(scope))
 
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
@@ -37,7 +36,7 @@ export function usePermissions() {
 
   const canEditUser = (user: Pick<User, 'primaryOffice'>) => {
     if (hasScope(SCOPES.USER_UPDATE)) return true
-    if (hasScope(SCOPES.USER_UPDATE_MY_OFFICE))
+    if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION))
       return user.primaryOffice.id === userPrimaryOffice?.id
 
     return false
