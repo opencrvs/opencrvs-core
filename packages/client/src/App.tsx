@@ -385,7 +385,15 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+                                                SCOPES.RECORD_REGISTRATION_CORRECT
+                                              ]}
+                                              path={routes.VERIFY_COLLECTOR}
+                                              component={VerifyCollector}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              scopes={[
+                                                SCOPES.RECORD_REGISTRATION_CORRECT
                                               ]}
                                               path={routes.VERIFY_CORRECTOR}
                                               component={VerifyCorrector}
@@ -403,7 +411,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_CORRECT
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
                                               ]}
                                               path={
                                                 routes.CERTIFICATE_CORRECTION
@@ -413,7 +421,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_CORRECT
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
                                               ]}
                                               path={
                                                 routes.CERTIFICATE_CORRECTION_REVIEW
@@ -428,9 +436,9 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.ORGANISATION_READ,
-                                                SCOPES.ORGANISATION_READ_LOCATIONS,
-                                                SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+                                                SCOPES.USER_READ,
+                                                SCOPES.USER_READ_MY_OFFICE,
+                                                SCOPES.USER_READ_MY_JURISDICTION
                                               ]}
                                               path={routes.TEAM_SEARCH}
                                               component={TeamSearch}
@@ -438,8 +446,9 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.ORGANISATION_READ_LOCATIONS,
-                                                SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+                                                SCOPES.USER_READ,
+                                                SCOPES.USER_READ_MY_OFFICE,
+                                                SCOPES.USER_READ_MY_JURISDICTION
                                               ]}
                                               path={routes.TEAM_USER_LIST}
                                               component={UserList}
@@ -456,8 +465,7 @@ export function App(props: IAppProps) {
                                               exact
                                               scopes={[
                                                 SCOPES.USER_CREATE,
-                                                SCOPES.USER_CREATE_MY_JURISDICTION,
-                                                SCOPES.USER_READ_MY_OFFICE
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
                                               ]}
                                               path={routes.CREATE_USER}
                                               component={CreateNewUser}
@@ -466,8 +474,7 @@ export function App(props: IAppProps) {
                                               exact
                                               scopes={[
                                                 SCOPES.USER_CREATE,
-                                                SCOPES.USER_CREATE_MY_JURISDICTION,
-                                                SCOPES.USER_READ_MY_OFFICE
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
                                               ]}
                                               path={
                                                 routes.CREATE_USER_ON_LOCATION
@@ -478,8 +485,7 @@ export function App(props: IAppProps) {
                                               exact
                                               scopes={[
                                                 SCOPES.USER_CREATE,
-                                                SCOPES.USER_CREATE_MY_JURISDICTION,
-                                                SCOPES.USER_READ_MY_OFFICE
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
                                               ]}
                                               path={routes.CREATE_USER_SECTION}
                                               component={CreateNewUser}
@@ -488,8 +494,7 @@ export function App(props: IAppProps) {
                                               exact
                                               scopes={[
                                                 SCOPES.USER_CREATE,
-                                                SCOPES.USER_CREATE_MY_JURISDICTION,
-                                                SCOPES.USER_READ_MY_OFFICE
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
                                               ]}
                                               path={routes.REVIEW_USER_FORM}
                                               component={CreateNewUser}
@@ -498,21 +503,25 @@ export function App(props: IAppProps) {
                                               exact
                                               scopes={[
                                                 SCOPES.USER_CREATE,
-                                                SCOPES.USER_CREATE_MY_JURISDICTION,
-                                                SCOPES.USER_READ_MY_OFFICE
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
                                               ]}
                                               path={routes.REVIEW_USER_DETAILS}
                                               component={CreateNewUser}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              scopes={[SCOPES.PERFORMANCE_READ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ,
+                                                SCOPES.PERFORMANCE_READ_MY_OFFICE
+                                              ]}
                                               path={routes.PERFORMANCE_HOME}
                                               component={PerformanceHome}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              scopes={[SCOPES.PERFORMANCE_READ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ_DASHBOARDS
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_STATISTICS
                                               }
@@ -520,7 +529,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              scopes={[SCOPES.PERFORMANCE_READ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ_DASHBOARDS
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_LEADER_BOARDS
                                               }
@@ -583,7 +594,9 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.ORGANISATION_READ
+                                                SCOPES.ORGANISATION_READ_LOCATIONS,
+                                                SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                                                SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
                                               ]}
                                               path={routes.ORGANISATIONS_INDEX}
                                               component={AdministrativeLevels}
