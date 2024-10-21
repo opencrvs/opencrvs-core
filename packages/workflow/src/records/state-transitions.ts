@@ -944,7 +944,7 @@ export async function toCertified(
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitionerExtensions = createCertifiedTask(
     previousTask,
-    certificateDetails.templateConfig
+    certificateDetails.certTemplateId
   )
 
   const [certifiedTask, practitionerResourcesBundle] =
@@ -964,7 +964,7 @@ export async function toCertified(
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
-    certificateDetails.templateConfig
+    certificateDetails.certTemplateId
   )
 
   const certificateSection: CompositionSection = {

@@ -403,14 +403,14 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  templateConfig: CertificateConfigData
+  certTemplateId: String
 }
 
 input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  templateConfig: CertificateConfigDataInput
+  certTemplateId: String
 }
 
 enum CertificateStatus {

@@ -151,24 +151,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contactEmail
         certificates {
           hasShowedVerifiedDocument
-          templateConfig {
-            id
-            event
-            label {
-              id
-              defaultMessage
-              description
-            }
-            registrationTarget
-            lateRegistrationTarget
-            printInAdvance
-            fee {
-              onTime
-              late
-              delayed
-            }
-            svgUrl
-          }
+          certTemplateId
           collector {
             relationship
             otherRelationship
@@ -242,24 +225,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         requesterOther
         noSupportingDocumentationRequired
         hasShowedVerifiedDocument
-        templateConfig {
-          id
-          event
-          label {
-            id
-            defaultMessage
-            description
-          }
-          registrationTarget
-          lateRegistrationTarget
-          printInAdvance
-          fee {
-            onTime
-            late
-            delayed
-          }
-          svgUrl
-        }
+        certTemplateId
         date
         action
         regStatus

@@ -879,7 +879,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
-  templateConfig: CertificateConfigData
+  certTemplateId: String
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   system: IntegratedSystem
@@ -1366,7 +1366,7 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  templateConfig: CertificateConfigData
+  certTemplateId: String
 }
 
 type DuplicatesInfo {
@@ -1392,17 +1392,6 @@ enum RegAction {
 
 type StatusReason {
   text: String
-}
-
-type CertificateConfigData {
-  id: String!
-  event: String!
-  label: CertificateLabel!
-  registrationTarget: Int!
-  lateRegistrationTarget: Int!
-  printInAdvance: Boolean!
-  fee: CertificateFee!
-  svgUrl: String!
 }
 
 type IntegratedSystem {
@@ -1708,7 +1697,7 @@ input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  templateConfig: CertificateConfigDataInput
+  certTemplateId: String
 }
 
 input IdentityInput {
@@ -1733,18 +1722,6 @@ input DeceasedInput {
 input LabelInput {
   lang: String!
   label: String!
-}
-
-type CertificateLabel {
-  id: String!
-  defaultMessage: String!
-  description: String!
-}
-
-type CertificateFee {
-  onTime: Float!
-  late: Float!
-  delayed: Float!
 }
 
 interface AuditLogItemBase {
@@ -1806,27 +1783,4 @@ input PaymentInput {
   outcome: PaymentOutcomeType
   date: Date
   data: String
-}
-
-input CertificateConfigDataInput {
-  id: String!
-  event: String!
-  label: CertificateLabelInput!
-  registrationTarget: Int!
-  lateRegistrationTarget: Int!
-  printInAdvance: Boolean!
-  fee: CertificateFeeInput!
-  svgUrl: String!
-}
-
-input CertificateLabelInput {
-  id: String!
-  defaultMessage: String!
-  description: String!
-}
-
-input CertificateFeeInput {
-  onTime: Float!
-  late: Float!
-  delayed: Float!
 }

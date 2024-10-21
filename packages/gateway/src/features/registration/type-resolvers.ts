@@ -1243,13 +1243,12 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-    templateConfig(docRef: DocumentReference, _) {
-      const templateConfig = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/templateConfig`,
+    certTemplateId(docRef: DocumentReference, _) {
+      const certTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certTemplateId`,
         docRef.extension as Extension[]
       )
-      if (templateConfig && templateConfig.valueString)
-        return JSON.parse(templateConfig.valueString)
+      return certTemplateId
     }
   },
   Identifier: {
@@ -1425,15 +1424,12 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-    templateConfig: (task: Task) => {
-      const templateConfig = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/templateConfig`,
+    certTemplateId: (task: Task) => {
+      const certTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certTemplateId`,
         task.extension as Extension[]
       )
-
-      if (templateConfig && templateConfig.valueString) {
-        return JSON.parse(templateConfig.valueString)
-      }
+      return certTemplateId
     },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(

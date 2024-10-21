@@ -385,50 +385,14 @@ export type Certificate = {
   collector?: Maybe<RelatedPerson>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   payments?: Maybe<Array<Maybe<Payment>>>
-  templateConfig?: Maybe<CertificateConfigData>
-}
-
-export type CertificateConfigData = {
-  __typename?: 'CertificateConfigData'
-  event: Scalars['String']
-  fee: CertificateFee
-  id: Scalars['String']
-  label: CertificateLabel
-  lateRegistrationTarget: Scalars['Int']
-  printInAdvance: Scalars['Boolean']
-  registrationTarget: Scalars['Int']
-  svgUrl: Scalars['String']
-}
-
-export type CertificateConfigDataInput = {
-  event: Scalars['String']
-  fee: CertificateFeeInput
-  id: Scalars['String']
-  label: CertificateLabelInput
-  lateRegistrationTarget: Scalars['Int']
-  printInAdvance: Scalars['Boolean']
-  registrationTarget: Scalars['Int']
-  svgUrl: Scalars['String']
-}
-
-export type CertificateFee = {
-  __typename?: 'CertificateFee'
-  delayed: Scalars['Float']
-  late: Scalars['Float']
-  onTime: Scalars['Float']
-}
-
-export type CertificateFeeInput = {
-  delayed: Scalars['Float']
-  late: Scalars['Float']
-  onTime: Scalars['Float']
+  certTemplateId?: Maybe<Scalars['String']>
 }
 
 export type CertificateInput = {
   collector?: InputMaybe<RelatedPersonInput>
   hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
-  templateConfig?: InputMaybe<CertificateConfigDataInput>
+  certTemplateId?: InputMaybe<Scalars['String']>
 }
 
 export type CertificateLabel = {
@@ -767,7 +731,7 @@ export type History = {
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   system?: Maybe<IntegratedSystem>
-  templateConfig?: Maybe<CertificateConfigData>
+  certTemplateId?: Maybe<Scalars['String']>
   user?: Maybe<User>
 }
 
@@ -3334,27 +3298,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
-        templateConfig?: {
-          __typename?: 'CertificateConfigData'
-          id: string
-          event: string
-          registrationTarget: number
-          lateRegistrationTarget: number
-          printInAdvance: boolean
-          svgUrl: string
-          label: {
-            __typename?: 'CertificateLabel'
-            id: string
-            defaultMessage: string
-            description: string
-          }
-          fee: {
-            __typename?: 'CertificateFee'
-            onTime: number
-            late: number
-            delayed: number
-          }
-        } | null
+        certTemplateId?: string | null
         collector?: {
           __typename?: 'RelatedPerson'
           relationship?: string | null
@@ -3441,27 +3385,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
-      templateConfig?: {
-        __typename?: 'CertificateConfigData'
-        id: string
-        event: string
-        registrationTarget: number
-        lateRegistrationTarget: number
-        printInAdvance: boolean
-        svgUrl: string
-        label: {
-          __typename?: 'CertificateLabel'
-          id: string
-          defaultMessage: string
-          description: string
-        }
-        fee: {
-          __typename?: 'CertificateFee'
-          onTime: number
-          late: number
-          delayed: number
-        }
-      } | null
+      certTemplateId?: string | null
       documents: Array<{
         __typename?: 'Attachment'
         id: string

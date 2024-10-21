@@ -8,14 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IFormData } from '@client/forms'
+import { IFormData, IFormField } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
+import { IOfflineData } from '@client/offline/reducer'
 
 export function getBirthRegistrationSectionTransformer(
   transformedData: IFormData,
   queryData: any,
-  sectionId: string
+  sectionId: string,
+  fieldDef: IFormField,
+  nestedFormField?: IFormField,
+  offlineData?: IOfflineData
 ) {
   if (queryData[sectionId].trackingId) {
     transformedData[sectionId].trackingId = queryData[sectionId].trackingId
@@ -43,7 +47,9 @@ export function getBirthRegistrationSectionTransformer(
     transformedData[sectionId].certificates = certificate?.templateConfig
       ? [
           {
-            templateConfig: certificate.templateConfig
+            templateConfig: offlineData?.templates.certificates?.find(
+              (x) => x.id === certificate.certTemplateId
+            )
           }
         ]
       : []

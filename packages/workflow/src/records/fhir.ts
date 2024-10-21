@@ -218,7 +218,7 @@ export function createDocumentReferenceEntryForCertificate(
   temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
-  templateConfig?: Record<string, any>,
+  certTemplateId?: string,
   attachmentUrl?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
@@ -242,8 +242,8 @@ export function createDocumentReferenceEntryForCertificate(
           valueBoolean: hasShowedVerifiedDocument
         },
         {
-          url: 'http://opencrvs.org/specs/extension/templateConfig',
-          valueString: JSON.stringify(templateConfig)
+          url: 'http://opencrvs.org/specs/extension/certTemplateId',
+          valueString: certTemplateId
         },
         ...(paymentUrl
           ? [
@@ -919,14 +919,14 @@ export async function createUnassignedTask(
 
 export function createCertifiedTask(
   previousTask: SavedTask,
-  templateConfig: Record<string, any>
+  certTemplateId: string
 ): SavedTask {
   return createNewTaskResource(
     previousTask,
     [
       {
-        url: 'http://opencrvs.org/specs/extension/templateConfig',
-        valueString: JSON.stringify(templateConfig)
+        url: 'http://opencrvs.org/specs/extension/certTemplateId',
+        valueString: certTemplateId
       }
     ],
     'CERTIFIED'

@@ -753,7 +753,7 @@ export interface GQLHistory {
   requester?: string
   requesterOther?: string
   hasShowedVerifiedDocument?: boolean
-  templateConfig?: GQLCertificateConfigData
+  certTemplateId?: string
   noSupportingDocumentationRequired?: boolean
   otherReason?: string
   system?: GQLIntegratedSystem
@@ -1264,7 +1264,7 @@ export interface GQLCertificate {
   collector?: GQLRelatedPerson
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPayment | null>
-  templateConfig?: GQLCertificateConfigData
+  certTemplateId?: string
 }
 
 export interface GQLDuplicatesInfo {
@@ -1290,17 +1290,6 @@ export const enum GQLRegAction {
 
 export interface GQLStatusReason {
   text?: string
-}
-
-export interface GQLCertificateConfigData {
-  id: string
-  event: string
-  label: GQLCertificateLabel
-  registrationTarget: number
-  lateRegistrationTarget: number
-  printInAdvance: boolean
-  fee: GQLCertificateFee
-  svgUrl: string
 }
 
 export interface GQLIntegratedSystem {
@@ -1607,7 +1596,7 @@ export interface GQLCertificateInput {
   collector?: GQLRelatedPersonInput
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPaymentInput | null>
-  templateConfig?: GQLCertificateConfigDataInput
+  certTemplateId?: string
 }
 
 export interface GQLIdentityInput {
@@ -1632,18 +1621,6 @@ export interface GQLDeceasedInput {
 export interface GQLLabelInput {
   lang: string
   label: string
-}
-
-export interface GQLCertificateLabel {
-  id: string
-  defaultMessage: string
-  description: string
-}
-
-export interface GQLCertificateFee {
-  onTime: number
-  late: number
-  delayed: number
 }
 
 export interface GQLAuditLogItemBase {
@@ -1716,29 +1693,6 @@ export interface GQLPaymentInput {
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
   data?: string
-}
-
-export interface GQLCertificateConfigDataInput {
-  id: string
-  event: string
-  label: GQLCertificateLabelInput
-  registrationTarget: number
-  lateRegistrationTarget: number
-  printInAdvance: boolean
-  fee: GQLCertificateFeeInput
-  svgUrl: string
-}
-
-export interface GQLCertificateLabelInput {
-  id: string
-  defaultMessage: string
-  description: string
-}
-
-export interface GQLCertificateFeeInput {
-  onTime: number
-  late: number
-  delayed: number
 }
 
 /*********************************
@@ -1843,7 +1797,6 @@ export interface GQLResolver {
   Certificate?: GQLCertificateTypeResolver
   DuplicatesInfo?: GQLDuplicatesInfoTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
-  CertificateConfigData?: GQLCertificateConfigDataTypeResolver
   IntegratedSystem?: GQLIntegratedSystemTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
@@ -1864,8 +1817,6 @@ export interface GQLResolver {
   WebhookPermission?: GQLWebhookPermissionTypeResolver
   OIDPUserAddress?: GQLOIDPUserAddressTypeResolver
   FieldValue?: GraphQLScalarType
-  CertificateLabel?: GQLCertificateLabelTypeResolver
-  CertificateFee?: GQLCertificateFeeTypeResolver
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
@@ -6367,7 +6318,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   requester?: HistoryToRequesterResolver<TParent>
   requesterOther?: HistoryToRequesterOtherResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
-  templateConfig?: HistoryToTemplateConfigResolver<TParent>
+  certTemplateId?: HistoryToCertTemplateIdResolver<TParent>
   noSupportingDocumentationRequired?: HistoryToNoSupportingDocumentationRequiredResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
   system?: HistoryToSystemResolver<TParent>
@@ -6487,7 +6438,7 @@ export interface HistoryToHasShowedVerifiedDocumentResolver<
   ): TResult
 }
 
-export interface HistoryToTemplateConfigResolver<TParent = any, TResult = any> {
+export interface HistoryToCertTemplateIdResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -8301,7 +8252,7 @@ export interface GQLCertificateTypeResolver<TParent = any> {
   collector?: CertificateToCollectorResolver<TParent>
   hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<TParent>
   payments?: CertificateToPaymentsResolver<TParent>
-  templateConfig?: CertificateToTemplateConfigResolver<TParent>
+  certTemplateId?: CertificateToCertTemplateIdResolver<TParent>
 }
 
 export interface CertificateToCollectorResolver<TParent = any, TResult = any> {
@@ -8334,7 +8285,7 @@ export interface CertificateToPaymentsResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface CertificateToTemplateConfigResolver<
+export interface CertificateToCertTemplateIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -8380,113 +8331,6 @@ export interface GQLStatusReasonTypeResolver<TParent = any> {
 }
 
 export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCertificateConfigDataTypeResolver<TParent = any> {
-  id?: CertificateConfigDataToIdResolver<TParent>
-  event?: CertificateConfigDataToEventResolver<TParent>
-  label?: CertificateConfigDataToLabelResolver<TParent>
-  registrationTarget?: CertificateConfigDataToRegistrationTargetResolver<TParent>
-  lateRegistrationTarget?: CertificateConfigDataToLateRegistrationTargetResolver<TParent>
-  printInAdvance?: CertificateConfigDataToPrintInAdvanceResolver<TParent>
-  fee?: CertificateConfigDataToFeeResolver<TParent>
-  svgUrl?: CertificateConfigDataToSvgUrlResolver<TParent>
-}
-
-export interface CertificateConfigDataToIdResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToEventResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToLabelResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToRegistrationTargetResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToLateRegistrationTargetResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToPrintInAdvanceResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToFeeResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateConfigDataToSvgUrlResolver<
-  TParent = any,
-  TResult = any
-> {
   (
     parent: TParent,
     args: {},
@@ -10766,78 +10610,6 @@ export interface OIDPUserAddressToCountryResolver<
   TParent = any,
   TResult = any
 > {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCertificateLabelTypeResolver<TParent = any> {
-  id?: CertificateLabelToIdResolver<TParent>
-  defaultMessage?: CertificateLabelToDefaultMessageResolver<TParent>
-  description?: CertificateLabelToDescriptionResolver<TParent>
-}
-
-export interface CertificateLabelToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateLabelToDefaultMessageResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateLabelToDescriptionResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLCertificateFeeTypeResolver<TParent = any> {
-  onTime?: CertificateFeeToOnTimeResolver<TParent>
-  late?: CertificateFeeToLateResolver<TParent>
-  delayed?: CertificateFeeToDelayedResolver<TParent>
-}
-
-export interface CertificateFeeToOnTimeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateFeeToLateResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface CertificateFeeToDelayedResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
