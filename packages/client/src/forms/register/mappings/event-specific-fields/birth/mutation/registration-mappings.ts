@@ -57,7 +57,7 @@ export function setBirthRegistrationSectionTransformer(
     )
     transformedData[sectionId].certificates =
       updatedCertificates.length > 0 &&
-      Object.keys(updatedCertificates[0]).length > 0
+      Object.keys(updatedCertificates[0]).length > 0 // making sure we are not sending empty object as certificate
         ? updatedCertificates
         : []
   }

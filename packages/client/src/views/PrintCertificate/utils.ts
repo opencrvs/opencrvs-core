@@ -66,10 +66,10 @@ function getDayRanges(
       const BIRTH_REGISTRATION_TARGET =
         certificate.templateConfig?.registrationTarget
       const BIRTH_LATE_REGISTRATION_TARGET =
-        certificate.templateConfig?.lateRegistrationTarget || 0 // offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
-      const BIRTH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime //offlineData.config.BIRTH.FEE.ON_TIME
-      const BIRTH_LATE_FEE = certificate.templateConfig?.fee.late //offlineData.config.BIRTH.FEE.LATE
-      const BIRTH_DELAYED_FEE = certificate.templateConfig?.fee.delayed //offlineData.config.BIRTH.FEE.DELAYED
+        certificate.templateConfig?.lateRegistrationTarget
+      const BIRTH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
+      const BIRTH_LATE_FEE = certificate.templateConfig?.fee.late
+      const BIRTH_DELAYED_FEE = certificate.templateConfig?.fee.delayed
       const birthRanges = [
         { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
         {
