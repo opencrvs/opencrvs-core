@@ -213,6 +213,24 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        certificates {
+          hasShowedVerifiedDocument
+          certTemplateId
+          collector {
+            relationship
+            otherRelationship
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
+            }
+          }
+        }
         duplicates {
           compositionId
           trackingId
@@ -288,6 +306,7 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         requester
         requesterOther
         hasShowedVerifiedDocument
+        certTemplateId
         noSupportingDocumentationRequired
         date
         action
@@ -363,6 +382,7 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         certificates {
           hasShowedVerifiedDocument
+          certTemplateId
           collector {
             relationship
             otherRelationship
@@ -628,6 +648,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         certificates {
           hasShowedVerifiedDocument
+          certTemplateId
           collector {
             relationship
             otherRelationship

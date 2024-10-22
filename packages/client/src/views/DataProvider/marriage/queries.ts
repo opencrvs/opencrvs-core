@@ -158,6 +158,24 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        certificates {
+          hasShowedVerifiedDocument
+          certTemplateId
+          collector {
+            relationship
+            otherRelationship
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
+            }
+          }
+        }
         groomSignature
         brideSignature
         witnessOneSignature
@@ -227,6 +245,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         otherReason
         requester
         hasShowedVerifiedDocument
+        certTemplateId
         noSupportingDocumentationRequired
         date
         action
