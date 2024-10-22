@@ -67,14 +67,14 @@ const deathDeclaration = {
 // Helper function to set up test
 async function setupPaymentTest({
   registrationId,
-  certTemplateId,
+  eventType,
   declaration,
   store,
   history,
   mockLocation
 }: {
   registrationId: string
-  certTemplateId: string
+  eventType: string
   declaration: any
   store: any
   history: any
@@ -90,7 +90,7 @@ async function setupPaymentTest({
       match={{
         params: {
           registrationId,
-          certTemplateId
+          eventType
         },
         isExact: true,
         path: '',
@@ -118,7 +118,7 @@ describe('verify collector tests', () => {
     it('renders Payment component when mother is collector', async () => {
       const testComponent = await setupPaymentTest({
         registrationId: 'mockBirth1234',
-        certTemplateId: 'birth-certificate-copy',
+        eventType: 'birth',
         declaration: birthDeclaration,
         store,
         history,
@@ -129,7 +129,7 @@ describe('verify collector tests', () => {
         'Birth'
       )
       expect(testComponent.find('#amountDue').hostNodes().text()).toContain(
-        '20'
+        '150'
       )
 
       testComponent.find('#Continue').hostNodes().simulate('click')
@@ -143,7 +143,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth',
-              certTemplateId: 'birth-certificate-copy'
+              eventType: 'birth'
             },
             isExact: true,
             path: '',
@@ -170,7 +170,7 @@ describe('verify collector tests', () => {
     it('renders Payment component when informant is collector', async () => {
       const testComponent = await setupPaymentTest({
         registrationId: 'mockDeath1234',
-        certTemplateId: 'death-certificate',
+        eventType: 'death',
         declaration: deathDeclaration,
         store,
         history,
