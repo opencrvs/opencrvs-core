@@ -18,7 +18,7 @@ import {
   ILocation
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { System } from '@client/utils/gateway'
+import { Event, System } from '@client/utils/gateway'
 import { Validator } from '@client/forms/validators'
 import { IntlShape } from 'react-intl'
 
@@ -79,21 +79,22 @@ interface ILoginBackground {
 }
 export interface ICertificateConfigData {
   id: string
-  event: string
+  event: Event
   label: {
     id: string
     defaultMessage: string
     description: string
   }
-  svgUrl: string
-  fonts: {
-    [fontName: string]: {
-      normal: string
-      bold: string
-      italics: string
-      bolditalics: string
-    }
+  registrationTarget: number
+  lateRegistrationTarget: number
+  printInAdvance: boolean
+  fee: {
+    onTime: number
+    late: number
+    delayed: number
   }
+  svgUrl: string
+  fonts?: Record<string, FontFamilyTypes>
 }
 export interface ICurrency {
   isoCode: string
