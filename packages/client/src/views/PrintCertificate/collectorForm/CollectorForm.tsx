@@ -184,7 +184,6 @@ interface IState {
   showError: boolean
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
-  certTemplateId: string
 }
 
 class CollectorFormComponent extends React.Component<IProps, IState> {
@@ -193,8 +192,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     this.state = {
       showError: false,
       showModalForNoSignedAffidavit: false,
-      isFileUploading: false,
-      certTemplateId: ''
+      isFileUploading: false
     }
   }
 
@@ -212,7 +210,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const certificates = declaration.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
-
+    const selectedTemplatedConfig =
+      this.props.offlineCountryConfiguration.templates.certificates?.find(
+        (x) => x.id === (collector.certTemplateId as string)
+      )
     this.props.modifyDeclaration({
       ...declaration,
       data: {
@@ -222,7 +223,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           certificates: [
             {
               collector: collector,
-              hasShowedVerifiedDocument: false
+              hasShowedVerifiedDocument: false,
+              templateConfig: selectedTemplatedConfig
             }
           ]
         }
@@ -259,10 +261,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
-    this.setState({
-      ...this.state,
-      certTemplateId: collector?.certTemplateId as string
-    })
     if (errLength > 0) {
       this.setState({
         showError: true
@@ -308,23 +306,16 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.writeDeclaration(draft)
 
       if (isCertificateForPrintInAdvance(draft)) {
-        this.props.goToReviewCertificate(
-          declarationId,
-          collector?.certTemplateId as string
-        )
+        this.props.goToReviewCertificate(declarationId, event)
       } else {
         this.props.goToVerifyCollector(
           declarationId,
-          collector?.certTemplateId as string,
+          event,
           collector.type as string
         )
       }
     } else {
-      this.props.goToPrintCertificate(
-        declarationId,
-        collector?.certTemplateId as string,
-        nextGroup
-      )
+      this.props.goToPrintCertificate(declarationId, event, nextGroup)
     }
   }
 
@@ -337,18 +328,15 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       .props as PropsWhenDeclarationIsFound
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         getEventDate(declaration.data, event),
         getRegisteredDate(declaration.data),
         offlineCountryConfiguration
       )
     ) {
-      this.props.goToReviewCertificate(declarationId, this.state.certTemplateId)
+      this.props.goToReviewCertificate(declarationId, event)
     } else {
-      this.props.goToPrintCertificatePayment(
-        declarationId,
-        this.state.certTemplateId
-      )
+      this.props.goToPrintCertificatePayment(declarationId, event)
     }
   }
 
@@ -564,7 +552,7 @@ const mapStateToProps = (
       declaration.data.registration.certificates &&
       declaration.data.registration.certificates[
         declaration.data.registration.certificates.length - 1
-      ].collector) ||
+      ]?.collector) ||
       {},
     declaration && declaration.data,
     offlineCountryConfiguration,

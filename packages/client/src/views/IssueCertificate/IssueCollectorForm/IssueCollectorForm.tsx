@@ -63,7 +63,8 @@ export function IssueCollectorForm({
             certificates: [
               {
                 collector: collector,
-                hasShowedVerifiedDocument: false
+                hasShowedVerifiedDocument: false,
+                templateConfig: certificate.templateConfig
               }
             ]
           }
@@ -81,7 +82,13 @@ export function IssueCollectorForm({
     if (relationship === 'OTHER') {
       dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
     } else {
-      dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
+      dispatch(
+        goToVerifyIssueCollector(
+          declaration.id,
+          declaration.event,
+          relationship
+        )
+      )
     }
   }
 
