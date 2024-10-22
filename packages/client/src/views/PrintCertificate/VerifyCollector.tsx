@@ -47,10 +47,11 @@ import { IForm } from '@client/forms'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { Event } from '@client/utils/gateway'
 
 interface IMatchParams {
   registrationId: string
-  certTemplateId: string
+  eventType: Event
   collector: string
 }
 
@@ -94,7 +95,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         eventDate,
         registeredDate,
         offlineCountryConfiguration
@@ -103,24 +104,24 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       if (!isIssueUrl) {
         this.props.goToReviewCertificate(
           this.props.match.params.registrationId,
-          this.props.match.params.certTemplateId
+          event
         )
       } else {
         this.props.goToIssueCertificatePayment(
           this.props.match.params.registrationId,
-          this.props.match.params.certTemplateId
+          event
         )
       }
     } else {
       if (!isIssueUrl) {
         this.props.goToPrintCertificatePayment(
           this.props.match.params.registrationId,
-          this.props.match.params.certTemplateId
+          event
         )
       } else {
         this.props.goToIssueCertificatePayment(
           this.props.match.params.registrationId,
-          this.props.match.params.certTemplateId
+          event
         )
       }
     }

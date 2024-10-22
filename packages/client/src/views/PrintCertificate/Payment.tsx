@@ -46,7 +46,6 @@ import { UserDetails } from '@client/utils/userUtils'
 interface IProps {
   event: Event
   registrationId: string
-  certTemplateId: string
   language: string
   declaration: IPrintableDeclaration
   theme: ITheme
@@ -64,12 +63,11 @@ const PaymentComponent = ({
   declaration,
   intl,
   event,
-  registrationId,
-  certTemplateId,
   goBack,
   offlineCountryConfig,
   modifyDeclaration,
-  goToReviewCertificate
+  goToReviewCertificate,
+  registrationId
 }: IFullProps) => {
   const handleContinue = (paymentAmount: string) => {
     const certificates =
@@ -98,7 +96,7 @@ const PaymentComponent = ({
       }
     })
 
-    goToReviewCertificate(registrationId, certTemplateId)
+    goToReviewCertificate(registrationId, event)
   }
 
   if (!declaration) {
@@ -120,7 +118,8 @@ const PaymentComponent = ({
     event,
     eventDate,
     registeredDate,
-    offlineCountryConfig
+    offlineCountryConfig,
+    declaration.data.registration.certificates[0]
   )
 
   const serviceMessage = getServiceMessage(
@@ -182,27 +181,30 @@ const PaymentComponent = ({
   )
 }
 
-const getEvent = (state: IStoreState, certTemplateId: string | undefined) => {
-  return (
-    state.offline.offlineData.templates?.certificates?.find(
-      (x) => x.id === certTemplateId
-    )?.event || ''
-  )
+const getEvent = (eventType: string | undefined) => {
+  switch (eventType && eventType.toLowerCase()) {
+    case 'birth':
+    default:
+      return Event.Birth
+    case 'death':
+      return Event.Death
+    case 'marriage':
+      return Event.Marriage
+  }
 }
 
 function mapStatetoProps(
   state: IStoreState,
-  props: RouteComponentProps<{ registrationId: string; certTemplateId: string }>
+  props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
-  const { registrationId, certTemplateId } = props.match.params
-  const event = getEvent(state, certTemplateId) as Event
+  const { registrationId, eventType } = props.match.params
+  const event = getEvent(eventType) as Event
   const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
   ) as IPrintableDeclaration
 
   return {
     event,
-    certTemplateId,
     registrationId,
     language: state.i18n.language,
     declaration,
