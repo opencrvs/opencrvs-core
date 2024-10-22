@@ -59,6 +59,7 @@ interface ICertificateMessages
   receiptPaidAmount: MessageDescriptor
   receiptService: MessageDescriptor
   selectSignature: MessageDescriptor
+  selectedCertificateTemplateLabel: MessageDescriptor
   service: MessageDescriptor
   amountDue: MessageDescriptor
   typeOfID: MessageDescriptor
@@ -335,6 +336,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Select e-signatures',
     description: 'The label for choose signature select',
     id: 'print.certificate.selectSignature'
+  },
+  selectedCertificateTemplateLabel: {
+    defaultMessage: 'Selected certificate template',
+    description: 'The title of selected certificate template label',
+    id: 'certificate.selectedTemplate'
   },
   service: {
     defaultMessage:

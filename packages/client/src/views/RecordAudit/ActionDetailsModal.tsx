@@ -452,6 +452,27 @@ const ActionDetailsModalListTable = ({
       width: 100
     }
   ]
+
+  const selectedCertificateTemplate = [
+    {
+      key: 'certTemplate',
+      label: intl.formatMessage(
+        certificateMessages.selectedCertificateTemplateLabel
+      ),
+      width: 200
+    }
+  ]
+
+  const certificateTemplateMessageDescriptor =
+    offlineData.templates?.certificates?.find(
+      (x) => x.id === actionDetailsData.certTemplateId
+    )?.label
+
+  const selectedCertificateTemplateName = {
+    certTemplate: certificateTemplateMessageDescriptor
+      ? intl.formatMessage(certificateTemplateMessageDescriptor)
+      : ''
+  }
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
   const requesterLabel = requesterLabelMapper(
@@ -609,6 +630,17 @@ const ActionDetailsModalListTable = ({
             onPageChange={pageChangeHandler}
           />
         )}
+      {!isEmpty(collectorData) && !!actionDetailsData.certTemplateId && (
+        <Table
+          noResultText=" "
+          columns={selectedCertificateTemplate}
+          content={[selectedCertificateTemplateName]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        />
+      )}
 
       {/* Matched to */}
       {actionDetailsData.potentialDuplicates &&
