@@ -293,13 +293,13 @@ export function goToBirthRegistrationAsParent(declarationId: string) {
 
 export function goToPrintCertificate(
   registrationId: string,
-  event: string,
+  eventType: string,
   groupId?: string
 ) {
   return push(
     formatUrl(CERTIFICATE_COLLECTOR, {
       registrationId,
-      event,
+      eventType,
       groupId: groupId || 'certCollector'
     })
   )
@@ -319,13 +319,13 @@ export function goToIssueCertificate(
 
 export function goToVerifyIssueCollector(
   registrationId: string,
-  event: string,
+  eventType: string,
   collector: string
 ) {
   return push(
     formatUrl(ISSUE_VERIFY_COLLECTOR, {
       registrationId: registrationId.toString(),
-      event,
+      eventType,
       collector: collector.toLowerCase().toString()
     })
   )
@@ -360,11 +360,14 @@ export function goToVerifyCorrector(declarationId: string, corrector: string) {
   )
 }
 
-export function goToReviewCertificate(registrationId: string, event: string) {
+export function goToReviewCertificate(
+  registrationId: string,
+  eventType: string
+) {
   return push(
     formatUrl(REVIEW_CERTIFICATE, {
       registrationId,
-      event
+      eventType
     }),
     { isNavigatedInsideApp: true }
   )
@@ -372,13 +375,13 @@ export function goToReviewCertificate(registrationId: string, event: string) {
 
 export function goToVerifyCollector(
   registrationId: string,
-  event: string,
+  eventType: string,
   collector: string
 ) {
   return push(
     formatUrl(VERIFY_COLLECTOR, {
       registrationId: registrationId.toString(),
-      event: event.toLowerCase().toString(),
+      eventType: eventType.toLowerCase().toString(),
       collector: collector.toLowerCase().toString()
     })
   )
@@ -386,24 +389,24 @@ export function goToVerifyCollector(
 
 export function goToPrintCertificatePayment(
   registrationId: string,
-  event: string
+  eventType: string
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
       registrationId,
-      event
+      eventType
     })
   )
 }
 
 export function goToIssueCertificatePayment(
   registrationId: string,
-  event: string
+  eventType: string
 ) {
   return push(
     formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
       registrationId,
-      event
+      eventType
     })
   )
 }

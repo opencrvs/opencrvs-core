@@ -1248,7 +1248,7 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/certTemplateId`,
         docRef.extension as Extension[]
       )
-      return certTemplateId
+      return certTemplateId?.valueString
     }
   },
   Identifier: {
@@ -1429,7 +1429,7 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/certTemplateId`,
         task.extension as Extension[]
       )
-      return certTemplateId
+      return certTemplateId?.valueString
     },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(

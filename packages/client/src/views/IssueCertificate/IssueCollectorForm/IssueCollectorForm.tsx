@@ -85,8 +85,7 @@ export function IssueCollectorForm({
       dispatch(
         goToVerifyIssueCollector(
           declaration.id,
-          declaration.data.registration.certificates[0].templateConfig
-            ?.id as string,
+          declaration.event,
           relationship
         )
       )

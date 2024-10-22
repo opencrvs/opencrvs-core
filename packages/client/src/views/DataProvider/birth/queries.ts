@@ -314,6 +314,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         certificates {
           hasShowedVerifiedDocument
+          certTemplateId
           collector {
             relationship
             otherRelationship
@@ -590,6 +591,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         certificates {
           hasShowedVerifiedDocument
+          certTemplateId
           collector {
             relationship
             otherRelationship

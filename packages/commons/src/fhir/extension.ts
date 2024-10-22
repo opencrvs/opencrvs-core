@@ -130,7 +130,7 @@ export type StringExtensionType = {
   }
   'http://opencrvs.org/specs/extension/certTemplateId': {
     url: 'http://opencrvs.org/specs/extension/certTemplateId'
-    valueString: string
+    valueString?: string
   }
   'http://opencrvs.org/specs/extension/regLastOffice': {
     url: 'http://opencrvs.org/specs/extension/regLastOffice'

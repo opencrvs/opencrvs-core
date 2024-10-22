@@ -84,9 +84,9 @@ function getDayRanges(
 
     case Event.Death: {
       const DEATH_REGISTRATION_TARGET =
-        offlineData.config.DEATH.REGISTRATION_TARGET
-      const DEATH_ON_TIME_FEE = offlineData.config.DEATH.FEE.ON_TIME
-      const DEATH_DELAYED_FEE = offlineData.config.DEATH.FEE.DELAYED
+        certificate.templateConfig?.registrationTarget
+      const DEATH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
+      const DEATH_DELAYED_FEE = certificate.templateConfig?.fee.delayed
 
       const deathRanges = [
         { start: 0, end: DEATH_REGISTRATION_TARGET, value: DEATH_ON_TIME_FEE },
@@ -96,9 +96,9 @@ function getDayRanges(
     }
     case Event.Marriage: {
       const MARRIAGE_REGISTRATION_TARGET =
-        offlineData.config.MARRIAGE.REGISTRATION_TARGET
-      const MARRIAGE_ON_TIME_FEE = offlineData.config.MARRIAGE.FEE.ON_TIME
-      const MARRIAGE_DELAYED_FEE = offlineData.config.MARRIAGE.FEE.DELAYED
+        certificate.templateConfig?.registrationTarget
+      const MARRIAGE_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
+      const MARRIAGE_DELAYED_FEE = certificate.templateConfig?.fee.delayed
       const marriageRanges = [
         {
           start: 0,

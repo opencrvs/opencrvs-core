@@ -1046,7 +1046,7 @@ export async function toIssued(
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
-    undefined,
+    certificateDetails.certTemplateId,
     undefined,
     paymentEntry.fullUrl
   )
