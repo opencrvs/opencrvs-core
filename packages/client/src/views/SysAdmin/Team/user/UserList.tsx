@@ -554,19 +554,17 @@ function UserListComponent(props: IProps) {
         return []
       }
 
-      return data.searchUsers.results.map(
-        (user: User | null, index: number) => {
-          if (user !== null) {
-            const name =
-              (user &&
-                user.name &&
-                ((createNamesMap(user.name)[intl.locale] as string) ||
-                  (createNamesMap(user.name)[LANG_EN] as string))) ||
-              ''
-            const role = intl.formatMessage({
-              id: getUserRoleIntlKey(user.role._id)
-            })
-            const avatar = user.avatar
+      return data.searchUsers.results.map((user, index) => {
+        if (user !== null) {
+          const name =
+            (user.name &&
+              intl.formatMessage(constantsMessages.humanName, {
+                firstName: user.name[0].firstNames,
+                lastName: user.name[0].familyName
+              })) ||
+            ''
+          const role = intl.formatMessage(user.role.label)
+          const avatar = user.avatar
 
             return {
               image: (
