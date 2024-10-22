@@ -159,6 +159,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  certTemplateId: String
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   #This doesn't resolve to the System model properly rather
@@ -422,14 +423,14 @@ input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
+  certTemplateId: String
 }
 
 type Certificate { # -> Document Reference
   collector: RelatedPerson # -> .extension
   hasShowedVerifiedDocument: Boolean # -> .extension
   payments: [Payment] # -> .extension
-  data: String # -> .content.attachment.data base64
+  certTemplateId: String
 }
 
 input QuestionnaireQuestionInput {

@@ -1243,6 +1243,13 @@ export const typeResolvers: GQLResolver = {
       }
 
       return false
+    },
+    certTemplateId(docRef: DocumentReference, _) {
+      const certTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certTemplateId`,
+        docRef.extension as Extension[]
+      )
+      return certTemplateId?.valueString
     }
   },
   Identifier: {
@@ -1408,7 +1415,6 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         task.extension as Extension[]
       )
-
       if (hasShowedDocument?.valueString) {
         return Boolean(hasShowedDocument?.valueString)
       }
@@ -1419,7 +1425,13 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-
+    certTemplateId: (task: Task) => {
+      const certTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certTemplateId`,
+        task.extension as Extension[]
+      )
+      return certTemplateId?.valueString
+    },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(
         NO_SUPPORTING_DOCUMENTATION_REQUIRED,
