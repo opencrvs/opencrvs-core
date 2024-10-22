@@ -383,16 +383,29 @@ export type BookmarkedSeachItem = {
 export type Certificate = {
   __typename?: 'Certificate'
   collector?: Maybe<RelatedPerson>
-  data?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   payments?: Maybe<Array<Maybe<Payment>>>
+  certTemplateId?: Maybe<Scalars['String']>
 }
 
 export type CertificateInput = {
   collector?: InputMaybe<RelatedPersonInput>
-  data?: InputMaybe<Scalars['String']>
   hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
+  certTemplateId?: InputMaybe<Scalars['String']>
+}
+
+export type CertificateLabel = {
+  __typename?: 'CertificateLabel'
+  defaultMessage: Scalars['String']
+  description: Scalars['String']
+  id: Scalars['String']
+}
+
+export type CertificateLabelInput = {
+  defaultMessage: Scalars['String']
+  description: Scalars['String']
+  id: Scalars['String']
 }
 
 export type CertificationMetric = {
@@ -718,6 +731,7 @@ export type History = {
   signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   system?: Maybe<IntegratedSystem>
+  certTemplateId?: Maybe<Scalars['String']>
   user?: Maybe<User>
 }
 
@@ -3223,6 +3237,28 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        certTemplateId?: string | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+      } | null> | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -3291,6 +3327,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       reason?: string | null
       duplicateOf?: string | null
       potentialDuplicates?: Array<string> | null
+      certTemplateId?: string | null
       documents: Array<{
         __typename?: 'Attachment'
         id: string

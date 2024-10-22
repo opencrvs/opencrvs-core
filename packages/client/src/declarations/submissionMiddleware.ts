@@ -305,12 +305,6 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
             details: graphqlPayload
           }
         })
-        //delete data from certificates to identify event in workflow for markEventAsIssued
-        if (declaration.data.registration.certificates) {
-          delete (
-            declaration.data.registration.certificates as ICertificate[]
-          )?.[0].data
-        }
         updateDeclaration(dispatch, {
           ...declaration,
           registrationStatus: RegStatus.Certified,

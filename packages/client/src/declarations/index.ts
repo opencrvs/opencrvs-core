@@ -91,6 +91,7 @@ import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -266,11 +267,11 @@ type RelationForCertificateCorrection =
   | 'CHILD'
 
 export type ICertificate = {
-  collector?: Partial<{ type: Relation | string }>
+  collector?: Partial<{ type: Relation | string; certTemplateId?: string }>
   corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
-  data?: string
+  templateConfig?: ICertificateConfigData
 }
 
 /*

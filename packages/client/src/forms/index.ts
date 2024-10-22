@@ -38,6 +38,7 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -1296,5 +1297,6 @@ export interface ICertificate {
   collector?: IFormSectionData
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
-  data?: string
+  templateConfig?: ICertificateConfigData
+  certTemplateId?: string
 }
