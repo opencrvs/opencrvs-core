@@ -34,7 +34,7 @@ import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 let wrapper: ReactWrapper<{}, {}>
 

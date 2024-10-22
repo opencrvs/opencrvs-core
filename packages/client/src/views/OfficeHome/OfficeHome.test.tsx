@@ -27,7 +27,7 @@ import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './inProgress/InProgress'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
 
 const mockFetchUserDetails = vi.fn()

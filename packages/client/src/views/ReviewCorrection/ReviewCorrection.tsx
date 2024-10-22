@@ -22,7 +22,7 @@ import {
 import { useRecord } from '@client/hooks/useRecord'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { useSelector } from 'react-redux'

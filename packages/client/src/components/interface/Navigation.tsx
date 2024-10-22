@@ -14,7 +14,6 @@ import {
   IDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { usePermissions } from '@client/hooks/useAuthorization'
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -65,42 +64,13 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
+import { useNavigation } from '@client/hooks/useNavigation'
+import {
+  TAB_GROUPS,
+  WORKQUEUE_TABS
+} from '@client/components/interface/WorkQueueTabs'
 
 const SCREEN_LOCK = 'screenLock'
-
-type Keys = keyof typeof WORKQUEUE_TABS
-export type IWORKQUEUE_TABS = (typeof WORKQUEUE_TABS)[Keys]
-
-export const WORKQUEUE_TABS = {
-  inProgress: 'progress',
-  inProgressFieldAgent: 'progress/field-agents',
-  sentForReview: 'sentForReview',
-  readyForReview: 'readyForReview',
-  requiresUpdate: 'requiresUpdate',
-  sentForApproval: 'approvals',
-  readyToPrint: 'print',
-  outbox: 'outbox',
-  externalValidation: 'waitingValidation',
-  performance: 'performance',
-  vsexports: 'vsexports',
-  team: 'team',
-  config: 'config',
-  organisation: 'organisation',
-  application: 'application',
-  certificate: 'certificate',
-  systems: 'integration',
-  userRoles: 'userroles',
-  settings: 'settings',
-  logout: 'logout',
-  communications: 'communications',
-  informantNotification: 'informantnotification',
-  emailAllUsers: 'emailAllUsers',
-  readyToIssue: 'readyToIssue',
-  dashboard: 'dashboard',
-  statistics: 'statistics',
-  leaderboards: 'leaderboards',
-  report: 'report'
-} as const
 
 interface ICount {
   inProgress?: number
@@ -242,7 +212,6 @@ const NavigationView = (props: IFullProps) => {
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
-  const { hasScope, hasAnyScope } = usePermissions()
 
   const { data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -311,52 +280,9 @@ const NavigationView = (props: IFullProps) => {
     ).length
   }
 
-  const hasInProgress = hasAnyScope([
-    'record.declare-birth',
-    'record.declare-birth:my-jurisdiction',
-    'record.declare-death',
-    'record.declare-death:my-jurisdiction',
-    'record.declare-marriage',
-    'record.declare-marriage:my-jurisdiction'
-  ])
-
-  const hasSentForReview = hasAnyScope(['record.submit-for-review'])
-
-  const hasReadyForReview = hasScope('record.declaration-review')
-  const hasSentForApproval = hasScope('record.submit-for-approval')
-  const hasRequiresUpdates = hasScope('record.declaration-review')
-  const hasReadyToPrint = hasScope('record.print-issue-certified-copies')
-  const hasReadyToIssue = hasScope('record.print-issue-certified-copies')
-
-  const hasOutbox = !hasAnyScope(['sysadmin', 'natlsysadmin'])
-
-  const hasAnyOrganisation = hasAnyScope([
-    'organisation.read',
-    'organisation.read-locations',
-    'organisation.read-locations:my-office'
-  ])
-  const hasOrganisation = hasScope('organisation.read')
-  const hasOrganisationTeam = hasAnyScope([
-    'organisation.read-locations',
-    'organisation.read-locations:my-office'
-  ])
-
-  const hasAnyPerformance = hasAnyScope([
-    'performance.read',
-    'performance.export-vital-statistics',
-    'performance.read-dashboards'
-  ])
-  const canRegister = hasScope('record.register')
-  const hasPerformanceDashboards = hasScope('performance.read-dashboards')
-  const hasPerformanceStatistics = hasScope('performance.read')
-  const hasPerformanceLeaderboards = hasScope('performance.read')
-  const hasPerformanceVitalStatisticsExports = hasScope(
-    'performance.export-vital-statistics'
-  )
-  const hasPerformance = hasScope('performance.read')
-
-  const hasSystemsConfig = hasAnyScope(['sysadmin', 'natlsysadmin'])
-  const hasEmailAllUsers = hasAnyScope(['sysadmin', 'natlsysadmin'])
+  const { routes } = useNavigation()
+  const hasAccess = (name: string): boolean =>
+    routes.some((x) => x.name === name || x.tabs.some((t) => t.name === name))
 
   return (
     <LeftNavigation
@@ -368,26 +294,24 @@ const NavigationView = (props: IFullProps) => {
       avatar={() => userInfo && userInfo.avatar}
       className={className}
     >
-      <>
+      {hasAccess(TAB_GROUPS.declarations) && (
         <NavigationGroup>
-          {hasInProgress && (
-            <>
-              <NavigationItem
-                icon={() => <DeclarationIconSmall color={'purple'} />}
-                id={`navigation_${WORKQUEUE_TABS.inProgress}`}
-                label={intl.formatMessage(
-                  navigationMessages[WORKQUEUE_TABS.inProgress]
-                )}
-                count={declarationCount.inProgress}
-                isSelected={tabId === WORKQUEUE_TABS.inProgress}
-                onClick={() => {
-                  props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-                  menuCollapse && menuCollapse()
-                }}
-              />
-            </>
+          {hasAccess(WORKQUEUE_TABS.inProgress) && (
+            <NavigationItem
+              icon={() => <DeclarationIconSmall color={'purple'} />}
+              id={`navigation_${WORKQUEUE_TABS.inProgress}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.inProgress]
+              )}
+              count={declarationCount.inProgress}
+              isSelected={tabId === WORKQUEUE_TABS.inProgress}
+              onClick={() => {
+                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                menuCollapse && menuCollapse()
+              }}
+            />
           )}
-          {hasSentForReview && (
+          {hasAccess(WORKQUEUE_TABS.sentForReview) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'orange'} />}
               id={`navigation_${WORKQUEUE_TABS.sentForReview}`}
@@ -402,7 +326,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasSentForApproval && (
+          {hasAccess(WORKQUEUE_TABS.sentForApproval) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'grey'} />}
               id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
@@ -417,7 +341,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasRequiresUpdates && (
+          {hasAccess(WORKQUEUE_TABS.requiresUpdate) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'red'} />}
               id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
@@ -432,7 +356,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasReadyForReview && (
+          {hasAccess(WORKQUEUE_TABS.readyForReview) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'orange'} />}
               id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
@@ -447,8 +371,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-
-          {hasReadyToPrint && (
+          {hasAccess(WORKQUEUE_TABS.readyToPrint) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'green'} />}
               id={`navigation_${WORKQUEUE_TABS.readyToPrint}`}
@@ -463,8 +386,8 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {canRegister &&
-            window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && (
+          {window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE &&
+            hasAccess(WORKQUEUE_TABS.externalValidation) && (
               <NavigationItem
                 icon={() => <DeclarationIconSmall color={'teal'} />}
                 id={`navigation_${WORKQUEUE_TABS.externalValidation}`}
@@ -479,8 +402,7 @@ const NavigationView = (props: IFullProps) => {
                 }}
               />
             )}
-
-          {isOnePrintInAdvanceOn && hasReadyToIssue && (
+          {isOnePrintInAdvanceOn && hasAccess(WORKQUEUE_TABS.readyToIssue) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'teal'} />}
               id={`navigation_${WORKQUEUE_TABS.readyToIssue}`}
@@ -495,7 +417,7 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasOutbox && (
+          {hasAccess(WORKQUEUE_TABS.outbox) && (
             <NavigationItem
               icon={() => <Icon name="PaperPlaneTilt" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.outbox}`}
@@ -511,55 +433,61 @@ const NavigationView = (props: IFullProps) => {
             />
           )}
         </NavigationGroup>
-      </>
-
-      {hasAnyOrganisation && (
+      )}
+      {hasAccess(TAB_GROUPS.organisations) && (
         <NavigationGroup>
-          {hasPerformance && userDetails && (
-            <NavigationItem
-              icon={() => <Icon name="Activity" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.performance}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.performance]
+          {userDetails && (
+            <>
+              {hasAccess(WORKQUEUE_TABS.performance) && (
+                <NavigationItem
+                  icon={() => <Icon name="Activity" size="medium" />}
+                  id={`navigation_${WORKQUEUE_TABS.performance}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.performance]
+                  )}
+                  onClick={() => {
+                    props.goToPerformanceViewAction()
+                  }}
+                  isSelected={
+                    enableMenuSelection &&
+                    activeMenuItem === WORKQUEUE_TABS.performance
+                  }
+                />
               )}
-              onClick={() => {
-                props.goToPerformanceViewAction()
-              }}
-              isSelected={
-                enableMenuSelection &&
-                activeMenuItem === WORKQUEUE_TABS.performance
-              }
-            />
-          )}
-          {hasOrganisation && userDetails && (
-            <NavigationItem
-              icon={() => <Icon name="Buildings" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.organisation}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.organisation]
+
+              {hasAccess(WORKQUEUE_TABS.organisation) && (
+                <NavigationItem
+                  icon={() => <Icon name="Buildings" size="medium" />}
+                  id={`navigation_${WORKQUEUE_TABS.organisation}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.organisation]
+                  )}
+                  onClick={() => props.goToOrganisationViewAction(userDetails)}
+                  isSelected={
+                    enableMenuSelection &&
+                    activeMenuItem === WORKQUEUE_TABS.organisation
+                  }
+                />
               )}
-              onClick={() => props.goToOrganisationViewAction(userDetails)}
-              isSelected={
-                enableMenuSelection &&
-                activeMenuItem === WORKQUEUE_TABS.organisation
-              }
-            />
-          )}
-          {hasOrganisationTeam && userDetails && (
-            <NavigationItem
-              icon={() => <Icon name="Users" size="medium" />}
-              id={`navigation_${WORKQUEUE_TABS.team}`}
-              label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.team]
+
+              {hasAccess(WORKQUEUE_TABS.team) && (
+                <NavigationItem
+                  icon={() => <Icon name="Users" size="medium" />}
+                  id={`navigation_${WORKQUEUE_TABS.team}`}
+                  label={intl.formatMessage(
+                    navigationMessages[WORKQUEUE_TABS.team]
+                  )}
+                  onClick={() => props.goToTeamViewAction(userDetails)}
+                  isSelected={
+                    enableMenuSelection &&
+                    activeMenuItem === WORKQUEUE_TABS.team
+                  }
+                />
               )}
-              onClick={() => props.goToTeamViewAction(userDetails)}
-              isSelected={
-                enableMenuSelection && activeMenuItem === WORKQUEUE_TABS.team
-              }
-            />
+            </>
           )}
 
-          {hasSystemsConfig && (
+          {hasAccess(WORKQUEUE_TABS.config) && (
             <>
               <NavigationItem
                 icon={() => <Icon name="Compass" size="medium" />}
@@ -595,7 +523,7 @@ const NavigationView = (props: IFullProps) => {
             </>
           )}
 
-          {hasEmailAllUsers && (
+          {hasAccess(WORKQUEUE_TABS.config) && (
             <>
               <NavigationItem
                 icon={() => <Icon name="ChatCircle" size="medium" />}
@@ -635,11 +563,11 @@ const NavigationView = (props: IFullProps) => {
           )}
         </NavigationGroup>
       )}
-      {hasAnyPerformance && (
+      {hasAccess(TAB_GROUPS.performance) && (
         <NavigationGroup>
           {
             <>
-              {showRegDashboard && hasPerformanceDashboards && (
+              {showRegDashboard && hasAccess(WORKQUEUE_TABS.dashboard) && (
                 <NavigationItem
                   icon={() => <Icon name="ChartLine" size="medium" />}
                   label={intl.formatMessage(navigationMessages['dashboard'])}
@@ -650,7 +578,7 @@ const NavigationView = (props: IFullProps) => {
                   }
                 />
               )}
-              {showStatistics && hasPerformanceStatistics && (
+              {showStatistics && hasAccess(WORKQUEUE_TABS.statistics) && (
                 <NavigationItem
                   icon={() => <Icon name="Activity" size="medium" />}
                   label={intl.formatMessage(navigationMessages['statistics'])}
@@ -661,7 +589,7 @@ const NavigationView = (props: IFullProps) => {
                   }
                 />
               )}
-              {showLeaderboard && hasPerformanceLeaderboards && (
+              {showLeaderboard && hasAccess(WORKQUEUE_TABS.leaderboards) && (
                 <NavigationItem
                   icon={() => <Icon name="Medal" size="medium" />}
                   label={intl.formatMessage(navigationMessages['leaderboards'])}
@@ -672,7 +600,7 @@ const NavigationView = (props: IFullProps) => {
                   }
                 />
               )}
-              {hasPerformance && userDetails && (
+              {userDetails && hasAccess(WORKQUEUE_TABS.report) && (
                 <NavigationItem
                   icon={() => <Icon name="ChartBar" size="medium" />}
                   label={intl.formatMessage(navigationMessages['performance'])}
@@ -686,7 +614,7 @@ const NavigationView = (props: IFullProps) => {
               )}
             </>
           }
-          {hasPerformanceVitalStatisticsExports && (
+          {hasAccess(WORKQUEUE_TABS.vsexports) && (
             <NavigationItem
               icon={() => <Icon name="Export" size="medium" />}
               id={`navigation_${WORKQUEUE_TABS.vsexports}`}

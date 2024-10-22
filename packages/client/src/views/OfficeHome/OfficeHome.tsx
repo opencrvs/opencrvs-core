@@ -45,10 +45,8 @@ import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
 import { RequiresUpdate } from './requiresUpdate/RequiresUpdate'
 import { ReadyForReview } from './readyForReview/ReadyForReview'
 import { InExternalValidationTab } from './inExternalValidation/InExternalValidationTab'
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
