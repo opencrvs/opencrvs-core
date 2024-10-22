@@ -78,11 +78,9 @@ const marriageDeclaration = {
 
 async function setupTest({
   declaration,
-  certTemplateId,
   registrationId
 }: {
   declaration: any
-  certTemplateId: string
   registrationId: string
 }) {
   global.fetch = vi.fn().mockImplementation(() =>
@@ -96,8 +94,7 @@ async function setupTest({
     { isNavigatedInsideApp: false },
     {
       matchParams: {
-        registrationId,
-        certTemplateId
+        registrationId
       }
     }
   )
@@ -129,7 +126,6 @@ describe('Review Certificate Tests', () => {
     beforeEach(async () => {
       component = await setupTest({
         declaration: deathDeclaration,
-        certTemplateId: 'death-certificate',
         registrationId: 'mockDeath1234'
       })
     })
@@ -146,7 +142,6 @@ describe('Review Certificate Tests', () => {
     beforeEach(async () => {
       component = await setupTest({
         declaration: birthDeclaration,
-        certTemplateId: 'birth-certificate',
         registrationId: 'mockBirth1234'
       })
     })
@@ -184,7 +179,6 @@ describe('Review Certificate Tests', () => {
     beforeEach(async () => {
       component = await setupTest({
         declaration: marriageDeclaration,
-        certTemplateId: 'marriage-certificate',
         registrationId: 'mockMarriage1234'
       })
     })
