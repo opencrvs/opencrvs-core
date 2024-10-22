@@ -149,6 +149,24 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        certificates {
+          hasShowedVerifiedDocument
+          certTemplateId
+          collector {
+            relationship
+            otherRelationship
+            name {
+              use
+              firstNames
+              familyName
+            }
+            telecom {
+              system
+              value
+              use
+            }
+          }
+        }
         duplicates {
           compositionId
           trackingId
@@ -207,6 +225,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         requesterOther
         noSupportingDocumentationRequired
         hasShowedVerifiedDocument
+        certTemplateId
         date
         action
         regStatus
@@ -295,6 +314,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         }
         certificates {
           hasShowedVerifiedDocument
+          certTemplateId
           collector {
             relationship
             otherRelationship
@@ -571,6 +591,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         certificates {
           hasShowedVerifiedDocument
+          certTemplateId
           collector {
             relationship
             otherRelationship

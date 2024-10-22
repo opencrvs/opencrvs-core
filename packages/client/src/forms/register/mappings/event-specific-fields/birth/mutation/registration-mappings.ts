@@ -48,11 +48,17 @@ export function setBirthRegistrationSectionTransformer(
     })
   }
 
-  if (draftData[sectionId].certificates) {
-    transformCertificateData(
-      transformedData,
-      (draftData[sectionId].certificates as ICertificate[])[0],
-      sectionId
+  if (
+    Array.isArray(draftData[sectionId].certificates) &&
+    draftData[sectionId].certificates.length
+  ) {
+    const updatedCertificates = transformCertificateData(
+      (draftData[sectionId].certificates as ICertificate[]).slice(-1)
     )
+    transformedData[sectionId].certificates =
+      updatedCertificates.length > 0 &&
+      Object.keys(updatedCertificates[0]).length > 0 // making sure we are not sending empty object as certificate
+        ? updatedCertificates
+        : []
   }
 }
