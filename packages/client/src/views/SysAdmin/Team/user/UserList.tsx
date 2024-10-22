@@ -553,10 +553,12 @@ function UserListComponent(props: IProps) {
         (user: User | null, index: number) => {
           if (user !== null) {
             const name =
-              (user &&
-                user.name &&
-                ((createNamesMap(user.name)[intl.locale] as string) ||
-                  (createNamesMap(user.name)[LANG_EN] as string))) ||
+              (user.name &&
+                intl.formatMessage(constantsMessages.humanName, {
+                  firstName: user.name[0].firstNames,
+                  middleName: user.name[0].middleName,
+                  lastName: user.name[0].familyName
+                })) ||
               ''
             const role = intl.formatMessage({
               id: getUserRoleIntlKey(user.role._id)
