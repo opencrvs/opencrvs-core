@@ -29,7 +29,7 @@ export const fetchLocation = async (id: UUID) => {
 }
 
 const FETCH_ALL_LOCATIONS = new URL(
-  '/locations?type=ADMIN_STRUCTURE',
+  '/locations?type=ADMIN_STRUCTURE&_count=0',
   APPLICATION_CONFIG_URL
 )
 
