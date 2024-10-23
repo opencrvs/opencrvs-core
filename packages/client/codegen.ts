@@ -21,11 +21,6 @@ const config: CodegenConfig = {
   documents: ['src/**/*.ts*', '!src/utils/gateway.ts', '!src/**/*.test.ts*'],
   generates: {
     './src/utils/gateway.ts': {
-      config: {
-        scalars: {
-          PlainDate: 'PlainDate'
-        }
-      },
       plugins: [
         'typescript',
         'typescript-operations',

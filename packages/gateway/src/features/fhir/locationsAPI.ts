@@ -9,14 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import {
-  Location,
-  Saved,
-  findResourceFromBundleById
-} from '@opencrvs/commons/types'
+
 import { UUID } from '@opencrvs/commons'
 import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+
+/* @todo */
+type Location = {
+  id: string
+  name: string
+}
 
 export default class LocationsAPI extends RESTDataSource {
   constructor() {
@@ -30,24 +32,13 @@ export default class LocationsAPI extends RESTDataSource {
     for (const each of headerKeys) {
       request.headers.set(each, headers[each])
     }
-    request.headers.set('Content-Type', 'application/fhir+json')
   }
 
-  getLocation(id: string): Promise<Saved<Location>> {
-    if (this.context.record) {
-      const inBundle = findResourceFromBundleById<Saved<Location>>(
-        this.context.record,
-        id
-      )
-      if (inBundle) {
-        return Promise.resolve(inBundle)
-      }
-    }
-
+  getLocation(id: string): Promise<Location> {
     return this.get(`/locations/${id}`)
   }
 
-  getHierarchy(id: UUID): Promise<Array<Saved<Location>>> {
+  getHierarchy(id: UUID): Promise<Array<Location>> {
     return this.get(`/locations/${id}/hierarchy`)
   }
 }

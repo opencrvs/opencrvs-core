@@ -66,7 +66,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -700,21 +700,6 @@ function UserListComponent(props: IProps) {
                 }
               />
             )}
-            <UserAuditActionModal
-              show={toggleActivation.modalVisible}
-              user={toggleActivation.selectedUser}
-              onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[
-                {
-                  query: SEARCH_USERS,
-                  variables: {
-                    primaryOfficeId: locationId,
-                    count: recordCount
-                  }
-                }
-              ]}
-            />
-
             <ResponsiveModal
               id="username-reminder-modal"
               show={toggleUsernameReminder.modalVisible}

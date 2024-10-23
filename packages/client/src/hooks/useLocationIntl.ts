@@ -18,10 +18,10 @@ export const useLocationIntl = () => {
 
   const localizeLocation = (location: Location) => {
     if (intl.locale === getDefaultLanguage()) {
-      // @TODO: Fix GraphQL typing to remove !
+      // Fix GraphQL typing to remove !
       return location.name!
     } else {
-      // @TODO: Fix GraphQL typing to remove !
+      // Fix GraphQL typing to remove !
       return location.alias?.[0] ?? location.name!
     }
   }

@@ -5,32 +5,14 @@ type Query {
     locale: String!
     type: NotificationType = EMAIL
   ): NotificationResult
-  fetchBirthRegistration(id: ID!): BirthRegistration
-  searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
-  searchDeathRegistrations(fromDate: Date, toDate: Date): [DeathRegistration]
-  queryRegistrationByIdentifier(identifier: ID!): BirthRegistration
-  queryPersonByIdentifier(identifier: ID!): Person
-  listBirthRegistrations(
-    locationIds: [String]
-    status: String
-    userId: String
-    from: Date
-    to: Date
-    count: Int
-    skip: Int
-  ): BirthRegResultSet
-  fetchDeathRegistration(id: ID!): DeathRegistration
-  fetchEventRegistration(id: ID!): EventRegistration
-  fetchRegistration(id: ID!): EventRegistration
-  fetchRegistrationForViewing(id: ID!): EventRegistration
-  queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
+  fetchEvent(id: ID!): EventData
+  fetchEventForViewing(id: ID!): EventData
   fetchRegistrationCountByStatus(
     status: [String]!
     locationId: String
-    event: String
+    event: Event
   ): RegistrationCountResult
-  fetchMarriageRegistration(id: ID!): MarriageRegistration
-  fetchRecordDetailsForVerification(id: String!): RecordDetails
+  fetchRecordDetailsForVerification(id: String!): EventData
   hasChildLocation(parentId: String!): Location
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
@@ -121,6 +103,7 @@ type Query {
     timeStart: String
     timeEnd: String
   ): UserAuditLogResultSet
+  getIndexedEvent(id: ID!): IndexedEvent!
   searchEvents(
     userId: String
     advancedSearchParameters: AdvancedSearchParametersInput!
@@ -129,15 +112,7 @@ type Query {
     sort: String
     sortColumn: String
     sortBy: [SortBy!]
-  ): EventSearchResultSet
-  getEventsWithProgress(
-    declarationJurisdictionId: String
-    registrationStatuses: [String]
-    compositionType: [String]
-    count: Int
-    skip: Int
-    sort: String
-  ): EventProgressResultSet
+  ): EventSearchResultSet!
   getSystemRoles(
     title: String
     value: ComparisonInput
@@ -147,77 +122,31 @@ type Query {
     sortOrder: String
   ): [SystemRole!]
   fetchSystem(clientId: ID!): System
-  getOIDPUserInfo(
-    code: String!
-    clientId: String!
-    redirectUri: String!
-    grantType: String
-  ): UserInfo
 }
 
 type Mutation {
-  requestRegistrationCorrection(id: ID!, details: CorrectionInput!): ID!
-  rejectRegistrationCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
-  approveBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
-  approveDeathRegistrationCorrection(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): ID!
-  approveMarriageRegistrationCorrection(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): ID!
-  createBirthRegistrationCorrection(
-    id: ID!
-    details: BirthRegistrationInput!
-  ): ID!
-  createDeathRegistrationCorrection(
-    id: ID!
-    details: DeathRegistrationInput!
-  ): ID!
-  createMarriageRegistrationCorrection(
-    id: ID!
-    details: MarriageRegistrationInput!
-  ): ID!
-  createBirthRegistration(details: BirthRegistrationInput!): CreatedIds!
-  markBirthAsVerified(
-    id: ID!
-    details: BirthRegistrationInput
-  ): BirthRegistration
-  markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID
-  markBirthAsRegistered(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
-  markBirthAsIssued(id: ID!, details: BirthRegistrationInput!): ID!
-  markEventAsVoided(id: String!, reason: String!, comment: String!): ID!
-  markEventAsReinstated(id: String!): Reinstated
-  markEventAsNotDuplicate(id: String!): ID!
+  requestEventCorrection(id: ID!, details: CorrectionInput!): ID!
+  rejectEventCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
+  approveEventCorrection(id: ID!, details: EventInput!): ID!
+  createEventCorrection(id: ID!, details: EventInput!): ID!
+  createEvent(details: EventInput!): CreatedIds!
+  markEventAsUnassigned(id: ID!): EventData
+  markEventAsVerified(id: ID!, details: EventInput!): EventData
+  markEventAsValidated(id: ID!, details: EventInput!): ID
+  markEventAsRegistered(id: ID!, details: EventInput!): ID!
+  markEventAsCertified(id: ID!, details: EventInput!): ID!
+  markEventAsIssued(id: ID!, details: EventInput!): ID!
+  markEventAsVoided(id: ID!, reason: String!, comment: String!): ID!
+  markEventAsReinstated(id: ID!): Reinstated
+  markEventAsNotDuplicate(id: ID!): ID!
   markEventAsArchived(
-    id: String!
+    id: ID!
     reason: String
     comment: String
     duplicateTrackingId: String
   ): ID!
-  createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
-  updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsVerified(
-    id: ID!
-    details: DeathRegistrationInput
-  ): DeathRegistration
-  markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID
-  markDeathAsRegistered(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
-  markDeathAsIssued(id: ID!, details: DeathRegistrationInput!): ID!
-  markEventAsUnassigned(id: String!): ID!
-  createMarriageRegistration(details: MarriageRegistrationInput!): CreatedIds!
-  markMarriageAsValidated(id: ID!, details: MarriageRegistrationInput): ID
-  markMarriageAsRegistered(id: ID!, details: MarriageRegistrationInput!): ID!
-  markMarriageAsCertified(id: ID!, details: MarriageRegistrationInput!): ID!
-  markMarriageAsIssued(id: ID!, details: MarriageRegistrationInput!): ID!
   markEventAsDuplicate(
-    id: String!
+    id: ID!
     reason: String!
     comment: String
     duplicateTrackingId: String
@@ -283,88 +212,14 @@ enum NotificationType {
   SMS
 }
 
-type BirthRegistration implements EventRegistration {
+type EventData {
   id: ID!
-  _fhirIDMap: Map
-  registration: Registration
-  child: Person
-  mother: Person
-  father: Person
-  informant: RelatedPerson
-  eventLocation: Location
-  birthType: String
-  questionnaire: [QuestionnaireQuestion]
-  weightAtBirth: Float
-  attendantAtBirth: String
-  otherAttendantAtBirth: String
-  childrenBornAliveToMother: Int
-  foetalDeathsToMother: Int
-  lastPreviousLiveBirth: Date
-  createdAt: Date
-  updatedAt: Date
-  history: [History]
-}
-
-scalar Date
-
-type DeathRegistration implements EventRegistration {
-  id: ID!
-  _fhirIDMap: Map
-  registration: Registration
-  deceased: Person
-  informant: RelatedPerson
-  mother: Person
-  father: Person
-  spouse: Person
-  eventLocation: Location
-  questionnaire: [QuestionnaireQuestion]
-  mannerOfDeath: String
-  deathDescription: String
-  causeOfDeathMethod: String
-  causeOfDeathEstablished: String
-  causeOfDeath: String
-  maleDependentsOfDeceased: Float
-  femaleDependentsOfDeceased: Float
-  medicalPractitioner: MedicalPractitioner
-  createdAt: Date
-  updatedAt: Date
-  history: [History]
-}
-
-type Person {
-  id: ID
-  _fhirID: ID
-  identifier: [IdentityType]
-  name: [HumanName]
-  telecom: [ContactPoint]
-  gender: String
-  birthDate: PlainDate
-  age: Float
-  maritalStatus: String
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: PlainDate
-  multipleBirth: Int
-  address: [Address]
-  photo: [Attachment]
-  deceased: Deceased
-  nationality: [String]
-  educationalAttainment: String
-  ageOfIndividualInYears: Int
-  exactDateOfBirthUnknown: Boolean
-}
-
-type BirthRegResultSet {
-  results: [BirthRegistration]
-  totalItems: Int
-}
-
-interface EventRegistration {
-  id: ID!
-  registration: Registration
-  history: [History]
-  createdAt: Date
+  type: String!
+  createdAt: String!
+  actions: [Action!]!
+  duplicates: [ID!]!
+  attachments: [Attachment!]!
+  status: RegStatus!
 }
 
 type RegistrationCountResult {
@@ -372,24 +227,11 @@ type RegistrationCountResult {
   total: Int!
 }
 
-type MarriageRegistration implements EventRegistration {
-  id: ID!
-  _fhirIDMap: Map
-  registration: Registration
-  informant: RelatedPerson
-  bride: Person
-  groom: Person
-  witnessOne: RelatedPerson
-  witnessTwo: RelatedPerson
-  eventLocation: Location
-  typeOfMarriage: String
-  questionnaire: [QuestionnaireQuestion]
-  createdAt: Date
-  updatedAt: Date
-  history: [History]
+enum Event {
+  birth
+  death
+  marriage
 }
-
-union RecordDetails = BirthRegistration | DeathRegistration
 
 type Location {
   id: ID!
@@ -516,13 +358,24 @@ type UserAuditLogResultSet {
   results: [UserAuditLogResultItem!]!
 }
 
+type IndexedEvent {
+  status: String!
+  id: ID!
+  type: String!
+  createdAt: Date!
+  createdAtLocation: String!
+  modifiedAt: String!
+  assignedTo: AssignmentData
+  duplicates: [ID!]!
+}
+
 type EventSearchResultSet {
-  results: [EventSearchSet]
-  totalItems: Int
+  results: [IndexedEvent!]!
+  totalItems: Int!
 }
 
 input AdvancedSearchParametersInput {
-  event: Event
+  event: String
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -600,11 +453,6 @@ input SortBy {
   order: String!
 }
 
-type EventProgressResultSet {
-  results: [EventProgressSet]
-  totalItems: Int
-}
-
 type SystemRole {
   id: ID!
   value: SystemRoleType!
@@ -634,13 +482,6 @@ type System {
   settings: SystemSettings
 }
 
-type UserInfo {
-  oidpUserInfo: OIDPUserInfo
-  districtFhirId: String
-  stateFhirId: String
-  locationLevel3FhirId: String
-}
-
 input CorrectionInput {
   requester: String!
   requesterOther: String
@@ -660,61 +501,10 @@ input CorrectionRejectionInput {
   timeLoggedMS: Int!
 }
 
-input BirthRegistrationInput {
-  _fhirIDMap: FHIRIDMap
-  registration: RegistrationInput
-  child: PersonInput
-  mother: PersonInput
-  father: PersonInput
-  informant: RelatedPersonInput
-  eventLocation: LocationInput
-  birthType: String
-  questionnaire: [QuestionnaireQuestionInput]
-  weightAtBirth: Float
-  attendantAtBirth: String
-  otherAttendantAtBirth: String
-  childrenBornAliveToMother: Int
-  foetalDeathsToMother: Int
-  lastPreviousLiveBirth: Date
-  createdAt: Date
-  updatedAt: Date
-}
-
-input DeathRegistrationInput {
-  _fhirIDMap: FHIRIDMap
-  registration: RegistrationInput
-  deceased: PersonInput
-  informant: RelatedPersonInput
-  mother: PersonInput
-  father: PersonInput
-  spouse: PersonInput
-  eventLocation: LocationInput
-  questionnaire: [QuestionnaireQuestionInput]
-  mannerOfDeath: String
-  deathDescription: String
-  causeOfDeathMethod: String
-  causeOfDeathEstablished: String
-  causeOfDeath: String
-  maleDependentsOfDeceased: Float
-  femaleDependentsOfDeceased: Float
-  medicalPractitioner: MedicalPractitionerInput
-  createdAt: Date
-  updatedAt: Date
-}
-
-input MarriageRegistrationInput {
-  _fhirIDMap: FHIRIDMap
-  registration: RegistrationInput
-  informant: RelatedPersonInput
-  bride: PersonInput
-  groom: PersonInput
-  witnessOne: RelatedPersonInput
-  witnessTwo: RelatedPersonInput
-  eventLocation: LocationInput
-  typeOfMarriage: String
-  questionnaire: [QuestionnaireQuestionInput]
-  createdAt: Date
-  updatedAt: Date
+input EventInput {
+  id: String
+  type: String
+  actions: [ActionsInput]
 }
 
 type CreatedIds {
@@ -802,119 +592,42 @@ input RemoveBookmarkedSeachInput {
   searchId: String!
 }
 
-scalar Map
-
-type Registration {
-  id: ID
-  _fhirID: ID
-  draftId: String
-  trackingId: String
-  mosipAid: String
-  registrationNumber: String
-  paperFormID: String
-  page: String
-  book: String
-  informantType: String
-  otherInformantType: String
-  assignment: AssignmentData
-  contact: String
-  contactRelationship: String
-  informantsSignature: String
-  groomSignature: String
-  brideSignature: String
-  witnessOneSignature: String
-  witnessTwoSignature: String
-  contactPhoneNumber: String
-  contactEmail: String
-  status: [RegWorkflow]
-  type: RegistrationType
-  inCompleteFields: String
-  attachments: [Attachment]
-  certificates: [Certificate]
-  duplicates: [DuplicatesInfo]
+type Action {
+  type: RegAction!
+  createdBy: String!
+  createdAt: String!
+  createdAtLocation: String!
+  fields: [Field!]!
 }
 
-type RelatedPerson {
-  id: ID
-  _fhirID: ID
-  _fhirIDPatient: ID
-  relationship: String
-  otherRelationship: String
-  affidavit: [Attachment]
-  identifier: [IdentityType]
-  name: [HumanName]
-  telecom: [ContactPoint]
-  gender: String
-  birthDate: String
-  age: Float
-  maritalStatus: String
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: Date
-  multipleBirth: Int
-  address: [Address]
-  photo: [Attachment]
-  deceased: Deceased
-  nationality: [String]
-  educationalAttainment: String
-  ageOfIndividualInYears: Int
-  exactDateOfBirthUnknown: Boolean
+type Attachment {
+  contentType: String!
+  uri: String!
+  description: String!
 }
 
-type QuestionnaireQuestion {
-  fieldId: String
+enum RegStatus {
+  IN_PROGRESS
+  ARCHIVED
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  CORRECTION_REQUESTED
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  ISSUED
+}
+
+type StatusWiseRegistrationCount {
+  status: String!
+  count: Int!
+}
+
+type Identifier {
+  system: String
   value: String
-}
-
-type History {
-  user: User
-  date: Date
-  regStatus: RegStatus
-  ipAddress: String
-  action: RegAction
-  note: String
-  statusReason: StatusReason
-  reason: String
-  requester: String
-  requesterOther: String
-  hasShowedVerifiedDocument: Boolean
-  noSupportingDocumentationRequired: Boolean
-  otherReason: String
-  system: IntegratedSystem
-  location: Location
-  office: Location
-  dhis2Notification: Boolean
-  comments: [Comment]
-  input: [InputOutput]
-  output: [InputOutput]
-  certificates: [Certificate]
-  signature: Signature
-  payment: Payment
-  documents: [Attachment!]!
-  duplicateOf: String
-  potentialDuplicates: [String!]
-}
-
-type MedicalPractitioner {
-  name: String
-  qualification: String
-  lastVisitDate: Date
-}
-
-type IdentityType {
-  id: ID
-  type: String
-  otherType: String
-  fieldsModifiedByIdentity: [String]
-}
-
-type HumanName {
-  use: String
-  firstNames: String
-  middleName: String
-  familyName: String
-  marriedLastName: String
 }
 
 type ContactPoint {
@@ -922,8 +635,6 @@ type ContactPoint {
   value: String
   use: String
 }
-
-scalar PlainDate
 
 type Address {
   use: String
@@ -943,34 +654,12 @@ type Address {
   partOf: String
 }
 
-type Attachment {
-  id: ID!
-  _fhirID: ID
-  contentType: String
-  data: String
-  uri: String
-  status: String
-  originalFileName: String
-  systemFileName: String
-  type: String
-  description: String
-  subject: String
-  createdAt: Date
-}
-
-type Deceased {
-  deceased: Boolean
-  deathDate: PlainDate
-}
-
-type StatusWiseRegistrationCount {
-  status: String!
-  count: Int!
-}
-
-type Identifier {
-  system: String
-  value: String
+type HumanName {
+  use: String
+  firstNames: String
+  middleName: String
+  familyName: String
+  marriedLastName: String
 }
 
 enum SystemRoleType {
@@ -1070,29 +759,14 @@ union UserAuditLogResultItem =
     UserAuditLogItemWithComposition
   | UserAuditLogItem
 
-interface EventSearchSet {
-  id: ID!
-  type: String
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
-}
+scalar Date
 
-enum Event {
-  birth
-  death
-  marriage
-}
-
-type EventProgressSet {
-  id: ID!
-  type: String
-  name: [HumanName]
-  dateOfEvent: PlainDate
-  registration: RegistrationSearchSet
-  startedBy: User
-  startedByFacility: String
-  startedAt: Date
-  progressReport: EventProgressData
+type AssignmentData {
+  practitionerId: String!
+  firstName: String!
+  lastName: String!
+  officeName: String!
+  avatarURL: String!
 }
 
 enum SystemStatus {
@@ -1118,29 +792,6 @@ type SystemSettings {
   openIdProviderClientId: String
   openIdProviderBaseUrl: String
   openIdProviderClaims: String
-}
-
-type OIDPUserInfo {
-  sub: String!
-  name: String
-  given_name: String
-  family_name: String
-  middle_name: String
-  nickname: String
-  preferred_username: String
-  profile: String
-  picture: String
-  website: String
-  email: String
-  email_verified: Boolean
-  gender: String
-  birthdate: String
-  zoneinfo: String
-  locale: String
-  phone_number: String
-  phone_number_verified: Boolean
-  address: OIDPUserAddress
-  updated_at: Int
 }
 
 input AttachmentInput {
@@ -1190,115 +841,9 @@ input LocationInput {
   geoData: String
 }
 
-input FHIRIDMap {
-  composition: String
-  encounter: String
-  eventLocation: String
-  questionnaireResponse: String
-  observation: ObservationFHIRIDS
-}
-
-input RegistrationInput {
-  _fhirID: ID
-  draftId: String
-  trackingId: String
-  mosipAid: String
-  registrationNumber: String
-  paperFormID: String
-  page: String
-  book: String
-  informantsSignature: String
-  groomSignature: String
-  brideSignature: String
-  witnessOneSignature: String
-  witnessTwoSignature: String
-  informantType: String
-  otherInformantType: String
-  contactPhoneNumber: String
-  contactEmail: String
-  status: [RegWorkflowInput]
-  type: RegistrationType
-  inCompleteFields: String
-  attachments: [AttachmentInput!]
-  certificates: [CertificateInput]
-  location: LocationInput
-  correction: CorrectionInput
-  changedValues: [CorrectionValueInput!]
-}
-
-input PersonInput {
-  _fhirID: ID
-  identifier: [IdentityInput]
-  name: [HumanNameInput]
-  telecom: [ContactPointInput]
-  gender: Gender
-  birthDate: PlainDate
-  age: Float
-  maritalStatus: String
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: PlainDate
-  multipleBirth: Int
-  address: [AddressInput]
-  photo: [AttachmentInput!]
-  deceased: DeceasedInput
-  nationality: [String]
-  educationalAttainment: String
-  ageOfIndividualInYears: Int
-}
-
-input RelatedPersonInput {
-  id: ID
-  _fhirID: ID
-  _fhirIDPatient: ID
-  relationship: String
-  otherRelationship: String
-  affidavit: [AttachmentInput!]
-  exactDateOfBirthUnknown: Boolean
-  identifier: [IdentityInput]
-  name: [HumanNameInput]
-  telecom: [ContactPointInput]
-  gender: Gender
-  birthDate: String
-  age: Float
-  maritalStatus: String
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: Date
-  multipleBirth: Int
-  address: [AddressInput]
-  photo: [AttachmentInput!]
-  deceased: DeceasedInput
-  nationality: [String]
-  educationalAttainment: String
-  ageOfIndividualInYears: Int
-}
-
-input QuestionnaireQuestionInput {
-  fieldId: String
-  value: String
-}
-
-input MedicalPractitionerInput {
-  name: String
-  qualification: String
-  lastVisitDate: Date
-}
-
-enum RegStatus {
-  IN_PROGRESS
-  ARCHIVED
-  DECLARED
-  DECLARATION_UPDATED
-  WAITING_VALIDATION
-  CORRECTION_REQUESTED
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
-  ISSUED
+input ActionsInput {
+  type: String!
+  fields: [FieldsInput!]!
 }
 
 input HumanNameInput {
@@ -1320,6 +865,8 @@ input SignatureInput {
   type: String
 }
 
+scalar Map
+
 input RoleInput {
   _id: ID
   labels: [LabelInput!]!
@@ -1333,44 +880,6 @@ input SystemSettingsInput {
 input WebhookInput {
   event: String!
   permissions: [String]!
-}
-
-type AssignmentData {
-  practitionerId: String
-  firstName: String
-  lastName: String
-  officeName: String
-  avatarURL: String!
-}
-
-type RegWorkflow {
-  id: ID!
-  type: RegStatus
-  user: User
-  timestamp: Date
-  comments: [Comment]
-  reason: String
-  location: Location
-  office: Location
-  timeLogged: Int
-}
-
-enum RegistrationType {
-  BIRTH
-  DEATH
-  MARRIAGE
-}
-
-type Certificate {
-  collector: RelatedPerson
-  hasShowedVerifiedDocument: Boolean
-  payments: [Payment]
-  data: String
-}
-
-type DuplicatesInfo {
-  compositionId: ID
-  trackingId: String
 }
 
 enum RegAction {
@@ -1389,36 +898,9 @@ enum RegAction {
   FLAGGED_AS_POTENTIAL_DUPLICATE
 }
 
-type StatusReason {
-  text: String
-}
-
-type IntegratedSystem {
-  name: String
-  username: String
-  type: String
-}
-
-type Comment {
-  id: ID!
-  user: User
-  comment: String
-  createdAt: Date
-}
-
-type InputOutput {
-  valueCode: String!
-  valueId: String!
-  value: FieldValue!
-}
-
-type Payment {
-  id: ID!
-  type: PaymentType!
-  amount: Float!
-  outcome: PaymentOutcomeType!
-  date: Date!
-  attachmentURL: String
+type Field {
+  fieldId: String!
+  value: String!
 }
 
 type RoleLabel {
@@ -1427,7 +909,7 @@ type RoleLabel {
 }
 
 type AdvancedSeachParameters {
-  event: Event
+  event: String
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -1529,101 +1011,9 @@ type UserAuditLogItem implements AuditLogItemBase {
   practitionerId: String!
 }
 
-type RegistrationSearchSet {
-  status: String
-  contactNumber: String
-  contactEmail: String
-  contactRelationship: String
-  dateOfDeclaration: Date
-  trackingId: String
-  registrationNumber: String
-  eventLocationId: String
-  registeredLocationId: String
-  reason: String
-  comment: String
-  duplicates: [ID]
-  createdAt: String
-  modifiedAt: String
-  assignment: AssignmentData
-}
-
-type OperationHistorySearchSet {
-  operationType: String
-  operatedOn: Date
-  operatorRole: String
-  operatorName: [HumanName]
-  operatorOfficeName: String
-  operatorOfficeAlias: [String]
-  notificationFacilityName: String
-  notificationFacilityAlias: [String]
-  rejectReason: String
-  rejectComment: String
-}
-
-type BirthEventSearchSet implements EventSearchSet {
-  id: ID!
-  type: String
-  childName: [HumanName]
-  childIdentifier: String
-  dateOfBirth: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
-  placeOfBirth: String
-  childGender: String
-  mothersFirstName: String
-  mothersLastName: String
-  fathersFirstName: String
-  fathersLastName: String
-  motherDateOfBirth: String
-  fatherDateOfBirth: String
-  motherIdentifier: String
-  fatherIdentifier: String
-}
-
-type DeathEventSearchSet implements EventSearchSet {
-  id: ID!
-  type: String
-  deceasedGender: String
-  deceasedName: [HumanName]
-  dateOfDeath: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
-}
-
-type MarriageEventSearchSet implements EventSearchSet {
-  id: ID!
-  type: String
-  brideName: [HumanName]
-  groomName: [HumanName]
-  brideIdentifier: String
-  groomIdentifier: String
-  dateOfMarriage: PlainDate
-  registration: RegistrationSearchSet
-  operationHistories: [OperationHistorySearchSet]
-}
-
-type EventProgressData {
-  timeInProgress: Int
-  timeInReadyForReview: Int
-  timeInRequiresUpdates: Int
-  timeInWaitingForApproval: Int
-  timeInWaitingForBRIS: Int
-  timeInReadyToPrint: Int
-}
-
 type WebhookPermission {
   event: String!
   permissions: [String!]!
-}
-
-type OIDPUserAddress {
-  formatted: String
-  street_address: String
-  locality: String
-  region: String
-  postal_code: String
-  city: String
-  country: String
 }
 
 enum AttachmentInputStatus {
@@ -1665,57 +1055,9 @@ input AddressInput {
   partOf: String
 }
 
-input ObservationFHIRIDS {
-  maleDependentsOfDeceased: String
-  femaleDependentsOfDeceased: String
-  mannerOfDeath: String
-  deathDescription: String
-  causeOfDeathEstablished: String
-  causeOfDeathMethod: String
-  causeOfDeath: String
-  birthType: String
-  typeOfMarriage: String
-  weightAtBirth: String
-  attendantAtBirth: String
-  childrenBornAliveToMother: String
-  foetalDeathsToMother: String
-  lastPreviousLiveBirth: String
-}
-
-input RegWorkflowInput {
-  type: RegStatus
-  user: UserInput
-  timestamp: Date
-  reason: String
-  comments: [CommentInput]
-  location: LocationInput
-  timeLoggedMS: Int
-}
-
-input CertificateInput {
-  collector: RelatedPersonInput
-  hasShowedVerifiedDocument: Boolean
-  payments: [PaymentInput]
-  data: String
-}
-
-input IdentityInput {
-  id: ID
-  type: String
-  otherType: String
-  fieldsModifiedByIdentity: [String]
-}
-
-enum Gender {
-  male
-  female
-  other
-  unknown
-}
-
-input DeceasedInput {
-  deceased: Boolean
-  deathDate: PlainDate
+input FieldsInput {
+  fieldId: String!
+  value: String!
 }
 
 input LabelInput {
@@ -1767,19 +1109,4 @@ enum AddressType {
   postal
   physical
   both
-}
-
-input CommentInput {
-  user: UserInput
-  comment: String
-  createdAt: Date
-}
-
-input PaymentInput {
-  paymentId: ID
-  type: PaymentType
-  amount: Float
-  outcome: PaymentOutcomeType
-  date: Date
-  data: String
 }

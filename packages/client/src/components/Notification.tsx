@@ -35,7 +35,6 @@ import {
   toggleEmailAllUsersFeedbackToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { goToDeclarationRecordAudit } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
@@ -56,7 +55,6 @@ type DispatchProps = {
   hideCreateUserFormDuplicateEmailErrorToast: typeof hideCreateUserFormDuplicateEmailErrorToast
   hideUnassignedDeclarationsToast: typeof hideUnassignedDeclarationsToast
   hideUserReconnectedToast: typeof hideUserReconnectedToast
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   toggleEmailAllUsersFeedbackToast: typeof toggleEmailAllUsersFeedbackToast
 }
 
@@ -79,7 +77,6 @@ const Component = ({
   hideCreateUserFormDuplicateEmailErrorToast,
   hideUnassignedDeclarationsToast,
   hideUserReconnectedToast,
-  goToDeclarationRecordAudit,
   toggleEmailAllUsersFeedbackToast,
   children,
   configurationError,
@@ -88,7 +85,6 @@ const Component = ({
   saveDraftClicked,
   submitFormSuccessToast,
   submitFormErrorToast,
-  userAuditSuccessToast,
   showPINUpdateSuccess,
   showDuplicateRecordsToast,
   duplicateTrackingId,
@@ -168,18 +164,7 @@ const Component = ({
           {userFormSubmitErrorMessage}
         </Toast>
       )}
-      {userAuditSuccessToast.visible && (
-        <Toast
-          id="userAuditSuccessToast"
-          type="success"
-          onClose={hideUserAuditSuccessToast}
-        >
-          {intl.formatMessage(messages.userAuditSuccess, {
-            name: userAuditSuccessToast.userFullName,
-            action: userAuditSuccessToast.action
-          })}
-        </Toast>
-      )}
+
       {showPINUpdateSuccess && (
         <Toast
           id="PINUpdateSuccessToast"
@@ -201,12 +186,14 @@ const Component = ({
                 underline
                 color="white"
                 element="button"
-                onClick={() =>
-                  hideDuplicateRecordsToast() &&
-                  goToDeclarationRecordAudit(
-                    'reviewTab',
-                    duplicateCompositionId
-                  )
+                onClick={
+                  () => hideDuplicateRecordsToast()
+                  // @todo
+                  // &&
+                  // goToDeclarationRecordAudit(
+                  //   'reviewTab',
+                  //   duplicateCompositionId
+                  // )
                 }
               >
                 {duplicateTrackingId}
@@ -297,7 +284,6 @@ const mapStateToProps = (store: IStoreState) => {
     saveDraftClicked: store.notification.saveDraftClicked,
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
     submitFormErrorToast: store.notification.submitFormErrorToast,
-    userAuditSuccessToast: store.notification.userAuditSuccessToast,
     showPINUpdateSuccess: store.notification.showPINUpdateSuccess,
     showDuplicateRecordsToast: store.notification.showDuplicateRecordsToast,
     duplicateCompositionId: store.notification.duplicateCompositionId,
@@ -329,7 +315,6 @@ export const NotificationComponent = withRouter(
     hideCreateUserErrorToast,
     hideCreateUserFormDuplicateEmailErrorToast,
     hideUserReconnectedToast,
-    goToDeclarationRecordAudit,
     hideUnassignedDeclarationsToast,
     toggleEmailAllUsersFeedbackToast
   })(injectIntl(withOnlineStatus(Component)))

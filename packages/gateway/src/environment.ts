@@ -33,6 +33,7 @@ export const env = cleanEnv(process.env, {
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   DISABLE_RATE_LIMIT: bool({
     default: false,
+    devDefault: true,
     desc: 'Disables the Redis-based rate limiting globally'
   }),
   SENTRY_DSN: str({ default: undefined }),

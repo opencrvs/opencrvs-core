@@ -11,7 +11,6 @@
 scalar Date
 scalar Map
 scalar FieldValue
-scalar PlainDate
 
 input HumanNameInput {
   use: String # bn | en - the language the name text is written in
@@ -27,14 +26,6 @@ type HumanName { # -> HumanName
   middleName: String # -> .given[1]
   familyName: String # -> .family
   marriedLastName: String # -> .suffix
-}
-
-# Although the recommended way is use ALL_CAPS but keeping it lowercase
-# makes it a lot more easier to use in client
-enum Event {
-  birth
-  death
-  marriage
 }
 
 input IdentityInput {
@@ -109,69 +100,11 @@ type RelatedPerson { # -> Related Person
   exactDateOfBirthUnknown: Boolean
 }
 
-input DeceasedInput {
-  deceased: Boolean
-  deathDate: PlainDate
-}
-
-type Deceased {
-  deceased: Boolean
-  deathDate: PlainDate
-}
-
 enum Gender {
   male
   female
   other
   unknown
-}
-
-input PersonInput {
-  _fhirID: ID
-  identifier: [IdentityInput]
-  name: [HumanNameInput]
-  telecom: [ContactPointInput]
-  gender: Gender
-  birthDate: PlainDate
-  age: Float
-  maritalStatus: String # Not in BDRIS2 - keep as optional
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: PlainDate # Not in BDRIS2
-  # For order of birth 3 equals 3rd born
-  multipleBirth: Int # Not in BDRIS2
-  address: [AddressInput]
-  photo: [AttachmentInput!]
-  deceased: DeceasedInput
-  nationality: [String] # In BDRIS2 for father and mother only
-  educationalAttainment: String # Not in BDRIS2
-  ageOfIndividualInYears: Int
-}
-
-type Person { # -> Patient
-  id: ID
-  _fhirID: ID # -> .id
-  identifier: [IdentityType] # -> .identifier
-  name: [HumanName] # -> .name
-  telecom: [ContactPoint] # -> .telecom
-  gender: String # -> .gender
-  birthDate: PlainDate # -> birthDate
-  age: Float # -> .extension(url='http://opencrvs.org/specs/age').valueInteger
-  maritalStatus: String # -> .maritalStatus
-  occupation: String
-  detailsExist: Boolean
-  reasonNotApplying: String
-  dateOfMarriage: PlainDate # -> .extension(url='http://opencrvs.org/specs/date-of-marriage').valueDateTime
-  # For order of birth 3 equals 3rd born
-  multipleBirth: Int # -> .multipleBirthInteger
-  address: [Address] # -> .address
-  photo: [Attachment] # -> .photo
-  deceased: Deceased # -> .deceased
-  nationality: [String] # -> .extension https://www.hl7.org/fhir/extension-patient-nationality.html
-  educationalAttainment: String # -> .extension(url='http://opencrvs.org/specs/extension/educational-attainment').valueString
-  ageOfIndividualInYears: Int
-  exactDateOfBirthUnknown: Boolean
 }
 
 enum TelecomSystem {
@@ -260,9 +193,3 @@ type Address { # -> Address (mostly the same property name except:)
   to: Date # -> .period.end
   partOf: String
 }
-
-enum AuthorizationStatus {
-  ANONYMOUS
-}
-
-directive @auth(requires: AuthorizationStatus!) on FIELD_DEFINITION

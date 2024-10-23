@@ -14,7 +14,7 @@ type BookmarkedSeachItem {
 }
 
 type AdvancedSeachParameters {
-  event: Event
+  event: String
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -80,7 +80,7 @@ input BookmarkSearchInput {
 }
 
 input AdvancedSearchParametersInput {
-  event: Event
+  event: String
   name: String
   registrationStatuses: [String]
   dateOfEvent: String

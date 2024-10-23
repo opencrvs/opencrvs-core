@@ -126,7 +126,7 @@ export const GET_USER = gql`
   }
 `
 
-export const USER_AUDIT_ACTION = gql`
+const USER_AUDIT_ACTION = gql`
   mutation auditUser(
     $userId: String!
     $action: String!

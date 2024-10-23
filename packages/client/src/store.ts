@@ -23,11 +23,7 @@ import {
   StoreEnhancer
 } from 'redux'
 import { combineReducers, getModel, install, StoreCreator } from 'redux-loop'
-import { declarationsReducer, IDeclarationsState } from '@client/declarations'
-import {
-  IRegisterFormState,
-  registerFormReducer
-} from '@client/forms/register/reducer'
+
 import { intlReducer, IntlState } from '@client/i18n/reducer'
 import { INavigationState, navigationReducer } from '@client/navigation'
 import {
@@ -36,20 +32,11 @@ import {
 } from '@client/notification/reducer'
 import { IOfflineDataState, offlineDataReducer } from '@client/offline/reducer'
 import { profileReducer, ProfileState } from '@client/profile/profileReducer'
-import {
-  IReviewFormState,
-  reviewReducer
-} from '@opencrvs/client/src/forms/register/reviewReducer'
-// eslint-disable-next-line no-restricted-imports
-import {
-  advancedSearchParamReducer,
-  IAdvancedSearchParamState
-} from '@client/search/advancedSearch/reducer'
+
 import { IUserFormState, userFormReducer } from '@client/user/userReducer'
 import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
-import { submissionMiddleware } from './declarations/submissionMiddleware'
-import { workqueueReducer, WorkqueueState } from './workqueue'
+
 import { persistenceMiddleware } from './utils/persistence/persistenceMiddleware'
 import {
   IReloadModalVisibilityState,
@@ -60,15 +47,10 @@ export interface IStoreState {
   profile: ProfileState
   router: RouterState
   i18n: IntlState
-  declarationsState: IDeclarationsState
-  registerForm: IRegisterFormState
   navigation: INavigationState
   notification: NotificationState
-  reviewForm: IReviewFormState
   offline: IOfflineDataState
   userForm: IUserFormState
-  workqueueState: WorkqueueState
-  advancedSearch: IAdvancedSearchParamState
   reloadModalVisibility: IReloadModalVisibilityState
 }
 
@@ -84,22 +66,16 @@ export const createStore = <T>(
   const history = existingHistory || createBrowserHistory()
   const reducers = combineReducers<IStoreState>({
     profile: profileReducer,
-    router: connectRouter(history) as any, // @todo
+    router: connectRouter(history) as any,
     i18n: intlReducer,
-    declarationsState: declarationsReducer,
-    registerForm: registerFormReducer,
     navigation: navigationReducer,
     notification: notificationReducer,
-    reviewForm: reviewReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
-    workqueueState: workqueueReducer,
-    advancedSearch: advancedSearchParamReducer,
     reloadModalVisibility: reloadModalVisibilityReducer
   })
-  // @ts-ignore
+
   const enhancer = compose(
-    applyMiddleware(submissionMiddleware),
     install(config),
     applyMiddleware(persistenceMiddleware),
     applyMiddleware(routerMiddleware(history)),

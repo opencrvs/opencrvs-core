@@ -10,7 +10,7 @@
  */
 
 import { UUID } from '@opencrvs/commons'
-import { Location, SavedLocation } from '@opencrvs/commons/types'
+
 import { APPLICATION_CONFIG_URL } from './constants'
 import fetch from 'node-fetch'
 
@@ -40,5 +40,5 @@ export const fetchLocationChildren = async (id: UUID) => {
     )
   }
 
-  return response.json() as Promise<SavedLocation[]>
+  return response.json() /* TODO */
 }

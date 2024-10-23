@@ -56,7 +56,6 @@ export interface GQLQuery {
   fetchMonthWiseEventMetrics?: Array<GQLMonthWiseEstimationMetric>
   fetchLocationWiseEventMetrics?: Array<GQLLocationWiseEstimationMetric>
   getUserAuditLog?: GQLUserAuditLogResultSet
-  searchEvents?: GQLEventSearchResultSet
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
   getCertificateSVG?: GQLCertificateSVG
@@ -405,11 +404,6 @@ export interface GQLLocationWiseEstimationMetric {
 export interface GQLUserAuditLogResultSet {
   total: number
   results: Array<GQLUserAuditLogResultItem>
-}
-
-export interface GQLEventSearchResultSet {
-  results?: Array<GQLEventSearchSet | null>
-  totalItems?: number
 }
 
 export interface GQLAdvancedSearchParametersInput {
@@ -1946,7 +1940,6 @@ export interface GQLResolver {
   MonthWiseEstimationMetric?: GQLMonthWiseEstimationMetricTypeResolver
   LocationWiseEstimationMetric?: GQLLocationWiseEstimationMetricTypeResolver
   UserAuditLogResultSet?: GQLUserAuditLogResultSetTypeResolver
-  EventSearchResultSet?: GQLEventSearchResultSetTypeResolver
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   SystemRole?: GQLSystemRoleTypeResolver
   CertificateSVG?: GQLCertificateSVGTypeResolver
@@ -4881,11 +4874,6 @@ export interface UserAuditLogResultSetToResultsResolver<
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLEventSearchResultSetTypeResolver<TParent = any> {
-  results?: EventSearchResultSetToResultsResolver<TParent>
-  totalItems?: EventSearchResultSetToTotalItemsResolver<TParent>
 }
 
 export interface EventSearchResultSetToResultsResolver<

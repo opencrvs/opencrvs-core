@@ -64,7 +64,7 @@ export const PERFORMANCE_STATS = gql`
     $locationId: String
     $populationYear: Int!
     $status: [String]!
-    $event: String
+    $event: Event
     $officeSelected: Boolean!
   ) {
     getLocationStatistics(

@@ -13,7 +13,7 @@ import { ReactWrapper } from 'enzyme'
 import { Store } from 'redux'
 import * as actions from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
 import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('when app notifies the user', () => {
@@ -105,31 +105,6 @@ describe('when app notifies the user', () => {
         app.find('#submissionErrorToastCancel').hostNodes().simulate('click')
         app.update()
         expect(store.getState().notification.submitFormErrorToast).toBe(null)
-      })
-    })
-    describe('In case of user audit successful submission', () => {
-      beforeEach(() => {
-        const action = actions.showUserAuditSuccessToast(
-          'John Doe',
-          AUDIT_ACTION.DEACTIVATE
-        )
-        store.dispatch(action)
-        app.update()
-      })
-
-      it('shows submit success toast', () => {
-        expect(app.find('#userAuditSuccessToast').hostNodes().text()).toBe(
-          'John Doe was deactivated'
-        )
-        expect(app.find('#userAuditSuccessToast').hostNodes()).toHaveLength(1)
-      })
-
-      it('clicking cancel button should hide the toast', () => {
-        app.find('#userAuditSuccessToastCancel').hostNodes().simulate('click')
-        app.update()
-        expect(
-          store.getState().notification.userAuditSuccessToast.visible
-        ).toBe(false)
       })
     })
   })

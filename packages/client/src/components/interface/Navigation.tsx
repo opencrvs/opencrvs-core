@@ -9,11 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  filterProcessingDeclarationsFromQuery,
-  IDeclaration,
-  SUBMISSION_STATUS
-} from '@client/declarations'
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -30,24 +25,15 @@ import {
   goToTeamView,
   goToVSExport
 } from '@client/navigation'
-import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { getAdvancedSearchParamsState } from '@client/search/advancedSearch/advancedSearchSelectors'
-import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
+
 import { storage } from '@client/storage'
-import styled from 'styled-components'
-import {
-  ALLOWED_STATUS_FOR_RETRY,
-  INPROGRESS_STATUS
-} from '@client/SubmissionController'
-import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
+import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { Event } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
-import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
@@ -58,12 +44,11 @@ import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavi
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
-import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
-import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
+import styled from 'styled-components'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -230,20 +215,13 @@ interface IDispatchProps {
   goToLeaderBoardsView: typeof goToLeaderBoardsView
   goToDashboardView: typeof goToDashboardView
   goToPerformanceStatistics: typeof goToPerformanceStatistics
-  updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
-  setAdvancedSearchParam: typeof setAdvancedSearchParam
   goToAllUserEmail: typeof goToAllUserEmail
 }
 
 interface IStateProps {
-  draftDeclarations: IDeclaration[]
-  declarationsReadyToSend: IDeclaration[]
   userDetails: UserDetails | null
-  advancedSearchParams: IAdvancedSearchParamState
   activeMenuItem: string
-  workqueue: IWorkqueue
   offlineCountryConfiguration: IOfflineData
-  storedDeclarations: IDeclaration[]
 }
 
 type IFullProps = IProps &
@@ -290,7 +268,6 @@ const NavigationView = (props: IFullProps) => {
     intl,
     match,
     userDetails,
-    advancedSearchParams,
     deselectAllTabs,
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
@@ -299,14 +276,9 @@ const NavigationView = (props: IFullProps) => {
     goToSystemViewAction,
     goToAdvancedSearchResultAction,
     navigationWidth,
-    workqueue,
-    storedDeclarations,
-    draftDeclarations,
     menuCollapse,
     userInfo,
     offlineCountryConfiguration,
-    updateRegistrarWorkqueue,
-    setAdvancedSearchParam,
     goToPerformanceStatistics,
     goToDashboardView,
     goToLeaderBoardsView,
@@ -330,11 +302,6 @@ const NavigationView = (props: IFullProps) => {
   const [isCommunationExpanded, setIsCommunationExpanded] =
     React.useState(false)
 
-  const { data, initialSyncDone } = workqueue
-  const filteredData = filterProcessingDeclarationsFromQuery(
-    data,
-    storedDeclarations
-  )
   const runningVer = String(localStorage.getItem('running-version'))
 
   const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
@@ -351,51 +318,16 @@ const NavigationView = (props: IFullProps) => {
     !IS_PROD_ENVIRONMENT ||
     (IS_PROD_ENVIRONMENT && window.config.STATISTICS_DASHBOARD_URL)
 
-  React.useEffect(() => {
-    if (!userDetails || !loadWorkqueueStatuses) {
-      return
-    }
-    updateRegistrarWorkqueue(
-      userDetails.practitionerId,
-      10, // Page size shouldn't matter here as we're only interested in totals
-      userDetails.systemRole === 'FIELD_AGENT'
-    )
-  }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
-
+  /* @todo */
   const declarationCount = {
-    inProgress: !initialSyncDone
-      ? 0
-      : draftDeclarations.filter(
-          (draft) =>
-            draft.submissionStatus ===
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        ).length +
-        (filteredData.inProgressTab?.totalItems || 0) +
-        (filteredData.notificationTab?.totalItems || 0),
-    readyForReview: !initialSyncDone
-      ? 0
-      : filteredData.reviewTab?.totalItems || 0,
-    requiresUpdate: !initialSyncDone
-      ? 0
-      : filteredData.rejectTab?.totalItems || 0,
-    sentForApproval: !initialSyncDone
-      ? 0
-      : filteredData.approvalTab?.totalItems || 0,
-    externalValidation:
-      window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
-        ? 0
-        : filteredData.externalValidationTab?.totalItems || 0,
-    readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
-    readyToIssue: !initialSyncDone ? 0 : filteredData.issueTab?.totalItems || 0,
-    outbox: storedDeclarations.filter((draft) =>
-      (
-        [
-          ...ALLOWED_STATUS_FOR_RETRY,
-          ...INPROGRESS_STATUS,
-          SUBMISSION_STATUS.FAILED
-        ] as SUBMISSION_STATUS[]
-      ).includes(draft.submissionStatus as SUBMISSION_STATUS)
-    ).length
+    inProgress: 0,
+    readyForReview: 0,
+    requiresUpdate: 0,
+    sentForApproval: 0,
+    externalValidation: 0,
+    readyToPrint: 0,
+    readyToIssue: 0,
+    outbox: 0
   }
 
   return (
@@ -417,7 +349,7 @@ const NavigationView = (props: IFullProps) => {
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.inProgress]
               )}
-              count={props.draftDeclarations.length}
+              count={0 /* @todo */}
               isSelected={tabId === WORKQUEUE_TABS.inProgress}
               onClick={() => {
                 props.goToHomeTab(WORKQUEUE_TABS.inProgress)
@@ -873,24 +805,29 @@ const NavigationView = (props: IFullProps) => {
                 id={`bookmarked_advanced_search_${bookmarkResult.searchId}`}
                 label={bookmarkResult.name}
                 disabled={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                  // @todo
+                  // advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  // props.location.pathname === ADVANCED_SEARCH_RESULT
+                  false
                 }
                 onClick={() => {
-                  const filteredParam = omit(
-                    bookmarkResult.parameters,
-                    '__typename'
-                  ) as IAdvancedSearchParamState
-                  setAdvancedSearchParam({
-                    ...filteredParam,
-                    searchId: bookmarkResult?.searchId,
-                    bookmarkName: bookmarkResult?.name
-                  })
+                  // @todo
+                  // const filteredParam = omit(
+                  //   bookmarkResult.parameters,
+                  //   '__typename'
+                  // ) as IAdvancedSearchParamState
+                  // setAdvancedSearchParam({
+                  //   ...filteredParam,
+                  //   searchId: bookmarkResult?.searchId,
+                  //   bookmarkName: bookmarkResult?.name
+                  // })
                   goToAdvancedSearchResultAction()
                 }}
                 isSelected={
-                  advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                  false
+                  // @todo
+                  // advancedSearchParams.searchId === bookmarkResult.searchId &&
+                  // props.location.pathname === ADVANCED_SEARCH_RESULT
                 }
               />
             )
@@ -909,26 +846,10 @@ const NavigationView = (props: IFullProps) => {
 const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
   return {
     offlineCountryConfiguration: getOfflineData(state),
-    draftDeclarations:
-      (state.declarationsState.declarations &&
-        state.declarationsState.declarations.filter(
-          (declaration: IDeclaration) =>
-            declaration.submissionStatus ===
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        )) ||
-      [],
-    declarationsReadyToSend: (
-      (state.declarationsState.declarations &&
-        state.declarationsState.declarations.filter(
-          (declaration: IDeclaration) =>
-            isDeclarationInReadyToReviewStatus(declaration.submissionStatus)
-        )) ||
-      []
-    ).reverse(),
-    workqueue: state.workqueueState.workqueue,
-    storedDeclarations: state.declarationsState.declarations,
+    draftDeclarations: [] /* @todo */,
+    declarationsReadyToSend: [] /* @todo */,
+    storedDeclarations: [] /* @todo */,
     userDetails: getUserDetails(state),
-    advancedSearchParams: getAdvancedSearchParamsState(state),
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
@@ -970,8 +891,6 @@ export const Navigation = connect<
   goToSystemViewAction: goToSystemList,
   redirectToAuthentication,
   goToSettings,
-  updateRegistrarWorkqueue,
-  setAdvancedSearchParam,
   goToPerformanceStatistics,
   goToLeaderBoardsView,
   goToDashboardView,

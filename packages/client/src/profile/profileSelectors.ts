@@ -22,9 +22,8 @@ export const getAuthenticated = (
   store: IStoreState
 ): ProfileState['authenticated'] => getKey(store, 'authenticated')
 
-export const getTokenPayload = (
-  store: IStoreState
-): ProfileState['tokenPayload'] => getKey(store, 'tokenPayload')
+const getTokenPayload = (store: IStoreState): ProfileState['tokenPayload'] =>
+  getKey(store, 'tokenPayload')
 
 export const getScope = (store: IStoreState): Scope | null => {
   const tokenPayload = getTokenPayload(store)

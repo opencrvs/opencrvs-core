@@ -1,0 +1,11 @@
+{
+  "ignore": [
+    "src/extract-translations.ts",
+    "src/src-sw.ts",
+    "no-font-styles.js",
+    "__mocks__/localforage.ts",
+    "src/components/*",
+    "src/hooks/*",
+    "src/utils/gateway.ts"
+  ]
+}

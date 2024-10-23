@@ -8,23 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getMetrics, postMetrics } from '@gateway/features/metrics/service'
-import {
-  getSystem,
-  getTokenPayload,
-  hasScope,
-  inScope
-} from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
-import { Options } from '@hapi/boom'
-import { ISearchCriteria, postAdvancedSearch } from './utils'
-import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
-import { ApolloError } from 'apollo-server-hapi'
 
-type ApiResponse<T> = {
-  body: T
-  statusCode: number
-}
+import { ApolloError } from 'apollo-server-hapi'
+import { decode } from 'jsonwebtoken'
+import { getUser } from '../user/utils'
 
 export class RateLimitError extends ApolloError {
   constructor(message: string) {
@@ -88,147 +76,33 @@ export const resolvers: GQLResolver = {
       },
       { headers: authHeader }
     ) {
-      const searchCriteria: ISearchCriteria = {
-        sort,
-        parameters: advancedSearchParameters
-      }
-      // Only registrar, registration agent & field agent should be able to search user
-      if (
-        !inScope(authHeader, [
-          'register',
-          'validate',
-          'certify',
-          'declare',
-          'recordsearch'
-        ])
-      ) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar, registration agent & field agent'
-          )
-        )
-      }
+      const decoded = decode(
+        authHeader.Authorization.replace('Bearer ', '')
+      ) as { sub: string }
+      const user = await getUser({ userId: decoded.sub }, authHeader)
+      console.log(user)
 
-      if (count) {
-        searchCriteria.size = count
-      }
-      if (skip) {
-        searchCriteria.from = skip
-      }
-      if (userId) {
-        searchCriteria.createdBy = userId
-      }
-      if (sortColumn) {
-        searchCriteria.sortColumn = sortColumn
-      }
-      if (sortBy) {
-        searchCriteria.sortBy = sortBy.map((sort) => ({
-          [sort.column]: sort.order
-        }))
-      }
-
-      const isExternalAPI = hasScope(authHeader, 'recordsearch')
-      if (isExternalAPI) {
-        const payload = getTokenPayload(authHeader.Authorization)
-        const system = await getSystem({ systemId: payload.sub }, authHeader)
-
-        const getTotalRequest = await getMetrics(
-          '/advancedSearch',
-          {},
-          authHeader
-        )
-        if (getTotalRequest.total >= system.settings.dailyQuota) {
-          throw new RateLimitError('Daily search quota exceeded')
-        }
-
-        const searchResult: ApiResponse<ISearchResponse<any>> =
-          await postAdvancedSearch(authHeader, searchCriteria)
-
-        if ((searchResult?.statusCode ?? 0) >= 400) {
-          const errMsg = searchResult as Options<string>
-          return await Promise.reject(new Error(errMsg.message))
-        }
-
-        ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await fetchRegistrationForDownloading(hit._id, authHeader)
-        })
-
-        if (searchResult.body.hits.total.value) {
-          await postMetrics('/advancedSearch', {}, authHeader)
-        }
-
-        return {
-          totalItems:
-            (searchResult &&
-              searchResult.body.hits &&
-              searchResult.body.hits.total.value) ||
-            0,
-          results:
-            (searchResult &&
-              searchResult.body.hits &&
-              searchResult.body.hits.hits) ||
-            []
-        }
-      } else {
-        const hasAtLeastOneParam = Object.values(advancedSearchParameters).some(
-          (param) => Boolean(param)
-        )
-
-        if (!hasAtLeastOneParam) {
-          return await Promise.reject(new Error('There is no param to search '))
-        }
-
-        searchCriteria.parameters = { ...advancedSearchParameters }
-
-        const searchResult: ApiResponse<ISearchResponse<any>> =
-          await postAdvancedSearch(authHeader, searchCriteria)
-        return {
-          totalItems: searchResult?.body?.hits?.total?.value ?? 0,
-          results: searchResult?.body?.hits?.hits ?? []
-        }
-      }
-    },
-    async getEventsWithProgress(
-      _,
-      {
-        declarationJurisdictionId,
-        registrationStatuses,
-        compositionType,
-        count,
-        skip,
-        sort = 'desc'
-      },
-      { headers: authHeader }
-    ) {
-      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'User does not have a sysadmin or register or validate scope'
-          )
-        )
-      }
-
-      const searchCriteria: ISearchCriteria = {
-        sort,
-        parameters: {
-          declarationJurisdictionId: declarationJurisdictionId,
-          registrationStatuses: registrationStatuses,
-          compositionType: compositionType
-        }
-      }
-
-      if (count) {
-        searchCriteria.size = count
-      }
-      if (skip) {
-        searchCriteria.from = skip
-      }
-
-      const searchResult: ApiResponse<ISearchResponse<any>> =
-        await postAdvancedSearch(authHeader, searchCriteria)
       return {
-        totalItems: searchResult?.body?.hits?.total?.value || 0,
-        results: searchResult?.body?.hits?.hits || []
+        totalItems: 1,
+        results: [
+          /* @todo */
+          {
+            status: 'REGISTERED',
+            id: '10a219cd-50a6-41b5-90b2-676949d3f192',
+            type: 'divorce',
+            createdAt: '2021-08-10T10:00:00Z',
+            createdAtLocation: user.primaryOfficeId,
+            modifiedAt: '2021-08-10T10:00:00Z',
+            assignedTo: {
+              practitionerId: user.practitionerId,
+              firstName: 'Riku',
+              lastName: 'Rouvila',
+              officeName: 'Helsinki office',
+              avatarURL:
+                'https://gravatar.com/avatar/9ebd6a2a7bbad60d44806ab340fe5efd?s=400&d=robohash&r=x'
+            }
+          }
+        ]
       }
     }
   }

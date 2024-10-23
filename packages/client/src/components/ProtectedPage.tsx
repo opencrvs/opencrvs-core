@@ -17,7 +17,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
-import { getCurrentUserID, IUserData } from '@client/declarations'
+import { getCurrentUserID, IUserData } from '@client/user'
 import { refreshToken } from '@client/utils/authUtils'
 import {
   DESKTOP_TIME_OUT_MILLISECONDS,

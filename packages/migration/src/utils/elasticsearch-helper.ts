@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// @TODO: Unify this file with @search/src/elasticsearch/dbhelper.ts
+// Unify this file with @search/src/elasticsearch/dbhelper.ts
 import { Client } from '@elastic/elasticsearch'
 import { SearchDocument } from '@opencrvs/commons/types'
 

@@ -159,7 +159,7 @@ class SecurityQuestionComponent extends React.Component<Props, State> {
         this.props.goToUpdatePasswordForm(result.nonce)
       }
     } catch (error) {
-      // @todo error handling
+      // error handling
       this.setState({ error: true })
     }
   }

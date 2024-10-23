@@ -13,57 +13,10 @@ import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
 import enGB from 'date-fns/locale/en-GB'
 import bn from 'date-fns/locale/bn'
 import fr from 'date-fns/locale/fr'
-import subYears from 'date-fns/subYears'
+
 import isValid from 'date-fns/isValid'
 
-/*
- *  The actual type is `${number}-${number}-${number}`
- *  but as Date constructor is way too permissive so
- *  using a custom type to restrict PlainDate's direct usage
- *  with Date
- *  It's of format YYYY-MM-DD
- */
-export type PlainDate = { __type: 'PlainDate' }
-
 export const locales: Record<string, Locale> = { en: enGB, bn, fr }
-
-/*
- * useful when dealing with draft data
- */
-export function isValidPlainDate(rawDate: unknown): rawDate is PlainDate {
-  if (typeof rawDate !== 'string') {
-    return false
-  }
-  const [yyyy, mm, dd] = rawDate.split('-')
-  if (
-    !dd ||
-    !mm ||
-    !yyyy ||
-    dd.length === 0 ||
-    mm.length === 0 ||
-    yyyy.length < 4 ||
-    !isValid(new Date(rawDate))
-  ) {
-    return false
-  }
-  return true
-}
-
-export function plainDateToLocalDate(plainDate: PlainDate) {
-  const rawDate = plainDate as unknown as `${number}-${number}-${number}`
-  const [yyyy, mm, dd] = rawDate.split('-')
-  return new Date(Number(yyyy), Number(mm) - 1, Number(dd))
-}
-
-export function formatPlainDate(
-  plainDate: PlainDate,
-  formatString = 'dd MMMM yyyy'
-) {
-  const localDate = plainDateToLocalDate(plainDate)
-  return format(localDate, formatString, {
-    locale: locales[window.__localeId__]
-  })
-}
 
 export const formatLongDate = (
   date: string,
@@ -100,10 +53,6 @@ export const formattedDuration = (fromDate: Date | number) => {
     addSuffix: true,
     roundingMethod: 'floor'
   })
-}
-
-export const convertAgeToDate = (age: string): string => {
-  return format(subYears(new Date(), Number(age)), 'yyyy-MM-dd')
 }
 
 export default function formatDate(

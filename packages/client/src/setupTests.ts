@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { storage } from '@client/storage'
-import { IUserData } from './declarations'
+
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
@@ -248,11 +248,10 @@ beforeEach(() => {
 
   queries.fetchUserDetails = vi.fn().mockReturnValue(mockUserResponse)
 
-  const userData: IUserData[] = [
+  const userData = [
     {
       userID: userDetails.userMgntUserID,
-      userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-      declarations: []
+      userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82'
     }
   ]
 
@@ -285,12 +284,4 @@ vi.mock('react-router', async () => ({
     event: 'birth',
     section: 'child'
   }))
-}))
-
-vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
-  ...((await vi.importActual(
-    '@client/views/OIDPVerificationCallback/utils'
-  )) as any),
-  useExtractCallBackState: vi.fn(),
-  useQueryParams: vi.fn()
 }))

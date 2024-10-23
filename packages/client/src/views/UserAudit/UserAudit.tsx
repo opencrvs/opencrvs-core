@@ -38,7 +38,7 @@ import { userMutations } from '@client/user/mutations'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+
 import {
   GetUserQuery,
   GetUserQueryVariables,
@@ -380,19 +380,7 @@ export const UserAudit = () => {
               />
             )}
           </>
-          <UserAuditActionModal
-            show={modalVisible}
-            user={data.getUser! as User}
-            onClose={() => toggleUserActivationModal()}
-            onConfirmRefetchQueries={[
-              {
-                query: GET_USER,
-                variables: {
-                  userId: userId
-                }
-              }
-            ]}
-          />
+
           <ResponsiveModal
             id="username-reminder-modal"
             show={toggleUsernameReminder}

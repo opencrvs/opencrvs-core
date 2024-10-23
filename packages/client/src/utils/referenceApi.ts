@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ISerializedForm } from '@client/forms'
-import { Conditional } from '@client/forms/conditionals'
+
 import { ILanguage } from '@client/i18n/reducer'
 import {
   AdminStructure,
@@ -19,8 +18,9 @@ import {
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { Event, System } from '@client/utils/gateway'
-import { Validator } from '@client/forms/validators'
+
 import { IntlShape } from 'react-intl'
+import Handlebars from 'handlebars'
 
 export interface ILocationDataResponse {
   [locationId: string]: AdminStructure
@@ -38,13 +38,13 @@ export const SearchCriteria = {
   EMAIL: 'EMAIL'
 } as const
 
-export type SearchCriteriaType = keyof typeof SearchCriteria
+type SearchCriteriaType = keyof typeof SearchCriteria
 
 export interface IOfficesDataResponse {
   [facilityId: string]: CRVSOffice
 }
 
-export type FontFamilyTypes = {
+type FontFamilyTypes = {
   normal: string
   bold: string
   italics: string
@@ -62,9 +62,6 @@ export interface IContentResponse {
 export interface LoadFormsResponse {
   forms: {
     version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
   }
 }
 
@@ -77,7 +74,7 @@ interface ILoginBackground {
   backgroundImage?: string
   imageFit?: string
 }
-export interface ICertificateTemplateData {
+interface ICertificateTemplateData {
   event: Event
   svgCode: string
 }
@@ -211,7 +208,7 @@ async function loadForms(): Promise<LoadFormsResponse> {
   }
 }
 
-export type LoadValidatorsResponse = Record<string, Validator>
+type LoadValidatorsResponse = Record<string, unknown>
 async function importValidators(): Promise<LoadValidatorsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const validators = await import(
@@ -221,8 +218,8 @@ async function importValidators(): Promise<LoadValidatorsResponse> {
   return validators
 }
 
-export type LoadConditionalsResponse = Record<string, Conditional>
-export async function importConditionals(): Promise<LoadConditionalsResponse> {
+type LoadConditionalsResponse = Record<string, unknown>
+async function importConditionals(): Promise<LoadConditionalsResponse> {
   // https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations
   const { conditionals } = await import(
     /* @vite-ignore */ `${window.config.COUNTRY_CONFIG_URL}/conditionals.js`
@@ -234,7 +231,7 @@ type InjectedUtilities = {
   intl: IntlShape
 }
 
-export type LoadHandlebarHelpersResponse = Record<
+type LoadHandlebarHelpersResponse = Record<
   string,
   (injectedUtilities: InjectedUtilities) => Handlebars.HelperDelegate
 >

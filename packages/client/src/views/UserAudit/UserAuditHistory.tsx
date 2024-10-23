@@ -12,7 +12,7 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import styled, { withTheme } from 'styled-components'
 import * as React from 'react'
 import Bowser from 'bowser'
-import { goToDeclarationRecordAudit } from '@client/navigation'
+
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
@@ -83,9 +83,7 @@ interface IBaseProp {
   loggedInUserRole: string | null | undefined
 }
 
-interface DispatchProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
+interface DispatchProps {}
 
 type Props = WrappedComponentProps &
   IBaseProp &
@@ -306,11 +304,9 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
           !isSystemAdmin ? (
             <Link
               font="bold14"
-              onClick={() =>
-                this.props.goToDeclarationRecordAudit(
-                  'printTab',
-                  userAuditItem.data.compositionId as string
-                )
+              onClick={
+                () => {}
+                /* @todo */
               }
             >
               {userAuditItem.data.trackingId}
@@ -477,6 +473,7 @@ class UserAuditHistoryComponent extends React.Component<Props, State> {
   }
 }
 
-export const UserAuditHistory = connect(null, {
-  goToDeclarationRecordAudit
-})(withTheme(injectIntl(withOnlineStatus(UserAuditHistoryComponent))))
+export const UserAuditHistory = connect(
+  null,
+  {}
+)(withTheme(injectIntl(withOnlineStatus(UserAuditHistoryComponent))))

@@ -1,0 +1,71 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+input AttachmentInput {
+  _fhirID: ID
+  contentType: String
+  # base64
+  data: String
+  uri: String
+  status: AttachmentInputStatus
+  originalFileName: String
+  systemFileName: String
+  type: String
+  description: String # -> use for other document type -> .description
+  subject: String
+  createdAt: Date
+}
+
+enum AttachmentInputStatus {
+  approved
+  validated
+  deleted
+}
+
+input CorrectionValueInput {
+  section: String!
+  fieldName: String!
+  oldValue: FieldValue
+  newValue: FieldValue!
+}
+
+input CorrectionPaymentInput {
+  _fhirID: ID
+  attachmentData: String
+  type: PaymentType!
+  amount: Float!
+  outcome: PaymentOutcomeType!
+  date: Date!
+}
+
+input CorrectionInput {
+  requester: String! # MOTHER, OTHER...
+  requesterOther: String # "The neighbour"
+  hasShowedVerifiedDocument: Boolean!
+  noSupportingDocumentationRequired: Boolean!
+  attachments: [AttachmentInput!]!
+  payment: CorrectionPaymentInput
+  values: [CorrectionValueInput!]!
+  location: LocationInput!
+  reason: String!
+  otherReason: String!
+  note: String!
+}
+
+input CorrectionRejectionInput {
+  reason: String!
+  timeLoggedMS: Int!
+}
+
+type Mutation {
+  requestEventCorrection(id: ID!, details: CorrectionInput!): ID!
+  rejectEventCorrection(id: ID!, details: CorrectionRejectionInput!): ID!
+  approveEventCorrection(id: ID!, details: EventInput!): ID!
+  createEventCorrection(id: ID!, details: EventInput!): ID!
+}

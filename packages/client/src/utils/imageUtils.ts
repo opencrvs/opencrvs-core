@@ -119,20 +119,5 @@ export async function getCroppedImage(imageSrc: IImage, croppedArea: Area) {
   }
 }
 
-export async function fetchImageAsBase64(url: string): Promise<string> {
-  const response = await fetch(url)
-  const blob = await response.blob()
-
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const base64 = reader.result as string
-      resolve(base64)
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(blob)
-  })
-}
-
 export const bytesToMB = (bytes: number) =>
   Number(Number(bytes / (1024 * 1024)).toFixed(2))

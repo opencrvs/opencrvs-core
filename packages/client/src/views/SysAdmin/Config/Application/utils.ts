@@ -12,13 +12,6 @@
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
 
-export enum NOTIFICATION_STATUS {
-  SUCCESS = 'success',
-  IDLE = 'idle',
-  IN_PROGRESS = 'inProgress',
-  ERROR = 'error'
-}
-
 export const getAmountWithCurrencySymbol = (
   currency: ICurrency,
   amount: number
@@ -32,11 +25,4 @@ export const getAmountWithCurrencySymbol = (
   ).format(amount)
 
   return amountWithSymbol.normalize('NFKD').replace(/[\u0300-\u036F]/g, '')
-}
-
-export const getCurrencySymbol = (currency: ICurrency) => {
-  const currencySymbol = lookup.currencies({
-    code: currency.isoCode
-  })[0].symbol
-  return currencySymbol
 }

@@ -29,61 +29,10 @@ export const SEARCH_EVENTS = gql`
       results {
         id
         type
-        registration {
-          status
-          contactNumber
-          contactEmail
-          trackingId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          assignment {
-            practitionerId
-            firstName
-            lastName
-            officeName
-            avatarURL
-          }
-          createdAt
-          modifiedAt
-        }
-        operationHistories {
-          operationType
-          operatedOn
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            middleName
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            middleName
-            familyName
-            use
-          }
-        }
-        ... on MarriageEventSearchSet {
-          dateOfMarriage
-          brideName {
-            firstNames
-            middleName
-            familyName
-            use
-          }
-          groomName {
-            firstNames
-            middleName
-            familyName
-            use
-          }
-        }
+        createdAt
+        createdAtLocation
+        modifiedAt
+        status
       }
     }
   }

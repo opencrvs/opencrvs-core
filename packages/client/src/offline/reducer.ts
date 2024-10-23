@@ -37,17 +37,11 @@ import { isOfflineDataLoaded } from './selectors'
 import { ISVGTemplate } from '@client/pdfRenderer'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
-import { ISerializedForm } from '@client/forms'
-import { initConditionals } from '@client/forms/conditionals'
-import { initValidators } from '@client/forms/validators'
+
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
-import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
-
-export const OFFLINE_LOCATIONS_KEY = 'locations'
-export const OFFLINE_FACILITIES_KEY = 'facilities'
 
 export type LocationType =
   | 'HEALTH_FACILITY'
@@ -94,9 +88,6 @@ export interface IOfflineData {
   locations: ILocationDataResponse
   forms: {
     version: string
-    birth: ISerializedForm
-    death: ISerializedForm
-    marriage: ISerializedForm
   }
   facilities: IFacilitiesDataResponse
   offices: IOfficesDataResponse
@@ -136,11 +127,6 @@ const initialState: IOfflineDataState = {
 
 async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
-}
-
-export type CertificatePayload = {
-  svgCode: string
-  event: Event
 }
 
 function checkIfDone(
@@ -218,21 +204,6 @@ const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   failActionCreator: actions.contentFailed
 })
 
-const CONDITIONALS_CMD = Cmd.run(() => initConditionals(), {
-  successActionCreator: actions.conditionalsLoaded,
-  failActionCreator: actions.conditionalsFailed
-})
-
-const VALIDATORS_CMD = Cmd.run(() => initValidators(), {
-  successActionCreator: actions.validatorsLoaded,
-  failActionCreator: actions.validatorsFailed
-})
-
-const HANDLEBARS_CMD = Cmd.run(() => initHandlebarHelpers(), {
-  successActionCreator: actions.handlebarsLoaded,
-  failActionCreator: actions.handlebarsFailed
-})
-
 const RETRY_TIMEOUT = 5000
 
 function delay(cmd: RunCmd<any>, time: number) {
@@ -248,9 +219,6 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     CONFIG_CMD,
     CERTIFICATE_CONFIG_CMD,
-    CONDITIONALS_CMD,
-    VALIDATORS_CMD,
-    HANDLEBARS_CMD,
     FORMS_CMD,
     CONTENT_CMD
   ])
@@ -371,61 +339,23 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, systems } = action.payload
+      const { config, systems } = action.payload
       merge(window.config, config)
-      const birthCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Birth
-      )
 
-      const deathCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Death
-      )
+      const certificatesTemplates = {
+        /* @todo */
+      }
+      const newOfflineData = {
+        ...state.offlineData,
+        config,
+        systems,
 
-      const marriageCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Marriage
-      )
-
-      let newOfflineData: Partial<IOfflineData>
-
-      if (
-        birthCertificateTemplate &&
-        deathCertificateTemplate &&
-        marriageCertificateTemplate
-      ) {
-        const certificatesTemplates = {
-          birth: {
-            definition: birthCertificateTemplate.svgCode
-          },
-          death: {
-            definition: deathCertificateTemplate.svgCode
-          },
-          marriage: {
-            definition: marriageCertificateTemplate.svgCode
-          }
-        }
-
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          systems,
-          templates: {
-            ...state.offlineData.templates,
-            certificates: certificatesTemplates
-          }
-        }
-      } else {
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          systems,
-
-          // Field agents do not get certificate templates from the config service.
-          // Our loading logic depends on certificates being present and the app would load infinitely
-          // without a value here.
-          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
-          // to not expect certificate templates when a field agent is logged in.
-          templates: {}
-        }
+        // Field agents do not get certificate templates from the config service.
+        // Our loading logic depends on certificates being present and the app would load infinitely
+        // without a value here.
+        // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
+        // to not expect certificate templates when a field agent is logged in.
+        templates: {}
       }
 
       return {

@@ -20,7 +20,7 @@ import type {
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
-export const systems: System[] = [
+const systems: System[] = [
   {
     name: 'WebHook 1',
     status: SystemStatus.Active,
@@ -568,7 +568,7 @@ export const mockOfflineLocationsWithHierarchy: {
     }
   }
 }
-export const mockOfflineDataWithLocationHierarchy = {
+const mockOfflineDataWithLocationHierarchy = {
   ...mockOfflineData,
   ...mockOfflineLocationsWithHierarchy
 }

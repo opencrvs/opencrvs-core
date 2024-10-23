@@ -91,4 +91,4 @@ class PersistLink extends ApolloLink {
 
 const createPersistLink = () => new PersistLink()
 
-export { PersistLink, createPersistLink }
+export { createPersistLink }

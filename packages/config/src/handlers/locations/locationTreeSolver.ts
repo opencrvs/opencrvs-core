@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  resourceIdentifierToUUID,
-  SavedLocation
-} from '@opencrvs/commons/types'
+import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 import { find } from 'lodash'
+
+type SavedLocation = any /* @todo */
 
 /**
  * Creates a new Map<SavedLocation.partOf, SavedLocation[]>

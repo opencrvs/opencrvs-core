@@ -9,17 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import healthCheckHandler from '@gateway/features/healthCheck/handler'
-import {
-  eventNotificationHandler,
-  fhirBundleSchema,
-  validationFailedAction
-} from '@gateway/features/eventNotification/eventNotificationHandler'
-import { ServerRoute } from '@hapi/hapi'
-import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
 import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
+import { ServerRoute } from '@hapi/hapi'
+import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -40,23 +35,6 @@ export const getRoutes = () => {
         auth: false,
         description: 'Checks the health of all services.',
         notes: 'Pass the service as a query param: service'
-      }
-    },
-    // create event notification
-    {
-      method: 'POST',
-      path: '/notification',
-      handler: eventNotificationHandler,
-      options: {
-        tags: ['api'],
-        description: 'Create a health notification',
-        auth: {
-          scope: ['declare', 'notification-api']
-        },
-        validate: {
-          payload: fhirBundleSchema,
-          failAction: validationFailedAction
-        }
       }
     },
     {

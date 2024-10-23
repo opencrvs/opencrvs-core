@@ -12,12 +12,10 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import {
   AUTH_URL,
-  SEARCH_URL,
   USER_MANAGEMENT_URL,
   METRICS_URL,
   NOTIFICATION_URL,
-  COUNTRY_CONFIG_URL,
-  WORKFLOW_URL
+  COUNTRY_CONFIG_URL
 } from '@gateway/constants'
 import fetch from '@gateway/fetch'
 
@@ -41,19 +39,15 @@ enum Services {
   METRICS = 'metrics',
   NOTIFICATION = 'notification',
   COUNTRY_CONFIG = 'countryconfig',
-  SEARCH = 'search',
-  WORKFLOW = 'workflow',
   GATEWAY = 'gateway'
 }
 
 const SERVICES = {
   [Services.AUTH]: `${AUTH_URL}/ping`,
-  [Services.SEARCH]: `${SEARCH_URL}ping`,
   [Services.USER_MGNT]: `${USER_MANAGEMENT_URL}ping`,
   [Services.METRICS]: `${METRICS_URL}/ping`,
   [Services.NOTIFICATION]: `${NOTIFICATION_URL}ping`,
-  [Services.COUNTRY_CONFIG]: `${COUNTRY_CONFIG_URL}/ping`,
-  [Services.WORKFLOW]: `${WORKFLOW_URL}ping`
+  [Services.COUNTRY_CONFIG]: `${COUNTRY_CONFIG_URL}/ping`
 }
 
 export default async function healthCheckHandler(
@@ -82,8 +76,6 @@ export const querySchema = Joi.object({
         Services.METRICS,
         Services.NOTIFICATION,
         Services.COUNTRY_CONFIG,
-        Services.SEARCH,
-        Services.WORKFLOW,
         Services.GATEWAY
       )
     )

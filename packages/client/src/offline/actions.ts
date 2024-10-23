@@ -24,9 +24,6 @@ import {
   IApplicationConfig,
   IApplicationConfigAnonymous,
   LoadFormsResponse,
-  LoadValidatorsResponse,
-  LoadConditionalsResponse,
-  LoadHandlebarHelpersResponse,
   CertificateConfiguration
 } from '@client/utils/referenceApi'
 import { System } from '@client/utils/gateway'
@@ -63,19 +60,19 @@ type LocationsFailedAction = {
 }
 
 export const FORMS_LOADED = 'OFFLINE/FORMS_LOADED'
-export type FormsLoadedAction = {
+type FormsLoadedAction = {
   type: typeof FORMS_LOADED
   payload: LoadFormsResponse
 }
 
-export const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
-export type CustomValidatorsLoadedLoadedAction = {
+const CUSTOM_VALIDATORS_LOADED = 'OFFLINE/CUSTOM_VALIDATORS_LOADED'
+type CustomValidatorsLoadedLoadedAction = {
   type: typeof CUSTOM_VALIDATORS_LOADED
   payload: LoadFormsResponse
 }
 
 export const FORMS_FAILED = 'OFFLINE/FORMS_FAILED'
-export type FormsFailedAction = {
+type FormsFailedAction = {
   type: typeof FORMS_FAILED
   payload: Error
 }
@@ -194,14 +191,6 @@ export const formsLoaded = (payload: LoadFormsResponse): FormsLoadedAction => ({
   payload: payload
 })
 
-export const CustomValidatorsSuccess = (
-  forms: LoadFormsResponse
-): CustomValidatorsLoadedLoadedAction => {
-  return {
-    type: CUSTOM_VALIDATORS_LOADED,
-    payload: forms
-  }
-}
 export const formsFailed = (error: Error): FormsFailedAction => ({
   type: FORMS_FAILED,
   payload: error
@@ -217,14 +206,6 @@ export const facilitiesLoaded = (
 ): FacilitiesLoadedAction => ({
   type: FACILITIES_LOADED,
   payload: payload
-})
-
-/*
- * Only called from tests atm
- */
-export const setOfflineData = (userDetails: UserDetails): SetOfflineData => ({
-  type: GET_EXISTING_OFFLINE_DATA,
-  payload: userDetails
 })
 
 export const getOfflineDataSuccess = (
@@ -267,13 +248,6 @@ export const configLoaded = (
   payload: payload
 })
 
-export const certificateLoadFailed = (
-  payload: CertificateLoadFailedAction['payload']
-): CertificateLoadFailedAction => ({
-  type: CERTIFICATE_LOAD_FAILED,
-  payload
-})
-
 export const certificateConfigurationLoaded = (
   payload: CertificateConfiguration
 ): CertificateConfigurationLoadedAction => ({
@@ -293,12 +267,6 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineConfigData = (payload: {
-  config: IApplicationConfig
-}): ApplicationConfigUpdatedAction => ({
-  type: UPDATE_OFFLINE_CONFIG,
-  payload: payload
-})
 export const updateOfflineSystems = (payload: {
   systems: System[]
 }): UpdateOfflineSystemsAction => ({
@@ -309,36 +277,6 @@ export const updateOfflineSystems = (payload: {
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
-})
-
-export const validatorsLoaded = (payload: LoadValidatorsResponse) => ({
-  type: 'OFFLINE/VALIDATORS_LOADED' as const,
-  payload: payload
-})
-
-export const validatorsFailed = (error: Error) => ({
-  type: 'OFFLINE/VALIDATORS_FAILED' as const,
-  payload: error
-})
-
-export const handlebarsLoaded = (payload: LoadHandlebarHelpersResponse) => ({
-  type: 'OFFLINE/HANDLEBARS_LOADED' as const,
-  payload: payload
-})
-
-export const handlebarsFailed = (error: Error) => ({
-  type: 'OFFLINE/HANDLEBARS_FAILED' as const,
-  payload: error
-})
-
-export const conditionalsLoaded = (payload: LoadConditionalsResponse) => ({
-  type: 'OFFLINE/CONDITIONALS_LOADED' as const,
-  payload: payload
-})
-
-export const conditionalsFailed = (error: Error) => ({
-  type: 'OFFLINE/CONDITIONALS_FAILED' as const,
-  payload: error
 })
 
 export type Action =
@@ -369,9 +307,3 @@ export type Action =
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>
   | ReturnType<typeof refreshOfflineData>
-  | ReturnType<typeof validatorsLoaded>
-  | ReturnType<typeof validatorsFailed>
-  | ReturnType<typeof conditionalsLoaded>
-  | ReturnType<typeof conditionalsFailed>
-  | ReturnType<typeof handlebarsLoaded>
-  | ReturnType<typeof handlebarsFailed>

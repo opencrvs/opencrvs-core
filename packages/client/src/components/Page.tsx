@@ -13,7 +13,6 @@ import styled from 'styled-components'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { setInitialDeclarations } from '@client/declarations'
 import {
   getOfflineData,
   getOfflineDataLoaded,
@@ -27,8 +26,6 @@ import {
 import { changeLanguage } from '@client/i18n/actions'
 import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
-import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
-import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
@@ -52,16 +49,13 @@ const StyledPage = styled.div<IPageProps>`
   }
 `
 interface IPageProps {
-  initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
-  registerFormLoaded: boolean
   loadingError: boolean
   offlineData: IOfflineData | undefined
   children?: React.ReactNode
 }
 
 interface IDispatchProps {
-  setInitialDeclarations: () => void
   checkAuth: typeof checkAuth
   showConfigurationErrorNotification: () => void
   hideConfigurationErrorNotification: () => void
@@ -109,14 +103,9 @@ class Component extends React.Component<
   }
 
   render() {
-    const {
-      initialDeclarationsLoaded,
-      offlineDataLoaded,
-      registerFormLoaded,
-      children
-    } = this.props
+    const { offlineDataLoaded, children } = this.props
 
-    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
+    if (offlineDataLoaded) {
       return (
         <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -134,16 +123,13 @@ class Component extends React.Component<
 
 const mapStateToProps = (store: IStoreState) => {
   return {
-    initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
-    registerFormLoaded: isRegisterFormReady(store),
     offlineData: getOfflineDataLoaded(store) ? getOfflineData(store) : undefined
   }
 }
 
 const mapDispatchToProps = {
-  setInitialDeclarations,
   checkAuth,
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification,

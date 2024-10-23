@@ -9,69 +9,41 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { inScope } from '@gateway/features/user/utils'
-import {
-  GQLBirthRegistrationInput,
-  GQLDeathRegistrationInput,
-  GQLMarriageRegistrationInput,
-  GQLResolver
-} from '@gateway/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 
 import { checkUserAssignment } from '@gateway/authorisation'
 import { UnassignError } from '@gateway/utils/unassignError'
-import {
-  validateBirthDeclarationAttachments,
-  validateDeathDeclarationAttachments,
-  validateMarriageDeclarationAttachments
-} from '@gateway/utils/validators'
-import {
-  approveRegistrationCorrection,
-  makeRegistrationCorrection,
-  rejectRegistrationCorrection,
-  requestRegistrationCorrection
-} from '@gateway/workflow'
+import { validateBirthDeclarationAttachments } from '@gateway/utils/validators'
+
 import { UserInputError } from 'apollo-server-hapi'
 
 export const resolvers: GQLResolver = {
   Mutation: {
-    async requestRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
+    async requestEventCorrection(_, { id, details }, { headers: authHeader }) {
       if (inScope(authHeader, ['register', 'validate'])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
         }
 
-        await requestRegistrationCorrection(id, details, authHeader)
-        return id
+        throw new Error('not implemented') /* @todo */
       } else {
         throw new Error('User does not have a register or validate scope')
       }
     },
-    async rejectRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
+    async rejectEventCorrection(_, { id, details }, { headers: authHeader }) {
       if (inScope(authHeader, ['register'])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
         }
-        await rejectRegistrationCorrection(id, details, authHeader)
-        return id
+        throw new Error('not implemented') /* @todo */
       } else {
         throw new Error('User does not have a register or validate scope')
       }
     },
-    async approveBirthRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
+    async approveEventCorrection(_, { id, details }, { headers: authHeader }) {
       if (inScope(authHeader, ['register'])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -82,56 +54,13 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return approveEventRegistrationCorrection(id, authHeader, details)
+        return approveEventEventCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
     },
-    async approveDeathRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (inScope(authHeader, ['register'])) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateDeathDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await approveEventRegistrationCorrection(id, authHeader, details)
-      } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async approveMarriageRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (inScope(authHeader, ['register'])) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateMarriageDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await approveEventRegistrationCorrection(id, authHeader, details)
-      } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async createBirthRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
+
+    async createEventCorrection(_, { id, details }, { headers: authHeader }) {
       if (inScope(authHeader, ['register'])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -142,47 +71,7 @@ export const resolvers: GQLResolver = {
         } catch (error) {
           throw new UserInputError(error.message)
         }
-        return createEventRegistrationCorrection(id, authHeader, details)
-      } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async createDeathRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (inScope(authHeader, ['register'])) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateDeathDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await createEventRegistrationCorrection(id, authHeader, details)
-      } else {
-        throw new Error('User does not have a register scope')
-      }
-    },
-    async createMarriageRegistrationCorrection(
-      _,
-      { id, details },
-      { headers: authHeader }
-    ) {
-      if (inScope(authHeader, ['register'])) {
-        const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
-        if (!hasAssignedToThisUser) {
-          throw new UnassignError('User has been unassigned')
-        }
-        try {
-          await validateMarriageDeclarationAttachments(details)
-        } catch (error) {
-          throw new UserInputError(error.message)
-        }
-        return await createEventRegistrationCorrection(id, authHeader, details)
+        return createEventEventCorrection(id, authHeader, details)
       } else {
         throw new Error('User does not have a register scope')
       }
@@ -190,27 +79,18 @@ export const resolvers: GQLResolver = {
   }
 }
 
-async function createEventRegistrationCorrection(
+async function createEventEventCorrection(
   id: string,
   authHeader: IAuthHeader,
-  input:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput
+  input: unknown
 ) {
-  await makeRegistrationCorrection(id, input, authHeader)
-
-  return id
+  throw new Error('not implemented') /* @todo */
 }
 
-async function approveEventRegistrationCorrection(
+async function approveEventEventCorrection(
   id: string,
   authHeader: IAuthHeader,
-  input:
-    | GQLBirthRegistrationInput
-    | GQLDeathRegistrationInput
-    | GQLMarriageRegistrationInput
+  input: unknown
 ) {
-  await approveRegistrationCorrection(id, input, authHeader)
-  return id
+  throw new Error('not implemented') /* @todo */
 }

@@ -42,12 +42,9 @@ function isUserHome(pathname: string): boolean {
 
 function isFormPage(pathname: string): boolean {
   if (
-    isPathExactmatch(pathname, routes.DRAFT_BIRTH_PARENT_FORM) ||
-    isPathExactmatch(pathname, routes.DRAFT_BIRTH_PARENT_FORM_PAGE) ||
-    isPathExactmatch(pathname, routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP) ||
-    isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM) ||
-    isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE) ||
-    isPathExactmatch(pathname, routes.DRAFT_DEATH_FORM_PAGE_GROUP) ||
+    isPathExactmatch(pathname, routes.DRAFT_FORM) ||
+    isPathExactmatch(pathname, routes.DRAFT_FORM_PAGE) ||
+    isPathExactmatch(pathname, routes.DRAFT_FORM_PAGE_GROUP) ||
     isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE) ||
     isPathExactmatch(pathname, routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP)
   ) {

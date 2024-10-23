@@ -69,36 +69,3 @@ export const ADVANCED_SEARCH_PARAM_FIELDS = gql`
     compositionType
   }
 `
-
-export const BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION = gql`
-  ${ADVANCED_SEARCH_PARAM_FIELDS}
-  mutation bookmarkAdvancedSearch($bookmarkSearchInput: BookmarkSearchInput!) {
-    bookmarkAdvancedSearch(bookmarkSearchInput: $bookmarkSearchInput) {
-      searchList {
-        searchId
-        name
-        parameters {
-          ...AdvancedSeachParameters
-        }
-      }
-    }
-  }
-`
-export const REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION = gql`
-  ${ADVANCED_SEARCH_PARAM_FIELDS}
-  mutation removeBookmarkedAdvancedSearch(
-    $removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
-  ) {
-    removeBookmarkedAdvancedSearch(
-      removeBookmarkedSearchInput: $removeBookmarkedSearchInput
-    ) {
-      searchList {
-        searchId
-        name
-        parameters {
-          ...AdvancedSeachParameters
-        }
-      }
-    }
-  }
-`

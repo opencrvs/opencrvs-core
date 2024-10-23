@@ -10,10 +10,7 @@
  */
 
 import { gql, InMemoryCache } from '@apollo/client'
-import {
-  clearOldCacheEntries,
-  clearUnusedViewRecordCacheEntries
-} from './clearCache'
+import { clearOldCacheEntries } from './clearCache'
 
 describe('Apollo cache clearing', () => {
   describe('duplicate removal', () => {
@@ -38,60 +35,6 @@ describe('Apollo cache clearing', () => {
         id: DUPLICATE_ITEM_RECORD_ID
       }
     }
-
-    it("doesn't clear cached records that are still being referenced", () => {
-      const cache = new InMemoryCache().restore(initialCache)
-      clearUnusedViewRecordCacheEntries(cache, [
-        {
-          id: 'acf0f21c-f62c-11ed-b67e-0242ac120002',
-          duplicates: [
-            {
-              trackingId: 'TEST123',
-              compositionId: DUPLICATE_ITEM_RECORD_ID
-            }
-          ]
-        }
-      ])
-      const query = cache.readQuery({
-        query: gql`
-          query fetchViewRecordByComposition($id: ID!) {
-            fetchRegistrationForViewing(id: $id) @persist {
-              id
-            }
-          }
-        `,
-        variables: {
-          id: 'd5a1f06f-eade-4b3d-b203-3bc081b59b90'
-        }
-      })
-
-      expect(query).toHaveProperty('fetchRegistrationForViewing')
-    })
-
-    it("clears cached records that aren't referenced", () => {
-      const cache = new InMemoryCache().restore(initialCache)
-      clearUnusedViewRecordCacheEntries(cache, [
-        {
-          id: 'acf0f21c-f62c-11ed-b67e-0242ac120002',
-          duplicates: [] // Now the duplicate in cache is not referenced by any composition
-        }
-      ])
-
-      const query = cache.readQuery({
-        query: gql`
-          query fetchViewRecordByComposition($id: ID!) {
-            fetchRegistrationForViewing(id: $id) @persist {
-              id
-            }
-          }
-        `,
-        variables: {
-          id: 'd5a1f06f-eade-4b3d-b203-3bc081b59b90'
-        }
-      })
-
-      expect(query).toBeNull()
-    })
   })
 
   // Based on requirements in OCRVS-5151, e.g. when we get to the May 2023, we clear out March 2022 and older values

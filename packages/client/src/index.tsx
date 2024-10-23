@@ -18,7 +18,7 @@ import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
-import { SubmissionController } from '@client/SubmissionController'
+
 import WebFont from 'webfontloader'
 import { BrowserTracing } from '@sentry/tracing'
 import { APPLICATION_VERSION } from './utils/constants'
@@ -62,5 +62,3 @@ window.addEventListener('online', userReconnectedToast)
 const container = document.getElementById('root')
 const root = createRoot(container!)
 root.render(<App store={store} history={history} />)
-
-new SubmissionController(store).start()

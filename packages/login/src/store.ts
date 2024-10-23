@@ -52,7 +52,7 @@ export const createStore = () => {
 
   const reducers = combineReducers<IStoreState>({
     login: loginReducer,
-    router: connectRouter(history) as any, // @todo
+    router: connectRouter(history) as any,
     i18n: intlReducer
   })
 

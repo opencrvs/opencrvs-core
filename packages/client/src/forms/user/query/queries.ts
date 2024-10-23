@@ -27,13 +27,6 @@ export const getSystemRolesQuery = gql`
   }
 `
 
-export const updateRoleQuery = gql`
-  mutation updateRole($systemRole: SystemRoleInput) {
-    updateRole(systemRole: $systemRole) {
-      roleIdMap
-    }
-  }
-`
 async function fetchRoles(criteria = {}) {
   return (
     client &&

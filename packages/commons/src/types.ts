@@ -8,11 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './fhir'
-export * from './fhir/transformers/input'
-export * from './record'
-export * from './test-resources'
+
+import { UUID } from './uuid'
+
 export * from './nominal'
 export * from './search'
+export * from './record'
+export * from './event'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+export function resourceIdentifierToUUID(resourceIdentifier: string) {
+  const urlParts = resourceIdentifier.split('/')
+  return urlParts[urlParts.length - 1] as UUID
+}

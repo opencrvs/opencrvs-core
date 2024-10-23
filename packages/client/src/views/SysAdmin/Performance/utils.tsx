@@ -40,16 +40,6 @@ export const Header = styled.h1`
   ${({ theme }) => theme.fonts.h2};
 `
 
-export function getMonthDateRange(year: number, month: number) {
-  return {
-    start: startOfMonth(new Date(year, month - 1)),
-    end: endOfMonth(new Date(year, month - 1))
-  }
-}
-export const ReportHeader = styled.div`
-  margin: 32px 0 24px 0;
-`
-
 export const SubHeader = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.h4};
@@ -61,15 +51,6 @@ export const Description = styled.div`
   ${({ theme }) => theme.fonts.reg14};
 `
 
-export const ActionContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  margin: 0 -24px 0 -24px;
-  padding: 12px 24px 11px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-`
 export const PerformanceTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16}
 `
@@ -131,17 +112,6 @@ export const ListContainer = styled.div`
   margin-top: 36px;
 `
 
-export const certificationRatesDummyData = [
-  {
-    label: 'Total',
-    value: 4000
-  },
-  {
-    label: 'Certification Rate',
-    value: 25
-  }
-]
-
 export function TotalDisplayWithPercentage(props: {
   total: number
   ofNumber: number
@@ -196,19 +166,6 @@ export function isUnderJurisdictionOfUser(
   }
 
   return locationId !== '0'
-}
-
-export function getPrimaryLocationIdOfOffice(
-  locations: { [key: string]: ILocation },
-  office: ILocation
-) {
-  const location = locations[office.partOf.split('/')[1]]
-
-  if (!location) {
-    throw new Error(`Office location of ${office.id} not found`)
-  }
-
-  return location.id
 }
 
 export enum CompletenessRateTime {

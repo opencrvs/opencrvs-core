@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { getCurrentUserID, IUserData } from '@client/declarations'
+import { getCurrentUserID, IUserData } from '@client/user'
 import { storage } from '@client/storage'
 
 async function loadUserPin() {

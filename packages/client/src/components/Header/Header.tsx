@@ -46,17 +46,15 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
-import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+
 import { HistoryNavigator } from './HistoryNavigator'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 
 type IStateProps = {
   userDetails: UserDetails | null
-  fieldNames: string[]
   language: string
   offlineData: IOfflineData
 }
@@ -68,7 +66,6 @@ type IDispatchProps = {
   goToCreateNewUser: typeof goToCreateNewUser
   goToAdvancedSearch: typeof goToAdvancedSearch
   goToSearchResult: typeof goToSearchResult
-  setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
 interface IProps extends RouteComponentProps {
@@ -131,7 +128,7 @@ const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
   PERFORMANCE_MANAGEMENT_ROLES
 )
 
-export const HeaderComponent = (props: IFullProps) => {
+const HeaderComponent = (props: IFullProps) => {
   const {
     location,
     userDetails,
@@ -148,7 +145,6 @@ export const HeaderComponent = (props: IFullProps) => {
     goToCreateNewUser,
     goToAdvancedSearch,
     goToSearchResult,
-    setAdvancedSearchParam,
     mapPerformanceClickHandler,
     changeTeamLocation
   } = props
@@ -277,7 +273,7 @@ export const HeaderComponent = (props: IFullProps) => {
   }
 
   const renderSearchInput = (props: IFullProps, isMobile?: boolean) => {
-    const { intl, searchText, selectedSearchType, language, fieldNames } = props
+    const { intl, searchText, selectedSearchType, language } = props
 
     const searchTypeList: ISearchType[] = [
       {
@@ -300,42 +296,14 @@ export const HeaderComponent = (props: IFullProps) => {
       }
     ]
 
-    if (fieldNames.includes('registrationPhone')) {
-      searchTypeList.splice(3, 0, {
-        name: SearchCriteria.PHONE_NUMBER,
-        label: intl.formatMessage(messages.typePhone),
-        icon: <Icon name="Phone" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderPhone)
-      })
-    }
-    if (
-      fieldNames.includes('iD') ||
-      fieldNames.includes('deceasedID') ||
-      fieldNames.includes('informantID') ||
-      fieldNames.some((name) => name.endsWith('NationalId'))
-    ) {
-      searchTypeList.splice(2, 0, {
-        name: SearchCriteria.NATIONAL_ID,
-        label: intl.formatMessage(constantsMessages.id),
-        icon: <Icon name="IdentificationCard" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeholderId)
-      })
-    }
-    if (fieldNames.includes('registrationEmail')) {
-      searchTypeList.push({
-        name: SearchCriteria.EMAIL,
-        label: intl.formatMessage(messages.email),
-        icon: <Icon name="Envelope" size="small" />,
-        placeHolderText: intl.formatMessage(messages.placeHolderEmail)
-      })
-    }
+    /* @todo I removed some conditionally added search types from here */
 
     const navigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
-          setAdvancedSearchParam(advancedSearchInitialState)
+          // @todo setAdvancedSearchParam(advancedSearchInitialState)
           goToAdvancedSearch()
         }
       }
@@ -472,12 +440,7 @@ export const Header = connect(
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store),
-    offlineData: getOfflineData(store),
-    fieldNames: Object.values(getRegisterForm(store))
-      .flatMap((form) => form.sections)
-      .flatMap((section) => section.groups)
-      .flatMap((group) => group.fields)
-      .map((field) => field.name)
+    offlineData: getOfflineData(store)
   }),
   {
     goToSearch,
@@ -486,7 +449,6 @@ export const Header = connect(
     goToCreateNewUserWithLocationId,
     goToCreateNewUser,
     goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam,
     goToSearchResult
   }
 )(injectIntl(withRouter(HeaderComponent)))

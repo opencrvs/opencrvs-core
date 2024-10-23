@@ -13,8 +13,7 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
   formMessages as messages,
   buttonMessages,
-  userMessages,
-  QUESTION_KEYS
+  userMessages
 } from '@client/i18n/messages'
 import styled from 'styled-components'
 import { InputError } from '@opencrvs/components/lib/InputField'
@@ -88,7 +87,16 @@ const Error = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   ${({ theme }) => theme.fonts.reg12};
 `
-
+enum QUESTION_KEYS {
+  BIRTH_TOWN,
+  HIGH_SCHOOL,
+  MOTHER_NAME,
+  FAVORITE_TEACHER,
+  FAVORITE_MOVIE,
+  FAVORITE_SONG,
+  FAVORITE_FOOD,
+  FIRST_CHILD_NAME
+}
 class SecurityQuestionView extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)

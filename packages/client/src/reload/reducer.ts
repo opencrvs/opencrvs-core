@@ -16,9 +16,9 @@ const initialState: IReloadModalVisibilityState = {
   isReloadModalVisible: false
 }
 
-export const RELOAD_MODAL_VISIBILITY = 'RELOAD_MODAL_VISIBILITY'
+const RELOAD_MODAL_VISIBILITY = 'RELOAD_MODAL_VISIBILITY'
 
-export type ReloadModalVisibilityAction = {
+type ReloadModalVisibilityAction = {
   type: typeof RELOAD_MODAL_VISIBILITY
   payload?: boolean
 }

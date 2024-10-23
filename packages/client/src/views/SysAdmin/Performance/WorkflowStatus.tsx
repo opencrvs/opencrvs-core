@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GenericErrorToast } from '@client/components/GenericErrorToast'
+
 import { LocationPicker } from '@client/components/LocationPicker'
-import { Query } from '@client/components/Query'
+
 import { formatTimeDuration } from '@client/DateUtils'
 import { Event, RegStatus } from '@client/utils/gateway'
 import {
@@ -22,8 +22,7 @@ import { messages } from '@client/i18n/messages/views/performance'
 import {
   goToPerformanceHome,
   goToWorkflowStatus,
-  goToSearchResult,
-  goToDeclarationRecordAudit
+  goToSearchResult
 } from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
@@ -51,7 +50,7 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
-import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
+
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 import format, { formattedDuration } from '@client/utils/date-formatting'
 import subYears from 'date-fns/subYears'
@@ -190,14 +189,13 @@ interface DispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToWorkflowStatus: typeof goToWorkflowStatus
   goToSearchResult: typeof goToSearchResult
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 interface ISearchParams {
   locationId: string
   status?: keyof IStatusMapping
   event?: Event
 }
-export interface IHistoryStateProps {
+interface IHistoryStateProps {
   timeStart: Date | string
   timeEnd: Date | string
 }
@@ -644,12 +642,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         ...row,
         id: (
           <LinkButton
-            onClick={() =>
-              props.goToDeclarationRecordAudit(
-                'printTab',
-                row.compositionId as string
-              )
-            }
+            onClick={() => {
+              /*@todo */
+            }}
           >
             {row.id}
           </LinkButton>
@@ -776,65 +771,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           </>
         }
       >
-        <Query
-          query={FETCH_EVENTS_WITH_PROGRESS}
-          variables={{
-            declarationJurisdictionId: locationId,
-            skip: pageSize * (currentPageNumber - 1),
-            count: pageSize,
-            registrationStatuses: (status && [status]) || undefined,
-            compositionType:
-              (event && [
-                `${event.toLowerCase()}-declaration`,
-                `${event.toLowerCase()}-notification`
-              ]) ||
-              undefined
-          }}
-          fetchPolicy={'no-cache'}
-        >
-          {({ data, loading, error }) => {
-            let total = 0
-            if (loading) {
-              return <Spinner id="status-view-loader" size={24} />
-            }
-            if (
-              data &&
-              data.getEventsWithProgress &&
-              data.getEventsWithProgress.totalItems
-            ) {
-              total = data.getEventsWithProgress.totalItems
-            }
-
-            return (
-              <>
-                <TableDiv id="table-div-wrapper">
-                  <Table
-                    id="declaration-status-list"
-                    content={getContent(data)}
-                    columns={getColumns()}
-                    isLoading={loading || Boolean(error)}
-                    noResultText={intl.formatMessage(
-                      constantsMessages.noResults
-                    )}
-                    fixedWidth={2050}
-                    tableHeight={150}
-                    highlightRowOnMouseOver
-                    noPagination
-                    isFullPage
-                  />
-                  {error && <GenericErrorToast />}
-                  {total > pageSize && (
-                    <Pagination
-                      currentPage={currentPageNumber}
-                      totalPages={Math.ceil(total / pageSize)}
-                      onPageChange={onPageChange}
-                    />
-                  )}
-                </TableDiv>
-              </>
-            )
-          }}
-        </Query>
+        <span>@todo</span>
       </Content>
     </SysAdminContentWrapper>
   )
@@ -843,6 +780,5 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 export const WorkflowStatus = connect(null, {
   goToPerformanceHome,
   goToSearchResult,
-  goToDeclarationRecordAudit,
   goToWorkflowStatus
 })(injectIntl(WorkflowStatusComponent))

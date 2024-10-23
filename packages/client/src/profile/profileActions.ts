@@ -104,7 +104,7 @@ export const userDetailsAvailable = (payload: UserDetails) => ({
   payload
 })
 
-export type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
+type UserDetailsAvailable = ReturnType<typeof userDetailsAvailable>
 
 export const modifyUserDetails = (
   payload: Partial<UserDetails>

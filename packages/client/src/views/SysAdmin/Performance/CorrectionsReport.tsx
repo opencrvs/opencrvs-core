@@ -21,8 +21,16 @@ import {
 import type { GQLCorrectionMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { CorrectionReason } from '@client/forms/correction/reason'
+
 import { useIntl } from 'react-intl'
+
+enum CorrectionReason {
+  CLERICAL_ERROR = 'CLERICAL_ERROR',
+  MATERIAL_ERROR = 'MATERIAL_ERROR',
+  MATERIAL_OMISSION = 'MATERIAL_OMISSION',
+  JUDICIAL_ORDER = 'JUDICIAL_ORDER',
+  OTHER = 'OTHER'
+}
 
 interface CorrectionsReportProps {
   data: Array<GQLCorrectionMetric>

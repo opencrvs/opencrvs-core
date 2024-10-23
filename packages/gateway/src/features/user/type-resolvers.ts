@@ -9,20 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IAuthHeader, UUID } from '@opencrvs/commons'
-
 import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
-import {
-  Bundle,
-  Extension,
-  OPENCRVS_SPECIFICATION_URL,
-  findExtension,
-  PractitionerRole,
-  ResourceIdentifier,
-  resourceIdentifierToUUID
-} from '@opencrvs/commons/types'
-import { fetchFHIR } from '@gateway/features/fhir/service'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -114,45 +102,6 @@ export interface IUserSearchPayload {
   sortOrder: string
 }
 
-async function getPractitionerByOfficeId(
-  primaryOfficeId: string,
-  authHeader: IAuthHeader
-) {
-  const roleBundle: Bundle = await fetchFHIR(
-    `/PractitionerRole?location=${primaryOfficeId}&role=LOCAL_REGISTRAR`,
-    authHeader
-  )
-
-  const practitionerRole =
-    roleBundle &&
-    roleBundle.entry &&
-    roleBundle.entry &&
-    roleBundle.entry.length > 0 &&
-    (roleBundle.entry[0].resource as PractitionerRole)
-
-  const roleCode =
-    practitionerRole &&
-    practitionerRole.code &&
-    practitionerRole.code.length > 0 &&
-    practitionerRole.code[0].coding &&
-    practitionerRole.code[0].coding[0].code
-
-  return {
-    practitionerId:
-      practitionerRole && practitionerRole.practitioner
-        ? (practitionerRole.practitioner.reference as ResourceIdentifier)
-        : undefined,
-    practitionerRole: roleCode || undefined
-  }
-}
-
-export function getSignatureExtension(extensions: Extension[] | undefined) {
-  return findExtension(
-    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
-    extensions || []
-  )
-}
-
 export const userTypeResolvers: GQLResolver = {
   User: {
     id(userModel: IUserModelData) {
@@ -174,6 +123,14 @@ export const userTypeResolvers: GQLResolver = {
     email(userModel: IUserModelData) {
       return userModel.emailForNotification
     },
+    async name(userModel: IUserModelData) {
+      return [
+        {
+          familyName: userModel.name[0].family,
+          firstNames: userModel.name[0].given[0]
+        }
+      ]
+    },
     async primaryOffice(userModel: IUserModelData, _, { dataSources }) {
       return dataSources.locationsAPI.getLocation(userModel.primaryOfficeId)
     },
@@ -182,73 +139,14 @@ export const userTypeResolvers: GQLResolver = {
       _,
       { headers: authHeader, dataSources }
     ) {
-      const scope = userModel.scope
-
-      if (!scope) {
-        return null
-      }
-
-      const { practitionerId, practitionerRole } = !scope.includes('register')
-        ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
-        : {
-            practitionerId: `Practitioner/${
-              userModel.practitionerId as UUID
-            }` as const,
-            practitionerRole: userModel.systemRole
-          }
-
-      if (!practitionerId) {
-        return
-      }
-
-      const practitioner = await dataSources.fhirAPI.getPractitioner(
-        resourceIdentifierToUUID(practitionerId)
-      )
-
-      if (!practitioner) {
-        return
-      }
-
-      const signatureExtension = getSignatureExtension(practitioner.extension)
-
-      const presignedUrl =
-        userModel.systemRole === 'FIELD_AGENT'
-          ? null
-          : signatureExtension &&
-            (await getPresignedUrlFromUri(
-              signatureExtension.valueAttachment.url,
-              authHeader
-            ))
-      return {
-        role: practitionerRole,
-        name: practitioner.name,
-        signature: presignedUrl
-      }
+      return null /* @todo what is the idea of this? what if there are two registrars */
     },
     async signature(
       userModel: IUserModelData,
       _,
       { headers: authHeader, dataSources }
     ) {
-      const practitioner = await dataSources.fhirAPI.getPractitioner(
-        userModel.practitionerId
-      )
-
-      const signatureExtension = getSignatureExtension(practitioner.extension)
-
-      const presignedUrl =
-        signatureExtension &&
-        (await getPresignedUrlFromUri(
-          signatureExtension.valueAttachment.url,
-          authHeader
-        ))
-
-      if (!presignedUrl) return null
-
-      return {
-        type: signatureExtension.valueAttachment.contentType,
-        data: presignedUrl
-      }
+      return null /* @todo */
     }
   },
 

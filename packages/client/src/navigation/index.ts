@@ -9,79 +9,63 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserSection, CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
+  ADVANCED_SEARCH,
+  ADVANCED_SEARCH_RESULT,
+  ALL_USER_EMAIL,
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
-  DRAFT_DEATH_FORM,
+  DRAFT_FORM,
   EVENT_COMPLETENESS_RATES,
-  HOME,
+  ORGANISATIONS_INDEX,
+  PERFORMANCE_DASHBOARD,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
-  ADVANCED_SEARCH,
-  PRINT_CERTIFICATE_PAYMENT,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_STATISTICS,
+  PRINT_RECORD,
   REGISTRAR_HOME_TAB,
-  REVIEW_CERTIFICATE,
-  REVIEW_USER_DETAILS,
+  REGISTRAR_HOME_TAB_PAGE,
   REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
   SELECT_VITAL_EVENT,
   SETTINGS,
+  SYSTEM_LIST,
   TEAM_SEARCH,
-  VERIFY_COLLECTOR,
-  WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CERTIFICATE_CORRECTION,
-  VERIFY_CORRECTOR,
-  DECLARATION_RECORD_AUDIT,
-  REGISTRAR_HOME_TAB_PAGE,
-  SYSTEM_LIST,
   VS_EXPORTS,
-  VIEW_RECORD,
-  ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST,
-  PERFORMANCE_LEADER_BOARDS,
-  PERFORMANCE_STATISTICS,
-  PERFORMANCE_DASHBOARD,
-  ORGANISATIONS_INDEX,
-  ISSUE_COLLECTOR,
-  ISSUE_VERIFY_COLLECTOR,
-  ISSUE_CERTIFICATE_PAYMENT,
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_MARRIAGE_FORM,
-  ALL_USER_EMAIL,
-  PRINT_RECORD
+  WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import {
-  NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES,
+  NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import {
   goBack as back,
+  goForward as forward,
   push,
-  replace,
-  goForward as forward
+  replace
 } from 'connected-react-router'
-import { stringify } from 'query-string'
-import { Cmd, loop } from 'redux-loop'
-import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { UserDetails } from '@client/utils/userUtils'
+import { stringify } from 'query-string'
+import { Cmd, loop } from 'redux-loop'
 
-export interface IDynamicValues {
+interface IDynamicValues {
   [key: string]: any
 }
 
@@ -92,7 +76,7 @@ export function formatUrl(url: string, props: { [key: string]: string }) {
   )
   return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
 }
-export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
+const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
 type GoToPageAction = {
   type: typeof GO_TO_PAGE
   payload: {
@@ -122,23 +106,7 @@ type GoToUserProfile = {
   }
 }
 
-export type Action = GoToPageAction | GoToReviewUserDetails | GoToUserProfile
-
-export function goToDeathInformant(declarationId: string) {
-  return push(
-    formatUrl(DRAFT_DEATH_FORM, {
-      declarationId: declarationId.toString()
-    })
-  )
-}
-
-export function goToMarriageInformant(declarationId: string) {
-  return push(
-    formatUrl(DRAFT_MARRIAGE_FORM, {
-      declarationId: declarationId.toString()
-    })
-  )
-}
+type Action = GoToPageAction | GoToReviewUserDetails | GoToUserProfile
 
 export function goToEvents() {
   return push(SELECT_VITAL_EVENT)
@@ -150,10 +118,6 @@ export function goBack() {
 
 export function goForward() {
   return forward()
-}
-
-export function goToHome() {
-  return push(HOME)
 }
 
 export function goToAllUserEmail() {
@@ -276,21 +240,6 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
-export function goToDeclarationRecordAudit(
-  tab: IRecordAuditTabs,
-  declarationId: string
-) {
-  return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
-}
-
-export function goToBirthRegistrationAsParent(declarationId: string) {
-  return push(
-    formatUrl(DRAFT_BIRTH_PARENT_FORM, {
-      declarationId: declarationId.toString()
-    })
-  )
-}
-
 export function goToPrintCertificate(
   registrationId: string,
   event: string,
@@ -302,115 +251,6 @@ export function goToPrintCertificate(
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
     })
-  )
-}
-
-export function goToIssueCertificate(
-  registrationId: string,
-  pageId = 'collector'
-) {
-  return push(
-    formatUrl(ISSUE_COLLECTOR, {
-      registrationId: registrationId.toString(),
-      pageId: pageId
-    })
-  )
-}
-
-export function goToVerifyIssueCollector(
-  registrationId: string,
-  event: string,
-  collector: string
-) {
-  return push(
-    formatUrl(ISSUE_VERIFY_COLLECTOR, {
-      registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString(),
-      collector: collector.toLowerCase().toString()
-    })
-  )
-}
-
-export function goToViewRecordPage(declarationId: string) {
-  return push(
-    formatUrl(VIEW_RECORD, {
-      declarationId
-    })
-  )
-}
-
-export function goToCertificateCorrection(
-  declarationId: string,
-  pageId: CorrectionSection
-) {
-  return push(
-    formatUrl(CERTIFICATE_CORRECTION, {
-      declarationId: declarationId.toString(),
-      pageId: pageId.toString()
-    })
-  )
-}
-
-export function goToVerifyCorrector(declarationId: string, corrector: string) {
-  return push(
-    formatUrl(VERIFY_CORRECTOR, {
-      declarationId: declarationId.toString(),
-      corrector: corrector.toLowerCase().toString()
-    })
-  )
-}
-
-export function goToReviewCertificate(registrationId: string, event: Event) {
-  return push(
-    formatUrl(REVIEW_CERTIFICATE, {
-      registrationId: registrationId.toString(),
-      eventType: event
-    }),
-    { isNavigatedInsideApp: true }
-  )
-}
-
-export function goToVerifyCollector(
-  registrationId: string,
-  event: string,
-  collector: string
-) {
-  return push(
-    formatUrl(VERIFY_COLLECTOR, {
-      registrationId: registrationId.toString(),
-      eventType: event.toLowerCase().toString(),
-      collector: collector.toLowerCase().toString()
-    })
-  )
-}
-
-export function goToPrintCertificatePayment(
-  registrationId: string,
-  event: Event
-) {
-  return push(
-    formatUrl(PRINT_CERTIFICATE_PAYMENT, {
-      registrationId: registrationId.toString(),
-      eventType: event
-    })
-  )
-}
-
-export function goToIssueCertificatePayment(
-  registrationId: string,
-  event: Event
-) {
-  return push(
-    formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
-      registrationId: registrationId.toString(),
-      eventType: event
-    })
-  )
-}
-
-export function goToDeathRegistration(declarationId: string) {
-  return push(
-    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
 }
 
@@ -551,65 +391,6 @@ type GoToUserReviewForm = {
   }
 }
 
-export function goToCreateUserSection(
-  sectionId: string,
-  nextGroupId: string,
-  fieldNameHash?: string,
-  historyState?: IDynamicValues
-): GoToCreateUserSection {
-  return {
-    type: GO_TO_CREATE_USER_SECTION,
-    payload: {
-      sectionId,
-      nextGroupId,
-      userFormFieldNameHash: fieldNameHash,
-      formHistoryState: historyState
-    }
-  }
-}
-
-export function goToUserReviewForm(
-  userId: string,
-  sectionId: string,
-  nextGroupId: string,
-  fieldNameHash?: string,
-  historyState?: IDynamicValues
-): GoToUserReviewForm {
-  return {
-    type: GO_TO_USER_REVIEW_FORM,
-    payload: {
-      userId,
-      sectionId,
-      nextGroupId,
-      userFormFieldNameHash: fieldNameHash,
-      formHistoryState: historyState
-    }
-  }
-}
-
-export function goToPageGroup(
-  pageRoute: string,
-  declarationId: string,
-  pageId: string,
-  groupId: string,
-  event: string,
-  fieldNameHash?: string,
-  historyState?: IDynamicValues
-) {
-  return {
-    type: GO_TO_PAGE,
-    payload: {
-      declarationId,
-      pageId,
-      groupId,
-      event,
-      fieldNameHash,
-      pageRoute,
-      historyState
-    }
-  }
-}
-
 export function goToPage(
   pageRoute: string,
   declarationId: string,
@@ -671,7 +452,7 @@ export function goToOrganisationView(userDetails: UserDetails) {
   return goToOrganizationList()
 }
 
-export function goToPrintRecordView(declarationId: string) {
+function goToPrintRecordView(declarationId: string) {
   return push(
     formatUrl(PRINT_RECORD, {
       declarationId
@@ -743,17 +524,8 @@ export function navigationReducer(state: INavigationState, action: any) {
         )
       )
     case GO_TO_REVIEW_USER_DETAILS:
-      return loop(
-        state,
-        Cmd.action(
-          push(
-            formatUrl(REVIEW_USER_DETAILS, {
-              userId: action.payload.userId,
-              sectionId: UserSection.Preview
-            })
-          )
-        )
-      )
+      return state /* @todo */
+
     case GO_TO_USER_PROFILE:
       return loop(
         state,

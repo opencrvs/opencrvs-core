@@ -8,35 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ISearchLocation, Stack } from '@client/../../components/lib'
+import { ISearchLocation } from '@client/../../components/lib'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { SegmentedControl } from '@client/components/SegmentedControl'
-import { constantsMessages, userMessages } from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
   goToFieldAgentList,
   goToPerformanceHome,
   goToRegistrationsList,
-  goToUserProfile,
-  goToTeamUserList
+  goToTeamUserList,
+  goToUserProfile
 } from '@client/navigation'
-import { AvatarSmall } from '@client/components/Avatar'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import {
   GetRegistrationsListByFilterQuery,
-  QueryGetRegistrationsListByFilterArgs,
-  RegistrationsListByLocationFilter,
-  RegistrationsListByRegistrarFilter,
-  RegistrationsListByTimeFilter,
-  RegistrationType
+  QueryGetRegistrationsListByFilterArgs
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
-import { getName } from '@client/views/RecordAudit/utils'
 import {
   IPerformanceSelectOption,
   PerformanceSelect
@@ -52,17 +46,12 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
-import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { Link } from '@opencrvs/components/lib/Link'
-import { useAuthorization } from '@client/hooks/useAuthorization'
-import formatDate from '@client/utils/date-formatting'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -129,12 +118,6 @@ enum EVENT_OPTIONS {
   DEATH = 'DEATH'
 }
 
-enum RESULT_TYPE {
-  by_registrar = 'TotalMetricsByRegistrar',
-  by_location = 'TotalMetricsByLocation',
-  by_time = 'TotalMetricsByTime'
-}
-
 enum FILTER_BY_OPTIONS {
   BY_TIME = 'by_time',
   BY_LOCATION = 'by_location',
@@ -144,13 +127,6 @@ enum FILTER_BY_OPTIONS {
 const TableDiv = styled.div`
   overflow: auto;
 `
-
-function getPercentage(total: number | undefined, current: number | undefined) {
-  if (!total || total <= 0 || !current || current <= 0) {
-    return 0
-  }
-  return Math.round((current / total) * 100)
-}
 
 function RegistrationListComponent(props: IProps) {
   const {
@@ -174,12 +150,11 @@ function RegistrationListComponent(props: IProps) {
   const recordCount = DEFAULT_PAGE_SIZE * currentPage
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
-  const { isPerformanceManager } = useAuthorization()
 
   const queryVariables: QueryGetRegistrationsListByFilterArgs = {
     timeStart: timeStart,
     timeEnd: timeEnd,
-    event: event || RegistrationType.Birth,
+    event: event,
     skip: recordCount,
     size: DEFAULT_PAGE_SIZE,
     filterBy
@@ -375,167 +350,10 @@ function RegistrationListComponent(props: IProps) {
     throw new Error('Invalid Filter')
   }
 
-  function getFieldAgentTypeLabel(type: string) {
-    return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
-  }
-
-  function showWithTooltip(
-    total: number,
-    amount: number,
-    key: string,
-    index: number
-  ) {
-    return (
-      <>
-        <ReactTooltip id={`${key}_${index}`}>
-          <ToolTipContainer>{amount}</ToolTipContainer>
-        </ReactTooltip>
-        <span data-tip data-for={`${key}_${index}`}>
-          {getPercentage(total, amount)}%
-        </span>
-      </>
-    )
-  }
-
-  const getTableContentByRegistrar = (
-    result: RegistrationsListByRegistrarFilter['results'][0],
-    index: number
-  ) => ({
-    ...result,
-    name: (
-      <Stack>
-        <AvatarSmall
-          name={
-            result.registrarPractitioner?.name
-              ? getName(result.registrarPractitioner.name, 'en')
-              : ''
-          }
-          avatar={result.registrarPractitioner?.avatar}
-        />
-        <>
-          {!isPerformanceManager ? (
-            <Link
-              font="bold14"
-              onClick={() => {
-                props.goToUserProfile(String(result.registrarPractitioner?.id))
-              }}
-            >
-              {result.registrarPractitioner?.name
-                ? getName(result.registrarPractitioner.name, 'en')
-                : ''}
-            </Link>
-          ) : (
-            String(
-              result.registrarPractitioner?.name
-                ? getName(result.registrarPractitioner.name, 'en')
-                : ''
-            )
-          )}
-        </>
-      </Stack>
-    ),
-    location: (
-      <>
-        {!isPerformanceManager ? (
-          <Link
-            font="bold14"
-            onClick={() => {
-              props.goToTeamUserList(
-                result.registrarPractitioner?.primaryOffice?.id as string
-              )
-            }}
-          >
-            {result.registrarPractitioner?.primaryOffice?.name}
-          </Link>
-        ) : (
-          String(result.registrarPractitioner?.primaryOffice?.name)
-        )}
-      </>
-    ),
-    systemRole: getFieldAgentTypeLabel(
-      result.registrarPractitioner?.systemRole as string
-    ),
-    total: String(result.total),
-    delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
-    delayed_num: getPercentage(result.total, result.delayed),
-    late: showWithTooltip(result.total, result.late, 'late', index),
-    late_num: getPercentage(result.total, result.late)
-  })
-
-  const getTableContentByLocation = (
-    result: RegistrationsListByLocationFilter['results'][0],
-    index: number
-  ) => ({
-    ...result,
-    location: result.location.name,
-    total: String(result.total),
-    delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
-    delayed_num: getPercentage(result.total, result.delayed),
-    late: showWithTooltip(result.total, result.late, 'late', index),
-    late_num: getPercentage(result.total, result.late),
-    home: showWithTooltip(result.total, result.home, 'home', index),
-    home_num: getPercentage(result.total, result.home),
-    healthFacility: showWithTooltip(
-      result.total,
-      result.healthFacility,
-      'healthFacility',
-      index
-    ),
-    healthFacility_num: getPercentage(result.total, result.healthFacility)
-  })
-
-  const getTableContentByTime = (
-    result: RegistrationsListByTimeFilter['results'][0],
-    index: number
-  ) => {
-    return {
-      ...result,
-      // Time is epoch but returned as a string
-      month: formatDate(new Date(result.month), 'MMMM yyyy', intl.locale),
-      total: String(result.total),
-      delayed: showWithTooltip(result.total, result.delayed, 'delayed', index),
-      delayed_num: getPercentage(result.total, result.delayed),
-      late: showWithTooltip(result.total, result.late, 'late', index),
-      late_num: getPercentage(result.total, result.late),
-      home: showWithTooltip(result.total, result.home, 'home', index),
-      home_num: getPercentage(result.total, result.home),
-      healthFacility: showWithTooltip(
-        result.total,
-        result.healthFacility,
-        'healthFacility',
-        index
-      ),
-      healthFacility_num: getPercentage(result.total, result.healthFacility)
-    }
-  }
-
   function getContent(
     content?: GetRegistrationsListByFilterQuery['getRegistrationsListByFilter']
   ) {
-    if (!content) {
-      return []
-    }
-
-    const orderRows = (
-      rows: Array<
-        ReturnType<
-          | typeof getTableContentByTime
-          | typeof getTableContentByLocation
-          | typeof getTableContentByRegistrar
-        >
-      >
-    ) => orderBy(rows, [columnToBeSort], [sortOrder[columnToBeSort]])
-
-    switch (content.__typename) {
-      case RESULT_TYPE.by_registrar:
-        return orderRows(content.results.map(getTableContentByRegistrar))
-      case RESULT_TYPE.by_location:
-        return orderRows(content.results.map(getTableContentByLocation))
-      case RESULT_TYPE.by_time:
-        return orderRows(content.results.map(getTableContentByTime))
-      default:
-        return []
-    }
+    return [] /* @todo */
   }
 
   const options: (IPerformanceSelectOption & { disabled?: boolean })[] = [

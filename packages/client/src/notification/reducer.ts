@@ -10,18 +10,8 @@
  */
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
-import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
-import { ShowUnassignedPayload } from '@client/notification/actions'
 
-type UserAuditSuccessToastState =
-  | {
-      visible: false
-    }
-  | {
-      visible: true
-      userFullName: string
-      action: AUDIT_ACTION
-    }
+import { ShowUnassignedPayload } from '@client/notification/actions'
 
 type userCreateDuplicateMobileFailedToastState = {
   visible: boolean
@@ -49,7 +39,6 @@ export type NotificationState = {
   saveDraftClicked: boolean
   submitFormSuccessToast: string | null
   submitFormErrorToast: string | null
-  userAuditSuccessToast: UserAuditSuccessToastState
   showPINUpdateSuccess: boolean
   showDuplicateRecordsToast: boolean
   duplicateCompositionId: string | null
@@ -72,7 +61,6 @@ const initialState: NotificationState = {
   saveDraftClicked: false,
   submitFormSuccessToast: null,
   submitFormErrorToast: null,
-  userAuditSuccessToast: { visible: false },
   showPINUpdateSuccess: false,
   showDuplicateRecordsToast: false,
   duplicateCompositionId: null,
@@ -189,27 +177,7 @@ export const notificationReducer: LoopReducer<
           email: null
         }
       }
-    case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:
-      const { userFullName, action: auditAction } = (
-        action as actions.ShowUserAuditSuccessToast
-      ).payload
-      return {
-        ...state,
-        userAuditSuccessToast: {
-          ...state.userAuditSuccessToast,
-          visible: true,
-          userFullName,
-          action: auditAction
-        }
-      }
-    case actions.HIDE_USER_AUDIT_SUCCESS_TOAST:
-      return {
-        ...state,
-        userAuditSuccessToast: {
-          ...state.userAuditSuccessToast,
-          visible: false
-        }
-      }
+
     case actions.SHOW_PIN_UPDATE_SUCCESS:
       return {
         ...state,

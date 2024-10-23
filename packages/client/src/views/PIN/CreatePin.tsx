@@ -15,7 +15,7 @@ import * as bcrypt from 'bcryptjs'
 import { storage } from '@opencrvs/client/src/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
-import { getCurrentUserID, IUserData } from '@client/declarations'
+import { getCurrentUserID, IUserData } from '@client/user'
 import { IOfflineData } from '@client/offline/reducer'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
@@ -87,8 +87,7 @@ const CreatePinComponent = ({
     } else {
       allUserData.push({
         userID: currentUserID,
-        userPIN: hash,
-        declarations: []
+        userPIN: hash
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
