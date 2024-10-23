@@ -111,29 +111,16 @@ export interface IApplicationConfig {
   BIRTH: {
     REGISTRATION_TARGET: number
     LATE_REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      LATE: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {
     REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   MARRIAGE: {
     REGISTRATION_TARGET: number
-    FEE: {
-      ON_TIME: number
-      DELAYED: number
-    }
     PRINT_IN_ADVANCE: boolean
   }
   FEATURES: {

@@ -293,7 +293,6 @@ input AvatarInput {
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
-  FEE: BirthFee
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -317,22 +316,9 @@ type BirthEventSearchSet implements EventSearchSet {
   fatherIdentifier: String
 }
 
-type BirthFee {
-  ON_TIME: Float
-  LATE: Float
-  DELAYED: Float
-}
-
-input BirthFeeInput {
-  ON_TIME: Float
-  LATE: Float
-  DELAYED: Float
-}
-
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
-  FEE: BirthFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -572,7 +558,6 @@ scalar FieldValue
 
 type Death {
   REGISTRATION_TARGET: Int
-  FEE: DeathFee
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -586,19 +571,8 @@ type DeathEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-type DeathFee {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
-input DeathFeeInput {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
 input DeathInput {
   REGISTRATION_TARGET: Int
-  FEE: DeathFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -934,7 +908,6 @@ scalar Map
 
 type Marriage {
   REGISTRATION_TARGET: Int
-  FEE: MarriageFee
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -950,19 +923,8 @@ type MarriageEventSearchSet implements EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-type MarriageFee {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
-input MarriageFeeInput {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
 input MarriageInput {
   REGISTRATION_TARGET: Int
-  FEE: MarriageFeeInput
   PRINT_IN_ADVANCE: Boolean
 }
 
@@ -1949,7 +1911,6 @@ type CertificateConfigData {
   id: String!
   event: String!
   label: CertificateLabel!
-
   fee: CertificateFee!
   svgUrl: String!
 }
@@ -1970,7 +1931,6 @@ input CertificateConfigDataInput {
   id: String!
   event: String!
   label: CertificateLabelInput!
-
   fee: CertificateFeeInput!
   svgUrl: String!
 }

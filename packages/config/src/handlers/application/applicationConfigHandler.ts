@@ -160,37 +160,18 @@ const applicationConfigResponseValidation = Joi.object({
     .keys({
       REGISTRATION_TARGET: Joi.number().required(),
       LATE_REGISTRATION_TARGET: Joi.number().required(),
-      FEE: Joi.object()
-        .keys({
-          ON_TIME: Joi.number().required(),
-          LATE: Joi.number().required(),
-          DELAYED: Joi.number().required()
-        })
-        .required(),
       PRINT_IN_ADVANCE: Joi.boolean().required()
     })
     .required(),
   DEATH: Joi.object()
     .keys({
       REGISTRATION_TARGET: Joi.number().required(),
-      FEE: Joi.object()
-        .keys({
-          ON_TIME: Joi.number().required(),
-          DELAYED: Joi.number().required()
-        })
-        .required(),
       PRINT_IN_ADVANCE: Joi.boolean().required()
     })
     .required(),
   MARRIAGE: Joi.object()
     .keys({
       REGISTRATION_TARGET: Joi.number().required(),
-      FEE: Joi.object()
-        .keys({
-          ON_TIME: Joi.number().required(),
-          DELAYED: Joi.number().required()
-        })
-        .required(),
       PRINT_IN_ADVANCE: Joi.boolean().required()
     })
     .required(),
