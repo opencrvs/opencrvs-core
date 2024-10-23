@@ -10,7 +10,7 @@
  */
 
 import type { GQLRelatedPersonInput } from '@client/utils/gateway-deprecated-do-not-use'
-import { ICertificate, IFileValue, TransformedData } from '@client/forms'
+import { ICertificate, IFileValue } from '@client/forms'
 import { omit } from 'lodash'
 
 export function stripTypename(obj: any): any {

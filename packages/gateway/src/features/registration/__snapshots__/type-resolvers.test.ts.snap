@@ -170,6 +170,7 @@ Object {
     "foetalDeathsToMother": null,
     "history": Array [
       Object {
+        "certTemplateId": null,
         "certificates": Array [
           null,
         ],
@@ -654,6 +655,7 @@ Object {
     "femaleDependentsOfDeceased": 4,
     "history": Array [
       Object {
+        "certTemplateId": null,
         "certificates": Array [],
         "comments": Array [],
         "date": "2023-09-22T11:52:48.611+00:00",
@@ -1201,6 +1203,7 @@ Object {
     },
     "history": Array [
       Object {
+        "certTemplateId": null,
         "certificates": Array [],
         "comments": Array [],
         "date": "2023-09-22T08:54:57.825+00:00",

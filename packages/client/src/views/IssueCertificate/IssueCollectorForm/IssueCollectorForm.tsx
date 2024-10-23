@@ -77,7 +77,6 @@ export function IssueCollectorForm({
   function continueButtonHandler() {
     const relationship =
       declaration.data.registration.certificates[0].collector?.type
-    const event = declaration.event
     if (!relationship) return
     if (relationship === 'OTHER') {
       dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
