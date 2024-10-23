@@ -16,6 +16,10 @@ import {
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
 import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import sendVerifyCodeHandler, {
+  requestSchema,
+  responseSchema
+} from '@gateway/routes/verifyCode/handler'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -52,6 +56,23 @@ export const getRoutes = () => {
         validate: {
           payload: fhirBundleSchema,
           failAction: validationFailedAction
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/sendVerifyCode',
+      handler: sendVerifyCodeHandler,
+      options: {
+        description: 'Send verify code to user contact',
+        notes:
+          'Generate a 6 digit verification code.' +
+          'Sends an SMS/email to the user with verification code.',
+        validate: {
+          payload: requestSchema
+        },
+        response: {
+          schema: responseSchema
         }
       }
     },

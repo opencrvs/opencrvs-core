@@ -568,7 +568,7 @@ const renderValue = (
       : intl.formatMessage(buttonMessages.no)
   }
 
-  if (typeof value === 'string' || typeof value === 'number') {
+  if (value && (typeof value === 'string' || typeof value === 'number')) {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
@@ -894,7 +894,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       <RequiredField id={`required_label_${section.id}_${field.name}`}>
         {field.ignoreFieldLabelOnErrorMessage ||
           (field.previewGroup &&
-            this.props.intl.formatMessage(field.label) + ' ')}
+            this.props.intl.formatMessage(field.label, field.labelParam) + ' ')}
         {this.props.intl.formatMessage(
           errorsOnField.message,
           errorsOnField.props
@@ -1102,7 +1102,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         .map((field) =>
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
-        .filter((value) => value)
+        .filter((value) => value.props.children)
       let completeValue = values[0]
       values.shift()
       values.forEach(
@@ -1146,7 +1146,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               true
             )
           )
-          .filter((value) => value)
+          .filter((value) => value.props.children)
         let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
         previousValues.shift()
         previousValues.forEach(
@@ -1936,7 +1936,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </Accordion>
                   )}
 
-                  {!(isCorrection(declaration) || viewRecord) && (
+                  {!(
+                    isCorrection(declaration) ||
+                    viewRecord ||
+                    isDuplicate
+                  ) && (
                     <FormFieldGenerator
                       id={reviewSection.id}
                       key={reviewSection.id}

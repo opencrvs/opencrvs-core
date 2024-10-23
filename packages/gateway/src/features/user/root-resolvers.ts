@@ -26,7 +26,6 @@ import {
   GQLHumanNameInput,
   GQLResolver,
   GQLSearchFieldAgentResponse,
-  GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { logger, isBase64FileString } from '@opencrvs/commons'
@@ -640,7 +639,6 @@ function createOrUpdateUserPayload(user: GQLUserInput): IUserPayload {
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),
-    identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
     ...(user.email && { emailForNotification: user.email }), //instead of saving data in email, we want to store it in emailForNotification property

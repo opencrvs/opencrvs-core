@@ -20,7 +20,8 @@ import {
   LOCATION_SEARCH_INPUT,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  IForm
+  IForm,
+  TEXT
   // MarriageSection
 } from '@client/forms'
 import { Event as DeclarationEvent, RegStatus } from '@client/utils/gateway'
@@ -486,6 +487,288 @@ describe('when in device of large viewport', () => {
 
     it('renders selected location label', () => {
       expect(reviewSectionComponent.find('#Hospital')).toBeTruthy()
+    })
+  })
+
+  describe('when form has a postfix with no value', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+
+    beforeAll(() => {
+      vi.resetAllMocks()
+    })
+
+    beforeEach(async () => {
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      const form = {
+        sections: [
+          {
+            id: 'registration',
+            viewType: 'hidden',
+            name: {
+              defaultMessage: 'Registration'
+            },
+            groups: []
+          },
+          {
+            id: 'child',
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'weight',
+                    type: 'NUMBER',
+                    required: false,
+                    validator: [],
+                    postfix: 'kg',
+                    label: {
+                      defaultMessage: 'Weight',
+                      id: 'weight'
+                    }
+                  },
+                  {
+                    name: 'height',
+                    type: 'NUMBER',
+                    required: false,
+                    validator: [],
+                    postfix: 'inches',
+                    label: {
+                      defaultMessage: 'Height',
+                      id: 'height'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'documents',
+            name: formMessages.documentsName,
+            title: formMessages.documentsTitle,
+            viewType: 'form' as ViewType,
+            groups: [
+              {
+                id: 'documents-view-group',
+                fields: []
+              }
+            ]
+          },
+          {
+            id: 'preview',
+            viewType: 'preview',
+            name: {
+              defaultMessage: 'Preview'
+            },
+            title: {
+              defaultMessage: 'Preview'
+            },
+            groups: [
+              {
+                id: 'preview-view-group',
+                fields: []
+              }
+            ]
+          }
+        ]
+      } satisfies IForm
+
+      const data = {
+        child: {
+          weight: 67
+        },
+        documents: {}
+      }
+
+      const simpleDraft = createReviewDeclaration(
+        uuid(),
+        data,
+        DeclarationEvent.Birth
+      )
+
+      const testComponent = await createTestComponent(
+        <ReviewSection
+          form={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={simpleDraft}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+          userDetails={userDetails}
+        />,
+        { store, history }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('should not render postfix', () => {
+      const text = reviewSectionComponent.text()
+
+      expect(text).toContain('kg')
+      expect(text).not.toContain('inches')
+    })
+  })
+
+  describe('when form has empty field in a group', () => {
+    let reviewSectionComponent: ReactWrapper<{}, {}>
+
+    beforeAll(() => {
+      vi.resetAllMocks()
+    })
+
+    beforeEach(async () => {
+      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      const form = {
+        sections: [
+          {
+            id: 'registration',
+            viewType: 'hidden',
+            name: {
+              defaultMessage: 'Registration',
+              description: 'Form section name for Registration',
+              id: 'form.section.declaration.name'
+            },
+            groups: []
+          },
+          {
+            id: 'child',
+            viewType: 'form' as ViewType,
+            title: formMessages.childTitle,
+            name: formMessages.childTitle,
+            groups: [
+              {
+                id: 'child-view-group',
+                fields: [
+                  {
+                    name: 'addressLine1Placeofbirth',
+                    type: TEXT,
+                    required: false,
+                    validator: [],
+                    previewGroup: 'address',
+                    label: {
+                      defaultMessage: 'TestAddress 1',
+                      id: 'test1'
+                    }
+                  },
+                  {
+                    name: 'addressLine2Placeofbirth',
+                    type: TEXT,
+                    required: false,
+                    validator: [],
+                    previewGroup: 'address',
+                    label: {
+                      defaultMessage: 'TestAddress 2',
+                      id: 'test2'
+                    }
+                  },
+                  {
+                    name: 'addressLine3Placeofbirth',
+                    type: TEXT,
+                    required: false,
+                    validator: [],
+                    previewGroup: 'address',
+                    label: {
+                      defaultMessage: 'TestAddress 3',
+                      id: 'test3'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'documents',
+            name: formMessages.documentsName,
+            title: formMessages.documentsTitle,
+            viewType: 'form' as ViewType,
+            groups: [
+              {
+                id: 'documents-view-group',
+                fields: [
+                  {
+                    name: 'uploadDocForMother',
+                    extraValue: 'MOTHER',
+                    type: DOCUMENT_UPLOADER_WITH_OPTION,
+                    label: formMessages.uploadDocForMother,
+                    required: true,
+                    validator: [],
+                    options: [
+                      {
+                        label: formMessages.docTypeBirthCert,
+                        value: 'BIRTH_CERTIFICATE'
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'preview',
+            viewType: 'preview',
+            name: {
+              defaultMessage: 'Preview',
+              description: 'Form section name for Preview',
+              id: 'register.form.section.preview.name'
+            },
+            title: {
+              defaultMessage: 'Preview',
+              description: 'Form section title for Preview',
+              id: 'register.form.section.preview.title'
+            },
+            groups: [
+              {
+                id: 'preview-view-group',
+                fields: []
+              }
+            ]
+          }
+        ]
+      } satisfies IForm
+
+      const data = {
+        child: {
+          addressLine1Placeofbirth: 'District 9',
+          addressLine2Placeofbirth: '',
+          addressLine3Placeofbirth: 'Suburb 7'
+        },
+        documents: {}
+      }
+
+      const simpleDraft = createReviewDeclaration(
+        uuid(),
+        data,
+        DeclarationEvent.Birth
+      )
+
+      const testComponent = await createTestComponent(
+        <ReviewSection
+          form={form}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+          draft={simpleDraft}
+          rejectDeclarationClickEvent={mockHandler}
+          submitClickEvent={mockHandler}
+          userDetails={userDetails}
+        />,
+        { store, history }
+      )
+      reviewSectionComponent = testComponent
+    })
+
+    it('renders only fields with values', () => {
+      const addressList = reviewSectionComponent.find({
+        'data-test-id': 'row-value-TestAddress'
+      })
+
+      const innerHtml = addressList
+        .children()
+        .map((n) => n.html())
+        .join('')
+
+      const addressLines = innerHtml.split('<br>')
+
+      expect(addressLines.length).toBe(2)
     })
   })
 })

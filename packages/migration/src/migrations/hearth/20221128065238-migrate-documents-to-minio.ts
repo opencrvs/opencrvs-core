@@ -38,7 +38,7 @@ export const up = async (db: Db, client: MongoClient) => {
         )
         while (await documentCursor.hasNext()) {
           const document = await documentCursor.next()
-          const fileData = document?.content[0].attachment.data
+          const fileData = document?.content?.[0]?.attachment?.data
           if (fileData && isBase64FileString(fileData)) {
             const refUrl = await uploadBase64ToMinio(fileData)
             if (refUrl) {
