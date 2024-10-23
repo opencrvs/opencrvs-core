@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useHttp } from './http'
-import { handleUnsupportedIcon } from '@client/forms/utils'
+import { handleUnsupportedIcon, isFieldButton } from '@client/forms/utils'
 
 interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   fieldDefinition: Ii18nButtonFormField
@@ -57,7 +57,11 @@ export function ButtonField(props: ButtonFieldProps) {
     isCompleted
   }) => {
     if (isCompleted) {
-      setFieldTouched(fieldDefinition.name)
+      const fieldsHavingSameTrigger = fields.filter(
+        (f) => isFieldButton(f) && f.options.trigger === trigger.name
+      )
+
+      fieldsHavingSameTrigger.forEach((f) => setFieldTouched(f.name))
     }
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
   }
