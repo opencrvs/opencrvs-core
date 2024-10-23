@@ -16,9 +16,7 @@
         "defaultMessage": "Birth Certificate",
         "description": "The label for a birth certificate"
       },
-      "registrationTarget": 30,
-      "lateRegistrationTarget": 365,
-      "printInAdvance": false,
+
       "fee": {
         "onTime": 0,
         "late": 5.5,
@@ -42,9 +40,7 @@
         "defaultMessage": "Birth Certificate certified copy",
         "description": "The label for a birth certificate"
       },
-      "registrationTarget": 30,
-      "lateRegistrationTarget": 365,
-      "printInAdvance": false,
+
       "fee": {
         "onTime": 0,
         "late": 5.5,
@@ -68,9 +64,7 @@
         "defaultMessage": "Death Certificate",
         "description": "The label for a death certificate"
       },
-      "registrationTarget": 30,
-      "lateRegistrationTarget": 365,
-      "printInAdvance": false,
+
       "fee": {
         "onTime": 0,
         "late": 5.5,
@@ -94,9 +88,7 @@
         "defaultMessage": "Marriage Certificate",
         "description": "The label for a marriage certificate"
       },
-      "registrationTarget": 30,
-      "lateRegistrationTarget": 365,
-      "printInAdvance": false,
+
       "fee": {
         "onTime": 0,
         "late": 5.5,

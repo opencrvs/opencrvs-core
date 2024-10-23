@@ -1949,9 +1949,7 @@ type CertificateConfigData {
   id: String!
   event: String!
   label: CertificateLabel!
-  registrationTarget: Int!
-  lateRegistrationTarget: Int!
-  printInAdvance: Boolean!
+
   fee: CertificateFee!
   svgUrl: String!
 }
@@ -1972,9 +1970,7 @@ input CertificateConfigDataInput {
   id: String!
   event: String!
   label: CertificateLabelInput!
-  registrationTarget: Int!
-  lateRegistrationTarget: Int!
-  printInAdvance: Boolean!
+
   fee: CertificateFeeInput!
   svgUrl: String!
 }

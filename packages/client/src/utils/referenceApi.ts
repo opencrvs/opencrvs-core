@@ -85,9 +85,7 @@ export interface ICertificateConfigData {
     defaultMessage: string
     description: string
   }
-  registrationTarget: number
-  lateRegistrationTarget: number
-  printInAdvance: boolean
+
   fee: {
     onTime: number
     late: number

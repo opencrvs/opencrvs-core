@@ -557,9 +557,7 @@ export const mockDeclarationData = {
             defaultMessage: 'Birth Certificate certified copy',
             description: 'The label for a birth certificate'
           },
-          registrationTarget: 30,
-          lateRegistrationTarget: 365,
-          printInAdvance: true,
+
           fee: {
             onTime: 10,
             late: 500,
@@ -678,9 +676,7 @@ export const mockDeathDeclarationData = {
             defaultMessage: 'Death Certificate certified copy',
             description: 'The label for a death certificate'
           },
-          registrationTarget: 30,
-          lateRegistrationTarget: 365,
-          printInAdvance: true,
+
           fee: {
             onTime: 0,
             late: 5.5,
@@ -726,9 +722,7 @@ export const mockMarriageDeclarationData = {
             defaultMessage: 'Marriage Certificate certified copy',
             description: 'The label for a marriage certificate'
           },
-          registrationTarget: 30,
-          lateRegistrationTarget: 365,
-          printInAdvance: true,
+
           fee: {
             onTime: 0,
             late: 5.5,
@@ -869,9 +863,7 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Birth Certificate',
       description: 'The label for a birth certificate'
     },
-    registrationTarget: 30,
-    lateRegistrationTarget: 365,
-    printInAdvance: false,
+
     fee: {
       onTime: 0,
       late: 5.5,
@@ -895,9 +887,7 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Birth Certificate certified copy',
       description: 'The label for a birth certificate'
     },
-    registrationTarget: 30,
-    lateRegistrationTarget: 365,
-    printInAdvance: false,
+
     fee: {
       onTime: 0,
       late: 5.5,
@@ -922,9 +912,7 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Death Certificate',
       description: 'The label for a death certificate'
     },
-    registrationTarget: 30,
-    lateRegistrationTarget: 365,
-    printInAdvance: false,
+
     fee: {
       onTime: 0,
       late: 5.5,
@@ -948,9 +936,7 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Marriage Certificate',
       description: 'The label for a marriage certificate'
     },
-    registrationTarget: 30,
-    lateRegistrationTarget: 365,
-    printInAdvance: false,
+
     fee: {
       onTime: 0,
       late: 5.5,

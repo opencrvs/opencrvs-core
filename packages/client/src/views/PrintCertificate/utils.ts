@@ -64,9 +64,9 @@ function getDayRanges(
   switch (certificate.templateConfig?.event) {
     case Event.Birth: {
       const BIRTH_REGISTRATION_TARGET =
-        certificate.templateConfig?.registrationTarget
+        offlineData.config.BIRTH.REGISTRATION_TARGET
       const BIRTH_LATE_REGISTRATION_TARGET =
-        certificate.templateConfig?.lateRegistrationTarget
+        offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       const BIRTH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
       const BIRTH_LATE_FEE = certificate.templateConfig?.fee.late
       const BIRTH_DELAYED_FEE = certificate.templateConfig?.fee.delayed
@@ -84,7 +84,7 @@ function getDayRanges(
 
     case Event.Death: {
       const DEATH_REGISTRATION_TARGET =
-        certificate.templateConfig?.registrationTarget
+        offlineData.config.DEATH.REGISTRATION_TARGET
       const DEATH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
       const DEATH_DELAYED_FEE = certificate.templateConfig?.fee.delayed
 
@@ -96,7 +96,7 @@ function getDayRanges(
     }
     case Event.Marriage: {
       const MARRIAGE_REGISTRATION_TARGET =
-        certificate.templateConfig?.registrationTarget
+        offlineData.config.MARRIAGE.REGISTRATION_TARGET
       const MARRIAGE_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
       const MARRIAGE_DELAYED_FEE = certificate.templateConfig?.fee.delayed
       const marriageRanges = [
