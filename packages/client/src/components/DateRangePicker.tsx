@@ -636,13 +636,13 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         <MonthSelector
           id="end-date-small"
           date={endDateNav}
-          onNavigateDate={(date: Date) => setEndDateNav(endOfMonth(date))}
+          onNavigateDate={setEndDateNav}
           label={intl.formatMessage(constantsMessages.toCapitalized)}
           selectedDate={endDate}
           onSelectDate={(date) => {
             props.onDatesChange({
               startDate: startDate,
-              endDate: endOfDay(date)
+              endDate: endOfDay(endOfMonth(date))
             })
             setModalVisible(false)
             props.closeModalFromHOC && props.closeModalFromHOC()
@@ -716,7 +716,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               />
               <MonthSelector
                 date={endDateNav}
-                onNavigateDate={(date: Date) => setEndDateNav(endOfMonth(date))}
+                onNavigateDate={setEndDateNav}
                 label={intl.formatMessage(constantsMessages.toCapitalized)}
                 selectedDate={endDate}
                 onSelectDate={setEndDate}
@@ -732,7 +732,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
                 onClick={() => {
                   props.onDatesChange({
                     startDate: startDate,
-                    endDate: endOfDay(endDate)
+                    endDate: endOfDay(endOfMonth(endDate))
                   })
                   setModalVisible(false)
                   props.closeModalFromHOC && props.closeModalFromHOC()
