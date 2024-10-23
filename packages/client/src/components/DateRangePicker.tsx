@@ -38,6 +38,7 @@ import subMonths from 'date-fns/subMonths'
 import subYears from 'date-fns/subYears'
 import * as React from 'react'
 import { WrappedComponentProps, injectIntl } from 'react-intl'
+import endOfMonth from 'date-fns/endOfMonth'
 
 const { useState, useEffect, useMemo } = React
 
@@ -635,7 +636,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         <MonthSelector
           id="end-date-small"
           date={endDateNav}
-          onNavigateDate={setEndDateNav}
+          onNavigateDate={(date: Date) => setEndDateNav(endOfMonth(date))}
           label={intl.formatMessage(constantsMessages.toCapitalized)}
           selectedDate={endDate}
           onSelectDate={(date) => {
@@ -715,7 +716,7 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
               />
               <MonthSelector
                 date={endDateNav}
-                onNavigateDate={setEndDateNav}
+                onNavigateDate={(date: Date) => setEndDateNav(endOfMonth(date))}
                 label={intl.formatMessage(constantsMessages.toCapitalized)}
                 selectedDate={endDate}
                 onSelectDate={setEndDate}
