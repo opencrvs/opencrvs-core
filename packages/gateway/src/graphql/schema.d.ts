@@ -87,6 +87,8 @@ export interface GQLMutation {
   markMarriageAsCertified: string
   markMarriageAsIssued: string
   markEventAsDuplicate: string
+  confirmRegistration: string
+  rejectRegistration: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -106,10 +108,6 @@ export interface GQLMutation {
   deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
-}
-
-export interface GQLDummy {
-  dummy: string
 }
 
 export interface GQLNotificationResult {
@@ -611,6 +609,17 @@ export type GQLVoid = any
 export interface GQLReinstated {
   taskEntryResourceID: string
   registrationStatus?: GQLRegStatus
+}
+
+export interface GQLConfirmRegistrationInput {
+  childIdentifiers?: Array<GQLIdentifierInput>
+  registrationNumber?: string
+  trackingId?: string
+}
+
+export interface GQLRejectRegistrationInput {
+  reason: GQLRejectionReason
+  comment: string
 }
 
 export interface GQLUserInput {
@@ -1221,6 +1230,15 @@ export const enum GQLRegStatus {
   ISSUED = 'ISSUED'
 }
 
+export interface GQLIdentifierInput {
+  type: GQLSupportedPatientIdentifierCode
+  value: string
+}
+
+export const enum GQLRejectionReason {
+  OTHER = 'OTHER'
+}
+
 export interface GQLHumanNameInput {
   use?: string
   firstNames?: string
@@ -1639,6 +1657,25 @@ export interface GQLDeceasedInput {
   deathDate?: GQLPlainDate
 }
 
+export const enum GQLSupportedPatientIdentifierCode {
+  PASSPORT = 'PASSPORT',
+  NATIONAL_ID = 'NATIONAL_ID',
+  MOSIP_PSUT_TOKEN_ID = 'MOSIP_PSUT_TOKEN_ID',
+  DECEASED_PATIENT_ENTRY = 'DECEASED_PATIENT_ENTRY',
+  BIRTH_PATIENT_ENTRY = 'BIRTH_PATIENT_ENTRY',
+  DRIVING_LICENSE = 'DRIVING_LICENSE',
+  REFUGEE_NUMBER = 'REFUGEE_NUMBER',
+  ALIEN_NUMBER = 'ALIEN_NUMBER',
+  OTHER = 'OTHER',
+  SOCIAL_SECURITY_NO = 'SOCIAL_SECURITY_NO',
+  BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
+  DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
+  MARRIAGE_REGISTRATION_NUMBER = 'MARRIAGE_REGISTRATION_NUMBER',
+  BIRTH_CONFIGURABLE_IDENTIFIER_1 = 'BIRTH_CONFIGURABLE_IDENTIFIER_1',
+  BIRTH_CONFIGURABLE_IDENTIFIER_2 = 'BIRTH_CONFIGURABLE_IDENTIFIER_2',
+  BIRTH_CONFIGURABLE_IDENTIFIER_3 = 'BIRTH_CONFIGURABLE_IDENTIFIER_3'
+}
+
 export interface GQLLabelInput {
   lang: string
   label: string
@@ -1729,7 +1766,6 @@ export interface GQLPaymentInput {
 export interface GQLResolver {
   Query?: GQLQueryTypeResolver
   Mutation?: GQLMutationTypeResolver
-  Dummy?: GQLDummyTypeResolver
   NotificationResult?: GQLNotificationResultTypeResolver
   BirthRegistration?: GQLBirthRegistrationTypeResolver
   Date?: GraphQLScalarType
@@ -2551,6 +2587,8 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
   markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
+  confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
+  rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -3083,6 +3121,38 @@ export interface MutationToMarkEventAsDuplicateResolver<
   ): TResult
 }
 
+export interface MutationToConfirmRegistrationArgs {
+  id: string
+  details: GQLConfirmRegistrationInput
+}
+export interface MutationToConfirmRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToConfirmRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRejectRegistrationArgs {
+  id: string
+  details: GQLRejectRegistrationInput
+}
+export interface MutationToRejectRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRejectRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToCreateOrUpdateUserArgs {
   user: GQLUserInput
 }
@@ -3353,19 +3423,6 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLDummyTypeResolver<TParent = any> {
-  dummy?: DummyToDummyResolver<TParent>
-}
-
-export interface DummyToDummyResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

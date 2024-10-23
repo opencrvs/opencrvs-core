@@ -10,7 +10,7 @@
  */
 import { useExternalValidationQueue } from '@opencrvs/commons/message-queue'
 import { getComposition } from '@opencrvs/commons/types'
-import { REDIS_HOST } from '@workflow/constants'
+import { REDIS_HOST, REDIS_PORT } from '@workflow/constants'
 import { writeMetricsEvent } from '@workflow/records/audit'
 import { indexBundle } from '@workflow/records/search'
 import { toWaitingForExternalValidationState } from '@workflow/records/state-transitions'
@@ -19,7 +19,10 @@ import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
 
-const { sendForExternalValidation } = useExternalValidationQueue(REDIS_HOST)
+const { sendForExternalValidation } = useExternalValidationQueue({
+  host: REDIS_HOST,
+  port: REDIS_PORT
+})
 
 export const registerRoute = createRoute({
   method: 'POST',

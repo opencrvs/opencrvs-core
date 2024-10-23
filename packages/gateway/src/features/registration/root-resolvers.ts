@@ -31,6 +31,7 @@ import {
 import {
   archiveRegistration,
   certifyRegistration,
+  confirmRegistration,
   createRegistration,
   duplicateRegistration,
   fetchRegistrationForDownloading,
@@ -634,6 +635,20 @@ export const resolvers: GQLResolver = {
       )
 
       return taskEntry.resource.id
+    },
+    async confirmRegistration(_, { id, details }, { headers: authHeader }) {
+      if (!inScope(authHeader, ['register', 'validate'])) {
+        throw new Error('User does not have a register or validate scope')
+      }
+
+      return confirmRegistration(id, authHeader, details)
+    },
+    async rejectRegistration(_, { id, details }, { headers: authHeader }) {
+      if (!inScope(authHeader, ['register', 'validate'])) {
+        throw new Error('User does not have a register or validate scope')
+      }
+
+      return rejectDeclaration(id, authHeader, details.comment, details.reason)
     }
   }
 }

@@ -563,6 +563,45 @@ input CorrectionRejectionInput {
   timeLoggedMS: Int!
 }
 
+# if you change this, also change packages/commons/src/fhir/patient.ts SUPPORTED_PATIENT_IDENTIFIER_CODES
+enum SupportedPatientIdentifierCode {
+  PASSPORT
+  NATIONAL_ID
+  MOSIP_PSUT_TOKEN_ID
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
+  DRIVING_LICENSE
+  REFUGEE_NUMBER
+  ALIEN_NUMBER
+  OTHER
+  SOCIAL_SECURITY_NO
+  BIRTH_REGISTRATION_NUMBER
+  DEATH_REGISTRATION_NUMBER
+  MARRIAGE_REGISTRATION_NUMBER
+  BIRTH_CONFIGURABLE_IDENTIFIER_1
+  BIRTH_CONFIGURABLE_IDENTIFIER_2
+  BIRTH_CONFIGURABLE_IDENTIFIER_3
+}
+
+input IdentifierInput {
+  type: SupportedPatientIdentifierCode!
+  value: String!
+}
+input ConfirmRegistrationInput {
+  childIdentifiers: [IdentifierInput!]
+  registrationNumber: String
+  trackingId: String
+}
+
+enum RejectionReason {
+  OTHER
+}
+
+input RejectRegistrationInput {
+  reason: RejectionReason! # Rejection type
+  comment: String! # Free text comment for audit log
+}
+
 type Mutation {
   # Generic correction handlers for all event types
   # Applying a correction request is made on a event level as payload is dependant on event type
@@ -639,4 +678,6 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
+  confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
+  rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
 }
