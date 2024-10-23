@@ -28,7 +28,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { vi } from 'vitest'
-import { scopes as allScopes, Scope } from '@client/utils/gateway'
+import { scopes as allScopes, Scope, SCOPES } from '@client/utils/gateway'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -251,13 +251,13 @@ describe('Given a user with scopes views Navigation', () => {
     const id = `#navigation_${WORKQUEUE_TABS.inProgress}`
 
     const requiredScopes = [
-      'record.declare-birth',
-      'record.declare-birth:my-jurisdiction',
-      'record.declare-death',
-      'record.declare-death:my-jurisdiction',
-      'record.declare-marriage',
-      'record.declare-marriage:my-jurisdiction'
-    ]
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -284,7 +284,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Sent for review', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.sentForReview}`
 
-    const requiredScopes = ['record.submit-for-review']
+    const requiredScopes = [SCOPES.RECORD_SUBMIT_FOR_REVIEW] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -306,7 +306,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Sent for approval', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.sentForApproval}`
 
-    const requiredScopes = ['record.submit-for-approval']
+    const requiredScopes = [SCOPES.RECORD_SUBMIT_FOR_APPROVAL] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -328,7 +328,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Requires update', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.requiresUpdate}`
 
-    const requiredScopes = ['record.declaration-review']
+    const requiredScopes = [SCOPES.RECORD_DECLARATION_REVIEW] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -350,7 +350,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Ready for review', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.readyForReview}`
 
-    const requiredScopes = ['record.declaration-review']
+    const requiredScopes = [SCOPES.RECORD_DECLARATION_REVIEW] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -372,7 +372,9 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Ready to print', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.readyToPrint}`
 
-    const requiredScopes = ['record.print-issue-certified-copies']
+    const requiredScopes = [
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -394,7 +396,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('External validation', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.externalValidation}`
 
-    const requiredScopes = ['record.register']
+    const requiredScopes = [SCOPES.RECORD_REGISTER] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -417,7 +419,9 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Ready to issue', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.readyToIssue}`
 
-    const requiredScopes = ['record.print-issue-certified-copies']
+    const requiredScopes = [
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -442,7 +446,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Outbox', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.outbox}`
 
-    const excludedScopes = ['sysadmin', 'natlsysadmin']
+    const excludedScopes = [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
 
     const anyOtherScope = allScopes.filter(
       (scope) => !excludedScopes.includes(scope)
@@ -464,15 +468,17 @@ describe('Given a user with scopes views Navigation', () => {
 
   describe('and user has organisation scopes', async () => {
     const orgScopes = [
-      'organisation.read',
-      'organisation.read-locations',
-      'organisation.read-locations:my-office'
-    ]
+      SCOPES.ORGANISATION_READ,
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+    ] as Scope[]
 
     describe('Performance', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.performance}`
 
-      const requiredScopes = ['performance.read'].concat(orgScopes)
+      const requiredScopes = ([SCOPES.PERFORMANCE_READ] as Scope[]).concat(
+        orgScopes
+      )
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
@@ -500,7 +506,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Organisation', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.organisation}`
 
-      const requiredScopes = ['organisation.read']
+      const requiredScopes = [SCOPES.ORGANISATION_READ] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
@@ -524,9 +530,9 @@ describe('Given a user with scopes views Navigation', () => {
       const id = `#navigation_${WORKQUEUE_TABS.team}`
 
       const requiredScopes = [
-        'organisation.read-locations',
-        'organisation.read-locations:my-office'
-      ]
+        SCOPES.ORGANISATION_READ_LOCATIONS,
+        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+      ] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
@@ -550,7 +556,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Config', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.config}_main`
 
-      const requiredScopes = ['sysadmin', 'natlsysadmin']
+      const requiredScopes = [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
@@ -579,7 +585,9 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Systems', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.systems}`
 
-      const requiredScopes = ['sysadmin', 'natlsysadmin'].concat(orgScopes)
+      const requiredScopes = (
+        [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
+      ).concat(orgScopes)
 
       const tests = [[requiredScopes, true]]
 
@@ -600,7 +608,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Communications', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.communications}_main`
 
-      const requiredScopes = ['sysadmin', 'natlsysadmin']
+      const requiredScopes = [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
@@ -629,7 +637,9 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Email all users', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.emailAllUsers}`
 
-      const requiredScopes = ['sysadmin', 'natlsysadmin'].concat(orgScopes)
+      const requiredScopes = (
+        [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
+      ).concat(orgScopes)
 
       const tests = [[requiredScopes, true]]
 
@@ -651,7 +661,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Dashboard', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.dashboard}`
 
-    const requiredScopes = ['performance.read-dashboards']
+    const requiredScopes = [SCOPES.PERFORMANCE_READ_DASHBOARDS] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -674,7 +684,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Statistics', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.statistics}`
 
-    const requiredScopes = ['performance.read']
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -697,7 +707,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Statistics', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.statistics}`
 
-    const requiredScopes = ['performance.read']
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -720,7 +730,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Statistics', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.leaderboards}`
 
-    const requiredScopes = ['performance.read']
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -743,7 +753,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Report', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.report}`
 
-    const requiredScopes = ['performance.read']
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -766,7 +776,9 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Exports', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.vsexports}`
 
-    const requiredScopes = ['performance.export-vital-statistics']
+    const requiredScopes = [
+      SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)

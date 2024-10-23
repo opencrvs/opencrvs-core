@@ -29,6 +29,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { vi } from 'vitest'
 import { merge } from 'lodash'
 import { queries } from '@client/profile/queries'
+import { SCOPES } from '@client/utils/gateway'
 
 describe('Team search test', () => {
   let store: AppStore
@@ -48,6 +49,7 @@ describe('Team search test', () => {
         store,
         history
       })
+      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
       app.update()
     })
 
@@ -134,14 +136,14 @@ describe('Team search test', () => {
       queries.fetchUserDetails = mockFetchUserDetails
     })
 
-    beforeAll(async () => {
-      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
-    })
+    beforeAll(async () => {})
 
     beforeEach(async () => {
       const testApp = await createTestApp()
       app = testApp.app
       history = testApp.history
+      store = testApp.store
+      setScopes([SCOPES.USER_READ], store)
 
       history.replace(TEAM_SEARCH, {
         selectedLocation: {

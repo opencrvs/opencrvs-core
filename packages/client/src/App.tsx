@@ -70,6 +70,7 @@ import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
+import { SCOPES } from './utils/gateway'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -134,12 +135,23 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_BIRTH,
+                                                SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+                                                SCOPES.RECORD_DECLARE_DEATH,
+                                                SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+                                                SCOPES.RECORD_DECLARE_MARRIAGE,
+                                                SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={routes.SELECT_VITAL_EVENT}
                                               component={SelectVitalEvent}
                                             />
-
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_DEATH,
+                                                SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.SELECT_DEATH_INFORMANT
                                               }
@@ -147,6 +159,10 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_MARRIAGE,
+                                                SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.SELECT_MARRIAGE_INFORMANT
                                               }
@@ -154,6 +170,10 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_BIRTH,
+                                                SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_BIRTH_PARENT_FORM
                                               }
@@ -161,6 +181,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES
+                                              ]}
                                               path={
                                                 routes.VIEW_VERIFY_CERTIFICATE
                                               }
@@ -168,6 +191,10 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_BIRTH,
+                                                SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_BIRTH_PARENT_FORM_PAGE
                                               }
@@ -175,6 +202,10 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_BIRTH,
+                                                SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
                                               }
@@ -182,11 +213,19 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_DEATH,
+                                                SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+                                              ]}
                                               path={routes.DRAFT_DEATH_FORM}
                                               component={DeclarationForm}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_DEATH,
+                                                SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_DEATH_FORM_PAGE
                                               }
@@ -194,11 +233,19 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_MARRIAGE,
+                                                SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={routes.DRAFT_MARRIAGE_FORM}
                                               component={DeclarationForm}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_DEATH,
+                                                SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_DEATH_FORM_PAGE_GROUP
                                               }
@@ -206,6 +253,10 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_MARRIAGE,
+                                                SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_MARRIAGE_FORM_PAGE
                                               }
@@ -213,6 +264,10 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_DECLARE_MARRIAGE,
+                                                SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP
                                               }
@@ -256,29 +311,35 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.CONFIG_UPDATE_ALL
+                                              ]}
                                               path={routes.ALL_USER_EMAIL}
                                               component={AllUserEmail}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.SEARCH_BIRTH,
+                                                SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_DEATH,
+                                                SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_MARRIAGE,
+                                                SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={routes.ADVANCED_SEARCH}
                                               component={AdvancedSearchConfig}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.SEARCH_BIRTH,
+                                                SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_DEATH,
+                                                SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_MARRIAGE,
+                                                SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.ADVANCED_SEARCH_RESULT
                                               }
@@ -291,10 +352,26 @@ export function App(props: IAppProps) {
                                               component={RecordAudit}
                                             />
                                             <ProtectedRoute
+                                              scopes={[
+                                                SCOPES.SEARCH_BIRTH,
+                                                SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_DEATH,
+                                                SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_MARRIAGE,
+                                                SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={routes.SEARCH}
                                               component={SearchResult}
                                             />
                                             <ProtectedRoute
+                                              scopes={[
+                                                SCOPES.SEARCH_BIRTH,
+                                                SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_DEATH,
+                                                SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+                                                SCOPES.SEARCH_MARRIAGE,
+                                                SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+                                              ]}
                                               path={routes.SEARCH_RESULT}
                                               component={SearchResult}
                                             />
@@ -307,11 +384,17 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_PRINT_RECORDS
+                                              ]}
                                               path={routes.VERIFY_COLLECTOR}
                                               component={VerifyCollector}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_REGISTRATION_CORRECT
+                                              ]}
                                               path={routes.VERIFY_CORRECTOR}
                                               component={VerifyCorrector}
                                             />
@@ -327,6 +410,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+                                              ]}
                                               path={
                                                 routes.CERTIFICATE_CORRECTION
                                               }
@@ -334,6 +420,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+                                              ]}
                                               path={
                                                 routes.CERTIFICATE_CORRECTION_REVIEW
                                               }
@@ -346,44 +435,47 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.USER_READ,
+                                                SCOPES.USER_READ_MY_OFFICE,
+                                                SCOPES.USER_READ_MY_JURISDICTION
+                                              ]}
                                               path={routes.TEAM_SEARCH}
                                               component={TeamSearch}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalRegistrar,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.USER_READ,
+                                                SCOPES.USER_READ_MY_OFFICE,
+                                                SCOPES.USER_READ_MY_JURISDICTION
+                                              ]}
                                               path={routes.TEAM_USER_LIST}
                                               component={UserList}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.CONFIG_UPDATE_ALL
+                                              ]}
                                               path={routes.SYSTEM_LIST}
                                               component={SystemList}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.USER_CREATE,
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
+                                              ]}
                                               path={routes.CREATE_USER}
                                               component={CreateNewUser}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.USER_CREATE,
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
+                                              ]}
                                               path={
                                                 routes.CREATE_USER_ON_LOCATION
                                               }
@@ -391,40 +483,45 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.USER_CREATE,
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
+                                              ]}
                                               path={routes.CREATE_USER_SECTION}
                                               component={CreateNewUser}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.USER_CREATE,
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
+                                              ]}
                                               path={routes.REVIEW_USER_FORM}
                                               component={CreateNewUser}
                                             />
                                             <ProtectedRoute
                                               exact
+                                              scopes={[
+                                                SCOPES.USER_CREATE,
+                                                SCOPES.USER_CREATE_MY_JURISDICTION
+                                              ]}
                                               path={routes.REVIEW_USER_DETAILS}
                                               component={CreateNewUser}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ,
+                                                SCOPES.PERFORMANCE_READ_MY_OFFICE
+                                              ]}
                                               path={routes.PERFORMANCE_HOME}
                                               component={PerformanceHome}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ_DASHBOARDS
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_STATISTICS
                                               }
@@ -432,12 +529,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ_DASHBOARDS
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_LEADER_BOARDS
                                               }
@@ -445,12 +539,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_READ_DASHBOARDS
+                                              ]}
                                               path={
                                                 routes.PERFORMANCE_DASHBOARD
                                               }
@@ -458,10 +549,9 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+                                              ]}
                                               path={routes.VS_EXPORTS}
                                               component={VSExport}
                                             />
@@ -503,14 +593,11 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              // roles={[
-                                              //   SystemRoleType.RegistrationAgent,
-                                              //   SystemRoleType.LocalRegistrar,
-                                              //   SystemRoleType.LocalSystemAdmin,
-                                              //   SystemRoleType.NationalSystemAdmin,
-                                              //   SystemRoleType.PerformanceManagement,
-                                              //   SystemRoleType.NationalRegistrar
-                                              // ]}
+                                              scopes={[
+                                                SCOPES.ORGANISATION_READ_LOCATIONS,
+                                                SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                                                SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+                                              ]}
                                               path={routes.ORGANISATIONS_INDEX}
                                               component={AdministrativeLevels}
                                             />

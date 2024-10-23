@@ -11,11 +11,13 @@
 import {
   mockDeclarationData,
   createTestApp,
-  flushPromises
+  flushPromises,
+  setScopes,
+  waitForReady
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Event, RegStatus, SCOPES } from '@client/utils/gateway'
 import {
   IDeclaration,
   storeDeclaration,
@@ -29,7 +31,7 @@ import { History } from 'history'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-let wrapper: ReactWrapper<{}, {}>
+let wrapper: ReactWrapper
 let store: Store
 let history: History
 
@@ -65,8 +67,9 @@ describe('Review form for an declaration', () => {
     store = appBundle.store
     history = appBundle.history
 
+    setScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION], store)
+    await waitForReady(wrapper)
     store.dispatch(storeDeclaration(declaration))
-
     history.replace(
       formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
         declarationId: declaration.id,
@@ -74,6 +77,7 @@ describe('Review form for an declaration', () => {
         groupId: 'review-view-group'
       })
     )
+
     await waitForElement(wrapper, 'CorrectionReviewFormComponent')
   })
 

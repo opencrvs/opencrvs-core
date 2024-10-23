@@ -71,7 +71,7 @@ import {
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Link } from '@opencrvs/components'
-import { UserRole } from '@client/utils/gateway'
+import { SCOPES, UserRole } from '@client/utils/gateway'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { draftToGqlTransformer } from '@client/transformer'
 
@@ -308,8 +308,8 @@ const UserReviewFormComponent = ({
   goToUserReviewForm
 }: IFullProps & IDispatchProps & IStateProps) => {
   const { hasScope } = usePermissions()
-  const hasCreateUserScope = hasScope('user.create')
-  const hasUpdateUserScope = hasScope('user.update')
+  const hasCreateUserScope = hasScope(SCOPES.USER_CREATE)
+  const hasUpdateUserScope = hasScope(SCOPES.USER_UPDATE)
 
   let title: string | undefined
   let actionComponent: JSX.Element

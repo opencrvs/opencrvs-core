@@ -203,7 +203,7 @@ export const HeaderComponent = (props: IFullProps) => {
             }
           ]
         }
-      } else if (scopes?.includes('user.create')) {
+      } else if (scopes?.includes(SCOPES.USER_CREATE)) {
         return {
           mobileLeft: [
             {

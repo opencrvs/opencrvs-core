@@ -16,8 +16,8 @@ import {
   waitForReady,
   flushPromises,
   setScopes,
-  REGISTRAR_DEFAULT_SCOPES,
-  REGISTRATION_AGENT_DEFAULT_SCOPES
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -57,6 +57,7 @@ describe('when user is previewing the form data', () => {
     app = testApp.app
     history = testApp.history
     store = testApp.store
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
     await waitForReady(app)
   })
 
@@ -74,6 +75,7 @@ describe('when user is previewing the form data', () => {
 
       customDraft = { id: uuid(), data, review: true, event: Event.Death }
       store.dispatch(storeDeclaration(customDraft))
+
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
           ':declarationId',
@@ -126,6 +128,7 @@ describe('when user is previewing the form data', () => {
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
       store.dispatch(storeDeclaration(customDraft))
+
       history.replace(
         DRAFT_BIRTH_PARENT_FORM.replace(
           ':declarationId',
@@ -174,6 +177,7 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+      await waitForReady(app)
       await flushPromises()
       const data = birthReviewDraftData
 
@@ -260,8 +264,6 @@ describe('when user is previewing the form data', () => {
 
   describe('when user has validate scope', () => {
     beforeEach(async () => {
-      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
-
       await flushPromises()
       const data = {
         _fhirIDMap: {

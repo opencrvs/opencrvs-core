@@ -29,7 +29,7 @@ import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 
 import { vi, Mock } from 'vitest'
-import { SearchUsersQuery, Status } from '@client/utils/gateway'
+import { SCOPES, SearchUsersQuery, Status } from '@client/utils/gateway'
 
 describe('user list without admin scope', () => {
   let store: AppStore
@@ -89,7 +89,7 @@ describe('User list tests', () => {
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createStore())
-    setScopes(['user.update', 'user.create'], store)
+    setScopes([SCOPES.USER_UPDATE, SCOPES.USER_CREATE], store)
 
     const action = {
       type: actions.SET_USER_DETAILS,

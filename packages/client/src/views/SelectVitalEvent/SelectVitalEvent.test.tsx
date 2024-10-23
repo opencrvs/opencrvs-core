@@ -37,7 +37,6 @@ describe('when user is selecting the vital event', () => {
 
   describe('when user is in vital event selection view', () => {
     beforeEach(async () => {
-      history.replace(SELECT_VITAL_EVENT)
       setScopes(
         [
           SCOPES.RECORD_DECLARE_BIRTH,
@@ -46,6 +45,8 @@ describe('when user is selecting the vital event', () => {
         ],
         store
       )
+      await waitForReady(app)
+      history.replace(SELECT_VITAL_EVENT)
       await waitForElement(app, '#select_vital_event_view')
     })
     it('lists the options', () => {
@@ -96,10 +97,6 @@ describe('when user is selecting the vital event', () => {
   })
 
   describe('Birth option', () => {
-    beforeEach(async () => {
-      history.replace(SELECT_VITAL_EVENT)
-    })
-
     const tests = [
       [[SCOPES.RECORD_DECLARE_BIRTH], true],
       [[SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION], true],
@@ -109,6 +106,7 @@ describe('when user is selecting the vital event', () => {
     tests.forEach(([scopes, length]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
+        history.replace(SELECT_VITAL_EVENT)
         await waitForElement(app, '#select_vital_event_view')
         expect(app.exists('#select_birth_event')).toBe(length)
       })
@@ -116,10 +114,6 @@ describe('when user is selecting the vital event', () => {
   })
 
   describe('Death option', () => {
-    beforeEach(async () => {
-      history.replace(SELECT_VITAL_EVENT)
-    })
-
     const tests = [
       [[SCOPES.RECORD_DECLARE_DEATH], true],
       [[SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION], true],
@@ -129,6 +123,8 @@ describe('when user is selecting the vital event', () => {
     tests.forEach(([scopes, exists]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
+        history.replace(SELECT_VITAL_EVENT)
+
         await waitForElement(app, '#select_vital_event_view')
         expect(app.exists('#select_death_event')).toBe(exists)
       })
@@ -136,10 +132,6 @@ describe('when user is selecting the vital event', () => {
   })
 
   describe('Marriage option', () => {
-    beforeEach(async () => {
-      history.replace(SELECT_VITAL_EVENT)
-    })
-
     const tests = [
       [[SCOPES.RECORD_DECLARE_MARRIAGE], true],
       [[SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION], true],
@@ -149,6 +141,7 @@ describe('when user is selecting the vital event', () => {
     tests.forEach(([scopes, exists]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
+        history.replace(SELECT_VITAL_EVENT)
         await waitForElement(app, '#select_vital_event_view')
         expect(app.exists('#select_marriage_event')).toBe(exists)
       })

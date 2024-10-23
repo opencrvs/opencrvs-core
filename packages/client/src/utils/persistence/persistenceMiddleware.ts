@@ -16,6 +16,7 @@ import { IStoreState } from '@client/store'
 //   PERFORMANCE_STATS
 // } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Action, Middleware } from 'redux'
+import { SCOPES } from '@client/utils/gateway'
 // import startOfMonth from 'date-fns/startOfMonth'
 // import subMonths from 'date-fns/subMonths'
 // import { QueryOptions } from '@apollo/client/core'
@@ -84,8 +85,8 @@ export const persistenceMiddleware: Middleware<{}, IStoreState> =
       const scopes = getState().profile.tokenPayload!.scope!
 
       if (
-        scopes.includes('organisation.read-locations') ||
-        scopes.includes('organisation.read-locations:my-office')
+        scopes.includes(SCOPES.ORGANISATION_READ_LOCATIONS) ||
+        scopes.includes(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)
       ) {
         /*
         export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
