@@ -385,7 +385,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_CORRECT
+                                                SCOPES.RECORD_PRINT_RECORDS
                                               ]}
                                               path={routes.VERIFY_COLLECTOR}
                                               component={VerifyCollector}
