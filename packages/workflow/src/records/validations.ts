@@ -18,7 +18,7 @@ export const CertifyRequestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
   certificate: z.object({
     hasShowedVerifiedDocument: z.boolean(),
-    certTemplateId: z.string(),
+    certificateTemplateId: z.string(),
     collector: z
       .object({
         relationship: z.string(),

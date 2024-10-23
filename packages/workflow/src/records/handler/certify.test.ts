@@ -111,7 +111,7 @@ describe('Certify record endpoint', () => {
         event: 'BIRTH',
         certificate: {
           hasShowedVerifiedDocument: true,
-          certTemplateId: 'birth-certificate',
+          certificateTemplateId: 'birth-certificate',
           collector: {
             relationship: 'INFORMANT'
           }
@@ -215,7 +215,7 @@ describe('Certify record endpoint', () => {
         event: 'BIRTH',
         certificate: {
           hasShowedVerifiedDocument: true,
-          certTemplateId: 'birth-certificate',
+          certificateTemplateId: 'birth-certificate',
           collector: {
             relationship: 'Other',
             otherRelationship: 'Uncle',

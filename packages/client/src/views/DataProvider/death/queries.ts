@@ -215,7 +215,7 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         contactEmail
         certificates {
           hasShowedVerifiedDocument
-          certTemplateId
+          certificateTemplateId
           collector {
             relationship
             otherRelationship
@@ -306,7 +306,7 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         requester
         requesterOther
         hasShowedVerifiedDocument
-        certTemplateId
+        certificateTemplateId
         noSupportingDocumentationRequired
         date
         action
@@ -382,7 +382,7 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         certificates {
           hasShowedVerifiedDocument
-          certTemplateId
+          certificateTemplateId
           collector {
             relationship
             otherRelationship
@@ -648,7 +648,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
         certificates {
           hasShowedVerifiedDocument
-          certTemplateId
+          certificateTemplateId
           collector {
             relationship
             otherRelationship

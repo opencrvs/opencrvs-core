@@ -44,11 +44,11 @@ export function getBirthRegistrationSectionTransformer(
   ) {
     const certificate = queryData[sectionId].certificates.slice(-1)[0]
     // since we shall need this certificate only for ready to issue tab, to calculate certificate fee
-    transformedData[sectionId].certificates = certificate?.certTemplateId
+    transformedData[sectionId].certificates = certificate?.certificateTemplateId
       ? [
           {
             templateConfig: offlineData?.templates.certificates?.find(
-              (x) => x.id === certificate.certTemplateId
+              (x) => x.id === certificate.certificateTemplateId
             )
           }
         ]

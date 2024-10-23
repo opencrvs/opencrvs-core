@@ -160,7 +160,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactEmail
         certificates {
           hasShowedVerifiedDocument
-          certTemplateId
+          certificateTemplateId
           collector {
             relationship
             otherRelationship
@@ -245,7 +245,7 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         otherReason
         requester
         hasShowedVerifiedDocument
-        certTemplateId
+        certificateTemplateId
         noSupportingDocumentationRequired
         date
         action

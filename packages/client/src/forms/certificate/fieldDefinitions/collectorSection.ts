@@ -1066,7 +1066,7 @@ function getCertCollectorGroupForEvent(
         options: finalOptions
       },
       {
-        name: 'certTemplateId',
+        name: 'certificateTemplateId',
         type: 'SELECT_WITH_OPTIONS',
         label: certificateMessages.certificateTemplateSelectLabel,
         required: true,

@@ -389,14 +389,14 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  certTemplateId: String
+  certificateTemplateId: String
 }
 
 input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  certTemplateId: String
+  certificateTemplateId: String
 }
 
 enum CertificateStatus {

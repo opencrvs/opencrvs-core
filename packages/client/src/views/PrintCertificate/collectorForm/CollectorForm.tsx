@@ -212,7 +212,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const collector = { ...(certificate.collector || {}), ...sectionData }
     const selectedTemplatedConfig =
       this.props.offlineCountryConfiguration.templates.certificates?.find(
-        (x) => x.id === (collector.certTemplateId as string)
+        (x) => x.id === (collector.certificateTemplateId as string)
       )
     this.props.modifyDeclaration({
       ...declaration,

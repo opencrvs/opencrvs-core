@@ -465,7 +465,7 @@ const ActionDetailsModalListTable = ({
 
   const certificateTemplateMessageDescriptor =
     offlineData.templates?.certificates?.find(
-      (x) => x.id === actionDetailsData.certTemplateId
+      (x) => x.id === actionDetailsData.certificateTemplateId
     )?.label
 
   const selectedCertificateTemplateName = {
@@ -630,7 +630,7 @@ const ActionDetailsModalListTable = ({
             onPageChange={pageChangeHandler}
           />
         )}
-      {!isEmpty(collectorData) && !!actionDetailsData.certTemplateId && (
+      {!isEmpty(collectorData) && !!actionDetailsData.certificateTemplateId && (
         <Table
           noResultText=" "
           columns={selectedCertificateTemplate}

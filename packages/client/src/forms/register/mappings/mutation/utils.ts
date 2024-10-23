@@ -77,7 +77,8 @@ export function transformCertificateData(certificates: ICertificate[]) {
 
   // for templateConfig mapping
   if (certificateData && certificateData.templateConfig) {
-    updatedCertificates[0].certTemplateId = certificateData.templateConfig.id
+    updatedCertificates[0].certificateTemplateId =
+      certificateData.templateConfig.id
   }
 
   // Return the processed certificates array

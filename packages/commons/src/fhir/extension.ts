@@ -128,8 +128,8 @@ export type StringExtensionType = {
     valueString?: string
     valueBoolean: boolean
   }
-  'http://opencrvs.org/specs/extension/certTemplateId': {
-    url: 'http://opencrvs.org/specs/extension/certTemplateId'
+  'http://opencrvs.org/specs/extension/certificateTemplateId': {
+    url: 'http://opencrvs.org/specs/extension/certificateTemplateId'
     valueString?: string
   }
   'http://opencrvs.org/specs/extension/regLastOffice': {
