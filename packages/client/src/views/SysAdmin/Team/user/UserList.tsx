@@ -34,11 +34,10 @@ import {
   NATL_ADMIN_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
-import { createNamesMap } from '@client/utils/data-formatting'
+import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   getAddressName,
-  getUserRoleIntlKey,
   UserStatus,
   canDeactivateUser
 } from '@client/views/SysAdmin/Team/utils'
@@ -556,51 +555,45 @@ function UserListComponent(props: IProps) {
 
       return data.searchUsers.results.map((user, index) => {
         if (user !== null) {
-          const name =
-            (user.name &&
-              intl.formatMessage(constantsMessages.humanName, {
-                firstName: user.name[0].firstNames,
-                lastName: user.name[0].familyName
-              })) ||
-            ''
+          const name = getLocalisedName(intl, user.name[0])
+
           const role = intl.formatMessage(user.role.label)
           const avatar = user.avatar
 
-            return {
-              image: (
-                <AvatarSmall
-                  name={name}
-                  avatar={avatar || undefined}
-                  onClick={() => goToUserProfile(String(user.id))}
-                />
-              ),
-              label: (
-                <Link
-                  id="profile-link"
-                  onClick={() => goToUserProfile(String(user.id))}
-                >
-                  {name}
-                </Link>
-              ),
-              value: <Value>{role}</Value>,
-              actions: (
-                <StatusMenu
-                  userDetails={userDetails}
-                  locationId={locationId}
-                  user={user}
-                  index={index}
-                  status={user.status || undefined}
-                  underInvestigation={user.underInvestigation || false}
-                />
-              )
-            }
-          }
           return {
-            label: '',
-            value: <></>
+            image: (
+              <AvatarSmall
+                name={name}
+                avatar={avatar || undefined}
+                onClick={() => goToUserProfile(String(user.id))}
+              />
+            ),
+            label: (
+              <Link
+                id="profile-link"
+                onClick={() => goToUserProfile(String(user.id))}
+              >
+                {name}
+              </Link>
+            ),
+            value: <Value>{role}</Value>,
+            actions: (
+              <StatusMenu
+                userDetails={userDetails}
+                locationId={locationId}
+                user={user}
+                index={index}
+                status={user.status || undefined}
+                underInvestigation={user.underInvestigation || false}
+              />
+            )
           }
         }
-      )
+        return {
+          label: '',
+          value: <></>
+        }
+      })
     },
     [StatusMenu, intl, goToUserProfile]
   )
