@@ -29,7 +29,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event, Scope } from '@client/utils/gateway'
+import { Event, Scope, SCOPES } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
@@ -373,10 +373,12 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       this.isOfficeSelected(selectedLocation) &&
       this.props.userDetails
     ) {
-      if (this.props.scopes?.includes('organisation.read-locations')) {
+      if (this.props.scopes?.includes(SCOPES.ORGANISATION_READ_LOCATIONS)) {
         return true
       } else if (
-        this.props.scopes?.includes('organisation.read-locations:my-office') &&
+        this.props.scopes?.includes(
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+        ) &&
         this.props.userDetails.primaryOffice?.id === selectedLocation.id
       ) {
         return true
@@ -706,7 +708,7 @@ function mapStateToProps(
   if (
     userDetails &&
     !locationId &&
-    !scopes?.includes('organisation.read-locations')
+    !scopes?.includes(SCOPES.ORGANISATION_READ_LOCATIONS)
   ) {
     locationId = userDetails.primaryOffice.id
   }

@@ -18,7 +18,10 @@ const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
-import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
+import {
+  DEFAULT_ROLES_DEFINITION,
+  SCOPES
+} from '@opencrvs/commons/authentication'
 
 let container: StartedTestContainer
 
@@ -316,18 +319,18 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'declare',
-              'record.declare-birth',
-              'record.declare-death',
-              'record.declare-marriage',
-              'record.submit-incomplete',
-              'record.submit-for-review',
-              'search.birth',
-              'search.death',
-              'search.marriage',
-              'record.read',
-              'record.read-audit',
-              'record.read-comments'
+              SCOPES.DECLARE,
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE,
+              SCOPES.RECORD_READ,
+              SCOPES.RECORD_READ_AUDIT,
+              SCOPES.RECORD_READ_COMMENTS
             ]
           },
           status: 'active',
@@ -349,18 +352,18 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'declare',
-              'record.declare-birth',
-              'record.declare-death',
-              'record.declare-marriage',
-              'record.submit-incomplete',
-              'record.submit-for-review',
-              'search.birth',
-              'search.death',
-              'search.marriage',
-              'record.read',
-              'record.read-audit',
-              'record.read-comments'
+              SCOPES.DECLARE,
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE,
+              SCOPES.RECORD_READ,
+              SCOPES.RECORD_READ_AUDIT,
+              SCOPES.RECORD_READ_COMMENTS
             ]
           },
           status: 'pending',
@@ -421,18 +424,18 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'declare',
-              'record.declare-birth',
-              'record.declare-death',
-              'record.declare-marriage',
-              'record.submit-incomplete',
-              'record.submit-for-review',
-              'search.birth',
-              'search.death',
-              'search.marriage',
-              'record.read',
-              'record.read-audit',
-              'record.read-comments'
+              SCOPES.DECLARE,
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE,
+              SCOPES.RECORD_READ,
+              SCOPES.RECORD_READ_AUDIT,
+              SCOPES.RECORD_READ_COMMENTS
             ]
           },
           status: 'active',
@@ -454,18 +457,18 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'declare',
-              'record.declare-birth',
-              'record.declare-death',
-              'record.declare-marriage',
-              'record.submit-incomplete',
-              'record.submit-for-review',
-              'search.birth',
-              'search.death',
-              'search.marriage',
-              'record.read',
-              'record.read-audit',
-              'record.read-comments'
+              SCOPES.DECLARE,
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE,
+              SCOPES.RECORD_READ,
+              SCOPES.RECORD_READ_AUDIT,
+              SCOPES.RECORD_READ_COMMENTS
             ]
           },
           status: 'pending',
@@ -550,18 +553,18 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              'declare',
-              'record.declare-birth',
-              'record.declare-death',
-              'record.declare-marriage',
-              'record.submit-incomplete',
-              'record.submit-for-review',
-              'search.birth',
-              'search.death',
-              'search.marriage',
-              'record.read',
-              'record.read-audit',
-              'record.read-comments'
+              SCOPES.DECLARE,
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE,
+              SCOPES.RECORD_READ,
+              SCOPES.RECORD_READ_AUDIT,
+              SCOPES.RECORD_READ_COMMENTS
             ]
           },
           status: 'active',

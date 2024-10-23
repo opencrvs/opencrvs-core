@@ -18,10 +18,10 @@ export function usePermissions() {
   const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
 
   const hasScopes = (neededScopes: Scope[]) =>
-    neededScopes.length === 0 ||
     neededScopes.every((scope) => userScopes?.includes(scope))
 
   const hasAnyScope = (neededScopes: Scope[]) =>
+    neededScopes.length === 0 ||
     neededScopes.some((scope) => userScopes?.includes(scope))
 
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])

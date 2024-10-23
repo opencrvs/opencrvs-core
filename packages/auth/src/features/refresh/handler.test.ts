@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
+import {
+  DEFAULT_ROLES_DEFINITION,
+  SCOPES
+} from '@opencrvs/commons/authentication'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 
@@ -73,16 +76,16 @@ describe('authenticate handler receives a request', () => {
       const [, payload] = refreshResponse.result.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual([
-        'sysadmin',
-        'natlsysadmin',
-        'user.create',
-        'user.read',
-        'user.update',
-        'organisation.read',
-        'organisation.read-locations',
-        'performance.read',
-        'performance.read-dashboards',
-        'performance.export-vital-statistics'
+        SCOPES.SYSADMIN,
+        SCOPES.NATLSYSADMIN,
+        SCOPES.USER_CREATE,
+        SCOPES.USER_READ,
+        SCOPES.USER_UPDATE,
+        SCOPES.ORGANISATION_READ,
+        SCOPES.ORGANISATION_READ_LOCATIONS,
+        SCOPES.PERFORMANCE_READ,
+        SCOPES.PERFORMANCE_READ_DASHBOARDS,
+        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
       ])
       expect(body.sub).toBe('1')
     })

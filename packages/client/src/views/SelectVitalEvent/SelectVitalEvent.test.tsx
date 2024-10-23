@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
+import {
+  createTestApp,
+  flushPromises,
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes,
+  waitForReady
+} from '@client/tests/util'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
@@ -22,6 +28,9 @@ describe('when user is selecting the vital event', () => {
     const testApp = await createTestApp()
     app = testApp.app
     history = testApp.history
+    const store = testApp.store
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+
     await waitForReady(app)
   })
 
