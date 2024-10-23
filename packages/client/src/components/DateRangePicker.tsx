@@ -38,7 +38,6 @@ import subMonths from 'date-fns/subMonths'
 import subYears from 'date-fns/subYears'
 import * as React from 'react'
 import { WrappedComponentProps, injectIntl } from 'react-intl'
-import endOfMonth from 'date-fns/endOfMonth'
 
 const { useState, useEffect, useMemo } = React
 
@@ -526,19 +525,14 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
         </MonthSelectorHeader>
         <MonthButtonsContainer>
           {months.map((month, index) => {
-            const monthDate =
-              label === 'From'
-                ? new Date(Number(year), index)
-                : endOfMonth(new Date(Number(year), index))
-
+            const monthDate = new Date(Number(year), index)
             return (
               <MonthButton
                 id={`${id}-${month.toLowerCase()}`}
                 key={index}
                 disabled={
                   (minDate && isBefore(monthDate, minDate)) ||
-                  (!isSameMonth(maxDate, monthDate) &&
-                    isAfter(monthDate, maxDate))
+                  isAfter(monthDate, maxDate)
                 }
                 selected={
                   isSameMonth(selectedDate, monthDate) &&
