@@ -14,6 +14,7 @@ interface ICertificateMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   certificateCollectionTitle: MessageDescriptor
   addAnotherSignature: MessageDescriptor
+  certificateTemplateSelectLabel: MessageDescriptor
   certificateConfirmationTxt: MessageDescriptor
   certificateIsCorrect: MessageDescriptor
   certificateReceiptHeader: MessageDescriptor
@@ -58,6 +59,7 @@ interface ICertificateMessages
   receiptPaidAmount: MessageDescriptor
   receiptService: MessageDescriptor
   selectSignature: MessageDescriptor
+  selectedCertificateTemplateLabel: MessageDescriptor
   service: MessageDescriptor
   amountDue: MessageDescriptor
   typeOfID: MessageDescriptor
@@ -94,6 +96,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Certify record',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
+  },
+  certificateTemplateSelectLabel: {
+    defaultMessage: 'Select certificate template',
+    description: 'The title of select certificate template action',
+    id: 'certificate.selectTemplate'
   },
   certificateConfirmationTxt: {
     defaultMessage: 'Edit',
@@ -329,6 +336,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Select e-signatures',
     description: 'The label for choose signature select',
     id: 'print.certificate.selectSignature'
+  },
+  selectedCertificateTemplateLabel: {
+    defaultMessage: 'Selected certificate template',
+    description: 'The title of selected certificate template label',
+    id: 'certificate.selectedTemplate'
   },
   service: {
     defaultMessage:

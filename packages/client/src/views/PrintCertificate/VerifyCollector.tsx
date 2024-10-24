@@ -14,7 +14,6 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -48,6 +47,7 @@ import { IForm } from '@client/forms'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { Event } from '@client/utils/gateway'
 
 interface IMatchParams {
   registrationId: string
@@ -95,7 +95,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         eventDate,
         registeredDate,
         offlineCountryConfiguration

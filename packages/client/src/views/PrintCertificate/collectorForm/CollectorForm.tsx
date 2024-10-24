@@ -210,7 +210,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const certificates = declaration.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
-
+    const selectedTemplatedConfig =
+      this.props.offlineCountryConfiguration.templates.certificates?.find(
+        (x) => x.id === (collector.certificateTemplateId as string)
+      )
     this.props.modifyDeclaration({
       ...declaration,
       data: {
@@ -220,7 +223,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           certificates: [
             {
               collector: collector,
-              hasShowedVerifiedDocument: false
+              hasShowedVerifiedDocument: false,
+              templateConfig: selectedTemplatedConfig
             }
           ]
         }
@@ -324,7 +328,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       .props as PropsWhenDeclarationIsFound
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         getEventDate(declaration.data, event),
         getRegisteredDate(declaration.data),
         offlineCountryConfiguration
@@ -507,7 +511,10 @@ const mapStateToProps = (
 
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const certFormSection = getCertificateCollectorFormSection(declaration)
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration,
+    state.offline.offlineData.templates?.certificates
+  )
 
   const isAllowPrintInAdvance =
     event === Event.Birth
@@ -545,7 +552,7 @@ const mapStateToProps = (
       declaration.data.registration.certificates &&
       declaration.data.registration.certificates[
         declaration.data.registration.certificates.length - 1
-      ].collector) ||
+      ]?.collector) ||
       {},
     declaration && declaration.data,
     offlineCountryConfiguration,

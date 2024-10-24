@@ -63,7 +63,8 @@ export function IssueCollectorForm({
             certificates: [
               {
                 collector: collector,
-                hasShowedVerifiedDocument: false
+                hasShowedVerifiedDocument: false,
+                templateConfig: certificate.templateConfig
               }
             ]
           }
@@ -76,12 +77,17 @@ export function IssueCollectorForm({
   function continueButtonHandler() {
     const relationship =
       declaration.data.registration.certificates[0].collector?.type
-    const event = declaration.event
     if (!relationship) return
     if (relationship === 'OTHER') {
       dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
     } else {
-      dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
+      dispatch(
+        goToVerifyIssueCollector(
+          declaration.id,
+          declaration.event,
+          relationship
+        )
+      )
     }
   }
 

@@ -11,6 +11,7 @@
 - Fetch child identifier in view record
 - Auth token, ip address, remote address redacted from server log
 - **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
+- **Certificate Fetching**: Removed certificates from the database, allowing them to be fetched directly from the country configuration via a simplified API endpoint.
 
 ### New features
 
@@ -25,6 +26,10 @@
 - A new field: `Time Period` is added to advanced search [#6365](https://github.com/opencrvs/opencrvs-core/issues/6365)
 - Deploy UI-Kit Storybook to [opencrvs.pages.dev](https://opencrvs.pages.dev) to allow extending OpenCRVS using the component library
 - Reoder the sytem user add/edit field for surname to be first, also change labels from `Last name` to `User's surname` and lastly remove the NID question from the form [#6830](https://github.com/opencrvs/opencrvs-core/issues/6830)
+- **Template Selection for Certified Copies**: Added support for multiple certificate templates for each event (birth, death, marriage). Users can now select a template during the certificate issuance process.
+- **Template-based Payment Configuration**: Implemented payment differentiation based on the selected certificate template, ensuring the correct amount is charged.
+- **Template Action Tracking**: Each template printed is tracked in the history table, showing which specific template was used.
+- **Template Selection Dropdown**: Updated print workflow to include a dropdown menu for template selection when issuing a certificate.
 
 ## Bug fixes
 
@@ -53,7 +58,7 @@
 - Fix layout issue that was causing the edit button on the AdvancedSearch's date range picker to not show on mobile view. [#7417](https://github.com/opencrvs/opencrvs-core/issues/7417)
 - Fix hardcoded placeholder copy of input when saving a query in advanced search
 - Handle label params used in form inputs when rendering in action details modal
-- **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. ***This is purely a DX improvement without affecting any functionality of the system***
+- **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. **_This is purely a DX improvement without affecting any functionality of the system_**
 
 ### Breaking changes
 

@@ -79,7 +79,8 @@ export const IssueCollectorFormForOthers = ({
             certificates: [
               {
                 collector: collector,
-                hasShowedVerifiedDocument: false
+                hasShowedVerifiedDocument: false,
+                templateConfig: certificate.templateConfig
               }
             ]
           }
@@ -100,8 +101,7 @@ export const IssueCollectorFormForOthers = ({
   }
 
   function continueButtonHandler() {
-    const event = declaration.event
-    dispatch(goToIssueCertificatePayment(declaration.id, event))
+    dispatch(goToIssueCertificatePayment(declaration.id, declaration.event))
   }
 
   return (

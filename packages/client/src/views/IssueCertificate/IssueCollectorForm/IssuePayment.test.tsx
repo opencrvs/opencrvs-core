@@ -88,7 +88,7 @@ describe('verify collector tests for issuance', () => {
       history
     })
     expect(testComponent.find('#service').hostNodes().text()).toContain('Birth')
-    expect(testComponent.find('#amountDue').hostNodes().text()).toContain('20')
+    expect(testComponent.find('#amountDue').hostNodes().text()).toContain('15')
     testComponent.find('#Continue').hostNodes().simulate('click')
   })
 
@@ -140,7 +140,7 @@ describe('in case of death declaration renders issue payment component', () => {
       history
     })
     expect(testComponent.find('#service').hostNodes().text()).toContain('Death')
-    expect(testComponent.find('#amountDue').hostNodes().text()).toContain('0.0')
+    expect(testComponent.find('#amountDue').hostNodes().text()).toContain('15')
     testComponent.find('#Continue').hostNodes().simulate('click')
   })
 })

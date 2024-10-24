@@ -433,7 +433,14 @@ export const gqlToDraftTransformer = (
       transformedData[section.id]._fhirID = queryData[section.id].id
     }
     if (section.mapping && section.mapping.query) {
-      section.mapping.query(transformedData, queryData, section.id)
+      section.mapping.query(
+        transformedData,
+        queryData,
+        section.id,
+        undefined,
+        undefined,
+        offlineData
+      )
     }
     if (section.mapping?.template) {
       if (!transformedData.template) {

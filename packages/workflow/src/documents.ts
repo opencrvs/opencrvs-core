@@ -61,12 +61,7 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
       affidavit.data = await uploadBase64ToMinio(affidavit.data, authHeader)
     }
   }
-  if ('data' in certificateDetails) {
-    certificateDetails.data = await uploadBase64ToMinio(
-      certificateDetails.data,
-      authHeader
-    )
-  }
+
   return certificateDetails
 }
 

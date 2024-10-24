@@ -44,6 +44,9 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { printPDF } from '@client/pdfRenderer'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router'
+import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -60,7 +63,8 @@ const withEnhancedTemplateVariables = (
     declaration.event,
     eventDate,
     registeredDate,
-    offlineData
+    offlineData,
+    declaration.data.registration.certificates[0]
   )
 
   const locationKey = userDetails?.primaryOffice?.id
@@ -100,10 +104,13 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = (declarationId: string) => {
+export const usePrintableCertificate = () => {
+  const { registrationId } = useParams<{
+    registrationId: string
+  }>()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
-  >(declarationId)
+  >(registrationId)
   const userDetails = useSelector(getUserDetails)
   const offlineData = useSelector(getOfflineData)
   const declaration = withEnhancedTemplateVariables(
@@ -120,28 +127,37 @@ export const usePrintableCertificate = (declarationId: string) => {
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
-  let svg = undefined
-  const certificateTemplate =
-    declaration &&
-    offlineData.templates.certificates?.[declaration.event].definition
-  if (certificateTemplate) {
-    const svgWithoutFonts = compileSvg(
-      certificateTemplate,
-      { ...declaration.data.template, preview: true },
-      state
-    )
-    const svgWithFonts = addFontsToSvg(
-      svgWithoutFonts,
-      offlineData.templates.fonts ?? {}
-    )
-    svg = svgWithFonts
-  }
+  const [svgCode, setSvgCode] = useState<string>()
+  const certificateTemplateConfig: ICertificateConfigData | undefined =
+    declaration?.data.registration.certificates.slice(-1)[0].templateConfig
+  const certificateFonts = certificateTemplateConfig?.fonts ?? {}
+
+  useEffect(() => {
+    const certificateUrl =
+      (declaration &&
+        declaration?.data.registration.certificates.slice(-1)[0].templateConfig
+          ?.svgUrl) ||
+      ''
+
+    if (certificateUrl && declaration) {
+      fetch(certificateUrl)
+        .then((res) => res.text())
+        .then((certificateTemplate) => {
+          if (!certificateTemplate) return
+          const svgWithoutFonts = compileSvg(
+            certificateTemplate,
+            { ...declaration.data.template, preview: true },
+            state
+          )
+          const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
+          setSvgCode(svgWithFonts)
+        })
+    }
+    // eslint-disable-next-line
+  }, [declaration])
 
   const handleCertify = async () => {
-    if (
-      !declaration ||
-      !offlineData.templates.certificates?.[declaration.event].definition
-    ) {
+    if (!declaration || !certificateTemplateConfig) {
       return
     }
     const draft = cloneDeep(declaration)
@@ -159,7 +175,8 @@ export const usePrintableCertificate = (declarationId: string) => {
         draft.event,
         eventDate,
         registeredDate,
-        offlineData
+        offlineData,
+        declaration.data.registration.certificates[0]
       )
       certificate.payments = {
         type: 'MANUAL' as const,
@@ -169,23 +186,27 @@ export const usePrintableCertificate = (declarationId: string) => {
       }
     }
 
+    const svgTemplate = await fetch(certificateTemplateConfig.svgUrl).then(
+      (res) => res.text()
+    )
     const svg = await compileSvg(
-      offlineData.templates.certificates[draft.event].definition,
+      svgTemplate,
       { ...draft.data.template, preview: false },
       state
     )
 
+    const { fonts, ...templateConfig } = certificateTemplateConfig
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
           ...certificate,
-          data: svg || ''
+          templateConfig
         }
       ]
     }
 
-    const pdfTemplate = svgToPdfTemplate(svg, offlineData)
+    const pdfTemplate = svgToPdfTemplate(svg, certificateFonts)
 
     printPDF(pdfTemplate, draft.id)
 
@@ -214,12 +235,12 @@ export const usePrintableCertificate = (declarationId: string) => {
     }
 
     dispatch(
-      goToCertificateCorrection(declarationId, CorrectionSection.Corrector)
+      goToCertificateCorrection(registrationId, CorrectionSection.Corrector)
     )
   }
 
   return {
-    svg,
+    svgCode,
     handleCertify,
     isPrintInAdvance,
     canUserEditRecord,

@@ -426,27 +426,14 @@ export const mockOfflineData = {
     BIRTH: {
       REGISTRATION_TARGET: 45,
       LATE_REGISTRATION_TARGET: 365,
-      FEE: {
-        ON_TIME: 0,
-        LATE: 15,
-        DELAYED: 20
-      },
       PRINT_IN_ADVANCE: true
     },
     DEATH: {
       REGISTRATION_TARGET: 45,
-      FEE: {
-        ON_TIME: 0,
-        DELAYED: 0
-      },
       PRINT_IN_ADVANCE: true
     },
     MARRIAGE: {
       REGISTRATION_TARGET: 45,
-      FEE: {
-        ON_TIME: 0,
-        DELAYED: 0
-      },
       PRINT_IN_ADVANCE: true
     },
     FEATURES: {
