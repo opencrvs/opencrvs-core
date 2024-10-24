@@ -18,7 +18,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { IntlShape, useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 import { GET_USER } from '@client/user/queries'
-import { createNamesMap } from '@client/utils/data-formatting'
+import { getLocalisedName } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
@@ -38,20 +38,19 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
-import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  HumanName,
   User,
   SystemRoleType
 } from '@client/utils/gateway'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useQuery } from '@apollo/client'
+import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
@@ -86,10 +85,7 @@ const transformUserQueryResult = (
               '')) ||
         ''
     },
-    name:
-      createNamesMap(userData.name as HumanName[])[locale] ||
-      createNamesMap(userData.name as HumanName[])[LANG_EN],
-    systemRole: userData.systemRole,
+    name: getLocalisedName(intl, userData.name[0]),
     role: userData.role,
     number: userData.mobile,
     email: userData.email,
