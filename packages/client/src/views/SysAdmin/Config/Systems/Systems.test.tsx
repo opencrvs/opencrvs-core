@@ -267,12 +267,18 @@ describe('render toggle settings', () => {
 
     it('should delete system successfully', async () => {
       component
-        .find('#toggleMenuToggleButton')
+        .find('#toggleMenu-dropdownMenu')
         .hostNodes()
         .first()
         .simulate('click')
 
-      component.find('#toggleMenuItem3').hostNodes().simulate('click')
+      component
+        .find('#toggleMenu-Dropdown-Content')
+        .find('li')
+        .hostNodes()
+        .at(3)
+        .simulate('click')
+
       component.find('#delete').hostNodes().simulate('click')
       component.update()
       const modal = await waitForElement(component, '#systemToDeleteSuccess')
@@ -315,12 +321,17 @@ describe('render toggle settings', () => {
 
     it('should deactivated system successfully', async () => {
       component
-        .find('#toggleMenuToggleButton')
+        .find('#toggleMenu-dropdownMenu')
         .hostNodes()
         .first()
         .simulate('click')
 
-      component.find('#toggleMenuItem2').hostNodes().simulate('click')
+      component
+        .find('#toggleMenu-Dropdown-Content')
+        .find('li')
+        .hostNodes()
+        .at(2)
+        .simulate('click')
       component.find('#confirm').hostNodes().simulate('click')
       component.update()
       const modal = await waitForElement(
@@ -365,12 +376,20 @@ describe('render toggle settings', () => {
 
     it('should active system successfully', async () => {
       component
-        .find('#toggleMenuToggleButton')
+        .find('#toggleMenu-dropdownMenu')
         .hostNodes()
         .last()
         .simulate('click')
 
-      component.find('#toggleMenuItem1').hostNodes().simulate('click')
+      component
+        .find('#toggleMenu-Dropdown-Content')
+        .hostNodes()
+        .last()
+        .find('li')
+        .hostNodes()
+        .at(1)
+        .simulate('click')
+
       component.find('#confirm').hostNodes().simulate('click')
       component.update()
       const modal = await waitForElement(

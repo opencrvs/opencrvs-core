@@ -100,7 +100,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -131,7 +131,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -166,7 +166,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
-                  type: 'Birth',
+                  type: Event.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -197,7 +197,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-brbe037dec2f',
-                  type: 'Birth',
+                  type: Event.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -228,7 +228,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9beee7dec2f',
-                  type: 'Birth',
+                  type: Event.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -259,7 +259,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
-                  type: 'Birth',
+                  type: Event.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -414,7 +414,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -508,7 +508,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -610,7 +610,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -717,7 +717,7 @@ describe('SearchResult downloadButton tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -814,7 +814,7 @@ describe('SearchResult downloadButton tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: 'Death',
+                  type: Event.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
