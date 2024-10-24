@@ -230,7 +230,7 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#familyNameEng_error')
+          .find('#familyName_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
@@ -288,13 +288,13 @@ describe('create new user tests', () => {
 
     it('clicking change button on a field takes user back to form', async () => {
       testComponent
-        .find('#btn_change_firstNamesEng')
+        .find('#btn_change_firstName')
         .hostNodes()
         .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstNamesEng')
+      expect(history.location.hash).toBe('#firstName')
     })
 
     it('clicking submit button submits the form data', async () => {
@@ -339,11 +339,6 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            identifier: {
-              system: 'NATIONAL_ID',
-              value: '101488192',
-              __typename: 'Identifier'
-            },
             systemRole: 'NATIONAL_REGISTRAR',
             role: { _id: '63ef9466f708ea080777c27a' },
             status: 'active',

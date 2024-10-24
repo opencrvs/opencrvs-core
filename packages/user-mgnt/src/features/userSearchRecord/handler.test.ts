@@ -38,7 +38,6 @@ const mockUser: IUser & { _id: string } = {
     }
   ],
   username: 'j.doe1',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   systemRole: 'LOCAL_REGISTRAR',
