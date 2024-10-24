@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
-import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/service'
+import { fetchFHIR } from '@gateway/features/fhir/service'
 import {
   hasRecordAccess,
   hasScope,
