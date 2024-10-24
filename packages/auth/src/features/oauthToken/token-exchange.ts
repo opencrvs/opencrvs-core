@@ -45,13 +45,14 @@ export async function tokenExchangeHandler(
     return oauthResponse.invalidRequest(h)
   }
 
-  // @TODO: Get rid of overly functional code
   const decodedOrError = pipe(subjectToken, verifyToken)
   if (decodedOrError._tag === 'Left') {
     throw new Error('Invalid token')
   }
   const { sub } = decodedOrError.right
 
+  // @Zangetsu101: I guess we don't have any fine-grained access control in OpenCRVS yet? So it's fine to give access to any record with valid token
+  // @TODO: Check if the user actually has access to the record
   const recordToken = await createTokenForRecordValidation(
     sub as UUID,
     recordId
