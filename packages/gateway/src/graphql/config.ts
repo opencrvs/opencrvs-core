@@ -47,7 +47,7 @@ import {
 import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual } from 'lodash'
+import { merge } from 'lodash'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
 import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
@@ -226,9 +226,12 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
             throw new AuthenticationError('Authentication failed')
           }
 
-          if (credentials && !isEqual(credentials.scope, user.scope)) {
-            throw new AuthenticationError('Authentication failed')
-          }
+          // @TODO: When scope work is done, this check should stay.
+          // For now, the registrar might not have 'record.confirm-registration' token, but the per-record issued token will have it
+
+          // if (credentials && !isEqual(credentials.scope, user.scope)) {
+          //   throw new AuthenticationError('Authentication failed')
+          // }
         } catch (err) {
           throw new AuthenticationError(err)
         }

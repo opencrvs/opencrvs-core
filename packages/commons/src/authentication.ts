@@ -25,7 +25,8 @@ export const userScopes = {
   /** Bypasses the rate limiting in gateway. Useful for data seeder. */
   bypassRateLimit: 'bypassratelimit',
   teams: 'teams',
-  config: 'config'
+  config: 'config',
+  confirmRegistration: 'record.confirm-registration'
 } as const
 
 export const userRoleScopes = {
