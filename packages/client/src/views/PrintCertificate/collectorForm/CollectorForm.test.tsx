@@ -229,7 +229,7 @@ describe('Certificate collector test for a birth registration without father det
       })
       component.update()
       expect(history.location.pathname).toBe(
-        '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate/father'
+        '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
       )
     })
 
@@ -270,7 +270,7 @@ describe('Certificate collector test for a birth registration without father det
       })
       component.update()
       expect(history.location.pathname).toBe(
-        '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate/otherCertCollector'
+        '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/otherCertCollector'
       )
     })
   })
@@ -387,7 +387,7 @@ describe('Certificate collector test for a birth registration without father det
       })
       it('takes the user to affedavit view', async () => {
         expect(history.location.pathname).toBe(
-          '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate/affidavit'
+          '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/affidavit'
         )
       })
 
@@ -439,7 +439,7 @@ describe('Certificate collector test for a birth registration without father det
         component.find('#submit_confirm').hostNodes().simulate('click')
 
         expect(history.location.pathname).toBe(
-          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate'
+          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 
@@ -464,7 +464,7 @@ describe('Certificate collector test for a birth registration without father det
         ).toHaveLength(1)
         component.find('#submit_confirm').hostNodes().simulate('click')
         expect(history.location.pathname).toBe(
-          '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate'
+          '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 
@@ -575,7 +575,7 @@ describe('Certificate collector test for a death registration', () => {
       $confirm.hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
-        '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death-certificate'
+        '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
       )
     })
   })
@@ -632,7 +632,7 @@ describe('Certificate collector test for a marriage registration', () => {
       $confirm.hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
-        '/review/18ff35e1-3d92-4db3-b815-c4d2e609fb23/marriage-certificate'
+        '/review/18ff35e1-3d92-4db3-b815-c4d2e609fb23/marriage'
       )
     })
   })

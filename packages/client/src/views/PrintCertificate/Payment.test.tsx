@@ -129,7 +129,7 @@ describe('verify collector tests', () => {
         'Birth'
       )
       expect(testComponent.find('#amountDue').hostNodes().text()).toContain(
-        '150'
+        '15'
       )
 
       testComponent.find('#Continue').hostNodes().simulate('click')

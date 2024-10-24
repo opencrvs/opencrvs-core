@@ -546,7 +546,37 @@ export const mockDeclarationData = {
       officeAddressLevel3: 'Gazipur',
       officeAddressLevel4: 'Dhaka'
     },
-    certificates: [{}]
+    certificates: [
+      {
+        collector: {
+          relationship: 'OTHER',
+          affidavitFile: {
+            contentType: 'image/jpg',
+            data: 'data:image/png;base64,2324256'
+          },
+          name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+          identifier: [{ id: '123456', type: 'PASSPORT' }]
+        },
+        certificateTemplateId: 'certified-birth-certificate',
+        hasShowedVerifiedDocument: true,
+        templateConfig: {
+          id: 'certified-birth-certificate',
+          event: 'birth',
+          label: {
+            id: 'certificates.birth.certificate.copy',
+            defaultMessage: 'birth Certificate certified copy',
+            description: 'The label for a birth certificate'
+          },
+          fee: {
+            onTime: 0,
+            late: 5.5,
+            delayed: 15
+          },
+          svgUrl:
+            '/api/countryconfig/certificates/birth-certificate-certified-copy.svg'
+        }
+      }
+    ]
   },
   documents: {}
 }
@@ -644,7 +674,7 @@ export const mockDeathDeclarationData = {
     certificates: [
       {
         collector: {
-          type: 'MOTHER'
+          relationship: 'MOTHER'
         },
         hasShowedVerifiedDocument: true,
         templateConfig: {
@@ -788,18 +818,42 @@ export const mockBirthRegistrationSectionData = {
   certificates: [
     {
       collector: {
-        type: 'OTHER',
-        relationship: 'Uncle',
-        firstName: 'Mushraful',
-        lastName: 'Hoque',
-        iDType: 'PASSPORT',
-        iD: '123456789',
+        relationship: 'OTHER',
         affidavitFile: {
-          type: 'abc',
-          data: 'BASE64 data'
-        }
+          contentType: 'image/jpg',
+          data: 'data:image/png;base64,2324256'
+        },
+
+        name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+        identifier: [{ id: '123456', type: 'PASSPORT' }]
       },
-      hasShowedVerifiedDocument: true
+      hasShowedVerifiedDocument: true,
+      certificateTemplateId: 'certified-birth-certificate',
+      payments: [
+        {
+          paymentId: '1234',
+          type: 'MANUAL',
+          amount: 50,
+          outcome: 'COMPLETED',
+          date: '2018-10-22'
+        }
+      ],
+      templateConfig: {
+        id: 'certified-birth-certificate',
+        event: 'birth',
+        label: {
+          id: 'certificates.birth.certificate.copy',
+          defaultMessage: 'birth Certificate certified copy',
+          description: 'The label for a birth certificate'
+        },
+        fee: {
+          onTime: 0,
+          late: 5.5,
+          delayed: 15
+        },
+        svgUrl:
+          '/api/countryconfig/certificates/birth-certificate-certified-copy.svg'
+      }
     }
   ]
 }
@@ -827,6 +881,7 @@ export const mockDeathRegistrationSectionData = {
         iD: '123456789'
       },
       hasShowedVerifiedDocument: true,
+      certificateTemplateId: 'certified-death-certificate',
       templateConfig: {
         id: 'certified-death-certificate',
         event: 'death',

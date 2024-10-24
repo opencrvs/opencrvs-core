@@ -40,7 +40,13 @@ const birthDeclaration = {
 const deathDeclaration = {
   id: 'mockDeath1234',
   data: {
-    ...mockDeathDeclarationData,
+    ...{
+      ...mockDeathDeclarationData,
+      deathEvent: {
+        ...mockDeathDeclarationData.deathEvent,
+        deathDate: new Date().toISOString().slice(0, 10)
+      }
+    },
     history: [
       {
         date: '2022-03-21T08:16:24.467+00:00',
