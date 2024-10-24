@@ -17,8 +17,15 @@ import {
 import { pipe } from 'fp-ts/lib/function'
 import { UUID } from '@opencrvs/commons'
 
+export const SUBJECT_TOKEN_TYPE =
+  'urn:ietf:params:oauth:token-type:access_token'
+export const RECORD_TOKEN_TYPE =
+  'urn:opencrvs:oauth:token-type:single_record_token'
+
 /**
  * Allows creating record-specific tokens for when a 3rd party system needs to confirm a registration
+ *
+ * https://datatracker.ietf.org/doc/html/rfc8693#section-2.1
  */
 export async function tokenExchangeHandler(
   request: Hapi.Request,
@@ -32,9 +39,8 @@ export async function tokenExchangeHandler(
   if (
     !recordId ||
     !subjectToken ||
-    subjectTokenType !== 'urn:opencrvs:oauth:token-type:access_token' ||
-    requestedTokenType !==
-      'urn:opencrvs:oauth:token-type:single_record_validate_token'
+    subjectTokenType !== SUBJECT_TOKEN_TYPE ||
+    requestedTokenType !== RECORD_TOKEN_TYPE
   ) {
     return oauthResponse.invalidRequest(h)
   }
@@ -45,8 +51,6 @@ export async function tokenExchangeHandler(
     throw new Error('Invalid token')
   }
   const { sub } = decodedOrError.right
-
-  // @TODO: Check if the user has access to the record
 
   const recordToken = await createTokenForRecordValidation(
     sub as UUID,

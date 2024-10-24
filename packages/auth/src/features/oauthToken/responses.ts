@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
+import { RECORD_TOKEN_TYPE } from './token-exchange'
 
 export const invalidRequest = (h: Hapi.ResponseToolkit) =>
   h
@@ -26,8 +27,7 @@ export const invalidGrantType = (h: Hapi.ResponseToolkit) =>
   h
     .response({
       error: 'unsupported_grant_type',
-      error_description:
-        'Invalid grant type. Only "client_credentials" or "urn:ietf:params:oauth:grant-type:token-exchange" are supported.',
+      error_description: `Invalid grant type. Only "client_credentials" or "${RECORD_TOKEN_TYPE}" are supported.`,
       error_uri:
         'Refer to https://documentation.opencrvs.org/technology/interoperability/authenticate-a-client'
     })
