@@ -15,7 +15,6 @@ import {
   Composition,
   Patient,
   Practitioner,
-  RegistrationStatus,
   ResourceIdentifier,
   Saved,
   Task,
@@ -26,20 +25,14 @@ import {
   SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL, COUNTRY_CONFIG_URL } from '@workflow/constants'
-import {
-  OPENCRVS_SPECIFICATION_URL,
-  RegStatus
-} from '@workflow/features/registration/fhir/constants'
+import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
 import { getSectionEntryBySectionCode } from '@workflow/features/registration/fhir/fhir-template'
 import {
-  fetchExistingRegStatusCode,
   getFromFhir,
-  getRegStatusCode,
   updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getMosipUINToken } from '@workflow/features/registration/utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
-import { ITokenPayload } from '@workflow/utils/auth-utils'
 import fetch from 'node-fetch'
 
 export async function invokeRegistrationValidation(
@@ -62,39 +55,6 @@ export async function invokeRegistrationValidation(
     throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
   }
   return bundle
-}
-
-export async function setupRegistrationWorkflow(
-  taskResource: Task,
-  tokenpayload: ITokenPayload,
-  defaultStatus?: RegistrationStatus
-): Promise<Task> {
-  const regStatusCodeString = defaultStatus
-    ? defaultStatus
-    : getRegStatusCode(tokenpayload)
-
-  if (!taskResource.businessStatus) {
-    taskResource.businessStatus = {} as Task['businessStatus']
-  }
-  if (!taskResource.businessStatus.coding) {
-    taskResource.businessStatus.coding = []
-  }
-  const regStatusCode = taskResource.businessStatus.coding.find((code) => {
-    return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-  })
-
-  if (regStatusCode) {
-    regStatusCode.code = regStatusCodeString
-  } else {
-    taskResource.businessStatus.coding.push({
-      system: `${OPENCRVS_SPECIFICATION_URL}reg-status`,
-      code: regStatusCodeString
-    })
-  }
-  // Checking for duplicate status update
-  await checkForDuplicateStatusUpdate(taskResource)
-
-  return taskResource
 }
 
 export function setupLastRegOffice<T extends Task>(
@@ -138,32 +98,6 @@ export function setupLastRegUser<T extends Task>(
   taskResource.lastModified =
     taskResource.lastModified || new Date().toISOString()
   return taskResource
-}
-
-async function checkForDuplicateStatusUpdate(taskResource: Task) {
-  const regStatusCode =
-    taskResource &&
-    taskResource.businessStatus &&
-    taskResource.businessStatus.coding &&
-    taskResource.businessStatus.coding.find((code) => {
-      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-    })
-
-  if (
-    !taskResource ||
-    !taskResource.id ||
-    !regStatusCode ||
-    regStatusCode.code === RegStatus.CERTIFIED
-  ) {
-    return
-  }
-  const existingRegStatusCode = await fetchExistingRegStatusCode(
-    taskResource.id
-  )
-  if (existingRegStatusCode?.code === regStatusCode.code) {
-    logger.error(`Declaration is already in ${regStatusCode} state`)
-    throw new Error(`Declaration is already in ${regStatusCode} state`)
-  }
 }
 
 export function updatePatientIdentifierWithRN(

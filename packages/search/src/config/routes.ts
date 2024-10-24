@@ -30,6 +30,7 @@ import {
   reindexHandler,
   reindexStatusHandler
 } from '@search/features/reindex/handler'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const getRoutes = () => {
   const client = getOrCreateClient()
@@ -83,11 +84,11 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'record.submit-for-approval'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
           ]
         },
         description: 'Handles searching declaration assignment'
@@ -179,12 +180,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'record.submit-for-approval',
-            'config.update-all'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         description: 'Returns all the documents in the index'
@@ -198,13 +199,13 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'performance.read',
-            'record.submit-for-approval',
-            'config.update-all'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         validate: {
@@ -225,13 +226,13 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'record.submit-for-approval',
-            'config.update-all',
-            'recordsearch'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.RECORDSEARCH
           ]
         },
         description:
@@ -246,12 +247,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'record.submit-for-approval',
-            'config.update-all'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         description: 'Handles searching from declarations'
@@ -265,12 +266,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'record.submit-for-approval',
-            'config.update-all'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         description: 'Handle searching from death declarations'

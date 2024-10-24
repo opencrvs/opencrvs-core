@@ -32,6 +32,7 @@ import {
   getSearchTotalCount,
   SearchDocument
 } from '@opencrvs/commons/types'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -206,7 +207,7 @@ export async function advancedRecordSearch(
   try {
     let isExternalSearch = false
     const tokenPayload = getTokenPayload(request.headers.authorization)
-    if (tokenPayload.scope.includes('recordsearch')) {
+    if (tokenPayload.scope.includes(SCOPES.RECORDSEARCH)) {
       isExternalSearch = true
     }
     const result = await advancedSearch(

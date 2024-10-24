@@ -23,12 +23,6 @@ export const SYSTEM_INTEGRATION_SCOPES = {
   nationalId: SCOPES.NATIONALID
 } as const
 
-export const SUPER_ADMIN_SCOPES = [
-  SCOPES.NATLSYSADMIN,
-  SCOPES.BYPASSRATELIMIT,
-  SCOPES.SYSADMIN
-] satisfies Scope[]
-
 export const DEFAULT_ROLES_DEFINITION = [
   {
     id: 'FIELD_AGENT',
