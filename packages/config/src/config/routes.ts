@@ -28,16 +28,7 @@ import {
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
-
-export const enum RouteScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
-}
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export default function getRoutes(): ServerRoute[] {
   return [
@@ -64,14 +55,13 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         auth: {
           scope: [
-            'config.update-all',
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'record.register',
-            'record.certify',
-            'performance.read',
-            'record.submit-for-approval'
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
           ]
         },
         tags: ['api'],
@@ -136,7 +126,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['config.update-all']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Create a location',
         validate: {
@@ -164,7 +154,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['config.update-all']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Update a location or facility',
         validate: {

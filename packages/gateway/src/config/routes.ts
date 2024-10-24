@@ -16,6 +16,7 @@ import {
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
 import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { SCOPES } from '@gateway/../../commons/build/dist/scopes'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -48,10 +49,10 @@ export const getRoutes = () => {
         description: 'Create a health notification',
         auth: {
           scope: [
-            'record.declare-birth',
-            'record.declare-death',
-            'record.declare-marriage',
-            'notification-api'
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.NOTIFICATION_API
           ]
         },
         validate: {

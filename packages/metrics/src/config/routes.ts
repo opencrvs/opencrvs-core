@@ -77,6 +77,7 @@ import {
 } from '@metrics/features/performance/viewRefresher'
 import { PRODUCTION, QA_ENV } from '@metrics/constants'
 import * as Hapi from '@hapi/hapi'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export enum EventType {
   BIRTH = 'birth',
@@ -714,7 +715,7 @@ export const getRoutes = () => {
       handler: metricsDeleteMeasurementHandler,
       options: {
         auth: {
-          scope: ['config.update-all']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         tags: ['api']
       }
@@ -726,7 +727,7 @@ export const getRoutes = () => {
       handler: deletePerformanceHandler,
       options: {
         auth: {
-          scope: ['config.update-all']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         tags: ['api']
       }

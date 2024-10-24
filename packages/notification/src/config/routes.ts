@@ -263,7 +263,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms or email to a user for birth registration entry',
         auth: {
-          scope: ['record.register']
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: registrationNotificationSchema
@@ -279,7 +279,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms or email to a user for birth declaration rejection entry',
         auth: {
-          scope: ['record.submit-for-approval', 'record.register']
+          scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: rejectionNotificationSchema
@@ -340,7 +340,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
-          scope: ['record.register']
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: registrationNotificationSchema
@@ -356,7 +356,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms to a user for death declaration rejection entry',
         auth: {
-          scope: ['record.submit-for-approval', 'record.register']
+          scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: rejectionNotificationSchema
