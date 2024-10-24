@@ -23,6 +23,12 @@ export const HAS_CHILD_LOCATION = gql`
   }
 `
 
+export const IS_LEAF_LEVEL_LOCATION = gql`
+  query isLeafLevelLocation($locationId: String!) {
+    isLeafLevelLocation(locationId: $locationId)
+  }
+`
+
 export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
   query fetchMonthWiseEventMetrics(
     $timeStart: String!
