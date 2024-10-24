@@ -29,6 +29,7 @@ export interface GQLQuery {
   fetchMarriageRegistration?: GQLMarriageRegistration
   fetchRecordDetailsForVerification?: GQLRecordDetails
   hasChildLocation?: GQLLocation
+  isLeafLevelLocation: boolean
   getUser?: GQLUser
   getUserByMobile?: GQLUser
   getUserByEmail?: GQLUser
@@ -1839,6 +1840,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
+  isLeafLevelLocation?: QueryToIsLeafLevelLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
   getUserByEmail?: QueryToGetUserByEmailResolver<TParent>
@@ -2110,6 +2112,21 @@ export interface QueryToHasChildLocationResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToHasChildLocationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToIsLeafLevelLocationArgs {
+  locationId: string
+}
+export interface QueryToIsLeafLevelLocationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToIsLeafLevelLocationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
