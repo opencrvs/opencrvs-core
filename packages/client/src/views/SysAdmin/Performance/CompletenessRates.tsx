@@ -56,7 +56,7 @@ export enum COMPLETENESS_RATE_REPORT_BASE {
 }
 
 interface ISearchParams {
-  locationId: string
+  locationId?: string
   timeStart: string
   timeEnd: string
   time: CompletenessRateTime
@@ -133,6 +133,13 @@ function Filter({
     }
   })
   const dispatch = useDispatch()
+
+  if (
+    data?.isLeafLevelLocation === true &&
+    base === COMPLETENESS_RATE_REPORT_BASE.LOCATION
+  ) {
+    onBaseChange(COMPLETENESS_RATE_REPORT_BASE.TIME)
+  }
 
   const options: (IPerformanceSelectOption & { disabled?: boolean })[] = [
     {
