@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { METRICS_URL } from './constants'
+import { env } from './environment'
 import { resolve } from 'url'
 
 export async function postUserActionToMetrics(
@@ -18,7 +18,7 @@ export async function postUserActionToMetrics(
   userAgent: string,
   practitionerId?: string
 ) {
-  const url = resolve(METRICS_URL, '/audit/events')
+  const url = resolve(env.METRICS_URL, '/audit/events')
   const body = { action: action, practitionerId }
   const authentication = 'Bearer ' + token
 
