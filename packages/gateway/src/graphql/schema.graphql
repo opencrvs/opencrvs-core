@@ -32,6 +32,7 @@ type Query {
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
   hasChildLocation(parentId: String!): Location
+  isLeafLevelLocation(locationId: String!): Boolean!
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User

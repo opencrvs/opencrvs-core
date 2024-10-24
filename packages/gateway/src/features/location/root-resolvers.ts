@@ -20,6 +20,11 @@ import { UUID } from '@opencrvs/commons'
 export const resolvers: GQLResolver = {
   Query: {
     async hasChildLocation(_, { parentId }) {
+      const children = await fetchLocationChildren(parentId as UUID)
+      const [childLocation] = children
+      return childLocation
+    },
+    async isLeafLevelLocation(_, { locationId }) {
       let children: SavedLocation[]
       /*
        * This is because of a tech debt we have that
@@ -27,23 +32,23 @@ export const resolvers: GQLResolver = {
        * country so we have a bunch of places where we
        * need to manually check if the id equals '0'
        */
-      if (parentId === '0') {
+      if (locationId === '0') {
         children = await fetchAllLocations()
       } else {
-        children = await fetchLocationChildren(parentId as UUID)
+        children = await fetchLocationChildren(locationId as UUID)
       }
       /*
        * We want to consider only the admin structure locations
        * here & not the offices or addresses that might have the
        * given location as a parent
        */
-      const [childLocation] = children.filter(
+      const administrativeChildLocation = children.filter(
         (child) =>
           child.type?.coding?.some(({ code }) => code === 'ADMIN_STRUCTURE') &&
           child.partOf &&
-          resourceIdentifierToUUID(child.partOf.reference) === parentId
+          resourceIdentifierToUUID(child.partOf.reference) === locationId
       )
-      return childLocation
+      return administrativeChildLocation.length == 0
     }
   }
 }
