@@ -30,17 +30,7 @@ import {
   reindexHandler,
   reindexStatusHandler
 } from '@search/features/reindex/handler'
-
-export const enum RouteScope {
-  DECLARE = 'declare',
-  VALIDATE = 'validate',
-  REGISTER = 'register',
-  SYSADMIN = 'sysadmin',
-  CERTIFY = 'certify',
-  NATLSYSADMIN = 'natlsysadmin',
-  PERFORMANCE = 'performance',
-  RECORD_SEARCH = 'recordsearch'
-}
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const getRoutes = () => {
   const client = getOrCreateClient()
@@ -93,7 +83,13 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.DECLARE, RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: [
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+          ]
         },
         description: 'Handles searching declaration assignment'
       }
@@ -184,10 +180,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         description: 'Returns all the documents in the index'
@@ -201,11 +199,13 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN,
-            RouteScope.PERFORMANCE
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         validate: {
@@ -226,11 +226,13 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            RouteScope.RECORD_SEARCH,
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.RECORDSEARCH
           ]
         },
         description:
@@ -245,10 +247,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         description: 'Handles searching from declarations'
@@ -262,10 +266,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.SYSADMIN
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.CONFIG_UPDATE_ALL
           ]
         },
         description: 'Handle searching from death declarations'

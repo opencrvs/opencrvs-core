@@ -77,10 +77,8 @@ import {
 } from '@metrics/features/performance/viewRefresher'
 import { PRODUCTION, QA_ENV } from '@metrics/constants'
 import * as Hapi from '@hapi/hapi'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
-const enum RouteScope {
-  NATLSYSADMIN = 'natlsysadmin'
-}
 export enum EventType {
   BIRTH = 'birth',
   DEATH = 'death',
@@ -717,7 +715,7 @@ export const getRoutes = () => {
       handler: metricsDeleteMeasurementHandler,
       options: {
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         tags: ['api']
       }
@@ -729,7 +727,7 @@ export const getRoutes = () => {
       handler: deletePerformanceHandler,
       options: {
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         tags: ['api']
       }

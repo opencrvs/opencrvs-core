@@ -63,15 +63,7 @@ import {
   birthSentForUpdatesNotification,
   deathSentForUpdatesNotification
 } from '@notification/features/sentForUpdates/handler'
-
-const enum RouteScope {
-  DECLARE = 'declare',
-  VALIDATE = 'validate',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  SYSADMIN = 'sysadmin',
-  NATIONAL_SYSTEM_ADMIN = 'natlsysadmin'
-}
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const recordValidation: RouteOptionsValidate = {
   payload: Joi.object()
@@ -226,10 +218,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description: 'Sends an sms to a user for birth in-progress entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_CERTIFY,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
           ]
         },
         validate: {
@@ -247,10 +241,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
           'Sends an sms or email to a user for birth declaration entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_CERTIFY,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
           ]
         },
         validate: {
@@ -267,7 +263,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms or email to a user for birth registration entry',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: registrationNotificationSchema
@@ -283,7 +279,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms or email to a user for birth declaration rejection entry',
         auth: {
-          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: rejectionNotificationSchema
@@ -300,10 +296,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
           'Sends an sms or email to a user for death in-progress entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_CERTIFY,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
           ]
         },
         validate: {
@@ -321,10 +319,12 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
           'Sends an sms or email to a user for death declaration entry',
         auth: {
           scope: [
-            RouteScope.DECLARE,
-            RouteScope.VALIDATE,
-            RouteScope.REGISTER,
-            RouteScope.CERTIFY
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_CERTIFY,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
           ]
         },
         validate: {
@@ -340,7 +340,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user for death registration entry',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: registrationNotificationSchema
@@ -356,7 +356,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         description:
           'Sends an sms to a user for death declaration rejection entry',
         auth: {
-          scope: [RouteScope.VALIDATE, RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: rejectionNotificationSchema
@@ -371,7 +371,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         validate: {
           payload: userCredentialsNotificationSchema
@@ -386,7 +386,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: sendCorrectionRejectedNotificationInput
@@ -401,7 +401,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [RouteScope.REGISTER]
+          scope: [SCOPES.RECORD_REGISTER]
         },
         validate: {
           payload: sendCorrectionApprovedNotificationInput
@@ -416,7 +416,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
-          scope: [RouteScope.SYSADMIN]
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         validate: {
           payload: userPasswordResetNotificationSchema
@@ -454,7 +454,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: [RouteScope.NATIONAL_SYSTEM_ADMIN]
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Sends emails to all users given in payload',
         validate: {
