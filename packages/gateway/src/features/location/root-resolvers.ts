@@ -19,11 +19,6 @@ import { UUID } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async hasChildLocation(_, { parentId }) {
-      const children = await fetchLocationChildren(parentId as UUID)
-      const [childLocation] = children
-      return childLocation
-    },
     async isLeafLevelLocation(_, { locationId }) {
       let children: SavedLocation[]
       /*

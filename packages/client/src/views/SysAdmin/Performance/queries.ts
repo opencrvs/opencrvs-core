@@ -10,19 +10,6 @@
  */
 import { gql } from '@apollo/client'
 
-export const HAS_CHILD_LOCATION = gql`
-  query hasChildLocation($parentId: String!) {
-    hasChildLocation(parentId: $parentId) {
-      id
-      type
-      identifier {
-        system
-        value
-      }
-    }
-  }
-`
-
 export const IS_LEAF_LEVEL_LOCATION = gql`
   query isLeafLevelLocation($locationId: String!) {
     isLeafLevelLocation(locationId: $locationId)

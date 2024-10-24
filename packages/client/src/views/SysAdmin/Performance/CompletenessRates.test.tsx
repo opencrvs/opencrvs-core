@@ -42,7 +42,7 @@ describe('Registraion Rates tests', () => {
       },
       result: {
         data: {
-          hasChildLocation: true
+          isLeafLevelLocation: true
         }
       }
     },
@@ -217,7 +217,7 @@ describe('Registraion Rates error state tests', () => {
       },
       result: {
         data: {
-          hasChildLocation: true
+          isLeafLevelLocation: true
         }
       }
     },
