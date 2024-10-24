@@ -18,7 +18,7 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { IntlShape, useIntl } from 'react-intl'
 import { useParams } from 'react-router'
 import { GET_USER } from '@client/user/queries'
-import { createNamesMap } from '@client/utils/data-formatting'
+import { getLocalisedName } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
@@ -42,7 +42,6 @@ import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAudit
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  HumanName,
   User,
   SystemRoleType
 } from '@client/utils/gateway'
@@ -83,9 +82,7 @@ const transformUserQueryResult = (
               '')) ||
         ''
     },
-    name:
-      createNamesMap(userData.name as HumanName[])[locale] ||
-      createNamesMap(userData.name as HumanName[])[LANG_EN],
+    name: getLocalisedName(intl, userData.name[0]),
     systemRole: userData.systemRole,
     role: userData.role,
     number: userData.mobile,
