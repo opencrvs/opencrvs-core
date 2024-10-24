@@ -10,7 +10,7 @@
  */
 
 import { UUID } from '@opencrvs/commons'
-import { Location, SavedLocation } from '@opencrvs/commons/types'
+import { Location, SavedBundle, SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from './constants'
 import fetch from 'node-fetch'
 
@@ -26,6 +26,24 @@ export const fetchLocation = async (id: UUID) => {
   }
 
   return response.json() as Promise<Location>
+}
+
+const FETCH_ALL_LOCATIONS = new URL(
+  '/locations?type=ADMIN_STRUCTURE&_count=0',
+  APPLICATION_CONFIG_URL
+)
+
+export const fetchAllLocations = async () => {
+  const response = await fetch(FETCH_ALL_LOCATIONS)
+
+  if (!response.ok) {
+    throw new Error(
+      `Couldn't fetch the locations from config: ${await response.text()}`
+    )
+  }
+  const locationsBundle: SavedBundle<SavedLocation> = await response.json()
+
+  return locationsBundle.entry.map(({ resource }) => resource)
 }
 
 const FETCH_ALL_LOCATION_CHILDREN = (id: UUID) =>

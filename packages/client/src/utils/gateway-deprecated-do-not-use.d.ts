@@ -38,7 +38,6 @@ export interface GQLQuery {
   fetchRecordDetailsForVerification?: GQLRecordDetails
   locationsByParent?: Array<GQLLocation | null>
   locationById?: GQLLocation
-  hasChildLocation?: GQLLocation
   getUser?: GQLUser
   getUserByMobile?: GQLUser
   getUserByEmail?: GQLUser
@@ -2053,7 +2052,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
   locationsByParent?: QueryToLocationsByParentResolver<TParent>
   locationById?: QueryToLocationByIdResolver<TParent>
-  hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
   getUserByEmail?: QueryToGetUserByEmailResolver<TParent>
