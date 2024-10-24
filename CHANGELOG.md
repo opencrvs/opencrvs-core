@@ -2,6 +2,22 @@
 
 ## 1.7.0 Release candidate
 
+### Migration guide
+
+- To make sure that `dashboard` still works after migrating to `v1.7.0`, you would need to:
+
+  - ssh into your server
+  - stop `opencrvs_dashboard`
+  - delete `metabase.mv.db` from `/data/metabase/`
+  - start `opencrvs_dashboard`
+
+  ```
+  ssh user@yourcoutryconfig-dev.opencrvs.org
+  docker service scale opencrvs_dashboards=0
+  sudo rm /data/metabase/metabase.mv.db
+  docker service scale opencrvs_dashboards=1
+  ```
+
 ### Breaking changes
 
 - **Title** Description
@@ -53,7 +69,7 @@
 - Fix layout issue that was causing the edit button on the AdvancedSearch's date range picker to not show on mobile view. [#7417](https://github.com/opencrvs/opencrvs-core/issues/7417)
 - Fix hardcoded placeholder copy of input when saving a query in advanced search
 - Handle label params used in form inputs when rendering in action details modal
-- **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. ***This is purely a DX improvement without affecting any functionality of the system***
+- **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. **_This is purely a DX improvement without affecting any functionality of the system_**
 
 ### Breaking changes
 
