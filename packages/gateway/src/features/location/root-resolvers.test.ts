@@ -18,19 +18,6 @@ import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as any
 
 describe('Location root resolvers', () => {
-  describe('hasChildLocation()', () => {
-    it('returns a location object if found', async () => {
-      fetch.mockResponseOnce(JSON.stringify([{ id: 'woohoo' }]))
-      // @ts-ignore
-      const composition = await resolvers.Query!.hasChildLocation(
-        {},
-        { parentId: '1' },
-        { headers: undefined }
-      )
-
-      expect(composition).toBeDefined()
-    })
-  })
   describe('isLeafLevelLocation', () => {
     it('returns false if a location has administrative locations as its children', async () => {
       fetch.mockResponseOnce(

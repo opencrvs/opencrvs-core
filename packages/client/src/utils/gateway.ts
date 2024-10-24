@@ -1410,7 +1410,6 @@ export type Query = {
   getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
-  hasChildLocation?: Maybe<Location>
   isLeafLevelLocation: Scalars['Boolean']
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   queryPersonByIdentifier?: Maybe<Person>
@@ -1568,10 +1567,6 @@ export type QueryGetUserByEmailArgs = {
 
 export type QueryGetUserByMobileArgs = {
   mobile?: InputMaybe<Scalars['String']>
-}
-
-export type QueryHasChildLocationArgs = {
-  parentId: Scalars['String']
 }
 
 export type QueryIsLeafLevelLocationArgs = {
@@ -7312,24 +7307,6 @@ export type GetLocationStatisticsQuery = {
       status: string
       count: number
     } | null>
-  } | null
-}
-
-export type HasChildLocationQueryVariables = Exact<{
-  parentId: Scalars['String']
-}>
-
-export type HasChildLocationQuery = {
-  __typename?: 'Query'
-  hasChildLocation?: {
-    __typename?: 'Location'
-    id: string
-    type?: string | null
-    identifier?: Array<{
-      __typename?: 'Identifier'
-      system?: string | null
-      value?: string | null
-    }> | null
   } | null
 }
 
