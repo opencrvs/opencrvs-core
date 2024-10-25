@@ -23,7 +23,7 @@ import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
 import { IDeclaration } from '@opencrvs/client/src/declarations'
 import { getScope } from '@client/profile/profileSelectors'
-import { Event, Scope } from '@client/utils/gateway'
+import { Event, Scope, SCOPES } from '@client/utils/gateway'
 
 import {
   REGISTRAR_HOME_TAB,
@@ -58,7 +58,7 @@ const ErrorText = styled.div`
 
 class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {

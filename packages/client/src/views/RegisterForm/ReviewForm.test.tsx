@@ -28,7 +28,9 @@ import {
   mockUserResponseWithName,
   getReviewFormFromStore,
   createTestStore,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
@@ -264,10 +266,10 @@ describe('ReviewForm tests', () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
     form = await getReviewFormFromStore(store, Event.Birth)
     getItem.mockReturnValue(registerScopeToken)
-    store.dispatch(checkAuth())
   })
 
   it('Shared contact phone number should be set properly', async () => {

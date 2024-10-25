@@ -58,7 +58,7 @@ import {
   CorrectionSection,
   SubmissionAction
 } from '@client/forms'
-import { Event, RegStatus, Scope } from '@client/utils/gateway'
+import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -687,7 +687,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {
