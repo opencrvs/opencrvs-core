@@ -51,8 +51,7 @@ export async function tokenExchangeHandler(
   }
   const { sub } = decodedOrError.right
 
-  // @Zangetsu101: I guess we don't have any fine-grained access control in OpenCRVS yet? So it's fine to give access to any record with valid token
-  // @TODO: Check if the user actually has access to the record
+  // @TODO: If in the future we have a fine grained access control for records, check here that the subject actually has access to the record requested
   const recordToken = await createTokenForRecordValidation(
     sub as UUID,
     recordId
