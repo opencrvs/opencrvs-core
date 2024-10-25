@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as Hapi from '@hapi/hapi'
 import {
   BundleEntry,
   CertifiedRecord,
@@ -56,9 +57,11 @@ import {
   SECTION_CODE
 } from '@workflow/features/events/utils'
 import {
+  invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  validateDeceasedDetails
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -104,7 +107,6 @@ import {
   mergeBundles
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
-import { triggerEvent } from '@workflow/utils/country-config'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -441,36 +443,24 @@ export async function toWaitingForExternalValidationState(
   )
 }
 
-export async function confirmRegistration(
+export async function initiateRegistration(
   record: WaitingForValidationRecord,
   headers: Record<string, string>,
   token: string
-) {
-  const response = await triggerEvent(
-    'waiting-external-validation',
-    record,
-    headers
-  )
-
-  // no-op: Country config received the event and is processing the external validation
-  if (response.status === 202) {
-    return record
-  }
-
-  if (response.status >= 400 && response.status <= 499) {
-    return toRejected(record, token, {
+): Promise<WaitingForValidationRecord | RejectedRecord> {
+  try {
+    await invokeRegistrationValidation(record, headers)
+  } catch (error) {
+    const statusReason: fhir3.CodeableConcept = {
       text: REG_NUMBER_GENERATION_FAILED
-    })
+    }
+    return toRejected(record, token, statusReason)
   }
-
-  throw new Error(
-    `Country config responded unexpectedly with status: ${
-      response.status
-    }. Check the implementation of country config '/events/waiting-external-validation' endpoint. Response body: ${await response.text()}`
-  )
+  return record
 }
 
 export async function toRegistered(
+  request: Hapi.Request,
   record: WaitingForValidationRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
@@ -530,6 +520,16 @@ export async function toRegistered(
         previousIdentifier.value = childIdentifier.value
       }
     })
+  }
+
+  if (event === EVENT_TYPE.DEATH) {
+    /** using first patient because for death event there is only one patient */
+    patientsWithRegNumber[0] = await validateDeceasedDetails(
+      patientsWithRegNumber[0],
+      {
+        Authorization: request.headers.authorization
+      }
+    )
   }
 
   const patientIds = patientsWithRegNumber.map((p) => p.id)

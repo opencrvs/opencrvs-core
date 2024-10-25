@@ -70,7 +70,7 @@ import {
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import {
-  confirmRegistration,
+  initiateRegistration,
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
@@ -350,7 +350,7 @@ export default async function createRecordHandler(
    * record in waiting validation state
    */
   if (isWaitingExternalValidation(record)) {
-    const rejectedOrWaitingValidationRecord = await confirmRegistration(
+    const rejectedOrWaitingValidationRecord = await initiateRegistration(
       record,
       request.headers,
       token

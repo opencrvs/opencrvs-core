@@ -11,7 +11,7 @@
 import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import {
-  confirmRegistration,
+  initiateRegistration,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
@@ -52,7 +52,7 @@ export const registerRoute = createRoute({
       token
     )
 
-    const rejectedOrWaitingValidationRecord = await confirmRegistration(
+    const rejectedOrWaitingValidationRecord = await initiateRegistration(
       recordInWaitingValidationState,
       request.headers,
       token

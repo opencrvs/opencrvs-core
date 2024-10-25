@@ -58,8 +58,7 @@ import {
   duplicateRegistration,
   viewDeclaration,
   verifyRegistration,
-  markNotADuplicate,
-  confirmRegistration
+  markNotADuplicate
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
@@ -648,10 +647,11 @@ export const resolvers: GQLResolver = {
         throw new Error('User does not have access to the record')
       }
 
-      return await confirmRegistration(authHeader, {
-        compositionId: id,
-        ...details
-      })
+      // @TODO this is a no-op, only to test the token exchange actually works
+      // An upcoming pull request will implement this and a `rejectRegistration` mutations
+      console.info(details)
+
+      return id
     }
   }
 }
