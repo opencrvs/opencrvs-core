@@ -150,11 +150,7 @@ export async function createTokenForRecordValidation(
       expiresIn: '7 days',
       audience: [
         'opencrvs:gateway-user', // to get to the gateway
-        'opencrvs:workflow-user', // to get to the workflow
-        'opencrvs:user-mgnt-user', // to allow the gateway to connect the 'sub' to an actual user
-        'opencrvs:search-user', // to allow the confirm-registration to index the record
-        'opencrvs:metrics-user', // to allow the confirm-registration to index the record to metrics
-        'opencrvs:config-user' // to allow metrics to fetch the application config with this token... (does this make any sense anymore?)
+        'opencrvs:user-mgnt-user' // to allow the gateway to connect the 'sub' to an actual user
       ],
       issuer: JWT_ISSUER
     }
