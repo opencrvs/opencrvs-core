@@ -538,7 +538,6 @@ export const mockDeclarationData = {
   },
   registration: {
     informantsSignature: 'data:image/png;base64,abcd',
-
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -549,19 +548,29 @@ export const mockDeclarationData = {
     },
     certificates: [
       {
+        collector: {
+          relationship: 'OTHER',
+          affidavitFile: {
+            contentType: 'image/jpg',
+            data: 'data:image/png;base64,2324256'
+          },
+          name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+          identifier: [{ id: '123456', type: 'PASSPORT' }]
+        },
+        certificateTemplateId: 'certified-birth-certificate',
+        hasShowedVerifiedDocument: true,
         templateConfig: {
           id: 'certified-birth-certificate',
           event: 'birth',
           label: {
             id: 'certificates.birth.certificate.copy',
-            defaultMessage: 'Birth Certificate certified copy',
+            defaultMessage: 'birth Certificate certified copy',
             description: 'The label for a birth certificate'
           },
-
           fee: {
-            onTime: 10,
-            late: 500,
-            delayed: 150
+            onTime: 0,
+            late: 5.5,
+            delayed: 15
           },
           svgUrl:
             '/api/countryconfig/certificates/birth-certificate-certified-copy.svg'
@@ -665,7 +674,7 @@ export const mockDeathDeclarationData = {
     certificates: [
       {
         collector: {
-          type: 'MOTHER'
+          relationship: 'MOTHER'
         },
         hasShowedVerifiedDocument: true,
         templateConfig: {
@@ -676,7 +685,6 @@ export const mockDeathDeclarationData = {
             defaultMessage: 'Death Certificate certified copy',
             description: 'The label for a death certificate'
           },
-
           fee: {
             onTime: 0,
             late: 5.5,
@@ -722,7 +730,6 @@ export const mockMarriageDeclarationData = {
             defaultMessage: 'Marriage Certificate certified copy',
             description: 'The label for a marriage certificate'
           },
-
           fee: {
             onTime: 0,
             late: 5.5,
@@ -811,18 +818,42 @@ export const mockBirthRegistrationSectionData = {
   certificates: [
     {
       collector: {
-        type: 'OTHER',
-        relationship: 'Uncle',
-        firstName: 'Mushraful',
-        lastName: 'Hoque',
-        iDType: 'PASSPORT',
-        iD: '123456789',
+        relationship: 'OTHER',
         affidavitFile: {
-          type: 'abc',
-          data: 'BASE64 data'
-        }
+          contentType: 'image/jpg',
+          data: 'data:image/png;base64,2324256'
+        },
+
+        name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+        identifier: [{ id: '123456', type: 'PASSPORT' }]
       },
-      hasShowedVerifiedDocument: true
+      hasShowedVerifiedDocument: true,
+      certificateTemplateId: 'certified-birth-certificate',
+      payments: [
+        {
+          paymentId: '1234',
+          type: 'MANUAL',
+          amount: 50,
+          outcome: 'COMPLETED',
+          date: '2018-10-22'
+        }
+      ],
+      templateConfig: {
+        id: 'certified-birth-certificate',
+        event: 'birth',
+        label: {
+          id: 'certificates.birth.certificate.copy',
+          defaultMessage: 'birth Certificate certified copy',
+          description: 'The label for a birth certificate'
+        },
+        fee: {
+          onTime: 0,
+          late: 5.5,
+          delayed: 15
+        },
+        svgUrl:
+          '/api/countryconfig/certificates/birth-certificate-certified-copy.svg'
+      }
     }
   ]
 }
@@ -849,7 +880,24 @@ export const mockDeathRegistrationSectionData = {
         iDType: 'PASSPORT',
         iD: '123456789'
       },
-      hasShowedVerifiedDocument: true
+      hasShowedVerifiedDocument: true,
+      certificateTemplateId: 'certified-death-certificate',
+      templateConfig: {
+        id: 'certified-death-certificate',
+        event: 'death',
+        label: {
+          id: 'certificates.death.certificate.copy',
+          defaultMessage: 'Death Certificate certified copy',
+          description: 'The label for a death certificate'
+        },
+        fee: {
+          onTime: 0,
+          late: 5.5,
+          delayed: 15
+        },
+        svgUrl:
+          '/api/countryconfig/certificates/death-certificate-certified-copy.svg'
+      }
     }
   ]
 }
@@ -857,7 +905,7 @@ export const mockDeathRegistrationSectionData = {
 const mockFetchCertificatesTemplatesDefinition = [
   {
     id: 'birth-certificate',
-    event: 'birth',
+    event: 'birth' as Event,
     label: {
       id: 'certificates.birth.certificate',
       defaultMessage: 'Birth Certificate',
@@ -881,7 +929,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: 'birth-certificate-copy',
-    event: 'birth',
+    event: 'birth' as Event,
     label: {
       id: 'certificates.birth-certificate-copy',
       defaultMessage: 'Birth Certificate certified copy',
@@ -906,7 +954,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: 'death-certificate',
-    event: 'death',
+    event: 'death' as Event,
     label: {
       id: 'certificates.death.certificate',
       defaultMessage: 'Death Certificate',
@@ -930,7 +978,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: 'marriage-certificate',
-    event: 'marriage',
+    event: 'marriage' as Event,
     label: {
       id: 'certificates.marriage.certificate',
       defaultMessage: 'Marriage Certificate',

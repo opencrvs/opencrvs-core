@@ -32,46 +32,46 @@ describe('Birth registration mutation mapping related tests', () => {
     expect(transformedData.registration.trackingId).toEqual('BDSS0SE')
     expect(transformedData.registration.certificates).toEqual([
       {
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'certified-birth-certificate',
+        payments: [
+          {
+            paymentId: '1234',
+            type: 'MANUAL',
+            amount: 50,
+            outcome: 'COMPLETED',
+            date: '2018-10-22'
+          }
+        ],
         collector: {
-          relationship: 'OTHER',
-          otherRelationship: 'Uncle',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mushraful',
-              familyName: 'Hoque'
-            }
-          ],
-          identifier: [
-            {
-              id: '123456789',
-              type: 'PASSPORT'
-            }
-          ],
-          affidavit: [
-            {
-              contentType: 'abc',
-              data: 'BASE64 data'
-            }
-          ]
-        },
-        hasShowedVerifiedDocument: true
+          otherRelationship: 'OTHER',
+          name: [{ use: 'en' }],
+          identifier: [{}],
+          affidavit: [{ data: 'data:image/png;base64,2324256' }]
+        }
       }
     ])
   })
-  it('Test certificate mapping without any data', () => {
+  it('Test certificate mapping template config data', () => {
     const transformedData: TransformedData = {
       registration: {}
     }
+    const mockBirthDeclaration = cloneDeep({
+      ...mockDeclarationData,
+      registration: {
+        ...mockDeclarationData.registration,
+        certificates: [{}]
+      }
+    })
     setBirthRegistrationSectionTransformer(
       transformedData,
-      mockDeclarationData,
+      mockBirthDeclaration,
       'registration'
     )
     expect(transformedData.registration).toBeDefined()
     expect(transformedData.registration.registrationNumber).toEqual(
       '201908122365BDSS0SE1'
     )
-    expect(transformedData.registration.certificates).toEqual([{}])
+    expect(transformedData.registration.certificates).toEqual([])
   })
 })

@@ -17,17 +17,20 @@ import {
   inValidImageB64String,
   mockDeclarationData,
   mockDeathDeclarationData,
-  mockMarriageDeclarationData
+  mockMarriageDeclarationData,
+  mockOfflineData,
+  flushPromises
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { createLocation, History } from 'history'
-import { merge } from 'lodash'
+import { cloneDeep, merge } from 'lodash'
 import { Event } from '@client/utils/gateway'
-import { storeDeclaration } from '@client/declarations'
+import { modifyDeclaration, storeDeclaration } from '@client/declarations'
 import { vi } from 'vitest'
+import { getOfflineDataSuccess } from '@client/offline/actions'
 
 let store: AppStore
 let history: History
@@ -229,7 +232,7 @@ describe('Certificate collector test for a birth registration without father det
       })
       component.update()
       expect(history.location.pathname).toBe(
-        '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate/father'
+        '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
       )
     })
 
@@ -270,7 +273,7 @@ describe('Certificate collector test for a birth registration without father det
       })
       component.update()
       expect(history.location.pathname).toBe(
-        '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate/otherCertCollector'
+        '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/otherCertCollector'
       )
     })
   })
@@ -282,7 +285,11 @@ describe('Certificate collector test for a birth registration without father det
       /*
        * Who is collecting the certificate?
        */
-      store.dispatch(storeDeclaration(birthDeclaration))
+      const declaration = cloneDeep(birthDeclaration)
+      delete (declaration.data.registration.certificates[0].collector as any)
+        .affidavitFile
+
+      store.dispatch(storeDeclaration(declaration))
       component = await createTestComponent(
         <CollectorForm
           location={location}
@@ -387,7 +394,7 @@ describe('Certificate collector test for a birth registration without father det
       })
       it('takes the user to affedavit view', async () => {
         expect(history.location.pathname).toBe(
-          '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate/affidavit'
+          '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/affidavit'
         )
       })
 
@@ -439,13 +446,36 @@ describe('Certificate collector test for a birth registration without father det
         component.find('#submit_confirm').hostNodes().simulate('click')
 
         expect(history.location.pathname).toBe(
-          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate'
+          '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 
       it('continue to review section when the mandatory fields are filled and birth event is before target days', async () => {
-        birthDeclaration.data.child.childBirthDate = '2022-09-20'
-        store.dispatch(storeDeclaration(birthDeclaration))
+        // setting date of birth today
+        const clonedBirthDeclaration = cloneDeep(birthDeclaration)
+        clonedBirthDeclaration.data.child.childBirthDate = new Date()
+          .toISOString()
+          .slice(0, 10)
+        store.dispatch(modifyDeclaration(clonedBirthDeclaration))
+
+        // setting on time birth certificate fee amount to 0
+        const offlineDataResponse = JSON.stringify({
+          ...mockOfflineData,
+          templates: {
+            ...mockOfflineData.templates,
+            certificates: mockOfflineData.templates.certificates.map(
+              (x: any) => {
+                if (x.event === 'birth') {
+                  x.fee.onTime = 0
+                }
+                return x
+              }
+            )
+          }
+        })
+        store.dispatch(getOfflineDataSuccess(offlineDataResponse))
+        await flushPromises()
+
         const comp = await waitForElement(
           component,
           '#noAffidavitAgreementAFFIDAVIT'
@@ -464,7 +494,7 @@ describe('Certificate collector test for a birth registration without father det
         ).toHaveLength(1)
         component.find('#submit_confirm').hostNodes().simulate('click')
         expect(history.location.pathname).toBe(
-          '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth-certificate'
+          '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
 
@@ -575,7 +605,7 @@ describe('Certificate collector test for a death registration', () => {
       $confirm.hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
-        '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death-certificate'
+        '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
       )
     })
   })
@@ -632,7 +662,7 @@ describe('Certificate collector test for a marriage registration', () => {
       $confirm.hostNodes().simulate('click')
 
       expect(history.location.pathname).toBe(
-        '/review/18ff35e1-3d92-4db3-b815-c4d2e609fb23/marriage-certificate'
+        '/review/18ff35e1-3d92-4db3-b815-c4d2e609fb23/marriage'
       )
     })
   })
