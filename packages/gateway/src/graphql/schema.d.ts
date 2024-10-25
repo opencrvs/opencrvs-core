@@ -603,12 +603,6 @@ export interface GQLReinstated {
   registrationStatus?: GQLRegStatus
 }
 
-export interface GQLConfirmRegistrationInput {
-  registrationNumber: string
-  error?: string
-  identifiers: Array<GQLIdentifierInput>
-}
-
 export interface GQLUserInput {
   id?: string
   name: Array<GQLHumanNameInput>
@@ -1204,11 +1198,6 @@ export const enum GQLRegStatus {
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED',
   ISSUED = 'ISSUED'
-}
-
-export interface GQLIdentifierInput {
-  type: string
-  value: string
 }
 
 export interface GQLHumanNameInput {
@@ -3054,7 +3043,6 @@ export interface MutationToMarkEventAsDuplicateResolver<
 
 export interface MutationToConfirmRegistrationArgs {
   id: string
-  details: GQLConfirmRegistrationInput
 }
 export interface MutationToConfirmRegistrationResolver<
   TParent = any,

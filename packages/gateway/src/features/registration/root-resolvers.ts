@@ -636,7 +636,7 @@ export const resolvers: GQLResolver = {
 
       return taskEntry.resource.id
     },
-    async confirmRegistration(_, { id, details }, { headers: authHeader }) {
+    async confirmRegistration(_, { id }, { headers: authHeader }) {
       if (!inScope(authHeader, ['record.confirm-registration'])) {
         throw new Error(
           'User does not have a "record.confirm-registration" scope'
@@ -649,8 +649,6 @@ export const resolvers: GQLResolver = {
 
       // @TODO this is a no-op, only to test the token exchange actually works
       // An upcoming pull request will implement this and a `rejectRegistration` mutations
-      console.info(details)
-
       return id
     }
   }
