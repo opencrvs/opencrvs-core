@@ -221,11 +221,17 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       (option: ISelectOption) => option.value === documentType
     )
 
+    const options = { ...defaultOptions }
+    const resizedImage =
+      Boolean(options.maxSizeMB) &&
+      bytesToMB(uploadedImage.size) > options.maxSizeMB &&
+      (await imageCompression(uploadedImage, options))
+
     const newDocument: IFileValue = {
       optionValues,
-      type: uploadedImage.type,
+      type: resizedImage.type || uploadedImage.type,
       data: fileAsBase64.toString(),
-      fileSize: uploadedImage.size
+      fileSize: resizedImage.size || uploadedImage.size
     }
 
     props.onComplete([...props.files, newDocument])
