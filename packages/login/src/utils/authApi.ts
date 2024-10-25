@@ -11,7 +11,7 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as Sentry from '@sentry/react'
 
-export interface ICodeVerifyData {
+interface ICodeVerifyData {
   nonce: string
   code: string
 }
@@ -55,7 +55,7 @@ export interface IAuthenticateResponse {
   email?: string
 }
 
-export enum QUESTION_KEYS {
+enum QUESTION_KEYS {
   BIRTH_TOWN = 'BIRTH_TOWN',
   HIGH_SCHOOL = 'HIGH_SCHOOL',
   MOTHER_NAME = 'MOTHER_NAME',
