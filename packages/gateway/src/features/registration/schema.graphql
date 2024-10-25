@@ -567,17 +567,6 @@ input CorrectionRejectionInput {
   timeLoggedMS: Int!
 }
 
-input IdentifierInput {
-  type: String!
-  value: String!
-}
-
-input ConfirmRegistrationInput {
-  registrationNumber: String!
-  error: String
-  identifiers: [IdentifierInput!]!
-}
-
 type Mutation {
   # Generic correction handlers for all event types
   # Applying a correction request is made on a event level as payload is dependant on event type
