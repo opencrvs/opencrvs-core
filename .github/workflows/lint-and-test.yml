@@ -138,6 +138,16 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
+  lint-knip:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+      - name: Run knip
+        run: yarn knip --reporter=./knip-reporter.ts
+
   security-scans:
     needs: setup
     runs-on: ubuntu-22.04
