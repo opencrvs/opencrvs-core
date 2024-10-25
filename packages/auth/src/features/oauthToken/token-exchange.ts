@@ -47,7 +47,7 @@ export async function tokenExchangeHandler(
 
   const decodedOrError = pipe(subjectToken, verifyToken)
   if (decodedOrError._tag === 'Left') {
-    throw new Error('Invalid token')
+    return oauthResponse.invalidSubjectToken(h)
   }
   const { sub } = decodedOrError.right
 
