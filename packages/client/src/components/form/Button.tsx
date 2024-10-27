@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useHttp } from './http'
-import { handleUnsupportedIcon } from '@client/forms/utils'
+import { handleUnsupportedIcon, isFieldButton } from '@client/forms/utils'
 
 interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   fieldDefinition: Ii18nButtonFormField
@@ -57,7 +57,21 @@ export function ButtonField(props: ButtonFieldProps) {
     isCompleted
   }) => {
     if (isCompleted) {
-      setFieldTouched(fieldDefinition.name)
+      /**
+       * Form can have buttons having the same triggers. For example, if a button works as an id
+       * generator and is required, then it prevents the user in review page to submit the declaration
+       * without clicking it, which is fine. But if a problem occurs in the id generating server, then
+       * the user can never submit the form and the flow is blocked forever. To avoid this scenario and
+       * to keep the user experience smooth, a conditional button with the exact same trigger and with identical
+       * appearance of the generator button is shown with the error message that trigger gets after the request.
+       * This button is not required.
+       * The UX is shown in the screen capture: https://github.com/opencrvs/opencrvs-core/pull/7822#issue-2608396705
+       */
+      const fieldsHavingSameTrigger = fields.filter(
+        (f) => isFieldButton(f) && f.options.trigger === trigger.name
+      )
+
+      fieldsHavingSameTrigger.forEach((f) => setFieldTouched(f.name))
     }
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
   }
