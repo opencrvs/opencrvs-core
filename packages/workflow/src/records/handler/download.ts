@@ -33,9 +33,7 @@ function getDownloadedOrAssignedExtension(
 ) {
   if (
     inScope(authHeader, [
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
       SCOPES.RECORDSEARCH
     ]) ||
     (hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
