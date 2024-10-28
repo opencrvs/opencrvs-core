@@ -61,15 +61,18 @@ function getDayRanges(
   offlineData: IOfflineData,
   certificate: ICertificate
 ): IRange[] {
-  switch (certificate.templateConfig?.event) {
+  const templateConfig = offlineData.templates.certificates.find(
+    (x) => x.id === certificate.certificateTemplateId
+  )
+  switch (templateConfig?.event) {
     case Event.Birth: {
       const BIRTH_REGISTRATION_TARGET =
         offlineData.config.BIRTH.REGISTRATION_TARGET
       const BIRTH_LATE_REGISTRATION_TARGET =
         offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
-      const BIRTH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
-      const BIRTH_LATE_FEE = certificate.templateConfig?.fee.late
-      const BIRTH_DELAYED_FEE = certificate.templateConfig?.fee.delayed
+      const BIRTH_ON_TIME_FEE = templateConfig?.fee.onTime
+      const BIRTH_LATE_FEE = templateConfig?.fee.late
+      const BIRTH_DELAYED_FEE = templateConfig?.fee.delayed
       const birthRanges = [
         { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
         {
@@ -85,8 +88,8 @@ function getDayRanges(
     case Event.Death: {
       const DEATH_REGISTRATION_TARGET =
         offlineData.config.DEATH.REGISTRATION_TARGET
-      const DEATH_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
-      const DEATH_DELAYED_FEE = certificate.templateConfig?.fee.delayed
+      const DEATH_ON_TIME_FEE = templateConfig?.fee.onTime
+      const DEATH_DELAYED_FEE = templateConfig?.fee.delayed
 
       const deathRanges = [
         { start: 0, end: DEATH_REGISTRATION_TARGET, value: DEATH_ON_TIME_FEE },
@@ -97,8 +100,8 @@ function getDayRanges(
     case Event.Marriage: {
       const MARRIAGE_REGISTRATION_TARGET =
         offlineData.config.MARRIAGE.REGISTRATION_TARGET
-      const MARRIAGE_ON_TIME_FEE = certificate.templateConfig?.fee.onTime
-      const MARRIAGE_DELAYED_FEE = certificate.templateConfig?.fee.delayed
+      const MARRIAGE_ON_TIME_FEE = templateConfig?.fee.onTime
+      const MARRIAGE_DELAYED_FEE = templateConfig?.fee.delayed
       const marriageRanges = [
         {
           start: 0,

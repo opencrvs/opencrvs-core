@@ -8,18 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IFormData, IFormField } from '@client/forms'
+import { IFormData } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
-import { IOfflineData } from '@client/offline/reducer'
 
 export function getBirthRegistrationSectionTransformer(
   transformedData: IFormData,
   queryData: any,
-  sectionId: string,
-  fieldDef: IFormField,
-  nestedFormField?: IFormField,
-  offlineData?: IOfflineData
+  sectionId: string
 ) {
   if (queryData[sectionId].trackingId) {
     transformedData[sectionId].trackingId = queryData[sectionId].trackingId
@@ -42,16 +38,10 @@ export function getBirthRegistrationSectionTransformer(
     Array.isArray(queryData[sectionId].certificates) &&
     queryData[sectionId].certificates.length > 0
   ) {
-    const certificate = queryData[sectionId].certificates.slice(-1)[0]
-    // since we shall need this certificate only for ready to issue tab, to calculate certificate fee
-    transformedData[sectionId].certificates = certificate?.certificateTemplateId
-      ? [
-          {
-            templateConfig: offlineData?.templates.certificates?.find(
-              (x) => x.id === certificate.certificateTemplateId
-            )
-          }
-        ]
-      : []
+    transformedData[sectionId].certificates = [
+      queryData[sectionId].certificates[
+        queryData[sectionId].certificates.length - 1
+      ]
+    ]
   }
 }

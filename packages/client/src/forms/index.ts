@@ -1297,6 +1297,5 @@ export interface ICertificate {
   collector?: IFormSectionData
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
-  templateConfig?: ICertificateConfigData
   certificateTemplateId?: string
 }

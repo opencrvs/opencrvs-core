@@ -151,23 +151,7 @@ describe('Submission middleware', () => {
             identifier: [{ id: '123456', type: 'PASSPORT' }]
           },
           hasShowedVerifiedDocument: true,
-          certificateTemplateId: 'certified-birth-certificate',
-          templateConfig: {
-            id: 'certified-birth-certificate',
-            event: 'birth',
-            label: {
-              id: 'certificates.birth.certificate.copy',
-              defaultMessage: 'birth Certificate certified copy',
-              description: 'The label for a birth certificate'
-            },
-            fee: {
-              onTime: 0,
-              late: 5.5,
-              delayed: 15
-            },
-            svgUrl:
-              '/api/countryconfig/certificates/birth-certificate-certified-copy.svg'
-          }
+          certificateTemplateId: 'certified-birth-certificate'
         }
         const action = declarationReadyForStatusChange({
           id: 'mockDeclaration',

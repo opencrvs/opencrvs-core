@@ -129,15 +129,16 @@ export const usePrintableCertificate = () => {
 
   const [svgCode, setSvgCode] = useState<string>()
   const certificateTemplateConfig: ICertificateConfigData | undefined =
-    declaration?.data.registration.certificates.slice(-1)[0].templateConfig
+    offlineData.templates.certificates.find(
+      (x) =>
+        x.id ===
+        declaration?.data.registration.certificates[0].certificateTemplateId
+    )
   const certificateFonts = certificateTemplateConfig?.fonts ?? {}
 
   useEffect(() => {
     const certificateUrl =
-      (declaration &&
-        declaration?.data.registration.certificates.slice(-1)[0].templateConfig
-          ?.svgUrl) ||
-      ''
+      (declaration && certificateTemplateConfig?.svgUrl) || ''
 
     if (certificateUrl && declaration) {
       fetch(certificateUrl)
@@ -194,14 +195,11 @@ export const usePrintableCertificate = () => {
       { ...draft.data.template, preview: false },
       state
     )
-
-    const { fonts, ...templateConfig } = certificateTemplateConfig
     draft.data.registration = {
       ...draft.data.registration,
       certificates: [
         {
-          ...certificate,
-          templateConfig
+          ...certificate
         }
       ]
     }

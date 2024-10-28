@@ -105,7 +105,7 @@ export interface IOfflineData {
     fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
-    certificates?: ICertificateConfigData[]
+    certificates: ICertificateConfigData[]
   }
   assets: {
     logo: string

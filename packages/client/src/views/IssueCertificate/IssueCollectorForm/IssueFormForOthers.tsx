@@ -59,7 +59,11 @@ export const IssueCollectorFormForOthers = ({
   const dispatch = useDispatch()
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
-
+  const { relationship, ...collectorForm }: { [key: string]: any } =
+    (declaration &&
+      declaration.data.registration.certificates &&
+      declaration.data.registration.certificates[0].collector) ||
+    {}
   const fields: IFormField[] = collectorFormFieldsForOthers(declaration.event)
   const handleChange = (
     sectionData: ICertificate['collector'],
@@ -80,7 +84,7 @@ export const IssueCollectorFormForOthers = ({
               {
                 collector: collector,
                 hasShowedVerifiedDocument: false,
-                templateConfig: certificate.templateConfig
+                certificateTemplateId: certificate.certificateTemplateId
               }
             ]
           }
@@ -138,12 +142,7 @@ export const IssueCollectorFormForOthers = ({
         setAllFieldsDirty={false}
         fields={replaceInitialValues(
           fields,
-          (declaration &&
-            declaration.data.registration.certificates &&
-            declaration.data.registration.certificates[
-              declaration.data.registration.certificates.length - 1
-            ].collector) ||
-            {},
+          collectorForm,
           declaration && declaration.data,
           config,
           user

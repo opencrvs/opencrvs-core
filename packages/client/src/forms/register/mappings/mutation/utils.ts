@@ -33,7 +33,7 @@ export function transformCertificateData(certificates: ICertificate[]) {
   // Prepare the base certificate data
   const updatedCertificates: ICertificate[] = [
     {
-      ...omit(certificateData, 'collector', 'templateConfig')
+      ...omit(certificateData, 'collector')
     }
   ]
 
@@ -73,12 +73,6 @@ export function transformCertificateData(certificates: ICertificate[]) {
       ]
     }
     updatedCertificates[0].collector = collector as any
-  }
-
-  // for templateConfig mapping
-  if (certificateData && certificateData.templateConfig) {
-    updatedCertificates[0].certificateTemplateId =
-      certificateData.templateConfig.id
   }
 
   // Return the processed certificates array

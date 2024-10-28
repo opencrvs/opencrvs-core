@@ -64,7 +64,7 @@ export function IssueCollectorForm({
               {
                 collector: collector,
                 hasShowedVerifiedDocument: false,
-                templateConfig: certificate.templateConfig
+                certificateTemplateId: certificate.certificateTemplateId
               }
             ]
           }

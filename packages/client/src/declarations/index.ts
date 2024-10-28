@@ -275,7 +275,6 @@ export type ICertificate = {
   hasShowedVerifiedDocument?: boolean
   payments?: Payment
   certificateTemplateId?: string
-  templateConfig?: ICertificateConfigData
 }
 
 /*
