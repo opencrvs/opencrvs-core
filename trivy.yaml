@@ -20,11 +20,12 @@ scan:
     - sequence-diagrams
     - usr/local/share/.cache/yarn/v6/
     - home/node/.cache/yarn/v6
+  skip-files:
+    - Dockerfile.dockerignore
+    - packages/*/Dockerfile.dockerignore
   scanners:
     - vuln
     - misconfig
 ignorefile: .trivyignore.yaml
 vulnerability:
   ignore-unfixed: true
-db:
-  repository: 'public.ecr.aws/aquasecurity/trivy-db'
