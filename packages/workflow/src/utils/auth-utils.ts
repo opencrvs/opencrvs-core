@@ -12,7 +12,7 @@ import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
 import { hasScope } from '@opencrvs/commons/authentication'
 
-export enum USER_SCOPE {
+enum USER_SCOPE {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
