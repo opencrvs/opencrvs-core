@@ -141,45 +141,41 @@ jobs:
   lint-knip:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the PR branch
+        uses: actions/checkout@v2
+
+      - name: Get the base branch
+        id: base_branch
+        run: echo "::set-output name=branch::$(echo '${{ github.base_ref }}' || echo 'main')"
+
+      - name: Checkout base branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.base_branch.outputs.branch }}
       - uses: actions/setup-node@v4
       - name: Install dependencies
         run: yarn install --ignore-scripts
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/knip
-      - name: show all workflow run artifacts
-        run: ls -R artifacts/knip
-        continue-on-error: true
-      - name: Extract previous issues count
-        id: extract_count
+      - name: Run knip on base branch
+        id: knip_base
         run: |
-          if [ -f previous-knip-results/knip-results.json ]; then
-            PREV_ISSUES=$(jq '.totalIssues' previous-knip-results/knip-results.json)
-            echo "Previous Issues Count: $PREV_ISSUES"
-            echo "::set-output name=count::$PREV_ISSUES"
-          else
-            echo "No previous results found. Setting count to 10000"
-            echo "::set-output name=count::10000"
-          fi
+          OUTPUT=$(yarn knip --no-exit-code --reporter=./knip-reporter.ts)
+          echo "Output: $OUTPUT"
 
-      - name: Run knip
-        run: |
-          MAX_ISSUES=${{ steps.extract_count.outputs.count }}
-          echo "Running knip with --max-issues=$MAX_ISSUES"
-          OUTPUT=$(yarn knip --max-issues=$MAX_ISSUES --reporter=./knip-reporter.ts)
-          echo "$OUTPUT"
-          JSON_OUTPUT=$(echo "$OUTPUT" | grep -o '{.*}')
-          echo "$JSON_OUTPUT" > knip-result.json
-        continue-on-error: true
+          # Extract totalIssues value using jq
+          total_issues=$(echo "$OUTPUT" | jq '.totalIssues')
+          echo "Total Issues: $total_issues"
+          echo "::set-output name=maxIssues::$total_issues"
 
-      - name: Upload knip results
-        uses: actions/upload-artifact@v4
+      - name: Checkout the PR branch
+        uses: actions/checkout@v2
         with:
-          name: knip-result
-          path: knip-result.json
-          retention-days: 30
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+      - name: Run knip on PR branch
+        run: |
+          yarn knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --reporter=./knip-reporter.ts
 
   security-scans:
     needs: setup
