@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
 import { invalidateToken } from '@auth/features/invalidateToken/service'
-import { postUserActionToMetrics } from '@auth/features/authenticate/service'
+import { postUserActionToMetrics } from '@auth/metrics'
 import { logger } from '@opencrvs/commons'
 
 interface IInvalidateTokenPayload {

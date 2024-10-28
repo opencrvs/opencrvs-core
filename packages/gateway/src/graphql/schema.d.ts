@@ -86,6 +86,7 @@ export interface GQLMutation {
   markMarriageAsCertified: string
   markMarriageAsIssued: string
   markEventAsDuplicate: string
+  confirmRegistration: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -2510,6 +2511,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markMarriageAsCertified?: MutationToMarkMarriageAsCertifiedResolver<TParent>
   markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
+  confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -3037,6 +3039,21 @@ export interface MutationToMarkEventAsDuplicateResolver<
   (
     parent: TParent,
     args: MutationToMarkEventAsDuplicateArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToConfirmRegistrationArgs {
+  id: string
+}
+export interface MutationToConfirmRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToConfirmRegistrationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
