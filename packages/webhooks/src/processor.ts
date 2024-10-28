@@ -14,11 +14,6 @@ import { logger } from '@opencrvs/commons'
 import { Worker } from 'bullmq'
 import * as IORedis from 'ioredis'
 
-export interface IProcessData {
-  url: string
-  payload: any
-}
-
 export function initWorker(name: string, connection: IORedis.Redis): Worker {
   return new Worker(
     name,
