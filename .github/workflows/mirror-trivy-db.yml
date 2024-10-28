@@ -73,3 +73,6 @@ jobs:
 
       - name: Mirror trivy-java-db to GHCR
         run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-java-db:1 docker://ghcr.io/${{ github.repository_owner }}/trivy-java-db:1 ${{ env.RETRIES }}
+
+      - name: Mirror trivy-checks to GHCR
+        run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-checks:1 docker://ghcr.io/${{ github.repository_owner }}/trivy-checks:1 ${{ env.RETRIES }}

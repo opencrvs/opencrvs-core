@@ -15,10 +15,14 @@ on:
         description: Branch to build from
         default: develop
         required: true
-  push:
+  pull_request:
     branches-ignore:
       - 'dependabot/**'
       - 'renovate/**'
+  push:
+    branches:
+      - develop
+      - main
 jobs:
   base:
     runs-on: ubuntu-22.04
@@ -29,7 +33,7 @@ jobs:
           ref: '${{ github.event.inputs.branch_name }}'
 
       - uses: actions/checkout@v4
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
 
       - name: Set version and branch
         id: set-version-and-branch
@@ -37,6 +41,8 @@ jobs:
           export VERSION=`git log -1 --pretty=format:%h`
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" == 'push' ]; then
+            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          elif [ "${{ github.event_name }}" == 'pull_request' ]; then
             BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           else
             BRANCH=${{ inputs.branch_name }}
@@ -90,7 +96,7 @@ jobs:
           ref: '${{ github.event.inputs.branch_name }}'
 
       - uses: actions/checkout@v4
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -113,11 +119,64 @@ jobs:
           cache-from: type=registry,ref=opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
           cache-to: type=inline
 
+  security-scans-pr:
+    needs: [build, base]
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        service: ${{ fromJSON(needs.base.outputs.services) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            trivy.yaml
+            .trivyignore.yaml
+          sparse-checkout-cone-mode: false
+      - name: Gather Trivy output from base branch image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ github.event.pull_request.base.ref }}'
+          trivy-config: trivy.yaml
+          format: 'sarif'
+          output: './trivy-results-base.sarif'
+          exit-code: '0'
+
+      - name: Gather Trivy output from newly build image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
+          trivy-config: trivy.yaml
+          format: 'sarif'
+          output: './trivy-results-branch.sarif'
+          exit-code: '0'
+
+      - name: Remove lines that are always expected to be different
+        run: |
+          sed -i '/"uri": "file:\/\/\/github\/workspace\/base\//d' ${{ github.workspace }}/trivy-results-base.sarif
+          sed -i '/"uri": "file:\/\/\/github\/workspace\/branch\//d' ${{ github.workspace }}/trivy-results-branch.sarif
+
+      - name: Diff Trivy results to catch newly introduced vulnerabilities
+        run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif
+
+  security-scans-develop:
+    needs: [build, base]
+    runs-on: ubuntu-22.04
+    if: ${{ needs.base.outputs.branch == 'develop' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.base.outputs.services) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            trivy.yaml
+            .trivyignore.yaml
+          sparse-checkout-cone-mode: false
+
       - name: Run Trivy vulnerability scanner
-        # Skip temporarily for non-develop branches because of
-        # a TOOMANYREQUESTS error failing the check
-        # https://github.com/aquasecurity/trivy/discussions/7591
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
