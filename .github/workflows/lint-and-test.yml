@@ -163,7 +163,8 @@ jobs:
           echo "Running knip with --max-issues=$MAX_ISSUES"
           OUTPUT=$(yarn knip --max-issues=$MAX_ISSUES --reporter=./knip-reporter.ts)
           echo "$OUTPUT"
-          echo "$OUTPUT" | jq '{totalIssues: .totalIssues}' > knip-result.json
+          JSON_OUTPUT=$(echo "$OUTPUT" | grep -o '{.*}')
+          echo "$JSON_OUTPUT" > knip-result.json
         continue-on-error: true
 
       - name: Upload knip results
