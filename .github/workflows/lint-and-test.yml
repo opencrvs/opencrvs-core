@@ -162,7 +162,8 @@ jobs:
           MAX_ISSUES=${{ steps.extract_count.outputs.count }}
           echo "Running knip with --max-issues=$MAX_ISSUES"
           OUTPUT=$(yarn knip --max-issues=$MAX_ISSUES --reporter=./knip-reporter.ts)
-          echo "$OUTPUT" > knip-result.json
+          echo "$OUTPUT"
+          echo "$OUTPUT" | jq '{totalIssues: .totalIssues}' > knip-result.json
         continue-on-error: true
 
       - name: Upload knip results
