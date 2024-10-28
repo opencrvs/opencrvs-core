@@ -22,7 +22,7 @@ export const resolvers: GQLResolver = {
       { subject, body, type, locale },
       { headers: authHeader }
     ) {
-      if (!inScope(authHeader, ['natlsysadmin'])) {
+      if (!inScope(authHeader, [SCOPES.CONFIG_UPDATE_ALL])) {
         throw unauthorized(
           'Sending mass notification is only allowed for national system admin'
         )

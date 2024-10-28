@@ -20,7 +20,7 @@ import { getValidRecordById } from '@workflow/records/index'
 import { getToken } from '@workflow/utils/auth-utils'
 import { IAuthHeader, logger } from '@opencrvs/commons'
 import { toDownloaded } from '@workflow/records/state-transitions'
-import { hasScope, inScope } from '@opencrvs/commons/authentication'
+import { hasScope, inScope, SCOPES } from '@opencrvs/commons/authentication'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { indexBundleToRoute } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
@@ -32,8 +32,13 @@ function getDownloadedOrAssignedExtension(
   status: TaskStatus
 ) {
   if (
-    inScope(authHeader, ['declare', 'recordsearch']) ||
-    (hasScope(authHeader, 'validate') &&
+    inScope(authHeader, [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORDSEARCH
+    ]) ||
+    (hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
       ['CORRECTION_REQUESTED', 'VALIDATED'].includes(status))
   ) {
     return `http://opencrvs.org/specs/extension/regDownloaded` as const
