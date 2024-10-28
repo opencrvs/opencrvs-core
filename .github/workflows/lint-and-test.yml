@@ -151,6 +151,7 @@ jobs:
           path: artifacts/knip
       - name: show all workflow run artifacts
         run: ls -R artifacts/knip
+        continue-on-error: true
       - name: Extract previous issues count
         id: extract_count
         run: |
