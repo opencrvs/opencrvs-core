@@ -21,7 +21,8 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import {
   HumanName,
   EventSearchSet,
-  SearchEventsQuery
+  SearchEventsQuery,
+  Event
 } from '@client/utils/gateway'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { ITaskHistory } from '@client/declarations'
@@ -29,19 +30,19 @@ import { ITaskHistory } from '@client/declarations'
 export const isBirthEvent = (
   req: EventSearchSet
 ): req is GQLBirthEventSearchSet => {
-  return req.type === 'Birth'
+  return req.type === Event.Birth
 }
 
 export const isDeathEvent = (
   req: EventSearchSet
 ): req is GQLDeathEventSearchSet => {
-  return req.type === 'Death'
+  return req.type === Event.Death
 }
 
 export const isMarriageEvent = (
   reg: EventSearchSet
 ): reg is GQLMarriageEventSearchSet => {
-  return reg.type === 'Marriage'
+  return reg.type === Event.Marriage
 }
 
 export const transformData = (
