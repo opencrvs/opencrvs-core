@@ -1,8 +1,3 @@
-import { GQLNotificationType, GQLResolver } from '@gateway/graphql/schema'
-import { inScope } from '@gateway/features/user/utils'
-import { sendEmailToAllUsers } from './service'
-import { unauthorized } from '@hapi/boom'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,6 +8,13 @@ import { unauthorized } from '@hapi/boom'
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { GQLNotificationType, GQLResolver } from '@gateway/graphql/schema'
+import { inScope } from '@gateway/features/user/utils'
+import { sendEmailToAllUsers } from './service'
+import { unauthorized } from '@hapi/boom'
+import { SCOPES } from '@opencrvs/commons/authentication'
+
 export const resolvers: GQLResolver = {
   Query: {
     async sendNotificationToAllUsers(
