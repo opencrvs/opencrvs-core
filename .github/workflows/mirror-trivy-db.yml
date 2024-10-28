@@ -1,0 +1,34 @@
+name: Mirror Docker Images to GHCR
+
+on:
+  schedule:
+    # Run 30 mins after trivy DB runs (the trivy job takes 15 mins max)
+    # https://github.com/aquasecurity/trivy-db/blob/cfa337a1088bbcee598ab93656c83fe6b9acb946/.github/workflows/cron.yml#L5
+    # https://github.com/aquasecurity/trivy-db/actions
+    - cron: '30 */6 * * *'
+
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  mirror-dbs:
+    runs-on: ubuntu-latest
+    env:
+      RETRIES: 100
+
+    steps:
+      - name: Install Skopeo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | skopeo login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Mirror trivy-db to GHCR
+        run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-db:2 docker://ghcr.io/${{ github.repository_owner }}/trivy-db:2 ${{ env.RETRIES }}
+
+      - name: Mirror trivy-java-db to GHCR
+        run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-java-db:1 docker://ghcr.io/${{ github.repository_owner }}/trivy-java-db:1 ${{ env.RETRIES }}
