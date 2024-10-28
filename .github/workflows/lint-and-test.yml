@@ -161,18 +161,15 @@ jobs:
         run: |
           MAX_ISSUES=${{ steps.extract_count.outputs.count }}
           echo "Running knip with --max-issues=$MAX_ISSUES"
-          yarn knip --max-issues=$MAX_ISSUES --reporter=./knip-reporter.ts
-
-      - name: Save knip results as artifact
-        run: |
-          echo "{\"totalIssues\": $MAX_ISSUES}" > knip-results.json
+          OUTPUT=$(yarn knip --max-issues=$MAX_ISSUES --reporter=./knip-reporter.ts)
+          echo "$OUTPUT" > knip-result.json
         continue-on-error: true
 
       - name: Upload knip results
         uses: actions/upload-artifact@v4
         with:
-          name: knip-results
-          path: knip-results.json
+          name: knip-result
+          path: knip-result.json
           retention-days: 30
 
   security-scans:
