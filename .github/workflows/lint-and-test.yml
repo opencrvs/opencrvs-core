@@ -141,30 +141,22 @@ jobs:
   lint-knip:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout the PR branch
-        uses: actions/checkout@v2
-
-      - name: Get the base branch
-        id: base_branch
-        run: echo "::set-output name=branch::$(echo '${{ github.base_ref }}' || echo 'main')"
-
       - name: Checkout base branch
         uses: actions/checkout@v2
         with:
-          ref: ${{ steps.base_branch.outputs.branch }}
+          ref: ${{ github.base_ref }}
       - uses: actions/setup-node@v4
       - name: Install dependencies
         run: yarn install --ignore-scripts
       - name: Run knip on base branch
         id: knip_base
         run: |
-          echo "${{ steps.base_branch.outputs.branch }}"
           OUTPUT=$(yarn knip --no-exit-code --reporter=./knip-reporter.ts)
           echo "Output: $OUTPUT"
           JSON=$(echo "$OUTPUT" | grep -o '{.*}')
           total_issues=$(echo "$JSON" | jq '.totalIssues')
           echo "Total Issues: $total_issues"
-          echo "::set-output name=maxIssues::$total_issues"
+          echo "{maxIssues}={$total_issues}" >> $GITHUB_OUTPUT
 
       - name: Checkout the PR branch
         uses: actions/checkout@v2
