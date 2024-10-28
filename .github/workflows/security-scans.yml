@@ -13,19 +13,35 @@ on:
     branches:
       - develop
   pull_request:
-
+  schedule:
+    # Run every day at midnight
+    - cron: '0 0 * * *'
 jobs:
+  security-scan-scheduled:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: 'develop'
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+
   security-scan-development:
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Run Trivy vulnerability scanner in fs mode
         uses: aquasecurity/trivy-action@0.28.0
-        env:
-          TRIVY_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-db'
-          TRIVY_JAVA_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-java-db'
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -46,34 +62,30 @@ jobs:
         with:
           path: 'branch'
 
-      - name: Run Trivy vulnerability scanner in fs mode
+      - name: Gather Trivy output from base branch
         uses: aquasecurity/trivy-action@0.28.0
-        env:
-          TRIVY_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-db'
-          TRIVY_JAVA_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-java-db'
         with:
           scan-type: 'fs'
           scan-ref: 'base'
-          trivy-config: ./base/trivy.yaml
+          trivy-config: ./branch/trivy.yaml
           format: 'sarif'
           output: './trivy-results-base.sarif'
+          exit-code: '0'
 
-      - name: Run Trivy vulnerability scanner in fs mode
+      - name: Gather Trivy output from PR branch
         uses: aquasecurity/trivy-action@0.28.0
-        env:
-          TRIVY_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-db'
-          TRIVY_JAVA_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-java-db'
         with:
           scan-type: 'fs'
           scan-ref: 'branch'
           trivy-config: ./branch/trivy.yaml
           format: 'sarif'
           output: './trivy-results-branch.sarif'
+          exit-code: '0'
 
       - name: Remove lines that are always expected to be different
         run: |
-          sed -i '/"uri": "file:\/\/\/github\/workspace\/base\//d' ${{ github.workspace }}/trivy-results-base.sarif
-          sed -i '/"uri": "file:\/\/\/github\/workspace\/branch\//d' ${{ github.workspace }}/trivy-results-branch.sarif
+          sed -i '/"uri": "file:\/\/\/home\/runner\/work\/opencrvs-core\/opencrvs-core\/base\/"/d' ./trivy-results-base.sarif
+          sed -i '/"uri": "file:\/\/\/home\/runner\/work\/opencrvs-core\/opencrvs-core\/branch\/"/d' ./trivy-results-branch.sarif
 
-      - name: Diff Trivy results
+      - name: Diff Trivy results to catch newly introduced vulnerabilities
         run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif

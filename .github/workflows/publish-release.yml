@@ -103,9 +103,6 @@ jobs:
           sparse-checkout-cone-mode: false
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
-        env:
-          TRIVY_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-db'
-          TRIVY_JAVA_DB_REPOSITORY: 'ghcr.io/opencrvs/trivy-java-db'
         with:
           image-ref: 'opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}'
           trivy-config: trivy.yaml
