@@ -27,10 +27,6 @@ type QueueEventType = {
 
 let webhookQueue: Queue
 
-export interface IQueueConnector {
-  getQueue: () => Promise<Queue | null>
-}
-
 export function getQueue(): Queue {
   return webhookQueue
 }
