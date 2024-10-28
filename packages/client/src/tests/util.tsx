@@ -557,7 +557,7 @@ export const mockDeclarationData = {
           name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
           identifier: [{ id: '123456', type: 'PASSPORT' }]
         },
-        certificateTemplateId: 'certified-birth-certificate',
+        certificateTemplateId: 'birth-certificate',
         hasShowedVerifiedDocument: true
       }
     ]
@@ -660,7 +660,8 @@ export const mockDeathDeclarationData = {
         collector: {
           relationship: 'MOTHER'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'death-certificate'
       }
     ]
   }
@@ -689,7 +690,8 @@ export const mockMarriageDeclarationData = {
         collector: {
           type: 'BRIDE'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'marriage-certificate'
       }
     ]
   },
@@ -780,7 +782,7 @@ export const mockBirthRegistrationSectionData = {
         identifier: [{ id: '123456', type: 'PASSPORT' }]
       },
       hasShowedVerifiedDocument: true,
-      certificateTemplateId: 'certified-birth-certificate',
+      certificateTemplateId: 'birth-certificate',
       payments: [
         {
           paymentId: '1234',
@@ -817,7 +819,7 @@ export const mockDeathRegistrationSectionData = {
         iD: '123456789'
       },
       hasShowedVerifiedDocument: true,
-      certificateTemplateId: 'certified-death-certificate'
+      certificateTemplateId: 'death-certificate'
     }
   ]
 }
@@ -861,8 +863,7 @@ const mockFetchCertificatesTemplatesDefinition = [
       late: 5.5,
       delayed: 15
     },
-    svgUrl:
-      '/api/countryconfig/certificates/birth-certificate-certified-copy.svg',
+    svgUrl: '/api/countryconfig/certificates/birth-certificate-copy.svg',
     fonts: {
       'Noto Sans': {
         normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',

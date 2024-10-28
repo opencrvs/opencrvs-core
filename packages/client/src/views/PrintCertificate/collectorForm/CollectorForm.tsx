@@ -220,7 +220,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
             {
               collector: collector,
               hasShowedVerifiedDocument: false,
-              certificateTemplateId: certificate.certificateTemplateId
+              certificateTemplateId: collector.certificateTemplateId
             }
           ]
         }

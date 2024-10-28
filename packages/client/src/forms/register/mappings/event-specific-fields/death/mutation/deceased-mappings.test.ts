@@ -38,7 +38,7 @@ describe('Death registration mutation mapping related tests', () => {
           name: [{ use: 'en' }],
           identifier: [{}]
         },
-        certificateTemplateId: 'certified-death-certificate'
+        certificateTemplateId: 'death-certificate'
       }
     ])
   })
@@ -58,7 +58,7 @@ describe('Death registration mutation mapping related tests', () => {
     expect(transformedData.registration.certificates).toEqual([
       {
         hasShowedVerifiedDocument: true,
-        certificateTemplateId: 'certified-death-certificate',
+        certificateTemplateId: 'death-certificate',
         collector: {
           relationship: 'OTHER',
           otherRelationship: 'Uncle',

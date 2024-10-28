@@ -140,6 +140,11 @@ export const usePrintableCertificate = () => {
     const certificateUrl =
       (declaration && certificateTemplateConfig?.svgUrl) || ''
 
+    console.log(
+      'declaration?.id, certificateTemplateConfig?.svgUrl ',
+      declaration?.id,
+      certificateTemplateConfig?.svgUrl
+    )
     if (certificateUrl && declaration) {
       fetch(certificateUrl)
         .then((res) => res.text())
