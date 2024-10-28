@@ -11,8 +11,8 @@
 import type { Reporter } from 'knip'
 
 const reporter: Reporter = function (options) {
-  const { counters } = options
-  console.log('Total unused exports found with knip:', counters.total)
+  const totalIssues = options.counters.total
+  console.log(JSON.stringify({ totalIssues }))
 }
 
 export default reporter

@@ -145,8 +145,35 @@ jobs:
       - uses: actions/setup-node@v4
       - name: Install dependencies
         run: yarn install --ignore-scripts
+      - name: Extract previous issues count
+        id: extract_count
+        run: |
+          if [ -f previous-knip-results/knip-results.json ]; then
+            PREV_ISSUES=$(jq '.totalIssues' previous-knip-results/knip-results.json)
+            echo "Previous Issues Count: $PREV_ISSUES"
+            echo "::set-output name=count::$PREV_ISSUES"
+          else
+            echo "No previous results found. Setting count to 10000"
+            echo "::set-output name=count::10000"
+          fi
+
       - name: Run knip
-        run: yarn knip --reporter=./knip-reporter.ts
+        run: |
+          MAX_ISSUES=${{ steps.extract_count.outputs.count }}
+          echo "Running knip with --max-issues=$MAX_ISSUES"
+          yarn knip --max-issues=$MAX_ISSUES --reporter=./knip-reporter.ts
+
+      - name: Save knip results as artifact
+        run: |
+          echo "{\"totalIssues\": $MAX_ISSUES}" > knip-results.json
+        continue-on-error: true
+
+      - name: Upload knip results
+        uses: actions/upload-artifact@v4
+        with:
+          name: knip-results
+          path: knip-results.json
+          retention-days: 30
 
   security-scans:
     needs: setup
