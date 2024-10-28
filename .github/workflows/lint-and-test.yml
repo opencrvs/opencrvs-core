@@ -158,11 +158,11 @@ jobs:
       - name: Run knip on base branch
         id: knip_base
         run: |
+          echo "${{ steps.base_branch.outputs.branch }}"
           OUTPUT=$(yarn knip --no-exit-code --reporter=./knip-reporter.ts)
           echo "Output: $OUTPUT"
-
-          # Extract totalIssues value using jq
-          total_issues=$(echo "$OUTPUT" | jq '.totalIssues')
+          JSON=$(echo "$OUTPUT" | grep -o '{.*}')
+          total_issues=$(echo "$JSON" | jq '.totalIssues')
           echo "Total Issues: $total_issues"
           echo "::set-output name=maxIssues::$total_issues"
 
