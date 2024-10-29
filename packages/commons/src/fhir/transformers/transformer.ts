@@ -22,10 +22,7 @@ export type Context<A extends string | number | symbol = never> = {
   event: EVENT_TYPE
   _index: { [Key in A]: number }
 }
-export type IFieldBuilderFunction<
-  Key extends string | number | symbol,
-  FieldType
-> = (
+type IFieldBuilderFunction<Key extends string | number | symbol, FieldType> = (
   accumulatedObj: Bundle,
   fieldValue: NonNullable<FieldType>,
   context: Context<Key>

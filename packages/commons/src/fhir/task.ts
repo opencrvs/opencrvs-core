@@ -92,8 +92,6 @@ export type TaskIdentifier =
       value: string
     }
 
-export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
-
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
 export type TaskIdentifierSystem = ExtractSystem<TaskIdentifier>
 
@@ -174,19 +172,13 @@ export function getBusinessStatus<T extends Task | TaskHistory>(task: T) {
   return code.code
 }
 
-export function isTaskBundleEntry<T extends BundleEntry>(
-  entry: T
-): entry is (T & BundleEntry<Task>) | (T & Saved<BundleEntry<SavedTask>>) {
-  return entry.resource.resourceType === 'Task'
-}
-
 export function isTask<T extends Resource>(
   resource: T
 ): resource is (T & Task) | (T & SavedTask) {
   return resource.resourceType === 'Task'
 }
 
-export function isTaskHistory<T extends Resource>(
+function isTaskHistory<T extends Resource>(
   resource: T
 ): resource is T & TaskHistory {
   return resource.resourceType === 'TaskHistory'
@@ -209,9 +201,7 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(
   return task
 }
 
-export function sortTasksAscending<T extends { lastModified: string }>(
-  tasks: T[]
-) {
+function sortTasksAscending<T extends { lastModified: string }>(tasks: T[]) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
@@ -285,7 +275,7 @@ export function getTasksInAscendingOrder<
   )
 }
 
-export const enum TaskAction {
+const enum TaskAction {
   VERIFIED = 'VERIFIED',
   ASSIGNED = 'ASSIGNED',
   UNASSIGNED = 'UNASSIGNED',
@@ -426,18 +416,6 @@ export const TaskActionExtension = [
   DUPLICATE_TRACKING_ID,
   FLAGGED_AS_POTENTIAL_DUPLICATE
 ]
-
-export function clearActionExtension(task: Task) {
-  return {
-    ...task,
-    extension: (task.extension ?? []).filter(
-      (ext) =>
-        !TaskActionExtension.includes(
-          ext.url as (typeof TaskActionExtension)[number]
-        )
-    )
-  }
-}
 
 /*
  * @deprecated

@@ -118,7 +118,7 @@ type StringReplace<
   ? StringReplace<R, S, D, `${A}${L}${D}`>
   : `${A}${T}`
 
-export enum SignatureExtensionPostfix {
+enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
   GROOM = 'groom-signature',
   BRIDE = 'bride-signature',

@@ -152,14 +152,6 @@ export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
   return record as any as StateIdenfitiers[A]
 }
 
-export function getState(record: RecordBase) {
-  const task = record.entry.map(({ resource }) => resource).find(isTask)
-  if (!task) {
-    throw new Error('No task found')
-  }
-  return getBusinessStatus(task) as keyof StateIdenfitiers
-}
-
 export function isInProgress(record: ValidRecord): record is InProgressRecord {
   return getStatusFromTask(getTaskFromSavedBundle(record)) === 'IN_PROGRESS'
 }

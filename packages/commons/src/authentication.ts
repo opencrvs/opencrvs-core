@@ -56,7 +56,7 @@ export const userRoleScopes = {
 }
 
 /** All the scopes system/integration can be assigned to */
-export const systemScopes = {
+const systemScopes = {
   recordsearch: 'recordsearch',
   declare: 'declare',
   notificationApi: 'notification-api',
@@ -76,9 +76,8 @@ export const systemRoleScopes = {
 }
 
 export type UserRole = keyof typeof userRoleScopes
-export type UserScope = (typeof userScopes)[keyof typeof userScopes]
-export type SystemRole = keyof typeof systemRoleScopes
-export type SystemScope = (typeof systemScopes)[keyof typeof systemScopes]
+type UserScope = (typeof userScopes)[keyof typeof userScopes]
+type SystemScope = (typeof systemScopes)[keyof typeof systemScopes]
 export type Scope = UserScope | SystemScope
 
 export interface ITokenPayload {

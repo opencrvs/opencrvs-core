@@ -35,14 +35,12 @@ import {
 } from '../../types'
 import { UUID } from '../../uuid'
 
-export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 export const MARRIAGE_ENCOUNTER_CODE = 'marriage-encounter'
 export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
 export const MARRIAGE_TYPE_CODE = 'partnership'
 export const BIRTH_ATTENDANT_CODE = '73764-3'
-export const INFORMANT_TYPE = 'informant-type'
 export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
 export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
 export const MALE_DEPENDENTS_ON_DECEASED_CODE =
@@ -55,7 +53,6 @@ export const OBSERVATION_CATEGORY_PROCEDURE_DESC = 'Procedure'
 export const OBSERVATION_CATEGORY_VSIGN_CODE = 'vital-signs'
 export const OBSERVATION_CATEGORY_VSIGN_DESC = 'Vital Signs'
 export const ATTACHMENT_CONTEXT_KEY = 'attachments'
-export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 export const DEATH_ENCOUNTER_CODE = 'death-encounter'
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
@@ -63,7 +60,6 @@ export const CAUSE_OF_DEATH_ESTABLISHED_CODE = 'cause-of-death-established'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 export const DEATH_DESCRIPTION_CODE =
   'lay-reported-or-verbal-autopsy-description'
-export const PARENT_DETAILS = 'parent-details'
 
 export function createPersonSection<T extends CompositionSectionCode>(
   refUuid: UUID,
