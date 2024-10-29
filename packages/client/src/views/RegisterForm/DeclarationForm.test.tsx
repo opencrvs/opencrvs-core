@@ -19,7 +19,10 @@ import {
   getFileFromBase64String,
   validImageB64String,
   selectOption,
-  goToSection
+  goToSection,
+  setScopes,
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  waitForReady
 } from '@client/tests/util'
 import {
   storeDeclaration,
@@ -31,7 +34,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { storage } from '@client/storage'
-import { Event } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
@@ -65,7 +68,7 @@ describe('when user has starts a new declaration', () => {
       app = testApp.app
       history = testApp.history
       store = testApp.store
-
+      setScopes([SCOPES.RECORD_DECLARE_BIRTH], store)
       draft = createDeclaration(Event.Birth)
       await store.dispatch(storeDeclaration(draft))
     })
@@ -88,6 +91,8 @@ describe('when user has starts a new declaration', () => {
       app = testApp.app
       history = testApp.history
       store = testApp.store
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
+      await waitForReady(app)
     })
 
     describe('when user is in birth registration by parent informant view', () => {
