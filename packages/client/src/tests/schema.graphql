@@ -1179,39 +1179,6 @@ input ObservationFHIRIDS {
   lastPreviousLiveBirth: String
 }
 
-type OIDPUserAddress {
-  formatted: String
-  street_address: String
-  locality: String
-  region: String
-  postal_code: String
-  city: String
-  country: String
-}
-
-type OIDPUserInfo {
-  sub: String!
-  name: String
-  given_name: String
-  family_name: String
-  middle_name: String
-  nickname: String
-  preferred_username: String
-  profile: String
-  picture: String
-  website: String
-  email: String
-  email_verified: Boolean
-  gender: String
-  birthdate: String
-  zoneinfo: String
-  locale: String
-  phone_number: String
-  phone_number_verified: Boolean
-  address: OIDPUserAddress
-  updated_at: Int
-}
-
 type OperationHistorySearchSet {
   operationType: String
   operatedOn: Date
@@ -1455,12 +1422,6 @@ type Query {
   getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   informantSMSNotifications: [SMSNotification!]
-  getOIDPUserInfo(
-    code: String!
-    clientId: String!
-    redirectUri: String!
-    grantType: String
-  ): UserInfo
 }
 
 type QuestionnaireQuestion {
@@ -1942,13 +1903,6 @@ input UserIdentifierInput {
   use: String
   system: String
   value: String
-}
-
-type UserInfo {
-  oidpUserInfo: OIDPUserInfo
-  districtFhirId: String
-  stateFhirId: String
-  locationLevel3FhirId: String
 }
 
 input UserInput {

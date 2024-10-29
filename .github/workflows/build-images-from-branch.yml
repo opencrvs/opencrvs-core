@@ -33,21 +33,30 @@ jobs:
           ref: '${{ github.event.inputs.branch_name }}'
 
       - uses: actions/checkout@v4
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        if: github.event_name == 'push'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set version and branch
         id: set-version-and-branch
         run: |
           export VERSION=`git log -1 --pretty=format:%h`
+          echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" == 'push' ]; then
-            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           elif [ "${{ github.event_name }}" == 'pull_request' ]; then
-            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          BRANCH=${{ github.event.pull_request.head.ref }}
           else
-            BRANCH=${{ inputs.branch_name }}
+          BRANCH=${{ inputs.branch_name }}
           fi
           ESCAPED_BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          echo "from branch $BRANCH"
           echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Get list of services
@@ -153,8 +162,8 @@ jobs:
 
       - name: Remove lines that are always expected to be different
         run: |
-          sed -i '/"uri": "file:\/\/\/github\/workspace\/base\//d' ${{ github.workspace }}/trivy-results-base.sarif
-          sed -i '/"uri": "file:\/\/\/github\/workspace\/branch\//d' ${{ github.workspace }}/trivy-results-branch.sarif
+          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-base.sarif > ${{ github.workspace }}/trivy-results-base.sarif
+          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-branch.sarif > ${{ github.workspace }}/trivy-results-branch.sarif
 
       - name: Diff Trivy results to catch newly introduced vulnerabilities
         run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif
