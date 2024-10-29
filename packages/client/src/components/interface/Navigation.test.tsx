@@ -328,7 +328,7 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Requires update', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.requiresUpdate}`
 
-    const requiredScopes = [SCOPES.RECORD_DECLARATION_REVIEW] as Scope[]
+    const requiredScopes = [SCOPES.RECORD_SUBMIT_FOR_UPDATES] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -350,7 +350,10 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Ready for review', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.readyForReview}`
 
-    const requiredScopes = [SCOPES.RECORD_DECLARATION_REVIEW] as Scope[]
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -468,9 +471,9 @@ describe('Given a user with scopes views Navigation', () => {
 
   describe('and user has organisation scopes', async () => {
     const orgScopes = [
-      SCOPES.ORGANISATION_READ,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
     ] as Scope[]
 
     describe('Performance', async () => {
@@ -506,7 +509,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Organisation', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.organisation}`
 
-      const requiredScopes = [SCOPES.ORGANISATION_READ] as Scope[]
+      const requiredScopes = [SCOPES.ORGANISATION_READ_LOCATIONS] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)

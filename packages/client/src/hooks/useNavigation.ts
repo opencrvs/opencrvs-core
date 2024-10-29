@@ -61,11 +61,14 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.requiresUpdate,
-        scopes: [SCOPES.RECORD_DECLARATION_REVIEW]
+        scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
       },
       {
         name: WORKQUEUE_TABS.readyForReview,
-        scopes: [SCOPES.RECORD_DECLARATION_REVIEW]
+        scopes: [
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+          SCOPES.RECORD_SUBMIT_FOR_UPDATES
+        ]
       },
       {
         name: WORKQUEUE_TABS.readyToPrint,
@@ -88,9 +91,9 @@ const routeAccess: NavigationConfig[] = [
   {
     name: TAB_GROUPS.organisations,
     scopes: [
-      SCOPES.ORGANISATION_READ,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
     ],
     tabs: [
       {
@@ -99,7 +102,7 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.organisation,
-        scopes: [SCOPES.ORGANISATION_READ]
+        scopes: [SCOPES.ORGANISATION_READ_LOCATIONS]
       },
       {
         name: WORKQUEUE_TABS.team,

@@ -385,7 +385,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_PRINT_RECORDS
+                                                SCOPES.RECORD_REGISTRATION_PRINT
                                               ]}
                                               path={routes.VERIFY_COLLECTOR}
                                               component={VerifyCollector}
@@ -510,10 +510,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              scopes={[
-                                                SCOPES.PERFORMANCE_READ,
-                                                SCOPES.PERFORMANCE_READ_MY_OFFICE
-                                              ]}
+                                              scopes={[SCOPES.PERFORMANCE_READ]}
                                               path={routes.PERFORMANCE_HOME}
                                               component={PerformanceHome}
                                             />

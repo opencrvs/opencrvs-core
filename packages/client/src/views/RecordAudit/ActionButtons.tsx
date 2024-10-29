@@ -179,7 +179,7 @@ export const ShowPrintButton = ({
   const { id, type } = declaration || {}
   const { hasScope } = usePermissions()
 
-  const showActionButton = hasScope(SCOPES.RECORD_PRINT_RECORDS)
+  const showActionButton = hasScope(SCOPES.RECORD_REGISTRATION_PRINT)
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
