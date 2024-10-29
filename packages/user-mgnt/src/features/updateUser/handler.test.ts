@@ -37,7 +37,6 @@ const mockUser = {
     }
   ],
   username: 'jw.doe',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   primaryOfficeId: '321',
@@ -191,7 +190,6 @@ describe('updateUser handler', () => {
             family: 'Doe'
           }
         ],
-        identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         role: '',
@@ -234,7 +232,6 @@ describe('updateUser handler', () => {
             family: 'Doe'
           }
         ],
-        identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123111111',
         role: 'POLICE_OFFICER',
@@ -348,7 +345,6 @@ describe('updateUser handler', () => {
             family: 'Doe'
           }
         ],
-        identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
         role: 'SOCIAL_WORKER',

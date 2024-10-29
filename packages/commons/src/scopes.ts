@@ -31,15 +31,15 @@ export const SCOPES = {
   RECORDSEARCH: 'recordsearch',
 
   // declare
-  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
-  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
+  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_DEATH: 'record.declare-death',
+  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
+  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
   RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
     'record.declare-marriage:my-jurisdiction',
-  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
-  RECORD_SUBMIT_INCOMPLETE: 'record.submit-incomplete',
-  RECORD_SUBMIT_FOR_REVIEW: 'record.submit-for-review',
+  RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
+  RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_ASSIGN_UNASSIGN_MYSELF: 'record.assign-unassign-myself',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
@@ -104,18 +104,22 @@ export const SCOPES = {
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.export-vital-statistics',
 
   // organisation
-  ORGANISATION_READ: 'organisation.read',
+  ORGANISATION_READ: 'organisation.read:all',
+  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
-  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations',
+  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
+    'organisation.read-locations:my-jurisdiction',
 
   // user
+  USER_READ: 'user.read:all',
   USER_READ_MY_OFFICE: 'user.read:my-office',
-  USER_READ: 'user.read',
-  USER_CREATE: 'user.create',
+  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
+  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
+  USER_CREATE: 'user.create:all',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE_MY_OFFICE: 'user.update:my-office',
-  USER_UPDATE: 'user.update',
+  USER_UPDATE: 'user.update:all',
+  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
   // config
   CONFIG_UPDATE_ALL: 'config.update:all'

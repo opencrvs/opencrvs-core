@@ -88,7 +88,8 @@ import {
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
   findResourceFromBundleById,
-  getUserRoleFromHistory
+  getUserRoleFromHistory,
+  SavedOffice
 } from '@opencrvs/commons/types'
 
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
@@ -1567,7 +1568,7 @@ export const typeResolvers: GQLResolver = {
 
       return { ...userResponse, role }
     },
-    system: async (task: Task, _: any, { headers: authHeader }) => {
+    system: async (task: Task, _: any) => {
       const systemIdentifier = task.identifier?.find(
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
@@ -1577,15 +1578,26 @@ export const typeResolvers: GQLResolver = {
       }
       return JSON.parse(systemIdentifier.value)
     },
-    location: async (task: Task, _: any, { dataSources, record }) => {
-      const taskLocation = findExtension(
+    location: async (task: Task, _: any, { record }) => {
+      const officeExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
-        task.extension as Extension[]
+        task.extension
       )
-      if (!taskLocation || !record) {
+      if (!officeExtension || !record) {
         return null
       }
-      return findLastOfficeLocationFromSavedBundle(record)
+      const office = findResourceFromBundleById<SavedOffice>(
+        record,
+        resourceIdentifierToUUID(officeExtension.valueReference.reference)
+      )
+      if (!office || !office.partOf) {
+        return null
+      }
+      const officeLocation = findResourceFromBundleById<SavedLocation>(
+        record,
+        resourceIdentifierToUUID(office.partOf.reference)
+      )
+      return officeLocation
     },
     office: async (task: Task, _: any, { dataSources }) => {
       const taskLocation = findExtension(

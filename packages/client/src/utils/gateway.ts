@@ -30,14 +30,14 @@ export const scopes = [
   'nationalId',
   'notification-api',
   'recordsearch',
-  'record.declare-birth:my-jurisdiction',
   'record.declare-birth',
-  'record.declare-death:my-jurisdiction',
+  'record.declare-birth:my-jurisdiction',
   'record.declare-death',
-  'record.declare-marriage:my-jurisdiction',
+  'record.declare-death:my-jurisdiction',
   'record.declare-marriage',
-  'record.submit-incomplete',
-  'record.submit-for-review',
+  'record.declare-marriage:my-jurisdiction',
+  'record.declaration-submit-incomplete',
+  'record.declaration-submit-for-review',
   'record.assign-unassign-myself',
   'record.unassign-others',
   'record.declaration-review',
@@ -79,15 +79,18 @@ export const scopes = [
   'performance.read',
   'performance.read-dashboards',
   'performance.export-vital-statistics',
-  'organisation.read',
+  'organisation.read:all',
+  'organisation.read-locations:all',
   'organisation.read-locations:my-office',
-  'organisation.read-locations',
+  'organisation.read-locations:my-jurisdiction',
+  'user.read:all',
   'user.read:my-office',
-  'user.read',
-  'user.create',
+  'user.read:my-jurisdiction',
+  'user.read:only-my-audit',
+  'user.create:all',
   'user.create:my-jurisdiction',
-  'user.update:my-office',
-  'user.update',
+  'user.update:all',
+  'user.update:my-jurisdiction',
   'config.update:all'
 ] as const
 export type Scope = (typeof scopes)[number]
@@ -108,15 +111,15 @@ export const SCOPES = {
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
-  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
-  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
+  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_DEATH: 'record.declare-death',
+  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
+  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
   RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
     'record.declare-marriage:my-jurisdiction',
-  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
-  RECORD_SUBMIT_INCOMPLETE: 'record.submit-incomplete',
-  RECORD_SUBMIT_FOR_REVIEW: 'record.submit-for-review',
+  RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
+  RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_ASSIGN_UNASSIGN_MYSELF: 'record.assign-unassign-myself',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
   RECORD_DECLARATION_REVIEW: 'record.declaration-review',
@@ -163,16 +166,20 @@ export const SCOPES = {
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.export-vital-statistics',
-  ORGANISATION_READ: 'organisation.read',
+  ORGANISATION_READ: 'organisation.read:all',
+  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
-  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations',
+  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
+    'organisation.read-locations:my-jurisdiction',
+  USER_READ: 'user.read:all',
   USER_READ_MY_OFFICE: 'user.read:my-office',
-  USER_READ: 'user.read',
-  USER_CREATE: 'user.create',
+  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
+  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
+  USER_CREATE: 'user.create:all',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE_MY_OFFICE: 'user.update:my-office',
-  USER_UPDATE: 'user.update',
+  USER_UPDATE: 'user.update:all',
+  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
   CONFIG_UPDATE_ALL: 'config.update:all'
 } as const
 
@@ -3065,13 +3072,7 @@ export type GetUserQuery = {
     } | null
     role: {
       __typename?: 'UserRole'
-      id: string
-      label: {
-        __typename?: 'I18nMessage'
-        id: string
-        defaultMessage: string
-        description: string
-      }
+      _id: string
     }
     primaryOffice: {
       __typename?: 'Location'

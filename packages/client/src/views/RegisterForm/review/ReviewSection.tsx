@@ -1936,7 +1936,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </Accordion>
                   )}
 
-                  {!(isCorrection(declaration) || viewRecord) && (
+                  {!(
+                    isCorrection(declaration) ||
+                    viewRecord ||
+                    isDuplicate
+                  ) && (
                     <FormFieldGenerator
                       id={reviewSection.id}
                       key={reviewSection.id}

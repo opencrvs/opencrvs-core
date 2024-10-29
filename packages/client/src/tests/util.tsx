@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { App } from '@client/App'
-import { Event, Status, Scope } from '@client/utils/gateway'
+import { Event, Status, Scope, SCOPES } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -73,81 +73,80 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
   /*
    * @deprecated
    */
-  'sysadmin',
-  'natlsysadmin',
-
-  'user.create',
-  'user.read',
-  'user.update',
-  'organisation.read',
-  'organisation.read-locations',
-  'performance.read',
-  'performance.read-dashboards',
-  'performance.export-vital-statistics'
+  SCOPES.SYSADMIN,
+  SCOPES.NATLSYSADMIN,
+  SCOPES.USER_CREATE,
+  SCOPES.USER_READ,
+  SCOPES.USER_UPDATE,
+  SCOPES.ORGANISATION_READ,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
 ] satisfies Scope[]
 
 export const REGISTRAR_DEFAULT_SCOPES = [
   /*
    * @deprecated
    */
-  'register',
-  'performance',
-  'certify',
+  SCOPES.REGISTER,
+  SCOPES.PERFORMANCE,
+  SCOPES.CERTIFY,
 
-  'record.declare-birth',
-  'record.declare-death',
-  'record.declare-marriage',
-  'record.declaration-review',
-  'record.submit-for-updates',
-  'record.review-duplicates',
-  'record.declaration-archive',
-  'record.declaration-reinstate',
-  'record.register',
-  'record.registration-correct',
-  'record.print-records',
-  'record.print-records-supporting-documents',
-  'record.export-records',
-  'record.print-issue-certified-copies',
-  'record.registration-verify-certified-copies',
-  'record.create-comments',
-  'performance.read',
-  'performance.read-dashboards',
-  'organisation.read',
-  'organisation.read-locations:my-office',
-  'search.birth',
-  'search.death',
-  'search.marriage',
-  'record.read',
-  'record.read-audit',
-  'record.read-comments'
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_DECLARATION_REVIEW,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_REVIEW_DUPLICATES,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_PRINT_RECORDS,
+  SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+  SCOPES.RECORD_CREATE_COMMENTS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.ORGANISATION_READ,
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE,
+  SCOPES.RECORD_READ,
+  SCOPES.RECORD_READ_AUDIT,
+  SCOPES.RECORD_READ_COMMENTS
 ] satisfies Scope[]
 
 export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
-  'record.declare-birth',
-  'record.declare-death',
-  'record.declare-marriage',
-  'record.declaration-review',
-  'record.submit-for-approval',
-  'record.submit-for-updates',
-  'record.declaration-archive',
-  'record.declaration-reinstate',
-  'record.registration-request-correction',
-  'record.print-records',
-  'record.print-records-supporting-documents',
-  'record.export-records',
-  'record.print-issue-certified-copies',
-  'record.registration-verify-certified-copies',
-  'record.create-comments',
-  'performance.read',
-  'performance.read-dashboards',
-  'organisation.read',
-  'organisation.read-locations:my-office',
-  'search.birth',
-  'search.death',
-  'search.marriage',
-  'record.read',
-  'record.read-audit',
-  'record.read-comments'
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_DECLARATION_REVIEW,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_PRINT_RECORDS,
+  SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+  SCOPES.RECORD_CREATE_COMMENTS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.ORGANISATION_READ,
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE,
+  SCOPES.RECORD_READ,
+  SCOPES.RECORD_READ_AUDIT,
+  SCOPES.RECORD_READ_COMMENTS
 ] satisfies Scope[]
 
 export const ACTION_STATUS_MAP = {
@@ -1295,10 +1294,8 @@ export const mockCompleteFormData = {
   accountDetails: '',
   assignedRegistrationOffice: '',
   device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  familyName: 'Hossain',
+  firstName: 'Jeff',
   nid: '123456789',
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
@@ -1448,7 +1445,7 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'firstNamesEng',
+                      name: 'firstNames',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English first name',
@@ -1470,12 +1467,12 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'familyNameEng',
+                      name: 'familyName',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English last name',
                         description: 'English last name',
-                        id: 'form.field.label.lastNameEN'
+                        id: 'form.field.label.userSurname'
                       },
                       required: true,
                       initialValue: '',
@@ -1510,33 +1507,6 @@ export const mockUserGraphqlOperation = {
                         query: {
                           operation: 'localPhoneTransformer',
                           parameters: ['user.mobile']
-                        }
-                      }
-                    },
-                    {
-                      name: 'nid',
-                      type: 'TEXT',
-                      label: {
-                        defaultMessage: 'NID',
-                        description: 'National ID',
-                        id: 'form.field.label.NID'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [
-                        {
-                          operation: 'validIDNumber',
-                          parameters: ['NATIONAL_ID']
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'fieldToIdentifierWithTypeTransformer',
-                          parameters: ['NATIONAL_ID']
-                        },
-                        query: {
-                          operation: 'identifierWithTypeToFieldTransformer',
-                          parameters: ['NATIONAL_ID']
                         }
                       }
                     },
@@ -1654,10 +1624,8 @@ export const mockDataWithRegistarRoleSelected = {
   accountDetails: '',
   assignedRegistrationOffice: '',
   device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  familyName: 'Hossain',
+  firstName: 'Jeff',
   email: 'jeff@gmail.com',
   nid: '101488192',
   phoneNumber: '01662132132',

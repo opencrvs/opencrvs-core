@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader, logger } from '@opencrvs/commons'
+import { IAuthHeader, logger, UUID } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   ISystemModelData,
@@ -23,6 +23,8 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: string[]
+  /** The record ID that the token has access to */
+  recordId?: UUID
 }
 
 export async function getUser(
@@ -117,6 +119,11 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
+}
+
+export const hasRecordAccess = (authHeader: IAuthHeader, recordId: string) => {
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return tokenPayload.recordId === recordId
 }
 
 export const getUserId = (authHeader: IAuthHeader): string => {
