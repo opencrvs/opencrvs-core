@@ -30,8 +30,7 @@ vulnerability:
   ignore-unfixed: true
 db:
   repository: 'ghcr.io/opencrvs/trivy-db'
-java:
-  db:
-    repository: 'ghcr.io/opencrvs/trivy-java-db'
+  java-repository: 'ghcr.io/opencrvs/trivy-java-db'
+
 policies-bundle:
   repository: 'ghcr.io/opencrvs/trivy-checks'
