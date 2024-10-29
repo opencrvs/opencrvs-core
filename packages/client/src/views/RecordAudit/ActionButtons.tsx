@@ -270,10 +270,13 @@ export const ShowReviewButton = ({
   goToPage
 }: CMethodParams) => {
   const { id, type } = declaration || {}
-  const { hasScope } = usePermissions()
+  const { hasAnyScope } = usePermissions()
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-  const showActionButton = hasScope(SCOPES.RECORD_DECLARATION_REVIEW)
+  const showActionButton = hasAnyScope([
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES
+  ])
 
   if (type && showActionButton) {
     if (!isDownloaded) {

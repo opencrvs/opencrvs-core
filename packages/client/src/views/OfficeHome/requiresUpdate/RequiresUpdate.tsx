@@ -179,9 +179,12 @@ class RequiresUpdateComponent extends React.Component<
       return []
     }
 
-    const isReviewer = this.props.scope?.includes(
-      SCOPES.RECORD_DECLARATION_REVIEW
-    )
+    const validateScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    const isReviewer = this.props.scope?.some((x) => validateScopes.includes(x))
 
     const transformedData = transformData(data, this.props.intl)
     const items = transformedData.map((reg, index) => {

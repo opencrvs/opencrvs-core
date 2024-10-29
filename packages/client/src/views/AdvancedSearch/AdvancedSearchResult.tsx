@@ -40,7 +40,7 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { Scope, SearchEventsQuery } from '@client/utils/gateway'
+import { Scope, SCOPES, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -224,9 +224,15 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   const userHasRegisterScope = () => {
     return props.scope && props.scope.includes('register')
   }
+
   const userHasValidateScope = () => {
-    return props.scope && props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+    return props.scope && props.scope.some((x) => validateScopes.includes(x))
   }
+
   const userHasCertifyScope = () => {
     return props.scope && props.scope.includes('certify')
   }

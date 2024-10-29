@@ -847,14 +847,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     }
   }
 
-  userHasValidateScope() {
-    if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('validate')
-    } else {
-      return false
-    }
-  }
-
   isVisibleField(field: IFormField, section: IFormSection) {
     const { draft, offlineCountryConfiguration, userDetails } = this.props
 
@@ -1980,8 +1972,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         <ReviewAction
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}
-                          declarationToBeValidated={this.userHasValidateScope()}
-                          declarationToBeRegistered={this.userHasRegisterScope()}
                           alreadyRejectedDeclaration={
                             this.props.draft.registrationStatus === REJECTED
                           }

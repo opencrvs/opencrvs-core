@@ -423,7 +423,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         { store, history, apolloClient: client }
       )
       testComponent = createdTestComponent
-      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
     })
 
     it('downloads the declaration after clicking download button', async () => {

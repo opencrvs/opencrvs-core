@@ -314,7 +314,7 @@ function RecordAuditBody({
 
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
-  const { hasScope } = usePermissions()
+  const { hasScope, hasAnyScope } = usePermissions()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -429,7 +429,10 @@ function RecordAuditBody({
       SUBMISSION_STATUS.VALIDATED,
       SUBMISSION_STATUS.CORRECTION_REQUESTED
     ].includes(declaration.status as SUBMISSION_STATUS) &&
-    hasScope(SCOPES.RECORD_DECLARATION_REVIEW)
+    hasAnyScope([
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ])
   ) {
     actions.push(
       ShowReviewButton({

@@ -24,7 +24,11 @@ import {
   TEXT
   // MarriageSection
 } from '@client/forms'
-import { Event as DeclarationEvent, RegStatus } from '@client/utils/gateway'
+import {
+  Event as DeclarationEvent,
+  RegStatus,
+  SCOPES
+} from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { createStore } from '@client/store'
@@ -35,6 +39,7 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch,
   resizeWindow,
+  setScopes,
   userDetails
 } from '@client/tests/util'
 import {
@@ -307,7 +312,10 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page to validate birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validate'])
+      setScopes(
+        [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+        store
+      )
       const testComponent = await createTestComponent(
         <ReviewSection
           form={form}

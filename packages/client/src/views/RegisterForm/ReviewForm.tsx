@@ -62,7 +62,15 @@ class ReviewFormView extends React.Component<IProps> {
   }
 
   userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((scope) => validateScopes.includes(scope))
+    )
   }
 
   render() {
