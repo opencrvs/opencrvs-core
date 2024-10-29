@@ -100,7 +100,7 @@
     "nodemon": "^3.0.0",
     "opener": "^1.5.1",
     "prettier": "2.8.8",
-    "testcontainers": "^9.1.1",
+    "testcontainers": "^10.0.0",
     "ts-jest": "27.1.4",
     "ts-node": "^6.1.1",
     "typescript": "4.9.5"
