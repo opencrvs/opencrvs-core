@@ -346,7 +346,7 @@ export const getDraftDeclarationData = (
 ): IDeclarationData => {
   return {
     id: declaration.id,
-    name: getDeclarationFullName(declaration),
+    name: getDeclarationFullName(declaration, intl),
     type: declaration.event || EMPTY_STRING,
     registrationNo:
       declaration.data?.registration?.registrationNumber?.toString() ||
