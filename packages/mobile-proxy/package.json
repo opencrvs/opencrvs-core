@@ -10,6 +10,6 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "ngrok": "^4.3.3",
-    "ts-node": "^8.6.0"
+    "ts-node": "^10.0.0"
   }
 }
