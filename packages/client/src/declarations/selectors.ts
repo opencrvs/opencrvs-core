@@ -39,6 +39,5 @@ const selectDeclaration =
 export const useDeclaration = <T extends IDeclaration | undefined>(
   declarationId: string
 ) => {
-  const foo = useSelector(selectDeclaration<T>(declarationId))
-  return foo
+  return useSelector(selectDeclaration<T>(declarationId))
 }

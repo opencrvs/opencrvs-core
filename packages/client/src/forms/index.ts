@@ -38,7 +38,6 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
-import { ICertificateConfigData } from '@client/utils/referenceApi'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
