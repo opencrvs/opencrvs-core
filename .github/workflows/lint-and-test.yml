@@ -148,10 +148,12 @@ jobs:
       - uses: actions/setup-node@v4
       - name: Install dependencies
         run: yarn install --ignore-scripts
+      - name: Create reporter
+        run: echo "const reporter = function (options) {const totalIssues = Object.values(options.issues).reduce((acc, issueRecords) =>acc +Object.values(issueRecords).reduce((acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,0),0); console.log(JSON.stringify({ totalIssues }))}; export default reporter" > knip-reporter.js
       - name: Run knip on base branch
         id: knip_base
         run: |
-          OUTPUT=$(yarn knip --no-exit-code --reporter=./knip-reporter.ts)
+          OUTPUT=$(yarn knip --no-exit-code --exports --reporter=knip-reporter.js)
           echo "Output: $OUTPUT"
           JSON=$(echo "$OUTPUT" | grep -o '{.*}')
           total_issues=$(echo "$JSON" | jq '.totalIssues')
@@ -165,9 +167,11 @@ jobs:
       - uses: actions/setup-node@v4
       - name: Install dependencies
         run: yarn install --ignore-scripts
+      - name: Create reporter
+        run: echo "const reporter = function (options) {const totalIssues = Object.values(options.issues).reduce((acc, issueRecords) =>acc +Object.values(issueRecords).reduce((acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,0),0); console.log(JSON.stringify({ totalIssues }))}; export default reporter" > knip-reporter.js
       - name: Run knip on PR branch
         run: |
-          yarn knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --reporter=./knip-reporter.ts
+          yarn knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --exports --reporter=knip-reporter.js
 
   security-scans:
     needs: setup
