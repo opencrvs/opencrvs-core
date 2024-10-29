@@ -28,7 +28,6 @@ import {
   goToViewRecordPage
 } from '@client/navigation'
 import { useIntl } from 'react-intl'
-import { Scope } from '@sentry/react'
 import { IDeclarationData } from './utils'
 import {
   clearCorrectionAndPrintChanges,
@@ -51,7 +50,7 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
@@ -68,7 +67,7 @@ import {
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
-  scope: Scope
+  scope: Scope[]
   draft: IDeclaration | null
   duplicates?: string[]
   toggleDisplayDialog: () => void
@@ -202,7 +201,7 @@ export const ActionMenu: React.FC<{
 
 interface IActionItemCommonProps {
   isDownloaded: boolean
-  scope: Scope
+  scope: Scope[]
   declarationStatus?: SUBMISSION_STATUS
 }
 
@@ -509,7 +508,7 @@ const UnassignAction: React.FC<{
   handleUnassign: () => void
   isDownloaded: boolean
   assignment?: GQLAssignmentData
-  scope: Scope
+  scope: Scope[]
 }> = ({ handleUnassign, isDownloaded, assignment, scope }) => {
   const intl = useIntl()
   const isAssignedToSomeoneElse = !isDownloaded && assignment
