@@ -33,9 +33,13 @@ jobs:
           ref: '${{ github.event.inputs.branch_name }}'
 
       - uses: actions/checkout@v4
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        if: github.event_name == 'push'
         with:
-          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request'
+        with:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set version and branch
