@@ -31,6 +31,7 @@ import {
   REMOVE_ADVANCED_SEARCH_RESULT_BOOKMARK_MUTATION
 } from '@client/profile/mutations'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import { Event } from '@client/utils/gateway'
 
 const graphqlMock = [
   {
@@ -54,7 +55,7 @@ const graphqlMock = [
           results: [
             {
               id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-              type: 'Death',
+              type: Event.Death,
               __typename: 'X',
               registration: {
                 __typename: 'X',

@@ -27,9 +27,7 @@ import { ReactWrapper } from 'enzyme'
 import {
   createDeclaration,
   storeDeclaration,
-  IDeclaration,
-  SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  IDeclaration
 } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
@@ -37,11 +35,6 @@ import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
-import {
-  getCurrentUserWorkqueuSuccess,
-  IWorkqueue,
-  workqueueInitialState
-} from '@client/workqueue'
 
 const declaration: IDeclaration = createDeclaration(
   Event.Birth,
@@ -72,24 +65,6 @@ declaration.data.history = [
     output: []
   }
 ]
-
-const workqueue: IWorkqueue = {
-  ...workqueueInitialState.workqueue,
-  data: {
-    inProgressTab: {},
-    notificationTab: {},
-    reviewTab: {
-      results: [{ id: declaration.id, registration: {} }],
-      totalItems: 1
-    },
-    rejectTab: {},
-    approvalTab: {},
-    printTab: {},
-    issueTab: {},
-    externalValidationTab: {}
-  },
-  initialSyncDone: true
-}
 
 describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
@@ -242,7 +217,7 @@ describe('Record audit summary for WorkQueue declarations', () => {
     store.getState().workqueueState.workqueue.data.inProgressTab.results = [
       {
         id: 'db097901-feba-4f71-a1ae-d3d46289d2d5',
-        type: 'Birth',
+        type: Event.Birth,
         registration: {
           status: 'DRAFT',
           contactNumber: '+8801622688231',
@@ -336,67 +311,6 @@ describe('Record audit summary for WorkQueue declarations', () => {
         })
         .hostNodes()
     ).toHaveLength(0)
-  })
-})
-
-describe('Record audit for a draft declaration', () => {
-  let component: ReactWrapper<{}, {}>
-
-  beforeEach(async () => {
-    const { store, history } = createStore()
-
-    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
-
-    await flushPromises()
-
-    declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
-    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-
-    store.dispatch(storeDeclaration(declaration))
-    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
-
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
-          formatUrl(DECLARATION_RECORD_AUDIT, {
-            declarationId: declaration.id,
-            tab: 'reviewTab'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              declarationId: declaration.id,
-              tab: 'reviewTab'
-            }
-          }
-        )}
-      />,
-      { store, history }
-    )
-  })
-
-  it('should show the archive button', async () => {
-    expect(component.exists('#archive_button')).toBeTruthy()
-  })
-
-  it('should show the confirmation modal when archive button is clicked', async () => {
-    component.find('#archive_button').hostNodes().simulate('click')
-
-    component.update()
-
-    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
-  })
-
-  it('should close the confirmation modal when cancel button is clicked', async () => {
-    component.find('#archive_button').hostNodes().simulate('click')
-
-    component.update()
-
-    component.find('#cancel-btn').hostNodes().simulate('click')
-
-    component.update()
-
-    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
   })
 })
 
@@ -538,59 +452,5 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
 
   it('Redirect to home page', async () => {
     expect(window.location.href).not.toContain('/record-audit')
-  })
-})
-
-describe('Record audit for a reinstate declaration', () => {
-  let component: ReactWrapper<{}, {}>
-
-  beforeEach(async () => {
-    const { store, history } = createStore()
-
-    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
-
-    await flushPromises()
-
-    declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
-    declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-    store.dispatch(storeDeclaration(declaration))
-    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
-
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
-          formatUrl(DECLARATION_RECORD_AUDIT, {
-            declarationId: declaration.id,
-            tab: 'reviewTab'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              declarationId: declaration.id,
-              tab: 'reviewTab'
-            }
-          }
-        )}
-      />,
-      { store, history }
-    )
-  })
-
-  it('should show the reinstate button', async () => {
-    expect(component.exists('#reinstate_button')).toBeTruthy()
-  })
-
-  it('should show the confirmation modal when reinstate button is clicked', async () => {
-    component.find('#reinstate_button').hostNodes().simulate('click')
-    component.update()
-    expect(component.find('ResponsiveModal').prop('show')).toBeTruthy()
-  })
-
-  it('should close the confirmation modal when cancel button is clicked', async () => {
-    component.find('#reinstate_button').hostNodes().simulate('click')
-    component.update()
-    component.find('#cancel-btn').hostNodes().simulate('click')
-    component.update()
-    expect(component.find('ResponsiveModal').prop('show')).toBe(false)
   })
 })

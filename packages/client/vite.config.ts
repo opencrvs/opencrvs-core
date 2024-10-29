@@ -95,7 +95,24 @@ export default defineConfig(({ mode }) => {
           '@opencrvs/commons/authentication'
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), VitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react({
+        babel: {
+          plugins: [
+            [
+              'babel-plugin-styled-components',
+              {
+                displayName: true,
+                fileName: false
+              }
+            ]
+          ]
+        }
+      }),
+      tsconfigPaths(),
+      VitePWAPlugin()
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',

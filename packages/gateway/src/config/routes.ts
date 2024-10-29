@@ -15,7 +15,11 @@ import {
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
-import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import sendVerifyCodeHandler, {
+  requestSchema,
+  responseSchema
+} from '@gateway/routes/verifyCode/handler'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -55,6 +59,23 @@ export const getRoutes = () => {
         }
       }
     },
+    {
+      method: 'POST',
+      path: '/sendVerifyCode',
+      handler: sendVerifyCodeHandler,
+      options: {
+        description: 'Send verify code to user contact',
+        notes:
+          'Generate a 6 digit verification code.' +
+          'Sends an SMS/email to the user with verification code.',
+        validate: {
+          payload: requestSchema
+        },
+        response: {
+          schema: responseSchema
+        }
+      }
+    },
 
     catchAllProxy.locations,
     catchAllProxy.locationsSuffix,
@@ -63,6 +84,7 @@ export const getRoutes = () => {
     catchAllProxy.locationId,
 
     catchAllProxy.auth,
+    authProxy.token,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser

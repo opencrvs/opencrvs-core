@@ -3080,13 +3080,7 @@ export type GetUserQuery = {
     } | null
     role: {
       __typename?: 'UserRole'
-      id: string
-      label: {
-        __typename?: 'I18nMessage'
-        id: string
-        defaultMessage: string
-        description: string
-      }
+      _id: string
     }
     primaryOffice: {
       __typename?: 'Location'

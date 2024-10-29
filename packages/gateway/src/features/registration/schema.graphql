@@ -644,4 +644,5 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
+  confirmRegistration(id: ID!): ID!
 }
