@@ -14,7 +14,7 @@ const config: CodegenConfig = {
   schema: [
     {
       'http://localhost:7070/graphql': {
-        headers: { Authorization: `Bearer ${process.env.TOKEN}` }
+        headers: {}
       }
     }
   ],

@@ -24,10 +24,5 @@ export const env = cleanEnv(process.env, {
   RECORD_SEARCH_QUOTA: num({ default: 2000 }),
 
   FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
-  METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
-
-  NATIONAL_ID_OIDP_BASE_URL: str({ default: undefined }),
-  NATIONAL_ID_OIDP_CLIENT_ID: str({ default: undefined }),
-  NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS: str({ default: undefined }),
-  NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS: str({ default: undefined })
+  METRICS_URL: url({ devDefault: 'http://localhost:1050' })
 })

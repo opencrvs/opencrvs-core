@@ -932,6 +932,7 @@ export type Mutation = {
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
+  confirmRegistration: Scalars['ID']
   createBirthRegistration: CreatedIds
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
@@ -1030,6 +1031,10 @@ export type MutationChangePhoneArgs = {
   phoneNumber: Scalars['String']
   userId: Scalars['String']
   verifyCode: Scalars['String']
+}
+
+export type MutationConfirmRegistrationArgs = {
+  id: Scalars['ID']
 }
 
 export type MutationCreateBirthRegistrationArgs = {
@@ -1234,41 +1239,6 @@ export enum NotificationType {
   Sms = 'SMS'
 }
 
-export type OidpUserAddress = {
-  __typename?: 'OIDPUserAddress'
-  city?: Maybe<Scalars['String']>
-  country?: Maybe<Scalars['String']>
-  formatted?: Maybe<Scalars['String']>
-  locality?: Maybe<Scalars['String']>
-  postal_code?: Maybe<Scalars['String']>
-  region?: Maybe<Scalars['String']>
-  street_address?: Maybe<Scalars['String']>
-}
-
-export type OidpUserInfo = {
-  __typename?: 'OIDPUserInfo'
-  address?: Maybe<OidpUserAddress>
-  birthdate?: Maybe<Scalars['String']>
-  email?: Maybe<Scalars['String']>
-  email_verified?: Maybe<Scalars['Boolean']>
-  family_name?: Maybe<Scalars['String']>
-  gender?: Maybe<Scalars['String']>
-  given_name?: Maybe<Scalars['String']>
-  locale?: Maybe<Scalars['String']>
-  middle_name?: Maybe<Scalars['String']>
-  name?: Maybe<Scalars['String']>
-  nickname?: Maybe<Scalars['String']>
-  phone_number?: Maybe<Scalars['String']>
-  phone_number_verified?: Maybe<Scalars['Boolean']>
-  picture?: Maybe<Scalars['String']>
-  preferred_username?: Maybe<Scalars['String']>
-  profile?: Maybe<Scalars['String']>
-  sub: Scalars['String']
-  updated_at?: Maybe<Scalars['Int']>
-  website?: Maybe<Scalars['String']>
-  zoneinfo?: Maybe<Scalars['String']>
-}
-
 export type ObservationFhirids = {
   attendantAtBirth?: InputMaybe<Scalars['String']>
   birthType?: InputMaybe<Scalars['String']>
@@ -1398,7 +1368,6 @@ export type Query = {
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
-  getOIDPUserInfo?: Maybe<UserInfo>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
   getSystemRoles?: Maybe<Array<SystemRole>>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
@@ -1494,13 +1463,6 @@ export type QueryGetEventsWithProgressArgs = {
 export type QueryGetLocationStatisticsArgs = {
   locationId?: InputMaybe<Scalars['String']>
   populationYear: Scalars['Int']
-}
-
-export type QueryGetOidpUserInfoArgs = {
-  clientId: Scalars['String']
-  code: Scalars['String']
-  grantType?: InputMaybe<Scalars['String']>
-  redirectUri: Scalars['String']
 }
 
 export type QueryGetRegistrationsListByFilterArgs = {
@@ -2151,14 +2113,6 @@ export type UserIdentifierInput = {
   system?: InputMaybe<Scalars['String']>
   use?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
-}
-
-export type UserInfo = {
-  __typename?: 'UserInfo'
-  districtFhirId?: Maybe<Scalars['String']>
-  locationLevel3FhirId?: Maybe<Scalars['String']>
-  oidpUserInfo?: Maybe<OidpUserInfo>
-  stateFhirId?: Maybe<Scalars['String']>
 }
 
 export type UserInput = {
@@ -5328,55 +5282,6 @@ export type MarkEventAsNotDuplicateMutation = {
   markEventAsNotDuplicate: string
 }
 
-export type GetOidpUserInfoQueryVariables = Exact<{
-  code: Scalars['String']
-  clientId: Scalars['String']
-  redirectUri: Scalars['String']
-  grantType?: InputMaybe<Scalars['String']>
-}>
-
-export type GetOidpUserInfoQuery = {
-  __typename?: 'Query'
-  getOIDPUserInfo?: {
-    __typename?: 'UserInfo'
-    districtFhirId?: string | null
-    stateFhirId?: string | null
-    locationLevel3FhirId?: string | null
-    oidpUserInfo?: {
-      __typename?: 'OIDPUserInfo'
-      sub: string
-      name?: string | null
-      given_name?: string | null
-      family_name?: string | null
-      middle_name?: string | null
-      nickname?: string | null
-      preferred_username?: string | null
-      profile?: string | null
-      picture?: string | null
-      website?: string | null
-      email?: string | null
-      email_verified?: boolean | null
-      gender?: string | null
-      birthdate?: string | null
-      zoneinfo?: string | null
-      locale?: string | null
-      phone_number?: string | null
-      phone_number_verified?: boolean | null
-      updated_at?: number | null
-      address?: {
-        __typename?: 'OIDPUserAddress'
-        formatted?: string | null
-        street_address?: string | null
-        locality?: string | null
-        region?: string | null
-        postal_code?: string | null
-        city?: string | null
-        country?: string | null
-      } | null
-    } | null
-  } | null
-}
-
 type EventSearchFields_BirthEventSearchSet_Fragment = {
   __typename?: 'BirthEventSearchSet'
   dateOfBirth?: PlainDate | null
@@ -7454,82 +7359,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 
