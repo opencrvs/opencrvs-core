@@ -129,7 +129,7 @@
     "@types/webfontloader": "^1.6.34",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
-    "@vitest/coverage-c8": "^0.25.5",
+    "@vitest/coverage-c8": "^0.33.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "chalk": "^2.4.1",
     "csv-stringify": "^6.4.6",
@@ -161,7 +161,7 @@
     "typescript": "4.9.5",
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-plugin-pwa": "^0.20.0",
-    "vitest": "0.25.5",
+    "vitest": "0.34.6",
     "vitest-fetch-mock": "^0.2.1"
   },
   "browserslist": {
