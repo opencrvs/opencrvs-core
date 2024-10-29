@@ -607,7 +607,7 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async confirmRegistration(_, { id }, { headers: authHeader }) {
-      if (!inScope(authHeader, ['record.confirm-registration'])) {
+      if (!inScope(authHeader, [SCOPES.RECORD_CONFIRM_REGISTRATION])) {
         throw new Error(
           'User does not have a "record.confirm-registration" scope'
         )

@@ -21,11 +21,7 @@ import {
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
-import {
-  GQLResolver,
-  GQLSignatureInput,
-  GQLUserIdentifierInput
-} from '@gateway/graphql/schema'
+import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
 import {
   Bundle,
   Extension,
@@ -99,7 +95,6 @@ export interface IUserPayload
     '_id' | 'status' | 'practitionerId' | 'username' | 'identifiers' | 'role'
   > {
   id?: string
-  identifiers: GQLUserIdentifierInput[]
   status?: string
   username?: string
   password?: string
