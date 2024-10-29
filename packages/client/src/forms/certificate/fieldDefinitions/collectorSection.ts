@@ -1045,10 +1045,7 @@ function getCertCollectorGroupForEvent(
     certificates
       ?.filter((x) => x.event === declaration.event)
       .map((x) => ({ label: x.label, value: x.id })) || []
-  const certTemplateDefaultValue =
-    certificateTemplateOptions.length > 0
-      ? certificateTemplateOptions[0].value
-      : ''
+  const certTemplateDefaultValue = certificates?.find((x) => x.isDefault)?.id
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,

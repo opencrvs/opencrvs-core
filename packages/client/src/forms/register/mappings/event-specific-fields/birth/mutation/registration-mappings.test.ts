@@ -33,7 +33,7 @@ describe('Birth registration mutation mapping related tests', () => {
     expect(transformedData.registration.certificates).toEqual([
       {
         hasShowedVerifiedDocument: true,
-        certificateTemplateId: 'certified-birth-certificate',
+        certificateTemplateId: 'birth-certificate',
         payments: [
           {
             paymentId: '1234',
@@ -45,9 +45,14 @@ describe('Birth registration mutation mapping related tests', () => {
         ],
         collector: {
           otherRelationship: 'OTHER',
-          name: [{ use: 'en' }],
-          identifier: [{}],
-          affidavit: [{ data: 'data:image/png;base64,2324256' }]
+          name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
+          identifier: [{ id: '123456', type: 'PASSPORT' }],
+          affidavit: [
+            {
+              contentType: 'image/jpg',
+              data: 'data:image/png;base64,2324256'
+            }
+          ]
         }
       }
     ])

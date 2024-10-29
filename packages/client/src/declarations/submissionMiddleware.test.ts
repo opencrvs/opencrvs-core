@@ -12,6 +12,7 @@ import { ApolloError } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
 import {
   ACTION_STATUS_MAP,
+  mockBirthRegistrationSectionData,
   mockDeclarationData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
@@ -140,19 +141,7 @@ describe('Submission middleware', () => {
       }
 
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
-        mockDeclarationData.registration.certificates[0] = {
-          collector: {
-            relationship: 'OTHER',
-            affidavitFile: {
-              contentType: 'image/jpg',
-              data: 'data:image/png;base64,2324256'
-            },
-            name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-            identifier: [{ id: '123456', type: 'PASSPORT' }]
-          },
-          hasShowedVerifiedDocument: true,
-          certificateTemplateId: 'certified-birth-certificate'
-        }
+        mockDeclarationData.registration = mockBirthRegistrationSectionData
         const action = declarationReadyForStatusChange({
           id: 'mockDeclaration',
           data: mockDeclarationData,

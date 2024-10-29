@@ -551,14 +551,25 @@ export const mockDeclarationData = {
         collector: {
           relationship: 'OTHER',
           affidavitFile: {
-            contentType: 'image/jpg',
+            type: 'image/jpg',
             data: 'data:image/png;base64,2324256'
           },
-          name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-          identifier: [{ id: '123456', type: 'PASSPORT' }]
+          firstName: 'Doe',
+          lastName: 'Jane',
+          iD: '123456',
+          iDType: 'PASSPORT'
         },
         certificateTemplateId: 'birth-certificate',
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        payments: [
+          {
+            paymentId: '1234',
+            type: 'MANUAL',
+            amount: 50,
+            outcome: 'COMPLETED',
+            date: '2018-10-22'
+          }
+        ]
       }
     ]
   },
@@ -774,15 +785,16 @@ export const mockBirthRegistrationSectionData = {
       collector: {
         relationship: 'OTHER',
         affidavitFile: {
-          contentType: 'image/jpg',
+          type: 'image/jpg',
           data: 'data:image/png;base64,2324256'
         },
-
-        name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-        identifier: [{ id: '123456', type: 'PASSPORT' }]
+        firstName: 'Doe',
+        lastName: 'Jane',
+        iD: '123456',
+        iDType: 'PASSPORT'
       },
-      hasShowedVerifiedDocument: true,
       certificateTemplateId: 'birth-certificate',
+      hasShowedVerifiedDocument: true,
       payments: [
         {
           paymentId: '1234',
@@ -833,12 +845,12 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Birth Certificate',
       description: 'The label for a birth certificate'
     },
-
     fee: {
       onTime: 0,
       late: 5.5,
       delayed: 15
     },
+    isDefault: true,
     svgUrl: '/api/countryconfig/certificates/birth-certificate.svg',
     fonts: {
       'Noto Sans': {
@@ -857,12 +869,12 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Birth Certificate certified copy',
       description: 'The label for a birth certificate'
     },
-
     fee: {
       onTime: 0,
       late: 5.5,
       delayed: 15
     },
+    isDefault: false,
     svgUrl: '/api/countryconfig/certificates/birth-certificate-copy.svg',
     fonts: {
       'Noto Sans': {
@@ -881,12 +893,12 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Death Certificate',
       description: 'The label for a death certificate'
     },
-
     fee: {
       onTime: 0,
       late: 5.5,
       delayed: 15
     },
+    isDefault: true,
     svgUrl: '/api/countryconfig/certificates/death-certificate.svg',
     fonts: {
       'Noto Sans': {
@@ -905,12 +917,12 @@ const mockFetchCertificatesTemplatesDefinition = [
       defaultMessage: 'Marriage Certificate',
       description: 'The label for a marriage certificate'
     },
-
     fee: {
       onTime: 0,
       late: 5.5,
       delayed: 15
     },
+    isDefault: true,
     svgUrl: '/api/countryconfig/certificates/marriage-certificate.svg',
     fonts: {
       'Noto Sans': {

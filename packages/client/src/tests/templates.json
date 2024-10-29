@@ -22,6 +22,7 @@
         "late": 5.5,
         "delayed": 15
       },
+      "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/birth-certificate.svg",
       "fonts": {
         "Noto Sans": {
@@ -46,6 +47,7 @@
         "late": 5.5,
         "delayed": 15
       },
+      "isDefault": false,
       "svgUrl": "/api/countryconfig/certificates/birth-certificate-certified-copy.svg",
       "fonts": {
         "Noto Sans": {
@@ -70,6 +72,7 @@
         "late": 5.5,
         "delayed": 15
       },
+      "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/death-certificate.svg",
       "fonts": {
         "Noto Sans": {
@@ -94,6 +97,7 @@
         "late": 5.5,
         "delayed": 15
       },
+      "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/marriage-certificate.svg",
       "fonts": {
         "Noto Sans": {

@@ -85,7 +85,7 @@ export interface ICertificateConfigData {
     defaultMessage: string
     description: string
   }
-
+  isDefault: boolean
   fee: {
     onTime: number
     late: number

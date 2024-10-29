@@ -399,33 +399,6 @@ input CertificateInput {
   certificateTemplateId: String
 }
 
-enum CertificateStatus {
-  ACTIVE
-  INACTIVE
-}
-
-type CertificateSVG {
-  id: ID!
-  svgCode: String!
-  svgFilename: String!
-  svgDateUpdated: String!
-  svgDateCreated: String!
-  user: String!
-  event: Event!
-  status: CertificateStatus!
-}
-
-input CertificateSVGInput {
-  id: ID
-  svgCode: String!
-  svgFilename: String!
-  svgDateUpdated: Int
-  svgDateCreated: Int
-  user: String!
-  event: Event!
-  status: CertificateStatus!
-}
-
 type CertificationMetric {
   total: Float!
   eventType: String!
@@ -1379,8 +1352,6 @@ type Query {
     sortBy: String
     sortOrder: String
   ): [SystemRole!]
-  getCertificateSVG(status: CertificateStatus!, event: Event!): CertificateSVG
-  getActiveCertificatesSVG: [CertificateSVG!]
   fetchSystem(clientId: ID!): System
   informantSMSNotifications: [SMSNotification!]
 }
@@ -1905,44 +1876,4 @@ input WebhookInput {
 type WebhookPermission {
   event: String!
   permissions: [String!]!
-}
-
-type CertificateConfigData {
-  id: String!
-  event: String!
-  label: CertificateLabel!
-  fee: CertificateFee!
-  svgUrl: String!
-}
-
-type CertificateLabel {
-  id: String!
-  defaultMessage: String!
-  description: String!
-}
-
-type CertificateFee {
-  onTime: Float!
-  late: Float!
-  delayed: Float!
-}
-
-input CertificateConfigDataInput {
-  id: String!
-  event: String!
-  label: CertificateLabelInput!
-  fee: CertificateFeeInput!
-  svgUrl: String!
-}
-
-input CertificateLabelInput {
-  id: String!
-  defaultMessage: String!
-  description: String!
-}
-
-input CertificateFeeInput {
-  onTime: Float!
-  late: Float!
-  delayed: Float!
 }

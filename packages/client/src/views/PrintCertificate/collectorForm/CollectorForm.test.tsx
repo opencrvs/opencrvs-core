@@ -286,9 +286,7 @@ describe('Certificate collector test for a birth registration without father det
        * Who is collecting the certificate?
        */
       const declaration = cloneDeep(birthDeclaration)
-      delete (declaration.data.registration.certificates[0].collector as any)
-        .affidavitFile
-
+      declaration.data.registration.certificates = []
       store.dispatch(storeDeclaration(declaration))
       component = await createTestComponent(
         <CollectorForm
