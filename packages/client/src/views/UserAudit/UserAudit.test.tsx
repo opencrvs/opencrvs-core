@@ -169,13 +169,18 @@ describe('User audit list tests for sys admin', () => {
 
     const menuLink = await waitForElement(
       component,
-      '#sub-page-header-munu-buttonToggleButton'
+      '#sub-page-header-munu-button-dropdownMenu'
     )
     menuLink.hostNodes().simulate('click')
-    const editUserLink = await waitForElement(
-      component,
-      '#sub-page-header-munu-buttonItem0'
+    const editUserLink = (
+      await waitForElement(
+        component,
+        '#sub-page-header-munu-button-Dropdown-Content'
+      )
     )
+      .find('li')
+      .hostNodes()
+      .at(0)
     editUserLink.hostNodes().simulate('click')
 
     // wait for mocked data to load mockedProvider

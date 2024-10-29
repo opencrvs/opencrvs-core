@@ -368,7 +368,9 @@ export const getRoutes = () => {
             RouteScope.SYSADMIN,
             RouteScope.VALIDATE,
             RouteScope.VERIFY,
-            RouteScope.RECORDSEARCH
+            RouteScope.RECORDSEARCH,
+            // @TODO: Refer to an enum / constant
+            'record.confirm-registration'
           ]
         },
         validate: {

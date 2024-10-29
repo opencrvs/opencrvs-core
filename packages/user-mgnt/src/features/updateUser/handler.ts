@@ -61,7 +61,6 @@ export default async function updateUser(
   }
   // Update existing user's fields
   existingUser.name = user.name
-  existingUser.identifiers = user.identifiers
   existingUser.email = user.email
   existingUser.mobile = user.mobile
   existingUser.emailForNotification = user.emailForNotification

@@ -29,6 +29,7 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { History } from 'history'
+import { Event } from '@client/utils/gateway'
 import { vi } from 'vitest'
 
 const nameObj = {
@@ -50,7 +51,7 @@ const nameObj = {
 
 const mockUserData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-  type: 'Birth',
+  type: Event.Birth,
   registration: {
     status: 'DECLARED',
     contactNumber: '01622688231',
@@ -146,7 +147,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
+                type: Event.Birth,
                 registration: {
                   status: 'VALIDATED',
                   contactNumber: '01622688231',
@@ -195,7 +196,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
+                type: Event.Death,
                 registration: {
                   status: 'VALIDATED',
                   trackingId: 'DW0UTHR',
@@ -343,7 +344,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
+                type: Event.Birth,
                 registration: {
                   status: 'VALIDATED',
                   contactNumber: '01622688231',
@@ -371,7 +372,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
+                type: Event.Death,
                 registration: {
                   status: 'VALIDATED',
                   trackingId: 'DW0UTHR',
@@ -470,7 +471,7 @@ describe('Tablet tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: 'Birth',
+                type: Event.Birth,
                 registration: {
                   status: 'VALIDATED',
                   contactNumber: '01622688231',
@@ -498,7 +499,7 @@ describe('Tablet tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: 'Death',
+                type: Event.Death,
                 registration: {
                   status: 'VALIDATED',
                   trackingId: 'DW0UTHR',

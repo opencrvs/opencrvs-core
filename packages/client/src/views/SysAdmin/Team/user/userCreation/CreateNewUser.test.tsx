@@ -36,7 +36,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import { GetUserQuery, Status } from '@client/utils/gateway'
+import { GetUserQuery } from '@client/utils/gateway'
 
 const mockUsers = {
   data: {
@@ -271,7 +271,7 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#familyNameEng_error')
+          .find('#familyName_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
@@ -332,13 +332,13 @@ describe('create new user tests', () => {
 
     it('clicking change button on a field takes user back to form', async () => {
       testComponent
-        .find('#btn_change_firstNamesEng')
+        .find('#btn_change_firstName')
         .hostNodes()
         .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstNamesEng')
+      expect(history.location.hash).toBe('#firstName')
     })
 
     it('clicking submit button submits the form data', async () => {
@@ -383,15 +383,10 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            role: {
-              id: 'NATIONAL_REGISTRAR',
-              label: {
-                id: 'userRoles.nationalRegistrar',
-                defaultMessage: 'National Registrar',
-                description: ''
-              }
-            },
-            status: Status.Active,
+            systemRole: 'NATIONAL_REGISTRAR',
+            role: { _id: '63ef9466f708ea080777c27a' },
+            status: 'active',
+            underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
               id: '895cc945-94a9-4195-9a29-22e9310f3385',
