@@ -43,6 +43,7 @@ import {
   UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
   UPDATE_WORKQUEUE_PAGINATION
 } from './actions'
+import { Scope, SCOPES } from '@client/utils/gateway'
 
 export interface IQueryData {
   inProgressTab: GQLEventSearchResultSet
@@ -154,7 +155,16 @@ async function getFilteredDeclarations(
   // for other agents, check if the status of workqueue declaration
   // has changed and if that declaration is saved in the store
   // also declaration should not show as unassigned when it is being submitted
-  if (scope?.includes('declare'))
+  const declareScopes = [
+    SCOPES.RECORD_DECLARE_BIRTH,
+    SCOPES.RECORD_DECLARE_DEATH,
+    SCOPES.RECORD_DECLARE_MARRIAGE,
+    SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+    SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+    SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+  ] as Scope[]
+
+  if (scope?.some((x) => declareScopes.includes(x)))
     return {
       currentlyDownloadedDeclarations: savedDeclarations,
       unassignedDeclarations: []
