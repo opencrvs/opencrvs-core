@@ -840,7 +840,6 @@ const FormSectionComponent = (props: Props) => {
     touched,
     setFieldValue
   } = props
-  const prevProps = usePrevious(props)
 
   const showValidationErrors = useCallback(
     (fields: IFormField[]) => {
@@ -904,6 +903,8 @@ const FormSectionComponent = (props: Props) => {
     showValidationErrors
   ])
 
+  const prevProps = usePrevious(props)
+
   useEffect(() => {
     const userChangedForm = !isEqual(values, prevProps?.values)
     const sectionChanged = prevProps?.id !== id
@@ -927,11 +928,11 @@ const FormSectionComponent = (props: Props) => {
     values,
     id,
     onChange,
-    resetForm,
-    fields,
     setAllFieldsDirty,
+    fields,
     fieldsToShowValidationErrors,
     showValidationErrors,
+    resetForm,
     prevProps
   ])
 
@@ -1181,7 +1182,9 @@ const FormSectionComponent = (props: Props) => {
               </Field>
             </FormItem>
           )
-        } else if (
+        }
+
+        if (
           field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
           field.nestedFields
         ) {
@@ -1276,39 +1279,38 @@ const FormSectionComponent = (props: Props) => {
               </Field>
             </FormItem>
           )
-        } else {
-          return (
-            <FormItem
-              key={`${field.name}${language}`}
-              ignoreBottomMargin={field.ignoreBottomMargin}
-            >
-              <Field name={field.name}>
-                {(formikFieldProps: FieldProps<any>) => {
-                  return (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      setFieldValue={setFieldValuesWithDependency}
-                      setFieldTouched={setFieldTouched}
-                      resetDependentSelectValues={resetDependentSelectValues}
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={isFieldDisabled ? '' : error}
-                      draftData={draftData}
-                      fields={fields}
-                      values={values}
-                      dynamicDispatch={dynamicDispatch}
-                      disabled={isFieldDisabled}
-                      onUploadingStateChanged={onUploadingStateChanged}
-                    />
-                  )
-                }}
-              </Field>
-            </FormItem>
-          )
         }
+        return (
+          <FormItem
+            key={`${field.name}${language}`}
+            ignoreBottomMargin={field.ignoreBottomMargin}
+          >
+            <Field name={field.name}>
+              {(formikFieldProps: FieldProps<any>) => {
+                return (
+                  <GeneratedInputField
+                    fieldDefinition={internationaliseFieldObject(
+                      intl,
+                      withDynamicallyGeneratedFields
+                    )}
+                    setFieldValue={setFieldValuesWithDependency}
+                    setFieldTouched={setFieldTouched}
+                    resetDependentSelectValues={resetDependentSelectValues}
+                    {...formikFieldProps.field}
+                    touched={touched[field.name] || false}
+                    error={isFieldDisabled ? '' : error}
+                    draftData={draftData}
+                    fields={fields}
+                    values={values}
+                    dynamicDispatch={dynamicDispatch}
+                    disabled={isFieldDisabled}
+                    onUploadingStateChanged={onUploadingStateChanged}
+                  />
+                )
+              }}
+            </Field>
+          </FormItem>
+        )
       })}
     </section>
   )
