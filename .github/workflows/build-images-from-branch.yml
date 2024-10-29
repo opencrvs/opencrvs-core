@@ -153,8 +153,8 @@ jobs:
 
       - name: Remove lines that are always expected to be different
         run: |
-          sed -i '/"uri": "file:\/\/\/github\/workspace\/base\//d' ${{ github.workspace }}/trivy-results-base.sarif
-          sed -i '/"uri": "file:\/\/\/github\/workspace\/branch\//d' ${{ github.workspace }}/trivy-results-branch.sarif
+          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-base.sarif > ${{ github.workspace }}/trivy-results-base.sarif
+          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ${{ github.workspace }}/trivy-results-branch.sarif > ${{ github.workspace }}/trivy-results-branch.sarif
 
       - name: Diff Trivy results to catch newly introduced vulnerabilities
         run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif
