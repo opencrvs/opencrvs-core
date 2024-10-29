@@ -38,15 +38,3 @@ function safeVerifyJwt(token: string) {
 export function verifyToken(token: string) {
   return f.pipe(token, safeVerifyJwt, e.chainW(tokenPayload.decode))
 }
-
-export const getTokenPayload = (token: string) => {
-  let decoded: ITokenPayload
-  try {
-    decoded = decode(token)
-  } catch (err) {
-    throw new Error(
-      `getTokenPayload: Error occurred during token decode : ${err}`
-    )
-  }
-  return decoded
-}
