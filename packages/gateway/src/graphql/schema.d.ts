@@ -828,7 +828,7 @@ export const enum GQLStatus {
 
 export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
-  role: GQLUserRole
+  role?: string
   signature?: GQLSignature
 }
 

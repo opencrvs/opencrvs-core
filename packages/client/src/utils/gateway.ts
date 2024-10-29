@@ -59,6 +59,7 @@ export const scopes = [
   'record.registration-revoke',
   'record.registration-request-reinstatement',
   'record.registration-reinstate',
+  'record.certify',
   'search.birth:my-jurisdiction',
   'search.birth',
   'search.death:my-jurisdiction',
@@ -142,6 +143,7 @@ export const SCOPES = {
   RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
     'record.registration-request-reinstatement',
   RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
+  RECORD_CERTIFY: 'record.certify',
   SEARCH_BIRTH_MY_JURISDICTION: 'search.birth:my-jurisdiction',
   SEARCH_BIRTH: 'search.birth',
   SEARCH_DEATH_MY_JURISDICTION: 'search.death:my-jurisdiction',
@@ -938,7 +940,7 @@ export enum IntegratingSystemType {
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: UserRole
+  role?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
 }
 
@@ -2707,21 +2709,13 @@ export type FetchUserQuery = {
     }
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
+      role?: string | null
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
       } | null>
-      role: {
-        __typename?: 'UserRole'
-        label: {
-          __typename?: 'I18nMessage'
-          id: string
-          defaultMessage: string
-          description: string
-        }
-      }
       signature?: {
         __typename?: 'Signature'
         data?: string | null
