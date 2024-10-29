@@ -41,7 +41,7 @@
     "@types/fhir": "^0.0.30",
     "@types/hapi__boom": "^9.0.1",
     "@types/hapi__hapi": "^20.0.0",
-    "@types/ioredis": "^4.28.5",
+    "@types/ioredis": "^5.0.0",
     "@types/jest": "^26.0.14",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/jwt-decode": "^2.2.1",
