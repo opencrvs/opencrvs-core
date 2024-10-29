@@ -39,15 +39,17 @@ jobs:
         id: set-version-and-branch
         run: |
           export VERSION=`git log -1 --pretty=format:%h`
+          echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" == 'push' ]; then
-            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           elif [ "${{ github.event_name }}" == 'pull_request' ]; then
-            BRANCH=${{ github.event.pull_request.head.ref }}
+          BRANCH=${{ github.event.pull_request.head.ref }}
           else
-            BRANCH=${{ inputs.branch_name }}
+          BRANCH=${{ inputs.branch_name }}
           fi
           ESCAPED_BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          echo "from branch $BRANCH"
           echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Get list of services
