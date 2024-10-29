@@ -53,7 +53,7 @@
     "jest": "27.5.1",
     "jest-fetch-mock": "^2.1.2",
     "nodemon": "^3.0.0",
-    "prettier": "2.8.8",
+    "prettier": "3.3.3",
     "eslint": "^7.11.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "ts-jest": "27.1.4",

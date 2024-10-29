@@ -149,7 +149,7 @@
     "glob": "^7.1.2",
     "jsonwebtoken": "^9.0.0",
     "opener": "^1.5.1",
-    "prettier": "2.8.8",
+    "prettier": "3.3.3",
     "qrcode": "^1.5.1",
     "serve": "^14.2.0",
     "stylelint": "^14.11.0",

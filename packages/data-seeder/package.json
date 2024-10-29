@@ -13,7 +13,7 @@
     "@typescript-eslint/parser": "^4.5.0",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^9.0.0",
-    "prettier": "2.8.8"
+    "prettier": "3.3.3"
   },
   "dependencies": {
     "@types/fhir": "^0.0.37",
