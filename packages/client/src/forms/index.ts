@@ -69,7 +69,6 @@ export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 export const TIME = 'TIME'
-export const NID_VERIFICATION_BUTTON = 'NID_VERIFICATION_BUTTON'
 export const DIVIDER = 'DIVIDER'
 export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
@@ -698,12 +697,6 @@ interface ITimeFormFIeld extends IFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
 }
-export interface INidVerificationButton extends IFormFieldBase {
-  type: typeof NID_VERIFICATION_BUTTON
-  labelForVerified: MessageDescriptor
-  labelForUnverified: MessageDescriptor
-  labelForOffline: MessageDescriptor
-}
 
 export interface ISignatureFormField extends IFormFieldBase {
   type: typeof SIGNATURE
@@ -772,7 +765,6 @@ export type IFormField =
   | ILocationSearchInputFormField
   | IDateRangePickerFormField
   | ITimeFormFIeld
-  | INidVerificationButton
   | IDividerFormField
   | ISignatureFormField
   | IHttpFormField
@@ -1194,13 +1186,6 @@ interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   errorText: string
   networkErrorText: string
 }
-interface Ii18nNidVerificationButtonField extends Ii18nFormFieldBase {
-  type: typeof NID_VERIFICATION_BUTTON
-  onClick: () => void
-  labelForVerified: string
-  labelForUnverified: string
-  labelForOffline: string
-}
 
 interface I18nDividerField extends Ii18nFormFieldBase {
   type: typeof DIVIDER
@@ -1280,7 +1265,6 @@ export type Ii18nFormField =
   | Ii18nLocationSearchInputFormField
   | Ii18nDateRangePickerFormField
   | Ii18nTimeFormField
-  | Ii18nNidVerificationButtonField
   | I18nDividerField
   | I18nHeading3Field
   | Ii18nSignatureField
