@@ -23,7 +23,6 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { SCOPES } from '@client/utils/gateway'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { de } from 'date-fns/locale'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string

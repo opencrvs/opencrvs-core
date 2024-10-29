@@ -16,7 +16,6 @@ import {
   waitForReady,
   flushPromises,
   setScopes,
-  REGISTRATION_AGENT_DEFAULT_SCOPES,
   REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import {
