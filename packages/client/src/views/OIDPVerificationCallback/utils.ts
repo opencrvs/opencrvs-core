@@ -218,7 +218,7 @@ export const useNidAuthentication = () => {
   return { onClick }
 }
 
-export function redirectToNidIntegration(
+function redirectToNidIntegration(
   offlineCountryConfig: IOfflineData,
   declarationId: string,
   currentSection: string,

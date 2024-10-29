@@ -293,14 +293,6 @@ const getLocation = (
   return EMPTY_STRING
 }
 
-export const getFormattedDate = (date: Date) => {
-  return formatLongDate(
-    date.toLocaleString(),
-    window.config.LANGUAGES,
-    'MMMM dd, yyyy · hh.mm a'
-  )
-}
-
 export const getCaptitalizedWord = (word: string | undefined): string => {
   if (!word) return EMPTY_STRING
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)

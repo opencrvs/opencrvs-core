@@ -63,10 +63,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
 
-export const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
-
 const FABContainer = styled.div`
   position: fixed;
   right: 40px;
