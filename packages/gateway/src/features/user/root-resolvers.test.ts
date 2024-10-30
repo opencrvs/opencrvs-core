@@ -649,7 +649,7 @@ describe('User root resolvers', () => {
         { headers: authHeaderValidUser }
       )
 
-      expect(response).toEqual(true)
+      expect(response).toEqual(undefined)
     })
     it('throws error if @user-mgnt/changeUserPassword sends anything but 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
@@ -735,7 +735,7 @@ describe('User root resolvers', () => {
         { headers: authHeaderValidUser }
       )
 
-      expect(response).toEqual(true)
+      expect(response).toEqual(undefined)
     })
     it('throws error if @user-mgnt/changeUserPhone sends anything but 201', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
@@ -1066,7 +1066,7 @@ describe('User root resolvers', () => {
         { headers: authHeaderSysAdmin }
       )
 
-      expect(response).toEqual(true)
+      expect(response).toEqual(undefined)
     })
 
     it('throws error for unauthorized user', async () => {
@@ -1178,7 +1178,7 @@ describe('User root resolvers', () => {
         { headers: authHeaderSysAdmin }
       )
 
-      expect(res).toBe(true)
+      expect(res).toBe(undefined)
     })
   })
 
@@ -1256,7 +1256,7 @@ describe('User root resolvers', () => {
         { headers: authHeaderSysAdmin }
       )
 
-      expect(res).toBe(true)
+      expect(res).toBe(undefined)
     })
   })
 
@@ -1334,7 +1334,7 @@ describe('User root resolvers', () => {
         { headers: authHeaderSysAdmin }
       )
 
-      expect(res).toBe(true)
+      expect(res).toBe(undefined)
     })
   })
 })
