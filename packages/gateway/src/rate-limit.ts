@@ -105,7 +105,7 @@ export const rateLimitedRoute =
     const key = pathOptionsForKey!.find(
       (path) => get(payload, path) !== undefined
     )
-    const value = payload[key!]
+    const value = get(payload, key!)
 
     if (!value) {
       throw new Error(
