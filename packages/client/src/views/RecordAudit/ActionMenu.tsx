@@ -50,7 +50,7 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
-import { Event, Scope } from '@client/utils/gateway'
+import { Event, Scope, SCOPES } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
@@ -243,8 +243,7 @@ const CorrectRecordAction: React.FC<
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =
     scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
+    (scope as any as string[]).includes(SCOPES.RECORD_REGISTRATION_CORRECT)
 
   if (
     !isBirthOrDeathEvent ||
@@ -283,8 +282,8 @@ const ArchiveAction: React.FC<
   // can he archive validated record?
   const userHasArchiveScope =
     scope &&
-    ((scope as any as string[]).includes('register') ||
-      ((scope as any as string[]).includes('validate') &&
+    ((scope as any as string[]).includes(SCOPES.RECORD_DECLARATION_ARCHIVE) ||
+      ((scope as any as string[]).includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
         declarationStatus !== SUBMISSION_STATUS.VALIDATED))
 
   if (!isArchivable(declarationStatus) || !userHasArchiveScope) return null
@@ -307,8 +306,7 @@ const ReinstateAction: React.FC<
   // can he reinstate validated record?
   const userHasReinstateScope =
     scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
+    (scope as any as string[]).includes(SCOPES.RECORD_REGISTRATION_REINSTATE)
 
   if (!isArchived(declarationStatus) || !userHasReinstateScope) return null
 
@@ -335,8 +333,7 @@ const ReviewAction: React.FC<
 
   const userHasReviewScope =
     scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
+    (scope as any as string[]).includes(SCOPES.RECORD_DECLARATION_REVIEW)
 
   if (!userHasReviewScope) return null
 
@@ -384,9 +381,8 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   // @ToDo use: appropriate scope after configurable role pr is merged
   const userHasUpdateScope =
     scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate') ||
-      ((scope as any as string[]).includes('validate') &&
+    ((scope as any as string[]).includes(SCOPES.RECORD_REGISTER) ||
+      ((scope as any as string[]).includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
         declarationStatus === SUBMISSION_STATUS.DRAFT))
 
   let PAGE_ROUTE: string, PAGE_ID: string
@@ -435,9 +431,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
   // @ToDo use: `record.print-records` or other appropriate scope after configurable role pr is merged
   const userHasPrintScope =
-    scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
+    scope && (scope as any as string[]).includes(SCOPES.RECORD_PRINT_RECORDS)
 
   if (!isPrintable(declarationStatus) || !userHasPrintScope) return null
 
@@ -472,8 +466,9 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   // @ToDo use: `record.print-issue-certified-copies` or other appropriate scope after configurable role pr is merged
   const userHasIssueScope =
     scope &&
-    ((scope as any as string[]).includes('register') ||
-      (scope as any as string[]).includes('validate'))
+    (scope as any as string[]).includes(
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    )
 
   if (!isCertified(declarationStatus) || !userHasIssueScope) return null
 
@@ -515,7 +510,7 @@ const UnassignAction: React.FC<{
 
   // @ToDo use: appropriate scope after configurable role pr is merged
   const userHasUnassignScope =
-    scope && (scope as any as string[]).includes('register')
+    scope && (scope as any as string[]).includes(SCOPES.RECORD_UNASSIGN_OTHERS)
 
   if (!isDownloaded && (!isAssignedToSomeoneElse || !userHasUnassignScope))
     return null
