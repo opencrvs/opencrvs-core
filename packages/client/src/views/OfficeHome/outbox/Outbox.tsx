@@ -168,7 +168,7 @@ export function Outbox() {
 
   function transformDeclarationsReadyToSend() {
     const items = declarations.map((declaration, index) => {
-      const name = getDeclarationFullName(declaration)
+      const name = getDeclarationFullName(declaration, intl)
       let dateOfEvent
       if (declaration.event && declaration.event.toString() === 'birth') {
         dateOfEvent = declaration.data?.child?.childBirthDate as string

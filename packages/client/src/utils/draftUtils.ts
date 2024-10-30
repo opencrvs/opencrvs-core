@@ -36,7 +36,7 @@ export const getDeclarationFullName = (
         ? getLocalisedName(intl, {
             firstNames: draft.data.child.firstNamesEng as string,
             middleName: draft.data.child.middleNameEng as string,
-            familyName: draft.data.child.middleNameEng as string
+            familyName: draft.data.child.familyNameEng as string
           })
         : EMPTY_STRING
     case EventType.Death:
