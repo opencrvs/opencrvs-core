@@ -240,7 +240,7 @@ describe('Rate limit', () => {
     return expect(() => Promise.all(resolverCalls)).not.toThrowError()
   })
 
-  it.only('handles multiple users authenticating with different usernames', async () => {
+  it('handles multiple users authenticating with different usernames', async () => {
     const server = await createServer()
 
     // okay to go through 10 times
