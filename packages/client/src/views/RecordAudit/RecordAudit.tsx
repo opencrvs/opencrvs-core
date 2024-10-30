@@ -766,7 +766,10 @@ const BodyContent = ({
                 assignment: data.fetchRegistration?.registration?.assignment
               }
             } else {
-              declaration = getGQLDeclaration(data.fetchRegistration, language)
+              declaration = getGQLDeclaration(data.fetchRegistration, intl)
+              /* draft might not be in store for unassigned record,
+              in that case use the one from the short declaration info query */
+              declaration.assignment ??= draft?.assignmentStatus
             }
 
             return (
@@ -803,7 +806,7 @@ const BodyContent = ({
           }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-            language,
+            intl,
             trackingId
           )
     const wqStatus = workqueueDeclaration?.registration?.status

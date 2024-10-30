@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormField, IRadioGroupFormField, ISelectOption } from '@client/forms'
-import { IOfflineData } from '@client/offline/reducer'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
@@ -25,15 +24,16 @@ import type {
   GQLAssignmentData,
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
-import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
 import {
   recordAuditMessages,
   regActionMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
+import { IDynamicValues } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
+import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
 import {
   EMPTY_STRING,
   FIELD_AGENT_ROLES,
@@ -374,7 +374,7 @@ export const getDraftDeclarationData = (
 
 export const getWQDeclarationData = (
   workqueueDeclaration: GQLEventSearchSet,
-  language: string,
+  intl: IntlShape,
   trackingId: string
 ) => {
   let name = EMPTY_STRING
@@ -382,19 +382,35 @@ export const getWQDeclarationData = (
     isBirthDeclaration(workqueueDeclaration) &&
     workqueueDeclaration.childName
   ) {
-    name = getName(workqueueDeclaration.childName, language)
+    name = getLocalisedName(intl, {
+      firstNames: workqueueDeclaration.childName[0]?.firstNames,
+      middleName: workqueueDeclaration.childName[0]?.middleName,
+      familyName: workqueueDeclaration.childName[0]?.familyName
+    })
   } else if (
     isDeathDeclaration(workqueueDeclaration) &&
     workqueueDeclaration.deceasedName
   ) {
-    name = getName(workqueueDeclaration.deceasedName, language)
+    name = getLocalisedName(intl, {
+      firstNames: workqueueDeclaration.deceasedName[0]?.firstNames,
+      middleName: workqueueDeclaration.deceasedName[0]?.middleName,
+      familyName: workqueueDeclaration.deceasedName[0]?.familyName
+    })
   } else if (
     isMarriageDeclaration(workqueueDeclaration) &&
     workqueueDeclaration.brideName &&
     workqueueDeclaration.groomName
   ) {
-    const groomName = getName(workqueueDeclaration.groomName, language)
-    const brideName = getName(workqueueDeclaration.brideName, language)
+    const groomName = getLocalisedName(intl, {
+      firstNames: workqueueDeclaration.groomName[0]?.firstNames,
+      middleName: workqueueDeclaration.groomName[0]?.middleName,
+      familyName: workqueueDeclaration.groomName[0]?.familyName
+    })
+    const brideName = getLocalisedName(intl, {
+      firstNames: workqueueDeclaration.brideName[0]?.firstNames,
+      middleName: workqueueDeclaration.brideName[0]?.middleName,
+      familyName: workqueueDeclaration.brideName[0]?.familyName
+    })
 
     name =
       brideName && groomName
@@ -416,25 +432,48 @@ export const getWQDeclarationData = (
 
 export const getGQLDeclaration = (
   data: IGQLDeclaration,
-  language: string
+  intl: IntlShape
 ): IDeclarationData => {
   let name = EMPTY_STRING
   if (data.child) {
-    name = data.child.name ? getName(data.child.name, language) : EMPTY_STRING
+    name = data.child.name
+      ? getLocalisedName(intl, {
+          firstNames: data.child.name[0]?.firstNames,
+          middleName: data.child.name[0]?.middleName,
+          familyName: data.child.name[0]?.familyName
+        })
+      : EMPTY_STRING
   } else if (data.deceased) {
     name = data.deceased.name
-      ? getName(data.deceased.name, language)
+      ? getLocalisedName(intl, {
+          firstNames: data.deceased.name[0]?.firstNames,
+          middleName: data.deceased.name[0]?.middleName,
+          familyName: data.deceased.name[0]?.familyName
+        })
       : EMPTY_STRING
   } else if (data.groom || data.bride) {
     if (data.groom?.name && data.bride?.name) {
-      name = `${getName(data.groom.name, language)} & ${getName(
-        data.bride.name,
-        language
-      )}`
+      name = `${getLocalisedName(intl, {
+        firstNames: data.groom.name[0]?.firstNames,
+        middleName: data.groom.name[0]?.middleName,
+        familyName: data.groom.name[0]?.familyName
+      })} & ${getLocalisedName(intl, {
+        firstNames: data.bride.name[0]?.firstNames,
+        middleName: data.bride.name[0]?.middleName,
+        familyName: data.bride.name[0]?.firstNames
+      })}`
     } else if (data.groom?.name) {
-      name = getName(data.groom.name, language)
+      name = getLocalisedName(intl, {
+        firstNames: data.groom.name[0]?.firstNames,
+        middleName: data.groom.name[0]?.middleName,
+        familyName: data.groom.name[0]?.familyName
+      })
     } else if (data.bride?.name) {
-      name = getName(data.bride.name, language)
+      name = getLocalisedName(intl, {
+        firstNames: data.bride.name[0]?.firstNames,
+        middleName: data.bride.name[0]?.middleName,
+        familyName: data.bride.name[0]?.familyName
+      })
     } else {
       name = EMPTY_STRING
     }
