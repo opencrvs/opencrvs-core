@@ -149,7 +149,21 @@ jobs:
       - name: Install dependencies
         run: yarn install --ignore-scripts
       - name: Create reporter
-        run: echo "const reporter = function (options) {const totalIssues = Object.values(options.issues).reduce((acc, issueRecords) =>acc +Object.values(issueRecords).reduce((acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,0),0); console.log(JSON.stringify({ totalIssues }))}; export default reporter" > knip-reporter.js
+        run: |
+          cat << 'EOF' > knip-reporter.js
+          const reporter = function (options) {
+            const totalIssues = Object.values(options.issues).reduce(
+              (acc, issueRecords) =>
+                acc + Object.values(issueRecords).reduce(
+                  (acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,
+                  0
+                ),
+              0
+            );
+            console.log(JSON.stringify({ totalIssues }));
+          };
+          export default reporter;
+          EOF
       - name: Run knip on base branch
         id: knip_base
         run: |
@@ -168,7 +182,21 @@ jobs:
       - name: Install dependencies
         run: yarn install --ignore-scripts
       - name: Create reporter
-        run: echo "const reporter = function (options) {const totalIssues = Object.values(options.issues).reduce((acc, issueRecords) =>acc +Object.values(issueRecords).reduce((acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,0),0); console.log(JSON.stringify({ totalIssues }))}; export default reporter" > knip-reporter.js
+        run: |
+          cat << 'EOF' > knip-reporter.js
+          const reporter = function (options) {
+            const totalIssues = Object.values(options.issues).reduce(
+              (acc, issueRecords) =>
+                acc + Object.values(issueRecords).reduce(
+                  (acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,
+                  0
+                ),
+              0
+            );
+            console.log(JSON.stringify({ totalIssues }));
+          };
+          export default reporter;
+          EOF
       - name: Run knip on PR branch
         run: |
           npx knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --exports --reporter=./knip-reporter.js
