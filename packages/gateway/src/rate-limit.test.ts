@@ -21,6 +21,7 @@ import {
   flushAll
 } from './utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
+import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
@@ -144,12 +145,16 @@ describe('Rate limit', () => {
 
   it('does not throw RateLimitError when a non-rate-limited route is being called 20 times', async () => {
     const resolverCalls = Array.from({ length: 20 }, async () => {
-      fetch.mockResponseOnce(JSON.stringify([{ resourceType: 'Location' }]))
-      await locationResolvers.Query.hasChildLocation(
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          savedAdministrativeLocation({ partOf: { reference: 'Location/1' } })
+        ])
+      )
+      await locationResolvers.Query!.isLeafLevelLocation(
         {},
-        { parentId: '1' },
+        { locationId: '1' },
         { headers: authHeaderRegAgent },
-        { fieldName: 'hasChildLocation' }
+        { fieldName: 'isLeafLevelLocation' }
       )
     })
 
