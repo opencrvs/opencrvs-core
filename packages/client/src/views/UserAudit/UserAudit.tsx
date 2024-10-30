@@ -86,6 +86,7 @@ const transformUserQueryResult = (
         ''
     },
     name: getLocalisedName(intl, userData.name[0]),
+    systemRole: userData.systemRole,
     role: userData.role,
     number: userData.mobile,
     email: userData.email,

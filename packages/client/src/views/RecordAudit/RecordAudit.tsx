@@ -767,9 +767,6 @@ const BodyContent = ({
               }
             } else {
               declaration = getGQLDeclaration(data.fetchRegistration, intl)
-              /* draft might not be in store for unassigned record,
-              in that case use the one from the short declaration info query */
-              declaration.assignment ??= draft?.assignmentStatus
             }
 
             return (

@@ -39,7 +39,8 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import {
   getAddressName,
   UserStatus,
-  canDeactivateUser
+  canDeactivateUser,
+  getUserRoleIntlKey
 } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -557,7 +558,9 @@ function UserListComponent(props: IProps) {
         if (user !== null) {
           const name = getLocalisedName(intl, user.name[0])
 
-          const role = intl.formatMessage(user.role.label)
+          const role = intl.formatMessage({
+            id: getUserRoleIntlKey(user.role._id)
+          })
           const avatar = user.avatar
 
           return {
