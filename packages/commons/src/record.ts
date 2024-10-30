@@ -26,7 +26,6 @@ import {
   SavedBundle,
   Task,
   TrackingID,
-  getBusinessStatus,
   getComposition,
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -34,12 +33,6 @@ import {
   isTask
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
-
-export enum EVENT_TYPE {
-  BIRTH = 'BIRTH',
-  DEATH = 'DEATH',
-  MARRIAGE = 'MARRIAGE'
-}
 
 export function getEventLabelFromBundle(bundle: Bundle) {
   const composition = getComposition(bundle)
@@ -57,8 +50,6 @@ export function getEventLabelFromBundle(bundle: Bundle) {
     return 'MarriageRegistration'
   }
 }
-
-type RecordBase = Bundle
 
 export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
 

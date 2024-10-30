@@ -56,7 +56,6 @@ import {
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
   findCompositionSection,
-  findExtension,
   getComposition,
   isObservation,
   isURLReference,
@@ -70,12 +69,7 @@ import {
   isHealthFacility,
   PartialBy
 } from '../../types'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  EVENT_TYPE,
-  FHIR_OBSERVATION_CATEGORY_URL,
-  MAKE_CORRECTION_EXTENSION_URL
-} from '../constants'
+import { EVENT_TYPE, FHIR_OBSERVATION_CATEGORY_URL } from '../constants'
 
 function findCompositionSectionInBundle<T extends Bundle>(
   code: CompositionSectionCode,

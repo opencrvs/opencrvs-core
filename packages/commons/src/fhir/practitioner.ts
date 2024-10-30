@@ -11,9 +11,7 @@
 import {
   Bundle,
   Resource,
-  Task,
   WithStrictExtensions,
-  findExtension,
   WithUUID,
   SavedReference
 } from '.'

@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Bundle } from '..'
+import { Bundle, EVENT_TYPE } from '..'
 import { IsNominal } from '../../nominal'
-import { EVENT_TYPE } from '../../record'
 import {
   BirthRegistration,
   DeathRegistration,

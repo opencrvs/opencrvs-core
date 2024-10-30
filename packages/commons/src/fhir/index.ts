@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { RegistrationStatus, ValidRecord } from '../record'
+import { ValidRecord } from '../record'
 import { Nominal } from '../nominal'
 import { UUID } from '../uuid'
 import { Encounter, SavedEncounter } from './encounter'
 import { Extension } from './extension'
-import { Patient } from './patient'
 import {
   CompositionSection,
   CompositionSectionCode,

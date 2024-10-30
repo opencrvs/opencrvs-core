@@ -92,10 +92,11 @@ import {
   findExtension,
   getComposition,
   markSaved,
-  CompositionSectionTitleByCode
+  CompositionSectionTitleByCode,
+  EVENT_TYPE
 } from '..'
 import { getUUID } from '../..'
-import { EVENT_TYPE, replaceFromBundle } from '../../record'
+import { replaceFromBundle } from '../../record'
 import {
   AddressInput,
   Attachment,

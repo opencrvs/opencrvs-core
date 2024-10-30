@@ -23,6 +23,7 @@ import {
   QuestionnaireResponse,
   RelatedPerson,
   Section,
+  EVENT_TYPE,
   Task
 } from '..'
 import {
@@ -30,7 +31,6 @@ import {
   CompositionSectionTitle,
   CompositionSectionTitleByCode,
   DEATH_CORRECTION_ENCOUNTER_CODE,
-  EVENT_TYPE,
   PartialBy
 } from '../../types'
 import { UUID } from '../../uuid'
