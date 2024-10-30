@@ -353,7 +353,7 @@ async function getWorkqueueData(
 
   const scope = getScope(state)
   const reviewStatuses =
-    scope && scope.includes('register')
+    scope && scope.includes(SCOPES.RECORD_REGISTER)
       ? [
           EVENT_STATUS.DECLARED,
           EVENT_STATUS.VALIDATED,

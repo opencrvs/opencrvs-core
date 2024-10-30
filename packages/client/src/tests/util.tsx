@@ -88,7 +88,6 @@ export const REGISTRAR_DEFAULT_SCOPES = [
   /*
    * @deprecated
    */
-  SCOPES.REGISTER,
   SCOPES.PERFORMANCE,
   SCOPES.CERTIFY,
 

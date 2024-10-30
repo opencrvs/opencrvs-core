@@ -16,7 +16,7 @@ import {
   storeDeclaration
 } from '@opencrvs/client/src/declarations'
 import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Event, RegStatus, SCOPES } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
@@ -256,7 +256,7 @@ const mockFetchUserDetails = vi.fn()
 mockFetchUserDetails.mockReturnValue(mockUserResponseWithName)
 queries.fetchUserDetails = mockFetchUserDetails
 describe('ReviewForm tests', () => {
-  const scope = ['register']
+  const scope = [SCOPES.RECORD_REGISTER]
   const mock: any = vi.fn()
   let form: IForm
   let store: AppStore

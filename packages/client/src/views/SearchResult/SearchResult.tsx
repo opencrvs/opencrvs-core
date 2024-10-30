@@ -216,7 +216,7 @@ class SearchResultView extends React.Component<
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {

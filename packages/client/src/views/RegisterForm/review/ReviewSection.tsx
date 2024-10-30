@@ -73,7 +73,7 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event, RegStatus, Scope } from '@client/utils/gateway'
+import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -841,7 +841,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('register')
+      return (
+        this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
+      )
     } else {
       return false
     }

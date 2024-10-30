@@ -95,7 +95,6 @@ export const DEFAULT_ROLES_DEFINITION = [
       id: 'userRole.localRegistrar'
     },
     scopes: [
-      SCOPES.REGISTER,
       SCOPES.PERFORMANCE,
       SCOPES.CERTIFY,
       SCOPES.RECORD_DECLARE_BIRTH,
@@ -196,22 +195,9 @@ export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-export const LEGACY_SCOPES = {
-  demo: SCOPES.DEMO,
-  register: SCOPES.REGISTER,
-  certify: SCOPES.CERTIFY,
-  performance: SCOPES.PERFORMANCE,
-  systemAdmin: SCOPES.SYSADMIN,
-  nationalSystemAdmin: SCOPES.NATLSYSADMIN,
-  /** Bypasses the rate limiting in gateway. Useful for data seeder. */
-  bypassRateLimit: SCOPES.BYPASSRATELIMIT,
-  teams: SCOPES.TEAMS,
-  config: SCOPES.CONFIG
-} as const
-
 /** All the scopes user can be assigned to – old & new */
 export type UserScope =
-  | (typeof LEGACY_SCOPES)[keyof typeof LEGACY_SCOPES]
+  | (typeof SCOPES)[keyof typeof SCOPES]
   | 'profile.electronic-signature'
 
 export type SystemScope =

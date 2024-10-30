@@ -222,7 +222,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
   }
 
   const userHasRegisterScope = () => {
-    return props.scope && props.scope.includes('register')
+    return props.scope && props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   const userHasValidateScope = () => {
