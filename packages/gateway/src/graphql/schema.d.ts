@@ -28,7 +28,7 @@ export interface GQLQuery {
   fetchRegistrationCountByStatus?: GQLRegistrationCountResult
   fetchMarriageRegistration?: GQLMarriageRegistration
   fetchRecordDetailsForVerification?: GQLRecordDetails
-  hasChildLocation?: GQLLocation
+  isLeafLevelLocation: boolean
   getUser?: GQLUser
   getUserByMobile?: GQLUser
   getUserByEmail?: GQLUser
@@ -250,25 +250,6 @@ export interface GQLRecordDetailsNameMap {
   RecordDetails: GQLRecordDetails
   BirthRegistration: GQLBirthRegistration
   DeathRegistration: GQLDeathRegistration
-}
-
-export interface GQLLocation {
-  id: string
-  _fhirID?: string
-  identifier?: Array<GQLIdentifier>
-  status?: string
-  name?: string
-  alias?: Array<string>
-  description?: string
-  partOf?: string
-  type?: string
-  telecom?: Array<GQLContactPoint | null>
-  address?: GQLAddress
-  longitude?: number
-  latitude?: number
-  altitude?: number
-  geoData?: string
-  hierarchy?: Array<GQLLocation>
 }
 
 export interface GQLUser {
@@ -735,6 +716,25 @@ export interface GQLRelatedPerson {
   exactDateOfBirthUnknown?: boolean
 }
 
+export interface GQLLocation {
+  id: string
+  _fhirID?: string
+  identifier?: Array<GQLIdentifier>
+  status?: string
+  name?: string
+  alias?: Array<string>
+  description?: string
+  partOf?: string
+  type?: string
+  telecom?: Array<GQLContactPoint | null>
+  address?: GQLAddress
+  longitude?: number
+  latitude?: number
+  altitude?: number
+  geoData?: string
+  hierarchy?: Array<GQLLocation>
+}
+
 export interface GQLQuestionnaireQuestion {
   fieldId?: string
   value?: string
@@ -841,11 +841,6 @@ export interface GQLStatusWiseRegistrationCount {
   count: number
 }
 
-export interface GQLIdentifier {
-  system?: string
-  value?: string
-}
-
 export const enum GQLSystemRoleType {
   FIELD_AGENT = 'FIELD_AGENT',
   REGISTRATION_AGENT = 'REGISTRATION_AGENT',
@@ -872,6 +867,11 @@ export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
   role: GQLSystemRoleType
   signature?: GQLSignature
+}
+
+export interface GQLIdentifier {
+  system?: string
+  value?: string
 }
 
 export interface GQLSignature {
@@ -1722,7 +1722,6 @@ export interface GQLResolver {
     __resolveType: GQLRecordDetailsTypeResolver
   }
 
-  Location?: GQLLocationTypeResolver
   User?: GQLUserTypeResolver
   SearchUserResult?: GQLSearchUserResultTypeResolver
   SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
@@ -1755,6 +1754,7 @@ export interface GQLResolver {
   Map?: GraphQLScalarType
   Registration?: GQLRegistrationTypeResolver
   RelatedPerson?: GQLRelatedPersonTypeResolver
+  Location?: GQLLocationTypeResolver
   QuestionnaireQuestion?: GQLQuestionnaireQuestionTypeResolver
   History?: GQLHistoryTypeResolver
   MedicalPractitioner?: GQLMedicalPractitionerTypeResolver
@@ -1766,9 +1766,9 @@ export interface GQLResolver {
   Attachment?: GQLAttachmentTypeResolver
   Deceased?: GQLDeceasedTypeResolver
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
-  Identifier?: GQLIdentifierTypeResolver
   Role?: GQLRoleTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
+  Identifier?: GQLIdentifierTypeResolver
   Signature?: GQLSignatureTypeResolver
   BookmarkedSeachItem?: GQLBookmarkedSeachItemTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
@@ -1836,7 +1836,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   fetchRegistrationCountByStatus?: QueryToFetchRegistrationCountByStatusResolver<TParent>
   fetchMarriageRegistration?: QueryToFetchMarriageRegistrationResolver<TParent>
   fetchRecordDetailsForVerification?: QueryToFetchRecordDetailsForVerificationResolver<TParent>
-  hasChildLocation?: QueryToHasChildLocationResolver<TParent>
+  isLeafLevelLocation?: QueryToIsLeafLevelLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
   getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
   getUserByEmail?: QueryToGetUserByEmailResolver<TParent>
@@ -2101,13 +2101,16 @@ export interface QueryToFetchRecordDetailsForVerificationResolver<
   ): TResult
 }
 
-export interface QueryToHasChildLocationArgs {
-  parentId: string
+export interface QueryToIsLeafLevelLocationArgs {
+  locationId: string
 }
-export interface QueryToHasChildLocationResolver<TParent = any, TResult = any> {
+export interface QueryToIsLeafLevelLocationResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
-    args: QueryToHasChildLocationArgs,
+    args: QueryToIsLeafLevelLocationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -4344,169 +4347,6 @@ export interface GQLRecordDetailsTypeResolver<TParent = any> {
     | 'DeathRegistration'
     | Promise<'BirthRegistration' | 'DeathRegistration'>
 }
-export interface GQLLocationTypeResolver<TParent = any> {
-  id?: LocationToIdResolver<TParent>
-  _fhirID?: LocationTo_fhirIDResolver<TParent>
-  identifier?: LocationToIdentifierResolver<TParent>
-  status?: LocationToStatusResolver<TParent>
-  name?: LocationToNameResolver<TParent>
-  alias?: LocationToAliasResolver<TParent>
-  description?: LocationToDescriptionResolver<TParent>
-  partOf?: LocationToPartOfResolver<TParent>
-  type?: LocationToTypeResolver<TParent>
-  telecom?: LocationToTelecomResolver<TParent>
-  address?: LocationToAddressResolver<TParent>
-  longitude?: LocationToLongitudeResolver<TParent>
-  latitude?: LocationToLatitudeResolver<TParent>
-  altitude?: LocationToAltitudeResolver<TParent>
-  geoData?: LocationToGeoDataResolver<TParent>
-  hierarchy?: LocationToHierarchyResolver<TParent>
-}
-
-export interface LocationToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationTo_fhirIDResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToIdentifierResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToStatusResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToNameResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToAliasResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToDescriptionResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToPartOfResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToTelecomResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToAddressResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToLongitudeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToLatitudeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToAltitudeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LocationToHierarchyResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLUserTypeResolver<TParent = any> {
   id?: UserToIdResolver<TParent>
   userMgntUserID?: UserToUserMgntUserIDResolver<TParent>
@@ -6274,6 +6114,169 @@ export interface RelatedPersonToExactDateOfBirthUnknownResolver<
   ): TResult
 }
 
+export interface GQLLocationTypeResolver<TParent = any> {
+  id?: LocationToIdResolver<TParent>
+  _fhirID?: LocationTo_fhirIDResolver<TParent>
+  identifier?: LocationToIdentifierResolver<TParent>
+  status?: LocationToStatusResolver<TParent>
+  name?: LocationToNameResolver<TParent>
+  alias?: LocationToAliasResolver<TParent>
+  description?: LocationToDescriptionResolver<TParent>
+  partOf?: LocationToPartOfResolver<TParent>
+  type?: LocationToTypeResolver<TParent>
+  telecom?: LocationToTelecomResolver<TParent>
+  address?: LocationToAddressResolver<TParent>
+  longitude?: LocationToLongitudeResolver<TParent>
+  latitude?: LocationToLatitudeResolver<TParent>
+  altitude?: LocationToAltitudeResolver<TParent>
+  geoData?: LocationToGeoDataResolver<TParent>
+  hierarchy?: LocationToHierarchyResolver<TParent>
+}
+
+export interface LocationToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationTo_fhirIDResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToIdentifierResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToStatusResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToAliasResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToDescriptionResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToPartOfResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToTelecomResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToAddressResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToLongitudeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToLatitudeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToAltitudeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToGeoDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocationToHierarchyResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLQuestionnaireQuestionTypeResolver<TParent = any> {
   fieldId?: QuestionnaireQuestionToFieldIdResolver<TParent>
   value?: QuestionnaireQuestionToValueResolver<TParent>
@@ -7089,29 +7092,6 @@ export interface StatusWiseRegistrationCountToCountResolver<
   ): TResult
 }
 
-export interface GQLIdentifierTypeResolver<TParent = any> {
-  system?: IdentifierToSystemResolver<TParent>
-  value?: IdentifierToValueResolver<TParent>
-}
-
-export interface IdentifierToSystemResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface IdentifierToValueResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLRoleTypeResolver<TParent = any> {
   _id?: RoleTo_idResolver<TParent>
   labels?: RoleToLabelsResolver<TParent>
@@ -7163,6 +7143,29 @@ export interface LocalRegistrarToSignatureResolver<
   TParent = any,
   TResult = any
 > {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLIdentifierTypeResolver<TParent = any> {
+  system?: IdentifierToSystemResolver<TParent>
+  value?: IdentifierToValueResolver<TParent>
+}
+
+export interface IdentifierToSystemResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IdentifierToValueResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
