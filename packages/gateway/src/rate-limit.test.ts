@@ -14,7 +14,6 @@ import { resolvers as locationRootResolvers } from '@gateway/features/location/r
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-// eslint-disable-next-line import/no-relative-parent-imports
 import {
   startContainer,
   stopContainer,
@@ -22,6 +21,7 @@ import {
 } from './utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
 import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
+import { createServer } from '@gateway/server'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
@@ -238,5 +238,58 @@ describe('Rate limit', () => {
     })
 
     return expect(() => Promise.all(resolverCalls)).not.toThrowError()
+  })
+
+  it.only('handles multiple users authenticating with different usernames', async () => {
+    const server = await createServer()
+
+    // okay to go through 10 times
+    for (let i = 1; i <= 10; i++) {
+      const res = await server.app.inject({
+        method: 'POST',
+        url: '/auth/authenticate',
+        payload: {
+          username: 'test.user',
+          password: 'test'
+        }
+      })
+
+      expect((res.result as any).statusCode).not.toBe(402)
+    }
+
+    // should return 402 Forbidden
+    const res = await server.app.inject({
+      method: 'POST',
+      url: '/auth/authenticate',
+      payload: {
+        username: 'test.user',
+        password: 'test'
+      }
+    })
+    expect((res.result as any).statusCode).toBe(402)
+
+    // okay to go through 10 times with a different username
+    for (let i = 1; i <= 10; i++) {
+      const res = await server.app.inject({
+        method: 'POST',
+        url: '/auth/authenticate',
+        payload: {
+          username: 'test.user2',
+          password: 'test'
+        }
+      })
+      expect((res.result as any).statusCode).not.toBe(402)
+    }
+
+    // should return 402 Forbidden
+    const res2 = await server.app.inject({
+      method: 'POST',
+      url: '/auth/authenticate',
+      payload: {
+        username: 'test.user2',
+        password: 'test'
+      }
+    })
+    expect((res2.result as any).statusCode).toBe(402)
   })
 })
