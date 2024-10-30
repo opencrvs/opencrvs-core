@@ -38,13 +38,12 @@
     "add:license": "license-check-and-add add -f license-config.json",
     "build:components": "lerna run build --scope @opencrvs/components",
     "debug": "bash debug-service-in-chrome.sh"
-    },
+  },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
     "@types/node": "^22.7.9",
     "concurrently": "^8.0.0",
     "husky": "^9.1.6",
-    "knip": "^5.34.0",
     "lerna": "^8.0.0",
     "lint-staged": "^15.2.10",
     "prettier": "2.8.8",
