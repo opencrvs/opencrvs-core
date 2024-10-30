@@ -46,17 +46,5 @@ export const env = cleanEnv(process.env, {
   CONFIG_TOKEN_EXPIRY_SECONDS: num({ default: 604800 }), // 1 week
   CONFIG_SMS_CODE_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
   CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS: num({ default: 600 }), // 10 minutes
-  MINIO_BUCKET: str({ devDefault: 'ocrvs' }),
-
-  NATIONAL_ID_OIDP_BASE_URL: str({ default: undefined }),
-  NATIONAL_ID_OIDP_TOKEN_URL: str({ default: undefined }),
-  NATIONAL_ID_OIDP_USERINFO_URL: str({ default: undefined }),
-  NATIONAL_ID_OIDP_CLIENT_PRIVATE_KEY: str({
-    default: undefined,
-    desc: 'Base64 encoded RS256 JSON Web Key'
-  }),
-  NATIONAL_ID_OIDP_JWT_AUD_CLAIM: str({
-    default: undefined,
-    desc: 'Value for "aud" claim when getting access token for fetching Open ID provider user info'
-  })
+  MINIO_BUCKET: str({ devDefault: 'ocrvs' })
 })
