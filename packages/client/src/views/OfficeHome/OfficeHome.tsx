@@ -37,7 +37,6 @@ import {
   FIELD_AGENT_ROLES
 } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'

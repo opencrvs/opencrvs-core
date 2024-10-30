@@ -26,7 +26,6 @@ import type {
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
 import {

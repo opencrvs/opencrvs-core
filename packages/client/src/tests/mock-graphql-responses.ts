@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
-
 export const birthDeclarationForReview = {
   _fhirIDMap: {
     composition: 'ab6123f6-0fce-43f2-a973-c538d04de741',
