@@ -55,7 +55,7 @@ export interface IAuthenticateResponse {
   email?: string
 }
 
-enum QUESTION_KEYS {
+export enum QUESTION_KEYS {
   BIRTH_TOWN = 'BIRTH_TOWN',
   HIGH_SCHOOL = 'HIGH_SCHOOL',
   MOTHER_NAME = 'MOTHER_NAME',
