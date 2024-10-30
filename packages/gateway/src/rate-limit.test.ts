@@ -38,6 +38,7 @@ jest.mock('./constants', () => {
 })
 describe('Rate limit', () => {
   let authHeaderRegAgent: { Authorization: string }
+  let authHeaderRegAgent2: { Authorization: string }
 
   beforeAll(async () => {
     container = await startContainer()
@@ -62,6 +63,20 @@ describe('Rate limit', () => {
     )
     authHeaderRegAgent = {
       Authorization: `Bearer ${validateToken}`
+    }
+
+    const validateToken2 = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('./test/cert.key'),
+      {
+        subject: '5bdc55ece42c82de9a529c36',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderRegAgent2 = {
+      Authorization: `Bearer ${validateToken2}`
     }
   })
 
@@ -137,6 +152,70 @@ describe('Rate limit', () => {
       resolvers.Query.verifyPasswordById(
         {},
         { id: '123', password: 'test' },
+        { headers: authHeaderRegAgent },
+        { fieldName: 'verifyPasswordById' }
+      )
+    ).resolves.not.toThrowError()
+  })
+
+  it('does not throw RateLimitError when different users try to access the same route', async () => {
+    const users = [
+      { username: 'sakibal.hasan', id: '0' },
+      { username: 'p.rouvila', id: '1' }
+    ]
+
+    // Call the route 7 times for all users, it should not throw RateLimitError for this user yet
+    for (let i = 1; i <= 7; i++) {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: users[0].username,
+          id: users[0].id,
+          scope: ['declare'],
+          status: 'active'
+        })
+      )
+
+      await resolvers.Query.verifyPasswordById(
+        {},
+        { id: users[0].id, password: 'test' },
+        { headers: authHeaderRegAgent },
+        { fieldName: 'verifyPasswordById' }
+      )
+    }
+
+    // ...now call the same route 7 times for the second user, it should not throw RateLimitError for this user either
+    for (let i = 1; i <= 7; i++) {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: users[1].username,
+          id: users[1].id,
+          scope: ['declare'],
+          status: 'active'
+        })
+      )
+
+      await resolvers.Query.verifyPasswordById(
+        {},
+        { id: users[1].id, password: 'test' },
+        { headers: authHeaderRegAgent2 },
+        { fieldName: 'verifyPasswordById' }
+      )
+    }
+
+    // ...now call the same route for the first user again, it should not still throw RateLimitError
+    fetch.mockResponseOnce(
+      JSON.stringify({
+        username: users[0].username,
+        id: users[0].id,
+        scope: ['declare'],
+        status: 'active'
+      })
+    )
+
+    return expect(
+      resolvers.Query.verifyPasswordById(
+        {},
+        { id: users[0].id, password: 'test' },
         { headers: authHeaderRegAgent },
         { fieldName: 'verifyPasswordById' }
       )
