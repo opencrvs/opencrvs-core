@@ -16,7 +16,7 @@ export const AVATAR_API =
 
 export const NATIVE_LANGUAGE = (() => {
   const languages = env.LANGUAGES.split(',')
-  return languages.find((language: string) => language !== 'en')
+  return languages.find((language) => language !== 'en')
 })()
 
 export const DEFAULT_TIMEOUT = 600000
