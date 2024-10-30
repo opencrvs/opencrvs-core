@@ -30,7 +30,6 @@ import {
   SCOPES
 } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
-import * as profileSelectors from '@client/profile/profileSelectors'
 import { createStore } from '@client/store'
 import {
   createTestComponent,

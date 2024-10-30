@@ -14,8 +14,11 @@ export const SCOPES = {
   NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
 
-  DEMO: 'demo',
+  DECLARE: 'declare',
   REGISTER: 'register',
+  VALIDATE: 'validate',
+
+  DEMO: 'demo',
   CERTIFY: 'certify',
   PERFORMANCE: 'performance',
   SYSADMIN: 'sysadmin',
@@ -53,7 +56,7 @@ export const SCOPES = {
 
   // certify
   RECORD_EXPORT_RECORDS: 'record.export-records',
-  RECORD_DECLARATION_RECORDS: 'record.declaration-print',
+  RECORD_DECLARATION_PRINT: 'record.declaration-print',
   RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
     'record.declaration.print-supporting-documents',
   RECORD_REGISTRATION_PRINT: 'record.registration-print',

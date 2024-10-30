@@ -231,8 +231,23 @@ class SearchResultView extends React.Component<
     )
   }
 
-  userHasCertifyScope() {
-    return this.props.scope && this.props.scope.includes('certify')
+  hasIssueScope() {
+    return (
+      this.props.scope &&
+      this.props.scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+    )
+  }
+
+  hasPrintScope() {
+    const printScopes = [
+      SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((scope) => printScopes.includes(scope))
+    )
   }
 
   canSearchAnywhere() {
@@ -304,7 +319,7 @@ class SearchResultView extends React.Component<
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            this.userHasCertifyScope()
+            this.hasPrintScope()
           ) {
             actions.push({
               label: this.props.intl.formatMessage(buttonMessages.print),
@@ -316,7 +331,7 @@ class SearchResultView extends React.Component<
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && this.userHasCertifyScope()) {
+          } else if (declarationIsCertified && this.hasIssueScope()) {
             actions.push({
               label: this.props.intl.formatMessage(buttonMessages.issue),
               handler: (
