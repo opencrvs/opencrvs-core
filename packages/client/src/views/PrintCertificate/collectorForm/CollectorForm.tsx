@@ -509,7 +509,7 @@ const mapStateToProps = (
   const registeringOfficeId = getRegisteringOfficeId(declaration)
   const certFormSection = getCertificateCollectorFormSection(
     declaration,
-    state.offline.offlineData.templates?.certificates
+    state.offline.offlineData.templates?.certificates || []
   )
 
   const isAllowPrintInAdvance =

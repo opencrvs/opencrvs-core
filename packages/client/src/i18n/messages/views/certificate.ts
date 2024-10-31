@@ -98,7 +98,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.section.title'
   },
   certificateTemplateSelectLabel: {
-    defaultMessage: 'Select certificate template',
+    defaultMessage: 'Type',
     description: 'The title of select certificate template action',
     id: 'certificate.selectTemplate'
   },

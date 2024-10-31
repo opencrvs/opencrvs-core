@@ -1014,7 +1014,7 @@ const marriageIssueCollectorFormOptions = [
 
 function getCertCollectorGroupForEvent(
   declaration: IDeclaration,
-  certificates?: ICertificateConfigData[]
+  certificates: ICertificateConfigData[]
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1043,14 +1043,23 @@ function getCertCollectorGroupForEvent(
   )
   const certificateTemplateOptions =
     certificates
-      ?.filter((x) => x.event === declaration.event)
+      .filter((x) => x.event === declaration.event)
       .map((x) => ({ label: x.label, value: x.id })) || []
-  const certTemplateDefaultValue = certificates?.find((x) => x.isDefault)?.id
+  const certTemplateDefaultValue = certificates.find((x) => x.isDefault)?.id
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
     error: certificateMessages.certificateCollectorError,
     fields: [
+      {
+        name: 'certificateTemplateId',
+        type: 'SELECT_WITH_OPTIONS',
+        label: certificateMessages.certificateTemplateSelectLabel,
+        required: true,
+        initialValue: certTemplateDefaultValue,
+        validator: [],
+        options: certificateTemplateOptions
+      },
       {
         name: 'type',
         type: RADIO_GROUP,
@@ -1061,15 +1070,6 @@ function getCertCollectorGroupForEvent(
         initialValue: '',
         validator: [],
         options: finalOptions
-      },
-      {
-        name: 'certificateTemplateId',
-        type: 'SELECT_WITH_OPTIONS',
-        label: certificateMessages.certificateTemplateSelectLabel,
-        required: true,
-        initialValue: certTemplateDefaultValue,
-        validator: [],
-        options: certificateTemplateOptions
       }
     ]
   }
@@ -1077,7 +1077,7 @@ function getCertCollectorGroupForEvent(
 
 export function getCertificateCollectorFormSection(
   declaration: IDeclaration,
-  certificates?: ICertificateConfigData[]
+  certificates: ICertificateConfigData[]
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
