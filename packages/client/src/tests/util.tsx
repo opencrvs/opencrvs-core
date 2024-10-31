@@ -1182,7 +1182,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.hospitalFieldAgent'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.RECORD_DECLARE_BIRTH]
         },
         {
           id: 'FIELD_AGENT',
@@ -1191,7 +1191,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.fieldAgent'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
           id: 'POLICE_OFFICER',
@@ -1200,7 +1200,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Police Officer',
             id: 'userRole.policeOfficer'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
           id: 'SOCIAL_WORKER',
@@ -1209,7 +1209,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Social Worker',
             id: 'userRole.socialWorker'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
           id: 'HEALTHCARE_WORKER',
@@ -1218,7 +1218,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Healthcare Worker',
             id: 'userRole.healthcareWorker'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.SEARCH_BIRTH]
         },
         {
           id: 'LOCAL_LEADER',
@@ -1227,7 +1227,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Leader',
             id: 'userRole.localLeader'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
           id: 'REGISTRATION_AGENT',
@@ -1236,7 +1236,10 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Registration Agent',
             id: 'userRole.registrationAgent'
           },
-          scopes: ['performance', 'certify']
+          scopes: [
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+          ]
         },
         {
           id: 'LOCAL_REGISTRAR',
@@ -1245,7 +1248,11 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Registrar',
             id: 'userRole.localRegistrar'
           },
-          scopes: ['register', 'performance', 'certify']
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_CERTIFIED_COPIES
+          ]
         },
         {
           id: 'LOCAL_SYSTEM_ADMIN',
@@ -1254,7 +1261,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local System Admin',
             id: 'userRole.localSystemAdmin'
           },
-          scopes: ['sysadmin']
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
         },
         {
           id: 'NATIONAL_SYSTEM_ADMIN',
@@ -1263,7 +1270,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National System Admin',
             id: 'userRole.nationalSystemAdmin'
           },
-          scopes: ['sysadmin', 'natlsysadmin']
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
         },
         {
           id: 'PERFORMANCE_MANAGER',
@@ -1272,7 +1279,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Performance Manager',
             id: 'userRole.performanceManager'
           },
-          scopes: ['performance']
+          scopes: [SCOPES.PERFORMANCE_READ]
         },
         {
           id: 'NATIONAL_REGISTRAR',
@@ -1281,7 +1288,13 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National Registrar',
             id: 'userRole.nationalRegistrar'
           },
-          scopes: ['register', 'performance', 'certify', 'config', 'teams']
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.ORGANISATION_READ_LOCATIONS
+          ]
         }
       ]
     }
