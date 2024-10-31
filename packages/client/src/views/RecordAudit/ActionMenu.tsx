@@ -83,6 +83,22 @@ export const ActionMenu: React.FC<{
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
+  const isValidatedDeclaration =
+    declaration &&
+    declaration.status &&
+    declaration.status === SUBMISSION_STATUS.VALIDATED
+
+  const isSentForApprovalDeclaration =
+    isValidatedDeclaration && scope.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)
+
+  const canAssignOrUnassign = scope.includes(
+    SCOPES.RECORD_ASSIGN_UNASSIGN_MYSELF
+  )
+  const canUnassignOthers = scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
+  const canDoAssignment = canAssignOrUnassign || canUnassignOthers
+
+  const showActionMenu = !isSentForApprovalDeclaration && canDoAssignment
+
   const isDuplicate = (duplicates ?? []).length > 0
 
   const handleDelete = async () => {
@@ -142,6 +158,7 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             scope={scope}
             isDuplicate={isDuplicate}
+            showActionMenu={showActionMenu}
           />
           <UpdateAction
             declarationId={id}
@@ -149,17 +166,20 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             scope={scope}
+            showActionMenu={showActionMenu}
           />
           <ArchiveAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
             scope={scope}
+            showActionMenu={showActionMenu}
             declarationStatus={status}
           />
           <ReinstateAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
             scope={scope}
+            showActionMenu={showActionMenu}
             declarationStatus={status}
           />
           <PrintAction
@@ -168,12 +188,14 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             scope={scope}
+            showActionMenu={showActionMenu}
           />
           <IssueAction
             declarationStatus={status}
             declarationId={id}
             isDownloaded={isDownloaded}
             scope={scope}
+            showActionMenu={showActionMenu}
           />
           <CorrectRecordAction
             declarationId={id}
@@ -181,6 +203,7 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             scope={scope}
+            showActionMenu={showActionMenu}
           />
           <DeleteAction
             handleDelete={handleDelete}
@@ -191,6 +214,7 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             scope={scope}
             assignment={assignment}
+            showActionMenu={showActionMenu}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
@@ -200,6 +224,7 @@ export const ActionMenu: React.FC<{
 }
 
 interface IActionItemCommonProps {
+  showActionMenu: boolean
   isDownloaded: boolean
   scope: Scope[]
   declarationStatus?: SUBMISSION_STATUS
@@ -233,7 +258,14 @@ const ViewAction: React.FC<{
 
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
-> = ({ declarationId, declarationStatus, type, isDownloaded, scope }) => {
+> = ({
+  declarationId,
+  declarationStatus,
+  type,
+  isDownloaded,
+  scope,
+  showActionMenu
+}) => {
   const dispatch = useDispatch()
   const intl = useIntl()
 
@@ -249,7 +281,8 @@ const CorrectRecordAction: React.FC<
   if (
     !isBirthOrDeathEvent ||
     !canBeCorrected(declarationStatus) ||
-    !userHasCorrectionScope
+    !userHasCorrectionScope ||
+    !showActionMenu
   ) {
     return null
   }
@@ -275,7 +308,13 @@ const CorrectRecordAction: React.FC<
 
 const ArchiveAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
+> = ({
+  toggleDisplayDialog,
+  isDownloaded,
+  declarationStatus,
+  scope,
+  showActionMenu
+}) => {
   const intl = useIntl()
 
   // @ToDo use: `record.registration-archive` after configurable role pr is merged
@@ -287,7 +326,12 @@ const ArchiveAction: React.FC<
       ((scope as any as string[]).includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
         declarationStatus !== SUBMISSION_STATUS.VALIDATED))
 
-  if (!isArchivable(declarationStatus) || !userHasArchiveScope) return null
+  if (
+    !isArchivable(declarationStatus) ||
+    !userHasArchiveScope ||
+    !showActionMenu
+  )
+    return null
 
   return (
     <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
@@ -299,7 +343,13 @@ const ArchiveAction: React.FC<
 
 const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, declarationStatus, scope }) => {
+> = ({
+  toggleDisplayDialog,
+  isDownloaded,
+  declarationStatus,
+  scope,
+  showActionMenu
+}) => {
   const intl = useIntl()
 
   // @ToDo use: `record.registration-reinstate` after configurable role pr is merged
@@ -308,7 +358,12 @@ const ReinstateAction: React.FC<
   const userHasReinstateScope =
     scope && (scope as Scope[]).includes(SCOPES.RECORD_DECLARATION_REINSTATE)
 
-  if (!isArchived(declarationStatus) || !userHasReinstateScope) return null
+  if (
+    !isArchived(declarationStatus) ||
+    !userHasReinstateScope ||
+    !showActionMenu
+  )
+    return null
 
   return (
     <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
@@ -326,7 +381,8 @@ const ReviewAction: React.FC<
   type,
   scope,
   isDownloaded,
-  isDuplicate
+  isDuplicate,
+  showActionMenu
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -335,7 +391,7 @@ const ReviewAction: React.FC<
     scope &&
     (scope as any as string[]).includes(SCOPES.RECORD_DECLARATION_REVIEW)
 
-  if (!userHasReviewScope) return null
+  if (!userHasReviewScope || !showActionMenu) return null
 
   return isPendingCorrection(declarationStatus) ? (
     <DropdownMenu.Item
@@ -373,7 +429,8 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationStatus,
   type,
   scope,
-  isDownloaded
+  isDownloaded,
+  showActionMenu
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -404,7 +461,11 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     PAGE_ID = 'review'
   }
 
-  if (isUpdatableDeclaration(declarationStatus) && userHasUpdateScope)
+  if (
+    isUpdatableDeclaration(declarationStatus) &&
+    userHasUpdateScope &&
+    showActionMenu
+  )
     return (
       <DropdownMenu.Item
         onClick={() => {
@@ -432,7 +493,8 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationStatus,
   scope,
   type,
-  isDownloaded
+  isDownloaded,
+  showActionMenu
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -441,7 +503,8 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   const userHasPrintScope =
     scope && (scope as any as string[]).includes(SCOPES.RECORD_PRINT_RECORDS)
 
-  if (!isPrintable(declarationStatus) || !userHasPrintScope) return null
+  if (!isPrintable(declarationStatus) || !userHasPrintScope || !showActionMenu)
+    return null
 
   return (
     <DropdownMenu.Item
@@ -466,7 +529,8 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   isDownloaded,
   declarationStatus,
-  scope
+  scope,
+  showActionMenu
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -478,7 +542,8 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
     )
 
-  if (!isCertified(declarationStatus) || !userHasIssueScope) return null
+  if (!isCertified(declarationStatus) || !userHasIssueScope || showActionMenu)
+    return null
 
   return (
     <DropdownMenu.Item
@@ -512,7 +577,8 @@ const UnassignAction: React.FC<{
   isDownloaded: boolean
   assignment?: GQLAssignmentData
   scope: Scope[]
-}> = ({ handleUnassign, isDownloaded, assignment, scope }) => {
+  showActionMenu: boolean
+}> = ({ handleUnassign, isDownloaded, assignment, scope, showActionMenu }) => {
   const intl = useIntl()
   const isAssignedToSomeoneElse = !isDownloaded && assignment
 
@@ -520,7 +586,10 @@ const UnassignAction: React.FC<{
   const userHasUnassignScope =
     scope && (scope as any as string[]).includes(SCOPES.RECORD_UNASSIGN_OTHERS)
 
-  if (!isDownloaded && (!isAssignedToSomeoneElse || !userHasUnassignScope))
+  if (
+    (!isDownloaded && (!isAssignedToSomeoneElse || !userHasUnassignScope)) ||
+    !showActionMenu
+  )
     return null
 
   return (
