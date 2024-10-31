@@ -241,14 +241,15 @@ const CorrectRecordAction: React.FC<
     type && [Event.Birth, Event.Death].includes(type as Event)
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
-  const userHasRegisterScope =
-    scope &&
-    (scope as any as string[]).includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+  const userHasCorrectionScope = [
+    SCOPES.RECORD_REGISTRATION_CORRECT,
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  ].some((correctionScope) => scope.find((val) => val === correctionScope))
 
   if (
     !isBirthOrDeathEvent ||
     !canBeCorrected(declarationStatus) ||
-    !userHasRegisterScope
+    !userHasCorrectionScope
   ) {
     return null
   }
