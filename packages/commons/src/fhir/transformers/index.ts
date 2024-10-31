@@ -2553,10 +2553,6 @@ const builders: IFieldBuilders = {
       }
       return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
     },
-    mosipAid: (fhirBundle, fieldValue, context) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return setResourceIdentifier(taskResource, 'mosip-aid', fieldValue)
-    },
     registrationNumber: (fhirBundle, fieldValue, context) => {
       let regNumber:
         | 'birth-registration-number'
