@@ -39,7 +39,7 @@ export default function getPlugins() {
           environment: env.DOMAIN,
           dsn: env.SENTRY_DSN,
           initialScope: {
-            tags: { service: 'ocrvs_config' }
+            tags: { service: 'config' }
           }
         },
         catchLogErrors: true
