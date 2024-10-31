@@ -45,7 +45,7 @@ export type IntlState = {
   languages: ILanguageState
 }
 
-export const initLanguages = () => {
+const initLanguages = () => {
   const initLanguages: ILanguageState = {}
   getAvailableLanguages().forEach((lang) => {
     initLanguages[lang] = {

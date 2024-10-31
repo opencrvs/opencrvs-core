@@ -21,7 +21,7 @@ import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
 import { RouteScope } from '@config/config/routes'
 
-export const SystemRoleType = [
+const SystemRoleType = [
   'FIELD_AGENT',
   'LOCAL_REGISTRAR',
   'LOCAL_SYSTEM_ADMIN',

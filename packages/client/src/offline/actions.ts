@@ -267,13 +267,6 @@ export const configLoaded = (
   payload: payload
 })
 
-export const certificateLoadFailed = (
-  payload: CertificateLoadFailedAction['payload']
-): CertificateLoadFailedAction => ({
-  type: CERTIFICATE_LOAD_FAILED,
-  payload
-})
-
 export const certificateConfigurationLoaded = (
   payload: CertificateConfiguration
 ): CertificateConfigurationLoadedAction => ({
@@ -293,12 +286,6 @@ export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
   payload: error
 })
 
-export const updateOfflineConfigData = (payload: {
-  config: IApplicationConfig
-}): ApplicationConfigUpdatedAction => ({
-  type: UPDATE_OFFLINE_CONFIG,
-  payload: payload
-})
 export const updateOfflineSystems = (payload: {
   systems: System[]
 }): UpdateOfflineSystemsAction => ({
