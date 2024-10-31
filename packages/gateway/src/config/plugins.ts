@@ -59,7 +59,7 @@ export const getPlugins = () => {
           dsn: SENTRY_DSN,
           environment: process.env.DOMAIN,
           initialScope: {
-            tags: { service: 'ocrvs_gateway' }
+            tags: { service: 'gateway' }
           }
         },
         catchLogErrors: true
