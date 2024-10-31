@@ -45,7 +45,6 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
@@ -89,6 +88,9 @@ import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
+import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
+import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -498,6 +500,16 @@ const initialState: IDeclarationsState = {
   declarations: [],
   initialDeclarationsLoaded: false,
   isWritingDraft: false
+}
+
+/* Need to add mappings for events here */
+const QueryMapper = {
+  [Event.Birth]: getBirthQueryMappings,
+  [Event.Death]: getDeathQueryMappings,
+  [Event.Marriage]: getMarriageQueryMappings
+}
+const getQueryMapping = (event: Event, action: DeclarationAction) => {
+  return QueryMapper[event] && QueryMapper[event](action)
 }
 
 export function createDeclaration(event: Event, initialData?: IFormData) {
