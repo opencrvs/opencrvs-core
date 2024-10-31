@@ -449,15 +449,30 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Outbox', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.outbox}`
 
-    const excludedScopes = [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
+    const requiredScopes = [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REVIEW_DUPLICATES,
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_DECLARATION_ARCHIVE,
+      SCOPES.RECORD_DECLARATION_REINSTATE,
+      SCOPES.RECORD_REGISTRATION_REVOKE
+    ] as Scope[]
 
-    const anyOtherScope = allScopes.filter(
-      (scope) => !excludedScopes.includes(scope)
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
     )
     const tests = [
-      [[excludedScopes[0]], false],
-      [[excludedScopes[1]], false],
-      [anyOtherScope, true]
+      [requiredScopes, true],
+      [allOtherScopes, false]
     ]
 
     tests.forEach(([scopes, exists]) => {
@@ -559,20 +574,14 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Config', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.config}_main`
 
-      const requiredScopes = [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
+      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
       )
 
       const tests = [
-        [[requiredScopes[0], orgScopes[0]], true],
-        [[requiredScopes[0], orgScopes[1]], true],
-        [[requiredScopes[0], orgScopes[2]], true],
-        [[requiredScopes[1], orgScopes[0]], true],
-        [[requiredScopes[1], orgScopes[1]], true],
-        [[requiredScopes[1], orgScopes[2]], true],
-        [requiredScopes, false],
+        [requiredScopes, true],
         [allOtherScopes, false]
       ]
 
@@ -588,9 +597,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Systems', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.systems}`
 
-      const requiredScopes = (
-        [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
-      ).concat(orgScopes)
+      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
       const tests = [[requiredScopes, true]]
 
@@ -611,20 +618,14 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Communications', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.communications}_main`
 
-      const requiredScopes = [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
+      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
       const allOtherScopes = allScopes.filter(
         (scope) => !requiredScopes.includes(scope)
       )
 
       const tests = [
-        [[requiredScopes[0], orgScopes[0]], true],
-        [[requiredScopes[0], orgScopes[1]], true],
-        [[requiredScopes[0], orgScopes[2]], true],
-        [[requiredScopes[1], orgScopes[0]], true],
-        [[requiredScopes[1], orgScopes[1]], true],
-        [[requiredScopes[1], orgScopes[2]], true],
-        [requiredScopes, false],
+        [requiredScopes, true],
         [allOtherScopes, false]
       ]
 
@@ -640,9 +641,7 @@ describe('Given a user with scopes views Navigation', () => {
     describe('Email all users', async () => {
       const id = `#navigation_${WORKQUEUE_TABS.emailAllUsers}`
 
-      const requiredScopes = (
-        [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN] as Scope[]
-      ).concat(orgScopes)
+      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
       const tests = [[requiredScopes, true]]
 

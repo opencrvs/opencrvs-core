@@ -15,13 +15,9 @@
 import { PlainDate } from '@client/utils/date-formatting'
 
 export const scopes = [
-  'natlsysadmin',
   'bypassratelimit',
   'demo',
-  'performance',
-  'sysadmin',
   'teams',
-  'config',
   'webhook',
   'nationalId',
   'notification-api',
@@ -87,13 +83,9 @@ export const scopes = [
 export type Scope = (typeof scopes)[number]
 
 export const SCOPES = {
-  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
   DEMO: 'demo',
-  PERFORMANCE: 'performance',
-  SYSADMIN: 'sysadmin',
   TEAMS: 'teams',
-  CONFIG: 'config',
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
