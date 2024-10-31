@@ -40,7 +40,7 @@ export default function getPlugins() {
           environment: process.env.DOMAIN,
           dsn: SENTRY_DSN,
           initialScope: {
-            tags: { service: 'ocrvs_documents' }
+            tags: { service: 'documents' }
           }
         },
         catchLogErrors: true
