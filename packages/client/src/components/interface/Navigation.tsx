@@ -326,17 +326,17 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasAccess(WORKQUEUE_TABS.sentForApproval) && (
+          {hasAccess(WORKQUEUE_TABS.readyForReview) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
-              id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
+              icon={() => <DeclarationIconSmall color={'orange'} />}
+              id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
               label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.sentForApproval]
+                navigationMessages[WORKQUEUE_TABS.readyForReview]
               )}
-              count={declarationCount.sentForApproval}
-              isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
+              count={declarationCount.readyForReview}
+              isSelected={tabId === WORKQUEUE_TABS.readyForReview}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+                props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -356,17 +356,17 @@ const NavigationView = (props: IFullProps) => {
               }}
             />
           )}
-          {hasAccess(WORKQUEUE_TABS.readyForReview) && (
+          {hasAccess(WORKQUEUE_TABS.sentForApproval) && (
             <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              id={`navigation_${WORKQUEUE_TABS.readyForReview}`}
+              icon={() => <DeclarationIconSmall color={'grey'} />}
+              id={`navigation_${WORKQUEUE_TABS.sentForApproval}`}
               label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.readyForReview]
+                navigationMessages[WORKQUEUE_TABS.sentForApproval]
               )}
-              count={declarationCount.readyForReview}
-              isSelected={tabId === WORKQUEUE_TABS.readyForReview}
+              count={declarationCount.sentForApproval}
+              isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+                props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
                 menuCollapse && menuCollapse()
               }}
             />
