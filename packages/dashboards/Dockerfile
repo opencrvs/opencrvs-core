@@ -6,9 +6,10 @@ ADD packages/dashboards/update-database.sh /
 ADD packages/dashboards/environment-configuration.sql /
 ADD packages/dashboards/metabase.init.db.sql /
 
+ARG VERSION  
 ENV METABASE_JAR=/app/metabase.jar
 ENV MB_DB_INIT_SQL_FILE=/metabase.init.db.sql
-ENV MB_DB_FILE=/data/metabase/metabase.mv.db
+ENV MB_DB_FILE=/data/metabase/metabase_${VERSION}.mv.db
 ENV OPENCRVS_ENVIRONMENT_CONFIGURATION_SQL_FILE=/environment-configuration.sql
 
 # Install envsubst, uuidgen
