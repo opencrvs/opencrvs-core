@@ -38,7 +38,7 @@ export default function getPlugins() {
           environment: process.env.DOMAIN,
           dsn: env.SENTRY_DSN,
           initialScope: {
-            tags: { service: 'ocrvs_auth' }
+            tags: { service: 'auth' }
           }
         },
         catchLogErrors: true
