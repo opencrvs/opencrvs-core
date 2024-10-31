@@ -19,8 +19,7 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { ActionMenu } from './ActionMenu'
-import { Scope } from '@sentry/react'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope, SCOPES as ALL_SCOPES } from '@client/utils/gateway'
 import { vi } from 'vitest'
 
 const defaultDeclaration = {
@@ -74,13 +73,6 @@ const draftDeathNotDownloaded = {
   downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
 } as unknown as IDeclaration
 
-const SCOPES = {
-  FA: ['declare'] as any as Scope,
-  RA: ['validate'] as any as Scope,
-  REGISTRAR: ['register'] as any as Scope,
-  NONE: [] as any as Scope
-}
-
 enum ACTION_STATUS {
   HIDDEN = 'Hidden',
   ENABLED = 'Enabled',
@@ -122,7 +114,7 @@ const actionStatus = (
 }
 
 describe('View action', () => {
-  const VIEW_SCOPES = SCOPES.NONE
+  const VIEW_SCOPES = [] as Scope[]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -376,7 +368,7 @@ describe('View action', () => {
 })
 
 describe('Review action', () => {
-  const REVIEW_SCOPES = SCOPES.RA
+  const REVIEW_SCOPES = [ALL_SCOPES.RECORD_DECLARATION_REVIEW]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -477,7 +469,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -496,7 +488,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathNotDownloaded}
         duplicates={['duplicate1']}
         toggleDisplayDialog={() => {}}
@@ -633,7 +625,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -770,7 +762,7 @@ describe('Review action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CORRECTION_REQUESTED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -785,7 +777,7 @@ describe('Review action', () => {
 })
 
 describe('Update action', () => {
-  const UPDATE_SCOPES = SCOPES.RA
+  const UPDATE_SCOPES = [ALL_SCOPES.RECORD_REGISTER]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -846,7 +838,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -950,7 +942,7 @@ describe('Update action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1077,7 +1069,7 @@ describe('Update action', () => {
 })
 
 describe('Archive action', () => {
-  const ARCHIVE_SCOPES = ['validate', 'register'] as any as Scope
+  const ARCHIVE_SCOPES = [ALL_SCOPES.RECORD_DECLARATION_ARCHIVE] as Scope[]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1128,7 +1120,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1189,7 +1181,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1250,7 +1242,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REJECTED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1311,7 +1303,7 @@ describe('Archive action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.VALIDATED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1419,7 +1411,7 @@ describe('Archive action', () => {
 })
 
 describe('Reinstate action', () => {
-  const REINSTATE_SCOPES = SCOPES.RA
+  const REINSTATE_SCOPES = [ALL_SCOPES.RECORD_DECLARATION_REINSTATE]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1469,7 +1461,7 @@ describe('Reinstate action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.ARCHIVED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1520,7 +1512,7 @@ describe('Reinstate action', () => {
 })
 
 describe('Print action', () => {
-  const PRINT_SCOPES = SCOPES.RA
+  const PRINT_SCOPES = [ALL_SCOPES.RECORD_PRINT_RECORDS]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1689,7 +1681,7 @@ describe('Print action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1759,7 +1751,7 @@ describe('Print action', () => {
 })
 
 describe('Issue action', () => {
-  const ISSUE_SCOPES = SCOPES.RA
+  const ISSUE_SCOPES = [ALL_SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -1945,7 +1937,7 @@ describe('Issue action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -1996,7 +1988,7 @@ describe('Issue action', () => {
 })
 
 describe('Correct action', () => {
-  const CORRECTION_SCOPES = SCOPES.RA
+  const CORRECTION_SCOPES = [ALL_SCOPES.RECORD_REGISTRATION_CORRECT]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(
@@ -2165,7 +2157,7 @@ describe('Correct action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.REGISTERED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -2203,7 +2195,7 @@ describe('Correct action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.CERTIFIED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -2288,7 +2280,7 @@ describe('Delete declaration action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DRAFT
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -2312,7 +2304,7 @@ describe('Delete declaration action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.IN_PROGRESS
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -2331,7 +2323,7 @@ describe('Delete declaration action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -2344,7 +2336,7 @@ describe('Delete declaration action', () => {
 })
 
 describe('Unassign action', () => {
-  const UNASSIGN_SCOPES = SCOPES.REGISTRAR
+  const UNASSIGN_SCOPES = [ALL_SCOPES.RECORD_UNASSIGN_OTHERS]
   const Assignment = 'Assigned to Kennedy Mweene at Ibombo District Office'
   it('Has scope - assigned to someone else', async () => {
     const { store, history } = createStore()
@@ -2379,7 +2371,7 @@ describe('Unassign action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthNotDownloaded}
         toggleDisplayDialog={() => {}}
       />,
@@ -2401,7 +2393,7 @@ describe('Unassign action', () => {
           ...defaultDeclaration,
           status: SUBMISSION_STATUS.DECLARED
         }}
-        scope={SCOPES.NONE}
+        scope={[] as Scope[]}
         draft={draftBirthDownloaded}
         toggleDisplayDialog={() => {}}
       />,
