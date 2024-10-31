@@ -127,7 +127,8 @@ const UserReviewFormComponent = ({
   goToUserReviewForm,
   goToCreateUserSection,
   submitForm,
-  goBack
+  goBack,
+  section
 }: IFullProps & IDispatchProps) => {
   const getValue = (field: IFormField) => {
     if (field.type === LOCATION_SEARCH_INPUT) {
