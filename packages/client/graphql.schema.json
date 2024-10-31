@@ -13607,11 +13607,11 @@
             "deprecationReason": null
           },
           {
-            "name": "hasChildLocation",
+            "name": "isLeafLevelLocation",
             "description": null,
             "args": [
               {
-                "name": "parentId",
+                "name": "locationId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -13628,9 +13628,13 @@
               }
             ],
             "type": {
-              "kind": "OBJECT",
-              "name": "Location",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null

@@ -31,7 +31,7 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  hasChildLocation(parentId: String!): Location
+  isLeafLevelLocation(locationId: String!): Boolean!
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
@@ -385,25 +385,6 @@ type MarriageRegistration implements EventRegistration {
 }
 
 union RecordDetails = BirthRegistration | DeathRegistration
-
-type Location {
-  id: ID!
-  _fhirID: ID
-  identifier: [Identifier!]
-  status: String
-  name: String
-  alias: [String!]
-  description: String
-  partOf: String
-  type: String
-  telecom: [ContactPoint]
-  address: Address
-  longitude: Float
-  latitude: Float
-  altitude: Float
-  geoData: String
-  hierarchy: [Location!]
-}
 
 type User {
   id: ID!
@@ -850,6 +831,25 @@ type RelatedPerson {
   exactDateOfBirthUnknown: Boolean
 }
 
+type Location {
+  id: ID!
+  _fhirID: ID
+  identifier: [Identifier!]
+  status: String
+  name: String
+  alias: [String!]
+  description: String
+  partOf: String
+  type: String
+  telecom: [ContactPoint]
+  address: Address
+  longitude: Float
+  latitude: Float
+  altitude: Float
+  geoData: String
+  hierarchy: [Location!]
+}
+
 type QuestionnaireQuestion {
   fieldId: String
   value: String
@@ -956,11 +956,6 @@ type StatusWiseRegistrationCount {
   count: Int!
 }
 
-type Identifier {
-  system: String
-  value: String
-}
-
 enum SystemRoleType {
   FIELD_AGENT
   REGISTRATION_AGENT
@@ -987,6 +982,11 @@ type LocalRegistrar {
   name: [HumanName]!
   role: SystemRoleType!
   signature: Signature
+}
+
+type Identifier {
+  system: String
+  value: String
 }
 
 type Signature {
