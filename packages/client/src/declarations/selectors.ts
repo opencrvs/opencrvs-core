@@ -30,10 +30,9 @@ export const getInitialDeclarationsLoaded = (
 const selectDeclaration =
   <T extends IDeclaration | undefined>(declarationId: string) =>
   (store: IStoreState) => {
-    const bar = getKey(store, 'declarations').find(
+    return getKey(store, 'declarations').find(
       ({ id }) => declarationId === id
     ) as T
-    return bar
   }
 
 export const useDeclaration = <T extends IDeclaration | undefined>(
