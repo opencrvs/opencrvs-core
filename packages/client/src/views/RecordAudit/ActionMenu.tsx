@@ -305,8 +305,7 @@ const ReinstateAction: React.FC<
   // @Question: If user has reinstate scope but not register scope,
   // can he reinstate validated record?
   const userHasReinstateScope =
-    scope &&
-    (scope as any as string[]).includes(SCOPES.RECORD_REGISTRATION_REINSTATE)
+    scope && (scope as Scope[]).includes(SCOPES.RECORD_DECLARATION_REINSTATE)
 
   if (!isArchived(declarationStatus) || !userHasReinstateScope) return null
 
@@ -383,7 +382,10 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     scope &&
     ((scope as any as string[]).includes(SCOPES.RECORD_REGISTER) ||
       ((scope as any as string[]).includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
-        declarationStatus === SUBMISSION_STATUS.DRAFT))
+        declarationStatus &&
+        [SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.IN_PROGRESS].includes(
+          declarationStatus
+        )))
 
   let PAGE_ROUTE: string, PAGE_ID: string
 
@@ -401,22 +403,27 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     PAGE_ID = 'review'
   }
 
-  if (!isUpdatableDeclaration(declarationStatus) || !userHasUpdateScope)
-    return null
+  if (isUpdatableDeclaration(declarationStatus) && userHasUpdateScope)
+    return (
+      <DropdownMenu.Item
+        onClick={() => {
+          dispatch(
+            goToPage(
+              PAGE_ROUTE,
+              declarationId as string,
+              PAGE_ID,
+              type as string
+            )
+          )
+        }}
+        disabled={!isDownloaded}
+      >
+        <Icon name="PencilCircle" color="currentColor" size="large" />
+        {intl.formatMessage(messages.updateDeclaration)}
+      </DropdownMenu.Item>
+    )
 
-  return (
-    <DropdownMenu.Item
-      onClick={() => {
-        dispatch(
-          goToPage(PAGE_ROUTE, declarationId as string, PAGE_ID, type as string)
-        )
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="PencilCircle" color="currentColor" size="large" />
-      {intl.formatMessage(messages.updateDeclaration)}
-    </DropdownMenu.Item>
-  )
+  return null
 }
 
 const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
