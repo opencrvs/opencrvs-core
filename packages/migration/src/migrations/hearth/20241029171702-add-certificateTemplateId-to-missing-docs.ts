@@ -10,69 +10,94 @@
  */
 import { Db, MongoClient } from 'mongodb'
 
-// Define an interface for your DocumentReference
-interface DocumentReference {
-  _id: string
-  extension: Array<{ url: string; valueString?: string }>
-  type?: {
-    coding?: Array<{ system: string; code: string }>
-  }
-}
-
 export const up = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const collection = db.collection<DocumentReference>('DocumentReference')
-      const documents = await collection.find({}).toArray()
-
-      for (const doc of documents) {
-        // Check if certificateTemplateId extension already exists
-        const hasCertificateTemplateId = doc.extension.some(
-          (ext) =>
-            ext.url ===
-            'http://opencrvs.org/specs/extension/certificateTemplateId'
-        )
-
-        if (!hasCertificateTemplateId) {
-          // Determine the certificate type based on `code`
-          const certType = doc.type?.coding?.find((x) =>
-            x.system.includes('certificate-type')
-          )?.code
-
-          let certificateTemplateId: string | null = null
-
-          switch (certType) {
-            case 'BIRTH':
-              certificateTemplateId = 'birth-certificate'
-              break
-            case 'DEATH':
-              certificateTemplateId = 'death-certificate'
-              break
-            case 'MARRIAGE':
-              certificateTemplateId = 'marriage-certificate'
-              break
+      const bulkOps = [
+        {
+          $match: {
+            'extension.url': {
+              $ne: 'http://opencrvs.org/specs/extension/certificateTemplateId'
+            }
           }
-
-          if (certificateTemplateId) {
-            // Add the missing certificateTemplateId extension
-            await collection.updateOne(
-              { _id: doc._id },
-              {
-                $push: {
-                  extension: {
-                    url: 'http://opencrvs.org/specs/extension/certificateTemplateId',
-                    valueString: certificateTemplateId
+        },
+        {
+          $set: {
+            certType: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: '$type.coding',
+                    as: 'coding',
+                    cond: {
+                      $regexMatch: {
+                        input: '$$coding.system',
+                        regex: /certificate-type/
+                      }
+                    }
                   }
-                }
+                },
+                0
+              ]
+            }
+          }
+        },
+        {
+          $set: {
+            certificateTemplateId: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$certType.code', 'BIRTH'] },
+                    then: 'birth-certificate'
+                  },
+                  {
+                    case: { $eq: ['$certType.code', 'DEATH'] },
+                    then: 'death-certificate'
+                  },
+                  {
+                    case: { $eq: ['$certType.code', 'MARRIAGE'] },
+                    then: 'marriage-certificate'
+                  }
+                ],
+                default: null
               }
-            )
-            console.log(
-              `Updated DocumentReference document with _id: ${doc._id} for missing certificateTemplateId with the extension value ${certificateTemplateId}`
-            )
+            }
+          }
+        },
+        {
+          $match: {
+            certificateTemplateId: { $ne: null }
+          }
+        },
+        {
+          $set: {
+            extension: {
+              $concatArrays: [
+                '$extension',
+                [
+                  {
+                    url: 'http://opencrvs.org/specs/extension/certificateTemplateId',
+                    valueString: '$certificateTemplateId'
+                  }
+                ]
+              ]
+            }
+          }
+        },
+        {
+          $unset: ['certType', 'certificateTemplateId']
+        },
+        {
+          $merge: {
+            into: 'DocumentReference',
+            whenMatched: 'replace'
           }
         }
-      }
+      ]
+
+      await db.collection('DocumentReference').aggregate(bulkOps).toArray()
     })
   } catch (error) {
     console.error('Error occurred while updating document references:', error)
@@ -86,25 +111,41 @@ export const down = async (db: Db, client: MongoClient) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      const collection = db.collection<DocumentReference>('DocumentReference')
-
-      // Remove the certificateTemplateId extension for each certificate type
-      await collection.updateMany(
+      const bulkOps = [
         {
-          extension: {
-            $elemMatch: {
-              url: 'http://opencrvs.org/specs/extension/certificateTemplateId'
+          $match: {
+            extension: {
+              $elemMatch: {
+                url: 'http://opencrvs.org/specs/extension/certificateTemplateId'
+              }
             }
           }
         },
         {
-          $pull: {
+          $set: {
             extension: {
-              url: 'http://opencrvs.org/specs/extension/certificateTemplateId'
+              $filter: {
+                input: '$extension',
+                as: 'ext',
+                cond: {
+                  $ne: [
+                    '$$ext.url',
+                    'http://opencrvs.org/specs/extension/certificateTemplateId'
+                  ]
+                }
+              }
             }
           }
+        },
+        {
+          $merge: {
+            into: 'DocumentReference',
+            whenMatched: 'merge',
+            whenNotMatched: 'discard'
+          }
         }
-      )
+      ]
+      await db.collection('DocumentReference').aggregate(bulkOps).toArray()
       console.log('Reverted certificateTemplateId extension from all documents')
     })
   } catch (error) {
