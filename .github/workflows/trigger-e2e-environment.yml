@@ -26,6 +26,7 @@ jobs:
   trigger-e2e:
     if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
+    environment: ${{ inputs.pr_number || github.ref }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
