@@ -26,6 +26,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
+  getToken,
   hasRegisterScope,
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
@@ -136,23 +137,32 @@ export const usePrintableCertificate = () => {
     )
   const certificateFonts = certificateTemplateConfig?.fonts ?? {}
 
+  const downloadCertificateSvg = async (certificateUrl: string) => {
+    const response = await fetch(certificateUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${getToken()}`
+      }
+    })
+    const svg = await response.text()
+    return svg
+  }
+
   useEffect(() => {
     const certificateUrl =
       (declaration && certificateTemplateConfig?.svgUrl) || ''
 
     if (certificateUrl && declaration) {
-      fetch(certificateUrl)
-        .then((res) => res.text())
-        .then((certificateTemplate) => {
-          if (!certificateTemplate) return
-          const svgWithoutFonts = compileSvg(
-            certificateTemplate,
-            { ...declaration.data.template, preview: true },
-            state
-          )
-          const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
-          setSvgCode(svgWithFonts)
-        })
+      downloadCertificateSvg(certificateUrl).then((certificateTemplate) => {
+        if (!certificateTemplate) return
+        const svgWithoutFonts = compileSvg(
+          certificateTemplate,
+          { ...declaration.data.template, preview: true },
+          state
+        )
+        const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
+        setSvgCode(svgWithFonts)
+      })
     }
     // eslint-disable-next-line
   }, [declaration])
@@ -187,9 +197,10 @@ export const usePrintableCertificate = () => {
       }
     }
 
-    const svgTemplate = await fetch(certificateTemplateConfig.svgUrl).then(
-      (res) => res.text()
+    const svgTemplate = await downloadCertificateSvg(
+      certificateTemplateConfig.svgUrl
     )
+
     const svg = await compileSvg(
       svgTemplate,
       { ...draft.data.template, preview: false },

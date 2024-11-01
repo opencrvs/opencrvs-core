@@ -362,7 +362,23 @@ function reducer(
         systems,
         templates: {
           ...state.offlineData.templates,
-          certificates
+          certificates: (certificates as ICertificateConfigData[]).map((x) => {
+            const baseUrl = window.location.origin
+            if (x.fonts) {
+              x.fonts = Object.fromEntries(
+                Object.entries(x.fonts).map(([fontFamily, fontStyles]) => [
+                  fontFamily,
+                  {
+                    normal: `${baseUrl}${fontStyles.normal}`,
+                    bold: `${baseUrl}${fontStyles.bold}`,
+                    italics: `${baseUrl}${fontStyles.italics}`,
+                    bolditalics: `${baseUrl}${fontStyles.bolditalics}`
+                  }
+                ])
+              )
+            }
+            return x
+          })
         }
       }
 
