@@ -621,15 +621,6 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              path={
-                                                routes.OIDP_VERIFICATION_CALLBACK
-                                              }
-                                              component={
-                                                OIDPVerificationCallback
-                                              }
-                                            />
-                                            <ProtectedRoute
-                                              exact
                                               path={routes.PRINT_RECORD}
                                               component={PrintRecord}
                                             />

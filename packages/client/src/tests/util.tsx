@@ -294,7 +294,7 @@ export const selectOption = (
   return input.find('.react-select__control')
 }
 
-export const eventAddressData = {
+const eventAddressData = {
   country: 'FAR',
   state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
   district: '852b103f-2fe0-4871-a323-51e51c6d9198',
@@ -314,7 +314,7 @@ export const eventAddressData = {
   internationalPostalCode: ''
 }
 
-export const primaryAddressData = {
+const primaryAddressData = {
   primaryAddress: '',
   countryPrimary: 'FAR',
   statePrimary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -328,7 +328,7 @@ export const primaryAddressData = {
   addressLine5Primary: 'my village'
 }
 
-export const secondaryAddressData = {
+const secondaryAddressData = {
   secondaryAddress: '',
   countrySecondary: 'FAR',
   stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -342,7 +342,7 @@ export const secondaryAddressData = {
   addressLine5Secondary: ''
 }
 
-export const primaryInternationalAddressLines = {
+const primaryInternationalAddressLines = {
   internationalStatePrimary: 'ujggiu',
   internationalDistrictPrimary: 'iuoug',
   internationalCityPrimary: '',
@@ -352,7 +352,7 @@ export const primaryInternationalAddressLines = {
   internationalPostalCodePrimary: ''
 }
 
-export const secondaryInternationalAddressLines = {
+const secondaryInternationalAddressLines = {
   internationalStateSecondary: 'ugou',
   internationalDistrictSecondary: 'iugoug',
   internationalCitySecondary: '',
@@ -539,7 +539,7 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-export function appendStringToKeys(
+function appendStringToKeys(
   obj: Record<string, any>,
   appendString: string
 ): Record<string, any> {

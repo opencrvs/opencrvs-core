@@ -56,12 +56,15 @@
 - Fix hardcoded placeholder copy of input when saving a query in advanced search
 - Handle label params used in form inputs when rendering in action details modal
 - **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. **_This is purely a DX improvement without affecting any functionality of the system_**
+- Fix `informantType` missing in template object which prevented rendering informant relationship data in the certificates [#5952](https://github.com/opencrvs/opencrvs-core/issues/5952)
+- Fix users hitting rate limit when multiple users authenticated the same time with different usernames [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
 
 ### Breaking changes
 
 - Remove informant notification configuration from the UI and read notification configuration settings from `record-notification` endpoint in countryconfig
 - **Gateways searchEvents API updated** `operationHistories` only returns `operationType` & `operatedOn` due to the other fields being unused in OpenCRVS
-- **Config changes to review/preview and signatures** Core used to provide review/preview section by default which are now removed and need to be provided from countryconfig. The signature field definitions (e.g. informant signature, bride signature etc.) were hard coded in core which also have now been removed. The signatures can now be added through the review/preview sections defined in countryconfig just like any other field. You can use the following section definition as the default which is without any additional fields. We highly recommend checking out our reference country repository which has the signature fields in it's review/preview sections
+- **Config changes to review/preview and signatures** Core used to provide review/preview section by default which are now removed and need to be provided from countryconfig. The signature field definitions (e.g. informant signature, bride signature etc.) were hard coded in core which also have now been removed. The signatures can now be added through the review/preview sections defined in countryconfig just like any other field. You can use the following section definition as the default which is without any additional fields. We highly recommend checking out our reference country repository which has the signature fields in its review/preview sections
+- `hasChildLocation` query has been removed from gateway. We have created the query `isLeafLevelLocation` instead which is more descriptive on its intended use.
 
 ```
 {

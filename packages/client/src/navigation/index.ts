@@ -401,12 +401,6 @@ export function goToIssueCertificatePayment(
   )
 }
 
-export function goToDeathRegistration(declarationId: string) {
-  return push(
-    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
-  )
-}
-
 export function goToSettings() {
   return push(SETTINGS)
 }

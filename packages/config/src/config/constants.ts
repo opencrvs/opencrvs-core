@@ -8,5 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const DEFAULT_TIMEOUT = 600000

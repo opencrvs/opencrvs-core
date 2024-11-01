@@ -19,7 +19,7 @@ import {
 } from '@client/forms/index'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 
-export function userSectionFormType(): ISerializedFormSection {
+function userSectionFormType(): ISerializedFormSection {
   return {
     id: UserSection.User,
     viewType: 'form',
@@ -229,7 +229,7 @@ const getPreviewGroups = () => {
   })
 }
 
-export const userSectionPreviewType: ISerializedFormSection = {
+const userSectionPreviewType: ISerializedFormSection = {
   id: UserSection.Preview,
   viewType: 'preview',
   name: userFormMessages.userFormReviewTitle,

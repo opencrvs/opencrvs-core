@@ -105,14 +105,17 @@ export const rateLimitedRoute =
     const key = pathOptionsForKey!.find(
       (path) => get(payload, path) !== undefined
     )
+    const value = get(payload, key!)
 
-    if (!key) {
-      throw new Error("Couldn't find a rate limiting key in payload")
+    if (!value) {
+      throw new Error(
+        "Couldn't find the value for a rate limiting key in payload"
+      )
     }
 
     return withRateLimit(
       {
-        key: `${key}:${route}`,
+        key: `${value}:${route}`,
         requestsPerMinute
       },
       fn

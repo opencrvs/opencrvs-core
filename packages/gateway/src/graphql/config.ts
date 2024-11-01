@@ -31,7 +31,6 @@ import { resolvers as integrationResolver } from '@gateway/features/systems/root
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -86,7 +85,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   correctionRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  OIDPUserInfoResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({
       name: 'FieldValue',

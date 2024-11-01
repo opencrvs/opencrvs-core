@@ -82,8 +82,6 @@ import {
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
   TIME,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
@@ -132,9 +130,6 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
-import { useOnlineStatus } from '@client/utils'
-import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
 import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
@@ -235,7 +230,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       (val: string) => setFieldValue(fieldDefinition.name, val),
       [fieldDefinition.name, setFieldValue]
     )
-    const isOnline = useOnlineStatus()
 
     const inputProps = {
       id: fieldDefinition.name,
@@ -615,21 +609,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
-      return (
-        <InputField {...inputFieldProps}>
-          <VerificationButton
-            id={fieldDefinition.name}
-            onClick={fieldDefinition.onClick}
-            labelForVerified={fieldDefinition.labelForVerified}
-            labelForUnverified={fieldDefinition.labelForUnverified}
-            labelForOffline={fieldDefinition.labelForOffline}
-            status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
-          />
-        </InputField>
-      )
-    }
-
     if (fieldDefinition.type === REDIRECT) {
       return (
         <RedirectField
@@ -791,7 +770,6 @@ interface IFormSectionProps {
 interface IStateProps {
   offlineCountryConfig: IOfflineData
   userDetails: UserDetails | null
-  onNidAuthenticationClick: () => void
 }
 
 interface IDispatchProps {
@@ -1120,18 +1098,12 @@ class FormSectionComponent extends React.Component<Props> {
                     field.searchableType as LocationType[]
                   )
                 }
-              : field.type === NID_VERIFICATION_BUTTON
-              ? ({
-                  ...field,
-                  onClick: this.props.onNidAuthenticationClick
-                } as INidVerificationButton)
               : field
 
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_BUTTON ||
             field.type === BUTTON
           ) {
             return (
@@ -1311,7 +1283,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
   const userDetails = useSelector(getUserDetails)
   const intl = useIntl()
   const dispatch = useDispatch()
-  const { onClick: onNidAuthenticationClick } = useNidAuthentication()
 
   return (
     <Formik<IFormSectionData>
@@ -1345,7 +1316,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
           offlineCountryConfig={offlineCountryConfig}
           userDetails={userDetails}
           dynamicDispatch={(...args) => dispatch(dynamicDispatch(...args))}
-          onNidAuthenticationClick={onNidAuthenticationClick}
         />
       )}
     </Formik>

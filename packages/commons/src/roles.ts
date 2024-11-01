@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+<<<<<<<< HEAD:packages/commons/src/roles.ts
 import { Scope } from './scopes'
 
 export type Roles = Array<{
@@ -15,3 +16,6 @@ export type Roles = Array<{
   labels: Array<{ language: string; label: string }>
   scopes: Scope[]
 }>
+========
+export * from './Dropdown'
+>>>>>>>> origin/develop:packages/components/src/Dropdown/index.ts

@@ -53,7 +53,7 @@ jobs:
           elif [ "${{ github.event_name }}" == 'pull_request' ]; then
             BRANCH=${{ github.event.pull_request.head.ref }}
           else
-            BRANCH=${{ inputs.branch_name }}
+          BRANCH=${{ inputs.branch_name }}
           fi
           ESCAPED_BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_.-]/-/g')
           echo "from branch $BRANCH"
