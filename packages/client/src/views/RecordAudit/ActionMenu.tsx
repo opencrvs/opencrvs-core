@@ -50,7 +50,12 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
-import { Event, Scope, SCOPES } from '@client/utils/gateway'
+import {
+  Event,
+  FetchDeclarationShortInfoQuery,
+  Scope,
+  SCOPES
+} from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
@@ -64,6 +69,8 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
+import { useQuery } from '@apollo/client'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -77,7 +84,17 @@ export const ActionMenu: React.FC<{
 
   const intl = useIntl()
 
-  const { id, type, assignment, status } = declaration
+  const { id, type, status } = declaration
+  const { data } = useQuery<FetchDeclarationShortInfoQuery>(
+    FETCH_DECLARATION_SHORT_INFO,
+    {
+      variables: { id: declaration.id }
+    }
+  )
+
+  const assignment =
+    (data?.fetchRegistration?.registration?.assignment as GQLAssignmentData) ??
+    declaration.assignment
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -91,13 +108,9 @@ export const ActionMenu: React.FC<{
   const isSentForApprovalDeclaration =
     isValidatedDeclaration && scope.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)
 
-  const canAssignOrUnassign = scope.includes(
-    SCOPES.RECORD_ASSIGN_UNASSIGN_MYSELF
-  )
   const canUnassignOthers = scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
-  const canDoAssignment = canAssignOrUnassign || canUnassignOthers
 
-  const showActionMenu = !isSentForApprovalDeclaration && canDoAssignment
+  const showActionMenu = !isSentForApprovalDeclaration
 
   const isDuplicate = (duplicates ?? []).length > 0
 
@@ -214,7 +227,7 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             scope={scope}
             assignment={assignment}
-            showActionMenu={showActionMenu}
+            showActionMenu={showActionMenu || canUnassignOthers}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
