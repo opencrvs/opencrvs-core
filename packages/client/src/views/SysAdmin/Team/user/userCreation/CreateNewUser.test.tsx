@@ -36,7 +36,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import { GetUserQuery } from '@client/utils/gateway'
+import { GetUserQuery, Status } from '@client/utils/gateway'
 
 const mockUsers = {
   data: {
@@ -383,9 +383,15 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            systemRole: 'NATIONAL_REGISTRAR',
-            role: { _id: '63ef9466f708ea080777c27a' },
-            status: 'active',
+            role: {
+              id: 'NATIONAL_REGISTRAR',
+              label: {
+                id: 'userRoles.nationalRegistrar',
+                defaultMessage: 'National Registrar',
+                description: ''
+              }
+            },
+            status: Status.Active,
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {

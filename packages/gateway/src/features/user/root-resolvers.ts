@@ -32,6 +32,7 @@ import {
   GQLHumanNameInput,
   GQLResolver,
   GQLSearchFieldAgentResponse,
+  GQLUserIdentifierInput,
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
@@ -649,6 +650,7 @@ function createOrUpdateUserPayload(
     role: user.role as string,
     ...(user.password && { password: user.password }),
     ...(user.status && { status: user.status }),
+    identifiers: (user.identifier as GQLUserIdentifierInput[]) || [],
     primaryOfficeId: user.primaryOffice as string,
     email: '',
     ...(user.email && { emailForNotification: user.email }), //instead of saving data in email, we want to store it in emailForNotification property
