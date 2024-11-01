@@ -10,6 +10,7 @@ spec:
       targetPort: 7070
   selector:
     app: gateway
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment

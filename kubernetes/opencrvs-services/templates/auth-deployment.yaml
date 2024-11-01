@@ -10,6 +10,7 @@ spec:
       targetPort: 4040
   selector:
     app: auth
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
