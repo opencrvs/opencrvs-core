@@ -809,11 +809,6 @@ export interface GQLStatusWiseRegistrationCount {
   count: number
 }
 
-export interface GQLIdentifier {
-  system?: string
-  value?: string
-}
-
 export const enum GQLStatus {
   active = 'active',
   deactivated = 'deactivated',
@@ -1682,7 +1677,6 @@ export interface GQLResolver {
   Attachment?: GQLAttachmentTypeResolver
   Deceased?: GQLDeceasedTypeResolver
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
-  Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Identifier?: GQLIdentifierTypeResolver
   Signature?: GQLSignatureTypeResolver
@@ -6902,29 +6896,6 @@ export interface StatusWiseRegistrationCountToCountResolver<
   ): TResult
 }
 
-export interface GQLRoleTypeResolver<TParent = any> {
-  _id?: RoleTo_idResolver<TParent>
-  labels?: RoleToLabelsResolver<TParent>
-}
-
-export interface RoleTo_idResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RoleToLabelsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLLocalRegistrarTypeResolver<TParent = any> {
   name?: LocalRegistrarToNameResolver<TParent>
   role?: LocalRegistrarToRoleResolver<TParent>
@@ -6932,6 +6903,27 @@ export interface GQLLocalRegistrarTypeResolver<TParent = any> {
 }
 
 export interface LocalRegistrarToNameResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocalRegistrarToRoleResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface LocalRegistrarToSignatureResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

@@ -922,11 +922,6 @@ type StatusWiseRegistrationCount {
   count: Int!
 }
 
-type Identifier {
-  system: String
-  value: String
-}
-
 enum Status {
   active
   deactivated

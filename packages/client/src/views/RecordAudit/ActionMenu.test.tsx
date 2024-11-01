@@ -19,8 +19,7 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { ActionMenu } from './ActionMenu'
-import { Scope } from '@sentry/react'
-import { Event } from '@client/utils/gateway'
+import { Event, Scope } from '@client/utils/gateway'
 import { vi } from 'vitest'
 
 const defaultDeclaration = {
@@ -75,10 +74,10 @@ const draftDeathNotDownloaded = {
 } as unknown as IDeclaration
 
 const SCOPES = {
-  FA: ['declare'] as any as Scope,
-  RA: ['validate'] as any as Scope,
-  REGISTRAR: ['register'] as any as Scope,
-  NONE: [] as any as Scope
+  FA: ['declare'] as Scope[],
+  RA: ['validate'] as Scope[],
+  REGISTRAR: ['register'] as Scope[],
+  NONE: [] as Scope[]
 }
 
 enum ACTION_STATUS {
@@ -1077,7 +1076,7 @@ describe('Update action', () => {
 })
 
 describe('Archive action', () => {
-  const ARCHIVE_SCOPES = ['validate', 'register'] as any as Scope
+  const ARCHIVE_SCOPES = ['validate', 'register'] as Scope[]
   it('Draft', async () => {
     const { store, history } = createStore()
     const component = await createTestComponent(

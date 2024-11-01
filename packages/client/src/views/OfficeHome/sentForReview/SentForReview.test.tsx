@@ -29,8 +29,8 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { History } from 'history'
-import { Event } from '@client/utils/gateway'
 import { vi } from 'vitest'
+import { Event } from '@client/utils/gateway'
 
 const nameObj = {
   data: {

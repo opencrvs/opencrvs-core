@@ -91,13 +91,3 @@ export async function refreshToken() {
   }
   return true
 }
-
-const enum AuthScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
-}

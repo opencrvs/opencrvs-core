@@ -17,9 +17,7 @@ import {
   flushPromises,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
-  userDetails,
-  setScopes,
-  REGISTRAR_DEFAULT_SCOPES
+  userDetails
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'

@@ -3034,7 +3034,13 @@ export type GetUserQuery = {
     } | null
     role: {
       __typename?: 'UserRole'
-      _id: string
+      id: string
+      label: {
+        __typename?: 'I18nMessage'
+        id: string
+        defaultMessage: string
+        description: string
+      }
     }
     primaryOffice: {
       __typename?: 'Location'
@@ -7321,24 +7327,24 @@ export type GetRegistrationsListByFilterQuery = {
           total: number
           late: number
           delayed: number
-          registrarPractitioner?: {
+          registrarPractitioner: {
             __typename?: 'User'
             id: string
-            systemRole: SystemRoleType
             role: {
-              __typename?: 'Role'
-              _id: string
-              labels: Array<{
-                __typename?: 'RoleLabel'
-                lang: string
-                label: string
-              }>
+              __typename?: 'UserRole'
+              id: string
+              label: {
+                __typename?: 'I18nMessage'
+                id: string
+                defaultMessage: string
+                description: string
+              }
             }
-            primaryOffice?: {
+            primaryOffice: {
               __typename?: 'Location'
               name?: string | null
               id: string
-            } | null
+            }
             name: Array<{
               __typename?: 'HumanName'
               firstNames?: string | null
@@ -7350,7 +7356,7 @@ export type GetRegistrationsListByFilterQuery = {
               type: string
               data: string
             } | null
-          } | null
+          }
         }>
       }
     | {

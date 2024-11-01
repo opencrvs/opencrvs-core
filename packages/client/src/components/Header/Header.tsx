@@ -119,7 +119,7 @@ const HeaderRight = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `
 
-export const HeaderComponent = (props: IFullProps) => {
+const HeaderComponent = (props: IFullProps) => {
   const {
     location,
     mobileSearchBar,
