@@ -27,14 +27,14 @@ import {
   referenceApi,
   CertificateConfiguration,
   IFacilitiesDataResponse,
-  IOfficesDataResponse
+  IOfficesDataResponse,
+  ICertificateConfigData
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { Event, System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
-import { ISVGTemplate } from '@client/pdfRenderer'
 import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
@@ -105,11 +105,7 @@ export interface IOfflineData {
     fonts?: CertificateConfiguration['fonts']
     // Certificates might not be defined in the case of
     // a field agent using the app.
-    certificates?: {
-      birth: ISVGTemplate
-      death: ISVGTemplate
-      marriage: ISVGTemplate
-    }
+    certificates?: ICertificateConfigData[]
   }
   assets: {
     logo: string
@@ -200,14 +196,6 @@ const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   failActionCreator: actions.configFailed
 })
 
-const CERTIFICATE_CONFIG_CMD = Cmd.run(
-  () => referenceApi.loadCertificateConfiguration(),
-  {
-    successActionCreator: actions.certificateConfigurationLoaded,
-    failActionCreator: actions.certificateConfigurationLoadFailed
-  }
-)
-
 const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
   successActionCreator: actions.contentLoaded,
   failActionCreator: actions.contentFailed
@@ -242,7 +230,6 @@ function getDataLoadingCommands() {
     FACILITIES_CMD,
     LOCATIONS_CMD,
     CONFIG_CMD,
-    CERTIFICATE_CONFIG_CMD,
     CONDITIONALS_CMD,
     VALIDATORS_CMD,
     HANDLEBARS_CMD,
@@ -368,58 +355,14 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, systems } = action.payload
       merge(window.config, config)
-      const birthCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Birth
-      )
 
-      const deathCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Death
-      )
-
-      const marriageCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Marriage
-      )
-
-      let newOfflineData: Partial<IOfflineData>
-
-      if (
-        birthCertificateTemplate &&
-        deathCertificateTemplate &&
-        marriageCertificateTemplate
-      ) {
-        const certificatesTemplates = {
-          birth: {
-            definition: birthCertificateTemplate.svgCode
-          },
-          death: {
-            definition: deathCertificateTemplate.svgCode
-          },
-          marriage: {
-            definition: marriageCertificateTemplate.svgCode
-          }
-        }
-
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          systems,
-          templates: {
-            ...state.offlineData.templates,
-            certificates: certificatesTemplates
-          }
-        }
-      } else {
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          systems,
-
-          // Field agents do not get certificate templates from the config service.
-          // Our loading logic depends on certificates being present and the app would load infinitely
-          // without a value here.
-          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
-          // to not expect certificate templates when a field agent is logged in.
-          templates: {}
+      const newOfflineData = {
+        ...state.offlineData,
+        config,
+        systems,
+        templates: {
+          ...state.offlineData.templates,
+          certificates
         }
       }
 
@@ -475,23 +418,6 @@ function reducer(
         },
         delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
-    }
-
-    case actions.CERTIFICATE_CONFIGURATION_LOADED: {
-      return {
-        ...state,
-        offlineData: {
-          ...state.offlineData,
-          templates: {
-            ...state.offlineData.templates,
-            fonts: action.payload.fonts
-          }
-        }
-      }
-    }
-
-    case actions.CERTIFICATE_CONFIGURATION_LOAD_FAILED: {
-      return loop(state, delay(CERTIFICATE_CONFIG_CMD, RETRY_TIMEOUT))
     }
 
     /*
