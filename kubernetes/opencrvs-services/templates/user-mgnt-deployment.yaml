@@ -10,6 +10,7 @@ spec:
       targetPort: 3030
   selector:
     app: user-mgnt
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment

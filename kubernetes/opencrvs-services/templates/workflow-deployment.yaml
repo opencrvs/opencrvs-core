@@ -10,6 +10,7 @@ spec:
       targetPort: 5050
   selector:
     app: workflow
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment

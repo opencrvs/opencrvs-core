@@ -10,6 +10,7 @@ spec:
       targetPort: 2525
   selector:
     app: webhooks
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment

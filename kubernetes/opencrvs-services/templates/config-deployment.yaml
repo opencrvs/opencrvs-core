@@ -10,6 +10,7 @@ spec:
       targetPort: 2021
   selector:
     app: config
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
