@@ -8,6 +8,7 @@
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 set -e
 
-sed -i s~THIS_WILL_BE_REPLACED_BY_RUNTIME_ENV_VARIABLE~$COUNTRY_CONFIG_URL~g /usr/share/nginx/html/index.html
+sed -i s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g /etc/nginx/conf.d/default.conf
+sed -i s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g /usr/share/nginx/html/index.html
 sed -i s~{{CONTENT_SECURITY_POLICY_WILDCARD}}~$CONTENT_SECURITY_POLICY_WILDCARD~g /etc/nginx/conf.d/default.conf
 nginx -g 'daemon off;'

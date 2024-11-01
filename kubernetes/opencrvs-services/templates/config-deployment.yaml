@@ -39,7 +39,7 @@ spec:
               value: "2021"
             - name: AUTH_URL
               value: http://auth.opencrvs-services-dev.svc.cluster.local:4040 # FIXME: harcoded
-            - name: COUNTRY_CONFIG_URL
+            - name: COUNTRY_CONFIG_URL_INTERNAL
               value: http://countryconfig.opencrvs-services-dev.svc.cluster.local:3040 # FIXME: harcoded
             - name: DOCUMENTS_URL
               value: http://documents.opencrvs-services-dev.svc.cluster.local:9050 # FIXME: harcoded
