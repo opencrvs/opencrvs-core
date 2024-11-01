@@ -138,11 +138,6 @@ async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
 }
 
-export type CertificatePayload = {
-  svgCode: string
-  event: Event
-}
-
 function checkIfDone(
   oldState: IOfflineDataState,
   loopOrState: IOfflineDataState | Loop<IOfflineDataState, Action>

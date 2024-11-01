@@ -17,16 +17,11 @@ import {
   joinURL,
   logger
 } from '@opencrvs/commons'
-
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
-import {
-  GQLIdentifier,
-  GQLResolver,
-  GQLSignatureInput,
-  GQLUserIdentifierInput
-} from '@gateway/graphql/schema'
+import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
+
 import {
   Bundle,
   Extension,
@@ -68,7 +63,6 @@ export interface IUserModelData {
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
-  identifiers: GQLIdentifier[]
   device: string
   auditHistory?: IAuditHistory[]
   avatar?: IAvatar
@@ -101,7 +95,6 @@ export interface IUserPayload
     '_id' | 'status' | 'practitionerId' | 'username' | 'identifiers' | 'role'
   > {
   id?: string
-  identifiers: GQLUserIdentifierInput[]
   status?: string
   username?: string
   password?: string
@@ -184,9 +177,6 @@ export const userTypeResolvers: GQLResolver = {
         userModel.auditHistory[userModel.auditHistory.length - 1].reason ===
           'SUSPICIOUS'
       )
-    },
-    identifier(userModel: IUserModelData) {
-      return userModel.identifiers && userModel.identifiers[0]
     },
     email(userModel: IUserModelData) {
       return userModel.emailForNotification

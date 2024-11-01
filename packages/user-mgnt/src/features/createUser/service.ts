@@ -35,7 +35,6 @@ export const createFhirPractitioner = (
   if (system) {
     return {
       resourceType: 'Practitioner',
-      identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
         { system: 'email', value: user.emailForNotification }
@@ -51,7 +50,6 @@ export const createFhirPractitioner = (
   } else {
     return {
       resourceType: 'Practitioner',
-      identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
         { system: 'email', value: user.emailForNotification }

@@ -34,7 +34,6 @@ import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -58,10 +57,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event, SCOPES } from '@client/utils/gateway'
 import ProtectedComponent from '@client/components/ProtectedComponent'
-
-export const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
 
 const FABContainer = styled.div`
   position: fixed;

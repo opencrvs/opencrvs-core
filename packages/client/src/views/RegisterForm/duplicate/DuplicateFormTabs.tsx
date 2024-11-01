@@ -107,7 +107,7 @@ interface IComparisonDeclaration {
   }[]
 }
 
-export const getVisibleSections = (
+const getVisibleSections = (
   formSections: IFormSection[],
   declaration: IDeclaration
 ) => {

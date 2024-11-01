@@ -36,7 +36,6 @@ const mockUser = {
     }
   ],
   username: 'j.doe1',
-  identifiers: [{ system: 'NID', value: '1234' }],
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   role: 'LOCAL_REGISTRAR',
@@ -90,7 +89,6 @@ describe('createUser handler', () => {
           }
         ],
         username: 'j.doe1',
-        identifiers: [{ system: 'NID', value: '1234' }],
         emailForNotification: 'j.doe@gmail.com',
         mobile: '+880123445568',
         role: 'FIELD_AGENT',
@@ -105,7 +103,6 @@ describe('createUser handler', () => {
 
     const expectedPractitioner = {
       resourceType: 'Practitioner',
-      identifier: [{ system: 'NID', value: '1234' }],
       telecom: [
         { system: 'phone', value: '+880123445568' },
         { system: 'email', value: 'j.doe@gmail.com' }
