@@ -47,10 +47,16 @@ spec:
               value: redis.opencrvs-deps-dev.svc.cluster.local # FIXME: harcoded
             - name: USER_MANAGEMENT_URL
               value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
-            - name: USER_MANAGEMENT_URL
-              value: http://user-mgnt.opencrvs-services-dev.svc.cluster.local:3030/ # FIXME: hardcoded
             - name: AUTH_PORT
-              value: "4040"          
+              value: "4040"
+            - name: COUNTRY_CONFIG_URL
+              value: http://countryconfig.opencrvs-services-dev.svc.cluster.local:3040 # FIXME: harcoded
+            - name: DOMAIN
+              value: "opencrvs-services-dev.svc.cluster.local"
+            - name: CLIENT_APP_URL    
+              value: "http://client.opencrvs-services-dev.svc.cluster.local:3000"
+            - name: LOGIN_URL  
+              value: "http://login.opencrvs-services-dev.svc.cluster.local:3020"
           ports:
             - containerPort: 4040
               protocol: TCP
@@ -63,7 +69,7 @@ spec:
               subPath: private-key.pem
           readinessProbe:
             httpGet:
-              path: /ping
+              path: /ping # FIXME: not real healthz, just checking if http server is up
               port: 4040
       restartPolicy: Always
       volumes:
