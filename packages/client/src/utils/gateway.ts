@@ -1091,6 +1091,7 @@ export type Mutation = {
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
+  confirmRegistration: Scalars['ID']
   createBirthRegistration: CreatedIds
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
@@ -1188,6 +1189,10 @@ export type MutationChangePhoneArgs = {
   phoneNumber: Scalars['String']
   userId: Scalars['String']
   verifyCode: Scalars['String']
+}
+
+export type MutationConfirmRegistrationArgs = {
+  id: Scalars['ID']
 }
 
 export type MutationCreateBirthRegistrationArgs = {
@@ -3080,7 +3085,13 @@ export type GetUserQuery = {
     } | null
     role: {
       __typename?: 'UserRole'
-      _id: string
+      id: string
+      label: {
+        __typename?: 'I18nMessage'
+        id: string
+        defaultMessage: string
+        description: string
+      }
     }
     primaryOffice: {
       __typename?: 'Location'
