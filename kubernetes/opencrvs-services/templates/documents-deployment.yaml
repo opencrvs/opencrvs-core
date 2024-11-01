@@ -1,3 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: documents
+  name: documents
+spec:
+  ports:
+    - port: 9050
+      targetPort: 9050
+  selector:
+    app: documents
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,11 +40,16 @@ spec:
               value: "minio-0.minio.opencrvs-deps-dev.svc.cluster.local"
             - name: MINIO_PORT
               value: "3535"
+            - name: DOCUMENTS_PORT
+              value: "4040"
           image: "opencrvs/ocrvs-documents:{{ .Values.image.tag }}"
           volumeMounts:
             - mountPath: /secrets/public-key.pem
               name: public-key
               subPath: public-key.pem
+          ports:
+            - containerPort: 9050
+              protocol: TCP
       restartPolicy: Always
       volumes:
         - configMap:
