@@ -32,10 +32,16 @@ spec:
         - name: webhooks
           image: "opencrvs/ocrvs-webhooks:{{ .Values.image.tag }}"
           env:
+            - name: NODE_ENV
+              value: development
+            - name: QA_ENV
+              value: "false"
             - name: AUTH_URL
               value: http://auth.opencrvs-services-dev.svc.cluster.local:4040 # FIXME: harcoded
             - name: CERT_PUBLIC_KEY_PATH
               value: /secrets/public-key.pem
+            - name: CERT_PRIVATE_KEY_PATH
+              value: /secrets/private-key.pem
             - name: CHECK_INVALID_TOKEN
               value: "true"
             - name: FHIR_URL
@@ -55,6 +61,9 @@ spec:
             - mountPath: /secrets/public-key.pem
               name: public-key
               subPath: public-key.pem
+            - mountPath: /secrets/private-key.pem
+              name: private-key
+              subPath: private-key.pem
       restartPolicy: Always
       volumes:
         - configMap:
@@ -63,3 +72,6 @@ spec:
                 path: public-key.pem
             name: public-key
           name: public-key
+        - secret:
+            secretName: private-key
+          name: private-key
