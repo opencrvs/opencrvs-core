@@ -1379,7 +1379,7 @@ export type Query = {
   getUserByEmail?: Maybe<User>
   getUserByMobile?: Maybe<User>
   getVSExports?: Maybe<TotalVsExport>
-  hasChildLocation?: Maybe<Location>
+  isLeafLevelLocation: Scalars['Boolean']
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
@@ -1531,8 +1531,8 @@ export type QueryGetUserByMobileArgs = {
   mobile?: InputMaybe<Scalars['String']>
 }
 
-export type QueryHasChildLocationArgs = {
-  parentId: Scalars['String']
+export type QueryIsLeafLevelLocationArgs = {
+  locationId: Scalars['String']
 }
 
 export type QueryListBirthRegistrationsArgs = {
@@ -2320,15 +2320,6 @@ export type GetSystemRolesQuery = {
       labels: Array<{ __typename?: 'RoleLabel'; lang: string; label: string }>
     }>
   }> | null
-}
-
-export type UpdateRoleMutationVariables = Exact<{
-  systemRole?: InputMaybe<SystemRoleInput>
-}>
-
-export type UpdateRoleMutation = {
-  __typename?: 'Mutation'
-  updateRole: { __typename?: 'Response'; roleIdMap: any }
 }
 
 export type AdvancedSeachParametersFragment = {
@@ -7215,22 +7206,13 @@ export type GetLocationStatisticsQuery = {
   } | null
 }
 
-export type HasChildLocationQueryVariables = Exact<{
-  parentId: Scalars['String']
+export type IsLeafLevelLocationQueryVariables = Exact<{
+  locationId: Scalars['String']
 }>
 
-export type HasChildLocationQuery = {
+export type IsLeafLevelLocationQuery = {
   __typename?: 'Query'
-  hasChildLocation?: {
-    __typename?: 'Location'
-    id: string
-    type?: string | null
-    identifier?: Array<{
-      __typename?: 'Identifier'
-      system?: string | null
-      value?: string | null
-    }> | null
-  } | null
+  isLeafLevelLocation: boolean
 }
 
 export type FetchMonthWiseEventMetricsQueryVariables = Exact<{
@@ -7359,82 +7341,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner?: {
-      __typename?: 'User'
-      id: string
-      systemRole: SystemRoleType
-      role: {
-        __typename?: 'Role'
-        _id: string
-        labels: Array<{
-          __typename?: 'RoleLabel'
-          lang: string
-          label: string
-        }>
-      }
-      primaryOffice?: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      } | null
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    } | null
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner?: {
+            __typename?: 'User'
+            id: string
+            systemRole: SystemRoleType
+            role: {
+              __typename?: 'Role'
+              _id: string
+              labels: Array<{
+                __typename?: 'RoleLabel'
+                lang: string
+                label: string
+              }>
+            }
+            primaryOffice?: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            } | null
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          } | null
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 

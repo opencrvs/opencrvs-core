@@ -42,7 +42,7 @@ type Props = { goToHome: typeof goToHome } & RouteComponentProps<
 > &
   IntlShapeProps & { logo: string | undefined }
 
-export const ResetCredentialsSuccessView = (props: Props) => {
+const ResetCredentialsSuccessView = (props: Props) => {
   const { logo, goToHome, intl, location } = props
   const { forgottenItem } = location.state
 

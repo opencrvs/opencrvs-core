@@ -37,7 +37,6 @@ import {
   FIELD_AGENT_ROLES
 } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -62,10 +61,6 @@ import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
-
-export const StyledSpinner = styled(Spinner)`
-  margin: 20% auto;
-`
 
 const FABContainer = styled.div`
   position: fixed;
