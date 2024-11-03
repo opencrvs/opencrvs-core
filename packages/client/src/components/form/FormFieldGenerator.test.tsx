@@ -36,6 +36,7 @@ import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
 import { vi } from 'vitest'
+import { AnyFn } from '@client/forms/deserializer/deserializer'
 
 describe('form component', () => {
   let component: ReactWrapper<{}, {}>
@@ -125,21 +126,34 @@ describe('form component', () => {
       expect(select.text()).toEqual('BARGUNA')
     })
     describe('when resetDependentSelectValues is called', () => {
-      beforeEach(() => {
-        const instance = component
-          .find('FormSectionComponent')
-          .instance() as any
-        instance.resetDependentSelectValues('statePrimary')
-      })
-      it('resets dependent select fields', () => {
-        expect(component.find('#districtPrimary').hostNodes().text()).toEqual(
-          'Select'
-        )
+      it('resets dependent select fields', async () => {
+        selectOption(component, '#statePrimary', 'Barisal')
+        const select = selectOption(component, '#districtPrimary', 'BARGUNA')
+        expect(select.hostNodes().text()).toEqual('BARGUNA')
+
+        const resetDependentSelectValues = component
+          .find('[name="statePrimary"]')
+          .find('MemoizedGeneratedInputField')
+          .prop<AnyFn<void>>('resetDependentSelectValues')
+
+        resetDependentSelectValues('statePrimary')
+
+        expect(
+          component
+            .update()
+            .find('[name="districtPrimary"]')
+            .find('MemoizedGeneratedInputField')
+            .props().value
+        ).toEqual('')
       })
       it('doesnt reset non dependent select fields', () => {
-        expect(component.find('#countryPrimary').hostNodes().text()).toEqual(
-          'Bangladesh'
-        )
+        expect(
+          component
+            .update()
+            .find('[name="countryPrimary"]')
+            .find('MemoizedGeneratedInputField')
+            .props().value
+        ).toEqual('BGD')
       })
     })
   })

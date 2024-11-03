@@ -961,8 +961,7 @@ const FormSectionComponent = (props: Props) => {
   }
 
   const resetDependentSelectValues = (fieldName: string) => {
-    const currentFields = fields
-    const fieldsToReset = currentFields.filter(
+    const fieldsToReset = fields.filter(
       (field) =>
         (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
           field.dynamicOptions.dependency === fieldName) ||
