@@ -593,16 +593,12 @@ const UnassignAction: React.FC<{
   showActionMenu: boolean
 }> = ({ handleUnassign, isDownloaded, assignment, scope, showActionMenu }) => {
   const intl = useIntl()
-  const isAssignedToSomeoneElse = !isDownloaded && assignment
 
   // @ToDo use: appropriate scope after configurable role pr is merged
   const userHasUnassignScope =
     scope && (scope as any as string[]).includes(SCOPES.RECORD_UNASSIGN_OTHERS)
 
-  if (
-    (!isDownloaded && (!isAssignedToSomeoneElse || !userHasUnassignScope)) ||
-    !showActionMenu
-  )
+  if (!isDownloaded || !assignment || !userHasUnassignScope || !showActionMenu)
     return null
 
   return (
