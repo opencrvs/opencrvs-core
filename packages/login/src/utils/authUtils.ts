@@ -11,14 +11,11 @@
 import decode from 'jwt-decode'
 import * as Sentry from '@sentry/react'
 
-export const ERROR_CODE_TOO_MANY_ATTEMPTS = 429
 export const ERROR_CODE_FIELD_MISSING = 500
 export const ERROR_CODE_INVALID_CREDENTIALS = 401
 export const ERROR_CODE_FORBIDDEN_CREDENTIALS = 403
 export const ERROR_CODE_PHONE_NUMBER_VALIDATE = 503
-export interface IURLParams {
-  [key: string]: string | string[] | undefined
-}
+
 export interface ITokenPayload {
   subject: string
   exp: string

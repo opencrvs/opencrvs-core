@@ -76,11 +76,6 @@ export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
 export const REDIRECT = 'REDIRECT'
 
-export enum Sort {
-  ASC = 'asc',
-  DESC = 'desc'
-}
-
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
@@ -279,9 +274,6 @@ export interface IQuestionnaireQuestion {
   fieldId: string
   value: string
 }
-export interface IQuestionnaire {
-  data: IQuestionnaireQuestion[]
-}
 
 export interface IFileValue {
   optionValues: IFormFieldValue[]
@@ -297,7 +289,7 @@ export interface IContactPointPhone {
 interface IInformantOtherInformantType {
   otherInformantType: string
 }
-export interface IInformant {
+interface IInformant {
   value: string
   nestedFields: IInformantOtherInformantType
 }
@@ -369,16 +361,6 @@ interface Operation<
   Key extends keyof OperationMap = keyof OperationMap
 > {
   operation: Key
-}
-
-export type IFormFieldQueryMapDescriptor<
-  T extends keyof typeof queries = keyof typeof queries
-> = {
-  operation: T
-  parameters: FunctionParamsToDescriptor<
-    Params<(typeof queries)[T]>,
-    IQueryDescriptor
-  >
 }
 
 export type IFormFieldMapping = {
@@ -471,7 +453,7 @@ export type DependencyInfo = {
 }
 export type InitialValue = IFormFieldValue | DependencyInfo
 
-export interface IFormFieldBase {
+interface IFormFieldBase {
   name: string
   type: IFormField['type']
   label: MessageDescriptor
@@ -565,7 +547,7 @@ export interface IRadioGroupWithNestedFieldsFormField
   nestedFields: INestedInputFields
 }
 
-export interface IInformativeRadioGroupFormField extends IFormFieldBase {
+interface IInformativeRadioGroupFormField extends IFormFieldBase {
   type: typeof INFORMATIVE_RADIO_GROUP
   information: IFormSectionData
   dynamicInformationRetriever?: (obj: any) => IFormSectionData
@@ -577,22 +559,22 @@ export interface ITextFormField extends IFormFieldBase {
   maxLength?: number
   dependency?: string
 }
-export interface IHiddenFormField extends IFormFieldBase {
+interface IHiddenFormField extends IFormFieldBase {
   type: typeof HIDDEN
 }
 
-export interface ITelFormField extends IFormFieldBase {
+interface ITelFormField extends IFormFieldBase {
   type: typeof TEL
   isSmallSized?: boolean
 }
-export interface INumberFormField extends IFormFieldBase {
+interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
   inputWidth?: number
   maxLength?: number
 }
-export interface IBigNumberFormField extends IFormFieldBase {
+interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
   step?: number
 }
@@ -610,26 +592,26 @@ export interface IDateFormField extends IFormFieldBase {
   notice?: MessageDescriptor
   ignorePlaceHolder?: boolean
 }
-export interface IDateRangePickerFormField extends IFormFieldBase {
+interface IDateRangePickerFormField extends IFormFieldBase {
   type: typeof DATE_RANGE_PICKER
   notice?: MessageDescriptor
   ignorePlaceHolder?: boolean
 }
 
-export interface ITextareaFormField extends IFormFieldBase {
+interface ITextareaFormField extends IFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
 }
-export interface ISubsectionFormField extends IFormFieldBase {
+interface ISubsectionFormField extends IFormFieldBase {
   type: typeof SUBSECTION_HEADER
 }
-export interface IDividerFormField extends IFormFieldBase {
+interface IDividerFormField extends IFormFieldBase {
   type: typeof DIVIDER
 }
-export interface IFieldGroupTitleField extends IFormFieldBase {
+interface IFieldGroupTitleField extends IFormFieldBase {
   type: typeof FIELD_GROUP_TITLE
 }
-export interface IDocumentsFormField extends IFormFieldBase {
+interface IDocumentsFormField extends IFormFieldBase {
   type: typeof DOCUMENTS
 }
 export interface IListFormField extends IFormFieldBase {
@@ -641,11 +623,11 @@ export interface IDynamicListFormField extends IFormFieldBase {
   type: typeof DYNAMIC_LIST
   dynamicItems: IDynamicItems
 }
-export interface IParagraphFormField extends IFormFieldBase {
+interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
   fontVariant?: string
 }
-export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
+interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
   optionSection: IFormSection
 }
@@ -657,12 +639,12 @@ export interface IDocumentUploaderWithOptionsFormField extends IFormFieldBase {
   optionCondition?: string
   hideOnEmptyOption?: boolean
 }
-export interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
+interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
   type: typeof SIMPLE_DOCUMENT_UPLOADER
   allowedDocType?: string[]
 }
 
-export interface ILocationSearchInputFormField extends IFormFieldBase {
+interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
   searchableResource: Array<
     Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
@@ -673,11 +655,11 @@ export interface ILocationSearchInputFormField extends IFormFieldBase {
   dynamicOptions?: IDynamicOptions
 }
 
-export interface IWarningField extends IFormFieldBase {
+interface IWarningField extends IFormFieldBase {
   type: typeof WARNING
 }
 
-export interface ILink extends IFormFieldBase {
+interface ILink extends IFormFieldBase {
   type: typeof LINK
 }
 
@@ -711,7 +693,7 @@ export interface ILoaderButton extends IFormFieldBase {
   errorTitle: MessageDescriptor
 }
 
-export interface ITimeFormFIeld extends IFormFieldBase {
+interface ITimeFormFIeld extends IFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
 }
@@ -909,11 +891,6 @@ export type IMutationDescriptor =
   | MutationFactoryOperation
   | MutationDefaultOperation
 
-export type X = FunctionParamsToDescriptor<
-  Params<(typeof mutations)['eventLocationMutationTransformer']>,
-  IMutationDescriptor
->
-
 // Initial type as it's always used as an object.
 // @todo should be stricter than this
 export type TransformedData = { [key: string]: any }
@@ -945,15 +922,8 @@ export enum UserSection {
   Preview = 'preview'
 }
 
-export enum AdvancedSearchSection {
-  Birth = 'birth',
-  Death = 'death'
-}
-
 export enum CertificateSection {
-  Collector = 'collector',
-  CollectCertificate = 'collectCertificate',
-  CollectDeathCertificate = 'collectDeathCertificate'
+  Collector = 'collector'
 }
 
 export enum CorrectionSection {
@@ -972,7 +942,7 @@ export enum ReviewSection {
   Review = 'review'
 }
 
-export enum RegistrationSection {
+enum RegistrationSection {
   Registration = 'registration'
 }
 
@@ -1031,12 +1001,7 @@ export interface ISerializedForm {
   sections: ISerializedFormSection[]
 }
 
-export interface Ii18nSelectOption {
-  value: string
-  label: string
-}
-
-export interface Ii18nFormFieldBase {
+interface Ii18nFormFieldBase {
   name: string
   type: Ii18nFormField['type']
   label: string
@@ -1061,7 +1026,7 @@ export interface Ii18nFormFieldBase {
   dependsOn?: string[]
 }
 
-export interface Ii18nSelectFormField extends Ii18nFormFieldBase {
+interface Ii18nSelectFormField extends Ii18nFormFieldBase {
   type: typeof SELECT_WITH_OPTIONS
   optionCondition?: string
   options: SelectComponentOption[]
@@ -1114,11 +1079,11 @@ export interface Ii18nTextFormField extends Ii18nFormFieldBase {
 export interface Ii18nHiddenFormField extends Ii18nFormFieldBase {
   type: typeof HIDDEN
 }
-export interface Ii18nTelFormField extends Ii18nFormFieldBase {
+interface Ii18nTelFormField extends Ii18nFormFieldBase {
   type: typeof TEL
   isSmallSized?: boolean
 }
-export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
+interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
@@ -1126,58 +1091,57 @@ export interface Ii18nNumberFormField extends Ii18nFormFieldBase {
   maxLength?: number
 }
 
-export interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
+interface Ii18nBigNumberFormField extends Ii18nFormFieldBase {
   type: typeof BIG_NUMBER
   step?: number
 }
 
-export interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
+interface Ii18nCheckboxGroupFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX_GROUP
   options: CheckboxComponentOption[]
 }
 
-export interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
+interface Ii18nCheckboxFormField extends Ii18nFormFieldBase {
   type: typeof CHECKBOX
   checkedValue?: 'true' | 'false' | boolean
   uncheckedValue?: 'true' | 'false' | boolean
 }
-export interface Ii18nDateFormField extends Ii18nFormFieldBase {
+interface Ii18nDateFormField extends Ii18nFormFieldBase {
   type: typeof DATE
   notice?: string
   ignorePlaceHolder?: boolean
 }
-export interface Ii18nDateRangePickerFormField extends Ii18nFormFieldBase {
+interface Ii18nDateRangePickerFormField extends Ii18nFormFieldBase {
   type: typeof DATE_RANGE_PICKER
   notice?: string
   ignorePlaceHolder?: boolean
 }
-export interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
+interface Ii18nTextareaFormField extends Ii18nFormFieldBase {
   type: typeof TEXTAREA
   maxLength?: number
 }
-export interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
+interface Ii18nSubsectionFormField extends Ii18nFormFieldBase {
   type: typeof SUBSECTION_HEADER
 }
-export interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
+interface Ii18nFieldGroupTitleField extends Ii18nFormFieldBase {
   type: typeof FIELD_GROUP_TITLE
 }
-export interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
+interface Ii18nDocumentsFormField extends Ii18nFormFieldBase {
   type: typeof DOCUMENTS
 }
-export interface Ii18nListFormField extends Ii18nFormFieldBase {
+interface Ii18nListFormField extends Ii18nFormFieldBase {
   type: typeof BULLET_LIST
   items: string[]
 }
-export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
+interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH
   fontVariant?: IFont
 }
-export interface Ii18nImageUploaderWithOptionsFormField
-  extends Ii18nFormFieldBase {
+interface Ii18nImageUploaderWithOptionsFormField extends Ii18nFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
   optionSection: IFormSection
 }
-export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
+interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   type: typeof DOCUMENT_UPLOADER_WITH_OPTION
   options: SelectComponentOption[]
   optionCondition?: string
@@ -1185,13 +1149,12 @@ export interface Ii18nDocumentUploaderWithOptions extends Ii18nFormFieldBase {
   maxSizeMB?: number
   hideOnEmptyOption?: boolean
 }
-export interface Ii18nSimpleDocumentUploaderFormField
-  extends Ii18nFormFieldBase {
+interface Ii18nSimpleDocumentUploaderFormField extends Ii18nFormFieldBase {
   type: typeof SIMPLE_DOCUMENT_UPLOADER
   allowedDocType?: string[]
 }
 
-export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
+interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
   searchableResource: Array<
     Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
@@ -1203,15 +1166,15 @@ export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
   dynamicOptions?: IDynamicOptions
 }
 
-export interface Ii18nWarningField extends Ii18nFormFieldBase {
+interface Ii18nWarningField extends Ii18nFormFieldBase {
   type: typeof WARNING
 }
 
-export interface Ii18nLinkField extends Ii18nFormFieldBase {
+interface Ii18nLinkField extends Ii18nFormFieldBase {
   type: typeof LINK
 }
 
-export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
+interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   type: typeof FETCH_BUTTON
   queryMap: IQueryMap
   queryData?: IQuery
@@ -1224,20 +1187,20 @@ export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
   networkErrorText: string
 }
 
-export interface I18nDividerField extends Ii18nFormFieldBase {
+interface I18nDividerField extends Ii18nFormFieldBase {
   type: typeof DIVIDER
 }
 
-export interface I18nHeading3Field extends Ii18nFormFieldBase {
+interface I18nHeading3Field extends Ii18nFormFieldBase {
   type: typeof HEADING3
 }
 
-export interface Ii18nTimeFormField extends Ii18nFormFieldBase {
+interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
 }
 
-export interface Ii18nSignatureField extends Ii18nFormFieldBase {
+interface Ii18nSignatureField extends Ii18nFormFieldBase {
   type: typeof SIGNATURE
   maxSizeMb?: number
   allowedFileFormats?: (
@@ -1248,7 +1211,7 @@ export interface Ii18nSignatureField extends Ii18nFormFieldBase {
   )[]
 }
 
-export interface Ii18nHttpFormField extends Ii18nFormFieldBase {
+interface Ii18nHttpFormField extends Ii18nFormFieldBase {
   type: typeof HTTP
   options: {
     headers: Record<string, string>
@@ -1267,7 +1230,7 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
+interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   type: typeof REDIRECT
   options: {
     url: string

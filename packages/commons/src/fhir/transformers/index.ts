@@ -92,10 +92,11 @@ import {
   findExtension,
   getComposition,
   markSaved,
-  CompositionSectionTitleByCode
+  CompositionSectionTitleByCode,
+  EVENT_TYPE
 } from '..'
 import { getUUID } from '../..'
-import { EVENT_TYPE, replaceFromBundle } from '../../record'
+import { replaceFromBundle } from '../../record'
 import {
   AddressInput,
   Attachment,
@@ -118,7 +119,7 @@ type StringReplace<
   ? StringReplace<R, S, D, `${A}${L}${D}`>
   : `${A}${T}`
 
-export enum SignatureExtensionPostfix {
+enum SignatureExtensionPostfix {
   INFORMANT = 'informants-signature',
   GROOM = 'groom-signature',
   BRIDE = 'bride-signature',
