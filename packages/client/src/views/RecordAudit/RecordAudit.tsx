@@ -254,7 +254,6 @@ function RecordAuditBody({
   duplicates,
   intl,
   goToHomeTab,
-  scope,
   refetchDeclarationInfo,
   userDetails,
   registerForm,
@@ -305,7 +304,6 @@ function RecordAuditBody({
     <ActionMenu
       declaration={declaration}
       duplicates={duplicates}
-      scope={scope}
       draft={draft}
       toggleDisplayDialog={toggleDisplayDialog}
     />
