@@ -70,6 +70,7 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
+import { Workqueues } from './v2-events/workqueues'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -536,6 +537,11 @@ export function App(props: IAppProps) {
                                               exact
                                               path={routes.PRINT_RECORD}
                                               component={PrintRecord}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={'/v2'}
+                                              component={Workqueues}
                                             />
                                           </Switch>
                                         </TransitionWrapper>
