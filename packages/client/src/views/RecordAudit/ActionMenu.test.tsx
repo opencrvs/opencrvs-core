@@ -23,7 +23,7 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { ActionMenu } from './ActionMenu'
-import { Event, Scope, SCOPES } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
 import { vi } from 'vitest'
 
 const defaultDeclaration = {
