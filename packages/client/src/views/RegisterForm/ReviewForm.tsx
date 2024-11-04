@@ -63,6 +63,7 @@ class ReviewFormView extends React.Component<IProps> {
 
   userHasValidateScope() {
     const validateScopes = [
+      SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES
     ] as Scope[]
