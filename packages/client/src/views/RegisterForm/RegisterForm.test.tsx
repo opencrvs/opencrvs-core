@@ -395,7 +395,7 @@ describe('when user is in the register form review section', () => {
       mockDeclarationData,
       Event.Birth
     )
-    setScopes([SCOPES.RECORD_REGISTER], store)
+    setScopes([SCOPES.RECORD_REGISTER, SCOPES.RECORD_SUBMIT_FOR_UPDATES], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
