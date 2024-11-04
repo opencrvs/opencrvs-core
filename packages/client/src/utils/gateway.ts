@@ -2322,15 +2322,6 @@ export type GetSystemRolesQuery = {
   }> | null
 }
 
-export type UpdateRoleMutationVariables = Exact<{
-  systemRole?: InputMaybe<SystemRoleInput>
-}>
-
-export type UpdateRoleMutation = {
-  __typename?: 'Mutation'
-  updateRole: { __typename?: 'Response'; roleIdMap: any }
-}
-
 export type AdvancedSeachParametersFragment = {
   __typename?: 'AdvancedSeachParameters'
   event?: Event | null

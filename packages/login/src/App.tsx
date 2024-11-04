@@ -12,7 +12,7 @@ import { PageContainer } from '@login/common/PageContainer'
 import { ErrorBoundary } from '@login/ErrorBoundary'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 import * as routes from '@login/navigation/routes'
-import { AppStore, createStore } from '@login/store'
+import { AppStore } from '@login/store'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
@@ -32,7 +32,6 @@ import { LoginBackgroundWrapper } from '@login/common/LoginBackgroundWrapper'
 import { StepTwoContainer } from '@login/views/StepTwo/StepTwoContainer'
 import { ReloadModal } from './views/ReloadModal'
 
-export const { store, history } = createStore()
 interface IAppProps {
   store: AppStore
   history: History
