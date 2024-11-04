@@ -84,7 +84,8 @@ jobs:
 
       - name: Parse the branch name and set it as environment variable
         run: |
-          echo "BRANCH_NAME=${{  needs.generate_stack_name_and_branch.outputs.B_NAME  }}" >> $GITHUB_ENV
+          B_NAME=${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+          echo "BRANCH_NAME=${B_NAME}" >> $GITHUB_ENV
 
       - name: Get PR Information (when manually triggered)
         env:
