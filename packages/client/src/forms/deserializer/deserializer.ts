@@ -289,7 +289,7 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
-export function deserializeFormField(
+function deserializeFormField(
   field: SerializedFormField,
   validators: Record<string, Validator>
 ): IFormField {
