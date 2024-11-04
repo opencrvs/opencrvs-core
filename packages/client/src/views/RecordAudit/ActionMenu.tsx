@@ -50,12 +50,7 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
-import {
-  Event,
-  FetchDeclarationShortInfoQuery,
-  Scope,
-  SCOPES
-} from '@client/utils/gateway'
+import { Event, Scope, SCOPES } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
@@ -69,8 +64,6 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { FETCH_DECLARATION_SHORT_INFO } from './queries'
-import { useQuery } from '@apollo/client'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -84,17 +77,7 @@ export const ActionMenu: React.FC<{
 
   const intl = useIntl()
 
-  const { id, type, status } = declaration
-  const { data } = useQuery<FetchDeclarationShortInfoQuery>(
-    FETCH_DECLARATION_SHORT_INFO,
-    {
-      variables: { id: declaration.id }
-    }
-  )
-
-  const assignment =
-    (data?.fetchRegistration?.registration?.assignment as GQLAssignmentData) ??
-    declaration.assignment
+  const { id, type, status, assignment } = declaration
 
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
@@ -109,8 +92,6 @@ export const ActionMenu: React.FC<{
     isValidatedDeclaration && scope.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)
 
   const canUnassignOthers = scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
-
-  const showActionMenu = !isSentForApprovalDeclaration
 
   const isDuplicate = (duplicates ?? []).length > 0
 
@@ -171,7 +152,7 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             scope={scope}
             isDuplicate={isDuplicate}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
           />
           <UpdateAction
             declarationId={id}
@@ -179,20 +160,20 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             scope={scope}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
           />
           <ArchiveAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
             scope={scope}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
             declarationStatus={status}
           />
           <ReinstateAction
             toggleDisplayDialog={toggleDisplayDialog}
             isDownloaded={isDownloaded}
             scope={scope}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
             declarationStatus={status}
           />
           <PrintAction
@@ -201,14 +182,14 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             scope={scope}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
           />
           <IssueAction
             declarationStatus={status}
             declarationId={id}
             isDownloaded={isDownloaded}
             scope={scope}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
           />
           <CorrectRecordAction
             declarationId={id}
@@ -216,7 +197,7 @@ export const ActionMenu: React.FC<{
             type={type}
             isDownloaded={isDownloaded}
             scope={scope}
-            showActionMenu={showActionMenu}
+            showActionMenu={!isSentForApprovalDeclaration}
           />
           <DeleteAction
             handleDelete={handleDelete}
@@ -227,7 +208,7 @@ export const ActionMenu: React.FC<{
             isDownloaded={isDownloaded}
             scope={scope}
             assignment={assignment}
-            showActionMenu={showActionMenu || canUnassignOthers}
+            showActionMenu={!isSentForApprovalDeclaration || canUnassignOthers}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
