@@ -420,15 +420,17 @@ const ReviewActionComponent = ({
             </>
           )}
           {rejectDeclarationAction && !alreadyRejectedDeclaration && (
-            <Button
-              type="negative"
-              size="large"
-              id="rejectDeclarationBtn"
-              onClick={rejectDeclarationAction}
-            >
-              <Icon name="X" />
-              {intl.formatMessage(buttonMessages.reject)}
-            </Button>
+            <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_UPDATES]}>
+              <Button
+                type="negative"
+                size="large"
+                id="rejectDeclarationBtn"
+                onClick={rejectDeclarationAction}
+              >
+                <Icon name="X" />
+                {intl.formatMessage(buttonMessages.reject)}
+              </Button>
+            </ProtectedComponent>
           )}
         </ActionContainer>
       </Content>
