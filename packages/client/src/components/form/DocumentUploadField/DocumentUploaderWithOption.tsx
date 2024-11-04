@@ -73,7 +73,7 @@ type DocumentFields = {
   documentData: string
 }
 
-export const getBase64String = (file: File) => {
+export const getBase64String = (file: File | Blob) => {
   return new Promise<string | ArrayBuffer>((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -137,7 +137,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     return isValid
   }
 
-  const processImage = async (uploadedImage: File) => {
+   const processImage = async (uploadedImage: File) => {
     const options = { ...defaultOptions }
     if (!ALLOWED_IMAGE_TYPE.includes(uploadedImage.type)) {
       setErrorMessage(intl.formatMessage(messages.uploadError, { maxSize }))
@@ -153,14 +153,17 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       options.maxSizeMB = props.compressImagesToSizeMB
     }
     // disable compression with a falsy value
-    const resized =
+    const resized: Blob =
       Boolean(options.maxSizeMB) &&
       bytesToMB(uploadedImage.size) > options.maxSizeMB &&
       (await imageCompression(uploadedImage, options))
 
     const fileAsBase64 = await getBase64String(resized || uploadedImage)
 
-    return fileAsBase64.toString()
+    return {
+      fileAsBase64: fileAsBase64.toString(),
+      resized
+    }
   }
 
   const handleFileChange = async (uploadedImage: File) => {
@@ -172,6 +175,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     const documentType = fields.documentType || dropdownOptions[0].value
 
     let fileAsBase64: string
+    let resizedImage: Blob
     const optionValues: [IFormFieldValue, string] = [
       props.extraValue,
       documentType
@@ -194,10 +198,12 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
 
     try {
       // Start processing
-      ;[fileAsBase64] = await Promise.all([
+      const [{fileAsBase64: base64, resized}] = await Promise.all([
         processImage(uploadedImage),
         minimumProcessingTime
       ])
+      fileAsBase64 = base64
+      resizedImage = resized
     } catch (error) {
       if (props.onUploadingStateChanged) {
         props.onUploadingStateChanged(false)
@@ -220,12 +226,6 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       tempOptions,
       (option: ISelectOption) => option.value === documentType
     )
-
-    const options = { ...defaultOptions }
-    const resizedImage =
-      Boolean(options.maxSizeMB) &&
-      bytesToMB(uploadedImage.size) > options.maxSizeMB &&
-      (await imageCompression(uploadedImage, options))
 
     const newDocument: IFileValue = {
       optionValues,
