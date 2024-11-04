@@ -23,10 +23,52 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  gathering_information:
+    runs-on: ubuntu-22.04
+    outputs: 
+      slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
+    steps:
+       - uses: actions/checkout@v3
+
+       - name: Get branch name (when manually triggered)
+         env:
+           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+         if: ${{ github.event_name == 'workflow_dispatch' }}
+         run: |
+           PR_NUMBER=${{ github.event.inputs.pr_number }}
+           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
+           BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
+           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+       
+       - name: Get Branch Name (on PR creation)
+         if: ${{ github.event_name != 'workflow_dispatch' }}
+         run: |
+           echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+
+       - name: Slugify the branch name
+         id: slugify_bname
+         uses: actions/github-script@v7
+         with:
+          script: |
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substr(0, 35)
+                .replace(/[^a-zA-Z0-9]+$/g, '');
+            }
+            core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
+
+           
+
   trigger-e2e:
     if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
     runs-on: ubuntu-22.04
-    environment: for-workflow
+    needs: gathering_information
+    environment: ${{  needs.gathering_information.outputs.slugified_branch  }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
