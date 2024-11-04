@@ -146,28 +146,28 @@ export const usePrintableCertificate = (declarationId: string) => {
     }
     const draft = cloneDeep(declaration)
 
-    draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = isPrintInAdvance
-      ? SubmissionAction.CERTIFY_DECLARATION
-      : SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
+    // draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
+    // draft.action = isPrintInAdvance
+    //   ? SubmissionAction.CERTIFY_DECLARATION
+    //   : SubmissionAction.CERTIFY_AND_ISSUE_DECLARATION
 
     const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
-    if (!isPrintInAdvance) {
-      const paymentAmount = calculatePrice(
-        draft.event,
-        eventDate,
-        registeredDate,
-        offlineData
-      )
-      certificate.payments = {
-        type: 'MANUAL' as const,
-        amount: Number(paymentAmount),
-        outcome: 'COMPLETED' as const,
-        date: new Date().toISOString()
-      }
-    }
+    // if (!isPrintInAdvance) {
+    //   const paymentAmount = calculatePrice(
+    //     draft.event,
+    //     eventDate,
+    //     registeredDate,
+    //     offlineData
+    //   )
+    //   certificate.payments = {
+    //     type: 'MANUAL' as const,
+    //     amount: Number(paymentAmount),
+    //     outcome: 'COMPLETED' as const,
+    //     date: new Date().toISOString()
+    //   }
+    // }
 
     const svg = await compileSvg(
       offlineData.templates.certificates[draft.event].definition,
@@ -186,12 +186,12 @@ export const usePrintableCertificate = (declarationId: string) => {
     }
 
     const pdfTemplate = svgToPdfTemplate(svg, offlineData)
-
+    console.log(pdfTemplate)
     printPDF(pdfTemplate, draft.id)
 
-    dispatch(modifyDeclaration(draft))
-    dispatch(writeDeclaration(draft))
-    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+    // dispatch(modifyDeclaration(draft))
+    // dispatch(writeDeclaration(draft))
+    // dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
   }
 
   const handleEdit = () => {
