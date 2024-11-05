@@ -59,7 +59,6 @@ export const scopes = [
   'record.registration-revoke',
   'record.registration-request-reinstatement',
   'record.registration-reinstate',
-  'record.certify',
   'search.birth:my-jurisdiction',
   'search.birth',
   'search.death:my-jurisdiction',
@@ -146,7 +145,6 @@ export const SCOPES = {
   RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
     'record.registration-request-reinstatement',
   RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
-  RECORD_CERTIFY: 'record.certify',
   SEARCH_BIRTH_MY_JURISDICTION: 'search.birth:my-jurisdiction',
   SEARCH_BIRTH: 'search.birth',
   SEARCH_DEATH_MY_JURISDICTION: 'search.death:my-jurisdiction',
