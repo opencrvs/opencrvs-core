@@ -169,16 +169,6 @@ export const ACTION_STATUS_MAP = {
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
 } as const
 
-export const validateScopeToken = jwt.sign(
-  { scope: ['validate'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
-
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
 }
