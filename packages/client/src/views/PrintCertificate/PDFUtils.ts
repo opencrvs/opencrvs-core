@@ -268,19 +268,23 @@ export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
 
   const foreignObjects = svgElement.getElementsByTagName('foreignObject')
   const absolutelyPositionedHTMLs: Content[] = []
-  if (foreignObjects.length) {
-    for (const foreignObject of foreignObjects) {
-      const x = Number.parseInt(foreignObject.getAttribute('x')!)
-      const y = Number.parseInt(foreignObject.getAttribute('y')!)
-      const htmlContent = foreignObject.innerHTML
-      const pdfmakeContent = htmlToPdfmake(htmlContent, {
-        ignoreStyles: ['font-family']
-      })
-      absolutelyPositionedHTMLs.push({
-        stack: pdfmakeContent,
-        absolutePosition: { x, y }
-      } as Content)
-    }
+  for (const foreignObject of foreignObjects) {
+    const width = Number.parseInt(foreignObject.getAttribute('width')!)
+    const x = Number.parseInt(foreignObject.getAttribute('x')!)
+    const y = Number.parseInt(foreignObject.getAttribute('y')!)
+    const htmlContent = foreignObject.innerHTML
+    const pdfmakeContent = htmlToPdfmake(htmlContent, {
+      ignoreStyles: ['font-family']
+    })
+    absolutelyPositionedHTMLs.push({
+      columns: [
+        {
+          width,
+          stack: pdfmakeContent
+        }
+      ],
+      absolutePosition: { x, y }
+    } as Content)
   }
 
   pdfTemplate.definition.content = [
