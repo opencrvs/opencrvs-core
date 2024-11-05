@@ -27,15 +27,6 @@ export interface ITokenPayload {
   recordId?: UUID
 }
 
-export type scopeType =
-  | 'register'
-  | 'validate'
-  | 'recordsearch'
-  | 'certify'
-  | 'declare'
-  | 'sysadmin'
-  | 'performance'
-
 export async function getUser(
   body: { [key: string]: string | undefined },
   authHeader: IAuthHeader

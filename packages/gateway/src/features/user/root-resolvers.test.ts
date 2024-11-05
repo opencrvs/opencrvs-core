@@ -43,7 +43,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -163,9 +163,7 @@ describe('User root resolvers', () => {
             fieldName: 'searchUsers'
           }
         )
-      ).rejects.toThrow(
-        'Search user is only allowed for sysadmin or registrar or registration agent'
-      )
+      ).rejects.toThrow('Search user is not allowed for this type of user')
     })
     it('returns filtered user list', async () => {
       fetch.mockResponseOnce(
@@ -203,7 +201,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -216,7 +214,7 @@ describe('User root resolvers', () => {
         Authorization: `Bearer ${sysAdminToken}`
       }
       const declareToken = jwt.sign(
-        { scope: ['declare'] },
+        { scope: ['record.declare-birth'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -500,9 +498,7 @@ describe('User root resolvers', () => {
           { headers: authHeaderFieldAgent },
           { fieldName: 'searchFieldAgents' }
         )
-      ).rejects.toThrow(
-        'Search field agents is only allowed for sysadmin or registrar or registration agent'
-      )
+      ).rejects.toThrow('Search field agents is not allowed for this user')
     })
     it('returns field agent list with active status only', async () => {
       fetch.mockResponseOnce(
@@ -1030,7 +1026,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1120,7 +1116,7 @@ describe('User root resolvers', () => {
 
       expect(
         resolvers.Mutation!.createOrUpdateUser({}, { user }, authHeaderRegister)
-      ).rejects.toThrowError('Create user is only allowed for sysadmin')
+      ).rejects.toThrowError('Create user is not allowed for this user')
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {
@@ -1152,7 +1148,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1236,7 +1232,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1314,7 +1310,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1392,7 +1388,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',

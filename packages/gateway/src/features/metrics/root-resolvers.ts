@@ -12,6 +12,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 
 import { inScope } from '@gateway/features/user/utils'
 import { getMetrics } from './service'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export interface IMetricsParam {
   timeStart?: string
@@ -61,7 +62,9 @@ export const resolvers: GQLResolver = {
     },
     async getVSExports(_, variables, { headers: authHeader }) {
       let results
-      if (inScope(authHeader, ['natlsysadmin', 'performance'])) {
+      if (
+        inScope(authHeader, [SCOPES.CONFIG_UPDATE_ALL, SCOPES.PERFORMANCE_READ])
+      ) {
         results = await getMetrics('/fetchVSExport', variables, authHeader)
         return {
           results

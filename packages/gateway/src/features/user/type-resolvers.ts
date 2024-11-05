@@ -20,7 +20,11 @@ import {
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
-import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
+import {
+  GQLResolver,
+  GQLSignatureInput,
+  GQLUserIdentifierInput
+} from '@gateway/graphql/schema'
 
 import {
   Bundle,
@@ -31,8 +35,8 @@ import {
   findExtension,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-import { scopesInclude } from './utils'
-import { UserScope } from '@opencrvs/commons/authentication'
+import { getTokenPayload, scopesInclude } from './utils'
+import { SCOPES, UserScope } from '@opencrvs/commons/authentication'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -95,6 +99,7 @@ export interface IUserPayload
     '_id' | 'status' | 'practitionerId' | 'username' | 'identifiers' | 'role'
   > {
   id?: string
+  identifiers: GQLUserIdentifierInput[]
   status?: string
   username?: string
   password?: string
@@ -189,13 +194,16 @@ export const userTypeResolvers: GQLResolver = {
       _,
       { headers: authHeader, dataSources }
     ) {
-      const scope = userModel.scope
+      const tokenPayload = getTokenPayload(authHeader.Authorization)
+      const scope = tokenPayload.scope
 
       if (!scope) {
         return null
       }
 
-      const { practitionerId, practitionerRole } = !scope.includes('register')
+      const { practitionerId, practitionerRole } = !scope.includes(
+        SCOPES.RECORD_REGISTER
+      )
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${

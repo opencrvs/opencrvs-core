@@ -28,7 +28,7 @@ describe('Search root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const validUserTokenRegister = jwt.sign(
-        { scope: ['register'] },
+        { scope: ['record.register'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -41,7 +41,7 @@ describe('Search root resolvers', () => {
         Authorization: `Bearer ${validUserTokenRegister}`
       }
       const validUserTokenDeclare = jwt.sign(
-        { scope: ['declare'] },
+        { scope: ['record.declare-birth'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -309,7 +309,7 @@ describe('Search root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const declareToken = jwt.sign(
-        { scope: ['declare'] },
+        { scope: ['record.declare-birth'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -322,7 +322,7 @@ describe('Search root resolvers', () => {
         Authorization: `Bearer ${declareToken}`
       }
       const sysadminUserToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['config.update:all'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -369,9 +369,7 @@ describe('Search root resolvers', () => {
           {},
           { headers: unauthorizedUser }
         )
-      ).rejects.toThrowError(
-        'User does not have a sysadmin or register or validate scope'
-      )
+      ).rejects.toThrowError('User does not have enough scope')
     })
     it('returns empty result for invalid location id', async () => {
       fetch.mockResponseOnce(

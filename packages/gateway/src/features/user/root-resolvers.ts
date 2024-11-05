@@ -41,6 +41,7 @@ import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -83,11 +84,15 @@ export const resolvers: GQLResolver = {
         { headers: authHeader }
       ) => {
         // Only sysadmin or registrar or registration agent should be able to search user
-        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
+        if (
+          !inScope(authHeader, [
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+          ])
+        ) {
           return await Promise.reject(
-            new Error(
-              'Search user is only allowed for sysadmin or registrar or registration agent'
-            )
+            new Error('Search user is not allowed for this type of user')
           )
         }
 
@@ -142,11 +147,15 @@ export const resolvers: GQLResolver = {
         { headers: authHeader, dataSources }
       ) => {
         // Only sysadmin or registrar or registration agent should be able to search field agents
-        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
+        if (
+          !inScope(authHeader, [
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+          ])
+        ) {
           return await Promise.reject(
-            new Error(
-              'Search field agents is only allowed for sysadmin or registrar or registration agent'
-            )
+            new Error('Search field agents is not allowed for this user')
           )
         }
 
@@ -269,9 +278,9 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async createOrUpdateUser(_, { user }, { headers: authHeader }) {
       // Only sysadmin should be able to create user
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
         return await Promise.reject(
-          new Error('Create user is only allowed for sysadmin')
+          new Error('Create user is not allowed for this user')
         )
       }
 
@@ -358,9 +367,9 @@ export const resolvers: GQLResolver = {
       { userId, existingPassword, password },
       { headers: authHeader }
     ) {
-      // Only token owner except sysadmin should be able to change their password
+      // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
       if (
-        !hasScope(authHeader, 'sysadmin') &&
+        !hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL) &&
         !isTokenOwner(authHeader, userId)
       ) {
         return await Promise.reject(
@@ -510,7 +519,7 @@ export const resolvers: GQLResolver = {
       { userId, action, reason, comment },
       { headers: authHeader }
     ) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
         return await Promise.reject(
           new Error(
             `User ${userId} is not allowed to audit for not having the sys admin scope`
@@ -546,7 +555,7 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
         return await Promise.reject(
           new Error(
             'SMS invite can only be resent by a user with sys admin scope'
@@ -576,7 +585,7 @@ export const resolvers: GQLResolver = {
       return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
         return await Promise.reject(
           new Error(
             'Username reminder can only be resent by a user with sys admin scope'
@@ -605,7 +614,7 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
         return await Promise.reject(
           new Error(
             'Reset password can only be sent by a user with sys admin scope'
