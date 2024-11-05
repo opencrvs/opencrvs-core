@@ -2,22 +2,6 @@
 
 ## 1.7.0 Release candidate
 
-### Migration guide
-
-- To make sure that `dashboard` still works after migrating to `v1.7.0`, you would need to:
-
-  - ssh into your server
-  - stop `opencrvs_dashboard`
-  - delete `metabase.mv.db` from `/data/metabase/`
-  - start `opencrvs_dashboard`
-
-  ```
-  ssh user@yourcoutryconfig-dev.opencrvs.org
-  docker service scale opencrvs_dashboards=0
-  sudo rm /data/metabase/metabase.mv.db
-  docker service scale opencrvs_dashboards=1
-  ```
-
 ### Breaking changes
 
 - **Title** Description
