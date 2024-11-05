@@ -12,9 +12,9 @@ import { AUTH_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
 export async function tokenExchangeHandler(
-  token: string | undefined,
+  token: string,
   headers: Record<string, string>,
-  recordId: string | undefined
+  recordId: string
 ): Promise<any> {
   const grantType = 'urn:opencrvs:oauth:grant-type:token-exchange'
   const subject_token_type = 'urn:ietf:params:oauth:token-type:access_token'
@@ -22,9 +22,6 @@ export async function tokenExchangeHandler(
     'urn:opencrvs:oauth:token-type:single_record_token'
 
   try {
-    if (!recordId) throw new Error('Record ID not found!')
-    if (!token) throw new Error('Token not found!')
-
     const authUrl = new URL(
       `token?grant_type=${grantType}&subject_token=${token}&subject_token_type=${subject_token_type}&requested_token_type=${requested_token_type}&record_id=${recordId}`,
       AUTH_URL
@@ -51,7 +48,7 @@ export async function tokenExchangeHandler(
     throw new Error(
       JSON.stringify({
         status: 'error',
-        message: `Token exchange execution failed!. ${error}`,
+        message: error,
         action: 'tokenExchangeHandler'
       })
     )
