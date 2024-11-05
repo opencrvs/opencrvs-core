@@ -19,7 +19,7 @@ import fetch from 'node-fetch'
 import { getToken } from '@config/utils/auth'
 import { pipe } from 'fp-ts/lib/function'
 import { verifyToken } from '@config/utils/verifyToken'
-import { RouteScope } from '@config/config/routes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const SystemRoleType = [
   'FIELD_AGENT',
@@ -63,9 +63,8 @@ async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 
   if (
     scope &&
-    (scope.includes(RouteScope.CERTIFY) ||
-      scope.includes(RouteScope.VALIDATE) ||
-      scope.includes(RouteScope.NATLSYSADMIN))
+    (scope.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
+      scope.includes(SCOPES.CONFIG_UPDATE_ALL))
   ) {
     return Promise.all(
       (['birth', 'death', 'marriage'] as const).map(async (event) => {
