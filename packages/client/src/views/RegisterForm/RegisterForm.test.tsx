@@ -601,7 +601,7 @@ describe('When user is in Preview section death event', () => {
       mockDeathDeclarationData,
       Event.Death
     )
-    setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
@@ -657,7 +657,7 @@ describe('When user is in Preview section death event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component.find('#submit_for_review').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
@@ -753,7 +753,7 @@ describe('When user is in Preview section death event in offline mode', () => {
       Event.Death
     )
 
-    setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
@@ -785,7 +785,7 @@ describe('When user is in Preview section death event in offline mode', () => {
   })
 
   it('Should be able to submit the form', async () => {
-    component.find('#submit_for_review').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
@@ -823,7 +823,7 @@ describe('When user is in Preview section marriage event', () => {
       Event.Marriage
     )
 
-    setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     marriageDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(marriageDraft))
@@ -879,7 +879,7 @@ describe('When user is in Preview section marriage event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component.find('#submit_for_review').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
