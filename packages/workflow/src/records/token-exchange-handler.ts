@@ -21,36 +21,23 @@ export async function tokenExchangeHandler(
   const requested_token_type =
     'urn:opencrvs:oauth:token-type:single_record_token'
 
-  try {
-    const authUrl = new URL(
-      `token?grant_type=${grantType}&subject_token=${token}&subject_token_type=${subject_token_type}&requested_token_type=${requested_token_type}&record_id=${recordId}`,
-      AUTH_URL
-    ).toString()
-    const res = await fetch(authUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    })
-
-    if (!res.ok) {
-      const errorData = await res.json()
-      throw new Error(
-        `Error occured when calling the token exchange handler. ${JSON.stringify(
-          errorData
-        )}`
-      )
+  const authUrl = new URL(
+    `token?grant_type=${grantType}&subject_token=${token}&subject_token_type=${subject_token_type}&requested_token_type=${requested_token_type}&record_id=${recordId}`,
+    AUTH_URL
+  ).toString()
+  const res = await fetch(authUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
     }
-    const body = await res.json()
-    return body
-  } catch (error) {
+  })
+
+  if (!res.ok) {
     throw new Error(
-      JSON.stringify({
-        status: 'error',
-        message: `Token exchange execution failed!. ${error}`,
-        action: 'tokenExchangeHandler'
-      })
+      `Error occured when calling the token exchange handler. ${await res.text()}`
     )
   }
+  const body = await res.json()
+  return body
 }
