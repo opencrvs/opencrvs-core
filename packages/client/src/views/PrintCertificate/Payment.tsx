@@ -198,7 +198,7 @@ function mapStatetoProps(
   props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
   const { registrationId, eventType } = props.match.params
-  const event = getEvent(eventType) as Event
+  const event = getEvent(eventType)
   const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
   ) as IPrintableDeclaration

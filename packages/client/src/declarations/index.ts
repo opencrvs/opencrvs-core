@@ -268,7 +268,7 @@ type RelationForCertificateCorrection =
 export type ICertificate = {
   collector?: Partial<{
     type: Relation | string
-    certificateTemplateId?: string
+    certificateTemplateId: string
   }>
   corrector?: Partial<{ type: RelationForCertificateCorrection | string }>
   hasShowedVerifiedDocument?: boolean
