@@ -32,7 +32,7 @@ import {
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { Event, System } from '@client/utils/gateway'
+import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { isOfflineDataLoaded } from './selectors'
 import { merge } from 'lodash'
