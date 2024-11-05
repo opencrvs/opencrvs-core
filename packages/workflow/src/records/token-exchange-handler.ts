@@ -48,7 +48,7 @@ export async function tokenExchangeHandler(
     throw new Error(
       JSON.stringify({
         status: 'error',
-        message: error,
+        message: `Token exchange execution failed!. ${error}`,
         action: 'tokenExchangeHandler'
       })
     )
