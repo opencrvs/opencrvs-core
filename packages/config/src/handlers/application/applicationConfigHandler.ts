@@ -61,11 +61,7 @@ async function getCertificates(request: Hapi.Request, h: Hapi.ResponseToolkit) {
   }
   const { scope } = decodedOrError.right
 
-  if (
-    scope &&
-    (scope.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-      scope.includes(SCOPES.CONFIG_UPDATE_ALL))
-  ) {
+  if (scope && scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
     return Promise.all(
       (['birth', 'death', 'marriage'] as const).map(async (event) => {
         const response = await getEventCertificate(event, getToken(request))
