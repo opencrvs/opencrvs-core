@@ -87,8 +87,7 @@ export const resolvers: GQLResolver = {
         if (
           !inScope(authHeader, [
             SCOPES.USER_READ,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+            SCOPES.USER_READ_MY_JURISDICTION
           ])
         ) {
           return await Promise.reject(
@@ -150,8 +149,7 @@ export const resolvers: GQLResolver = {
         if (
           !inScope(authHeader, [
             SCOPES.USER_READ,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+            SCOPES.USER_READ_MY_JURISDICTION
           ])
         ) {
           return await Promise.reject(
@@ -369,7 +367,7 @@ export const resolvers: GQLResolver = {
     ) {
       // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
       if (
-        !hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL) &&
+        !hasScope(authHeader, SCOPES.USER_READ) &&
         !isTokenOwner(authHeader, userId)
       ) {
         return await Promise.reject(

@@ -13,7 +13,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { TestResolvers } from '@gateway/utils/testUtils'
-import { SCOPES } from '@gateway/../../commons/build/dist/scopes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
@@ -321,7 +321,7 @@ describe('Search root resolvers', () => {
 
     beforeEach(() => {
       fetch.resetMocks()
-      const performanceToken = jwt.sign(
+      const unauthorizedToken = jwt.sign(
         { scope: [SCOPES.RECORD_DECLARE_BIRTH] },
         readFileSync('./test/cert.key'),
         {
@@ -332,7 +332,7 @@ describe('Search root resolvers', () => {
         }
       )
       unauthorizedUser = {
-        Authorization: `Bearer ${performanceToken}`
+        Authorization: `Bearer ${unauthorizedToken}`
       }
       const sysadminUserToken = jwt.sign(
         { scope: [SCOPES.PERFORMANCE_READ] },
