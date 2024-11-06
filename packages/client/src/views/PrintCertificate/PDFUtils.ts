@@ -30,6 +30,8 @@ import isValid from 'date-fns/isValid'
 import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { FontFamilyTypes } from '@client/utils/referenceApi'
+import htmlToPdfmake from 'html-to-pdfmake'
+import { Content } from 'pdfmake/interfaces'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -251,8 +253,19 @@ export async function compileSvg(
 }
 
 export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
+  const initialDefaultFont = offlineResource.templates.fonts
+    ? Object.keys(offlineResource.templates.fonts)[0]
+    : null
   const pdfTemplate: IPDFTemplate = {
     ...certificateBaseTemplate,
+    definition: {
+      ...certificateBaseTemplate.definition,
+      defaultStyle: {
+        font:
+          initialDefaultFont ||
+          certificateBaseTemplate.definition.defaultStyle.font
+      }
+    },
     fonts: {
       ...certificateBaseTemplate.fonts,
       ...offlineResource.templates.fonts
@@ -280,9 +293,34 @@ export function svgToPdfTemplate(svg: string, offlineResource: IOfflineData) {
     }
   }
 
-  pdfTemplate.definition.content = {
-    svg
+  const foreignObjects = svgElement.getElementsByTagName('foreignObject')
+  const absolutelyPositionedHTMLs: Content[] = []
+  for (const foreignObject of foreignObjects) {
+    const width = Number.parseInt(foreignObject.getAttribute('width')!)
+    const x = Number.parseInt(foreignObject.getAttribute('x')!)
+    const y = Number.parseInt(foreignObject.getAttribute('y')!)
+    const htmlContent = foreignObject.innerHTML
+    const pdfmakeContent = htmlToPdfmake(htmlContent, {
+      ignoreStyles: ['font-family']
+    })
+    absolutelyPositionedHTMLs.push({
+      columns: [
+        {
+          width,
+          stack: pdfmakeContent
+        }
+      ],
+      absolutePosition: { x, y }
+    } as Content)
   }
+
+  pdfTemplate.definition.content = [
+    {
+      svg
+    },
+    ...absolutelyPositionedHTMLs
+  ]
+
   return pdfTemplate
 }
 
