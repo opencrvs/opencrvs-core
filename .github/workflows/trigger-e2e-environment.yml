@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs: 
       slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
-      branch_name: ${{  steps.bname_out.outputs.B_NAME  }}
+      branch_name: ${{  steps.set_branch_name.outputs.BRANCH_NAME  }}
     steps:
        - uses: actions/checkout@v3
 
@@ -48,9 +48,9 @@ jobs:
            echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
         
        - name: Set the branch name as output
-         id: bname_out
+         id: set_branch_name
          run: |
-           echo "B_NAME=$(echo ${{  env.BRANCH_NAME  }})" >> $GITHUB_OUTPUT
+           echo "BRANCH_NAME=$(echo ${{  env.BRANCH_NAME  }})" >> $GITHUB_OUTPUT
            
        - name: Slugify the branch name
          id: slugify_bname
@@ -84,8 +84,8 @@ jobs:
 
       - name: Parse the branch name and set it as environment variable
         run: |
-          B_NAME=${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
-          echo "BRANCH_NAME=${B_NAME}" >> $GITHUB_ENV
+          BRANCH_NAME=${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Get PR Information (when manually triggered)
         env:
@@ -121,7 +121,7 @@ jobs:
           echo "Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}"
       
       - name: Parse the stack name
-        id: gen_stack
+        id: generate_stack
         run: |
           stack=${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
           echo "stack=${stack}" >> $GITHUB_OUTPUT
@@ -139,7 +139,7 @@ jobs:
                 actor: '${{ github.actor }}',
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
-                stack: '${{  steps.gen_stack.outputs.stack  }}'
+                stack: '${{  steps.generate_stack.outputs.stack  }}'
               }
             });
 
@@ -169,10 +169,10 @@ jobs:
         id: print-links
         run: |
           E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
-          DEPLOYMENT_LINK="https://${{ steps.gen_stack.outputs.stack }}.opencrvs.dev"
+          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.opencrvs.dev"
 
           echo "See your E2E deployment run details here: $E2E_RUN_LINK" >> $GITHUB_STEP_SUMMARY
-          echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.gen_stack.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
+          echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.generate_stack.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "If everything goes alright, you should see your stack getting deployed here: $DEPLOYMENT_LINK" >> $GITHUB_STEP_SUMMARY
 
