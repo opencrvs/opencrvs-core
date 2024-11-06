@@ -12,7 +12,7 @@ import fetch from '@gateway/fetch'
 import { inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import { SCOPES } from '@gateway/../../commons/build/dist/scopes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const resolvers: GQLResolver = {
   Mutation: {

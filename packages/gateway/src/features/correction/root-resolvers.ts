@@ -31,7 +31,7 @@ import {
   requestRegistrationCorrection
 } from '@gateway/workflow'
 import { UserInputError } from 'apollo-server-hapi'
-import { SCOPES } from '@gateway/../../commons/build/dist/scopes'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const resolvers: GQLResolver = {
   Mutation: {
