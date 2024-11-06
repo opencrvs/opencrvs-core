@@ -51,7 +51,7 @@ import {
   TaskHistory,
   RejectedRecord
 } from '@opencrvs/commons/types'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -459,6 +459,8 @@ export async function initiateRegistration(
     headers.authorization = `Bearer ${recordSpecificToken.access_token}`
     await invokeRegistrationValidation(record, headers)
   } catch (error) {
+    logger.error(error)
+
     const statusReason: fhir3.CodeableConcept = {
       text: REG_NUMBER_GENERATION_FAILED
     }
