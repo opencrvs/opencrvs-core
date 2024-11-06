@@ -32,9 +32,10 @@ function getDownloadedOrAssignedExtension(
   status: TaskStatus
 ) {
   if (
+    inScope(authHeader, [SCOPES.RECORDSEARCH]) ||
     inScope(authHeader, [
-      SCOPES.RECORD_SUBMIT_INCOMPLETE,
-      SCOPES.RECORDSEARCH
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL
     ]) ||
     (hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) &&
       ['CORRECTION_REQUESTED', 'VALIDATED'].includes(status))

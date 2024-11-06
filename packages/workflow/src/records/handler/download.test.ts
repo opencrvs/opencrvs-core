@@ -36,7 +36,7 @@ describe('download record endpoint', () => {
 
   it('returns OK after downloading a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: ['record.register'] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
