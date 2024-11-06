@@ -293,9 +293,8 @@ describe('create new user tests', () => {
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
-      // this will have to be updated after signature page is updated for new user roles structure
       expect(history.location.pathname).toContain(
-        '/createUser/preview/preview-registration-office'
+        '/createUser/user/signature-attachment'
       )
     })
   })
