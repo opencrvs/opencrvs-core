@@ -12,7 +12,7 @@ import { IFormField, IRadioGroupFormField, ISelectOption } from '@client/forms'
 import { IOfflineData } from '@client/offline/reducer'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
   generateLocationName,
   generateFullLocation
@@ -26,7 +26,6 @@ import type {
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
 import {
@@ -54,7 +53,7 @@ import { getDeclarationFullName } from '@client/utils/draftUtils'
 export interface IDeclarationData {
   id: string
   name?: string
-  status?: string
+  status?: SUBMISSION_STATUS
   trackingId?: string
   type?: string
   dateOfBirth?: string
@@ -293,14 +292,6 @@ const getLocation = (
   return EMPTY_STRING
 }
 
-export const getFormattedDate = (date: Date) => {
-  return formatLongDate(
-    date.toLocaleString(),
-    window.config.LANGUAGES,
-    'MMMM dd, yyyy · hh.mm a'
-  )
-}
-
 export const getCaptitalizedWord = (word: string | undefined): string => {
   if (!word) return EMPTY_STRING
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)
@@ -318,19 +309,19 @@ export const removeUnderscore = (word: string): string => {
 const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
-  return (declaration && declaration.type === 'Birth') || false
+  return (declaration && declaration.type === Event.Birth) || false
 }
 
 const isDeathDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLDeathEventSearchSet => {
-  return (declaration && declaration.type === 'Death') || false
+  return (declaration && declaration.type === Event.Death) || false
 }
 
 const isMarriageDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLMarriageEventSearchSet => {
-  return (declaration && declaration.type === 'Marriage') || false
+  return (declaration && declaration.type === Event.Marriage) || false
 }
 
 export const getName = (names: (HumanName | null)[], language: string) => {
@@ -347,7 +338,7 @@ export const getDraftDeclarationData = (
   return {
     id: declaration.id,
     name: getDeclarationFullName(declaration),
-    type: declaration.event || EMPTY_STRING,
+    type: declaration.event,
     registrationNo:
       declaration.data?.registration?.registrationNumber?.toString() ||
       EMPTY_STRING,
@@ -406,7 +397,8 @@ export const getWQDeclarationData = (
     name,
     type:
       (workqueueDeclaration?.type && workqueueDeclaration.type) || EMPTY_STRING,
-    status: workqueueDeclaration?.registration?.status || EMPTY_STRING,
+    status: (workqueueDeclaration?.registration?.status ||
+      EMPTY_STRING) as SUBMISSION_STATUS,
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: EMPTY_STRING,
@@ -443,7 +435,7 @@ export const getGQLDeclaration = (
     id: data?.id,
     name,
     type: data?.registration?.type,
-    status: data?.registration?.status[0].type,
+    status: data?.registration?.status[0].type as SUBMISSION_STATUS,
     trackingId: data?.registration?.trackingId,
     assignment: data?.registration?.assignment,
     dateOfBirth: EMPTY_STRING,

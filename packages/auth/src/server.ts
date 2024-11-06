@@ -10,15 +10,8 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import {
-  AUTH_HOST,
-  AUTH_PORT,
-  CLIENT_APP_URL,
-  COUNTRY_CONFIG_URL,
-  DEFAULT_TIMEOUT,
-  HOSTNAME,
-  LOGIN_URL
-} from '@auth/constants'
+import { DEFAULT_TIMEOUT } from '@auth/constants'
+import { env } from '@auth/environment'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -66,7 +59,7 @@ import changePasswordHandler, {
 import sendUserNameHandler, {
   requestSchema as reqSendUserNameSchema
 } from '@auth/features/retrievalSteps/sendUserName/handler'
-import { tokenHandler } from '@auth/features/system/handler'
+import { tokenHandler } from '@auth/features/oauthToken/handler'
 import { logger } from '@opencrvs/commons'
 import { getPublicKey } from '@auth/features/authenticate/service'
 import anonymousTokenHandler, {
@@ -74,14 +67,14 @@ import anonymousTokenHandler, {
 } from './features/anonymousToken/handler'
 
 export async function createServer() {
-  let whitelist: string[] = [HOSTNAME]
-  if (HOSTNAME[0] !== '*') {
-    whitelist = [COUNTRY_CONFIG_URL, LOGIN_URL, CLIENT_APP_URL]
+  let whitelist: string[] = [env.DOMAIN]
+  if (env.DOMAIN[0] !== '*') {
+    whitelist = [env.COUNTRY_CONFIG_URL, env.LOGIN_URL, env.CLIENT_APP_URL]
   }
   logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
-    host: AUTH_HOST,
-    port: AUTH_PORT,
+    host: env.AUTH_HOST,
+    port: env.AUTH_PORT,
     routes: {
       cors: { origin: whitelist },
       payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
@@ -398,7 +391,7 @@ export async function createServer() {
   async function start() {
     await server.start()
     await database.start()
-    server.log('info', `server started on ${AUTH_HOST}:${AUTH_PORT}`)
+    server.log('info', `server started on ${env.AUTH_HOST}:${env.AUTH_PORT}`)
   }
 
   return { server, start, stop }

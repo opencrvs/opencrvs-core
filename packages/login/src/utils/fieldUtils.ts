@@ -27,11 +27,6 @@ export type Ii18nReduxFormFieldProps = {
   focusInput: boolean
 }
 
-export type IReduxFormFieldProps = {
-  placeholder?: MessageDescriptor
-  label?: MessageDescriptor
-} & Omit<Ii18nReduxFormFieldProps, 'placeholder' | 'label'>
-
 export type IFieldGroup = {
   [key: string]: Ii18nReduxFormFieldProps
 }

@@ -57,7 +57,10 @@ export const getPlugins = () => {
       options: {
         client: {
           dsn: SENTRY_DSN,
-          environment: process.env.DOMAIN
+          environment: process.env.DOMAIN,
+          initialScope: {
+            tags: { service: 'gateway' }
+          }
         },
         catchLogErrors: true
       }

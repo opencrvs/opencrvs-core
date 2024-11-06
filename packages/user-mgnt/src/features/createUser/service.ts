@@ -11,7 +11,6 @@
 import {
   DOCUMENTS_URL,
   FHIR_URL,
-  MINIO_BUCKET,
   NOTIFICATION_SERVICE_URL
 } from '@user-mgnt/constants'
 import User, {
@@ -37,7 +36,6 @@ export const createFhirPractitioner = (
   if (system) {
     return {
       resourceType: 'Practitioner',
-      identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
         { system: 'email', value: user.emailForNotification }
@@ -53,7 +51,6 @@ export const createFhirPractitioner = (
   } else {
     return {
       resourceType: 'Practitioner',
-      identifier: user.identifiers,
       telecom: [
         { system: 'phone', value: user.mobile },
         { system: 'email', value: user.emailForNotification }
@@ -83,10 +80,6 @@ export const uploadSignatureToMinio = async (
   })
   const res = await result.json()
   return res.refUrl
-}
-
-export const isMinioUrl = (uri: string | undefined) => {
-  return uri?.split('/')[3] === MINIO_BUCKET
 }
 
 export const getSignatureExtension = (extensions: Extension[] | undefined) => {

@@ -50,6 +50,16 @@ vulnerabilities:
   - id: CVE-2024-21634
     statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
   - id: CVE-2024-4068
-    statement: Transitive dependency of lint-staged, jest and msw. Not running in production. Likely fixed by upgrading.
+    statement: Transitive dependency of jest and msw. Not running in production. Likely fixed by upgrading.
   - id: CVE-2024-37890
     statement: ws vulnerability, transitive dependency of jest, storybook, graphql-codegen, not running in production.
+  - id: CVE-2024-45296
+    statement: Transitive dependency of react-router 5.3.4. Only affects client-side code ocrvs-7682
+  - id: CVE-2024-47068
+    statement: Transitive dependency of Vite. Not run in production and there is currently no fix.
+  - id: CVE-2024-7254
+    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.50 ocrvs-6607
+  - id: CVE-2024-41909
+    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.50 ocrvs-6607
+  - id: CVE-2024-22871
+    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.50 ocrvs-6607

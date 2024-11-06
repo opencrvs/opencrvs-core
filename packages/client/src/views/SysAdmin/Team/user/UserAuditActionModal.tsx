@@ -119,7 +119,9 @@ function UserAuditActionModalComponent(
   useEffect(() => {
     if (!props.form?.fields) return
 
-    if (hasFormError(props.form.fields, formValues, config, { formValues })) {
+    if (
+      hasFormError(props.form.fields, formValues, config, { formValues }, user)
+    ) {
       if (user && user.status === 'active') {
         const auditAction = 'deactivating'
         setFormError(intl.formatMessage(messages.formError, { auditAction }))

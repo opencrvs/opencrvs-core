@@ -41,8 +41,6 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
   ISelectFormFieldWithOptions,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
   BULLET_LIST,
   HIDDEN,
   Ii18nHiddenFormField,
@@ -53,7 +51,9 @@ import {
   IHttpFormField,
   IButtonFormField,
   BUTTON,
-  Ii18nButtonFormField
+  Ii18nButtonFormField,
+  IRedirectFormField,
+  REDIRECT
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -100,7 +100,7 @@ interface IRange {
   value: string
 }
 
-export const internationaliseOptions = (
+const internationaliseOptions = (
   intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
@@ -115,7 +115,7 @@ export const internationaliseOptions = (
   })
 }
 
-export const internationaliseListFieldObject = (
+const internationaliseListFieldObject = (
   intl: IntlShape,
   options: MessageDescriptor[]
 ) => {
@@ -188,18 +188,6 @@ export const internationaliseFieldObject = (
     )
   }
 
-  if (base.type === NID_VERIFICATION_BUTTON) {
-    ;(base as any).labelForVerified = intl.formatMessage(
-      (field as INidVerificationButton).labelForVerified
-    )
-    ;(base as any).labelForUnverified = intl.formatMessage(
-      (field as INidVerificationButton).labelForUnverified
-    )
-    ;(base as any).labelForOffline = intl.formatMessage(
-      (field as INidVerificationButton).labelForOffline
-    )
-  }
-
   if (isFieldButton(field)) {
     ;(base as Ii18nButtonFormField).buttonLabel = intl.formatMessage(
       field.buttonLabel
@@ -214,7 +202,7 @@ export const internationaliseFieldObject = (
   return base as Ii18nFormField
 }
 
-export const generateOptions = (
+const generateOptions = (
   options: ILocation[],
   optionType: string
 ): ISelectOption[] => {
@@ -536,7 +524,7 @@ interface IVars {
   [key: string]: any
 }
 
-export function getInputValues(
+function getInputValues(
   inputs: IFieldInput[],
   values: IFormSectionData
 ): IDynamicValues {
@@ -573,7 +561,7 @@ export const getConditionalActionsForField = (
   values: IFormSectionData,
   offlineCountryConfig: IOfflineData,
   draftData: IFormData,
-  userDetails: UserDetails | null = null
+  userDetails: UserDetails | null
 ): string[] => {
   if (!field.conditionals) {
     return []
@@ -676,13 +664,15 @@ export const hasFormError = (
   fields: IFormField[],
   values: IFormSectionData,
   resource: IOfflineData,
-  drafts: IFormData
+  drafts: IFormData,
+  user: UserDetails | null
 ): boolean => {
   const errors: Errors = getValidationErrorsForForm(
     fields,
     values,
     resource,
-    drafts
+    drafts,
+    user
   )
 
   const fieldListWithErrors = Object.values(errors).filter(
@@ -726,13 +716,11 @@ export const isRadioGroupWithNestedField = (
   return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
 }
 
-export const isDynamicField = (
-  field: IFormField
-): field is IDynamicFormField => {
+const isDynamicField = (field: IFormField): field is IDynamicFormField => {
   return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
 }
 
-export const isDateField = (
+const isDateField = (
   field: IFormField,
   sectionData: IFormSectionData
 ): field is IDateFormField => {
@@ -782,7 +770,13 @@ export function isFieldHttp(field: IFormField): field is IHttpFormField {
   return field.type === HTTP
 }
 
-export function isInitialValueDependencyInfo(
+export function isFieldRedirect(
+  field: IFormField
+): field is IRedirectFormField {
+  return field.type === REDIRECT
+}
+
+function isInitialValueDependencyInfo(
   value: InitialValue
 ): value is DependencyInfo {
   return typeof value === 'object' && value !== null && 'dependsOn' in value
@@ -805,4 +799,16 @@ export function handleUnsupportedIcon(iconName?: string) {
     return iconName as keyof typeof SupportedIcons
   }
   return null
+}
+
+export function handleInitialValue(
+  initialValue: InitialValue,
+  ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
+): IFormFieldValue {
+  return isInitialValueDependencyInfo(initialValue)
+    ? (evalExpressionInFieldDefinition(
+        initialValue.expression,
+        ...evalParams
+      ) as IFormFieldValue)
+    : initialValue
 }

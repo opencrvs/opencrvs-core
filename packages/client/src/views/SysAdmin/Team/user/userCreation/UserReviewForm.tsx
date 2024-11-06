@@ -117,110 +117,26 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
-class UserReviewFormComponent extends React.Component<
-  IFullProps & IDispatchProps
-> {
-  transformSectionData = () => {
-    const { intl, userFormSection } = this.props
-    let nameJoined = false,
-      fieldValue
-    const sections: ISectionData[] = []
-    getVisibleSectionGroupsBasedOnConditions(
-      userFormSection,
-      this.props.formData
-    ).forEach((group) => {
-      group.fields.forEach((field: IFormField, idx) => {
-        if (field.hideValueInPreview) {
-          return
-        } else if (field.type === SUBSECTION_HEADER || field.type === DIVIDER) {
-          return
-        } else if (field && field.type === FIELD_GROUP_TITLE) {
-          sections.push({ title: intl.formatMessage(field.label), items: [] })
-        } else if (field && sections.length > 0) {
-          if (field.name === 'username' && !this.getValue(field)) return
-          let label = intl.formatMessage(field.label)
-          if (
-            !getConditionalActionsForField(
-              field,
-              this.props.formData,
-              this.props.offlineCountryConfiguration,
-              { user: this.props.formData }
-            ).includes('hide')
-          ) {
-            fieldValue = this.getValue(field)
-
-            if (['firstNamesEng', 'familyNameEng'].includes(field.name)) {
-              if (nameJoined) return
-              label = intl.formatMessage(constantsMessages.name)
-              fieldValue = this.getName(group.fields)
-              nameJoined = true
-            }
-
-            if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
-              fieldValue = (
-                <SignatureImage
-                  src={
-                    (
-                      this.props.formData[field.name] as
-                        | IAttachmentValue
-                        | undefined
-                    )?.data
-                  }
-                />
-              )
-            }
-
-            sections[sections.length - 1].items.push({
-              label: <Label>{label}</Label>,
-              value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
-              actions:
-                !(
-                  field.name === 'registrationOffice' &&
-                  this.props.userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
-                ) && !field.readonly ? (
-                  <Link
-                    id={`btn_change_${field.name}`}
-                    onClick={() => {
-                      this.props.userId
-                        ? this.props.goToUserReviewForm(
-                            this.props.userId,
-                            userFormSection.id,
-                            group.id,
-                            field.name
-                          )
-                        : this.props.goToCreateUserSection(
-                            userFormSection.id,
-                            group.id,
-                            field.name
-                          )
-                    }}
-                  >
-                    {intl.formatMessage(messages.change)}
-                  </Link>
-                ) : (
-                  <></>
-                )
-            })
-          }
-        }
-      })
-    })
-
-    return sections
-  }
-
-  getValue = (field: IFormField) => {
-    const { intl, formData } = this.props
-
+const UserReviewFormComponent = ({
+  intl,
+  userFormSection,
+  userDetails,
+  formData,
+  offlineCountryConfiguration,
+  userId,
+  goToUserReviewForm,
+  goToCreateUserSection,
+  submitForm,
+  goBack,
+  section
+}: IFullProps & IDispatchProps) => {
+  const getValue = (field: IFormField) => {
     if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations = field.searchableResource.reduce(
         (locations, resource) => {
           return {
             ...locations,
-            ...getListOfLocations(
-              this.props.offlineCountryConfiguration,
-              resource
-            )
+            ...getListOfLocations(offlineCountryConfiguration, resource)
           }
         },
         {}
@@ -243,26 +159,112 @@ class UserReviewFormComponent extends React.Component<
       : ''
   }
 
-  getName = (fields: IFormField[]) => {
+  const transformSectionData = () => {
+    let nameJoined = false,
+      fieldValue
+    const sections: ISectionData[] = []
+    getVisibleSectionGroupsBasedOnConditions(userFormSection, formData).forEach(
+      (group) => {
+        group.fields.forEach((field: IFormField, idx) => {
+          if (field.hideValueInPreview) {
+            return
+          } else if (
+            field.type === SUBSECTION_HEADER ||
+            field.type === DIVIDER
+          ) {
+            return
+          } else if (field && field.type === FIELD_GROUP_TITLE) {
+            sections.push({ title: intl.formatMessage(field.label), items: [] })
+          } else if (field && sections.length > 0) {
+            if (field.name === 'username' && !getValue(field)) return
+            let label = intl.formatMessage(field.label)
+            if (
+              !getConditionalActionsForField(
+                field,
+                formData,
+                offlineCountryConfiguration,
+                { user: formData },
+                userDetails
+              ).includes('hide')
+            ) {
+              fieldValue = getValue(field)
+
+              if (['firstNamesEng', 'familyNameEng'].includes(field.name)) {
+                if (nameJoined) return
+                label = intl.formatMessage(constantsMessages.name)
+                fieldValue = getName(group.fields)
+                nameJoined = true
+              }
+
+              if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
+                fieldValue = (
+                  <SignatureImage
+                    src={
+                      (formData[field.name] as IAttachmentValue | undefined)
+                        ?.data
+                    }
+                  />
+                )
+              }
+
+              sections[sections.length - 1].items.push({
+                label: <Label>{label}</Label>,
+                value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
+                actions:
+                  !(
+                    field.name === 'registrationOffice' &&
+                    userDetails?.systemRole !== 'NATIONAL_SYSTEM_ADMIN'
+                  ) && !field.readonly ? (
+                    <Link
+                      id={`btn_change_${field.name}`}
+                      onClick={() => {
+                        userId
+                          ? goToUserReviewForm(
+                              userId,
+                              userFormSection.id,
+                              group.id,
+                              field.name
+                            )
+                          : goToCreateUserSection(
+                              userFormSection.id,
+                              group.id,
+                              field.name
+                            )
+                      }}
+                    >
+                      {intl.formatMessage(messages.change)}
+                    </Link>
+                  ) : (
+                    <></>
+                  )
+              })
+            }
+          }
+        })
+      }
+    )
+
+    return sections
+  }
+
+  const getName = (fields: IFormField[]) => {
     const firstNamesEngField = fields.find(
       (field) => field.name === 'firstNamesEng'
     ) as IFormField
     const familyNameEngField = fields.find(
-      (field) => field.name === 'familyNameEng'
+      (field) => field.name === 'familyName'
     ) as IFormField
 
-    return `${this.getValue(firstNamesEngField)} ${this.getValue(
-      familyNameEngField
-    )}`
+    return `${getValue(firstNamesEngField)} ${getValue(familyNameEngField)}`
   }
 
-  handleSubmit = () => {
+  const handleSubmit = () => {
     const variables = draftToGqlTransformer(
-      { sections: [this.props.userFormSection] },
-      { user: this.props.formData },
+      { sections: [userFormSection] },
+      { user: formData },
       '',
-      this.props.userDetails,
-      this.props.offlineCountryConfiguration
+      userDetails,
+      offlineCountryConfiguration
     )
     if (variables.user._fhirID) {
       variables.user.id = variables.user._fhirID
@@ -273,100 +275,89 @@ class UserReviewFormComponent extends React.Component<
       delete variables.user.signature.name
       delete variables.user.signature.__typename //to fix updating registrar bug
     }
-    this.props.submitForm(variables)
+    submitForm(variables)
   }
 
-  render() {
-    const {
-      intl,
-      section,
-      userId,
-      formData,
-      goToTeamUserList,
-      userDetails,
-      offlineCountryConfiguration
-    } = this.props
-    let title: string | undefined
-    let actionComponent: JSX.Element
-    const locationId = formData['registrationOffice']
-    const locationDetails =
-      offlineCountryConfiguration['locations'][`${locationId}`] ||
-      offlineCountryConfiguration['facilities'][`${locationId}`] ||
-      offlineCountryConfiguration['offices'][`${locationId}`]
-    if (userId) {
-      title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-      actionComponent = (
-        <SuccessButton
-          id="submit-edit-user-form"
-          disabled={
-            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
-              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
-            !this.props.formData.signature
-          }
-          onClick={this.handleSubmit}
-          icon={() => <Check />}
-          align={ICON_ALIGNMENT.LEFT}
-        >
-          {intl.formatMessage(buttonMessages.confirm)}
-        </SuccessButton>
-      )
-    } else {
-      title = section.title && intl.formatMessage(section.title)
-      actionComponent = (
-        <Button
-          id="submit_user_form"
-          type="positive"
-          size="large"
-          fullWidth
-          disabled={
-            (this.props.formData.systemRole === 'LOCAL_REGISTRAR' ||
-              this.props.formData.systemRole === 'NATIONAL_REGISTRAR') &&
-            !this.props.formData.signature
-          }
-          onClick={this.handleSubmit}
-        >
-          {intl.formatMessage(messages.createUser)}
-        </Button>
-      )
-    }
-    return (
-      <ActionPageLight
-        title={title}
-        goBack={this.props.goBack}
-        goHome={() =>
-          locationDetails
-            ? goToTeamUserList(locationDetails.id)
-            : userDetails?.primaryOffice?.id &&
-              goToTeamUserList(userDetails.primaryOffice.id)
+  let title: string | undefined
+  let actionComponent: JSX.Element
+  const locationId = formData['registrationOffice']
+  const locationDetails =
+    offlineCountryConfiguration['locations'][`${locationId}`] ||
+    offlineCountryConfiguration['facilities'][`${locationId}`] ||
+    offlineCountryConfiguration['offices'][`${locationId}`]
+  if (userId) {
+    title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+    actionComponent = (
+      <SuccessButton
+        id="submit-edit-user-form"
+        disabled={
+          (formData.systemRole === 'LOCAL_REGISTRAR' ||
+            formData.systemRole === 'NATIONAL_REGISTRAR') &&
+          !formData.signature
         }
-        hideBackground={true}
+        onClick={handleSubmit}
+        icon={() => <Check />}
+        align={ICON_ALIGNMENT.LEFT}
       >
-        <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
-          <Container>
-            {this.transformSectionData().map((sec, index) => {
-              return (
-                <React.Fragment key={index}>
-                  <ListViewSimplified bottomBorder>
-                    {sec.items.map((item, index) => {
-                      return (
-                        <ListViewItemSimplified
-                          key={index}
-                          label={item.label}
-                          value={item.value}
-                          actions={item.actions}
-                        />
-                      )
-                    })}
-                  </ListViewSimplified>
-                </React.Fragment>
-              )
-            })}
-            <Action>{actionComponent}</Action>
-          </Container>
-        </Content>
-      </ActionPageLight>
+        {intl.formatMessage(buttonMessages.confirm)}
+      </SuccessButton>
+    )
+  } else {
+    title = section.title && intl.formatMessage(section.title)
+    actionComponent = (
+      <Button
+        id="submit_user_form"
+        type="positive"
+        size="large"
+        fullWidth
+        disabled={
+          (formData.systemRole === 'LOCAL_REGISTRAR' ||
+            formData.systemRole === 'NATIONAL_REGISTRAR') &&
+          !formData.signature
+        }
+        onClick={handleSubmit}
+      >
+        {intl.formatMessage(messages.createUser)}
+      </Button>
     )
   }
+  return (
+    <ActionPageLight
+      title={title}
+      goBack={goBack}
+      goHome={() =>
+        locationDetails
+          ? goToTeamUserList(locationDetails.id)
+          : userDetails?.primaryOffice?.id &&
+            goToTeamUserList(userDetails.primaryOffice.id)
+      }
+      hideBackground={true}
+    >
+      <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
+        <Container>
+          {transformSectionData().map((sec, index) => {
+            return (
+              <React.Fragment key={index}>
+                <ListViewSimplified bottomBorder>
+                  {sec.items.map((item, index) => {
+                    return (
+                      <ListViewItemSimplified
+                        key={index}
+                        label={item.label}
+                        value={item.value}
+                        actions={item.actions}
+                      />
+                    )
+                  })}
+                </ListViewSimplified>
+              </React.Fragment>
+            )
+          })}
+          <Action>{actionComponent}</Action>
+        </Container>
+      </Content>
+    </ActionPageLight>
+  )
 }
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {

@@ -113,13 +113,6 @@ export interface Integration {
   status: string
 }
 
-export const statuses = {
-  PENDING: 'pending',
-  ACTIVE: 'active',
-  DISABLED: 'disabled',
-  DEACTIVATED: 'deactivated'
-}
-
 const configSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
   BIRTH: { type: birthSchema, required: false },

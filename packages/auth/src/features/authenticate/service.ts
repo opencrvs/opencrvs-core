@@ -9,16 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import {
-  USER_MANAGEMENT_URL,
-  CERT_PRIVATE_KEY_PATH,
-  CERT_PUBLIC_KEY_PATH,
-  CONFIG_TOKEN_EXPIRY_SECONDS,
-  CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS,
-  PRODUCTION,
-  QA_ENV,
-  METRICS_URL
-} from '@auth/constants'
+import { JWT_ISSUER } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
@@ -31,13 +22,14 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import { chainW, tryCatch } from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
+import { env } from '@auth/environment'
 
-const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
-const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
+const cert = readFileSync(env.CERT_PRIVATE_KEY_PATH)
+const publicCert = readFileSync(env.CERT_PUBLIC_KEY_PATH)
 
 const sign = promisify<
   Record<string, unknown>,
@@ -75,7 +67,7 @@ export async function authenticate(
   username: string,
   password: string
 ): Promise<IAuthentication> {
-  const url = resolve(USER_MANAGEMENT_URL, '/verifyPassword')
+  const url = resolve(env.USER_MANAGEMENT_URL, '/verifyPassword')
 
   const res = await fetch(url, {
     method: 'POST',
@@ -101,7 +93,7 @@ export async function authenticateSystem(
   client_id: string,
   client_secret: string
 ): Promise<ISystemAuthentication> {
-  const url = resolve(USER_MANAGEMENT_URL, '/verifySystem')
+  const url = resolve(env.USER_MANAGEMENT_URL, '/verifySystem')
 
   const res = await fetch(url, {
     method: 'POST',
@@ -135,11 +127,34 @@ export async function createToken(
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary
-      ? CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
-      : CONFIG_TOKEN_EXPIRY_SECONDS,
+      ? env.CONFIG_SYSTEM_TOKEN_EXPIRY_SECONDS
+      : env.CONFIG_TOKEN_EXPIRY_SECONDS,
     audience,
     issuer
   })
+}
+
+export async function createTokenForRecordValidation(
+  userId: UUID,
+  recordId: UUID
+) {
+  return sign(
+    {
+      scope: ['record.confirm-registration', 'record.reject-registration'],
+      recordId
+    },
+    cert,
+    {
+      subject: userId,
+      algorithm: 'RS256',
+      expiresIn: '7 days',
+      audience: [
+        'opencrvs:gateway-user', // to get to the gateway
+        'opencrvs:user-mgnt-user' // to allow the gateway to connect the 'sub' to an actual user
+      ],
+      issuer: JWT_ISSUER
+    }
+  )
 }
 
 export async function storeUserInformation(
@@ -173,7 +188,7 @@ export async function generateAndSendVerificationCode(
   mobile?: string,
   email?: string
 ) {
-  const isDemoUser = scope.indexOf('demo') > -1 || QA_ENV
+  const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
   logger.info(
     `isDemoUser,
       ${JSON.stringify({
@@ -187,7 +202,7 @@ export async function generateAndSendVerificationCode(
   } else {
     verificationCode = await generateVerificationCode(nonce)
   }
-  if (!PRODUCTION || QA_ENV) {
+  if (!env.isProd || env.QA_ENV) {
     logger.info(
       `Sending a verification to,
           ${JSON.stringify({
@@ -238,27 +253,4 @@ export function verifyToken(token: string) {
 
 export function getPublicKey() {
   return publicCert
-}
-
-export async function postUserActionToMetrics(
-  action: string,
-  token: string,
-  remoteAddress: string,
-  userAgent: string,
-  practitionerId?: string
-) {
-  const url = resolve(METRICS_URL, '/audit/events')
-  const body = { action: action, practitionerId }
-  const authentication = 'Bearer ' + token
-
-  await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authentication,
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
-    }
-  })
 }

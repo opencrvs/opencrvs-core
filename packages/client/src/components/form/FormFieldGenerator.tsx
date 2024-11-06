@@ -31,9 +31,9 @@ import {
   getVisibleOptions,
   getListOfLocations,
   getFieldHelperText,
-  isInitialValueDependencyInfo,
   getDependentFields,
-  evalExpressionInFieldDefinition
+  evalExpressionInFieldDefinition,
+  handleInitialValue
 } from '@client/forms/utils'
 import styled, { keyframes } from 'styled-components'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -82,8 +82,6 @@ import {
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
   TIME,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
@@ -132,9 +130,6 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
-import { useOnlineStatus } from '@client/utils'
-import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
 import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
@@ -235,7 +230,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       (val: string) => setFieldValue(fieldDefinition.name, val),
       [fieldDefinition.name, setFieldValue]
     )
-    const isOnline = useOnlineStatus()
 
     const inputProps = {
       id: fieldDefinition.name,
@@ -255,8 +249,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             isDisabled={fieldDefinition.disabled}
             value={value as string}
             onChange={(val: string) => {
-              resetDependentSelectValues(fieldDefinition.name)
               setFieldValue(fieldDefinition.name, val)
+              resetDependentSelectValues(fieldDefinition.name)
             }}
             onFocus={() =>
               handleSelectFocus(
@@ -615,21 +609,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
-      return (
-        <InputField {...inputFieldProps}>
-          <VerificationButton
-            id={fieldDefinition.name}
-            onClick={fieldDefinition.onClick}
-            labelForVerified={fieldDefinition.labelForVerified}
-            labelForUnverified={fieldDefinition.labelForUnverified}
-            labelForOffline={fieldDefinition.labelForOffline}
-            status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
-          />
-        </InputField>
-      )
-    }
-
     if (fieldDefinition.type === REDIRECT) {
       return (
         <RedirectField
@@ -738,14 +717,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-function handleInitialValue(initialValue: InitialValue): IFormFieldValue {
-  return isInitialValueDependencyInfo(initialValue) ? '' : initialValue
-}
-
-const mapFieldsToValues = (fields: IFormField[]) =>
+export const mapFieldsToValues = (
+  fields: IFormField[],
+  ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
+) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = handleInitialValue(
-      field.initialValue as InitialValue
+      field.initialValue as InitialValue,
+      ...evalParams
     )
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
@@ -755,14 +734,18 @@ const mapFieldsToValues = (fields: IFormField[]) =>
         (nestedValues, nestedField) => ({
           ...nestedValues,
           [nestedField.name]: handleInitialValue(
-            nestedField.initialValue as InitialValue
+            nestedField.initialValue as InitialValue,
+            ...evalParams
           )
         }),
         {}
       )
 
       fieldInitialValue = {
-        value: handleInitialValue(field.initialValue as InitialValue),
+        value: handleInitialValue(
+          field.initialValue as InitialValue,
+          ...evalParams
+        ),
         nestedFields: nestedInitialValues
       }
     }
@@ -787,7 +770,6 @@ interface IFormSectionProps {
 interface IStateProps {
   offlineCountryConfig: IOfflineData
   userDetails: UserDetails | null
-  onNidAuthenticationClick: () => void
 }
 
 interface IDispatchProps {
@@ -1116,18 +1098,12 @@ class FormSectionComponent extends React.Component<Props> {
                     field.searchableType as LocationType[]
                   )
                 }
-              : field.type === NID_VERIFICATION_BUTTON
-              ? ({
-                  ...field,
-                  onClick: this.props.onNidAuthenticationClick
-                } as INidVerificationButton)
               : field
 
           if (
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === NID_VERIFICATION_BUTTON ||
             field.type === BUTTON
           ) {
             return (
@@ -1307,11 +1283,19 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
   const userDetails = useSelector(getUserDetails)
   const intl = useIntl()
   const dispatch = useDispatch()
-  const { onClick: onNidAuthenticationClick } = useNidAuthentication()
 
   return (
     <Formik<IFormSectionData>
-      initialValues={props.initialValues ?? mapFieldsToValues(props.fields)}
+      initialValues={
+        props.initialValues ??
+        mapFieldsToValues(
+          props.fields,
+          {},
+          offlineCountryConfig,
+          props.draftData,
+          userDetails
+        )
+      }
       onSubmit={() => {}}
       validate={(values) =>
         getValidationErrorsForForm(
@@ -1319,6 +1303,7 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
           values,
           offlineCountryConfig,
           props.draftData,
+          userDetails,
           props.requiredErrorMessage
         )
       }
@@ -1331,7 +1316,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
           offlineCountryConfig={offlineCountryConfig}
           userDetails={userDetails}
           dynamicDispatch={(...args) => dispatch(dynamicDispatch(...args))}
-          onNidAuthenticationClick={onNidAuthenticationClick}
         />
       )}
     </Formik>
