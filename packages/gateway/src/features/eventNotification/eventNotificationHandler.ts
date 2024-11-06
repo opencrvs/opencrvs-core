@@ -29,7 +29,7 @@ import {
 } from '@opencrvs/commons/types'
 import { createHospitalNotification } from '@gateway/workflow/index'
 import { getAuthHeader } from '@opencrvs/commons/http'
-const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation']
+const RESOURCE_TYPES = ['Patient', 'RelatedPerson', 'Encounter', 'Observation', 'QuestionnaireResponse']
 
 const resourceSchema = Joi.object({
   resourceType: Joi.string()
