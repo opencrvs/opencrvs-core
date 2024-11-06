@@ -17,7 +17,7 @@ import {
 } from '@auth/features/authenticate/service'
 import { unauthorized } from '@hapi/boom'
 import { WEB_USER_JWT_AUDIENCES, JWT_ISSUER } from '@auth/constants'
-import { SUPER_ADMIN_SCOPES } from '@opencrvs/commons/authentication'
+import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 import { logger } from '@opencrvs/commons'
 
 interface IAuthPayload {
@@ -42,6 +42,11 @@ export default async function authenticateSuperUserHandler(
     logger.info('Login attempt with a deactivated super user account detected')
     throw unauthorized()
   }
+
+  const SUPER_ADMIN_SCOPES = [
+    SCOPES.BYPASSRATELIMIT,
+    SCOPES.CONFIG_UPDATE_ALL
+  ] satisfies Scope[]
 
   const token = await createToken(
     result.userId,
