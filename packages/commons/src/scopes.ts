@@ -78,6 +78,7 @@ export const SCOPES = {
   RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
     'record.registration-request-reinstatement',
   RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
+  RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
 
   // search
   SEARCH_BIRTH_MY_JURISDICTION: 'search.birth:my-jurisdiction',
