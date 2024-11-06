@@ -13,7 +13,8 @@ import {
   logger,
   SearchDocument,
   EVENT,
-  getSearchTotalCount
+  getSearchTotalCount,
+  UUID
 } from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
@@ -33,6 +34,7 @@ import {
   searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
 import { capitalize } from 'lodash'
+import { resolveLocationChildren } from './location'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -117,6 +119,10 @@ export interface ICountQueryParam {
   event?: string
 }
 
+const isLeafLocation = async (location: UUID) => {
+  return (await resolveLocationChildren(location)).length === 1
+}
+
 export async function getStatusWiseRegistrationCountHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -137,12 +143,20 @@ export async function getStatusWiseRegistrationCountHandler(
         }
       }
     ]
+    const locationRules: Record<string, any>[] = []
     if (payload.declarationJurisdictionId) {
-      matchRules.push({
-        match: {
-          declarationJurisdictionIds: payload.declarationJurisdictionId
+      const locationChildren = await resolveLocationChildren(
+        payload.declarationJurisdictionId as UUID
+      )
+      for (const locationChild of locationChildren) {
+        if (await isLeafLocation(locationChild as UUID)) {
+          locationRules.push({
+            match: {
+              declarationJurisdictionIds: locationChild
+            }
+          })
         }
-      })
+      }
     }
 
     const response = await client.search<
@@ -161,7 +175,8 @@ export async function getStatusWiseRegistrationCountHandler(
           size: 0,
           query: {
             bool: {
-              must: matchRules
+              must: matchRules,
+              should: locationRules
             }
           },
           aggs: {
