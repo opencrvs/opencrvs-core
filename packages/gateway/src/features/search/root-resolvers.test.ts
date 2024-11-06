@@ -13,6 +13,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { TestResolvers } from '@gateway/utils/testUtils'
+import { SCOPES } from '@gateway/../../commons/build/dist/scopes'
 const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
@@ -28,7 +29,13 @@ describe('Search root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const validUserTokenRegister = jwt.sign(
-        { scope: ['record.register'] },
+        {
+          scope: [
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE
+          ]
+        },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -41,7 +48,13 @@ describe('Search root resolvers', () => {
         Authorization: `Bearer ${validUserTokenRegister}`
       }
       const validUserTokenDeclare = jwt.sign(
-        { scope: ['record.declare-birth'] },
+        {
+          scope: [
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE
+          ]
+        },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -308,8 +321,8 @@ describe('Search root resolvers', () => {
 
     beforeEach(() => {
       fetch.resetMocks()
-      const declareToken = jwt.sign(
-        { scope: ['record.declare-birth'] },
+      const performanceToken = jwt.sign(
+        { scope: [SCOPES.RECORD_DECLARE_BIRTH] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -319,10 +332,10 @@ describe('Search root resolvers', () => {
         }
       )
       unauthorizedUser = {
-        Authorization: `Bearer ${declareToken}`
+        Authorization: `Bearer ${performanceToken}`
       }
       const sysadminUserToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.PERFORMANCE_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',

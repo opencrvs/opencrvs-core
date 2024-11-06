@@ -96,13 +96,9 @@ export const resolvers: GQLResolver = {
       // Only registrar, registration agent & field agent should be able to search user
       if (
         !inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-          SCOPES.RECORD_DECLARE_BIRTH,
-          SCOPES.RECORD_DECLARE_DEATH,
-          SCOPES.RECORD_DECLARE_MARRIAGE,
-          SCOPES.RECORDSEARCH
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE
         ])
       ) {
         return await Promise.reject(
@@ -201,13 +197,7 @@ export const resolvers: GQLResolver = {
       },
       { headers: authHeader }
     ) {
-      if (
-        !inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.CONFIG_UPDATE_ALL
-        ])
-      ) {
+      if (!inScope(authHeader, [SCOPES.PERFORMANCE_READ])) {
         return await Promise.reject(
           new Error('User does not have enough scope')
         )
