@@ -90,7 +90,7 @@ export const resolvers: GQLResolver = {
         return context.record
       } else {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have enough scope')
         )
       }
     },
@@ -107,7 +107,7 @@ export const resolvers: GQLResolver = {
         return context.record
       } else {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have enough scope')
         )
       }
     },
@@ -128,7 +128,7 @@ export const resolvers: GQLResolver = {
         return context.record
       } else {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have enough scope')
         )
       }
     },
@@ -158,7 +158,7 @@ export const resolvers: GQLResolver = {
         return await fetchFHIR(`/${task.focus.reference}`, authHeader)
       } else {
         return await Promise.reject(
-          new Error('User does not have a register or validate scope')
+          new Error('User does not have enough scope')
         )
       }
     },
@@ -204,7 +204,9 @@ export const resolvers: GQLResolver = {
       if (
         hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
         hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(authHeader, SCOPES.RECORD_SUBMIT_INCOMPLETE)
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_BIRTH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_DEATH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_MARRIAGE)
       ) {
         const response = await fetch(
           `${COUNTRY_CONFIG_URL}/verify/nid/${country}`,
@@ -237,8 +239,9 @@ export const resolvers: GQLResolver = {
       if (
         hasScope(authHeader, SCOPES.RECORD_REGISTER) ||
         hasScope(authHeader, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(authHeader, SCOPES.RECORD_SUBMIT_INCOMPLETE) ||
-        // @TODO add sysadmin scope
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_BIRTH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_DEATH) ||
+        hasScope(authHeader, SCOPES.RECORD_DECLARE_MARRIAGE) ||
         hasScope(authHeader, SCOPES.PERFORMANCE_READ)
       ) {
         const payload: {
@@ -505,7 +508,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_CERTIFY)) {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
         return Promise.reject(new Error('User does not have enough scope'))
       }
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
@@ -517,7 +520,7 @@ export const resolvers: GQLResolver = {
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
     },
     async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_CERTIFY)) {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
         return Promise.reject(new Error('User does not have enough scope'))
       }
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
@@ -529,7 +532,7 @@ export const resolvers: GQLResolver = {
       return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
     },
     async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_CERTIFY)) {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
         return Promise.reject(new Error('User does not have enough scope'))
       }
       return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)

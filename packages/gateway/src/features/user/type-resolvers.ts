@@ -20,11 +20,7 @@ import {
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
-import {
-  GQLResolver,
-  GQLSignatureInput,
-  GQLUserIdentifierInput
-} from '@gateway/graphql/schema'
+import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
 
 import {
   Bundle,
@@ -36,7 +32,7 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { getTokenPayload, scopesInclude } from './utils'
-import { SCOPES, UserScope } from '@opencrvs/commons/authentication'
+import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -58,7 +54,7 @@ export interface IUserModelData {
     family: string
     given: string[]
   }[]
-  scope?: UserScope[]
+  scope?: Scope[]
   email: string
   emailForNotification?: string
   mobile?: string
@@ -99,7 +95,6 @@ export interface IUserPayload
     '_id' | 'status' | 'practitionerId' | 'username' | 'identifiers' | 'role'
   > {
   id?: string
-  identifiers: GQLUserIdentifierInput[]
   status?: string
   username?: string
   password?: string
@@ -226,9 +221,9 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const presignedUrl = scopesInclude(
+      const presignedUrl = !scopesInclude(
         userModel.scope,
-        'profile.electronic-signature'
+        SCOPES.RECORD_SUBMIT_INCOMPLETE
       )
         ? signatureExtension &&
           (await getPresignedUrlFromUri(

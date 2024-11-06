@@ -29,9 +29,10 @@ import {
   getUserRoleFromHistory,
   PractitionerRoleHistory
 } from '@opencrvs/commons/types'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const MOCK_TOKEN = jwt.sign(
-  { scope: ['validate'] },
+  { scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL] },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -265,7 +266,11 @@ test('running a full aggregated birth FHIR bundle through resolvers produces a B
         auth: {
           isAuthenticated: true,
           credentials: {
-            scope: ['register', 'performance', 'certify', 'demo']
+            scope: [
+              SCOPES.RECORD_REGISTER,
+              SCOPES.PERFORMANCE_READ,
+              SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+            ]
           }
         },
         headers: {

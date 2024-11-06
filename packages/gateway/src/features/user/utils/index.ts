@@ -16,7 +16,7 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import * as decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
-import { Scope, UserScope } from '@opencrvs/commons/authentication'
+import { Scope } from '@opencrvs/commons/authentication'
 
 export interface ITokenPayload {
   sub: string
@@ -77,9 +77,9 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
 
 export function scopesInclude(
   scopes:
-    | UserScope[]
+    | Scope[]
     | undefined /* @todo remove undefined variant and make scope a required field for users */,
-  scope: UserScope
+  scope: Scope
 ) {
   if (!scopes) {
     return false

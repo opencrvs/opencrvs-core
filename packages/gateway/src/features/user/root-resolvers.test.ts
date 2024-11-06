@@ -43,7 +43,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -201,7 +201,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1026,7 +1026,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_CREATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1148,7 +1148,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1232,7 +1232,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1268,9 +1268,7 @@ describe('User root resolvers', () => {
           },
           authHeaderRegAgent
         )
-      ).rejects.toThrowError(
-        'SMS invite can only be resent by a user with sys admin scope'
-      )
+      ).rejects.toThrowError('SMS invite can not be resent by this user')
     })
 
     it('throws error when the user-mgnt response is not 200', async () => {
@@ -1310,7 +1308,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1346,9 +1344,7 @@ describe('User root resolvers', () => {
           },
           authHeaderRegAgent
         )
-      ).rejects.toThrowError(
-        'Username reminder can only be resent by a user with sys admin scope'
-      )
+      ).rejects.toThrowError('Username reminder can not be resent by this user')
     })
 
     it('throws error when the user-mgnt response is not 200', async () => {
@@ -1388,7 +1384,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['config.update:all'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1424,9 +1420,7 @@ describe('User root resolvers', () => {
           },
           authHeaderRegAgent
         )
-      ).rejects.toThrowError(
-        'Reset password can only be sent by a user with sys admin scope'
-      )
+      ).rejects.toThrowError('Reset password can not be sent by this user')
     })
 
     it('throws error when the user-mgnt response is not 200', async () => {

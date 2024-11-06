@@ -16,11 +16,14 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 
 import { UserInputError } from 'apollo-server-hapi'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
 const registerCertifyToken = jwt.sign(
-  { scope: ['register', 'certify'] },
+  {
+    scope: [SCOPES.RECORD_REGISTER, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]
+  },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -31,7 +34,7 @@ const registerCertifyToken = jwt.sign(
 )
 
 const validateToken = jwt.sign(
-  { scope: ['validate'] },
+  { scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL] },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -42,7 +45,13 @@ const validateToken = jwt.sign(
 )
 
 const declareToken = jwt.sign(
-  { scope: ['declare'] },
+  {
+    scope: [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_MARRIAGE
+    ]
+  },
   readFileSync('./test/cert.key'),
   {
     subject: '121221',
@@ -53,7 +62,7 @@ const declareToken = jwt.sign(
 )
 
 const certifyToken = jwt.sign(
-  { scope: ['certify'] },
+  { scope: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -260,7 +269,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchDeathRegistration()', () => {
@@ -365,7 +374,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchMarriageRegistration()', () => {
@@ -470,7 +479,7 @@ describe('Registration root resolvers', () => {
           { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
           authHeaderCertify
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('fetchRegistration()', () => {
@@ -585,7 +594,7 @@ describe('Registration root resolvers', () => {
           { id, reason, comment },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -602,7 +611,7 @@ describe('Registration root resolvers', () => {
           { id },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -619,7 +628,7 @@ describe('Registration root resolvers', () => {
           { id },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -862,7 +871,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           { headers: authHeaderRegCert }
         )
-      ).rejects.toThrowError('User does not have a validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1179,7 +1188,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           { headers: authHeaderRegCert }
         )
-      ).rejects.toThrowError('User does not have a validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1296,7 +1305,7 @@ describe('Registration root resolvers', () => {
           { id, details },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a certify scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('markDeathAsCertified()', () => {
@@ -1366,7 +1375,7 @@ describe('Registration root resolvers', () => {
           { details },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a certify scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
   describe('markEventAsNotDuplicate()', () => {
@@ -1382,7 +1391,7 @@ describe('Registration root resolvers', () => {
           },
           { headers: authHeaderNotRegCert }
         )
-      ).rejects.toThrowError('User does not have a register scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
 
     it('throws an error when the declaration is not assigned', async () => {
@@ -1476,7 +1485,7 @@ describe('Registration root resolvers', () => {
           { identifier: '2019333494BAQFYEG6' },
           authHeaderNotRegCert
         )
-      ).rejects.toThrowError('User does not have a register or validate scope')
+      ).rejects.toThrowError('User does not have enough scope')
     })
   })
 
@@ -1731,6 +1740,6 @@ describe('markEventAsUnassigned()', () => {
         { id },
         authHeaderNotRegCert
       )
-    ).rejects.toThrowError('User does not have a register or validate scope')
+    ).rejects.toThrowError('User does not have enough scope')
   })
 })
