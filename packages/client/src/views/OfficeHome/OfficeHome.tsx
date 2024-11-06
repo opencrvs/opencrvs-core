@@ -208,14 +208,6 @@ class OfficeHomeView extends React.Component<
     }
   }
 
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
-  }
-
-  userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
-  }
-
   subtractDeclarationsWithStatus(count: number, status: string[]) {
     const outboxCount = this.props.storedDeclarations.filter(
       (app) => app.submissionStatus && status.includes(app.submissionStatus)

@@ -520,7 +520,7 @@ describe('edit user tests', () => {
       expect(history.location.hash).toBe('#device')
     })
 
-    it.only('clicking confirm button starts submitting the form', async () => {
+    it('clicking confirm button starts submitting the form', async () => {
       await waitForElement(component, '#submit-edit-user-form')
       component.update()
 

@@ -59,7 +59,7 @@ import {
   CorrectionSection,
   SubmissionAction
 } from '@client/forms'
-import { Event, RegStatus, Scope } from '@client/utils/gateway'
+import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -693,11 +693,20 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
   userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((x) => validateScopes.includes(x))
+    )
   }
 
   componentDidMount() {
@@ -866,13 +875,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = async () => {
     const { declaration } = this.props
-    const isRegistrarOrRegistrationAgent =
+    const canApproveOrRegister =
       this.userHasRegisterScope() || this.userHasValidateScope()
     const isConfirmationModalApplicable =
       declaration.registrationStatus === DECLARED ||
       declaration.registrationStatus === VALIDATED ||
       declaration.registrationStatus === REJECTED
-    if (isRegistrarOrRegistrationAgent && isConfirmationModalApplicable) {
+    if (canApproveOrRegister && isConfirmationModalApplicable) {
       this.toggleConfirmationModal()
     } else {
       this.writeDeclarationAndGoToHome()
