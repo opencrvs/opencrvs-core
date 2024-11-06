@@ -68,7 +68,6 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
-  NID_VERIFICATION_BUTTON,
   WARNING,
   DIVIDER,
   HIDDEN
@@ -132,7 +131,6 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { ListReview } from '@opencrvs/components/lib/ListReview'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
@@ -542,25 +540,6 @@ const renderValue = (
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
-  if (field.type === NID_VERIFICATION_BUTTON) {
-    return (
-      <VerificationButton
-        onClick={() => {}}
-        labelForVerified={intl.formatMessage(
-          formMessageDescriptors.nidVerified
-        )}
-        labelForUnverified={intl.formatMessage(
-          formMessageDescriptors.nidNotVerified
-        )}
-        labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
-        reviewLabelForUnverified={intl.formatMessage(
-          formMessageDescriptors.nidNotVerifiedReviewSection
-        )}
-        status={value ? 'verified' : 'unverified'}
-        useAsReviewLabel={true}
-      />
-    )
-  }
 
   if (typeof value === 'boolean') {
     return value
@@ -568,7 +547,7 @@ const renderValue = (
       : intl.formatMessage(buttonMessages.no)
   }
 
-  if (typeof value === 'string' || typeof value === 'number') {
+  if (value && (typeof value === 'string' || typeof value === 'number')) {
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
@@ -1102,7 +1081,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         .map((field) =>
           this.getValueOrError(section, draft.data, field, errorsOnFields)
         )
-        .filter((value) => value)
+        .filter((value) => value.props.children)
       let completeValue = values[0]
       values.shift()
       values.forEach(
@@ -1146,7 +1125,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               true
             )
           )
-          .filter((value) => value)
+          .filter((value) => value.props.children)
         let previousCompleteValue = <Deleted>{previousValues[0]}</Deleted>
         previousValues.shift()
         previousValues.forEach(
@@ -1936,7 +1915,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </Accordion>
                   )}
 
-                  {!(isCorrection(declaration) || viewRecord) && (
+                  {!(
+                    isCorrection(declaration) ||
+                    viewRecord ||
+                    isDuplicate
+                  ) && (
                     <FormFieldGenerator
                       id={reviewSection.id}
                       key={reviewSection.id}

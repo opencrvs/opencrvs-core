@@ -10,7 +10,6 @@
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0",
-    "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.json' build/dist",
     "build:clean": "rm -rf build",
@@ -59,7 +58,7 @@
     "typescript": "4.9.5"
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
+    "src/**/*.ts": [
       "prettier --write",
       "eslint -c .eslintrc.js --fix"
     ]

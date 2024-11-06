@@ -79,7 +79,7 @@ async function getCompositionIdToStartedByMap(
     if (startedByMap.has(compositionId)) return
     startedByMap.set(
       compositionId,
-      extractId(task.extension[0].valueReference.reference)
+      extractId(task.extension[0]?.valueReference.reference)
     )
   })
   return startedByMap
