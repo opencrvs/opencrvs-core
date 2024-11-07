@@ -69,7 +69,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          AUTHOR=$(gh pr view $PR_NUMBER --json user.login --jq '.user.login')
+          AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
           echo "AUTHOR=${AUTHOR}" >> $GITHUB_ENV
 
       - name: Get Branch Name (on PR creation)
