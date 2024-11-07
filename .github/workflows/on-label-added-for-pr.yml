@@ -14,7 +14,7 @@ jobs:
           labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
           if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
             echo "Label not found, skipping dispatch."
-            exit 0
+            exit 1
           fi
           echo "Label found, dispatching deploy workflow."
         env:
@@ -27,11 +27,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
-            const result = await github.rest.repos.createDispatchEvent({
+            const result = await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'deploy-to-feature-environment.yml',
-              ref: 'main',
+              ref: 'develop',
               inputs: {
                 pr_number: prNumber.toString(),
               }
