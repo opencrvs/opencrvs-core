@@ -1264,7 +1264,7 @@ describe('Archive action', () => {
     expect(status).toBe(ACTION_STATUS.DISABLED)
   })
 
-  it('Validated - Downloaded', async () => {
+  it('Submitted - Downloaded', async () => {
     const { store, history } = createStore()
     setScopes([SCOPES.RECORD_DECLARATION_ARCHIVE], store)
     const toggleDisplayDialogMock = vi.fn()
@@ -1272,7 +1272,7 @@ describe('Archive action', () => {
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
-          status: SUBMISSION_STATUS.VALIDATED
+          status: SUBMISSION_STATUS.SUBMITTED
         }}
         draft={draftDeathDownloaded}
         toggleDisplayDialog={toggleDisplayDialogMock}
@@ -1287,14 +1287,14 @@ describe('Archive action', () => {
     expect(toggleDisplayDialogMock).toHaveBeenCalled()
   })
 
-  it('Validated - Does not have scope', async () => {
+  it('Submitted - Does not have scope', async () => {
     const { store, history } = createStore()
     setScopes([], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
-          status: SUBMISSION_STATUS.VALIDATED
+          status: SUBMISSION_STATUS.SUBMITTED
         }}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
@@ -1306,14 +1306,14 @@ describe('Archive action', () => {
     expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
 
-  it('Validated - Not downloaded - Has scope', async () => {
+  it('Submitted - Not downloaded - Has scope', async () => {
     const { store, history } = createStore()
     setScopes([SCOPES.RECORD_DECLARATION_ARCHIVE], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
-          status: SUBMISSION_STATUS.VALIDATED
+          status: SUBMISSION_STATUS.SUBMITTED
         }}
         draft={draftDeathNotDownloaded}
         toggleDisplayDialog={() => {}}
