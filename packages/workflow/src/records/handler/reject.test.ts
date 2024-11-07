@@ -43,10 +43,7 @@ describe('Reject record endpoint', () => {
   it('returns OK for a correctly authenticated user rejecting a birth declaration', async () => {
     const token = jwt.sign(
       {
-        scope: [
-          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-          SCOPES.RECORD_CONFIRM_REGISTRATION
-        ]
+        scope: [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
       },
       readFileSync('./test/cert.key'),
       {
