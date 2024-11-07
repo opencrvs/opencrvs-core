@@ -52,6 +52,7 @@ export const SCOPES = {
   RECORD_SUBMIT_FOR_UPDATES: 'record.submit-for-updates',
   RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
     'record.registration-verify-certified-copies',
+  RECORD_DECLARATION_EDIT: 'record.declaration-edit',
 
   // register
   RECORD_REGISTER: 'record.register',
