@@ -10,7 +10,7 @@ name: Deploy PR to feature environment
 
 on:
   pull_request:
-    types: [opened, synchronize, labeled]
+    types: [opened, synchronize]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -40,14 +40,24 @@ jobs:
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
           BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
 
-      - name: Check for "🚀 Ready to deploy" label
+      - name: Get PR Information
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
-          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+
+      - name: Check for "🚀 Ready to deploy" label
+        run: |
+          labels=$(gh pr view $PR_NUMBER --json labels --jq '.labels[].name')
           if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
-            echo "Label not found, cancelling workflow."
+            echo "Label '🚀 Ready to deploy' not found. Exiting."
             exit 1
+          else
+            echo "Label '🚀 Ready to deploy' found. Continuing."
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
