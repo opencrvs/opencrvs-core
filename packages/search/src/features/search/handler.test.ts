@@ -16,6 +16,8 @@ import { ICountQueryParam } from './handler'
 import { SearchDocument } from '@opencrvs/commons'
 import * as searchService from './service'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 
 jest.setTimeout(100000)
 
@@ -118,10 +120,16 @@ describe('Verify handlers', () => {
     it('Should return 200 for valid payload', async () => {
       const t = await setupTestCases(setup, { scope: ['register'] })
 
+      fetch.mockResponses(
+        [JSON.stringify([{ id: '123' }]), { status: 200 }],
+        [JSON.stringify([{ id: '123' }]), { status: 200 }]
+      )
       const res = await t.callStatusWiseRegistrationCount({
         declarationJurisdictionId: '123',
         status: ['REGISTERED']
       })
+
+      await new Promise((resolve) => setImmediate(resolve))
 
       expect(res.statusCode).toBe(200)
     })
