@@ -29,6 +29,7 @@ jobs:
       slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
       branch_name: ${{  steps.set_branch_name.outputs.BRANCH_NAME  }}
       pr_number: ${{  steps.set_branch_name.outputs.PR_NUMBER  }}
+      author: ${{  steps.set_branch_name.outputs.AUTHOR  }}
     steps:
       - uses: actions/checkout@v3
 
@@ -62,6 +63,13 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR Author
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          AUTHOR=$(gh pr view $PR_NUMBER --json user.login --jq '.user.login')
+          echo "AUTHOR=${AUTHOR}" >> $GITHUB_ENV
 
       - name: Get Branch Name (on PR creation)
         if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -103,7 +111,7 @@ jobs:
 
       - name: Parse the branch name and set it as environment variable
         run: |
-          BRANCH_NAME=${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+          BRANCH_NAME=${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Get PR Information (when manually triggered)
@@ -155,7 +163,7 @@ jobs:
               repo: 'e2e',
               event_type: 'run_e2e',
               client_payload: {
-                actor: '${{ github.actor }}',
+                actor: '${{ needs.generate_stack_name_and_branch.outputs.author }}',
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
                 stack: '${{  steps.generate_stack.outputs.stack  }}'
