@@ -14,6 +14,7 @@ import { env } from './environment'
 import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { inspect } from 'util'
+import { fromZodError } from 'zod-validation-error'
 
 const LocationSchema = z.array(
   z.object({
@@ -161,9 +162,9 @@ async function getLocations() {
   const parsedLocations = LocationSchema.safeParse(await res.json())
   if (!parsedLocations.success) {
     raise(
-      `Error when getting locations from country-config: ${inspect(
-        parsedLocations.error.issues
-      )}`
+      fromZodError(parsedLocations.error, {
+        prefix: `Error validating locations data returned from ${url}`
+      })
     )
   }
   const adminStructureMap = validateAdminStructure(

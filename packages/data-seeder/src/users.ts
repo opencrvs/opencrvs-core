@@ -93,9 +93,9 @@ async function getUsers(token: string) {
 
   if (!parsedUsers.success) {
     raise(
-      `Error when getting users metadata from country-config: ${inspect(
-        parsedUsers.error.issues
-      )}`
+      fromZodError(parsedUsers.error, {
+        prefix: `Error validating users metadata returned from ${url}`
+      })
     )
   }
 
