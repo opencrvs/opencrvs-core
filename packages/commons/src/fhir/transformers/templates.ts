@@ -31,7 +31,8 @@ import {
   CompositionSectionTitleByCode,
   DEATH_CORRECTION_ENCOUNTER_CODE,
   EVENT_TYPE,
-  PartialBy
+  PartialBy,
+  ReferenceTypeByCode
 } from '../../types'
 import { UUID } from '../../uuid'
 
@@ -130,7 +131,7 @@ export function createEncounterSection<
     },
     entry: [
       {
-        reference: `urn:uuid:${refUuid}` as const
+        reference: `urn:uuid:${refUuid}` as ReferenceTypeByCode<T>['reference']
       }
     ]
   }

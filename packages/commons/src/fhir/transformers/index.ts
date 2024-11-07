@@ -94,7 +94,7 @@ import {
   markSaved,
   CompositionSectionTitleByCode
 } from '..'
-import { getUUID } from '../..'
+import { getUUID, UUID } from '../..'
 import { EVENT_TYPE, replaceFromBundle } from '../../record'
 import {
   AddressInput,
@@ -507,7 +507,7 @@ function createAddressBuilder<T extends CompositionSectionCode>(
           {
             url: 'http://opencrvs.org/specs/extension/part-of',
             valueReference: {
-              reference: `Location/${fieldValue}`
+              reference: `Location/${fieldValue as UUID}`
             }
           }
         ],
@@ -641,7 +641,7 @@ function createLocationAddressBuilder(
         context
       )
 
-      location.partOf = { reference: `Location/${fieldValue}` }
+      location.partOf = { reference: `Location/${fieldValue as UUID}` }
     }
   }
 }
@@ -2089,7 +2089,7 @@ const builders: IFieldBuilders = {
             {
               url: 'http://opencrvs.org/specs/extension/part-of',
               valueReference: {
-                reference: `Location/${fieldValue}`
+                reference: `Location/${fieldValue as UUID}`
               }
             }
           ],
