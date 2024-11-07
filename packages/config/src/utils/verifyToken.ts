@@ -12,7 +12,7 @@ import * as jwt from 'jsonwebtoken'
 import * as t from 'io-ts'
 import { function as f, either as e } from 'fp-ts'
 import { publicCert } from '@config/server'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 
 const tokenPayload = t.type({
   sub: t.string,
