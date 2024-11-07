@@ -37,6 +37,7 @@ import {
 } from '@config/handlers/locations/handler'
 import { fetchLocationHandler } from '@config/handlers/locations/location'
 import { locationHierarchyHandler } from '@config/handlers/locations/hierarchy'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -216,7 +217,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['natlsysadmin']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Create a location',
         validate: {
@@ -244,7 +245,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: ['natlsysadmin']
+          scope: [SCOPES.CONFIG_UPDATE_ALL]
         },
         description: 'Update a location or facility',
         validate: {

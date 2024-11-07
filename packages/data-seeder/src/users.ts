@@ -16,19 +16,28 @@ import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { inspect } from 'util'
 import { joinURL } from '@opencrvs/commons'
+import { Scope, scopes } from '@opencrvs/commons/authentication'
+import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
 const RETRY_DELAY_IN_MILLISECONDS = 5000
 
-type Roles = {
-  id: string
-  label: {
-    defaultMessage: string
-    description: string
-    id: string
-  }
-  scopes: string[]
-}
+const RoleSchema = z.array(
+  z.object({
+    id: z.string(),
+    label: z.object({
+      defaultMessage: z.string(),
+      description: z.string(),
+      id: z.string()
+    }),
+    scopes: z.array(
+      z.string().refine(
+        (scope) => scopes.includes(scope as Scope),
+        (invalidScope) => ({ message: `invalid scope "${invalidScope}" found` })
+      )
+    )
+  })
+)
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -94,17 +103,27 @@ async function getUsers(token: string) {
 
   const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
 
-  const response = await fetch(rolesUrl)
+  const rolesResponse = await fetch(rolesUrl)
 
-  if (!response.ok) raise(`Error fetching roles: ${response.status}`)
+  if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
 
-  const allRoles: Roles[] = await response.json()
+  const parsedRoles = RoleSchema.safeParse(await rolesResponse.json())
+
+  if (!parsedRoles.success) {
+    raise(
+      fromZodError(parsedRoles.error, {
+        prefix: `Validation failed for roles returned from ${rolesUrl}`
+      }).message
+    )
+  }
+
+  const allRoles = parsedRoles.data
 
   let isConfigUpdateAllScopeAvailable = false
   const configScope = 'config.update:all' as const
 
   for (const userRole of userRoles) {
-    const currRole = allRoles.find((role: Roles) => role.id === userRole)
+    const currRole = allRoles.find((role) => role.id === userRole)
     if (!currRole)
       raise(`Role with id ${userRole} is not found in roles.json file`)
     if (currRole.scopes.includes(configScope))
