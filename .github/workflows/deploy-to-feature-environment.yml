@@ -28,6 +28,7 @@ jobs:
     outputs:
       slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
       branch_name: ${{  steps.set_branch_name.outputs.BRANCH_NAME  }}
+      pr_number: ${{  steps.set_branch_name.outputs.PR_NUMBER  }}
     steps:
       - uses: actions/checkout@v3
 
@@ -197,7 +198,7 @@ jobs:
           echo "deployment_link=$DEPLOYMENT_LINK" >> $GITHUB_OUTPUT
 
   listen-e2e:
-    needs: trigger-e2e
+    needs: [trigger-e2e, generate_stack_name_and_branch]
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
@@ -208,7 +209,7 @@ jobs:
             const owner = 'opencrvs';
             const repo = 'e2e';
             const runId = ${{ needs.trigger-e2e.outputs.run_id }};
-            const prNumber = ${{ github.event.pull_request.number }};
+            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
             const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
 
             let deployJobCompleted = false;
