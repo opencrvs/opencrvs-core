@@ -22,15 +22,66 @@ import {
   testDeathCertPayload
 } from '@metrics/features/registration/testUtils'
 import { cloneDeep } from 'lodash'
-import { Events } from '@metrics/features/metrics/constants'
 
 import * as api from '@metrics/api'
+import { getUser } from '@metrics/features/audit/handler'
+jest.mock('@metrics/features/audit/handler')
 
 const fetchLocation = api.fetchLocation as jest.Mock
 const fetchTaskHistory = api.fetchTaskHistory as jest.Mock
+const fetchUser = getUser as jest.Mock
 
 const AUTH_HEADER = {
-  Authorization: 'Bearer mock-token'
+  Authorization:
+    'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyZS1iaXJ0aCIsInJlY29yZC5kZWNsYXJlLWRlYXRoIiwicmVjb3JkLmRlY2xhcmUtbWFycmlhZ2UiLCJyZWNvcmQuZGVjbGFyYXRpb24tcmV2aWV3IiwicmVjb3JkLnN1Ym1pdC1mb3ItdXBkYXRlcyIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1hcmNoaXZlIiwicmVjb3JkLmRlY2xhcmF0aW9uLXJlaW5zdGF0ZSIsInJlY29yZC5yZWdpc3RlciIsInJlY29yZC5yZWdpc3RyYXRpb24tY29ycmVjdCIsInJlY29yZC5wcmludC1yZWNvcmRzIiwicmVjb3JkLnByaW50LXJlY29yZHMtc3VwcG9ydGluZy1kb2N1bWVudHMiLCJyZWNvcmQuZXhwb3J0LXJlY29yZHMiLCJyZWNvcmQucHJpbnQtaXNzdWUtY2VydGlmaWVkLWNvcGllcyIsInJlY29yZC5yZWdpc3RyYXRpb24tdmVyaWZ5LWNlcnRpZmllZC1jb3BpZXMiLCJyZWNvcmQuY3JlYXRlLWNvbW1lbnRzIiwicmVjb3JkLmNlcnRpZnkiLCJwZXJmb3JtYW5jZS5yZWFkIiwicGVyZm9ybWFuY2UucmVhZC1kYXNoYm9hcmRzIiwib3JnYW5pc2F0aW9uLnJlYWQiLCJvcmdhbmlzYXRpb24ucmVhZC1sb2NhdGlvbnM6bXktb2ZmaWNlIiwic2VhcmNoLmJpcnRoIiwic2VhcmNoLmRlYXRoIiwic2VhcmNoLm1hcnJpYWdlIiwicmVjb3JkLnJlYWQiLCJyZWNvcmQucmVhZC1hdWRpdCIsInJlY29yZC5yZWFkLWNvbW1lbnRzIiwiZGVtbyJdLCJpYXQiOjE3MzAxMTAzNTMsImV4cCI6MTczMDcxNTE1MywiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOmNvdW50cnljb25maWctdXNlciIsIm9wZW5jcnZzOndlYmhvb2tzLXVzZXIiLCJvcGVuY3J2czpjb25maWctdXNlciIsIm9wZW5jcnZzOmRvY3VtZW50cy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY3MWY2MzBiMjNlY2Y4YmVjZTdlZDZmMSJ9.X-zLm4Kqq-J0WIGGR6HyvtB5plhFCPzRBCk1m8QLZ-6zd5j8ZDA8C19P4dOGmiTTN9Ya7IKIVLZE2XHQLDQrTGqltAYk6LOV0V7UIoWQzJutaA9DYIymQvSFo_MbMi9P1GDMwspFo_Dr17uScyz-7KjS3e4htdlKvHVyduijxYSj513FOzYT1CRAPxB-6wd7awz1MKVyjC3658R6nTS6MblMhZpwkU-RUsXr_AUnYL9UARpO_9JeMwK1Ijtzf51NqW6NZgVvFdk5sZ0wptWaiklw9MdWSOwBoLysyDdox52cccqvZodhG3N9GyQcn-TWivlL08FOcpxqfsCNrW3IpQ'
+}
+
+const REGISTRATION_AGENT = {
+  name: [
+    {
+      use: 'en',
+      given: ['Felix'],
+      family: 'Katongo'
+    }
+  ],
+  username: 'f.katongo',
+  role: 'REGISTRATION_AGENT'
+}
+
+const FIELD_AGENT = {
+  name: [
+    {
+      use: 'en',
+      given: ['Kalush'],
+      family: 'Bwalya'
+    }
+  ],
+  username: 'k.bwalya',
+  role: 'FIELD_AGENT'
+}
+
+const REGISTRAR = {
+  name: [
+    {
+      use: 'en',
+      given: ['Kennedy'],
+      family: 'Mweene'
+    }
+  ],
+  username: 'k.bwalya',
+  role: 'REGISTRAR'
+}
+
+const RECORD_SEARCH_API = {
+  name: [
+    {
+      use: 'en',
+      given: ['abc'],
+      family: 'def'
+    }
+  ],
+  username: 'a.def',
+  role: 'NOTIFICATION_API_USER'
 }
 
 export const location = {
@@ -281,10 +332,10 @@ describe('Verify point generation', () => {
     ).rejects.toThrowError('Payment reconciliation not found')
   })
   it('returns declarations started point for field agent', async () => {
+    fetchUser.mockResolvedValueOnce(FIELD_AGENT)
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
-      AUTH_HEADER,
-      Events.READY_FOR_REVIEW
+      AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -301,10 +352,10 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for registration agent', async () => {
+    fetchUser.mockResolvedValueOnce(REGISTRATION_AGENT)
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
-      AUTH_HEADER,
-      Events.VALIDATED
+      AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -321,10 +372,10 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for registrar', async () => {
+    fetchUser.mockResolvedValueOnce(REGISTRAR)
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
-      AUTH_HEADER,
-      Events.WAITING_EXTERNAL_VALIDATION
+      AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -339,10 +390,10 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for field agent', async () => {
+    fetchUser.mockResolvedValueOnce(FIELD_AGENT)
     const point = await generateDeclarationStartedPoint(
       cloneDeep(testDeclaration),
-      AUTH_HEADER,
-      Events.INCOMPLETE
+      AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
@@ -359,13 +410,13 @@ describe('Verify point generation', () => {
     })
   })
   it('returns declarations started point for notification api', async () => {
+    fetchUser.mockResolvedValueOnce(RECORD_SEARCH_API)
     const payload = cloneDeep(testDeclaration)
     payload.entry[0].resource.type!.coding[0].code = 'birth-notification'
 
     const point = await generateDeclarationStartedPoint(
       cloneDeep(payload),
-      AUTH_HEADER,
-      Events.INCOMPLETE
+      AUTH_HEADER
     )
     expect(point).toMatchObject({
       measurement: 'declarations_started',
