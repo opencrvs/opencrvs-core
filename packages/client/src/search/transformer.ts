@@ -105,7 +105,7 @@ export const transformData = (
       return {
         id: assignedReg.id,
         name:
-          assignedReg.type === 'Marriage'
+          assignedReg.type === Event.Marriage
             ? mergedMarriageName
             : (createNamesMap(names as HumanName[])[locale] as string) ||
               (createNamesMap(names as HumanName[])[LANG_EN] as string) ||

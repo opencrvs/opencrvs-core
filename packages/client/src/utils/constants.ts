@@ -50,7 +50,7 @@ export const REGISTRAR_ROLES = [
   ROLE_REGISTRATION_AGENT
 ]
 
-export const MARRIAGE_SIGNATURE_KEYS = [
+const MARRIAGE_SIGNATURE_KEYS = [
   'groomSignature',
   'brideSignature',
   'witnessOneSignature',
@@ -63,7 +63,6 @@ export const SIGNATURE_KEYS = [
 ] as const
 
 export const PAGE_TRANSITIONS_CLASSNAME = 'page-transition'
-export const PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE = 'ease-in-out both'
 export const PAGE_TRANSITIONS_ENTER_TIME = 500
 export const PAGE_TRANSITIONS_EXIT_TIME = PAGE_TRANSITIONS_ENTER_TIME - 10
 
