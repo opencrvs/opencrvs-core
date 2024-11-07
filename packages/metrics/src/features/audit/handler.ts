@@ -12,7 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import { generateAuditPoint } from '@metrics/features/registration/pointGenerator'
 import { writePoints } from '@metrics/influxdb/client'
 import { internal } from '@hapi/boom'
-import { IUserAuditBody } from '@metrics/features/registration'
+import { IUserAuditBody, IUserModelData } from '@metrics/features/registration'
 import { PRACTITIONER_ID } from '@metrics/features/getTimeLogged/constants'
 import { countUserAuditEvents, getUserAuditEvents } from './service'
 import { getClientIdFromToken } from '@metrics/utils/authUtils'
@@ -60,7 +60,7 @@ export async function newAuditHandler(
 export async function getUser(
   userId: string,
   authHeader: { Authorization: string }
-) {
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}/getUser`, {
     method: 'POST',
     body: JSON.stringify({ userId }),
