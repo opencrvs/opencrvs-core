@@ -31,7 +31,6 @@ import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -47,7 +46,7 @@ import {
 import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual } from 'lodash'
+import { merge } from 'lodash'
 import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
 import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
@@ -84,7 +83,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   correctionRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  OIDPUserInfoResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({
       name: 'FieldValue',
@@ -226,9 +224,12 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
             throw new AuthenticationError('Authentication failed')
           }
 
-          if (credentials && !isEqual(credentials.scope, user.scope)) {
-            throw new AuthenticationError('Authentication failed')
-          }
+          // @TODO: When scope work is done, this check should stay.
+          // For now, the registrar might not have 'record.confirm-registration' token, but the per-record issued token will have it
+
+          // if (credentials && !isEqual(credentials.scope, user.scope)) {
+          //   throw new AuthenticationError('Authentication failed')
+          // }
         } catch (err) {
           throw new AuthenticationError(err)
         }

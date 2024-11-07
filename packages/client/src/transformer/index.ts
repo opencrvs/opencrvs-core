@@ -24,6 +24,7 @@ import {
   getConditionalActionsForField,
   getSelectedRadioOptionWithNestedFields,
   getVisibleSectionGroupsBasedOnConditions,
+  isFieldButton,
   isFieldHttp,
   isFieldRedirect,
   isRadioGroupWithNestedField,
@@ -204,7 +205,6 @@ export function getChangedValues(
 
         if (
           !conditionalActions.includes('hide') &&
-          !conditionalActions.includes('disable') &&
           !isMetaTypeField(fieldDef) &&
           hasFieldChanged(
             fieldDef,
@@ -264,6 +264,8 @@ export const draftToGqlTransformer = (
         )
         if (
           fieldDef.required &&
+          // do not count value even if it is required when the field is a button
+          !isFieldButton(fieldDef) &&
           !conditionalActions.includes('hide') &&
           !conditionalActions.includes('disable') &&
           (draftData[section.id][fieldDef.name] === undefined ||

@@ -52,6 +52,7 @@ export const up = async (db: Db, client: MongoClient) => {
           const body = {}
           const compositionDoc =
             (await compositionCursor.next()) as unknown as fhir.Composition
+
           await setInformantDeceasedAndLocationDetails(db, body, compositionDoc)
         }
         skip += limit
@@ -157,16 +158,18 @@ async function setInformantDeceasedAndLocationDetails(
     )
 
     if (encounterDoc.length > 0) {
-      const locationId = encounterDoc[0].location[0].location.reference.replace(
-        'Location/',
-        ''
-      )
+      const locationId =
+        encounterDoc[0]?.location?.[0]?.location?.reference?.replace(
+          'Location/',
+          ''
+        )
 
-      const locationDoc = await getCollectionDocuments(
-        db,
-        COLLECTION_NAMES.LOCATION,
-        [locationId]
-      )
+      const locationDoc = locationId
+        ? await getCollectionDocuments(db, COLLECTION_NAMES.LOCATION, [
+            locationId
+          ])
+        : []
+
       if (locationDoc.length > 0) {
         const address: fhir.Address = locationDoc[0].address
         if (address) {

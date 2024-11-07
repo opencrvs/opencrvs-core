@@ -51,7 +51,6 @@ const MOCK_USER: IUserModelData = {
     }
   ],
   username: 'd.bulaya',
-  identifiers: [],
   email: '',
   device: 'Samsung Galaxy S9',
   emailForNotification: 'kalushabw.alya17@gmail.com',

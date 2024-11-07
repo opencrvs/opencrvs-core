@@ -30,7 +30,7 @@ export enum CorrectionReason {
   OTHER = 'OTHER'
 }
 
-export const correctRecordReasonSectionGroup: IFormSectionGroup = {
+const correctRecordReasonSectionGroup: IFormSectionGroup = {
   id: 'recordCorrection',
   title: messages.whatWasTheReasonForCorrection,
   error: messages.reasonForChangeError,

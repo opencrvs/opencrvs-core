@@ -237,7 +237,6 @@ export type KnownExtensionType = StringExtensionType & {
     >
   }
 }
-export type StringExtension = { url: string; valueString: string }
 export type Extension = KnownExtensionType[keyof KnownExtensionType]
 
 type NestedExtensionTypes = Extract<
@@ -248,9 +247,6 @@ type NestedExtensionTypes = Extract<
 type AllExtensions =
   | KnownExtensionType[keyof KnownExtensionType]
   | NestedExtensionTypes
-
-export type StringValueExtension =
-  StringExtensionType[keyof StringExtensionType]
 
 export function findExtension<URL extends AllExtensions['url']>(
   url: URL,

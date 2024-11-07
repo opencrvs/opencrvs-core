@@ -31,7 +31,3 @@ export const convertToMSISDN = (phone: string, alpha3CountryCode: string) => {
       .replace(/[\s-]/g, '')
   )
 }
-
-export const getMSISDNCountryCode = (countryCode: string) => {
-  return callingCountries[countryCode.toUpperCase()].countryCallingCodes[0]
-}

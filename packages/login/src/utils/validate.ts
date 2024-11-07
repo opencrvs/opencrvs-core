@@ -12,7 +12,7 @@ import { MessageDescriptor } from 'react-intl'
 import { PrimitiveType } from 'intl-messageformat'
 import { messages } from '@login/i18n/messages/validations'
 import { validate as validateEmail } from 'email-validator'
-export interface IValidationResult {
+interface IValidationResult {
   message: MessageDescriptor
   props?: { [key: string]: PrimitiveType }
 }
@@ -23,7 +23,7 @@ export const isAValidPhoneNumberFormat = (value: string): boolean => {
   const pattern = window.config.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
-export const isAValidEmailAddressFormat = (value: string): boolean => {
+const isAValidEmailAddressFormat = (value: string): boolean => {
   return validateEmail(value)
 }
 
