@@ -203,8 +203,8 @@ export async function generateAndSendVerificationCode(
   logger.info(
     `isDemoUser,
       ${JSON.stringify({
-        isDemoUser: isDemoUser
-      })}`
+      isDemoUser: isDemoUser
+    })}`
   )
   let verificationCode
   if (isDemoUser) {
@@ -217,10 +217,10 @@ export async function generateAndSendVerificationCode(
     logger.info(
       `Sending a verification to,
           ${JSON.stringify({
-            mobile: mobile,
-            email: email,
-            verificationCode
-          })}`
+        mobile: mobile,
+        email: email,
+        verificationCode
+      })}`
     )
   } else {
     if (isDemoUser) {

@@ -159,7 +159,7 @@ describe('Register record endpoint', () => {
 
     const response = await server.server.inject({
       method: 'POST',
-      url: '/confirm/registration',
+      url: '/records/{id}/confirm',
       payload: {
         registrationNumber: '1234',
         compositionId: '7c3af302-08c9-41af-8701-92de9a71a3e4'

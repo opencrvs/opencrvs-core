@@ -59,9 +59,19 @@ export const getRoutes = () => {
         description: 'Health check endpoint'
       }
     },
+    // {
+    //   method: 'POST',
+    //   path: '/confirm/registration',
+    //   handler: markEventAsRegisteredCallbackHandler,
+    //   config: {
+    //     tags: ['api'],
+    //     description:
+    //       'Register event based on tracking id and registration number.'
+    //   }
+    // },
     {
       method: 'POST',
-      path: '/confirm/registration',
+      path: '/records/{id}/confirm',
       handler: markEventAsRegisteredCallbackHandler,
       config: {
         tags: ['api'],

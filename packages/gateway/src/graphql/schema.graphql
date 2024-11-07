@@ -216,7 +216,8 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
-  confirmRegistration(id: ID!): ID!
+  confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
+  rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -695,6 +696,17 @@ type CreatedIds {
 type Reinstated {
   taskEntryResourceID: ID!
   registrationStatus: RegStatus
+}
+
+input ConfirmRegistrationInput {
+  registrationNumber: String!
+  error: String
+  identifiers: [IdentifierInput!]!
+}
+
+input RejectRegistrationInput {
+  reason: String!
+  comment: String
 }
 
 input UserInput {
@@ -1264,6 +1276,11 @@ enum RegStatus {
   CERTIFIED
   REJECTED
   ISSUED
+}
+
+input IdentifierInput {
+  type: String!
+  value: String!
 }
 
 input HumanNameInput {

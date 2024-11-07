@@ -58,9 +58,12 @@ import {
   duplicateRegistration,
   viewDeclaration,
   verifyRegistration,
-  markNotADuplicate
+  markNotADuplicate,
+  rejectRegistration,
+  confirmRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
+import { tokenExchangeHandler } from './token-exchange'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -636,20 +639,79 @@ export const resolvers: GQLResolver = {
 
       return taskEntry.resource.id
     },
-    async confirmRegistration(_, { id }, { headers: authHeader }) {
+    async confirmRegistration(_, { id, details }, { headers: authHeader }) {     
+      const token = authHeader.Authorization.replace("Bearer ", "").trim();
+      const recordSpecificToken = await tokenExchangeHandler(
+        token,
+        authHeader,
+        id
+      )
+
+      authHeader.Authorization = `Bearer ${recordSpecificToken.access_token}`
+
       if (!inScope(authHeader, ['record.confirm-registration'])) {
-        throw new Error(
-          'User does not have a "record.confirm-registration" scope'
-        )
+        throw new Error('User does not have a Confirm Registration scope');
       }
 
       if (!hasRecordAccess(authHeader, id)) {
-        throw new Error('User does not have access to the record')
+        throw new Error('User does not have access to the record');
       }
 
-      // @TODO this is a no-op, only to test the token exchange actually works
-      // An upcoming pull request will implement this and a `rejectRegistration` mutations
-      return id
+      try {
+        const taskEntry = await confirmRegistration(
+          id,
+          authHeader,
+          {
+            error: details.error,
+            registrationNumber: details.registrationNumber,
+            childIdentifiers: details.identifiers,
+            compositionId: id
+          }
+        );
+
+        return taskEntry.resource.id;
+      } catch (error) {
+        throw new Error(`Failed to confirm registration: ${error.message}`);
+      }
+    },
+    async rejectRegistration(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+
+      const token = authHeader.Authorization.replace("Bearer ", "").trim();
+      const recordSpecificToken = await tokenExchangeHandler(
+        token,
+        authHeader,
+        id
+      )
+
+      authHeader.Authorization = `Bearer ${recordSpecificToken.access_token}`
+
+      if (!inScope(authHeader, ['record.reject-registration'])) {
+        throw new Error('User does not have a Reject Registration" scope');
+      }
+
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record');
+      }
+
+      try {
+        const taskEntry = await rejectRegistration(
+          id,
+          authHeader,
+          {
+            comment: details.comment || 'No comment provided',
+            reason: details.reason
+          }
+        );
+
+        // Return the task ID from the rejected record
+        return taskEntry.resource.id;
+      } catch (error) {
+        throw new Error(`Error in rejectRegistration: ${error.message}`);
+      }
     }
   }
 }
