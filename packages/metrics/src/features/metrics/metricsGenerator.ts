@@ -37,6 +37,8 @@ import {
   ResourceIdentifier,
   Location as FhirLocation
 } from '@opencrvs/commons/types'
+import { UUID } from '@opencrvs/commons'
+import { keys, keysIn, includes } from 'lodash'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -128,6 +130,7 @@ interface IGenderBasisPoint {
 
 type Payment = {
   total: number
+  [key: string]: any
 }
 
 export async function fetchCertificationPayments(
@@ -433,7 +436,7 @@ export async function fetchKeyFigures(
 
   const keyFigures: IBirthKeyFigures[] = []
   const queryLocationId =
-    `Location/${estimatedFigureForTargetDays.locationId}` as const
+    `Location/${estimatedFigureForTargetDays.locationId}` as `Location/${UUID}`
   const locationIds = await fetchLocationChildrenIds(queryLocationId)
   const [officeLocationInChildren, locationPlaceholders] = helpers.in(
     locationIds,
