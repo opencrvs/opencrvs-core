@@ -31,7 +31,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'deploy-to-feature-environment.yml',
-              ref: 'develop',
+              ref: context.payload.pull_request.head.ref,
               inputs: {
                 pr_number: prNumber.toString(),
               }
