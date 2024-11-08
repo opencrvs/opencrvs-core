@@ -2,6 +2,7 @@
 load('ext://configmap', 'configmap_create')
 load('ext://secret', 'secret_create_generic', 'secret_from_dict')
 load('ext://namespace', 'namespace_create', 'namespace_inject')
+load('ext://helm_resource', 'helm_resource', 'helm_repo')
 
 # Disable parallel updates, default 3
 update_settings(max_parallel_updates=2)
@@ -39,8 +40,13 @@ build_services()
 
 
 # Create namespace
+namespace_create('traefik')
 namespace_create('opencrvs-deps-dev')
 namespace_create('opencrvs-services-dev')
+
+# Install Traefik GW
+helm_repo('traefik-repo', 'https://traefik.github.io/charts')
+helm_resource('traefik', 'traefik-repo/traefik', resource_deps=['traefik-repo'], flags=['--values=kubernetes/traefik/values.yaml'])
 
 # Create auth keys in k8s
 secret_create_generic('private-key', from_file='.secrets/private-key.pem', namespace="opencrvs-services-dev")
