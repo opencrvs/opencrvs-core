@@ -158,6 +158,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   if (section.viewType === 'preview') {
     return <UserReviewForm client={client as ApolloClient<any>} {...props} />
   }
+  return null
 }
 
 function getNextSectionIds(
