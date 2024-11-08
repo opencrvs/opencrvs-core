@@ -15,7 +15,6 @@ export const env = cleanEnv(process.env, {
   HOST: str({ devDefault: '0.0.0.0' }),
   PORT: port({ default: 2525 }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030/' }),
-  CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),
   CERT_PUBLIC_KEY_PATH: str({ devDefault: '../../.secrets/public-key.pem' }),
   SENTRY_DSN: str({ default: undefined }),
   NODE_ENV: str({ devDefault: 'development' }),
