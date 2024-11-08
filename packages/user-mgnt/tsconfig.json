@@ -5,7 +5,7 @@
       "@user-mgnt/*": ["./*"]
     },
     "target": "es6",
-    "module": "commonjs",
+    "module": "node16",
     "rootDir": ".",
     "sourceMap": true,
     "moduleResolution": "node16",
