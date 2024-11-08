@@ -12203,7 +12203,7 @@
                 "label": {
                   "defaultMessage": "Last name",
                   "description": "English last name",
-                  "id": "form.field.label.lastNameEN"
+                  "id": "form.field.label.userSurname"
                 },
                 "required": true,
                 "initialValue": "",
@@ -12261,33 +12261,6 @@
                   "query": {
                     "operation": "localPhoneTransformer",
                     "parameters": ["user.mobile"]
-                  }
-                }
-              },
-              {
-                "name": "nid",
-                "type": "TEXT",
-                "label": {
-                  "defaultMessage": "NID",
-                  "description": "National ID",
-                  "id": "form.field.label.NID"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": [
-                  {
-                    "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                ],
-                "mapping": {
-                  "mutation": {
-                    "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  },
-                  "query": {
-                    "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
                   }
                 }
               },
@@ -12420,7 +12393,7 @@
             "conditionals": [
               {
                 "action": "hide",
-                "expression": "values.role!==\"LOCAL_REGISTRAR\" && values.role!==\"NATIONAL_REGISTRAR\""
+                "expression": "!values.scopes?.includes('profile.electronic-signature')"
               }
             ],
             "fields": [
@@ -12555,7 +12528,7 @@
                 "label": {
                   "defaultMessage": "Last name",
                   "description": "English last name",
-                  "id": "form.field.label.lastNameEN"
+                  "id": "form.field.label.userSurname"
                 },
                 "required": true,
                 "initialValue": "",
@@ -12613,33 +12586,6 @@
                   "query": {
                     "operation": "localPhoneTransformer",
                     "parameters": ["user.mobile"]
-                  }
-                }
-              },
-              {
-                "name": "nid",
-                "type": "TEXT",
-                "label": {
-                  "defaultMessage": "NID",
-                  "description": "National ID",
-                  "id": "form.field.label.NID"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": [
-                  {
-                    "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
-                  }
-                ],
-                "mapping": {
-                  "mutation": {
-                    "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
-                  },
-                  "query": {
-                    "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
                   }
                 }
               },

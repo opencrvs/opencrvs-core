@@ -68,12 +68,11 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SubmissionAction,
-  NID_VERIFICATION_BUTTON,
   WARNING,
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event, RegStatus, Scope } from '@client/utils/gateway'
+import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -132,7 +131,6 @@ import {
 } from '@client/views/CorrectionForm/utils'
 import { ListReview } from '@opencrvs/components/lib/ListReview'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
 import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateForm'
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
@@ -542,25 +540,6 @@ const renderValue = (
     )
     return (selectedLocation && selectedLocation.displayLabel) || ''
   }
-  if (field.type === NID_VERIFICATION_BUTTON) {
-    return (
-      <VerificationButton
-        onClick={() => {}}
-        labelForVerified={intl.formatMessage(
-          formMessageDescriptors.nidVerified
-        )}
-        labelForUnverified={intl.formatMessage(
-          formMessageDescriptors.nidNotVerified
-        )}
-        labelForOffline={intl.formatMessage(formMessageDescriptors.nidOffline)}
-        reviewLabelForUnverified={intl.formatMessage(
-          formMessageDescriptors.nidNotVerifiedReviewSection
-        )}
-        status={value ? 'verified' : 'unverified'}
-        useAsReviewLabel={true}
-      />
-    )
-  }
 
   if (typeof value === 'boolean') {
     return value
@@ -841,15 +820,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('register')
-    } else {
-      return false
-    }
-  }
-
-  userHasValidateScope() {
-    if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('validate')
+      return (
+        this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
+      )
     } else {
       return false
     }
@@ -1936,7 +1909,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                     </Accordion>
                   )}
 
-                  {!(isCorrection(declaration) || viewRecord) && (
+                  {!(
+                    isCorrection(declaration) ||
+                    viewRecord ||
+                    isDuplicate
+                  ) && (
                     <FormFieldGenerator
                       id={reviewSection.id}
                       key={reviewSection.id}
@@ -1980,8 +1957,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         <ReviewAction
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}
-                          declarationToBeValidated={this.userHasValidateScope()}
-                          declarationToBeRegistered={this.userHasRegisterScope()}
                           alreadyRejectedDeclaration={
                             this.props.draft.registrationStatus === REJECTED
                           }

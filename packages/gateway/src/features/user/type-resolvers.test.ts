@@ -51,7 +51,6 @@ describe('User type resolvers', () => {
     username: 'tamim.iqlbal',
     mobile: '+8801711111111',
     email: 'test@test.org',
-    identifiers: [{ system: 'NATIONAL_ID', value: '1010101010' }],
     scope: ['certify', 'profile.electronic-signature'],
     status: 'active',
     practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
@@ -82,13 +81,6 @@ describe('User type resolvers', () => {
     ]
     const res = userTypeResolvers.User!.underInvestigation(mockResponse)
     expect(res).toBeTruthy()
-  })
-  it('return user identifier', () => {
-    const res = userTypeResolvers.User!.identifier(mockResponse)
-    expect(res).toEqual({
-      system: mockResponse.identifiers[0].system,
-      value: mockResponse.identifiers[0].value
-    })
   })
   it('return primaryOffice type', async () => {
     const mockOffice = {

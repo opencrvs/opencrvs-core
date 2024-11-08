@@ -395,28 +395,32 @@ describe('User list tests', () => {
       it('clicking on toggleMenu pops up menu options', async () => {
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-0-menuToggleButton'
+          '#user-item-0-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-0-menuItem0'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-0-menu-Dropdown-Content')
         )
+          .find('li')
+          .hostNodes()
+          .at(0)
         expect(menuOptionButton.hostNodes()).toHaveLength(1)
       })
 
       it('clicking on menu options takes to user review page', async () => {
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-0-menuToggleButton'
+          '#user-item-0-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-0-menuItem0'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-0-menu-Dropdown-Content')
         )
+          .find('li')
+          .hostNodes()
+          .at(0)
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
@@ -428,15 +432,18 @@ describe('User list tests', () => {
         })
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-2-menuToggleButton'
+          '#user-item-2-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-2-menuItem3'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-2-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Resend invite')
+          .find('li')
+          .hostNodes()
+          .at(3)
+
+        expect(menuOptionButton.hostNodes().text().trim()).toBe('Resend invite')
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
@@ -449,15 +456,17 @@ describe('User list tests', () => {
         )
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-2-menuToggleButton'
+          '#user-item-2-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-2-menuItem3'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-2-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Resend invite')
+          .find('li')
+          .hostNodes()
+          .at(3)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe('Resend invite')
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
@@ -467,15 +476,17 @@ describe('User list tests', () => {
       it('clicking on menu options deactivate to user pops up audit action modal', async () => {
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem3'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
+          .find('li')
+          .hostNodes()
+          .at(3)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe('Deactivate')
         menuOptionButton.first().simulate('click')
         component.update()
         expect(component.exists('#user-audit-modal')).toBeTruthy()
@@ -484,16 +495,18 @@ describe('User list tests', () => {
       it('clicking on menu options Send username reminder pop up confirmation modal', async () => {
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem1'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
+          .find('li')
+          .hostNodes()
+          .at(1)
 
-        expect(menuOptionButton.hostNodes().text()).toBe(
+        expect(menuOptionButton.hostNodes().text().trim()).toBe(
           'Send username reminder'
         )
         menuOptionButton.hostNodes().simulate('click')
@@ -508,15 +521,17 @@ describe('User list tests', () => {
         })
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem1'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe(
+          .find('li')
+          .hostNodes()
+          .at(1)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe(
           'Send username reminder'
         )
         menuOptionButton.hostNodes().simulate('click')
@@ -537,15 +552,17 @@ describe('User list tests', () => {
         )
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem1'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe(
+          .find('li')
+          .hostNodes()
+          .at(1)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe(
           'Send username reminder'
         )
         menuOptionButton.hostNodes().simulate('click')
@@ -563,15 +580,17 @@ describe('User list tests', () => {
       it('clicking on menu options reactivate to user pops up audit action modal', async () => {
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-3-menuToggleButton'
+          '#user-item-3-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-3-menuItem1'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-3-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Reactivate')
+          .find('li')
+          .hostNodes()
+          .at(1)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe('Reactivate')
         menuOptionButton.first().simulate('click')
         component.update()
         expect(component.exists('#user-audit-modal')).toBeTruthy()
@@ -580,15 +599,19 @@ describe('User list tests', () => {
       it('clicking on menu options Reset Password pop up confirmation modal', async () => {
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem2'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
+          .find('li')
+          .hostNodes()
+          .at(2)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe(
+          'Reset Password'
+        )
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
         component.update()
@@ -601,16 +624,20 @@ describe('User list tests', () => {
         })
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem2'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
+          .find('li')
+          .hostNodes()
+          .at(2)
 
-        expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
+        expect(menuOptionButton.hostNodes().text().trim()).toBe(
+          'Reset Password'
+        )
         menuOptionButton.hostNodes().simulate('click')
         component.update()
         expect(component.exists('#user-reset-password-modal')).toBeTruthy()
@@ -629,15 +656,19 @@ describe('User list tests', () => {
         )
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-1-menu-dropdownMenu'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
-        const menuOptionButton = await waitForElement(
-          component,
-          '#user-item-1-menuItem2'
+        const menuOptionButton = (
+          await waitForElement(component, '#user-item-1-menu-Dropdown-Content')
         )
-        expect(menuOptionButton.hostNodes().text()).toBe('Reset Password')
+          .find('li')
+          .hostNodes()
+          .at(2)
+        expect(menuOptionButton.hostNodes().text().trim()).toBe(
+          'Reset Password'
+        )
         menuOptionButton.hostNodes().simulate('click')
         component.update()
         expect(component.exists('#user-reset-password-modal')).toBeTruthy()

@@ -62,13 +62,7 @@ export const getTokenPayload = (token: string) => {
   return decoded
 }
 
-export function getCurrentUserScope() {
-  const token = getToken()
-  const payload = token && getTokenPayload(token)
-  return (payload && payload.scope) || []
-}
-
-export function isTokenAboutToExpire(token: string) {
+function isTokenAboutToExpire(token: string) {
   const payload = token && getTokenPayload(token)
   const payloadExpMillis = Number(payload && payload.exp) * 1000
   return payloadExpMillis - Date.now() <= TOKEN_EXPIRE_MILLIS
@@ -96,14 +90,4 @@ export async function refreshToken() {
     }
   }
   return true
-}
-
-export const enum AuthScope {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify',
-  PERFORMANCE = 'performance',
-  SYSADMIN = 'sysadmin',
-  VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
 }

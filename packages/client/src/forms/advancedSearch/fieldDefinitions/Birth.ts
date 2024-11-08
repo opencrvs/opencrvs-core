@@ -15,110 +15,109 @@ import { messages as advancedSearchForm } from '@client/i18n/messages/views/adva
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
 
-export const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup =
-  {
-    id: 'BirthRegistrationDetails',
-    title: advancedSearchForm.registrationDetails,
-    fields: [
-      {
-        name: 'placeOfRegistration',
-        type: 'LOCATION_SEARCH_INPUT',
-        label: advancedSearchForm.placeOfRegistrationlabel,
-        helperText: advancedSearchForm.placeOfRegistrationHelperText,
-        placeholder: formMessageDescriptors.formSelectPlaceholder,
-        required: false,
-        initialValue: '',
-        searchableResource: ['locations', 'offices'],
-        searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
-        validator: []
-      },
-      {
-        name: 'dateOfRegistration',
-        type: 'DATE_RANGE_PICKER',
-        label: advancedSearchForm.dateOfRegistration,
-        required: false,
-        initialValue: '',
-        validator: [isValidDate]
-      },
-      {
-        name: 'registrationStatuses',
-        type: 'SELECT_WITH_OPTIONS',
-        label: advancedSearchForm.statusOfRecordLabel,
-        required: false,
-        initialValue: '',
-        validator: [],
-        placeholder: formMessageDescriptors.formSelectPlaceholder,
-        options: [
-          {
-            value: 'ALL',
-            label: advancedSearchForm.recordStatusAny
-          },
-          {
-            value: 'IN_PROGRESS',
-            label: advancedSearchForm.recordStatusInprogress
-          },
-          {
-            value: 'IN_REVIEW',
-            label: advancedSearchForm.recordStatusInReview
-          },
-          {
-            value: 'REJECTED',
-            label: advancedSearchForm.recordStatusRequireUpdate
-          },
-          {
-            value: 'REGISTERED',
-            label: advancedSearchForm.recordStatusRegistered
-          },
-          {
-            value: 'CERTIFIED',
-            label: advancedSearchForm.recordStatusCertified
-          },
-          {
-            value: 'ARCHIVED',
-            label: advancedSearchForm.recordStatusAchived
-          },
-          {
-            value: 'CORRECTION_REQUESTED',
-            label: advancedSearchForm.recordStatusCorrectionRequested
-          },
-          {
-            value: 'VALIDATED',
-            label: advancedSearchForm.recordStatusValidated
-          }
-        ]
-      },
-      {
-        name: 'registrationByPeriod',
-        type: 'SELECT_WITH_OPTIONS',
-        label: advancedSearchForm.timePeriodLabel,
-        required: false,
-        initialValue: '',
-        validator: [],
-        helperText: advancedSearchForm.timePeriodHelperText,
-        placeholder: formMessageDescriptors.formSelectPlaceholder,
-        options: [
-          {
-            value: TIME_PERIOD.LAST_7_DAYS,
-            label: advancedSearchForm.timePeriodLast7Days
-          },
-          {
-            value: TIME_PERIOD.LAST_30_DAYS,
-            label: advancedSearchForm.timePeriodLast30Days
-          },
-          {
-            value: TIME_PERIOD.LAST_90_DAYS,
-            label: advancedSearchForm.timePeriodLast90Days
-          },
-          {
-            value: TIME_PERIOD.LAST_YEAR,
-            label: advancedSearchForm.timePeriodLastYear
-          }
-        ]
-      }
-    ]
-  }
+const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
+  id: 'BirthRegistrationDetails',
+  title: advancedSearchForm.registrationDetails,
+  fields: [
+    {
+      name: 'placeOfRegistration',
+      type: 'LOCATION_SEARCH_INPUT',
+      label: advancedSearchForm.placeOfRegistrationlabel,
+      helperText: advancedSearchForm.placeOfRegistrationHelperText,
+      placeholder: formMessageDescriptors.formSelectPlaceholder,
+      required: false,
+      initialValue: '',
+      searchableResource: ['locations', 'offices'],
+      searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
+      validator: []
+    },
+    {
+      name: 'dateOfRegistration',
+      type: 'DATE_RANGE_PICKER',
+      label: advancedSearchForm.dateOfRegistration,
+      required: false,
+      initialValue: '',
+      validator: [isValidDate]
+    },
+    {
+      name: 'registrationStatuses',
+      type: 'SELECT_WITH_OPTIONS',
+      label: advancedSearchForm.statusOfRecordLabel,
+      required: false,
+      initialValue: '',
+      validator: [],
+      placeholder: formMessageDescriptors.formSelectPlaceholder,
+      options: [
+        {
+          value: 'ALL',
+          label: advancedSearchForm.recordStatusAny
+        },
+        {
+          value: 'IN_PROGRESS',
+          label: advancedSearchForm.recordStatusInprogress
+        },
+        {
+          value: 'IN_REVIEW',
+          label: advancedSearchForm.recordStatusInReview
+        },
+        {
+          value: 'REJECTED',
+          label: advancedSearchForm.recordStatusRequireUpdate
+        },
+        {
+          value: 'REGISTERED',
+          label: advancedSearchForm.recordStatusRegistered
+        },
+        {
+          value: 'CERTIFIED',
+          label: advancedSearchForm.recordStatusCertified
+        },
+        {
+          value: 'ARCHIVED',
+          label: advancedSearchForm.recordStatusAchived
+        },
+        {
+          value: 'CORRECTION_REQUESTED',
+          label: advancedSearchForm.recordStatusCorrectionRequested
+        },
+        {
+          value: 'VALIDATED',
+          label: advancedSearchForm.recordStatusValidated
+        }
+      ]
+    },
+    {
+      name: 'registrationByPeriod',
+      type: 'SELECT_WITH_OPTIONS',
+      label: advancedSearchForm.timePeriodLabel,
+      required: false,
+      initialValue: '',
+      validator: [],
+      helperText: advancedSearchForm.timePeriodHelperText,
+      placeholder: formMessageDescriptors.formSelectPlaceholder,
+      options: [
+        {
+          value: TIME_PERIOD.LAST_7_DAYS,
+          label: advancedSearchForm.timePeriodLast7Days
+        },
+        {
+          value: TIME_PERIOD.LAST_30_DAYS,
+          label: advancedSearchForm.timePeriodLast30Days
+        },
+        {
+          value: TIME_PERIOD.LAST_90_DAYS,
+          label: advancedSearchForm.timePeriodLast90Days
+        },
+        {
+          value: TIME_PERIOD.LAST_YEAR,
+          label: advancedSearchForm.timePeriodLastYear
+        }
+      ]
+    }
+  ]
+}
 
-export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
+const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
   id: 'BirthChildDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -176,7 +175,7 @@ export const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
+const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
   id: 'BirthEventDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -320,7 +319,7 @@ export const advancedSearchBirthSectionEventDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
+const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
   id: 'BirthMotherDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -355,7 +354,7 @@ export const advancedSearchBirthSectionMotherDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
+const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
   id: 'BirthFatherDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -388,7 +387,7 @@ export const advancedSearchBirthSectionFatherDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
+const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
   id: 'BirthInformantDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [

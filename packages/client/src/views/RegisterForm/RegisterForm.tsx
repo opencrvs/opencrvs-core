@@ -11,6 +11,7 @@
 import * as React from 'react'
 import { FormikTouched, FormikValues } from 'formik'
 import {
+  IntlShape,
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
   useIntl
@@ -210,6 +211,47 @@ function getDeclarationIconColor(declaration: IDeclaration): string {
     : 'orange'
 }
 
+export const DeleteModal: React.FC<{
+  intl: IntlShape
+  close: (result: boolean | null) => void
+}> = ({ intl, close }) => (
+  <ResponsiveModal
+    autoHeight
+    responsive={false}
+    title={intl.formatMessage(messages.deleteDeclarationConfirmModalTitle)}
+    actions={[
+      <Button
+        type="tertiary"
+        id="cancel_delete"
+        key="cancel_delete"
+        onClick={() => {
+          close(null)
+        }}
+      >
+        {intl.formatMessage(buttonMessages.cancel)}
+      </Button>,
+      <Button
+        type="negative"
+        key="confirm_delete"
+        id="confirm_delete"
+        onClick={() => {
+          close(true)
+        }}
+      >
+        {intl.formatMessage(buttonMessages.confirm)}
+      </Button>
+    ]}
+    show={true}
+    handleClose={() => close(null)}
+  >
+    <Stack>
+      <Text variant="reg16" element="p" color="grey500">
+        {intl.formatMessage(messages.deleteDeclarationConfirmModalDescription)}
+      </Text>
+    </Stack>
+  </ResponsiveModal>
+)
+
 function FormAppBar({
   section,
   declaration,
@@ -387,43 +429,7 @@ function FormAppBar({
 
   const handleDelete = async () => {
     const deleteConfirm = await openModal<boolean | null>((close) => (
-      <ResponsiveModal
-        autoHeight
-        responsive={false}
-        title={intl.formatMessage(messages.deleteDeclarationConfirmModalTitle)}
-        actions={[
-          <Button
-            type="tertiary"
-            id="cancel_delete"
-            key="cancel_delete"
-            onClick={() => {
-              close(null)
-            }}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </Button>,
-          <Button
-            type="negative"
-            key="confirm_delete"
-            id="confirm_delete"
-            onClick={() => {
-              close(true)
-            }}
-          >
-            {intl.formatMessage(buttonMessages.confirm)}
-          </Button>
-        ]}
-        show={true}
-        handleClose={() => close(null)}
-      >
-        <Stack>
-          <Text variant="reg16" element="p" color="grey500">
-            {intl.formatMessage(
-              messages.deleteDeclarationConfirmModalDescription
-            )}
-          </Text>
-        </Stack>
-      </ResponsiveModal>
+      <DeleteModal intl={intl} close={close}></DeleteModal>
     ))
 
     deleteConfirm && deleteDeclarationMethod(declaration)
@@ -691,7 +697,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    return (
+      this.props.scope &&
+      this.props.scope.some((x) => validateScopes.includes(x))
+    )
   }
 
   componentDidMount() {
@@ -860,13 +875,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   onSaveAsDraftClicked = async () => {
     const { declaration } = this.props
-    const isRegistrarOrRegistrationAgent =
+    const canApproveOrRegister =
       this.userHasRegisterScope() || this.userHasValidateScope()
     const isConfirmationModalApplicable =
       declaration.registrationStatus === DECLARED ||
       declaration.registrationStatus === VALIDATED ||
       declaration.registrationStatus === REJECTED
-    if (isRegistrarOrRegistrationAgent && isConfirmationModalApplicable) {
+    if (canApproveOrRegister && isConfirmationModalApplicable) {
       this.toggleConfirmationModal()
     } else {
       this.writeDeclarationAndGoToHome()

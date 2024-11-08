@@ -271,7 +271,7 @@ describe('create new user tests', () => {
       expect(
         testComponent
           .find(FormFieldGenerator)
-          .find('#familyNameEng_error')
+          .find('#familyName_error')
           .hostNodes()
           .text()
       ).toBe('Required to register a new user')
@@ -293,9 +293,8 @@ describe('create new user tests', () => {
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
-      // this will have to be updated after signature page is updated for new user roles structure
       expect(history.location.pathname).toContain(
-        '/createUser/preview/preview-registration-office'
+        '/createUser/user/signature-attachment'
       )
     })
   })
@@ -332,13 +331,13 @@ describe('create new user tests', () => {
 
     it('clicking change button on a field takes user back to form', async () => {
       testComponent
-        .find('#btn_change_firstNamesEng')
+        .find('#btn_change_firstName')
         .hostNodes()
         .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstNamesEng')
+      expect(history.location.hash).toBe('#firstName')
     })
 
     it('clicking submit button submits the form data', async () => {
@@ -384,14 +383,15 @@ describe('edit user tests', () => {
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
             role: {
-              id: 'NATIONAL_REGISTRAR',
+              id: '63ef9466f708ea080777c27a',
               label: {
-                id: 'userRoles.nationalRegistrar',
-                defaultMessage: 'National Registrar',
-                description: ''
+                defaultMessage: 'State Registrar',
+                description: 'Name for user role State Registrar',
+                id: 'userRole.stateRegistrar'
               }
             },
             status: Status.Active,
+            underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
               id: '895cc945-94a9-4195-9a29-22e9310f3385',
@@ -519,7 +519,7 @@ describe('edit user tests', () => {
       expect(history.location.hash).toBe('#device')
     })
 
-    it.only('clicking confirm button starts submitting the form', async () => {
+    it('clicking confirm button starts submitting the form', async () => {
       await waitForElement(component, '#submit-edit-user-form')
       component.update()
 

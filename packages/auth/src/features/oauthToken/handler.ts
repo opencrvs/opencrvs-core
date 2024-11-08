@@ -9,18 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { fetchDocuments } from '@gateway/features/documents/service'
+import { clientCredentialsHandler } from './client-credentials'
+import * as oauthResponse from './responses'
+import { tokenExchangeHandler } from './token-exchange'
 
-export async function getPresignedMinioURLHandler(
+export async function tokenHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const fileUri = request.params.fileUri
-  const response = await fetchDocuments(
-    '/presigned-url',
-    { Authorization: request.headers.authorization },
-    'POST',
-    JSON.stringify({ fileUri })
-  )
-  return response
+  const grantType = request.query.grant_type
+
+  if (grantType === 'client_credentials') {
+    return clientCredentialsHandler(request, h)
+  }
+
+  if (grantType === 'urn:opencrvs:oauth:grant-type:token-exchange') {
+    return tokenExchangeHandler(request, h)
+  }
+
+  return oauthResponse.invalidGrantType(h)
 }

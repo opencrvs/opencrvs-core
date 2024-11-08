@@ -20,8 +20,8 @@ import {
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { logger } from '@opencrvs/commons'
+import { postUserActionToMetrics } from '@auth/metrics'
 import { env } from '@auth/environment'
-import { postUserActionToMetrics } from '@auth/features/authenticate/service'
 
 interface IPayload {
   nonce: string

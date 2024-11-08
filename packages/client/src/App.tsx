@@ -21,18 +21,8 @@ import TransitionWrapper from '@client/components/TransitionWrapper'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
 import { useApolloClient } from '@client/utils/apolloClient'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
-import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
-import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
-import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import { Home } from '@client/views/OfficeHome/Home'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
-import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -46,8 +36,6 @@ import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceH
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
-import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
@@ -58,18 +46,29 @@ import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
-import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
-import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
+import { UserList } from './views/SysAdmin/Team/user/UserList'
+import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
+import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
+import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
+import { UserAudit } from './views/UserAudit/UserAudit'
+import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { PerformanceStatistics } from '@client/views/Performance/Statistics'
+import { Leaderboards } from '@client/views/Performance/Leaderboards'
+import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
+import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
+import { ApolloProvider } from '@client/utils/ApolloProvider'
+import { Home } from '@client/views/OfficeHome/Home'
+import { PrintRecord } from './views/PrintRecord/PrintRecord'
+import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
-import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
-import { UserList } from './views/SysAdmin/Team/user/UserList'
-import VSExport from './views/SysAdmin/Vsexports/VSExport'
-import { UserAudit } from './views/UserAudit/UserAudit'
 import { SCOPES } from './utils/gateway'
 
 interface IAppProps {
@@ -385,7 +384,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_PRINT_RECORDS
+                                                SCOPES.RECORD_REGISTRATION_PRINT
                                               ]}
                                               path={routes.VERIFY_COLLECTOR}
                                               component={VerifyCollector}
@@ -510,10 +509,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              scopes={[
-                                                SCOPES.PERFORMANCE_READ,
-                                                SCOPES.PERFORMANCE_READ_MY_OFFICE
-                                              ]}
+                                              scopes={[SCOPES.PERFORMANCE_READ]}
                                               path={routes.PERFORMANCE_HOME}
                                               component={PerformanceHome}
                                             />
@@ -618,15 +614,6 @@ export function App(props: IAppProps) {
                                                 routes.ISSUE_CERTIFICATE_PAYMENT
                                               }
                                               component={IssuePayment}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                routes.OIDP_VERIFICATION_CALLBACK
-                                              }
-                                              component={
-                                                OIDPVerificationCallback
-                                              }
                                             />
                                             <ProtectedRoute
                                               exact

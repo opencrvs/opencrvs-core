@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import { JWT_ISSUER } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
@@ -21,7 +22,7 @@ import {
   sendVerificationCode,
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
-import { logger } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import * as F from 'fp-ts'
 import { Scope } from '@opencrvs/commons/authentication'
@@ -134,6 +135,29 @@ export async function createToken(
   })
 }
 
+export async function createTokenForRecordValidation(
+  userId: UUID,
+  recordId: UUID
+) {
+  return sign(
+    {
+      scope: ['record.confirm-registration', 'record.reject-registration'],
+      recordId
+    },
+    cert,
+    {
+      subject: userId,
+      algorithm: 'RS256',
+      expiresIn: '7 days',
+      audience: [
+        'opencrvs:gateway-user', // to get to the gateway
+        'opencrvs:user-mgnt-user' // to allow the gateway to connect the 'sub' to an actual user
+      ],
+      issuer: JWT_ISSUER
+    }
+  )
+}
+
 export async function storeUserInformation(
   nonce: string,
   userFullName: IUserName[],
@@ -225,27 +249,4 @@ export function verifyToken(token: string) {
 
 export function getPublicKey() {
   return publicCert
-}
-
-export async function postUserActionToMetrics(
-  action: string,
-  token: string,
-  remoteAddress: string,
-  userAgent: string,
-  practitionerId?: string
-) {
-  const url = resolve(env.METRICS_URL, '/audit/events')
-  const body = { action: action, practitionerId }
-  const authentication = 'Bearer ' + token
-
-  await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authentication,
-      'x-real-ip': remoteAddress,
-      'x-real-user-agent': userAgent
-    }
-  })
 }

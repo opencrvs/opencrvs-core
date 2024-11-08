@@ -228,7 +228,6 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      //setScopes(REGISTRAR_DEFAULT_SCOPES, store)
       await flushPromises()
       const data = marriageReviewDraftData
 

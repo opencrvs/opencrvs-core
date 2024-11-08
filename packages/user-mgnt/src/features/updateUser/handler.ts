@@ -11,6 +11,7 @@
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { Practitioner } from '@opencrvs/commons/types'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
   createFhirPractitioner,
@@ -61,7 +62,6 @@ export default async function updateUser(
   }
   // Update existing user's fields
   existingUser.name = user.name
-  existingUser.identifiers = user.identifiers
   existingUser.email = user.email
   existingUser.mobile = user.mobile
   existingUser.emailForNotification = user.emailForNotification
@@ -71,7 +71,7 @@ export default async function updateUser(
   existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
-    if (request.auth.credentials?.scope?.includes('natlsysadmin')) {
+    if (request.auth.credentials?.scope?.includes(SCOPES.CONFIG_UPDATE_ALL)) {
       existingUser.primaryOfficeId = user.primaryOfficeId
     } else {
       throw new Error('Location can be changed only by National System Admin')

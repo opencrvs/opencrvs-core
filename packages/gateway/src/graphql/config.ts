@@ -31,7 +31,6 @@ import { resolvers as integrationResolver } from '@gateway/features/systems/root
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
-import { resolvers as OIDPUserInfoResolvers } from '@gateway/features/OIDPUserInfo/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
@@ -86,7 +85,6 @@ export const resolvers: StringIndexed<IResolvers> = merge(
   correctionRootResolvers as IResolvers,
   integrationResolver as IResolvers,
   bookmarkAdvancedSearchResolvers as IResolvers,
-  OIDPUserInfoResolvers as IResolvers,
   {
     FieldValue: new GraphQLScalarType({
       name: 'FieldValue',
@@ -227,6 +225,13 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
           if (!user || !['active', 'pending'].includes(user.status)) {
             throw new AuthenticationError('Authentication failed')
           }
+
+          // @TODO: When scope work is done, this check should stay.
+          // For now, the registrar might not have 'record.confirm-registration' token, but the per-record issued token will have it
+
+          // if (credentials && !isEqual(credentials.scope, user.scope)) {
+          //   throw new AuthenticationError('Authentication failed')
+          // }
         } catch (err) {
           logger.error(err)
           throw new AuthenticationError(err)

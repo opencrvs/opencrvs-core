@@ -15,17 +15,9 @@
 import { PlainDate } from '@client/utils/date-formatting'
 
 export const scopes = [
-  'natlsysadmin',
   'bypassratelimit',
   'demo',
-  'declare',
-  'register',
-  'certify',
-  'performance',
-  'sysadmin',
-  'validate',
   'teams',
-  'config',
   'webhook',
   'nationalId',
   'notification-api',
@@ -38,21 +30,22 @@ export const scopes = [
   'record.declare-marriage:my-jurisdiction',
   'record.declaration-submit-incomplete',
   'record.declaration-submit-for-review',
-  'record.assign-unassign-myself',
   'record.unassign-others',
-  'record.declaration-review',
-  'record.declaration-archive',
-  'record.declaration-reinstate',
-  'record.review-duplicates',
   'record.submit-for-approval',
   'record.submit-for-updates',
-  'record.registration-verify-certified-copies',
+  'record.declaration-edit',
+  'record.review-duplicates',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
   'record.register',
-  'record.print-records',
-  'record.print-records-supporting-documents',
   'record.export-records',
-  'record.print-issue-certified-copies',
-  'record.bulk-print-certified-copies',
+  'record.declaration-print',
+  'record.declaration.print-supporting-documents',
+  'record.registration-print',
+  'record.registration-print&issue-certified-copies',
+  'record.registration-print-certified-copies',
+  'record.registration-bulk-print-certified-copies',
+  'record.registration-verify-certified-copies',
   'record.registration-request-correction',
   'record.registration-correct',
   'record.registration-request-revocation',
@@ -69,16 +62,11 @@ export const scopes = [
   'record.read-audit',
   'record.read-comments',
   'record.create-comments',
-  'profile.update-signature',
-  'profile.update-phone-number',
-  'profile.update-name',
-  'profile.update-profile-image',
+  'profile.update',
   'profile.electronic-signature',
-  'performance.read:my-office',
   'performance.read',
   'performance.read-dashboards',
-  'performance.export-vital-statistics',
-  'organisation.read:all',
+  'performance.vital-statistics-export',
   'organisation.read-locations:all',
   'organisation.read-locations:my-office',
   'organisation.read-locations:my-jurisdiction',
@@ -95,17 +83,9 @@ export const scopes = [
 export type Scope = (typeof scopes)[number]
 
 export const SCOPES = {
-  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
   DEMO: 'demo',
-  DECLARE: 'declare',
-  REGISTER: 'register',
-  CERTIFY: 'certify',
-  PERFORMANCE: 'performance',
-  SYSADMIN: 'sysadmin',
-  VALIDATE: 'validate',
   TEAMS: 'teams',
-  CONFIG: 'config',
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
@@ -119,23 +99,26 @@ export const SCOPES = {
     'record.declare-marriage:my-jurisdiction',
   RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
-  RECORD_ASSIGN_UNASSIGN_MYSELF: 'record.assign-unassign-myself',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
-  RECORD_DECLARATION_REVIEW: 'record.declaration-review',
-  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
-  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
-  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
   RECORD_SUBMIT_FOR_APPROVAL: 'record.submit-for-approval',
   RECORD_SUBMIT_FOR_UPDATES: 'record.submit-for-updates',
+  RECORD_DECLARATION_EDIT: 'record.declaration-edit',
+  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
+  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
+  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
+  RECORD_REGISTER: 'record.register',
+  RECORD_EXPORT_RECORDS: 'record.export-records',
+  RECORD_DECLARATION_PRINT: 'record.declaration-print',
+  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
+    'record.declaration.print-supporting-documents',
+  RECORD_REGISTRATION_PRINT: 'record.registration-print',
+  RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
+    'record.registration-print&issue-certified-copies',
+  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies',
+  RECORD_BULK_PRINT_CERTIFIED_COPIES:
+    'record.registration-bulk-print-certified-copies',
   RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
     'record.registration-verify-certified-copies',
-  RECORD_REGISTER: 'record.register',
-  RECORD_PRINT_RECORDS: 'record.print-records',
-  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.print-records-supporting-documents',
-  RECORD_EXPORT_RECORDS: 'record.export-records',
-  RECORD_PRINT_ISSUE_CERTIFIED_COPIES: 'record.print-issue-certified-copies',
-  RECORD_BULK_PRINT_CERTIFIED_COPIES: 'record.bulk-print-certified-copies',
   RECORD_REGISTRATION_REQUEST_CORRECTION:
     'record.registration-request-correction',
   RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
@@ -155,16 +138,11 @@ export const SCOPES = {
   RECORD_READ_AUDIT: 'record.read-audit',
   RECORD_READ_COMMENTS: 'record.read-comments',
   RECORD_CREATE_COMMENTS: 'record.create-comments',
-  PROFILE_UPDATE_SIGNATURE: 'profile.update-signature',
-  PROFILE_UPDATE_PHONE_NUMBER: 'profile.update-phone-number',
-  PROFILE_UPDATE_NAME: 'profile.update-name',
-  PROFILE_UPDATE_PROFILE_IMAGE: 'profile.update-profile-image',
+  PROFILE_UPDATE: 'profile.update',
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
-  PERFORMANCE_READ_MY_OFFICE: 'performance.read:my-office',
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
-  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.export-vital-statistics',
-  ORGANISATION_READ: 'organisation.read:all',
+  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
@@ -1091,6 +1069,7 @@ export type Mutation = {
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
   changePhone?: Maybe<Scalars['String']>
+  confirmRegistration: Scalars['ID']
   createBirthRegistration: CreatedIds
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
@@ -1188,6 +1167,10 @@ export type MutationChangePhoneArgs = {
   phoneNumber: Scalars['String']
   userId: Scalars['String']
   verifyCode: Scalars['String']
+}
+
+export type MutationConfirmRegistrationArgs = {
+  id: Scalars['ID']
 }
 
 export type MutationCreateBirthRegistrationArgs = {
@@ -1388,41 +1371,6 @@ export enum NotificationType {
   Sms = 'SMS'
 }
 
-export type OidpUserAddress = {
-  __typename?: 'OIDPUserAddress'
-  city?: Maybe<Scalars['String']>
-  country?: Maybe<Scalars['String']>
-  formatted?: Maybe<Scalars['String']>
-  locality?: Maybe<Scalars['String']>
-  postal_code?: Maybe<Scalars['String']>
-  region?: Maybe<Scalars['String']>
-  street_address?: Maybe<Scalars['String']>
-}
-
-export type OidpUserInfo = {
-  __typename?: 'OIDPUserInfo'
-  address?: Maybe<OidpUserAddress>
-  birthdate?: Maybe<Scalars['String']>
-  email?: Maybe<Scalars['String']>
-  email_verified?: Maybe<Scalars['Boolean']>
-  family_name?: Maybe<Scalars['String']>
-  gender?: Maybe<Scalars['String']>
-  given_name?: Maybe<Scalars['String']>
-  locale?: Maybe<Scalars['String']>
-  middle_name?: Maybe<Scalars['String']>
-  name?: Maybe<Scalars['String']>
-  nickname?: Maybe<Scalars['String']>
-  phone_number?: Maybe<Scalars['String']>
-  phone_number_verified?: Maybe<Scalars['Boolean']>
-  picture?: Maybe<Scalars['String']>
-  preferred_username?: Maybe<Scalars['String']>
-  profile?: Maybe<Scalars['String']>
-  sub: Scalars['String']
-  updated_at?: Maybe<Scalars['Int']>
-  website?: Maybe<Scalars['String']>
-  zoneinfo?: Maybe<Scalars['String']>
-}
-
 export type ObservationFhirids = {
   attendantAtBirth?: InputMaybe<Scalars['String']>
   birthType?: InputMaybe<Scalars['String']>
@@ -1552,7 +1500,6 @@ export type Query = {
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
-  getOIDPUserInfo?: Maybe<UserInfo>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
   getTotalCertifications?: Maybe<Array<CertificationMetric>>
   getTotalCorrections?: Maybe<Array<CorrectionMetric>>
@@ -1564,7 +1511,7 @@ export type Query = {
   getUserByMobile?: Maybe<User>
   getUserRoles: Array<UserRole>
   getVSExports?: Maybe<TotalVsExport>
-  hasChildLocation?: Maybe<Location>
+  isLeafLevelLocation: Scalars['Boolean']
   listBirthRegistrations?: Maybe<BirthRegResultSet>
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
@@ -1650,13 +1597,6 @@ export type QueryGetLocationStatisticsArgs = {
   populationYear: Scalars['Int']
 }
 
-export type QueryGetOidpUserInfoArgs = {
-  clientId: Scalars['String']
-  code: Scalars['String']
-  grantType?: InputMaybe<Scalars['String']>
-  redirectUri: Scalars['String']
-}
-
 export type QueryGetRegistrationsListByFilterArgs = {
   event: Scalars['String']
   filterBy: Scalars['String']
@@ -1714,8 +1654,8 @@ export type QueryGetUserByMobileArgs = {
   mobile?: InputMaybe<Scalars['String']>
 }
 
-export type QueryHasChildLocationArgs = {
-  parentId: Scalars['String']
+export type QueryIsLeafLevelLocationArgs = {
+  locationId: Scalars['String']
 }
 
 export type QueryListBirthRegistrationsArgs = {
@@ -2247,14 +2187,6 @@ export type UserIdentifierInput = {
   system?: InputMaybe<Scalars['String']>
   use?: InputMaybe<Scalars['String']>
   value?: InputMaybe<Scalars['String']>
-}
-
-export type UserInfo = {
-  __typename?: 'UserInfo'
-  districtFhirId?: Maybe<Scalars['String']>
-  locationLevel3FhirId?: Maybe<Scalars['String']>
-  oidpUserInfo?: Maybe<OidpUserInfo>
-  stateFhirId?: Maybe<Scalars['String']>
 }
 
 export type UserInput = {
@@ -5557,55 +5489,6 @@ export type MarkEventAsNotDuplicateMutation = {
   markEventAsNotDuplicate: string
 }
 
-export type GetOidpUserInfoQueryVariables = Exact<{
-  code: Scalars['String']
-  clientId: Scalars['String']
-  redirectUri: Scalars['String']
-  grantType?: InputMaybe<Scalars['String']>
-}>
-
-export type GetOidpUserInfoQuery = {
-  __typename?: 'Query'
-  getOIDPUserInfo?: {
-    __typename?: 'UserInfo'
-    districtFhirId?: string | null
-    stateFhirId?: string | null
-    locationLevel3FhirId?: string | null
-    oidpUserInfo?: {
-      __typename?: 'OIDPUserInfo'
-      sub: string
-      name?: string | null
-      given_name?: string | null
-      family_name?: string | null
-      middle_name?: string | null
-      nickname?: string | null
-      preferred_username?: string | null
-      profile?: string | null
-      picture?: string | null
-      website?: string | null
-      email?: string | null
-      email_verified?: boolean | null
-      gender?: string | null
-      birthdate?: string | null
-      zoneinfo?: string | null
-      locale?: string | null
-      phone_number?: string | null
-      phone_number_verified?: boolean | null
-      updated_at?: number | null
-      address?: {
-        __typename?: 'OIDPUserAddress'
-        formatted?: string | null
-        street_address?: string | null
-        locality?: string | null
-        region?: string | null
-        postal_code?: string | null
-        city?: string | null
-        country?: string | null
-      } | null
-    } | null
-  } | null
-}
-
 type EventSearchFields_BirthEventSearchSet_Fragment = {
   __typename?: 'BirthEventSearchSet'
   dateOfBirth?: PlainDate | null
@@ -7263,22 +7146,13 @@ export type GetLocationStatisticsQuery = {
   } | null
 }
 
-export type HasChildLocationQueryVariables = Exact<{
-  parentId: Scalars['String']
+export type IsLeafLevelLocationQueryVariables = Exact<{
+  locationId: Scalars['String']
 }>
 
-export type HasChildLocationQuery = {
+export type IsLeafLevelLocationQuery = {
   __typename?: 'Query'
-  hasChildLocation?: {
-    __typename?: 'Location'
-    id: string
-    type?: string | null
-    identifier?: Array<{
-      __typename?: 'Identifier'
-      system?: string | null
-      value?: string | null
-    }> | null
-  } | null
+  isLeafLevelLocation: boolean
 }
 
 export type FetchMonthWiseEventMetricsQueryVariables = Exact<{
@@ -7407,82 +7281,76 @@ export type GetRegistrationsListByFilterQueryVariables = Exact<{
   size: Scalars['Int']
 }>
 
-export type RegistrationsListByLocationFilter = {
-  __typename: 'TotalMetricsByLocation'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByLocation'
-    total: number
-    late: number
-    delayed: number
-    home: number
-    healthFacility: number
-    location: { __typename?: 'Location'; name?: string | null }
-  }>
-}
-
-export type RegistrationsListByRegistrarFilter = {
-  __typename: 'TotalMetricsByRegistrar'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByRegistrar'
-    total: number
-    late: number
-    delayed: number
-    registrarPractitioner: {
-      __typename?: 'User'
-      id: string
-      role: {
-        __typename?: 'UserRole'
-        id: string
-        label: {
-          __typename?: 'I18nMessage'
-          id: string
-          defaultMessage: string
-          description: string
-        }
-      }
-      primaryOffice: {
-        __typename?: 'Location'
-        name?: string | null
-        id: string
-      }
-      name: Array<{
-        __typename?: 'HumanName'
-        firstNames?: string | null
-        familyName?: string | null
-        use?: string | null
-      }>
-      avatar?: {
-        __typename?: 'Avatar'
-        type: string
-        data: string
-      } | null
-    }
-  }>
-}
-
-export type RegistrationsListByTimeFilter = {
-  __typename: 'TotalMetricsByTime'
-  total?: number | null
-  results: Array<{
-    __typename?: 'EventMetricsByTime'
-    total: number
-    delayed: number
-    late: number
-    home: number
-    healthFacility: number
-    month: string
-    time: string
-  }>
-}
-
 export type GetRegistrationsListByFilterQuery = {
   __typename?: 'Query'
   getRegistrationsListByFilter?:
-    | RegistrationsListByLocationFilter
-    | RegistrationsListByRegistrarFilter
-    | RegistrationsListByTimeFilter
+    | {
+        __typename: 'TotalMetricsByLocation'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByLocation'
+          total: number
+          late: number
+          delayed: number
+          home: number
+          healthFacility: number
+          location: { __typename?: 'Location'; name?: string | null }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByRegistrar'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByRegistrar'
+          total: number
+          late: number
+          delayed: number
+          registrarPractitioner: {
+            __typename?: 'User'
+            id: string
+            role: {
+              __typename?: 'UserRole'
+              id: string
+              label: {
+                __typename?: 'I18nMessage'
+                id: string
+                defaultMessage: string
+                description: string
+              }
+            }
+            primaryOffice: {
+              __typename?: 'Location'
+              name?: string | null
+              id: string
+            }
+            name: Array<{
+              __typename?: 'HumanName'
+              firstNames?: string | null
+              familyName?: string | null
+              use?: string | null
+            }>
+            avatar?: {
+              __typename?: 'Avatar'
+              type: string
+              data: string
+            } | null
+          }
+        }>
+      }
+    | {
+        __typename: 'TotalMetricsByTime'
+        total?: number | null
+        results: Array<{
+          __typename?: 'EventMetricsByTime'
+          total: number
+          delayed: number
+          late: number
+          home: number
+          healthFacility: number
+          month: string
+          time: string
+        }>
+      }
     | null
 }
 

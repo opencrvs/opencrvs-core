@@ -12,7 +12,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   getReviewFormFromStore,
-  createTestStore
+  createTestStore,
+  setScopes
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -23,8 +24,7 @@ import {
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
-import { Event } from '@client/utils/gateway'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { Event, SCOPES } from '@client/utils/gateway'
 import { vi } from 'vitest'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 
@@ -1169,7 +1169,7 @@ describe('when user is in the register form review section', () => {
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    setScopes([SCOPES.RECORD_REGISTER], store)
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 

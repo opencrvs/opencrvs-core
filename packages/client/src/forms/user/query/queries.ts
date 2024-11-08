@@ -25,7 +25,7 @@ export const getUserRolesQuery = gql`
   }
 `
 
-async function fetchRoles() {
+async function fetchRoles(criteria = {}) {
   return (
     client &&
     client.query({

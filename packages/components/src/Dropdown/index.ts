@@ -8,15 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { getPresignedMinioURLHandler } from '@gateway/routes/getPresignedMinioURL/handler'
-
-export default {
-  method: 'GET',
-  path: '/document/{fileUri}',
-  handler: getPresignedMinioURLHandler,
-  config: {
-    description: 'Get presigned url from minio',
-    notes: 'Pass the fileName as url param'
-  }
-}
+export * from './Dropdown'

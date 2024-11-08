@@ -53,7 +53,7 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { RegStatus, Scope } from '@client/utils/gateway'
+import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -86,7 +86,10 @@ class SentForReviewComponent extends React.Component<
   IApprovalTabState
 > {
   pageSize = 10
-  isFieldAgent = this.props.scope?.includes('declare')
+
+  canSendForApproval = this.props.scope?.includes(
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+  )
 
   constructor(props: IApprovalTabProps) {
     super(props)
@@ -146,9 +149,9 @@ class SentForReviewComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          label: this.isFieldAgent
-            ? this.props.intl.formatMessage(navigationMessages.sentForReview)
-            : this.props.intl.formatMessage(navigationMessages.approvals),
+          label: this.canSendForApproval
+            ? this.props.intl.formatMessage(navigationMessages.approvals)
+            : this.props.intl.formatMessage(navigationMessages.sentForReview),
           width: 18,
           key: COLUMNS.SENT_FOR_APPROVAL,
           isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_APPROVAL,
@@ -221,7 +224,7 @@ class SentForReviewComponent extends React.Component<
         ''
 
       let sentForApproval
-      if (this.isFieldAgent) {
+      if (!this.canSendForApproval) {
         sentForApproval =
           getPreviousOperationDateByOperationType(
             reg.operationHistories,
@@ -257,9 +260,9 @@ class SentForReviewComponent extends React.Component<
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.isFieldAgent
-              ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
-              : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+            this.canSendForApproval
+              ? this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+              : this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
         >
           {reg.name}
@@ -268,9 +271,9 @@ class SentForReviewComponent extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.isFieldAgent
-              ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
-              : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+            this.canSendForApproval
+              ? this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+              : this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -336,12 +339,12 @@ class SentForReviewComponent extends React.Component<
       this.props.queryData.data.totalItems > pageSize
         ? true
         : false
-    const noResultText = this.isFieldAgent
-      ? intl.formatMessage(wqMessages.noRecordsSentForReview)
-      : intl.formatMessage(wqMessages.noRecordsSentForApproval)
-    const title = this.isFieldAgent
-      ? intl.formatMessage(navigationMessages.sentForReview)
-      : intl.formatMessage(navigationMessages.approvals)
+    const noResultText = this.canSendForApproval
+      ? intl.formatMessage(wqMessages.noRecordsSentForApproval)
+      : intl.formatMessage(wqMessages.noRecordsSentForReview)
+    const title = this.canSendForApproval
+      ? intl.formatMessage(navigationMessages.approvals)
+      : intl.formatMessage(navigationMessages.sentForReview)
     return (
       <WQContentWrapper
         title={title}
