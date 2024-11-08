@@ -1225,7 +1225,7 @@ function toSavedTask(
 
 function toSavedRelatedPerson(
   relatedPersion: RelatedPerson & {
-    patient: { reference: `urn:uuid:${string}` }
+    patient: { reference: `urn:uuid:${UUID}` }
   },
   id: UUID,
   resourceBundle: Bundle,
