@@ -32,7 +32,9 @@ const RoleSchema = z.array(
     scopes: z.array(
       z.string().refine(
         (scope) => scopes.includes(scope as Scope),
-        (invalidScope) => ({ message: `invalid scope "${invalidScope}" found` })
+        (invalidScope) => ({
+          message: `invalid scope "${invalidScope}" found\n`
+        })
       )
     )
   })
