@@ -20,7 +20,8 @@ import {
   createTestStore,
   flushPromises,
   userDetails,
-  mockOfflineData
+  mockOfflineData,
+  setScopes
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -43,11 +44,10 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
 import { IFormData } from '@opencrvs/client/src/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { Event, RegStatus, SCOPES } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
-import * as profileSelectors from '@client/profile/profileSelectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
@@ -248,7 +248,7 @@ describe('when user is in the register form for marriage event', () => {
   })
 })
 
-describe('when user is in the register form preview section', () => {
+describe('when user is in the register form preview section and has the submit complete scope', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
@@ -282,6 +282,7 @@ describe('when user is in the register form preview section', () => {
         }
       }
     }
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
@@ -310,18 +311,18 @@ describe('when user is in the register form preview section', () => {
   })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
-    expect(component.find('#submit_form').hostNodes().prop('disabled')).toBe(
-      false
-    )
+    expect(
+      component.find('#submit_incomplete').hostNodes().prop('disabled')
+    ).toBe(false)
   })
 
   it('Displays submit confirm modal when submit button is clicked', () => {
-    component.find('#submit_form').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
   })
 
-  describe('User in the Preview section for submitting the Form', () => {
+  describe('User in the Preview section for submitting the Form and has the submit for review scope', () => {
     beforeEach(async () => {
       // @ts-ignore
       const nDeclaration = createReviewDeclaration(
@@ -330,6 +331,7 @@ describe('when user is in the register form preview section', () => {
         Event.Birth
       )
       nDeclaration.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(nDeclaration))
 
@@ -358,7 +360,7 @@ describe('when user is in the register form preview section', () => {
     })
 
     it('should be able to submit the form', () => {
-      component.find('#submit_form').hostNodes().simulate('click')
+      component.find('#submit_for_review').hostNodes().simulate('click')
       component.update()
 
       const cancelBtn = component.find('#cancel-btn').hostNodes()
@@ -368,9 +370,9 @@ describe('when user is in the register form preview section', () => {
       component.update()
 
       expect(component.find('#submit_confirm').hostNodes().length).toEqual(0)
-      expect(component.find('#submit_form').hostNodes().length).toEqual(1)
+      expect(component.find('#submit_for_review').hostNodes().length).toEqual(1)
 
-      component.find('#submit_form').hostNodes().simulate('click')
+      component.find('#submit_for_review').hostNodes().simulate('click')
       component.update()
 
       const confirmBtn = component.find('#submit_confirm').hostNodes()
@@ -393,10 +395,10 @@ describe('when user is in the register form review section', () => {
       mockDeclarationData,
       Event.Birth
     )
+    setScopes([SCOPES.RECORD_REGISTER, SCOPES.RECORD_SUBMIT_FOR_UPDATES], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 
@@ -445,10 +447,10 @@ describe('when user is in the register form from review edit', () => {
       mockDeclarationData,
       Event.Birth
     )
+    setScopes([SCOPES.RECORD_REGISTER], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 
@@ -499,10 +501,10 @@ describe('when user is in the register form from sent for review edit', () => {
       Event.Birth,
       RegStatus.Declared
     )
+
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 
@@ -542,6 +544,7 @@ describe('when user is in the register form from sent for review edit', () => {
     )
     expect(saveDraftConfirmationModal.hostNodes()).toHaveLength(1)
   })
+
   it('clicking save confirm saves the draft', async () => {
     const DRAFT_MODIFY_TIME = 1582525379383
     Date.now = vi.fn(() => DRAFT_MODIFY_TIME)
@@ -598,11 +601,10 @@ describe('When user is in Preview section death event', () => {
       mockDeathDeclarationData,
       Event.Death
     )
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
-
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
     deathForm = await getRegisterFormFromStore(store, Event.Death)
     const nTestComponent = await createTestComponent(
@@ -655,7 +657,7 @@ describe('When user is in Preview section death event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component.find('#submit_form').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
@@ -665,6 +667,7 @@ describe('When user is in Preview section death event', () => {
 
     expect(history.location.pathname).toBe(HOME)
   })
+
   it('Check if death location as hospital is parsed properly', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
@@ -749,6 +752,8 @@ describe('When user is in Preview section death event in offline mode', () => {
       mockDeathDeclarationData,
       Event.Death
     )
+
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
@@ -780,7 +785,7 @@ describe('When user is in Preview section death event in offline mode', () => {
   })
 
   it('Should be able to submit the form', async () => {
-    component.find('#submit_form').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
@@ -817,11 +822,11 @@ describe('When user is in Preview section marriage event', () => {
       mockDeathDeclarationData,
       Event.Marriage
     )
+
+    setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     marriageDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(marriageDraft))
-
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
     marriageForm = await getRegisterFormFromStore(store, Event.Marriage)
     const nTestComponent = await createTestComponent(
@@ -874,7 +879,7 @@ describe('When user is in Preview section marriage event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component.find('#submit_form').hostNodes().simulate('click')
+    component.find('#submit_incomplete').hostNodes().simulate('click')
 
     const confirmBtn = component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)

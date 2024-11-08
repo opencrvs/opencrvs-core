@@ -40,7 +40,7 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { Scope, SearchEventsQuery } from '@client/utils/gateway'
+import { Scope, SCOPES, SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router'
@@ -86,6 +86,7 @@ import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/Bookm
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { UserDetails } from '@client/utils/userUtils'
 import { changeSortedColumn } from '@client/views/OfficeHome/utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -221,15 +222,24 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     }
   }
 
-  const userHasRegisterScope = () => {
-    return props.scope && props.scope.includes('register')
-  }
-  const userHasValidateScope = () => {
-    return props.scope && props.scope.includes('validate')
-  }
-  const userHasCertifyScope = () => {
-    return props.scope && props.scope.includes('certify')
-  }
+  const { hasAnyScope, hasScope } = usePermissions()
+
+  const userHasRegisterScope = () => hasScope(SCOPES.RECORD_REGISTER)
+
+  const userHasValidateScope = () =>
+    hasAnyScope([
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ])
+
+  const hasIssueScope = () =>
+    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+
+  const hasPrintScope = () =>
+    hasAnyScope([
+      SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+    ])
 
   const transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
@@ -283,7 +293,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            userHasCertifyScope()
+            hasPrintScope()
           ) {
             actions.push({
               label: intl.formatMessage(buttonMessages.print),
@@ -295,7 +305,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && userHasCertifyScope()) {
+          } else if (declarationIsCertified && hasIssueScope()) {
             actions.push({
               label: intl.formatMessage(buttonMessages.issue),
               handler: (

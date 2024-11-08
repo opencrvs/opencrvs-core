@@ -70,15 +70,10 @@ export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
 export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
-  /*
-   * @deprecated
-   */
-  SCOPES.SYSADMIN,
-  SCOPES.NATLSYSADMIN,
+  SCOPES.CONFIG_UPDATE_ALL,
   SCOPES.USER_CREATE,
   SCOPES.USER_READ,
   SCOPES.USER_UPDATE,
-  SCOPES.ORGANISATION_READ,
   SCOPES.ORGANISATION_READ_LOCATIONS,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
@@ -86,24 +81,16 @@ export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
 ] satisfies Scope[]
 
 export const REGISTRAR_DEFAULT_SCOPES = [
-  /*
-   * @deprecated
-   */
-  SCOPES.REGISTER,
-  SCOPES.PERFORMANCE,
-  SCOPES.CERTIFY,
-
   SCOPES.RECORD_DECLARE_BIRTH,
   SCOPES.RECORD_DECLARE_DEATH,
   SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_DECLARATION_REVIEW,
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
   SCOPES.RECORD_REVIEW_DUPLICATES,
   SCOPES.RECORD_DECLARATION_ARCHIVE,
   SCOPES.RECORD_DECLARATION_REINSTATE,
   SCOPES.RECORD_REGISTER,
   SCOPES.RECORD_REGISTRATION_CORRECT,
-  SCOPES.RECORD_PRINT_RECORDS,
+  SCOPES.RECORD_REGISTRATION_PRINT,
   SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
   SCOPES.RECORD_EXPORT_RECORDS,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
@@ -111,7 +98,7 @@ export const REGISTRAR_DEFAULT_SCOPES = [
   SCOPES.RECORD_CREATE_COMMENTS,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
-  SCOPES.ORGANISATION_READ,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
   SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
   SCOPES.SEARCH_BIRTH,
   SCOPES.SEARCH_DEATH,
@@ -125,13 +112,12 @@ export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
   SCOPES.RECORD_DECLARE_BIRTH,
   SCOPES.RECORD_DECLARE_DEATH,
   SCOPES.RECORD_DECLARE_MARRIAGE,
-  SCOPES.RECORD_DECLARATION_REVIEW,
   SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
   SCOPES.RECORD_DECLARATION_ARCHIVE,
   SCOPES.RECORD_DECLARATION_REINSTATE,
   SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
-  SCOPES.RECORD_PRINT_RECORDS,
+  SCOPES.RECORD_REGISTRATION_PRINT,
   SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
   SCOPES.RECORD_EXPORT_RECORDS,
   SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
@@ -139,7 +125,7 @@ export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
   SCOPES.RECORD_CREATE_COMMENTS,
   SCOPES.PERFORMANCE_READ,
   SCOPES.PERFORMANCE_READ_DASHBOARDS,
-  SCOPES.ORGANISATION_READ,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
   SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
   SCOPES.SEARCH_BIRTH,
   SCOPES.SEARCH_DEATH,
@@ -381,13 +367,7 @@ export const userDetails: UserDetails = {
     status: 'active'
   },
   localRegistrar: {
-    role: {
-      label: {
-        defaultMessage: 'Local Registrar',
-        description: 'Name for user role Field Agent',
-        id: 'userRole.fieldAgent'
-      }
-    },
+    role: 'LOCAL_REGISTRAR',
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -1114,13 +1094,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: {
-              label: {
-                defaultMessage: 'Local Registrar',
-                description: 'Name for user role Field Agent',
-                id: 'userRole.fieldAgent'
-              }
-            },
+            role: 'LOCAL_REGISTRAR',
             signature: undefined
           }
         }
@@ -1184,7 +1158,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.hospitalFieldAgent'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.RECORD_DECLARE_BIRTH]
         },
         {
           id: 'FIELD_AGENT',
@@ -1193,7 +1167,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Field Agent',
             id: 'userRole.fieldAgent'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
           id: 'POLICE_OFFICER',
@@ -1202,7 +1176,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Police Officer',
             id: 'userRole.policeOfficer'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
           id: 'SOCIAL_WORKER',
@@ -1211,7 +1185,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Social Worker',
             id: 'userRole.socialWorker'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
           id: 'HEALTHCARE_WORKER',
@@ -1220,7 +1194,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Healthcare Worker',
             id: 'userRole.healthcareWorker'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.SEARCH_BIRTH]
         },
         {
           id: 'LOCAL_LEADER',
@@ -1229,7 +1203,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Leader',
             id: 'userRole.localLeader'
           },
-          scopes: ['declare']
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
           id: 'REGISTRATION_AGENT',
@@ -1238,7 +1212,10 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Registration Agent',
             id: 'userRole.registrationAgent'
           },
-          scopes: ['validate', 'performance', 'certify']
+          scopes: [
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+          ]
         },
         {
           id: 'LOCAL_REGISTRAR',
@@ -1247,7 +1224,11 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local Registrar',
             id: 'userRole.localRegistrar'
           },
-          scopes: ['register', 'performance', 'certify']
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_CERTIFIED_COPIES
+          ]
         },
         {
           id: 'LOCAL_SYSTEM_ADMIN',
@@ -1256,7 +1237,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Local System Admin',
             id: 'userRole.localSystemAdmin'
           },
-          scopes: ['sysadmin']
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
         },
         {
           id: 'NATIONAL_SYSTEM_ADMIN',
@@ -1265,7 +1246,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National System Admin',
             id: 'userRole.nationalSystemAdmin'
           },
-          scopes: ['sysadmin', 'natlsysadmin']
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
         },
         {
           id: 'PERFORMANCE_MANAGER',
@@ -1274,7 +1255,7 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role Performance Manager',
             id: 'userRole.performanceManager'
           },
-          scopes: ['performance']
+          scopes: [SCOPES.PERFORMANCE_READ]
         },
         {
           id: 'NATIONAL_REGISTRAR',
@@ -1283,7 +1264,13 @@ export const mockFetchRoleGraphqlOperation = {
             description: 'Name for user role National Registrar',
             id: 'userRole.nationalRegistrar'
           },
-          scopes: ['register', 'performance', 'certify', 'config', 'teams']
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.ORGANISATION_READ_LOCATIONS
+          ]
         }
       ]
     }
@@ -1631,6 +1618,7 @@ export const mockDataWithRegistarRoleSelected = {
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
   role: 'LOCAL_REGISTRAR',
+  scopes: [SCOPES.PROFILE_ELECTRONIC_SIGNATURE],
   userDetails: '',
   username: '',
   signature: {

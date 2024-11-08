@@ -53,7 +53,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { RegStatus, Scope } from '@client/utils/gateway'
+import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -178,7 +178,15 @@ class RequiresUpdateComponent extends React.Component<
     if (!data || !data.results) {
       return []
     }
-    const isFieldAgent = this.props.scope?.includes('declare') ? true : false
+
+    const validateScopes = [
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ] as Scope[]
+
+    const isReviewer = this.props.scope?.some((x) => validateScopes.includes(x))
+
     const transformedData = transformData(data, this.props.intl)
     const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
@@ -191,7 +199,7 @@ class RequiresUpdateComponent extends React.Component<
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         if (
           this.state.width > this.props.theme.grid.breakpoints.lg &&
-          !isFieldAgent
+          isReviewer
         ) {
           actions.push({
             label: this.props.intl.formatMessage(buttonMessages.update),
@@ -202,7 +210,7 @@ class RequiresUpdateComponent extends React.Component<
       } else {
         if (
           this.state.width > this.props.theme.grid.breakpoints.lg &&
-          !isFieldAgent
+          isReviewer
         ) {
           actions.push({
             label: this.props.intl.formatMessage(buttonMessages.update),

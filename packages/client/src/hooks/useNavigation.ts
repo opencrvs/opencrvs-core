@@ -61,11 +61,14 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.requiresUpdate,
-        scopes: [SCOPES.RECORD_DECLARATION_REVIEW]
+        scopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES]
       },
       {
         name: WORKQUEUE_TABS.readyForReview,
-        scopes: [SCOPES.RECORD_DECLARATION_REVIEW]
+        scopes: [
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+          SCOPES.RECORD_SUBMIT_FOR_UPDATES
+        ]
       },
       {
         name: WORKQUEUE_TABS.readyToPrint,
@@ -81,16 +84,32 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.outbox,
-        denyScopes: [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]
+        scopes: [
+          SCOPES.RECORD_DECLARE_BIRTH,
+          SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+          SCOPES.RECORD_DECLARE_DEATH,
+          SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+          SCOPES.RECORD_DECLARE_MARRIAGE,
+          SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+          SCOPES.RECORD_REVIEW_DUPLICATES,
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+          SCOPES.RECORD_REGISTRATION_CORRECT,
+          SCOPES.RECORD_DECLARATION_ARCHIVE,
+          SCOPES.RECORD_DECLARATION_REINSTATE,
+          SCOPES.RECORD_REGISTRATION_REVOKE
+        ]
       }
     ]
   },
   {
     name: TAB_GROUPS.organisations,
     scopes: [
-      SCOPES.ORGANISATION_READ,
       SCOPES.ORGANISATION_READ_LOCATIONS,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
     ],
     tabs: [
       {
@@ -99,7 +118,7 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.organisation,
-        scopes: [SCOPES.ORGANISATION_READ]
+        scopes: [SCOPES.ORGANISATION_READ_LOCATIONS]
       },
       {
         name: WORKQUEUE_TABS.team,
@@ -110,19 +129,19 @@ const routeAccess: NavigationConfig[] = [
       },
       {
         name: WORKQUEUE_TABS.config,
-        scopes: [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]
+        scopes: [SCOPES.CONFIG_UPDATE_ALL]
       },
       {
         name: WORKQUEUE_TABS.systems,
-        scopes: []
+        scopes: [SCOPES.CONFIG_UPDATE_ALL]
       },
       {
         name: WORKQUEUE_TABS.communications,
-        scopes: [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]
+        scopes: [SCOPES.CONFIG_UPDATE_ALL]
       },
       {
         name: WORKQUEUE_TABS.emailAllUsers,
-        scopes: [SCOPES.SYSADMIN, SCOPES.NATLSYSADMIN]
+        scopes: [SCOPES.CONFIG_UPDATE_ALL]
       }
     ]
   },
