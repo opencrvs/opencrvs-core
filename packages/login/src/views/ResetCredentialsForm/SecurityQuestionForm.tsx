@@ -101,34 +101,33 @@ interface BaseProps
 type Props = BaseProps & WrappedComponentProps
 
 const SecurityQuestionComponent = ({
-  location,
-  goToSuccessPage,
+  goToPhoneNumberVerificationForm,
   goToUpdatePasswordForm,
+  goToSuccessPage,
   intl,
-  goToPhoneNumberVerificationForm
+  location
 }: Props) => {
-  const [answer, setAnswer] = useState('')
-  const [touched, setTouched] = useState(false)
-  const [error, setError] = useState(false)
-  const [questionKey, setQuestionKey] = useState(
+  const [answer, setAnswer] = useState<string>('')
+  const [touched, setTouched] = useState<boolean>(false)
+  const [error, setError] = useState<boolean>(false)
+  const [questionKey, setQuestionKey] = useState<QUESTION_KEYS>(
     location.state.securityQuestionKey
   )
 
   const handleChange = (value: string) => {
-    setError(value === '')
     setAnswer(value)
     setTouched(true)
+    setError(value === '')
   }
 
   const handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!answer) {
-      setError(true)
-      return setTouched(true)
+      setTouched(true)
+      return setError(true)
     }
-    if (error) {
-      return
-    }
+
+    if (error) return
 
     let result: IVerifySecurityAnswerResponse
 
@@ -142,7 +141,8 @@ const SecurityQuestionComponent = ({
         await authApi.sendUserName(location.state.nonce)
         return goToSuccessPage(location.state.forgottenItem)
       }
-      return goToUpdatePasswordForm(result.nonce)
+
+      goToUpdatePasswordForm(result.nonce)
     } catch (error) {
       // @todo error handling
       setError(true)

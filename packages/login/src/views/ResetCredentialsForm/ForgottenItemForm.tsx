@@ -38,12 +38,12 @@ interface BaseProps {
 type Props = BaseProps & WrappedComponentProps
 
 const ForgottenItemComponent = ({
+  goToHome,
   goToPhoneNumberVerificationForm,
-  intl,
-  goToHome
+  intl
 }: Props) => {
-  const [forgottenItem, setForgottenItem] = useState('')
-  const [error, setError] = useState(false)
+  const [forgottenItem, setForgottenItem] = useState<string>('')
+  const [error, setError] = useState<boolean>(false)
 
   const handleContinue = (event: React.FormEvent) => {
     event.preventDefault()
