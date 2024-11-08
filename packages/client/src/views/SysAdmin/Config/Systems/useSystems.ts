@@ -70,9 +70,6 @@ function useNewSystemDraft() {
 /** Handles communication with global state management */
 function useSystemsGlobalState() {
   const { systems: existingSystems } = useSelector(getOfflineData)
-  const doesNationalIdAlreadyExist = existingSystems.some(
-    (system) => system.type === SystemType.NationalId
-  )
   const dispatch = useDispatch()
 
   const dispatchSystemUpdate = (updatedSystem: System) => {
@@ -101,8 +98,7 @@ function useSystemsGlobalState() {
     dispatchSystemUpdate,
     dispatchNewSystem,
     existingSystems,
-    dispatchSystemRemove,
-    doesNationalIdAlreadyExist
+    dispatchSystemRemove
   }
 }
 
@@ -130,7 +126,6 @@ export function useSystems() {
     dispatchNewSystem,
     dispatchSystemUpdate,
     existingSystems,
-    doesNationalIdAlreadyExist,
     dispatchSystemRemove
   } = useSystemsGlobalState()
 
@@ -301,10 +296,7 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          integratingSystemType:
-            newSystemType === SystemType.NationalId
-              ? newIntegratingSystemType
-              : undefined,
+          integratingSystemType: undefined,
           ...(newSystemType === SystemType.Webhook && {
             settings: {
               dailyQuota: 0,
@@ -341,9 +333,6 @@ export function useSystems() {
     setDeathPermissions(initWebHook(Event.Death))
     setBirthPermissions(initWebHook(Event.Birth))
   }
-
-  const shouldWarnAboutNationalId =
-    newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
     closePermissionModal,
@@ -391,7 +380,6 @@ export function useSystems() {
     refreshTokenError,
     resetRefreshTokenData,
     resetData,
-    shouldWarnAboutNationalId,
     newIntegratingSystemType,
     setNewIntegratingSystemType
   }

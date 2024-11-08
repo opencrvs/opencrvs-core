@@ -2000,7 +2000,6 @@ export enum SystemStatus {
 
 export enum SystemType {
   Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Webhook = 'WEBHOOK'
 }
