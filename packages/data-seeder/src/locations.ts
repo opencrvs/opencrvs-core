@@ -13,7 +13,6 @@ import { OPENCRVS_SPECIFICATION_URL } from './constants'
 import { env } from './environment'
 import { TypeOf, z } from 'zod'
 import { raise } from './utils'
-import { inspect } from 'util'
 import { fromZodError } from 'zod-validation-error'
 
 const LocationSchema = z.array(
