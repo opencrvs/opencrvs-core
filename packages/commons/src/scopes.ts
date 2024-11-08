@@ -122,7 +122,10 @@ export const SCOPES = {
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
   // config
-  CONFIG_UPDATE_ALL: 'config.update:all'
+  CONFIG_UPDATE_ALL: 'config.update:all',
+
+  // data seeding
+  USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
 export type Scope = (typeof SCOPES)[keyof typeof SCOPES]
