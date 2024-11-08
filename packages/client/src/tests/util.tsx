@@ -155,18 +155,6 @@ export const ACTION_STATUS_MAP = {
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
 } as const
 
-export const validateScopeToken = jwt.sign(
-  {
-    scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL]
-  },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
-
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
 }
@@ -379,13 +367,7 @@ export const userDetails: UserDetails = {
     status: 'active'
   },
   localRegistrar: {
-    role: {
-      label: {
-        defaultMessage: 'Local Registrar',
-        description: 'Name for user role Field Agent',
-        id: 'userRole.fieldAgent'
-      }
-    },
+    role: 'LOCAL_REGISTRAR',
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -1112,13 +1094,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: {
-              label: {
-                defaultMessage: 'Local Registrar',
-                description: 'Name for user role Field Agent',
-                id: 'userRole.fieldAgent'
-              }
-            },
+            role: 'LOCAL_REGISTRAR',
             signature: undefined
           }
         }

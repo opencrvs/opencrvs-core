@@ -923,7 +923,7 @@ export enum IntegratingSystemType {
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: UserRole
+  role?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
 }
 
@@ -1516,8 +1516,6 @@ export type Query = {
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
   queryRegistrationByIdentifier?: Maybe<BirthRegistration>
-  searchBirthRegistrations?: Maybe<Array<Maybe<BirthRegistration>>>
-  searchDeathRegistrations?: Maybe<Array<Maybe<DeathRegistration>>>
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
@@ -2648,21 +2646,13 @@ export type FetchUserQuery = {
     }
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
+      role?: string | null
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
       } | null>
-      role: {
-        __typename?: 'UserRole'
-        label: {
-          __typename?: 'I18nMessage'
-          id: string
-          defaultMessage: string
-          description: string
-        }
-      }
       signature?: {
         __typename?: 'Signature'
         data?: string | null
