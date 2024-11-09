@@ -58,7 +58,7 @@ export enum FORGOTTEN_ITEMS {
   PASSWORD = 'password'
 }
 
-export type ApplicationConfigAction = {
+type ApplicationConfigAction = {
   type: typeof CONFIG_LOAD
 }
 
@@ -130,12 +130,12 @@ export type VerifyCodeFailedAction = {
   payload: Error
 }
 
-export type GoToAppAction = {
+type GoToAppAction = {
   type: typeof GOTO_APP
   payload: string
 }
 
-export type StoreReloadModalVisibilityAction = {
+type StoreReloadModalVisibilityAction = {
   type: typeof RELOAD_MODAL_VISIBILITY
   payload: { visibility: boolean }
 }
@@ -159,10 +159,6 @@ export type Action =
   | AuthenticationResetAction
   | StoreClientRedirectRouteAction
   | StoreReloadModalVisibilityAction
-
-export const applicationConfigLoadAction = (): ApplicationConfigAction => ({
-  type: CONFIG_LOAD
-})
 
 export const resetSubmissionError = (): AuthenticationResetAction => {
   return {
@@ -252,15 +248,6 @@ export const storeClientRedirectRoute = (
   }
 }
 
-export const storeReloadModalVisibility = (
-  visibility: boolean
-): StoreReloadModalVisibilityAction => {
-  return {
-    type: RELOAD_MODAL_VISIBILITY,
-    payload: { visibility }
-  }
-}
-
 export const verifyCode = (values: IVerifyCodeNumbers): VerifyCodeAction => {
   const code = Object.values(values).join('')
   return {
@@ -280,13 +267,7 @@ export const failVerifyCode = (error: AxiosError): VerifyCodeFailedAction => ({
   type: VERIFY_CODE_FAILED,
   payload: error
 })
-export function goBack() {
-  return back()
-}
-export const gotoApp = (appId: string): GoToAppAction => ({
-  type: GOTO_APP,
-  payload: appId
-})
+
 export function goToForgottenItemForm() {
   return push(FORGOTTEN_ITEM)
 }

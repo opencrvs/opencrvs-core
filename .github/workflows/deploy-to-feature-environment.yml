@@ -6,7 +6,7 @@
 # & Healthcare Disclaimer located at http://opencrvs.org/license.
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
-name: Deploy branch & run E2E
+name: Deploy PR to feature environment
 
 on:
   pull_request:
@@ -23,14 +23,100 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  trigger-e2e:
-    if: ${{ !contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false }}
+  generate_stack_name_and_branch:
     runs-on: ubuntu-22.04
+    outputs:
+      slugified_branch: ${{  steps.slugify_bname.outputs.stack  }}
+      branch_name: ${{  steps.set_branch_and_pr_number.outputs.BRANCH_NAME  }}
+      pr_number: ${{  steps.set_branch_and_pr_number.outputs.PR_NUMBER  }}
+      author: ${{  steps.get_author.outputs.AUTHOR  }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get branch name (when manually triggered)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
+          BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+
+      - name: Get PR Information
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
+
+      - name: Check for "🚀 Ready to deploy" label
+        run: |
+          labels=$(gh pr view $PR_NUMBER --json labels --jq '.labels[].name')
+          if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
+            echo "Label '🚀 Ready to deploy' not found. Exiting."
+            exit 1
+          else
+            echo "Label '🚀 Ready to deploy' found. Continuing."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR Author
+        id: get_author
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
+          echo "PR is created by $AUTHOR"
+          echo "AUTHOR=$(echo $AUTHOR)" >> $GITHUB_ENV
+          echo "::set-output name=AUTHOR::$AUTHOR"
+
+      - name: Get Branch Name (on PR creation)
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        run: |
+          echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+
+      - name: Set the branch name as output
+        id: set_branch_and_pr_number
+        run: |
+          echo "BRANCH_NAME=$(echo ${{  env.BRANCH_NAME  }})" >> $GITHUB_OUTPUT
+          echo "PR_NUMBER=$(echo ${{  env.PR_NUMBER  }})" >> $GITHUB_OUTPUT
+
+      - name: Slugify the branch name
+        id: slugify_bname
+        uses: actions/github-script@v7
+        with:
+          script: |
+            function slugify(str) {
+              return str
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .substr(0, 35)
+                .replace(/[^a-zA-Z0-9]+$/g, '');
+            }
+            core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
+
+  trigger-e2e:
+    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    runs-on: ubuntu-22.04
+    needs: generate_stack_name_and_branch
+    environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Parse the branch name and set it as environment variable
+        run: |
+          BRANCH_NAME=${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Get PR Information (when manually triggered)
         env:
@@ -39,16 +125,13 @@ jobs:
         run: |
           PR_NUMBER=${{ github.event.inputs.pr_number }}
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
-          BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
           HEAD_COMMIT_HASH=$(echo "$PR_DATA" | jq -r '.headRefOid' | cut -c1-7)
-          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
           echo "HEAD_COMMIT_HASH=${HEAD_COMMIT_HASH}" >> $GITHUB_ENV
 
-      - name: Get Branch Name and Head Commit Hash (on PR creation)
+      - name: Get Head Commit Hash (on PR creation)
         if: ${{ github.event_name != 'workflow_dispatch' }}
         id: vars
         run: |
-          echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
           COMMIT_HASH=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
           echo "HEAD_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
 
@@ -68,35 +151,28 @@ jobs:
           echo "PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}"
           echo "Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}"
 
+      - name: Parse the stack name
+        id: generate_stack
+        run: |
+          stack=${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
+          echo "stack=${stack}" >> $GITHUB_OUTPUT
       - name: Trigger E2E Workflow
         id: dispatch_e2e
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
-            function slugify(str) {
-              return str
-                .toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .trim()
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .substr(0, 35)
-                .replace(/[^a-zA-Z0-9]+$/g, '');
-            }
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
               repo: 'e2e',
               event_type: 'run_e2e',
               client_payload: {
-                actor: '${{ github.actor }}',
+                actor: '${{ needs.generate_stack_name_and_branch.outputs.author }}',
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
-                stack: slugify('${{ env.BRANCH_NAME }}')
+                stack: '${{  steps.generate_stack.outputs.stack  }}'
               }
             });
-
-            core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
 
             console.log(result);
             await new Promise(resolve => setTimeout(resolve, 10000));
@@ -122,17 +198,17 @@ jobs:
         id: print-links
         run: |
           E2E_RUN_LINK="https://github.com/opencrvs/e2e/actions/runs/${{ steps.dispatch_e2e.outputs.run_id }}"
-          DEPLOYMENT_LINK="https://${{ steps.dispatch_e2e.outputs.stack }}.opencrvs.dev"
+          DEPLOYMENT_LINK="https://${{ steps.generate_stack.outputs.stack }}.opencrvs.dev"
 
           echo "See your E2E deployment run details here: $E2E_RUN_LINK" >> $GITHUB_STEP_SUMMARY
-          echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.dispatch_e2e.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
+          echo "All deployments & E2E of this environment you can see here: https://github.com/opencrvs/e2e/deployments/${{ steps.generate_stack.outputs.stack }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "If everything goes alright, you should see your stack getting deployed here: $DEPLOYMENT_LINK" >> $GITHUB_STEP_SUMMARY
 
           echo "deployment_link=$DEPLOYMENT_LINK" >> $GITHUB_OUTPUT
 
   listen-e2e:
-    needs: trigger-e2e
+    needs: [trigger-e2e, generate_stack_name_and_branch]
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for Environment Deployment (Deploy Job)
@@ -143,7 +219,7 @@ jobs:
             const owner = 'opencrvs';
             const repo = 'e2e';
             const runId = ${{ needs.trigger-e2e.outputs.run_id }};
-            const prNumber = ${{ github.event.pull_request.number }};
+            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
             const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
 
             let deployJobCompleted = false;

@@ -15,7 +15,7 @@ import {
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
-import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
 import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
@@ -84,6 +84,7 @@ export const getRoutes = () => {
     catchAllProxy.locationId,
 
     catchAllProxy.auth,
+    authProxy.token,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser

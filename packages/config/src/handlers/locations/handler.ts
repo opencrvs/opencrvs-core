@@ -27,7 +27,7 @@ import {
 } from '@opencrvs/commons/types'
 import { fetchFromHearth, sendToFhir } from '@config/services/hearth'
 
-export enum Code {
+enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   HEALTH_FACILITY = 'HEALTH_FACILITY'

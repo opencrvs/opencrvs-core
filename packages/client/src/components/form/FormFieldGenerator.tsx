@@ -83,8 +83,6 @@ import {
   DATE_RANGE_PICKER,
   IDateRangePickerValue,
   TIME,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
   DIVIDER,
   HEADING3,
   SUBSECTION_HEADER,
@@ -133,9 +131,6 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { VerificationButton } from '@opencrvs/components/lib/VerificationButton'
-import { useOnlineStatus } from '@client/utils'
-import { useNidAuthentication } from '@client/views/OIDPVerificationCallback/utils'
 import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
@@ -236,7 +231,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       (val: string) => setFieldValue(fieldDefinition.name, val),
       [fieldDefinition.name, setFieldValue]
     )
-    const isOnline = useOnlineStatus()
 
     const inputProps = {
       id: fieldDefinition.name,
@@ -616,21 +610,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === NID_VERIFICATION_BUTTON) {
-      return (
-        <InputField {...inputFieldProps}>
-          <VerificationButton
-            id={fieldDefinition.name}
-            onClick={fieldDefinition.onClick}
-            labelForVerified={fieldDefinition.labelForVerified}
-            labelForUnverified={fieldDefinition.labelForUnverified}
-            labelForOffline={fieldDefinition.labelForOffline}
-            status={!isOnline ? 'offline' : value ? 'verified' : 'unverified'}
-          />
-        </InputField>
-      )
-    }
-
     if (fieldDefinition.type === REDIRECT) {
       return (
         <RedirectField
@@ -792,7 +771,6 @@ interface IFormSectionProps {
 interface IStateProps {
   offlineCountryConfig: IOfflineData
   userDetails: UserDetails | null
-  onNidAuthenticationClick: () => void
 }
 
 interface IDispatchProps {
@@ -1123,86 +1101,106 @@ const FormSectionComponent = (props: Props) => {
                   )
                   setValues(updatedValues)
                 }
-              } as ILoaderButton)
-            : field.type === LOCATION_SEARCH_INPUT
-            ? {
-                ...field,
-                locationList: generateLocations(
-                  field.searchableResource.reduce((locations, resource) => {
-                    return {
-                      ...locations,
-                      ...getListOfLocations(offlineCountryConfig, resource)
-                    }
-                  }, {}),
-                  intl,
-                  undefined,
-                  field.searchableType as LocationType[]
-                )
-              }
-            : field.type === NID_VERIFICATION_BUTTON
-            ? ({
-                ...field,
-                onClick: onNidAuthenticationClick
-              } as INidVerificationButton)
-            : field
+              : field
 
-        if (
-          field.type === FETCH_BUTTON ||
-          field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-          field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-          field.type === NID_VERIFICATION_BUTTON ||
-          field.type === BUTTON
-        ) {
-          return (
-            <FormItem
-              key={`${field.name}`}
-              ignoreBottomMargin={field.ignoreBottomMargin}
-            >
-              <Field name={field.name}>
-                {(formikFieldProps: FieldProps<any>) => (
-                  <GeneratedInputField
-                    fieldDefinition={internationaliseFieldObject(
-                      intl,
-                      withDynamicallyGeneratedFields
-                    )}
-                    setFieldValue={setFieldValuesWithDependency}
-                    setFieldTouched={setFieldTouched}
-                    resetDependentSelectValues={resetDependentSelectValues}
-                    {...formikFieldProps.field}
-                    touched={touched[field.name] || false}
-                    error={error}
-                    fields={fields}
-                    values={values}
-                    draftData={draftData}
-                    disabled={isFieldDisabled}
-                    dynamicDispatch={dynamicDispatch}
-                  />
-                )}
-              </Field>
-            </FormItem>
-          )
-        }
+          if (
+            field.type === FETCH_BUTTON ||
+            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
+            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+            field.type === BUTTON
+          ) {
+            return (
+              <FormItem
+                key={`${field.name}`}
+                ignoreBottomMargin={field.ignoreBottomMargin}
+              >
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => (
+                    <GeneratedInputField
+                      fieldDefinition={internationaliseFieldObject(
+                        intl,
+                        withDynamicallyGeneratedFields
+                      )}
+                      setFieldValue={this.setFieldValuesWithDependency}
+                      setFieldTouched={setFieldTouched}
+                      resetDependentSelectValues={
+                        this.resetDependentSelectValues
+                      }
+                      {...formikFieldProps.field}
+                      touched={touched[field.name] || false}
+                      error={error}
+                      fields={fields}
+                      values={values}
+                      draftData={draftData}
+                      disabled={isFieldDisabled}
+                      dynamicDispatch={dynamicDispatch}
+                    />
+                  )}
+                </Field>
+              </FormItem>
+            )
+          } else if (
+            field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+            field.nestedFields
+          ) {
+            let nestedFieldElements = Object.create(null)
 
-        if (
-          field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
-          field.nestedFields
-        ) {
-          let nestedFieldElements = Object.create(null)
+            nestedFieldElements = Object.keys(field.nestedFields).reduce(
+              (childElements, key) => ({
+                ...childElements,
+                [key]: field.nestedFields[key].map((nestedField) => {
+                  let nestedError: string
+                  const nestedFieldErrors =
+                    errors[field.name] &&
+                    errors[field.name].nestedFields[nestedField.name]
 
-          nestedFieldElements = Object.keys(field.nestedFields).reduce(
-            (childElements, key) => ({
-              ...childElements,
-              [key]: field.nestedFields[key].map((nestedField) => {
-                let nestedError: string
-                const nestedFieldErrors =
-                  errors[field.name] &&
-                  errors[field.name].nestedFields[nestedField.name]
+                  if (nestedFieldErrors && nestedFieldErrors.length > 0) {
+                    const [firstError] = nestedFieldErrors
+                    nestedError = intl.formatMessage(
+                      firstError.message,
+                      firstError.props
+                    )
+                  }
 
-                if (nestedFieldErrors && nestedFieldErrors.length > 0) {
-                  const [firstError] = nestedFieldErrors
-                  nestedError = intl.formatMessage(
-                    firstError.message,
-                    firstError.props
+                  const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
+                  const nestedFieldTouched =
+                    touched[field.name] &&
+                    (touched[field.name] as unknown as ITouchedNestedFields)
+                      .nestedFields &&
+                    (touched[field.name] as unknown as ITouchedNestedFields)
+                      .nestedFields[nestedField.name]
+
+                  return (
+                    <FormItem
+                      key={nestedFieldName}
+                      ignoreBottomMargin={field.ignoreBottomMargin}
+                    >
+                      <FastField name={nestedFieldName}>
+                        {(formikFieldProps: FieldProps<any>) => (
+                          <GeneratedInputField
+                            fieldDefinition={internationaliseFieldObject(intl, {
+                              ...nestedField,
+                              name: nestedFieldName
+                            })}
+                            setFieldValue={this.setFieldValuesWithDependency}
+                            setFieldTouched={setFieldTouched}
+                            resetDependentSelectValues={
+                              this.resetDependentSelectValues
+                            }
+                            {...formikFieldProps.field}
+                            fields={fields}
+                            values={values}
+                            touched={nestedFieldTouched || false}
+                            error={nestedError}
+                            draftData={draftData}
+                            dynamicDispatch={dynamicDispatch}
+                            onUploadingStateChanged={
+                              this.props.onUploadingStateChanged
+                            }
+                          />
+                        )}
+                      </FastField>
+                    </FormItem>
                   )
                 }
 
@@ -1320,7 +1318,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
   const userDetails = useSelector(getUserDetails)
   const intl = useIntl()
   const dispatch = useDispatch()
-  const { onClick: onNidAuthenticationClick } = useNidAuthentication()
 
   return (
     <Formik<IFormSectionData>
@@ -1354,7 +1351,6 @@ export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
           offlineCountryConfig={offlineCountryConfig}
           userDetails={userDetails}
           dynamicDispatch={(...args) => dispatch(dynamicDispatch(...args))}
-          onNidAuthenticationClick={onNidAuthenticationClick}
         />
       )}
     </Formik>

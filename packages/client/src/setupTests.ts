@@ -286,11 +286,3 @@ vi.mock('react-router', async () => ({
     section: 'child'
   }))
 }))
-
-vi.mock('@client/views/OIDPVerificationCallback/utils', async () => ({
-  ...((await vi.importActual(
-    '@client/views/OIDPVerificationCallback/utils'
-  )) as any),
-  useExtractCallBackState: vi.fn(),
-  useQueryParams: vi.fn()
-}))

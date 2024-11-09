@@ -13,12 +13,15 @@ import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
-import { Event } from '@client/utils/gateway'
+import {
+  Event,
+  IsLeafLevelLocationQuery,
+  QueryIsLeafLevelLocationArgs
+} from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToCompletenessRates } from '@client/navigation'
 
 import {
-  getJurisidictionType,
   CompletenessRateTime,
   getAdditionalLocations,
   NATIONAL_ADMINISTRATIVE_LEVEL
@@ -27,8 +30,8 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import type { GQLMonthWiseEstimationMetric } from '@client/utils/gateway-deprecated-do-not-use'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
+import { connect, useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
   IPerformanceSelectOption,
@@ -37,14 +40,14 @@ import {
 import {
   FETCH_LOCATION_WISE_EVENT_ESTIMATIONS,
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
-  HAS_CHILD_LOCATION
+  IS_LEAF_LEVEL_LOCATION
 } from './queries'
 import { CompletenessDataTable } from './reports/completenessRates/CompletenessDataTable'
-import { useCallback } from 'react'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
+import { useQuery } from '@apollo/client'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -53,7 +56,7 @@ export enum COMPLETENESS_RATE_REPORT_BASE {
 }
 
 interface ISearchParams {
-  locationId: string
+  locationId?: string
   timeStart: string
   timeEnd: string
   time: CompletenessRateTime
@@ -77,7 +80,7 @@ function prepareChartData(
   return (
     data &&
     data.reduce(
-      (chartData: any[], dataDetails: GQLMonthWiseEstimationMetric, index) => {
+      (chartData: any[], dataDetails: GQLMonthWiseEstimationMetric) => {
         if (dataDetails !== null) {
           chartData.push({
             label:
@@ -102,6 +105,138 @@ function prepareChartData(
   )
 }
 
+function Filter({
+  locationId,
+  event,
+  dateStart,
+  dateEnd,
+  base,
+  time,
+  onBaseChange
+}: {
+  locationId: string
+  event: Event
+  dateStart: Date
+  dateEnd: Date
+  base: COMPLETENESS_RATE_REPORT_BASE
+  time: CompletenessRateTime
+  onBaseChange: (base: COMPLETENESS_RATE_REPORT_BASE) => void
+}) {
+  const intl = useIntl()
+  const { data } = useQuery<
+    IsLeafLevelLocationQuery,
+    QueryIsLeafLevelLocationArgs
+  >(IS_LEAF_LEVEL_LOCATION, {
+    variables: {
+      locationId:
+        locationId === NATIONAL_ADMINISTRATIVE_LEVEL ? '0' : locationId
+    }
+  })
+  const dispatch = useDispatch()
+
+  if (
+    data?.isLeafLevelLocation === true &&
+    base === COMPLETENESS_RATE_REPORT_BASE.LOCATION
+  ) {
+    onBaseChange(COMPLETENESS_RATE_REPORT_BASE.TIME)
+  }
+
+  const options: (IPerformanceSelectOption & { disabled?: boolean })[] = [
+    {
+      label: intl.formatMessage(messages.overTime),
+      value: COMPLETENESS_RATE_REPORT_BASE.TIME
+    },
+    {
+      label: intl.formatMessage(messages.byLocation),
+      value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
+      disabled: data?.isLeafLevelLocation ?? true
+    }
+  ]
+
+  return (
+    <>
+      <SegmentedControl
+        id="base-select"
+        value={base}
+        options={options}
+        onChange={(option) =>
+          onBaseChange(option.value as COMPLETENESS_RATE_REPORT_BASE)
+        }
+      />
+      <LocationPicker
+        additionalLocations={getAdditionalLocations(intl)}
+        selectedLocationId={locationId}
+        requiredLocationTypes={'ADMIN_STRUCTURE'}
+        onChangeLocation={(newLocationId) => {
+          dispatch(
+            goToCompletenessRates(
+              event,
+              newLocationId,
+              dateStart,
+              dateEnd,
+              time
+            )
+          )
+        }}
+      />
+      <DateRangePicker
+        startDate={dateStart}
+        endDate={dateEnd}
+        onDatesChange={({ startDate, endDate }) => {
+          startDate.setDate(startDate.getDate() + 1)
+          dispatch(
+            goToCompletenessRates(
+              event,
+              locationId as string,
+              startDate,
+              endDate,
+              time
+            )
+          )
+        }}
+      />
+      <PerformanceSelect
+        onChange={(option) =>
+          dispatch(
+            goToCompletenessRates(
+              event,
+              locationId,
+              dateStart,
+              dateEnd,
+              option.value as CompletenessRateTime
+            )
+          )
+        }
+        id="completenessRateTimeSelect"
+        withLightTheme={true}
+        value={time}
+        options={[
+          {
+            label: intl.formatMessage(
+              messages.performanceWithinTargetDaysLabel,
+              {
+                target:
+                  window.config[event.toUpperCase() as Uppercase<Event>]
+                    .REGISTRATION_TARGET,
+                withPrefix: false
+              }
+            ),
+            value: CompletenessRateTime.WithinTarget
+          },
+          {
+            label: intl.formatMessage(messages.performanceWithin1YearLabel),
+            value: CompletenessRateTime.Within1Year
+          },
+          {
+            label: intl.formatMessage(messages.performanceWithin5YearsLabel),
+            value: CompletenessRateTime.Within5Years
+          }
+        ]}
+      />
+    </>
+  )
+}
+
 function CompletenessRatesComponent(props: ICompletenessRateProps) {
   const [base, setBase] = useState<IEstimationBase>({
     baseType: COMPLETENESS_RATE_REPORT_BASE.TIME
@@ -118,138 +253,8 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     search
   ) as unknown as ISearchParams
 
-  const getFilter = useCallback(() => {
-    const dateStart = new Date(timeStart)
-    const dateEnd = new Date(timeEnd)
-    return (
-      <Query
-        query={HAS_CHILD_LOCATION}
-        variables={{
-          parentId:
-            locationId && locationId !== NATIONAL_ADMINISTRATIVE_LEVEL
-              ? locationId
-              : '0'
-        }}
-        onCompleted={({ hasChildLocation }) => {
-          const childJurisdictionType = getJurisidictionType(hasChildLocation)
-          if (
-            !childJurisdictionType &&
-            base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
-          ) {
-            setBase({ baseType: COMPLETENESS_RATE_REPORT_BASE.TIME })
-          }
-        }}
-      >
-        {({ data, loading, error }) => {
-          const childJurisdictionType =
-            data &&
-            data.hasChildLocation &&
-            getJurisidictionType(data.hasChildLocation)
-
-          const options: (IPerformanceSelectOption & { disabled?: boolean })[] =
-            [
-              {
-                label: intl.formatMessage(messages.overTime),
-                value: COMPLETENESS_RATE_REPORT_BASE.TIME
-              },
-              {
-                label: intl.formatMessage(messages.byLocation, {
-                  childJurisdictionType
-                }),
-                value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
-                type: childJurisdictionType || '',
-                disabled: !childJurisdictionType
-              }
-            ]
-
-          return (
-            <>
-              <SegmentedControl
-                id="base-select"
-                value={base.baseType}
-                options={options}
-                onChange={(option) =>
-                  setBase({
-                    baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
-                    locationJurisdictionType: option.type
-                  })
-                }
-              />
-              <LocationPicker
-                additionalLocations={getAdditionalLocations(intl)}
-                selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
-                requiredLocationTypes={'ADMIN_STRUCTURE'}
-                onChangeLocation={(newLocationId) => {
-                  props.goToCompletenessRates(
-                    eventType as Event,
-                    newLocationId,
-                    dateStart,
-                    dateEnd,
-                    time
-                  )
-                }}
-              />
-              <DateRangePicker
-                startDate={dateStart}
-                endDate={dateEnd}
-                onDatesChange={({ startDate, endDate }) => {
-                  startDate.setDate(startDate.getDate() + 1)
-                  props.goToCompletenessRates(
-                    eventType as Event,
-                    locationId as string,
-                    startDate,
-                    endDate,
-                    time
-                  )
-                }}
-              />
-              <PerformanceSelect
-                onChange={(option) =>
-                  props.goToCompletenessRates(
-                    eventType as Event,
-                    locationId,
-                    dateStart,
-                    dateEnd,
-                    option.value as CompletenessRateTime
-                  )
-                }
-                id="completenessRateTimeSelect"
-                withLightTheme={true}
-                value={time}
-                options={[
-                  {
-                    label: intl.formatMessage(
-                      messages.performanceWithinTargetDaysLabel,
-                      {
-                        target:
-                          window.config[
-                            (eventType.toUpperCase() as 'BIRTH') || 'DEATH'
-                          ].REGISTRATION_TARGET,
-                        withPrefix: false
-                      }
-                    ),
-                    value: CompletenessRateTime.WithinTarget
-                  },
-                  {
-                    label: intl.formatMessage(
-                      messages.performanceWithin1YearLabel
-                    ),
-                    value: CompletenessRateTime.Within1Year
-                  },
-                  {
-                    label: intl.formatMessage(
-                      messages.performanceWithin5YearsLabel
-                    ),
-                    value: CompletenessRateTime.Within5Years
-                  }
-                ]}
-              />
-            </>
-          )
-        }}
-      </Query>
-    )
-  }, [base, props, timeStart, timeEnd, eventType, intl, locationId, time])
+  const dateStart = new Date(timeStart)
+  const dateEnd = new Date(timeEnd)
 
   return (
     <SysAdminContentWrapper
@@ -261,7 +266,17 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
         title={intl.formatMessage(navigationMessages.completenessRates)}
         showTitleOnMobile={true}
         size={ContentSize.LARGE}
-        filterContent={getFilter()}
+        filterContent={
+          <Filter
+            locationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
+            base={base.baseType}
+            time={time}
+            event={eventType as Event}
+            dateStart={dateStart}
+            dateEnd={dateEnd}
+            onBaseChange={(base) => setBase({ baseType: base })}
+          />
+        }
       >
         <Query
           query={

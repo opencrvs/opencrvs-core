@@ -10,7 +10,11 @@
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
-import { hasScope, inScope } from '@gateway/features/user/utils'
+import {
+  hasRecordAccess,
+  hasScope,
+  inScope
+} from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
@@ -631,6 +635,21 @@ export const resolvers: GQLResolver = {
       )
 
       return taskEntry.resource.id
+    },
+    async confirmRegistration(_, { id }, { headers: authHeader }) {
+      if (!inScope(authHeader, ['record.confirm-registration'])) {
+        throw new Error(
+          'User does not have a "record.confirm-registration" scope'
+        )
+      }
+
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      // @TODO this is a no-op, only to test the token exchange actually works
+      // An upcoming pull request will implement this and a `rejectRegistration` mutations
+      return id
     }
   }
 }

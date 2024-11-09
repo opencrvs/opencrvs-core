@@ -109,6 +109,9 @@ export const fieldValueTransformer =
     sectionId: SectionId,
     field: IFormField
   ) => {
+    if (!(sectionId in transformedData)) {
+      transformedData[sectionId] = {}
+    }
     if (queryData[sectionId] && queryData[sectionId][transformedFieldName]) {
       transformedData[sectionId][field.name] =
         queryData[sectionId][transformedFieldName]
