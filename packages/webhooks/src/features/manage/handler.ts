@@ -20,7 +20,7 @@ import {
 import { internal } from '@hapi/boom'
 import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@opencrvs/commons'
-import * as uuid from 'uuid/v4'
+import uuid from 'uuid/v4'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 
