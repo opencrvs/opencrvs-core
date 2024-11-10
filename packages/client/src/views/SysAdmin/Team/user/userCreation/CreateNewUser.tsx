@@ -158,7 +158,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   if (section.viewType === 'preview') {
     return <UserReviewForm client={client as ApolloClient<any>} {...props} />
   }
-  return null
+  // return null
 }
 
 function getNextSectionIds(
@@ -273,4 +273,4 @@ export const CreateNewUser = connect(mapStateToProps, {
   goBack,
   clearUserFormData,
   fetchAndStoreUserData
-})(injectIntl(withApollo<Props>(CreateNewUserComponent)))
+})(injectIntl(withApollo<Props>(CreateNewUserComponent as any)))
