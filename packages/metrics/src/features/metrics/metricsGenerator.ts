@@ -38,7 +38,6 @@ import {
   Location as FhirLocation
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
-import { keys, keysIn, includes } from 'lodash'
 interface IGroupedByGender {
   total: number
   gender: string
@@ -647,7 +646,7 @@ export async function fetchGenderBasisMetrics(
   timeTo: string,
   currLocation: string,
   currLocationLevel: string,
-  locationLevel: string,
+  locationLevel: keyof IGenderBasisPoint,
   event: EVENT_TYPE,
   childLocationIds: Array<string>
 ) {
@@ -1214,7 +1213,7 @@ export async function fetchRegistrationsGroupByTime(
 
 function populateGenderBasisMetrics(
   points: IGenderBasisPoint[],
-  locationLevel: string
+  locationLevel: keyof IGenderBasisPoint
 ): IGenderBasisMetrics[] {
   const metricsArray: IGenderBasisMetrics[] = []
 
