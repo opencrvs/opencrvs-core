@@ -812,7 +812,6 @@ const FormSectionComponent = (props: Props) => {
     draftData,
     userDetails,
     dynamicDispatch,
-    onNidAuthenticationClick,
     onUploadingStateChanged,
     intl,
     touched,
@@ -1101,106 +1100,80 @@ const FormSectionComponent = (props: Props) => {
                   )
                   setValues(updatedValues)
                 }
-              : field
+              } as ILoaderButton)
+            : field.type === LOCATION_SEARCH_INPUT
+            ? {
+                ...field,
+                locationList: generateLocations(
+                  field.searchableResource.reduce((locations, resource) => {
+                    return {
+                      ...locations,
+                      ...getListOfLocations(offlineCountryConfig, resource)
+                    }
+                  }, {}),
+                  intl,
+                  undefined,
+                  field.searchableType as LocationType[]
+                )
+              }
+            : field
 
-          if (
-            field.type === FETCH_BUTTON ||
-            field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
-            field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
-            field.type === BUTTON
-          ) {
-            return (
-              <FormItem
-                key={`${field.name}`}
-                ignoreBottomMargin={field.ignoreBottomMargin}
-              >
-                <Field name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      setFieldTouched={setFieldTouched}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                      fields={fields}
-                      values={values}
-                      draftData={draftData}
-                      disabled={isFieldDisabled}
-                      dynamicDispatch={dynamicDispatch}
-                    />
-                  )}
-                </Field>
-              </FormItem>
-            )
-          } else if (
-            field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
-            field.nestedFields
-          ) {
-            let nestedFieldElements = Object.create(null)
+        if (
+          field.type === FETCH_BUTTON ||
+          field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
+          field.type === SELECT_WITH_DYNAMIC_OPTIONS ||
+          field.type === BUTTON
+        ) {
+          return (
+            <FormItem
+              key={`${field.name}`}
+              ignoreBottomMargin={field.ignoreBottomMargin}
+            >
+              <Field name={field.name}>
+                {(formikFieldProps: FieldProps<any>) => (
+                  <GeneratedInputField
+                    fieldDefinition={internationaliseFieldObject(
+                      intl,
+                      withDynamicallyGeneratedFields
+                    )}
+                    setFieldValue={setFieldValuesWithDependency}
+                    setFieldTouched={setFieldTouched}
+                    resetDependentSelectValues={resetDependentSelectValues}
+                    {...formikFieldProps.field}
+                    touched={touched[field.name] || false}
+                    error={error}
+                    fields={fields}
+                    values={values}
+                    draftData={draftData}
+                    disabled={isFieldDisabled}
+                    dynamicDispatch={dynamicDispatch}
+                  />
+                )}
+              </Field>
+            </FormItem>
+          )
+        }
 
-            nestedFieldElements = Object.keys(field.nestedFields).reduce(
-              (childElements, key) => ({
-                ...childElements,
-                [key]: field.nestedFields[key].map((nestedField) => {
-                  let nestedError: string
-                  const nestedFieldErrors =
-                    errors[field.name] &&
-                    errors[field.name].nestedFields[nestedField.name]
+        if (
+          field.type === RADIO_GROUP_WITH_NESTED_FIELDS &&
+          field.nestedFields
+        ) {
+          let nestedFieldElements = Object.create(null)
 
-                  if (nestedFieldErrors && nestedFieldErrors.length > 0) {
-                    const [firstError] = nestedFieldErrors
-                    nestedError = intl.formatMessage(
-                      firstError.message,
-                      firstError.props
-                    )
-                  }
+          nestedFieldElements = Object.keys(field.nestedFields).reduce(
+            (childElements, key) => ({
+              ...childElements,
+              [key]: field.nestedFields[key].map((nestedField) => {
+                let nestedError: string
+                const nestedFieldErrors =
+                  errors[field.name] &&
+                  errors[field.name].nestedFields[nestedField.name]
 
-                  const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
-                  const nestedFieldTouched =
-                    touched[field.name] &&
-                    (touched[field.name] as unknown as ITouchedNestedFields)
-                      .nestedFields &&
-                    (touched[field.name] as unknown as ITouchedNestedFields)
-                      .nestedFields[nestedField.name]
-
-                  return (
-                    <FormItem
-                      key={nestedFieldName}
-                      ignoreBottomMargin={field.ignoreBottomMargin}
-                    >
-                      <FastField name={nestedFieldName}>
-                        {(formikFieldProps: FieldProps<any>) => (
-                          <GeneratedInputField
-                            fieldDefinition={internationaliseFieldObject(intl, {
-                              ...nestedField,
-                              name: nestedFieldName
-                            })}
-                            setFieldValue={this.setFieldValuesWithDependency}
-                            setFieldTouched={setFieldTouched}
-                            resetDependentSelectValues={
-                              this.resetDependentSelectValues
-                            }
-                            {...formikFieldProps.field}
-                            fields={fields}
-                            values={values}
-                            touched={nestedFieldTouched || false}
-                            error={nestedError}
-                            draftData={draftData}
-                            dynamicDispatch={dynamicDispatch}
-                            onUploadingStateChanged={
-                              this.props.onUploadingStateChanged
-                            }
-                          />
-                        )}
-                      </FastField>
-                    </FormItem>
+                if (nestedFieldErrors && nestedFieldErrors.length > 0) {
+                  const [firstError] = nestedFieldErrors
+                  nestedError = intl.formatMessage(
+                    firstError.message,
+                    firstError.props
                   )
                 }
 
@@ -1277,6 +1250,7 @@ const FormSectionComponent = (props: Props) => {
             </FormItem>
           )
         }
+
         return (
           <FormItem
             key={`${field.name}${language}`}
