@@ -141,6 +141,7 @@ const SecurityQuestionComponent = ({
         await authApi.sendUserName(location.state.nonce)
         return goToSuccessPage(location.state.forgottenItem)
       }
+
       goToUpdatePasswordForm(result.nonce)
     } catch (error) {
       // @todo error handling
