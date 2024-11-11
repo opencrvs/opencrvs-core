@@ -115,7 +115,7 @@ export default function getRoutes(): ServerRoute[] {
       options: {
         tags: ['api'],
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [SCOPES.CONFIG_UPDATE_ALL, SCOPES.USER_DATA_SEEDING]
         },
         description: 'Create a location',
         validate: {
