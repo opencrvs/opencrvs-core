@@ -367,7 +367,7 @@ export const resolvers: GQLResolver = {
     ) {
       // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
       if (
-        !hasScope(authHeader, SCOPES.USER_READ) &&
+        !hasScope(authHeader, SCOPES.USER_UPDATE) &&
         !isTokenOwner(authHeader, userId)
       ) {
         return await Promise.reject(
@@ -553,7 +553,7 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.USER_READ)) {
+      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
         return await Promise.reject(
           new Error('SMS invite can not be resent by this user')
         )
@@ -581,7 +581,7 @@ export const resolvers: GQLResolver = {
       return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.USER_READ)) {
+      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
         return await Promise.reject(
           new Error('Username reminder can not be resent by this user')
         )
@@ -608,7 +608,7 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.USER_READ)) {
+      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
         return await Promise.reject(
           new Error('Reset password can not be sent by this user')
         )

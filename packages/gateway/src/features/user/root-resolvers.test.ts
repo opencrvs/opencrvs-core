@@ -317,7 +317,6 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              SCOPES.DECLARE,
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -350,7 +349,6 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              SCOPES.DECLARE,
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -422,7 +420,6 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              SCOPES.DECLARE,
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -455,7 +452,6 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              SCOPES.DECLARE,
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -549,7 +545,6 @@ describe('User root resolvers', () => {
               id: 'userRole.fieldAgent'
             },
             scopes: [
-              SCOPES.DECLARE,
               SCOPES.RECORD_DECLARE_BIRTH,
               SCOPES.RECORD_DECLARE_DEATH,
               SCOPES.RECORD_DECLARE_MARRIAGE,
@@ -1232,7 +1227,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1308,7 +1303,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1384,7 +1379,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
