@@ -204,7 +204,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with credentials',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [SCOPES.USER_UPDATE]
         },
         validate: {
           payload: userCredentialsNotificationSchema
@@ -249,7 +249,7 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
         tags: ['api'],
         description: 'Sends an sms to a user with new temporary password',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [SCOPES.USER_UPDATE]
         },
         validate: {
           payload: userPasswordResetNotificationSchema
@@ -262,6 +262,9 @@ export default function getRoutes(): ServerRoute<ReqRefDefaults>[] {
       handler: retrieveUserName,
       options: {
         tags: ['api'],
+        auth: {
+          scope: [SCOPES.USER_UPDATE]
+        },
         description: 'Sends an sms to a user with username',
         validate: {
           payload: retrieveUserNameNotificationSchema

@@ -71,10 +71,10 @@ export default async function updateUser(
   existingUser.role = user.role
 
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
-    if (request.auth.credentials?.scope?.includes(SCOPES.CONFIG_UPDATE_ALL)) {
+    if (request.auth.credentials?.scope?.includes(SCOPES.USER_UPDATE)) {
       existingUser.primaryOfficeId = user.primaryOfficeId
     } else {
-      throw new Error('Location can be changed only by National System Admin')
+      throw new Error('Location can not be changed by this user')
     }
   }
   const signatureAttachment = user.signature && {

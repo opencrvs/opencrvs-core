@@ -13,6 +13,7 @@ import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { Types } from 'mongoose'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 let server: any
 
@@ -21,7 +22,7 @@ beforeEach(async () => {
 })
 
 const token = jwt.sign(
-  { scope: ['register'] },
+  { scope: [SCOPES.USER_READ] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
