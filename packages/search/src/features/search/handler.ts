@@ -119,10 +119,6 @@ export interface ICountQueryParam {
   event?: string
 }
 
-const isLeafLocation = async (location: UUID) => {
-  return (await resolveLocationChildren(location)).length === 1
-}
-
 export async function getStatusWiseRegistrationCountHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -143,20 +139,15 @@ export async function getStatusWiseRegistrationCountHandler(
         }
       }
     ]
-    const locationRules: Record<string, any>[] = []
     if (payload.declarationJurisdictionId) {
-      const locationChildren = await resolveLocationChildren(
+      const leafLevelJurisdictionIds = await resolveLocationChildren(
         payload.declarationJurisdictionId as UUID
       )
-      for (const locationChild of locationChildren) {
-        if (await isLeafLocation(locationChild as UUID)) {
-          locationRules.push({
-            match: {
-              declarationJurisdictionIds: locationChild
-            }
-          })
+      matchRules.push({
+        match: {
+          declarationJurisdictionIds: leafLevelJurisdictionIds
         }
-      }
+      })
     }
 
     const response = await client.search<
@@ -175,8 +166,7 @@ export async function getStatusWiseRegistrationCountHandler(
           size: 0,
           query: {
             bool: {
-              must: matchRules,
-              should: locationRules
+              must: matchRules
             }
           },
           aggs: {
