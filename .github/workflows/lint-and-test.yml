@@ -152,17 +152,20 @@ jobs:
         run: |
           cat << 'EOF' > knip-reporter.js
           const reporter = function (options) {
-            const totalIssues = Object.values(options.issues).reduce(
-              (acc, issueRecords) =>
-                acc + Object.values(issueRecords).reduce(
-                  (acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,
-                  0
-                ),
+            const totalIssues = Object.entries(options.counters).reduce(
+              (acc, [key, value]) => {
+                if (options.report[key]) {
+                  return acc + value
+                }
+
+                return acc
+              },
               0
-            );
-            console.log(JSON.stringify({ totalIssues }));
-          };
-          export default reporter;
+            )
+
+            console.log(JSON.stringify({ totalIssues }))
+          }
+          export default reporter
           EOF
       - name: Run knip on base branch
         id: knip_base
@@ -170,9 +173,9 @@ jobs:
           OUTPUT=$(npx knip --no-exit-code --exports --reporter=./knip-reporter.js)
           JSON=$(echo "$OUTPUT" | grep -o '{.*}')
           total_issues=$(echo "$JSON" | jq '.totalIssues')
-          echo "Total Issues: $total_issues"
+          echo "Found $total_issues issue(s) on base branch."
+          echo "Setting $total_issues issue(s) as max limit for PR branch."
           echo "maxIssues=${total_issues}" >> $GITHUB_OUTPUT
-          echo "Max issues = $maxIssues"
 
       - name: Checkout the PR branch
         uses: actions/checkout@v2
@@ -185,18 +188,20 @@ jobs:
         run: |
           cat << 'EOF' > knip-reporter.js
           const reporter = function (options) {
-            const totalIssues = Object.values(options.issues).reduce(
-              (acc, issueRecords) =>
-                acc + Object.values(issueRecords).reduce(
-                  (acc2, issuesInFile) => acc2 + Object.keys(issuesInFile).length,
-                  0
-                ),
+            const totalIssues = Object.entries(options.counters).reduce(
+              (acc, [key, value]) => {
+                if (options.report[key]) {
+                  return acc + value
+                }
+
+                return acc
+              },
               0
-            );
-            console.log(JSON.stringify({ totalIssues }));
-          };
-          export default reporter;
+            )
+
+            console.log(JSON.stringify({ totalIssues }))
+          }
+          export default reporter
           EOF
       - name: Run knip on PR branch
-        run: |
-          npx knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --exports --reporter=./knip-reporter.js
+        run: npx knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --exports --reporter=./knip-reporter.js
