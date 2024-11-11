@@ -84,11 +84,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         description: 'Handles searching declaration assignment'
@@ -180,12 +181,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-            SCOPES.CONFIG_UPDATE_ALL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         description: 'Returns all the documents in the index'
@@ -199,13 +200,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-            SCOPES.CONFIG_UPDATE_ALL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         validate: {
@@ -226,13 +226,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORDSEARCH
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         description:
@@ -247,12 +246,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-            SCOPES.CONFIG_UPDATE_ALL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         description: 'Handles searching from declarations'
@@ -266,12 +265,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.RECORD_REGISTER,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-            SCOPES.CONFIG_UPDATE_ALL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         description: 'Handle searching from death declarations'

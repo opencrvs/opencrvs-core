@@ -16,6 +16,7 @@ import { ICountQueryParam } from './handler'
 import { SearchDocument } from '@opencrvs/commons'
 import * as searchService from './service'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 jest.setTimeout(100000)
 
@@ -70,7 +71,7 @@ describe('Verify handlers', () => {
 
   describe('Advanced search', () => {
     it('should return status code 403 if the token does not hold any of the Register, Validate or Declare scope', async () => {
-      const t = await setupTestCases(setup, { scope: ['anonymous'] })
+      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
 
       const res = await t.callAdvancedRecordSearch({
         parameters: {}
@@ -80,7 +81,7 @@ describe('Verify handlers', () => {
 
     // @todo: fix this to use proper http codes if these are not relie on anywhere
     it('should return status code 400 on error', async () => {
-      const t = await setupTestCases(setup, { scope: ['register'] })
+      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
 
       jest.spyOn(searchService, 'advancedSearch').mockImplementationOnce(() => {
         throw new Error('error')
@@ -94,7 +95,7 @@ describe('Verify handlers', () => {
     })
 
     it('advanced search should return a valid response as expected', async () => {
-      const t = await setupTestCases(setup, { scope: ['register'] })
+      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
 
       await t.createTestIndex()
       const res = await t.callAdvancedRecordSearch({ parameters: {} })
@@ -105,7 +106,7 @@ describe('Verify handlers', () => {
 
     it('should return status code 200 when the token hold any or some of Register, Validate or Declare', async () => {
       const t = await setupTestCases(setup, {
-        scope: ['register', 'validate', 'declare']
+        scope: [SCOPES.SEARCH_BIRTH]
       })
 
       const res = await t.callAdvancedRecordSearch({ parameters: {} })
@@ -116,7 +117,7 @@ describe('Verify handlers', () => {
 
   describe('/statusWiseRegistrationCount', () => {
     it('Should return 200 for valid payload', async () => {
-      const t = await setupTestCases(setup, { scope: ['register'] })
+      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
 
       const res = await t.callStatusWiseRegistrationCount({
         declarationJurisdictionId: '123',
@@ -127,7 +128,7 @@ describe('Verify handlers', () => {
     })
 
     it('Should return 500 for an error', async () => {
-      const t = await setupTestCases(setup, { scope: ['register'] })
+      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
 
       jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue({
         search: async () => {
