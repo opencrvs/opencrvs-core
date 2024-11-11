@@ -15,7 +15,6 @@ import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   Event,
-  IntegratingSystemType,
   System,
   SystemStatus,
   SystemType,

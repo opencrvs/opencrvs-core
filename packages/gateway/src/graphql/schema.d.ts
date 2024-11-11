@@ -999,7 +999,6 @@ export const enum GQLSystemType {
 }
 
 export const enum GQLIntegratingSystemType {
-  MOSIP = 'MOSIP',
   OTHER = 'OTHER'
 }
 

@@ -861,7 +861,6 @@ type IntegratedSystem {
 }
 
 enum IntegratingSystemType {
-  MOSIP
   OSIA
   OTHER
 }
