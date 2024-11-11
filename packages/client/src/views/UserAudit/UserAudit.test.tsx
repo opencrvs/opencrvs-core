@@ -164,7 +164,7 @@ describe('User audit list tests for sys admin', () => {
     })
   })
 
-  it.only('redirects to edit user view on clicking edit details menu option', async () => {
+  it('redirects to edit user view on clicking edit details menu option', async () => {
     await waitForElement(component, '#user-audit-list')
 
     const menuLink = await waitForElement(

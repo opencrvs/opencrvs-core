@@ -40,13 +40,7 @@ const users: UserDetails[] = [
           familyName: 'Huq'
         }
       ],
-      role: {
-        label: {
-          defaultMessage: 'Local Registrar',
-          description: 'Name for user role Local Registrar',
-          id: 'userRole.localRegistrar'
-        }
-      },
+      role: 'LOCAL_REGISTRAR',
       signature: undefined
     },
     role: {
@@ -94,13 +88,7 @@ const users: UserDetails[] = [
           familyName: 'Islam'
         }
       ],
-      role: {
-        label: {
-          defaultMessage: 'Local Registrar',
-          description: 'Name for user role Local Registrar',
-          id: 'userRole.localRegistrar'
-        }
-      },
+      role: 'LOCAL_REGISTRAR',
       signature: undefined
     },
     creationDate: '2022-10-03T10:42:46.920Z',

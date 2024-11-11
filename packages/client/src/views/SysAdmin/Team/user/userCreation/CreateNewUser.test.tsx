@@ -293,9 +293,8 @@ describe('create new user tests', () => {
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
-      // this will have to be updated after signature page is updated for new user roles structure
       expect(history.location.pathname).toContain(
-        '/createUser/preview/preview-registration-office'
+        '/createUser/user/signature-attachment'
       )
     })
   })
@@ -520,7 +519,7 @@ describe('edit user tests', () => {
       expect(history.location.hash).toBe('#device')
     })
 
-    it.only('clicking confirm button starts submitting the form', async () => {
+    it('clicking confirm button starts submitting the form', async () => {
       await waitForElement(component, '#submit-edit-user-form')
       component.update()
 

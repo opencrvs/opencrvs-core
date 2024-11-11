@@ -74,36 +74,36 @@ type IBaseLoadingProps = {
 
 type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
-class LoadingIndicatorComp extends React.Component<IProps> {
-  render() {
-    const { loading, noDeclaration, hasError, intl } = this.props
-
-    return (
-      <Wrapper>
-        {this.props.isOnline && loading && (
-          <LoadingContainer>
-            <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
-          </LoadingContainer>
-        )}
-        <MobileViewContainer noDeclaration={noDeclaration}>
-          {this.props.isOnline && hasError && (
-            <ErrorText id="search-result-error-text-count">
-              {intl.formatMessage(errorMessages.queryError)}
-            </ErrorText>
-          )}
-          {!this.props.isOnline && (
-            <ConnectivityContainer>
-              <NoConnectivity />
-              <Text id="wait-connection-text">
-                {intl.formatMessage(constantsMessages.noConnection)}
-              </Text>
-            </ConnectivityContainer>
-          )}
-        </MobileViewContainer>
-      </Wrapper>
-    )
-  }
-}
+const LoadingIndicatorComp = ({
+  loading,
+  noDeclaration,
+  hasError,
+  intl,
+  isOnline
+}: IProps) => (
+  <Wrapper>
+    {isOnline && loading && (
+      <LoadingContainer>
+        <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
+      </LoadingContainer>
+    )}
+    <MobileViewContainer noDeclaration={noDeclaration}>
+      {isOnline && hasError && (
+        <ErrorText id="search-result-error-text-count">
+          {intl.formatMessage(errorMessages.queryError)}
+        </ErrorText>
+      )}
+      {!isOnline && (
+        <ConnectivityContainer>
+          <NoConnectivity />
+          <Text id="wait-connection-text">
+            {intl.formatMessage(constantsMessages.noConnection)}
+          </Text>
+        </ConnectivityContainer>
+      )}
+    </MobileViewContainer>
+  </Wrapper>
+)
 
 export function withOnlineStatus<T>(
   WrappedComponent: React.ComponentType<T & IOnlineStatusProps>

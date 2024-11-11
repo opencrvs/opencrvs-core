@@ -92,7 +92,7 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinURL(COUNTRY_CONFIG_HOST, 'roles')
+  const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
 
   const response = await fetch(rolesUrl)
 
@@ -100,18 +100,19 @@ async function getUsers(token: string) {
 
   const allRoles: Roles[] = await response.json()
 
-  let isNationalSysAdminScopeAvailable = false
+  let isConfigUpdateAllScopeAvailable = false
+  const configScope = 'config.update:all' as const
 
   for (const userRole of userRoles) {
     const currRole = allRoles.find((role: Roles) => role.id === userRole)
     if (!currRole)
       raise(`Role with id ${userRole} is not found in roles.json file`)
-    if (currRole.scopes.includes('natlsysadmin'))
-      isNationalSysAdminScopeAvailable = true
+    if (currRole.scopes.includes(configScope))
+      isConfigUpdateAllScopeAvailable = true
   }
 
-  if (!isNationalSysAdminScopeAvailable) {
-    raise(`At least one user with "natlsysadmin" scope must be created`)
+  if (!isConfigUpdateAllScopeAvailable) {
+    raise(`At least one user with ${configScope} scope must be created`)
   }
   return parsedUsers.data
 }

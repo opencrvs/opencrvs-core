@@ -534,29 +534,31 @@ class InProgressComponent extends React.Component<
     }
   }
 
+  validateScopes = [
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES
+  ] as Scope[]
+
+  declareScopes = [
+    SCOPES.RECORD_DECLARE_BIRTH,
+    SCOPES.RECORD_DECLARE_DEATH,
+    SCOPES.RECORD_DECLARE_MARRIAGE,
+    SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+    SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+    SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+  ] as Scope[]
+
   hasDrafts() {
-    return (
-      this.props.scopes?.includes(SCOPES.RECORD_DECLARE_BIRTH) ||
-      this.props.scopes?.includes(SCOPES.RECORD_DECLARE_DEATH) ||
-      this.props.scopes?.includes(SCOPES.RECORD_DECLARE_MARRIAGE) ||
-      this.props.scopes?.includes(
-        SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION
-      ) ||
-      this.props.scopes?.includes(
-        SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION
-      ) ||
-      this.props.scopes?.includes(
-        SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
-      )
-    )
+    return this.props.scopes?.some((x) => this.declareScopes.includes(x))
   }
 
   hasFieldAgents() {
-    return this.props.scopes?.includes(SCOPES.RECORD_DECLARATION_REVIEW)
+    return this.props.scopes?.some((x) => this.validateScopes.includes(x))
   }
 
   hasHealthSystem() {
-    return this.props.scopes?.includes(SCOPES.RECORD_DECLARATION_REVIEW)
+    return this.props.scopes?.some((x) => this.validateScopes.includes(x))
   }
 
   getTabs(

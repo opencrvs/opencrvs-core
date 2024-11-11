@@ -4,6 +4,8 @@
 
 ### Breaking changes
 
+- Removed unused searchBirthRegistrations and searchDeathRegistrations queries, as they are no longer used by the client.
+
 - **Title** Description
 
 ## Improvements

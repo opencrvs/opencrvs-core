@@ -16,7 +16,6 @@ import {
   waitForReady,
   flushPromises,
   setScopes,
-  REGISTRATION_AGENT_DEFAULT_SCOPES,
   REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import {
@@ -33,11 +32,10 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { Event } from '@client/utils/gateway'
+import { Event, SCOPES } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 // eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from '@apollo/client/react'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { waitForElement } from '@client/tests/wait-for-element'
 import {
   birthDraftData,
@@ -57,7 +55,7 @@ describe('when user is previewing the form data', () => {
     app = testApp.app
     history = testApp.history
     store = testApp.store
-    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     await waitForReady(app)
   })
 
@@ -69,11 +67,12 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      store.dispatch(checkAuth())
+
       await flushPromises()
       const data = deathReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.Death }
+
       store.dispatch(storeDeclaration(customDraft))
 
       history.replace(
@@ -89,6 +88,7 @@ describe('when user is previewing the form data', () => {
 
     it('successfully submits the review form', async () => {
       vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
+
       app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
       app.update()
       app.update().find('#submit_confirm').hostNodes().simulate('click')
@@ -127,6 +127,11 @@ describe('when user is previewing the form data', () => {
         event: Event.Birth,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
+      setScopes(
+        [SCOPES.RECORD_DECLARE_BIRTH, SCOPES.RECORD_SUBMIT_FOR_REVIEW],
+        store
+      )
+      await flushPromises()
       store.dispatch(storeDeclaration(customDraft))
 
       history.replace(
@@ -145,19 +150,19 @@ describe('when user is previewing the form data', () => {
       })
 
       it('check whether submit button is enabled or not', () => {
-        expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-          false
-        )
+        expect(
+          app.find('#submit_for_review').hostNodes().prop('disabled')
+        ).toBe(false)
       })
       describe('All sections visited', () => {
         it('Should be able to click SEND FOR REVIEW Button', () => {
-          expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
-            false
-          )
+          expect(
+            app.find('#submit_for_review').hostNodes().prop('disabled')
+          ).toBe(false)
         })
         describe('button clicked', () => {
           beforeEach(async () => {
-            app.find('#submit_form').hostNodes().simulate('click')
+            app.find('#submit_for_review').hostNodes().simulate('click')
           })
 
           it('confirmation screen should show up', () => {
@@ -223,7 +228,6 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      store.dispatch(checkAuth())
       await flushPromises()
       const data = marriageReviewDraftData
 
@@ -244,8 +248,6 @@ describe('when user is previewing the form data', () => {
       vi.doMock('@apollo/client/react', () => ({ default: ReactApollo }))
 
       app.find('#rejectDeclarationBtn').hostNodes().simulate('click')
-
-      // app.find('#rejectionReasonduplicate').hostNodes().simulate('change')
 
       app
         .find('#rejectionCommentForHealthWorker')
