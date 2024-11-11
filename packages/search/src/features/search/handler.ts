@@ -144,8 +144,8 @@ export async function getStatusWiseRegistrationCountHandler(
         payload.declarationJurisdictionId as UUID
       )
       matchRules.push({
-        match: {
-          declarationJurisdictionIds: leafLevelJurisdictionIds
+        terms: {
+          'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
         }
       })
     }
