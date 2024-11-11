@@ -34,7 +34,7 @@ export const requestCorrectionRoute = createRoute({
   allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
   action: 'REQUEST_CORRECTION',
   includeHistoryResources: true,
-  scope: [SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION],
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION],
   handler: async (request, record): Promise<CorrectionRequestedRecord> => {
     const correctionDetails = validateRequest(
       CorrectionRequestInput,

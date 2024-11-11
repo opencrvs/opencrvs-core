@@ -26,7 +26,7 @@ export const registerRoute = createRoute({
   path: '/records/{recordId}/register',
   allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
   action: 'WAITING_VALIDATION',
-  scope: [SCOPES.RECORD_REGISTER],
+  allowedScopes: [SCOPES.RECORD_REGISTER],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

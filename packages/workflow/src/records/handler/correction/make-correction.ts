@@ -41,7 +41,7 @@ export const makeCorrectionRoute = createRoute({
   allowedStartStates: ['REGISTERED', 'CERTIFIED', 'ISSUED'],
   action: 'MAKE_CORRECTION',
   includeHistoryResources: true,
-  scope: [SCOPES.RECORD_REGISTRATION_CORRECT],
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_CORRECT],
   handler: async (request, record): Promise<RegisteredRecord> => {
     const recordInput = request.payload as
       | BirthRegistration

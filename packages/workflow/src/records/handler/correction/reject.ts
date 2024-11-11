@@ -42,7 +42,7 @@ export const rejectCorrectionRoute = createRoute({
   allowedStartStates: ['CORRECTION_REQUESTED'],
   action: 'REJECT_CORRECTION',
   includeHistoryResources: true,
-  scope: [SCOPES.RECORD_REGISTRATION_CORRECT],
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_CORRECT],
   handler: async (
     request,
     record

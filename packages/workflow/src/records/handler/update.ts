@@ -79,7 +79,7 @@ export const updateRoute = createRoute({
   path: '/records/{recordId}/update',
   allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
   action: 'UPDATE_DECLARATION',
-  scope: [SCOPES.RECORD_DECLARATION_EDIT],
+  allowedScopes: [SCOPES.RECORD_DECLARATION_EDIT],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

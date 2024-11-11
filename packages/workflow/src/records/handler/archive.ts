@@ -28,7 +28,7 @@ export const archiveRoute = createRoute({
   path: '/records/{recordId}/archive',
   allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
   action: 'ARCHIVE',
-  scope: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  allowedScopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

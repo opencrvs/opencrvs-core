@@ -18,7 +18,7 @@ import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 
 function checkForDownloadExtenstion(task: Task) {
   return task.extension.find(
-    (e) => e.url === 'http://opencrvs.org/specs/extension/regDownloaded'
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regAssigned'
   )
 }
 

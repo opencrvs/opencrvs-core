@@ -22,7 +22,7 @@ export const validateRoute = createRoute({
   path: '/records/{recordId}/validate',
   allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
   action: 'VALIDATE',
-  scope: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL],
+  allowedScopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

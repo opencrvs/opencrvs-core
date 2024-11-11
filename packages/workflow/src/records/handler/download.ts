@@ -33,7 +33,7 @@ function getDownloadedOrAssignedExtension(
 ) {
   if (
     inScope(authHeader, [SCOPES.RECORDSEARCH]) ||
-    inScope(authHeader, [
+    !inScope(authHeader, [
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL
     ]) ||

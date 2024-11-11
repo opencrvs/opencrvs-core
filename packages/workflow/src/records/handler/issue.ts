@@ -26,7 +26,7 @@ export const issueRoute = createRoute({
   allowedStartStates: ['CERTIFIED'],
   action: 'ISSUE',
   includeHistoryResources: true,
-  scope: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  allowedScopes: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
   handler: async (request, record): Promise<IssuedRecord> => {
     const token = getToken(request)
     const { certificate: certificateDetailsWithRawAttachments, event } =

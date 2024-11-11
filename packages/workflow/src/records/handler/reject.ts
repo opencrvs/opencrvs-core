@@ -29,7 +29,7 @@ export const rejectRoute = createRoute({
   path: '/records/{recordId}/reject',
   allowedStartStates: ['READY_FOR_REVIEW', 'IN_PROGRESS', 'VALIDATED'],
   action: 'REJECT',
-  scope: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+  allowedScopes: [SCOPES.RECORD_SUBMIT_FOR_UPDATES],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

@@ -129,7 +129,7 @@ type RecordStateChangeRouteHandler<
   action: A
   method: string
   path: string
-  scope: Scope[]
+  allowedScopes: Scope[]
   includeHistoryResources: boolean
   handler: (
     request: Request,
@@ -149,10 +149,10 @@ export function createRoute<
   return {
     path: params.path,
     method: params.method,
-    ...(params.scope && {
+    ...(params.allowedScopes && {
       options: {
         auth: {
-          scope: params.scope
+          scope: params.allowedScopes
         },
         tags: ['api']
       }

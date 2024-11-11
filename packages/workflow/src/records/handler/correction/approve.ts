@@ -43,7 +43,7 @@ export const approveCorrectionRoute = createRoute({
   path: '/records/{recordId}/approve-correction',
   allowedStartStates: ['CORRECTION_REQUESTED'],
   action: 'APPROVE_CORRECTION',
-  scope: [SCOPES.RECORD_REGISTRATION_CORRECT],
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_CORRECT],
   includeHistoryResources: true,
   handler: async (request, record): Promise<RegisteredRecord> => {
     const recordInput = request.payload as

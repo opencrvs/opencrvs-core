@@ -22,7 +22,7 @@ export const reinstateRoute = createRoute({
   path: '/records/{recordId}/reinstate',
   allowedStartStates: ['ARCHIVED'],
   action: 'REINSTATE',
-  scope: [SCOPES.RECORD_DECLARATION_REINSTATE],
+  allowedScopes: [SCOPES.RECORD_DECLARATION_REINSTATE],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)
