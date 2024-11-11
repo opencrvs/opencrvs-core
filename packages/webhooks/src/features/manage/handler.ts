@@ -40,7 +40,7 @@ export async function subscribeWebhooksHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { hub } = request.payload as ISubscribePayload
-  if (!TRIGGERS[TRIGGERS[hub.topic]]) {
+  if (!(hub.topic in TRIGGERS)) {
     return h
       .response({
         hub: {
@@ -109,7 +109,7 @@ export async function subscribeWebhooksHandler(
       createdBy,
       address: hub.callback,
       sha_secret: hub.secret,
-      trigger: TRIGGERS[TRIGGERS[hub.topic]]
+      trigger: hub.topic in TRIGGERS ? hub.topic : undefined
     }
     const challenge = generateChallenge()
 
