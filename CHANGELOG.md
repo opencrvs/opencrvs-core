@@ -36,6 +36,7 @@
 - Only render units/postfix when field has a value [#7055](https://github.com/opencrvs/opencrvs-core/issues/7055)
 - Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
 - Fix prefix text overlap issue in form text inputs
+- Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 
 ## 1.6.0 Release candidate
 
