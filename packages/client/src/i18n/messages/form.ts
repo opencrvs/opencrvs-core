@@ -396,9 +396,9 @@ export const formMessageDescriptors = {
     description: 'Label for "Informant" select option'
   },
   otherFamilyMember: {
-    defaultMessage: 'Other family member',
-    description: 'Label for option Other family member',
-    id: 'form.field.label.relationOtherFamilyMember'
+    defaultMessage: 'Someone else',
+    description: 'Label for option Someone else',
+    id: 'form.field.label.relationSomeoneElse'
   },
   legalGuardian: {
     defaultMessage: 'Legal guardian',
