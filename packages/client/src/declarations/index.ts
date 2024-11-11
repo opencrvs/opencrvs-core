@@ -45,7 +45,6 @@ import {
   draftToGqlTransformer
 } from '@client/transformer'
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
-import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
 import type {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
@@ -89,6 +88,9 @@ import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
 import { getReviewForm } from '@client/forms/register/review-selectors'
+import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
+import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
+import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -159,7 +161,7 @@ export enum DOWNLOAD_STATUS {
   UNASSIGNING = 'UNASSIGNING'
 }
 
-export const processingStates = [
+const processingStates = [
   SUBMISSION_STATUS.READY_TO_ARCHIVE,
   SUBMISSION_STATUS.ARCHIVING,
   SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -500,6 +502,16 @@ const initialState: IDeclarationsState = {
   isWritingDraft: false
 }
 
+/* Need to add mappings for events here */
+const QueryMapper = {
+  [Event.Birth]: getBirthQueryMappings,
+  [Event.Death]: getDeathQueryMappings,
+  [Event.Marriage]: getMarriageQueryMappings
+}
+const getQueryMapping = (event: Event, action: DeclarationAction) => {
+  return QueryMapper[event] && QueryMapper[event](action)
+}
+
 export function createDeclaration(event: Event, initialData?: IFormData) {
   return {
     id: uuid(),
@@ -585,7 +597,7 @@ export const getStorageDeclarationsSuccess = (
   payload: response
 })
 
-export const getStorageDeclarationsFailed =
+const getStorageDeclarationsFailed =
   (): IGetStorageDeclarationsFailedAction => ({
     type: GET_DECLARATIONS_FAILED
   })
@@ -639,13 +651,13 @@ export function writeDeclaration(
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
 
-export function writeDeclarationSuccess(
+function writeDeclarationSuccess(
   declaration: IDeclaration
 ): IWriteDeclarationSuccessAction {
   return { type: WRITE_DECLARATION_SUCCESS, payload: { declaration } }
 }
 
-export function writeDeclarationFailed(): IWriteDeclarationFailedAction {
+function writeDeclarationFailed(): IWriteDeclarationFailedAction {
   return { type: WRITE_DECLARATION_FAILED }
 }
 
@@ -1222,7 +1234,7 @@ function downloadDeclarationFail(
   }
 }
 
-export function executeUnassignDeclaration(
+function executeUnassignDeclaration(
   id: string,
   client: ApolloClient<{}>,
   refetchQueries?: InternalRefetchQueriesInclude
@@ -1947,9 +1959,7 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function getMinioUrlsFromDeclaration(
-  declaration: IDeclaration | undefined
-) {
+function getMinioUrlsFromDeclaration(declaration: IDeclaration | undefined) {
   if (!declaration) {
     return []
   }
@@ -1995,7 +2005,7 @@ export function getMinioUrlsFromDeclaration(
   return minioUrls
 }
 
-export function postMinioUrlsToServiceWorker(minioUrls: string[]) {
+function postMinioUrlsToServiceWorker(minioUrls: string[]) {
   navigator?.serviceWorker?.controller?.postMessage({
     minioUrls: minioUrls
   })

@@ -8,23 +8,53 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import {
+  savedAdministrativeLocation,
+  savedLocation
+} from '@opencrvs/commons/fixtures'
 import { resolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
+import { UUID } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 
 describe('Location root resolvers', () => {
-  describe('hasChildLocation()', () => {
-    it('returns a location object if found', async () => {
-      fetch.mockResponseOnce(JSON.stringify([{ id: 'woohoo' }]))
+  describe('isLeafLevelLocation', () => {
+    it('returns false if a location has administrative locations as its children', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          savedAdministrativeLocation({
+            partOf: { reference: 'Location/1' as `Location/${UUID}` }
+          })
+        ])
+      )
       // @ts-ignore
-      const composition = await resolvers.Query!.hasChildLocation(
+      const isLeafLevelLocation = await resolvers.Query!.isLeafLevelLocation(
         {},
-        { parentId: '1' },
+        { locationId: '1' },
         { headers: undefined }
       )
+      expect(isLeafLevelLocation).toBe(false)
+    })
 
-      expect(composition).toBeDefined()
+    it('returns true if a location has no administrative locations as its children', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify([
+          savedLocation({
+            partOf: { reference: 'Location/1' as `Location/${UUID}` }
+          }),
+          savedAdministrativeLocation({
+            partOf: { reference: 'Location/2' as `Location/${UUID}` }
+          })
+        ])
+      )
+      // @ts-ignore
+      const isLeafLevelLocation = await resolvers.Query!.isLeafLevelLocation(
+        {},
+        { locationId: '1' },
+        { headers: undefined }
+      )
+      expect(isLeafLevelLocation).toBe(true)
     })
   })
 })

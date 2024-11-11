@@ -28,7 +28,7 @@ function transformRequestBody(
     ])
   )
 }
-export function transformHttpFieldIntoRequest(
+function transformHttpFieldIntoRequest(
   field: IHttpFormField,
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {

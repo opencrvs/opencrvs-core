@@ -10,7 +10,7 @@
  */
 /* eslint-disable */
 import { messageKeys } from '@notification/i18n/messages'
-import * as chalk from 'chalk'
+import chalk from 'chalk'
 import { Options, stringify } from 'csv-stringify'
 import csv2json from 'csv2json'
 import * as fs from 'fs'

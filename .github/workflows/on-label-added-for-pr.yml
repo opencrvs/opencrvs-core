@@ -1,0 +1,47 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Listen for labels added to PRs
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  dispatch-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for "🚀 Ready to deploy" label
+        id: label_check
+        run: |
+          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+          if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
+            echo "Label not found, skipping dispatch."
+            exit 1
+          fi
+          echo "Label found, dispatching deploy workflow."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Deploy Workflow
+        if: steps.label_check.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const result = await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy-to-feature-environment.yml',
+              ref: context.payload.pull_request.head.ref,
+              inputs: {
+                pr_number: prNumber.toString(),
+              }
+            });
+            console.log(result);

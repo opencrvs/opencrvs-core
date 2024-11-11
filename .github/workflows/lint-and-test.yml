@@ -137,3 +137,71 @@ jobs:
       - name: Run Unit Test
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
+
+  lint-knip:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+      - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+      - name: Create reporter
+        run: |
+          cat << 'EOF' > knip-reporter.js
+          const reporter = function (options) {
+            const totalIssues = Object.entries(options.counters).reduce(
+              (acc, [key, value]) => {
+                if (options.report[key]) {
+                  return acc + value
+                }
+
+                return acc
+              },
+              0
+            )
+
+            console.log(JSON.stringify({ totalIssues }))
+          }
+          export default reporter
+          EOF
+      - name: Run knip on base branch
+        id: knip_base
+        run: |
+          OUTPUT=$(npx knip --no-exit-code --exports --reporter=./knip-reporter.js)
+          JSON=$(echo "$OUTPUT" | grep -o '{.*}')
+          total_issues=$(echo "$JSON" | jq '.totalIssues')
+          echo "Found $total_issues issue(s) on base branch."
+          echo "Setting $total_issues issue(s) as max limit for PR branch."
+          echo "maxIssues=${total_issues}" >> $GITHUB_OUTPUT
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+      - name: Create reporter
+        run: |
+          cat << 'EOF' > knip-reporter.js
+          const reporter = function (options) {
+            const totalIssues = Object.entries(options.counters).reduce(
+              (acc, [key, value]) => {
+                if (options.report[key]) {
+                  return acc + value
+                }
+
+                return acc
+              },
+              0
+            )
+
+            console.log(JSON.stringify({ totalIssues }))
+          }
+          export default reporter
+          EOF
+      - name: Run knip on PR branch
+        run: npx knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --exports --reporter=./knip-reporter.js
