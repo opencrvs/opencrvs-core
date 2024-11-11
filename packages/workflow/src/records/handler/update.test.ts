@@ -22,6 +22,7 @@ import {
   URLReference,
   ValidRecord
 } from '@opencrvs/commons/types'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 describe('Update record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -37,7 +38,7 @@ describe('Update record endpoint', () => {
 
   it('returns OK for a correctly authenticated updating a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: [SCOPES.RECORD_DECLARATION_EDIT] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',

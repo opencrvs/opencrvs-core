@@ -29,6 +29,7 @@ import { validateRequest } from '@workflow/utils/index'
 import { ChangedValuesInput } from '@workflow/records/validations'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
 import { getAuthHeader } from '@opencrvs/commons/http'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 type BirthRegistration = Omit<GQLBirthRegistration, 'registration'> & {
   registration: Registration
@@ -78,6 +79,7 @@ export const updateRoute = createRoute({
   path: '/records/{recordId}/update',
   allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
   action: 'UPDATE_DECLARATION',
+  allowedScopes: [SCOPES.RECORD_DECLARATION_EDIT],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

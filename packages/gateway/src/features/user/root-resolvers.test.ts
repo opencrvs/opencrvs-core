@@ -163,7 +163,7 @@ describe('User root resolvers', () => {
             fieldName: 'searchUsers'
           }
         )
-      ).rejects.toThrow('Search user is not allowed for this type of user')
+      ).rejects.toThrow('Searching other users is not allowed for this user')
     })
     it('returns filtered user list', async () => {
       fetch.mockResponseOnce(
@@ -1111,7 +1111,9 @@ describe('User root resolvers', () => {
 
       expect(
         resolvers.Mutation!.createOrUpdateUser({}, { user }, authHeaderRegister)
-      ).rejects.toThrowError('Create user is not allowed for this user')
+      ).rejects.toThrowError(
+        'Create or update user is not allowed for this user'
+      )
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {

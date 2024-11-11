@@ -21,6 +21,7 @@ import {
   URLReference
 } from '@opencrvs/commons/types'
 import { ARCHIVED_BIRTH_RECORD } from '@test/mocks/records/archive'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 function getRegStatus(record: ReadyForReviewRecord | RegisteredRecord) {
   const taskEntry = record.entry.find((e) => e.resource.resourceType === 'Task')
@@ -42,7 +43,7 @@ describe('reinstate record endpoint', () => {
 
   it('returns OK after reinstating a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: [SCOPES.RECORD_DECLARATION_REINSTATE] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',

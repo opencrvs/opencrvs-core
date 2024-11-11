@@ -18,7 +18,7 @@ import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
 
 function checkForDownloadExtenstion(task: Task) {
   return task.extension.find(
-    (e) => e.url === 'http://opencrvs.org/specs/extension/regDownloaded'
+    (e) => e.url === 'http://opencrvs.org/specs/extension/regAssigned'
   )
 }
 
@@ -36,7 +36,7 @@ describe('download record endpoint', () => {
 
   it('returns OK after downloading a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: ['record.register'] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',

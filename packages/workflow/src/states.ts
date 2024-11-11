@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Request, ServerRoute } from '@hapi/hapi'
+import { Scope } from '@opencrvs/commons/authentication'
 import {
   CertifiedRecord,
   CorrectionRequestedRecord,
@@ -128,6 +129,7 @@ type RecordStateChangeRouteHandler<
   action: A
   method: string
   path: string
+  allowedScopes: Scope[]
   includeHistoryResources: boolean
   handler: (
     request: Request,
@@ -147,6 +149,14 @@ export function createRoute<
   return {
     path: params.path,
     method: params.method,
+    ...(params.allowedScopes && {
+      options: {
+        auth: {
+          scope: params.allowedScopes
+        },
+        tags: ['api']
+      }
+    }),
     handler: async (request: Request) => {
       const record = await getRecordById(
         request.params.recordId,

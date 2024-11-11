@@ -34,6 +34,7 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, sendNotification } from './utils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const rejectCorrectionRoute = createRoute({
   method: 'POST',
@@ -41,6 +42,7 @@ export const rejectCorrectionRoute = createRoute({
   allowedStartStates: ['CORRECTION_REQUESTED'],
   action: 'REJECT_CORRECTION',
   includeHistoryResources: true,
+  allowedScopes: [SCOPES.RECORD_REGISTRATION_CORRECT],
   handler: async (
     request,
     record
