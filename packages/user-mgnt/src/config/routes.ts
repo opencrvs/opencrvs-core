@@ -291,7 +291,12 @@ export const getRoutes = () => {
       handler: searchUsers,
       options: {
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_DATA_SEEDING
+          ]
         },
         validate: {
           payload: searchSchema
@@ -307,7 +312,12 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Retrieves a user',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_DATA_SEEDING
+          ]
         },
         validate: {
           payload: getUserRequestSchema
@@ -322,7 +332,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [SCOPES.USER_CREATE]
+          scope: [SCOPES.USER_CREATE, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
@@ -334,7 +344,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
-          scope: [SCOPES.USER_UPDATE]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
@@ -378,7 +388,7 @@ export const getRoutes = () => {
       handler: userAuditHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
         },
         validate: {
           payload: userAuditSchema

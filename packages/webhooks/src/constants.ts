@@ -18,7 +18,6 @@ export const MONGO_URL = env.MONGO_URL
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
-export const CERT_PRIVATE_KEY_PATH = env.CERT_PRIVATE_KEY_PATH
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 
 export const SENTRY_DSN = env.SENTRY_DSN

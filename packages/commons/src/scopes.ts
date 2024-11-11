@@ -44,8 +44,8 @@ export const SCOPES = {
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
 
   // validate
-  RECORD_SUBMIT_FOR_APPROVAL: 'record.submit-for-approval',
-  RECORD_SUBMIT_FOR_UPDATES: 'record.submit-for-updates',
+  RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
+  RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',
   RECORD_DECLARATION_EDIT: 'record.declaration-edit',
   RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
   RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
@@ -58,7 +58,7 @@ export const SCOPES = {
   RECORD_EXPORT_RECORDS: 'record.export-records',
   RECORD_DECLARATION_PRINT: 'record.declaration-print',
   RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.declaration.print-supporting-documents',
+    'record.declaration-print-supporting-documents',
   RECORD_REGISTRATION_PRINT: 'record.registration-print',
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
@@ -104,6 +104,7 @@ export const SCOPES = {
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
 
   // organisation
+  ORGANISATION_READ: 'organisation.read',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
@@ -121,7 +122,10 @@ export const SCOPES = {
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
 
   // config
-  CONFIG_UPDATE_ALL: 'config.update:all'
+  CONFIG_UPDATE_ALL: 'config.update:all',
+
+  // data seeding
+  USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
 export type Scope = (typeof SCOPES)[keyof typeof SCOPES]

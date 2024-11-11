@@ -24,7 +24,7 @@ describe('Correction root resolvers', () => {
 
   beforeEach(() => {
     registerCertifyToken = jwt.sign(
-      { scope: ['register', 'certify'] },
+      { scope: ['record.register'] },
       readFileSync('./test/cert.key'),
       {
         subject: '121223',

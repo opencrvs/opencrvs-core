@@ -45,7 +45,7 @@ export default async function authenticateSuperUserHandler(
 
   const SUPER_ADMIN_SCOPES = [
     SCOPES.BYPASSRATELIMIT,
-    SCOPES.CONFIG_UPDATE_ALL
+    SCOPES.USER_DATA_SEEDING
   ] satisfies Scope[]
 
   const token = await createToken(

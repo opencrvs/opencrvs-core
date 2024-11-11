@@ -53,7 +53,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: UserRole!
+  role: String
   signature: Signature
 }
 

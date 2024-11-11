@@ -31,8 +31,8 @@ import {
   findExtension,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-import { scopesInclude } from './utils'
-import { UserScope } from '@opencrvs/commons/authentication'
+import { getTokenPayload, scopesInclude } from './utils'
+import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -54,7 +54,7 @@ export interface IUserModelData {
     family: string
     given: string[]
   }[]
-  scope?: UserScope[]
+  scope?: Scope[]
   email: string
   emailForNotification?: string
   mobile?: string
@@ -189,13 +189,16 @@ export const userTypeResolvers: GQLResolver = {
       _,
       { headers: authHeader, dataSources }
     ) {
-      const scope = userModel.scope
+      const tokenPayload = getTokenPayload(authHeader.Authorization)
+      const scope = tokenPayload.scope
 
       if (!scope) {
         return null
       }
 
-      const { practitionerId, practitionerRole } = !scope.includes('register')
+      const { practitionerId, practitionerRole } = !scope.includes(
+        SCOPES.RECORD_REGISTER
+      )
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${
@@ -218,9 +221,9 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const presignedUrl = scopesInclude(
+      const presignedUrl = !scopesInclude(
         userModel.scope,
-        'profile.electronic-signature'
+        SCOPES.RECORD_SUBMIT_INCOMPLETE
       )
         ? signatureExtension &&
           (await getPresignedUrlFromUri(
