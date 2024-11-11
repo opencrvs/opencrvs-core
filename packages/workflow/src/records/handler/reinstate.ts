@@ -15,12 +15,14 @@ import { indexBundle } from '@workflow/records/search'
 import { findTaskHistories } from '@opencrvs/commons/types'
 import { createRoute } from '@workflow/states'
 import { auditEvent } from '@workflow/records/audit'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const reinstateRoute = createRoute({
   method: 'POST',
   path: '/records/{recordId}/reinstate',
   allowedStartStates: ['ARCHIVED'],
   action: 'REINSTATE',
+  allowedScopes: [SCOPES.RECORD_DECLARATION_REINSTATE],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

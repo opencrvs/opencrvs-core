@@ -72,7 +72,12 @@ export const registrar = {
   role: '66619330a6a4a835aa689ddb',
   practitionerId: '648c914d-de38-4c24-bdc9-ce8ee8cacd4c',
   primaryOfficeId: '435e5301-063d-4f22-958e-24176cfb4e54',
-  scope: ['register', 'performance', 'certify', 'demo'],
+  scope: [
+    'record.register',
+    'performance.read',
+    'record.print-issue-certified-copies',
+    'demo'
+  ],
   status: 'active',
   securityQuestionAnswers: [],
   creationDate: 1717670705858,
