@@ -14,21 +14,31 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { inspect } from 'util'
 import { joinURL } from '@opencrvs/commons'
+import { Scope, scopes } from '@opencrvs/commons/authentication'
+import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
 const RETRY_DELAY_IN_MILLISECONDS = 5000
 
-type Roles = {
-  id: string
-  label: {
-    defaultMessage: string
-    description: string
-    id: string
-  }
-  scopes: string[]
-}
+const RoleSchema = z.array(
+  z.object({
+    id: z.string(),
+    label: z.object({
+      defaultMessage: z.string(),
+      description: z.string(),
+      id: z.string()
+    }),
+    scopes: z.array(
+      z.string().refine(
+        (scope) => scopes.includes(scope as Scope),
+        (invalidScope) => ({
+          message: `invalid scope "${invalidScope}" found\n`
+        })
+      )
+    )
+  })
+)
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
@@ -84,34 +94,45 @@ async function getUsers(token: string) {
 
   if (!parsedUsers.success) {
     raise(
-      `Error when getting users metadata from country-config: ${inspect(
-        parsedUsers.error.issues
-      )}`
+      fromZodError(parsedUsers.error, {
+        prefix: `Error validating users metadata returned from ${url}`
+      })
     )
   }
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinURL(COUNTRY_CONFIG_HOST, 'roles')
+  const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
 
-  const response = await fetch(rolesUrl)
+  const rolesResponse = await fetch(rolesUrl)
 
-  if (!response.ok) raise(`Error fetching roles: ${response.status}`)
+  if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
 
-  const allRoles: Roles[] = await response.json()
+  const parsedRoles = RoleSchema.safeParse(await rolesResponse.json())
 
-  let isNationalSysAdminScopeAvailable = false
-
-  for (const userRole of userRoles) {
-    const currRole = allRoles.find((role: Roles) => role.id === userRole)
-    if (!currRole)
-      raise(`Role with id ${userRole} is not found in roles.json file`)
-    if (currRole.scopes.includes('natlsysadmin'))
-      isNationalSysAdminScopeAvailable = true
+  if (!parsedRoles.success) {
+    raise(
+      fromZodError(parsedRoles.error, {
+        prefix: `Validation failed for roles returned from ${rolesUrl}`
+      }).message
+    )
   }
 
-  if (!isNationalSysAdminScopeAvailable) {
-    raise(`At least one user with "natlsysadmin" scope must be created`)
+  const allRoles = parsedRoles.data
+
+  let isConfigUpdateAllScopeAvailable = false
+  const configScope = 'config.update:all' as const
+
+  for (const userRole of userRoles) {
+    const currRole = allRoles.find((role) => role.id === userRole)
+    if (!currRole)
+      raise(`Role with id ${userRole} is not found in roles.json file`)
+    if (currRole.scopes.includes(configScope))
+      isConfigUpdateAllScopeAvailable = true
+  }
+
+  if (!isConfigUpdateAllScopeAvailable) {
+    raise(`At least one user with ${configScope} scope must be created`)
   }
   return parsedUsers.data
 }

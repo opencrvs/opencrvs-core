@@ -70,13 +70,7 @@ describe('when user logs in', () => {
     status: 'active' as Status,
     localRegistrar: {
       name: [],
-      role: {
-        label: {
-          defaultMessage: 'Field Agent',
-          description: 'Name for user role Field Agent',
-          id: 'userRole.fieldAgent'
-        }
-      }
+      role: 'FIELD_AGENT'
     }
   }
 

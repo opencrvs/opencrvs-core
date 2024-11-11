@@ -191,6 +191,24 @@ export interface IUserAuditBody {
   action: USER_ACTION | string
   additionalData?: Record<string, any>
 }
+export interface IUserModelData {
+  _id: string
+  username: string
+  name: {
+    use: string
+    family: string
+    given: string[]
+  }[]
+  email: string
+  emailForNotification?: string
+  mobile?: string
+  status: string
+  role: string
+  creationDate?: string
+  practitionerId: string
+  primaryOfficeId: string
+  device: string
+}
 export interface IPaymentPoints {
   measurement: string
   tags: ILocationTags & {

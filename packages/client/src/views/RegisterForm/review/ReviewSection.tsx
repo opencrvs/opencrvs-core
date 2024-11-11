@@ -72,7 +72,7 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event, RegStatus, Scope } from '@client/utils/gateway'
+import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -820,15 +820,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 
   userHasRegisterScope() {
     if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('register')
-    } else {
-      return false
-    }
-  }
-
-  userHasValidateScope() {
-    if (this.props.scope) {
-      return this.props.scope && this.props.scope.includes('validate')
+      return (
+        this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
+      )
     } else {
       return false
     }
@@ -1699,11 +1693,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         '') as string
     }
 
-    const informantName = getDeclarationFullName(
-      declaration,
-      intl.locale,
-      this.isLastNameFirst()
-    )
+    const informantName = getDeclarationFullName(declaration, intl)
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections.filter(
@@ -1963,8 +1953,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         <ReviewAction
                           completeDeclaration={isComplete}
                           totalFileSizeExceeded={totalFileSizeExceeded}
-                          declarationToBeValidated={this.userHasValidateScope()}
-                          declarationToBeRegistered={this.userHasRegisterScope()}
                           alreadyRejectedDeclaration={
                             this.props.draft.registrationStatus === REJECTED
                           }

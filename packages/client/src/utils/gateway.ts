@@ -15,17 +15,9 @@
 import { PlainDate } from '@client/utils/date-formatting'
 
 export const scopes = [
-  'natlsysadmin',
   'bypassratelimit',
   'demo',
-  'declare',
-  'register',
-  'certify',
-  'performance',
-  'sysadmin',
-  'validate',
   'teams',
-  'config',
   'webhook',
   'nationalId',
   'notification-api',
@@ -38,21 +30,22 @@ export const scopes = [
   'record.declare-marriage:my-jurisdiction',
   'record.declaration-submit-incomplete',
   'record.declaration-submit-for-review',
-  'record.assign-unassign-myself',
   'record.unassign-others',
-  'record.declaration-review',
-  'record.declaration-archive',
-  'record.declaration-reinstate',
-  'record.review-duplicates',
   'record.submit-for-approval',
   'record.submit-for-updates',
-  'record.registration-verify-certified-copies',
+  'record.declaration-edit',
+  'record.review-duplicates',
+  'record.declaration-archive',
+  'record.declaration-reinstate',
   'record.register',
-  'record.print-records',
-  'record.print-records-supporting-documents',
   'record.export-records',
-  'record.print-issue-certified-copies',
-  'record.bulk-print-certified-copies',
+  'record.declaration-print',
+  'record.declaration.print-supporting-documents',
+  'record.registration-print',
+  'record.registration-print&issue-certified-copies',
+  'record.registration-print-certified-copies',
+  'record.registration-bulk-print-certified-copies',
+  'record.registration-verify-certified-copies',
   'record.registration-request-correction',
   'record.registration-correct',
   'record.registration-request-revocation',
@@ -69,16 +62,11 @@ export const scopes = [
   'record.read-audit',
   'record.read-comments',
   'record.create-comments',
-  'profile.update-signature',
-  'profile.update-phone-number',
-  'profile.update-name',
-  'profile.update-profile-image',
+  'profile.update',
   'profile.electronic-signature',
-  'performance.read:my-office',
   'performance.read',
   'performance.read-dashboards',
-  'performance.export-vital-statistics',
-  'organisation.read:all',
+  'performance.vital-statistics-export',
   'organisation.read-locations:all',
   'organisation.read-locations:my-office',
   'organisation.read-locations:my-jurisdiction',
@@ -95,17 +83,9 @@ export const scopes = [
 export type Scope = (typeof scopes)[number]
 
 export const SCOPES = {
-  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
   DEMO: 'demo',
-  DECLARE: 'declare',
-  REGISTER: 'register',
-  CERTIFY: 'certify',
-  PERFORMANCE: 'performance',
-  SYSADMIN: 'sysadmin',
-  VALIDATE: 'validate',
   TEAMS: 'teams',
-  CONFIG: 'config',
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
@@ -119,23 +99,26 @@ export const SCOPES = {
     'record.declare-marriage:my-jurisdiction',
   RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
-  RECORD_ASSIGN_UNASSIGN_MYSELF: 'record.assign-unassign-myself',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
-  RECORD_DECLARATION_REVIEW: 'record.declaration-review',
-  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
-  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
-  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
   RECORD_SUBMIT_FOR_APPROVAL: 'record.submit-for-approval',
   RECORD_SUBMIT_FOR_UPDATES: 'record.submit-for-updates',
+  RECORD_DECLARATION_EDIT: 'record.declaration-edit',
+  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
+  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
+  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
+  RECORD_REGISTER: 'record.register',
+  RECORD_EXPORT_RECORDS: 'record.export-records',
+  RECORD_DECLARATION_PRINT: 'record.declaration-print',
+  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
+    'record.declaration.print-supporting-documents',
+  RECORD_REGISTRATION_PRINT: 'record.registration-print',
+  RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
+    'record.registration-print&issue-certified-copies',
+  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies',
+  RECORD_BULK_PRINT_CERTIFIED_COPIES:
+    'record.registration-bulk-print-certified-copies',
   RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
     'record.registration-verify-certified-copies',
-  RECORD_REGISTER: 'record.register',
-  RECORD_PRINT_RECORDS: 'record.print-records',
-  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.print-records-supporting-documents',
-  RECORD_EXPORT_RECORDS: 'record.export-records',
-  RECORD_PRINT_ISSUE_CERTIFIED_COPIES: 'record.print-issue-certified-copies',
-  RECORD_BULK_PRINT_CERTIFIED_COPIES: 'record.bulk-print-certified-copies',
   RECORD_REGISTRATION_REQUEST_CORRECTION:
     'record.registration-request-correction',
   RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
@@ -155,16 +138,11 @@ export const SCOPES = {
   RECORD_READ_AUDIT: 'record.read-audit',
   RECORD_READ_COMMENTS: 'record.read-comments',
   RECORD_CREATE_COMMENTS: 'record.create-comments',
-  PROFILE_UPDATE_SIGNATURE: 'profile.update-signature',
-  PROFILE_UPDATE_PHONE_NUMBER: 'profile.update-phone-number',
-  PROFILE_UPDATE_NAME: 'profile.update-name',
-  PROFILE_UPDATE_PROFILE_IMAGE: 'profile.update-profile-image',
+  PROFILE_UPDATE: 'profile.update',
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
-  PERFORMANCE_READ_MY_OFFICE: 'performance.read:my-office',
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
-  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.export-vital-statistics',
-  ORGANISATION_READ: 'organisation.read:all',
+  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
@@ -945,7 +923,7 @@ export enum IntegratingSystemType {
 export type LocalRegistrar = {
   __typename?: 'LocalRegistrar'
   name: Array<Maybe<HumanName>>
-  role: UserRole
+  role?: Maybe<Scalars['String']>
   signature?: Maybe<Signature>
 }
 
@@ -1538,8 +1516,6 @@ export type Query = {
   queryPersonByIdentifier?: Maybe<Person>
   queryPersonByNidIdentifier?: Maybe<Person>
   queryRegistrationByIdentifier?: Maybe<BirthRegistration>
-  searchBirthRegistrations?: Maybe<Array<Maybe<BirthRegistration>>>
-  searchDeathRegistrations?: Maybe<Array<Maybe<DeathRegistration>>>
   searchEvents?: Maybe<EventSearchResultSet>
   searchFieldAgents?: Maybe<SearchFieldAgentResult>
   searchUsers?: Maybe<SearchUserResult>
@@ -2670,21 +2646,13 @@ export type FetchUserQuery = {
     }
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
+      role?: string | null
       name: Array<{
         __typename?: 'HumanName'
         use?: string | null
         firstNames?: string | null
         familyName?: string | null
       } | null>
-      role: {
-        __typename?: 'UserRole'
-        label: {
-          __typename?: 'I18nMessage'
-          id: string
-          defaultMessage: string
-          description: string
-        }
-      }
       signature?: {
         __typename?: 'Signature'
         data?: string | null

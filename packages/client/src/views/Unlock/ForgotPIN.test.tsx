@@ -75,13 +75,7 @@ describe('ForgotPIN tests', () => {
                   familyName: 'Ashraful'
                 }
               ],
-              role: {
-                label: {
-                  defaultMessage: 'Local Registrar',
-                  description: 'Name for user role Local Registrar',
-                  id: 'userRole.localRegistrar'
-                }
-              },
+              role: 'LOCAL_REGISTRAR',
               signature: undefined
             }
           }

@@ -30,7 +30,7 @@ describe('Verify user handlers', () => {
       server = await createServerWithEnvironment()
 
       const token = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['user.read:all'] },
         readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
@@ -64,7 +64,7 @@ describe('Verify user handlers', () => {
     })
     it('returns 400 if called with no username', async () => {
       const token = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['user.read:all'] },
         readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
@@ -94,7 +94,7 @@ describe('Verify user handlers', () => {
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['user.read:all'] },
         readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
@@ -454,7 +454,7 @@ describe('Verify user handlers', () => {
       server = await createServerWithEnvironment()
 
       const token = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['user.read:all'] },
         readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',
@@ -492,7 +492,7 @@ describe('Verify user handlers', () => {
         .mockImplementationOnce(() => Promise.reject(new Error()))
 
       const token = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: ['user.read:all'] },
         readFileSync('./test/cert.key'),
         {
           algorithm: 'RS256',

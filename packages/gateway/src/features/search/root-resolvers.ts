@@ -20,6 +20,7 @@ import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
 import { ApolloError } from 'apollo-server-hapi'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 type ApiResponse<T> = {
   body: T
@@ -95,17 +96,13 @@ export const resolvers: GQLResolver = {
       // Only registrar, registration agent & field agent should be able to search user
       if (
         !inScope(authHeader, [
-          'register',
-          'validate',
-          'certify',
-          'declare',
-          'recordsearch'
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE
         ])
       ) {
         return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar, registration agent & field agent'
-          )
+          new Error('Advanced search is not allowed for this user')
         )
       }
 
@@ -127,7 +124,7 @@ export const resolvers: GQLResolver = {
         }))
       }
 
-      const isExternalAPI = hasScope(authHeader, 'recordsearch')
+      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
       if (isExternalAPI) {
         const payload = getTokenPayload(authHeader.Authorization)
         const system = await getSystem({ systemId: payload.sub }, authHeader)
@@ -200,11 +197,9 @@ export const resolvers: GQLResolver = {
       },
       { headers: authHeader }
     ) {
-      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
+      if (!inScope(authHeader, [SCOPES.PERFORMANCE_READ])) {
         return await Promise.reject(
-          new Error(
-            'User does not have a sysadmin or register or validate scope'
-          )
+          new Error('User does not have enough scope')
         )
       }
 

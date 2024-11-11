@@ -189,8 +189,6 @@ describe('Test apollo server config', () => {
         request: request
       }
     )
-    expect(response.errors![0].message).toBe(
-      'User does not have a register or validate scope'
-    )
+    expect(response.errors![0].message).toBe('User does not have enough scope')
   })
 })

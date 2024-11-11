@@ -254,7 +254,6 @@ function RecordAuditBody({
   duplicates,
   intl,
   goToHomeTab,
-  scope,
   refetchDeclarationInfo,
   userDetails,
   registerForm,
@@ -305,7 +304,6 @@ function RecordAuditBody({
     <ActionMenu
       declaration={declaration}
       duplicates={duplicates}
-      scope={scope}
       draft={draft}
       toggleDisplayDialog={toggleDisplayDialog}
     />
@@ -555,7 +553,7 @@ const BodyContent = ({
                 assignment: data.fetchRegistration?.registration?.assignment
               }
             } else {
-              declaration = getGQLDeclaration(data.fetchRegistration, language)
+              declaration = getGQLDeclaration(data.fetchRegistration, intl)
             }
 
             return (
@@ -592,7 +590,7 @@ const BodyContent = ({
           }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-            language,
+            intl,
             trackingId
           )
     const wqStatus = workqueueDeclaration?.registration

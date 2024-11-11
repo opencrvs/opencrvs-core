@@ -27,7 +27,7 @@ describe('Advanced search resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const regsiterToken = jwt.sign(
-        { scope: ['register'] },
+        { scope: ['record.register'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -124,7 +124,7 @@ describe('Advanced search resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const regsiterToken = jwt.sign(
-        { scope: ['register'] },
+        { scope: ['record.register'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',

@@ -81,7 +81,6 @@ describe('authenticate handler receives a request', () => {
         SCOPES.USER_CREATE,
         SCOPES.USER_READ,
         SCOPES.USER_UPDATE,
-        SCOPES.ORGANISATION_READ,
         SCOPES.ORGANISATION_READ_LOCATIONS,
         SCOPES.PERFORMANCE_READ,
         SCOPES.PERFORMANCE_READ_DASHBOARDS,
