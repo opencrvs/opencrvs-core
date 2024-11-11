@@ -12,6 +12,7 @@ import fetch from '@gateway/fetch'
 import { inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const resolvers: GQLResolver = {
   Mutation: {
@@ -21,7 +22,12 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       // Only registrar or registration agent should be able to search user
-      if (!inScope(authHeader, ['register', 'validate'])) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+        ])
+      ) {
         return await Promise.reject(
           new Error(
             'Advanced search is only allowed for registrar or registration agent'
@@ -54,7 +60,12 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       // Only registrar or registration agent should be able to search user
-      if (!inScope(authHeader, ['register', 'validate'])) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.RECORD_REGISTER,
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+        ])
+      ) {
         return await Promise.reject(
           new Error(
             'Advanced search is only allowed for registrar or registration agent'

@@ -93,7 +93,7 @@ export const resolvers: GQLResolver = {
           ])
         ) {
           return await Promise.reject(
-            new Error('Search user is not allowed for this user')
+            new Error('Searching other users is not allowed for this user')
           )
         }
 
@@ -148,11 +148,14 @@ export const resolvers: GQLResolver = {
         { headers: authHeader, dataSources }
       ) => {
         // Only sysadmin or registrar or registration agent should be able to search field agents
-        if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
+        if (
+          !inScope(authHeader, [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION
+          ])
+        ) {
           return await Promise.reject(
-            new Error(
-              'Search field agents is only allowed for sysadmin or registrar or registration agent'
-            )
+            new Error('Search field agents is not allowed for this user')
           )
         }
 
@@ -274,7 +277,6 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createOrUpdateUser(_, { user }, { headers: authHeader }) {
-      // Only sysadmin should be able to create user
       if (
         !inScope(authHeader, [
           SCOPES.USER_DATA_SEEDING,
@@ -370,9 +372,9 @@ export const resolvers: GQLResolver = {
       { userId, existingPassword, password },
       { headers: authHeader }
     ) {
-      // Only token owner except sysadmin should be able to change their password
+      // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
       if (
-        !hasScope(authHeader, 'sysadmin') &&
+        !hasScope(authHeader, SCOPES.USER_UPDATE) &&
         !isTokenOwner(authHeader, userId)
       ) {
         return await Promise.reject(
@@ -524,9 +526,6 @@ export const resolvers: GQLResolver = {
     ) {
       if (
         !inScope(authHeader, [
-          SCOPES.USER_READ,
-          SCOPES.USER_READ_MY_JURISDICTION,
-          SCOPES.USER_READ_MY_OFFICE,
           SCOPES.USER_UPDATE,
           SCOPES.USER_DATA_SEEDING
         ])
@@ -566,11 +565,9 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
         return await Promise.reject(
-          new Error(
-            'SMS invite can only be resent by a user with sys admin scope'
-          )
+          new Error('SMS invite can not be resent by this user')
         )
       }
 
@@ -596,11 +593,9 @@ export const resolvers: GQLResolver = {
       return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
         return await Promise.reject(
-          new Error(
-            'Username reminder can only be resent by a user with sys admin scope'
-          )
+          new Error('Username reminder can not be resent by this user')
         )
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}usernameReminder`, {
@@ -625,11 +620,9 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, 'sysadmin')) {
+      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
         return await Promise.reject(
-          new Error(
-            'Reset password can only be sent by a user with sys admin scope'
-          )
+          new Error('Reset password can not be sent by this user')
         )
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordInvite`, {
