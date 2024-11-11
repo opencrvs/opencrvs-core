@@ -152,7 +152,6 @@ const ForgottenItemComponent = ({
     </>
   )
 }
-
 export const ForgottenItem = connect(null, {
   goToHome,
   goToPhoneNumberVerificationForm
