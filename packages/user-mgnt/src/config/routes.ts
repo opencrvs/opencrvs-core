@@ -337,14 +337,10 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_DATA_SEEDING
           ]
         },
         validate: {
@@ -362,16 +358,10 @@ export const getRoutes = () => {
         description: 'Retrieves a user',
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-            SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
-            SCOPES.RECORDSEARCH
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_DATA_SEEDING
           ]
         },
         validate: {
@@ -387,7 +377,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [SCOPES.CONFIG_UPDATE_ALL, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
@@ -399,7 +389,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [SCOPES.CONFIG_UPDATE_ALL, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
@@ -452,7 +442,13 @@ export const getRoutes = () => {
       handler: userAuditHandler,
       options: {
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [
+            SCOPES.USER_UPDATE,
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_DATA_SEEDING
+          ]
         },
         validate: {
           payload: userAuditSchema

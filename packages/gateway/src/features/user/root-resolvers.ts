@@ -87,11 +87,13 @@ export const resolvers: GQLResolver = {
         if (
           !inScope(authHeader, [
             SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_DATA_SEEDING
           ])
         ) {
           return await Promise.reject(
-            new Error('Search user is not allowed for this type of user')
+            new Error('Searching other users is not allowed for this user')
           )
         }
 
@@ -275,10 +277,15 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createOrUpdateUser(_, { user }, { headers: authHeader }) {
-      // Only sysadmin should be able to create user
-      if (!inScope(authHeader, [SCOPES.USER_CREATE, SCOPES.USER_UPDATE])) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_DATA_SEEDING,
+          SCOPES.USER_CREATE,
+          SCOPES.USER_UPDATE
+        ])
+      ) {
         return await Promise.reject(
-          new Error('Create user is not allowed for this user')
+          new Error('Create or update user is not allowed for this user')
         )
       }
 
@@ -517,7 +524,12 @@ export const resolvers: GQLResolver = {
       { userId, action, reason, comment },
       { headers: authHeader }
     ) {
-      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_DATA_SEEDING
+        ])
+      ) {
         return await Promise.reject(
           new Error(
             `User ${userId} is not allowed to audit for not having the sys admin scope`
