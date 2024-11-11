@@ -1367,8 +1367,10 @@ export function toSavedBundle<T extends Resource>(
           fullUrl: responseBundle.entry[index].response.location,
           resource: toSavedTask(
             {
-              ...entry.resource,
-              focus: { reference: entry.resource.focus.reference }
+              ...(entry.resource as Task),
+              focus: {
+                reference: entry.resource.focus.reference
+              }
             },
             urlReferenceToUUID(responseBundle.entry[index].response.location),
             resourceBundle,
