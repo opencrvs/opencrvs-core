@@ -120,16 +120,13 @@ describe('Verify handlers', () => {
     it('Should return 200 for valid payload', async () => {
       const t = await setupTestCases(setup, { scope: ['register'] })
 
-      fetch.mockResponses(
-        [JSON.stringify([{ id: '123' }]), { status: 200 }],
-        [JSON.stringify([{ id: '123' }]), { status: 200 }]
-      )
+      fetch.mockResponses([JSON.stringify([{ id: '123' }]), { status: 200 }])
       const res = await t.callStatusWiseRegistrationCount({
         declarationJurisdictionId: '123',
         status: ['REGISTERED']
       })
 
-      await new Promise((resolve) => setImmediate(resolve))
+      // await new Promise((resolve) => setImmediate(resolve))
 
       expect(res.statusCode).toBe(200)
     })
