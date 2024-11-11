@@ -16,3 +16,5 @@ export function getAvailableLanguages() {
 export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
+
+export function unusedFn() {}
