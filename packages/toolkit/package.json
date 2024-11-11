@@ -1,0 +1,15 @@
+{
+  "name": "@opencrvs/toolkit",
+  "version": "0.0.0",
+  "description": "OpenCRVS toolkit for building country configurations",
+  "license": "MPL-2.0",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "build": "rimraf lib && tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
