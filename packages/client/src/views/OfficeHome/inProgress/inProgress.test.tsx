@@ -297,7 +297,7 @@ describe('In Progress tab', () => {
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-      expect(data[0].name).toBe('anik hoque')
+      expect(data[0].name).toBe('hoque anik')
       expect(data[0].lastUpdated).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
       expect(data[0].actions).toBeDefined()
