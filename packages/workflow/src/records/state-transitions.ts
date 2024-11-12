@@ -51,7 +51,7 @@ import {
   TaskHistory,
   RejectedRecord
 } from '@opencrvs/commons/types'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -107,6 +107,7 @@ import {
   mergeBundles
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
+import { tokenExchangeHandler } from './token-exchange-handler'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -449,8 +450,17 @@ export async function initiateRegistration(
   token: string
 ): Promise<WaitingForValidationRecord | RejectedRecord> {
   try {
+    const composition = getComposition(record)
+    const recordSpecificToken = await tokenExchangeHandler(
+      token,
+      headers,
+      composition.id
+    )
+    headers.authorization = `Bearer ${recordSpecificToken.access_token}`
     await invokeRegistrationValidation(record, headers)
   } catch (error) {
+    logger.error(error)
+
     const statusReason: fhir3.CodeableConcept = {
       text: REG_NUMBER_GENERATION_FAILED
     }
@@ -464,7 +474,7 @@ export async function toRegistered(
   record: WaitingForValidationRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
-  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
+  identifiers?: EventRegistrationPayload['identifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTaskWithoutPractitionerExtensions =
@@ -497,10 +507,10 @@ export async function toRegistered(
     value: registrationNumber as RegistrationNumber
   })
 
-  if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
+  if (event === EVENT_TYPE.BIRTH && identifiers) {
     // For birth event patients[0] is child and it should
     // already be initialized with the RN identifier
-    childIdentifiers.forEach((childIdentifier) => {
+    identifiers.forEach((childIdentifier) => {
       const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
         ({ type }) => type?.coding?.[0].code === childIdentifier.type
       )
