@@ -246,7 +246,7 @@ export async function confirmRegistration(
   details: {
     error: string | undefined
     registrationNumber: string
-    childIdentifiers: IdentifierInput[]
+    identifiers: IdentifierInput[]
   }
 ) {
   const res: ReadyForReviewRecord = await createRequest(

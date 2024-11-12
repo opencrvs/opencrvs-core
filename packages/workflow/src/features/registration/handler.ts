@@ -26,7 +26,7 @@ export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
   error: string
-  childIdentifiers?: {
+  identifiers?: {
     type: SupportedPatientIdentifierCode
     value: string
   }[]
@@ -38,7 +38,7 @@ export async function markEventAsRegisteredCallbackHandler(
 ) {
   const token = getToken(request)
   const compositionId = request.params.id
-  const { registrationNumber, error, childIdentifiers } =
+  const { registrationNumber, error, identifiers } =
     request.payload as EventRegistrationPayload
 
   if (error) {
@@ -60,7 +60,7 @@ export async function markEventAsRegisteredCallbackHandler(
     savedRecord,
     registrationNumber,
     token,
-    childIdentifiers
+    identifiers
   )
   const event = getEventType(bundle)
 

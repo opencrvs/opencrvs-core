@@ -651,7 +651,7 @@ export const resolvers: GQLResolver = {
         const taskEntry = await confirmRegistration(id, authHeader, {
           error: details.error,
           registrationNumber: details.registrationNumber,
-          childIdentifiers: details.identifiers
+          identifiers: details.identifiers
         })
 
         return taskEntry.resource.id
