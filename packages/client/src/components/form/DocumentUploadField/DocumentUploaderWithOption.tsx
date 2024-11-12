@@ -73,7 +73,7 @@ type DocumentFields = {
   documentData: string
 }
 
-export const getBase64String = (file: File) => {
+const getBase64String = (file: File) => {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -223,7 +223,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
 
     const newDocument: IFileValue = {
       optionValues,
-      type: uploadedImage.type,
+      type: processedFile.type,
       data: await getBase64String(processedFile),
       fileSize: processedFile.size
     }
