@@ -200,12 +200,12 @@ export const getRoutes = () => {
         tags: ['api'],
         auth: {
           scope: [
-            SCOPES.SEARCH_BIRTH,
-            SCOPES.SEARCH_DEATH,
-            SCOPES.SEARCH_MARRIAGE,
-            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+            SCOPES.RECORD_REGISTER,
+            SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+            SCOPES.RECORD_DECLARE_BIRTH,
+            SCOPES.RECORD_DECLARE_DEATH,
+            SCOPES.RECORD_DECLARE_MARRIAGE,
+            SCOPES.PERFORMANCE_READ
           ]
         },
         validate: {

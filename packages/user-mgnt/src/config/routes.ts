@@ -202,9 +202,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
-        auth: {
-          scope: [SCOPES.USER_UPDATE]
-        },
         validate: {
           payload: changePasswordRequestSchema
         },
@@ -220,9 +217,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
-        auth: {
-          scope: [SCOPES.USER_UPDATE]
-        },
         validate: {
           payload: changePhoneRequestSchema
         },
@@ -238,9 +232,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes email for logged-in user',
-        auth: {
-          scope: [SCOPES.USER_UPDATE]
-        },
         validate: {
           payload: changeEmailRequestSchema
         },
@@ -256,9 +247,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes avatar for logged-in user',
-        auth: {
-          scope: [SCOPES.USER_UPDATE]
-        },
         validate: {
           payload: changeAvatarRequestSchema
         },

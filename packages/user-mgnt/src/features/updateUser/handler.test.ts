@@ -19,7 +19,7 @@ import { SCOPES } from '@opencrvs/commons/authentication'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: [SCOPES.USER_UPDATE] },
+  { scope: [SCOPES.USER_UPDATE, SCOPES.CONFIG_UPDATE_ALL] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
