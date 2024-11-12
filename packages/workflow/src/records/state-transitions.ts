@@ -474,7 +474,7 @@ export async function toRegistered(
   record: WaitingForValidationRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
-  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
+  identifiers?: EventRegistrationPayload['identifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTaskWithoutPractitionerExtensions =
@@ -507,10 +507,10 @@ export async function toRegistered(
     value: registrationNumber as RegistrationNumber
   })
 
-  if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
+  if (event === EVENT_TYPE.BIRTH && identifiers) {
     // For birth event patients[0] is child and it should
     // already be initialized with the RN identifier
-    childIdentifiers.forEach((childIdentifier) => {
+    identifiers.forEach((childIdentifier) => {
       const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
         ({ type }) => type?.coding?.[0].code === childIdentifier.type
       )
