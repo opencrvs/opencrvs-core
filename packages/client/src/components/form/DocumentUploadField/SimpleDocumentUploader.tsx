@@ -21,7 +21,7 @@ import {
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
-import { getBase64String } from './DocumentUploaderWithOption'
+import { getBase64String } from '@client/utils/imageUtils'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
