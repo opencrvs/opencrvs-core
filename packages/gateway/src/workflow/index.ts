@@ -243,21 +243,26 @@ export async function markNotADuplicate(id: string, authHeader: IAuthHeader) {
 export async function confirmRegistration(
   id: string,
   authHeader: IAuthHeader,
-  details: { error: string | undefined; registrationNumber: string; childIdentifiers: IdentifierInput[]; compositionId: string; }
+  details: {
+    error: string | undefined
+    registrationNumber: string
+    childIdentifiers: IdentifierInput[]
+    compositionId: string
+  }
 ) {
   const res: ReadyForReviewRecord = await createRequest(
     'POST',
     `/records/${id}/confirm`,
     authHeader,
     details
-  );
-  
-  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task');
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')
   if (!taskEntry) {
-    throw new Error('No task entry found in the confirmation response');
+    throw new Error('No task entry found in the confirmation response')
   }
 
-  return taskEntry;
+  return taskEntry
 }
 
 export async function rejectRegistration(
@@ -270,11 +275,11 @@ export async function rejectRegistration(
     `/records/${recordId}/reject`,
     authHeader,
     details
-  );
+  )
 
-  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!;
-  
-  return taskEntry;
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
 }
 
 export async function archiveRegistration(
