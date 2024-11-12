@@ -153,15 +153,12 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
       options.maxSizeMB = props.compressImagesToSizeMB
     }
     if (
-      !(
-        Boolean(options.maxSizeMB) &&
-        bytesToMB(uploadedImage.size) > options.maxSizeMB
-      )
+      !Boolean(options.maxSizeMB) ||
+      bytesToMB(uploadedImage.size) <= options.maxSizeMB
     ) {
       return uploadedImage
     }
 
-    // disable compression with a falsy value
     const resized = await imageCompression(uploadedImage, options)
 
     return resized
