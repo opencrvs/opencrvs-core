@@ -26,7 +26,6 @@ export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
   error: string
-  compositionId: string
   childIdentifiers?: {
     type: SupportedPatientIdentifierCode
     value: string
@@ -38,7 +37,8 @@ export async function markEventAsRegisteredCallbackHandler(
   h: Hapi.ResponseToolkit
 ) {
   const token = getToken(request)
-  const { registrationNumber, error, childIdentifiers, compositionId } =
+  const compositionId = request.params.id
+  const { registrationNumber, error, childIdentifiers } =
     request.payload as EventRegistrationPayload
 
   if (error) {
