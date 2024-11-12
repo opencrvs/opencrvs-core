@@ -62,7 +62,6 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
               props.onScanSuccess(barcodes[0].rawValue)
               // Stop capturing on successful scan
               if (videoRef.current && videoRef.current.srcObject) {
-                // eslint-disable-next-line react-hooks/exhaustive-deps
                 const stream = videoRef.current.srcObject as MediaStream
                 stream.getTracks().forEach((track) => track.stop())
               }
