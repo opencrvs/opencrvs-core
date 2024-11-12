@@ -109,6 +109,7 @@ import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import QRCodeScanner from '@client/components/form/QRCodeScanner'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -1210,7 +1211,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     )}
                                   </Alert>
                                 )}
-
+                              {activeSection.id !== 'information' && (
+                                <QRCodeScanner
+                                  label="Scan QR code"
+                                  fallbackErrorMessage="Video capture not allowed by the browser"
+                                  onScanSuccess={console.log}
+                                />
+                              )}
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
                                 key={this.state.formFieldKey}
