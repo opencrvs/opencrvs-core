@@ -1,0 +1,17 @@
+name: Publish toolkit to NPM registry
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: Branch to publish from
+        default: develop
+        required: true
+  push:
+    branches:
+      - develop
+jobs:
+  publish:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Placeholder for publish
+        run: echo "Placeholder for publish"
