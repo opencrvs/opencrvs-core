@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.6.0 (TBD)
+## 1.6.1 (TBD)
+
+## 1.6.0
 
 ## Improvements
 
@@ -44,7 +46,7 @@
 - Only render units/postfix when field has a value [#7055](https://github.com/opencrvs/opencrvs-core/issues/7055)
 - Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
 - Fix prefix text overlap issue in form text inputs
-- **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. ***This is purely a DX improvement without affecting any functionality of the system***
+- **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. **_This is purely a DX improvement without affecting any functionality of the system_**
 - Fix `informantType` missing in template object which prevented rendering informant relationship data in the certificates [#5952](https://github.com/opencrvs/opencrvs-core/issues/5952)
 - Fix users hitting rate limit when multiple users authenticated the same time with different usernames [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
 
