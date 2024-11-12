@@ -96,24 +96,6 @@ export const MARK_EVENT_AS_DUPLICATE = gql`
   }
 `
 
-export const CONFIRM_REGISTRATION = gql`
-  mutation confirmRegistration($id: ID!, $details: BirthRegistrationInput!) {
-    confirmRegistration(id: $id, details: $details)
-  }
-`
-
-export const REJECT_REGISTRATION = gql`
-  mutation rejectRegistration(
-    $id: String!
-    $details: IdentifierInput!
-  ) {
-    rejectRegistration(
-      id: $id
-      details: $details
-    )
-  }
-`
-
 export function getBirthMutation(action: SubmissionAction) {
   switch (action) {
     case SubmissionAction.SUBMIT_FOR_REVIEW:
