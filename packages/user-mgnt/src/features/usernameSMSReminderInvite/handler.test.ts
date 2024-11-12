@@ -13,9 +13,10 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const sysAdminToken = jwt.sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: [SCOPES.USER_UPDATE] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',

@@ -16,11 +16,12 @@ import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['natlsysadmin', 'demo'] },
+  { scope: [SCOPES.CONFIG_UPDATE_ALL] },
   readFileSync('./test/cert.key'),
   {
     subject: '123',

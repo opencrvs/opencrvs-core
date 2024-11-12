@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { logger } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons/authentication'
 import User, { IUser } from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
 import { readFileSync } from 'fs'
@@ -20,7 +21,7 @@ import * as mockingoose from 'mockingoose'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin'] },
+  { scope: [SCOPES.USER_UPDATE] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',

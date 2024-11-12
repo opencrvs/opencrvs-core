@@ -24,14 +24,16 @@ export const resolvers: GQLResolver = {
       // Only registrar or registration agent should be able to search user
       if (
         !inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
       ) {
         return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar or registration agent'
-          )
+          new Error('Advanced search is not allowed for this user')
         )
       }
 
@@ -62,8 +64,12 @@ export const resolvers: GQLResolver = {
       // Only registrar or registration agent should be able to search user
       if (
         !inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
       ) {
         return await Promise.reject(

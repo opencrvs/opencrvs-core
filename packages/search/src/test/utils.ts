@@ -20,6 +20,7 @@ import { UUID } from '@opencrvs/commons'
 import { isNil } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -4557,7 +4558,7 @@ export const mockMinimalMarriageFhirBundle = {
 }
 
 export const mockUserModelResponse = {
-  scope: ['record.register', 'performance.read', 'record.certify', 'demo'],
+  scope: [SCOPES.SEARCH_BIRTH],
   status: 'active',
   _id: '5ddfdfec61f7c0d1aafe1961',
   name: [

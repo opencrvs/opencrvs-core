@@ -202,18 +202,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
-        auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
-        },
         validate: {
           payload: changePasswordRequestSchema
         },
@@ -229,18 +217,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes password for logged-in user',
-        auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
-        },
         validate: {
           payload: changePhoneRequestSchema
         },
@@ -256,18 +232,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes email for logged-in user',
-        auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
-        },
         validate: {
           payload: changeEmailRequestSchema
         },
@@ -283,18 +247,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Changes avatar for logged-in user',
-        auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
-        },
         validate: {
           payload: changeAvatarRequestSchema
         },
@@ -311,16 +263,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Retrieves a user mobile number',
         auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
+          scope: [SCOPES.USER_READ]
         },
         validate: {
           payload: userIdSchema
@@ -377,7 +320,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL, SCOPES.USER_DATA_SEEDING]
+          scope: [SCOPES.USER_CREATE, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
@@ -389,7 +332,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL, SCOPES.USER_DATA_SEEDING]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
@@ -401,16 +344,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Activate an existing pending user',
         auth: {
-          scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
+          scope: [SCOPES.USER_UPDATE]
         },
         validate: {
           payload: activateUserRequestSchema
@@ -442,13 +376,7 @@ export const getRoutes = () => {
       handler: userAuditHandler,
       options: {
         auth: {
-          scope: [
-            SCOPES.USER_UPDATE,
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.USER_DATA_SEEDING
-          ]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
         },
         validate: {
           payload: userAuditSchema
@@ -463,14 +391,12 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         validate: {
@@ -486,14 +412,12 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.RECORD_DECLARE_BIRTH,
-            SCOPES.RECORD_DECLARE_DEATH,
-            SCOPES.RECORD_DECLARE_MARRIAGE,
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE,
+            SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+            SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+            SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
           ]
         },
         validate: {
@@ -508,7 +432,7 @@ export const getRoutes = () => {
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [SCOPES.USER_UPDATE]
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -523,7 +447,7 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [SCOPES.USER_UPDATE]
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -538,7 +462,7 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.CONFIG_UPDATE_ALL]
+          scope: [SCOPES.USER_UPDATE]
         },
         validate: {
           payload: resetPasswordRequestSchema
@@ -668,13 +592,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Gets count of users group by office ids',
         auth: {
-          scope: [
-            SCOPES.REGISTER,
-            SCOPES.CERTIFY,
-            SCOPES.PERFORMANCE_READ,
-            SCOPES.CONFIG_UPDATE_ALL,
-            SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-          ]
+          scope: [SCOPES.USER_READ]
         },
         validate: {
           payload: Joi.object({
