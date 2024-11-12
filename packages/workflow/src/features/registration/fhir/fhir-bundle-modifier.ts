@@ -58,8 +58,10 @@ export async function invokeRegistrationValidation(
     }
   )
   if (!res.ok) {
-    const errorData = await res.json()
-    throw `System error: ${res.statusText} ${res.status} ${errorData.msg}`
+    const errorText = await res.text()
+    throw new Error(
+      `Error calling country configuration event-registration [${res.statusText} ${res.status}]: ${errorText}`
+    )
   }
   return bundle
 }

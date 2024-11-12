@@ -28,7 +28,7 @@ export type IRegisterFormState =
       }
     }
 
-export const initialState: IRegisterFormState = {
+const initialState: IRegisterFormState = {
   state: 'LOADING',
   registerForm: null
 }

@@ -17,7 +17,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import * as React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
@@ -201,12 +201,6 @@ interface IMetricsQueryResult {
   getTotalMetrics: GQLTotalMetricsResult
 }
 
-interface State {
-  toggleStatus: boolean
-  officeSelected: boolean
-  isAccessibleOffice: boolean
-}
-
 type IOnlineStatusProps = {
   isOnline: boolean
 }
@@ -236,43 +230,75 @@ interface ICorrectionsQueryResult {
   getTotalCorrections: Array<GQLCorrectionMetric>
 }
 
-class PerformanceHomeComponent extends React.Component<Props, State> {
-  transformPropsToState(props: Props) {
-    const { selectedLocation } = props
-    return {
-      toggleStatus: false,
-      officeSelected: this.isOfficeSelected(selectedLocation),
-      isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
-    }
+const PerformanceHomeComponent = (props: Props) => {
+  const {
+    selectedLocation,
+    locations,
+    offices,
+    intl,
+    goToPerformanceHome,
+    goToWorkflowStatus,
+    goToCompletenessRates,
+    timeStart,
+    timeEnd,
+    event,
+    isOnline,
+    userDetails,
+    currency
+  } = props
+
+  const isOfficeSelected = useCallback(
+    (selectedLocation?: ISearchLocation) => {
+      if (selectedLocation) {
+        return Object.keys(offices).some((id) => id === selectedLocation.id)
+      }
+      return false
+    },
+    [offices]
+  )
+
+  const isAccessibleOfficeSelected = useCallback(
+    (selectedLocation?: ISearchLocation) => {
+      if (
+        selectedLocation &&
+        isOfficeSelected(selectedLocation) &&
+        userDetails &&
+        userDetails.systemRole
+      ) {
+        if (userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
+          return true
+        }
+        if (
+          REGISTRAR_ROLES.includes(userDetails?.systemRole) &&
+          userDetails.primaryOffice?.id === selectedLocation.id
+        ) {
+          return true
+        }
+      }
+      return false
+    },
+    [isOfficeSelected, userDetails]
+  )
+
+  const [toggleStatus, setToggleStatus] = useState(false)
+  const [officeSelected, setOfficeSelected] = useState(
+    isOfficeSelected(selectedLocation)
+  )
+  const [isAccessibleOffice, setIsAccessibleOffice] = useState(
+    isAccessibleOfficeSelected(selectedLocation)
+  )
+
+  useEffect(() => {
+    setOfficeSelected(isOfficeSelected(selectedLocation))
+    setIsAccessibleOffice(isAccessibleOfficeSelected(selectedLocation))
+  }, [selectedLocation, isAccessibleOfficeSelected, isOfficeSelected])
+
+  const togglePerformanceStatus = () => {
+    setToggleStatus(!toggleStatus)
   }
 
-  constructor(props: Props) {
-    super(props)
-    window.__localeId__ = this.props.intl.locale
-
-    this.state = this.transformPropsToState(props)
-  }
-
-  componentDidUpdate(previousProps: Props) {
-    if (previousProps.selectedLocation.id !== this.props.selectedLocation.id) {
-      this.setState({
-        officeSelected: this.isOfficeSelected(this.props.selectedLocation),
-        isAccessibleOffice: this.isAccessibleOfficeSelected(
-          this.props.selectedLocation
-        )
-      })
-    }
-  }
-
-  togglePerformanceStatus = () => {
-    this.setState({
-      toggleStatus: !this.state.toggleStatus
-    })
-  }
-
-  onClickDetails = (time: CompletenessRateTime) => {
-    const { event, timeStart, timeEnd, selectedLocation } = this.props
-    this.props.goToCompletenessRates(
+  const onClickDetails = (time: CompletenessRateTime) => {
+    goToCompletenessRates(
       event,
       selectedLocation && !isCountry(selectedLocation)
         ? selectedLocation.id
@@ -283,7 +309,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     )
   }
 
-  getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
+  const getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
     const { id: locationId } = selectedLocation
 
     return (
@@ -296,24 +322,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               newLocationId,
               generateLocations(
                 {
-                  ...this.props.locations,
-                  ...this.props.offices
+                  ...locations,
+                  ...offices
                 },
-                this.props.intl
+                intl
               ).concat(getAdditionalLocations(intl))
             )
-            this.props.goToPerformanceHome(
-              this.props.timeStart,
-              this.props.timeEnd,
-              this.props.event,
-              newLocation.id
-            )
+            goToPerformanceHome(timeStart, timeEnd, event, newLocation.id)
           }}
         />
         <PerformanceSelect
           onChange={(option) => {
-            const { timeStart, timeEnd } = this.props
-            this.props.goToPerformanceHome(
+            goToPerformanceHome(
               timeStart,
               timeEnd,
               option.value as Event,
@@ -323,7 +343,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           id="eventSelect"
           withLightTheme={true}
           defaultWidth={110}
-          value={this.props.event}
+          value={event}
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
@@ -336,352 +356,310 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           ]}
         />
         <DateRangePicker
-          startDate={this.props.timeStart}
-          endDate={this.props.timeEnd}
+          startDate={timeStart}
+          endDate={timeEnd}
           onDatesChange={({ startDate, endDate }) => {
-            this.props.goToPerformanceHome(
-              startDate,
-              endDate,
-              this.props.event,
-              locationId
-            )
+            goToPerformanceHome(startDate, endDate, event, locationId)
           }}
         />
       </>
     )
   }
 
-  onClickStatusDetails = (status?: keyof IStatusMapping) => {
-    const { event, timeStart, timeEnd, selectedLocation } = this.props
+  const onClickStatusDetails = (status?: keyof IStatusMapping) => {
     const { id: locationId } = selectedLocation
-    this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
+    goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
 
-  isOfficeSelected(selectedLocation?: ISearchLocation) {
-    if (selectedLocation) {
-      return Object.keys(this.props.offices).some(
-        (id) => id === selectedLocation.id
-      )
-    }
-    return false
+  const queryVariablesWithoutLocationId = {
+    timeStart: timeStart.toISOString(),
+    timeEnd: timeEnd.toISOString(),
+    event: event.toUpperCase()
   }
 
-  isAccessibleOfficeSelected(selectedLocation?: ISearchLocation) {
-    if (
-      selectedLocation &&
-      this.isOfficeSelected(selectedLocation) &&
-      this.props.userDetails &&
-      this.props.userDetails.systemRole
-    ) {
-      if (this.props.userDetails?.systemRole === 'NATIONAL_REGISTRAR') {
-        return true
-      } else if (
-        REGISTRAR_ROLES.includes(this.props.userDetails?.systemRole) &&
-        this.props.userDetails.primaryOffice?.id === selectedLocation.id
-      ) {
-        return true
-      }
-    }
-    return false
-  }
-
-  render() {
-    const { intl, isOnline } = this.props
-    const { toggleStatus, officeSelected } = this.state
-    const { timeStart, timeEnd, event, selectedLocation } = this.props
-
-    const queryVariablesWithoutLocationId = {
-      timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString(),
-      event: event.toUpperCase()
-    }
-    return (
-      <SysAdminContentWrapper
-        id="performanceHome"
-        isCertificatesConfigPage={true}
-        mapPerformanceClickHandler={this.togglePerformanceStatus}
-        hideBackground={true}
-      >
-        <Layout>
-          <LayoutLeft>
-            <Content
-              title={intl.formatMessage(navigationMessages.performance)}
-              size={ContentSize.LARGE}
-              filterContent={this.getFilter(intl, selectedLocation)}
-            >
-              {isOnline ? (
-                <>
-                  <Query
-                    query={PERFORMANCE_METRICS}
-                    fetchPolicy="cache-and-network"
-                    variables={
-                      selectedLocation && !isCountry(selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
+  return (
+    <SysAdminContentWrapper
+      id="performanceHome"
+      isCertificatesConfigPage={true}
+      mapPerformanceClickHandler={togglePerformanceStatus}
+      hideBackground={true}
+    >
+      <Layout>
+        <LayoutLeft>
+          <Content
+            title={intl.formatMessage(navigationMessages.performance)}
+            size={ContentSize.LARGE}
+            filterContent={getFilter(intl, selectedLocation)}
+          >
+            {isOnline ? (
+              <>
+                <Query
+                  query={PERFORMANCE_METRICS}
+                  fetchPolicy="cache-and-network"
+                  variables={
+                    selectedLocation && !isCountry(selectedLocation)
+                      ? {
+                          ...queryVariablesWithoutLocationId,
+                          locationId: selectedLocation.id
+                        }
+                      : queryVariablesWithoutLocationId
+                  }
+                >
+                  {({
+                    loading,
+                    error,
+                    data
+                  }: {
+                    loading: boolean
+                    error?: ApolloError
+                    data?: IMetricsQueryResult
+                  }) => {
+                    if (error) {
+                      return <GenericErrorToast />
                     }
-                  >
-                    {({
-                      loading,
-                      error,
-                      data
-                    }: {
-                      loading: boolean
-                      error?: ApolloError
-                      data?: IMetricsQueryResult
-                    }) => {
-                      if (error) {
-                        return <GenericErrorToast />
-                      }
 
-                      if (loading && !data) {
-                        return (
-                          <Spinner id="performance-home-loading" size={24} />
-                        )
-                      }
+                    if (loading && !data) {
+                      return <Spinner id="performance-home-loading" size={24} />
+                    }
 
-                      return (
-                        <>
-                          {!officeSelected && (
-                            <CompletenessReport
-                              data={data!.getTotalMetrics}
-                              selectedEvent={
-                                event.toUpperCase() as 'BIRTH' | 'DEATH'
-                              }
-                              onClickDetails={this.onClickDetails}
-                            />
-                          )}
-                          <RegistrationsReport
+                    return (
+                      <>
+                        {!officeSelected && (
+                          <CompletenessReport
                             data={data!.getTotalMetrics}
                             selectedEvent={
                               event.toUpperCase() as 'BIRTH' | 'DEATH'
                             }
-                            timeStart={timeStart.toISOString()}
-                            timeEnd={timeEnd.toISOString()}
-                            locationId={selectedLocation.id}
-                          />
-                          <CertificationRatesReport
-                            totalRegistrations={calculateTotal(
-                              data?.getTotalMetrics.results || []
-                            )}
-                            {...(selectedLocation &&
-                            !isCountry(selectedLocation)
-                              ? {
-                                  ...queryVariablesWithoutLocationId,
-                                  locationId: selectedLocation.id
-                                }
-                              : queryVariablesWithoutLocationId)}
-                          />
-                          <AppSources
-                            data={data!.getTotalMetrics}
-                            isAccessibleOffice={this.state.isAccessibleOffice}
-                            locationId={
-                              isCountry(selectedLocation)
-                                ? undefined
-                                : selectedLocation.id
-                            }
-                            timeStart={timeStart.toISOString()}
-                            timeEnd={timeEnd.toISOString()}
-                            event={event}
-                          />
-                        </>
-                      )
-                    }}
-                  </Query>
-                  <Query
-                    fetchPolicy="cache-and-network"
-                    query={CORRECTION_TOTALS}
-                    variables={
-                      selectedLocation && !isCountry(selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
-                    }
-                  >
-                    {({
-                      loading,
-                      error,
-                      data
-                    }: {
-                      loading: boolean
-                      error?: ApolloError
-                      data?: ICorrectionsQueryResult
-                    }) => {
-                      if (error) {
-                        return <GenericErrorToast />
-                      }
-
-                      if (loading) {
-                        return null
-                      }
-                      return (
-                        <CorrectionsReport data={data!.getTotalCorrections} />
-                      )
-                    }}
-                  </Query>
-                  <Query
-                    fetchPolicy="cache-and-network"
-                    query={GET_TOTAL_PAYMENTS}
-                    variables={
-                      selectedLocation && !isCountry(selectedLocation)
-                        ? {
-                            ...queryVariablesWithoutLocationId,
-                            locationId: selectedLocation.id
-                          }
-                        : queryVariablesWithoutLocationId
-                    }
-                  >
-                    {({ loading, data, error }) => {
-                      if (error) {
-                        return <GenericErrorToast />
-                      }
-                      if (loading) {
-                        return null
-                      }
-                      if (data && data.getTotalPayments) {
-                        return (
-                          <PaymentsAmountComponent
-                            currency={this.props.currency}
-                            data={data!.getTotalPayments}
-                          />
-                        )
-                      }
-
-                      return <></>
-                    }}
-                  </Query>
-                </>
-              ) : (
-                <ConnectivityContainer>
-                  <NoConnectivity />
-                  <Text id="no-connection-text">
-                    {intl.formatMessage(constantsMessages.noConnection)}
-                  </Text>
-                </ConnectivityContainer>
-              )}
-            </Content>
-          </LayoutLeft>
-          <Query
-            query={PERFORMANCE_STATS}
-            variables={{
-              locationId:
-                selectedLocation && !isCountry(selectedLocation)
-                  ? selectedLocation.id
-                  : undefined,
-              populationYear: timeEnd.getFullYear(),
-              event,
-              status: [
-                'IN_PROGRESS',
-                'DECLARED',
-                'REJECTED',
-                'VALIDATED',
-                'WAITING_VALIDATION',
-                'REGISTERED'
-              ],
-              officeSelected: this.state.officeSelected
-            }}
-            fetchPolicy="cache-and-network"
-            key={Number(isOnline)} // To re-render when online
-          >
-            {({ loading, data, error }) => {
-              if (error) {
-                return <GenericErrorToast />
-              }
-              return (
-                <>
-                  <ResponsiveModal
-                    title={intl.formatMessage(constantsMessages.status)}
-                    show={toggleStatus}
-                    handleClose={this.togglePerformanceStatus}
-                    actions={[]}
-                  >
-                    <ResponsiveModalContent>
-                      {loading && !data ? (
-                        <Spinner id="modal-data-loading" size={24} />
-                      ) : (
-                        <>
-                          {isOnline && (
-                            <StatusWiseDeclarationCountView
-                              selectedEvent={this.props.event}
-                              isAccessibleOffice={this.state.isAccessibleOffice}
-                              statusMapping={StatusMapping}
-                              data={data.fetchRegistrationCountByStatus}
-                              onClickStatusDetails={this.onClickStatusDetails}
-                            />
-                          )}
-
-                          {!officeSelected && isOnline && (
-                            <>
-                              <Devider />
-
-                              <LocationStatsView
-                                registrationOffices={
-                                  data.getLocationStatistics!.offices
-                                }
-                                totalRegistrars={
-                                  data.getLocationStatistics!.registrars
-                                }
-                                citizen={Math.round(
-                                  data.getLocationStatistics!.population /
-                                    data.getLocationStatistics!.registrars
-                                )}
-                              />
-                            </>
-                          )}
-                        </>
-                      )}
-                    </ResponsiveModalContent>
-                  </ResponsiveModal>
-                  <LayoutRight>
-                    {!officeSelected && (
-                      <LocationStats>
-                        {!isOnline ? null : loading && !data ? (
-                          <Spinner id="location-stats-loading" size={24} />
-                        ) : (
-                          <LocationStatsView
-                            registrationOffices={
-                              data.getLocationStatistics!.offices
-                            }
-                            totalRegistrars={
-                              data.getLocationStatistics!.registrars
-                            }
-                            citizen={Math.round(
-                              data.getLocationStatistics!.population /
-                                data.getLocationStatistics!.registrars
-                            )}
+                            onClickDetails={onClickDetails}
                           />
                         )}
-                      </LocationStats>
-                    )}
+                        <RegistrationsReport
+                          data={data!.getTotalMetrics}
+                          selectedEvent={
+                            event.toUpperCase() as 'BIRTH' | 'DEATH'
+                          }
+                          timeStart={timeStart.toISOString()}
+                          timeEnd={timeEnd.toISOString()}
+                          locationId={selectedLocation.id}
+                        />
+                        <CertificationRatesReport
+                          totalRegistrations={calculateTotal(
+                            data?.getTotalMetrics.results || []
+                          )}
+                          {...(selectedLocation && !isCountry(selectedLocation)
+                            ? {
+                                ...queryVariablesWithoutLocationId,
+                                locationId: selectedLocation.id
+                              }
+                            : queryVariablesWithoutLocationId)}
+                        />
+                        <AppSources
+                          data={data!.getTotalMetrics}
+                          isAccessibleOffice={isAccessibleOffice}
+                          locationId={
+                            isCountry(selectedLocation)
+                              ? undefined
+                              : selectedLocation.id
+                          }
+                          timeStart={timeStart.toISOString()}
+                          timeEnd={timeEnd.toISOString()}
+                          event={event}
+                        />
+                      </>
+                    )
+                  }}
+                </Query>
+                <Query
+                  fetchPolicy="cache-and-network"
+                  query={CORRECTION_TOTALS}
+                  variables={
+                    selectedLocation && !isCountry(selectedLocation)
+                      ? {
+                          ...queryVariablesWithoutLocationId,
+                          locationId: selectedLocation.id
+                        }
+                      : queryVariablesWithoutLocationId
+                  }
+                >
+                  {({
+                    loading,
+                    error,
+                    data
+                  }: {
+                    loading: boolean
+                    error?: ApolloError
+                    data?: ICorrectionsQueryResult
+                  }) => {
+                    if (error) {
+                      return <GenericErrorToast />
+                    }
 
-                    <RegistrationStatus>
-                      {!isOnline ? (
-                        <></>
-                      ) : loading && !data ? (
-                        <Spinner id="registration-status-loading" size={24} />
+                    if (loading) {
+                      return null
+                    }
+                    return (
+                      <CorrectionsReport data={data!.getTotalCorrections} />
+                    )
+                  }}
+                </Query>
+                <Query
+                  fetchPolicy="cache-and-network"
+                  query={GET_TOTAL_PAYMENTS}
+                  variables={
+                    selectedLocation && !isCountry(selectedLocation)
+                      ? {
+                          ...queryVariablesWithoutLocationId,
+                          locationId: selectedLocation.id
+                        }
+                      : queryVariablesWithoutLocationId
+                  }
+                >
+                  {({ loading, data, error }) => {
+                    if (error) {
+                      return <GenericErrorToast />
+                    }
+                    if (loading) {
+                      return null
+                    }
+                    if (data && data.getTotalPayments) {
+                      return (
+                        <PaymentsAmountComponent
+                          currency={currency}
+                          data={data!.getTotalPayments}
+                        />
+                      )
+                    }
+
+                    return <></>
+                  }}
+                </Query>
+              </>
+            ) : (
+              <ConnectivityContainer>
+                <NoConnectivity />
+                <Text id="no-connection-text">
+                  {intl.formatMessage(constantsMessages.noConnection)}
+                </Text>
+              </ConnectivityContainer>
+            )}
+          </Content>
+        </LayoutLeft>
+        <Query
+          query={PERFORMANCE_STATS}
+          variables={{
+            locationId:
+              selectedLocation && !isCountry(selectedLocation)
+                ? selectedLocation.id
+                : undefined,
+            populationYear: timeEnd.getFullYear(),
+            event,
+            status: [
+              'IN_PROGRESS',
+              'DECLARED',
+              'REJECTED',
+              'VALIDATED',
+              'WAITING_VALIDATION',
+              'REGISTERED'
+            ],
+            officeSelected: officeSelected
+          }}
+          fetchPolicy="cache-and-network"
+          key={Number(isOnline)} // To re-render when online
+        >
+          {({ loading, data, error }) => {
+            if (error) {
+              return <GenericErrorToast />
+            }
+            return (
+              <>
+                <ResponsiveModal
+                  title={intl.formatMessage(constantsMessages.status)}
+                  show={toggleStatus}
+                  handleClose={togglePerformanceStatus}
+                  actions={[]}
+                >
+                  <ResponsiveModalContent>
+                    {loading && !data ? (
+                      <Spinner id="modal-data-loading" size={24} />
+                    ) : (
+                      <>
+                        {isOnline && (
+                          <StatusWiseDeclarationCountView
+                            selectedEvent={event}
+                            isAccessibleOffice={isAccessibleOffice}
+                            statusMapping={StatusMapping}
+                            data={data.fetchRegistrationCountByStatus}
+                            onClickStatusDetails={onClickStatusDetails}
+                          />
+                        )}
+
+                        {!officeSelected && isOnline && (
+                          <>
+                            <Devider />
+
+                            <LocationStatsView
+                              registrationOffices={
+                                data.getLocationStatistics!.offices
+                              }
+                              totalRegistrars={
+                                data.getLocationStatistics!.registrars
+                              }
+                              citizen={Math.round(
+                                data.getLocationStatistics!.population /
+                                  data.getLocationStatistics!.registrars
+                              )}
+                            />
+                          </>
+                        )}
+                      </>
+                    )}
+                  </ResponsiveModalContent>
+                </ResponsiveModal>
+                <LayoutRight>
+                  {!officeSelected && (
+                    <LocationStats>
+                      {!isOnline ? null : loading && !data ? (
+                        <Spinner id="location-stats-loading" size={24} />
                       ) : (
-                        <StatusWiseDeclarationCountView
-                          selectedEvent={this.props.event}
-                          isAccessibleOffice={this.state.isAccessibleOffice}
-                          statusMapping={StatusMapping}
-                          data={data.fetchRegistrationCountByStatus}
-                          onClickStatusDetails={this.onClickStatusDetails}
+                        <LocationStatsView
+                          registrationOffices={
+                            data.getLocationStatistics!.offices
+                          }
+                          totalRegistrars={
+                            data.getLocationStatistics!.registrars
+                          }
+                          citizen={Math.round(
+                            data.getLocationStatistics!.population /
+                              data.getLocationStatistics!.registrars
+                          )}
                         />
                       )}
-                    </RegistrationStatus>
-                  </LayoutRight>
-                </>
-              )
-            }}
-          </Query>
-        </Layout>
-      </SysAdminContentWrapper>
-    )
-  }
+                    </LocationStats>
+                  )}
+
+                  <RegistrationStatus>
+                    {!isOnline ? (
+                      <></>
+                    ) : loading && !data ? (
+                      <Spinner id="registration-status-loading" size={24} />
+                    ) : (
+                      <StatusWiseDeclarationCountView
+                        selectedEvent={event}
+                        isAccessibleOffice={isAccessibleOffice}
+                        statusMapping={StatusMapping}
+                        data={data.fetchRegistrationCountByStatus}
+                        onClickStatusDetails={onClickStatusDetails}
+                      />
+                    )}
+                  </RegistrationStatus>
+                </LayoutRight>
+              </>
+            )
+          }}
+        </Query>
+      </Layout>
+    </SysAdminContentWrapper>
+  )
 }
 
 function mapStateToProps(

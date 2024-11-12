@@ -43,7 +43,7 @@ export const getEventRegisterForm = (state: IStoreState, event: Event) => {
   return getRegisterForm(state)[event]
 }
 
-export const getRegisterFormSection = (
+const getRegisterFormSection = (
   state: IStoreState,
   key: Section | string,
   event: Event
