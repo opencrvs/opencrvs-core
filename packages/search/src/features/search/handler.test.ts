@@ -70,8 +70,10 @@ describe('Verify handlers', () => {
   afterAll(shutdown)
 
   describe('Advanced search', () => {
-    it('should return status code 403 if the token does not hold any of the Register, Validate or Declare scope', async () => {
-      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
+    it('should return status code 403 if the token does not hold right scopes', async () => {
+      const t = await setupTestCases(setup, {
+        scope: [SCOPES.RECORD_DECLARE_BIRTH]
+      })
 
       const res = await t.callAdvancedRecordSearch({
         parameters: {}
@@ -117,7 +119,9 @@ describe('Verify handlers', () => {
 
   describe('/statusWiseRegistrationCount', () => {
     it('Should return 200 for valid payload', async () => {
-      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
+      const t = await setupTestCases(setup, {
+        scope: [SCOPES.PERFORMANCE_READ]
+      })
 
       const res = await t.callStatusWiseRegistrationCount({
         declarationJurisdictionId: '123',
@@ -128,7 +132,9 @@ describe('Verify handlers', () => {
     })
 
     it('Should return 500 for an error', async () => {
-      const t = await setupTestCases(setup, { scope: [SCOPES.SEARCH_BIRTH] })
+      const t = await setupTestCases(setup, {
+        scope: [SCOPES.PERFORMANCE_READ]
+      })
 
       jest.spyOn(esClient, 'getOrCreateClient').mockReturnValue({
         search: async () => {
