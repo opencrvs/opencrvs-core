@@ -163,7 +163,6 @@ interface IConstantsMessages
   refresh: MessageDescriptor
   duplicateOf: MessageDescriptor
   matchedTo: MessageDescriptor
-  humanName: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   action: {
@@ -979,11 +978,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: `{registrationTargetDays} days - 1 year`,
     description: `Label for registrations within {registrationTargetDays} days to 1 year`,
     id: 'constants.withinTargetDaysTo1Year'
-  },
-  humanName: {
-    defaultMessage: `{lastName} {middleName} {firstName}`,
-    description: 'A localized order of the full name',
-    id: 'constants.humanName'
   }
 }
 export const constantsMessages: Record<
