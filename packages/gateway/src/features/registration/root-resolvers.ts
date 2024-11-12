@@ -612,7 +612,7 @@ export const resolvers: GQLResolver = {
       return taskEntry.resource.id
     },
     async confirmRegistration(_, { id, details }, { headers: authHeader }) {
-      if (!inScope(authHeader, ['record.confirm-registration'])) {
+      if (!inScope(authHeader, [SCOPES.RECORD_CONFIRM_REGISTRATION])) {
         throw new Error('User does not have a Confirm Registration scope')
       }
 
@@ -633,7 +633,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async rejectRegistration(_, { id, details }, { headers: authHeader }) {
-      if (!inScope(authHeader, ['record.reject-registration'])) {
+      if (!inScope(authHeader, [SCOPES.RECORD_REJECT_REGISTRATION])) {
         throw new Error('User does not have a Reject Registration" scope')
       }
 
