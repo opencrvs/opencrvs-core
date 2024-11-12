@@ -60,8 +60,7 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN,
-  validateDeceasedDetails
+  updatePatientIdentifierWithRN
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -530,16 +529,6 @@ export async function toRegistered(
         previousIdentifier.value = childIdentifier.value
       }
     })
-  }
-
-  if (event === EVENT_TYPE.DEATH) {
-    /** using first patient because for death event there is only one patient */
-    patientsWithRegNumber[0] = await validateDeceasedDetails(
-      patientsWithRegNumber[0],
-      {
-        Authorization: request.headers.authorization
-      }
-    )
   }
 
   const patientIds = patientsWithRegNumber.map((p) => p.id)
