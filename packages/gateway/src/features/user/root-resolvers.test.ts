@@ -324,10 +324,7 @@ describe('User root resolvers', () => {
               SCOPES.RECORD_SUBMIT_FOR_REVIEW,
               SCOPES.SEARCH_BIRTH,
               SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.RECORD_READ,
-              SCOPES.RECORD_READ_AUDIT,
-              SCOPES.RECORD_READ_COMMENTS
+              SCOPES.SEARCH_MARRIAGE
             ]
           },
           status: 'active',
@@ -356,10 +353,7 @@ describe('User root resolvers', () => {
               SCOPES.RECORD_SUBMIT_FOR_REVIEW,
               SCOPES.SEARCH_BIRTH,
               SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.RECORD_READ,
-              SCOPES.RECORD_READ_AUDIT,
-              SCOPES.RECORD_READ_COMMENTS
+              SCOPES.SEARCH_MARRIAGE
             ]
           },
           status: 'pending',
@@ -427,10 +421,7 @@ describe('User root resolvers', () => {
               SCOPES.RECORD_SUBMIT_FOR_REVIEW,
               SCOPES.SEARCH_BIRTH,
               SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.RECORD_READ,
-              SCOPES.RECORD_READ_AUDIT,
-              SCOPES.RECORD_READ_COMMENTS
+              SCOPES.SEARCH_MARRIAGE
             ]
           },
           status: 'active',
@@ -459,10 +450,7 @@ describe('User root resolvers', () => {
               SCOPES.RECORD_SUBMIT_FOR_REVIEW,
               SCOPES.SEARCH_BIRTH,
               SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.RECORD_READ,
-              SCOPES.RECORD_READ_AUDIT,
-              SCOPES.RECORD_READ_COMMENTS
+              SCOPES.SEARCH_MARRIAGE
             ]
           },
           status: 'pending',
@@ -552,10 +540,7 @@ describe('User root resolvers', () => {
               SCOPES.RECORD_SUBMIT_FOR_REVIEW,
               SCOPES.SEARCH_BIRTH,
               SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.RECORD_READ,
-              SCOPES.RECORD_READ_AUDIT,
-              SCOPES.RECORD_READ_COMMENTS
+              SCOPES.SEARCH_MARRIAGE
             ]
           },
           status: 'active',
