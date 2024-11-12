@@ -126,8 +126,6 @@ describe('Verify handlers', () => {
         status: ['REGISTERED']
       })
 
-      // await new Promise((resolve) => setImmediate(resolve))
-
       expect(res.statusCode).toBe(200)
     })
 
