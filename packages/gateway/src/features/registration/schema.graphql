@@ -575,7 +575,7 @@ input IdentifierInput {
 input ConfirmRegistrationInput {
   registrationNumber: String!
   error: String
-  identifiers: [IdentifierInput!]!
+  identifiers: [IdentifierInput!]
 }
 
 input RejectRegistrationInput {

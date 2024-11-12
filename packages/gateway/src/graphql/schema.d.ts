@@ -580,7 +580,7 @@ export interface GQLReinstated {
 export interface GQLConfirmRegistrationInput {
   registrationNumber: string
   error?: string
-  identifiers: Array<GQLIdentifierInput>
+  identifiers?: Array<GQLIdentifierInput>
 }
 
 export interface GQLRejectRegistrationInput {
