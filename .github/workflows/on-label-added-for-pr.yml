@@ -16,17 +16,15 @@ jobs:
   dispatch-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check for "🚀 Ready to deploy" label
+      - name: Check if added label is "🚀 Ready to deploy"
         id: label_check
         run: |
-          labels=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
-          if [[ "$labels" != *"🚀 Ready to deploy"* ]]; then
-            echo "Label not found, skipping dispatch."
+          added_label=$(jq -r '.label.name' "$GITHUB_EVENT_PATH")
+          if [[ "$added_label" != "🚀 Ready to deploy" ]]; then
+            echo "Label not found or incorrect, skipping dispatch."
             exit 1
           fi
-          echo "Label found, dispatching deploy workflow."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "Correct label added, dispatching deploy workflow."
 
       - name: Trigger Deploy Workflow
         if: steps.label_check.outcome == 'success'

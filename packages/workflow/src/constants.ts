@@ -33,6 +33,7 @@ export const DOCUMENTS_URL =
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const SENTRY_DSN = process.env.SENTRY_DSN
+export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040/'
 
 function getAvailableLanguages() {
   const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,fr'
