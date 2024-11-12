@@ -183,8 +183,7 @@ export const ActionMenu: React.FC<{
             scopes={[
               SCOPES.RECORD_DECLARATION_PRINT,
               SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-              SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES,
-              SCOPES.RECORD_PRINT_CERTIFIED_COPIES
+              SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES
             ]}
           >
             <PrintAction

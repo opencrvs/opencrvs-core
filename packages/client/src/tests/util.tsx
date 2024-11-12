@@ -1225,7 +1225,7 @@ export const mockFetchRoleGraphqlOperation = {
           scopes: [
             SCOPES.RECORD_REGISTER,
             SCOPES.PERFORMANCE_READ,
-            SCOPES.RECORD_PRINT_CERTIFIED_COPIES
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
           ]
         },
         {
@@ -1265,7 +1265,7 @@ export const mockFetchRoleGraphqlOperation = {
           scopes: [
             SCOPES.RECORD_REGISTER,
             SCOPES.PERFORMANCE_READ,
-            SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
             SCOPES.CONFIG_UPDATE_ALL,
             SCOPES.ORGANISATION_READ_LOCATIONS
           ]

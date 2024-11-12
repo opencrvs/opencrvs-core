@@ -222,7 +222,8 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     }
   }
 
-  const { hasAnyScope, hasScope } = usePermissions()
+  const { hasAnyScope, hasScope, canIssueRecord, canPrintRecord } =
+    usePermissions()
 
   const userHasRegisterScope = () => hasScope(SCOPES.RECORD_REGISTER)
 
@@ -230,15 +231,6 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     hasAnyScope([
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES
-    ])
-
-  const hasIssueScope = () =>
-    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
-
-  const hasPrintScope = () =>
-    hasAnyScope([
-      SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
     ])
 
   const transformSearchContent = (data: QueryData) => {
@@ -293,7 +285,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            hasPrintScope()
+            canPrintRecord()
           ) {
             actions.push({
               label: intl.formatMessage(buttonMessages.print),
@@ -305,7 +297,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && hasIssueScope()) {
+          } else if (declarationIsCertified && canIssueRecord()) {
             actions.push({
               label: intl.formatMessage(buttonMessages.issue),
               handler: (
