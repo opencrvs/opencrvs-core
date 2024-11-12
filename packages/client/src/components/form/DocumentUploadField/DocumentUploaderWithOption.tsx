@@ -74,12 +74,12 @@ type DocumentFields = {
 }
 
 export const getBase64String = (file: File) => {
-  return new Promise<string | ArrayBuffer>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => {
       if (reader.result) {
-        return resolve(reader.result)
+        return resolve(reader.result.toString())
       }
     }
     reader.onerror = (error) => reject(error)
@@ -152,26 +152,29 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     if (props.compressImagesToSizeMB !== undefined) {
       options.maxSizeMB = props.compressImagesToSizeMB
     }
+    if (
+      !(
+        Boolean(options.maxSizeMB) &&
+        bytesToMB(uploadedImage.size) > options.maxSizeMB
+      )
+    ) {
+      return uploadedImage
+    }
+
     // disable compression with a falsy value
-    const resized =
-      Boolean(options.maxSizeMB) &&
-      bytesToMB(uploadedImage.size) > options.maxSizeMB &&
-      (await imageCompression(uploadedImage, options))
+    const resized = await imageCompression(uploadedImage, options)
 
-    const fileAsBase64 = await getBase64String(resized || uploadedImage)
-
-    return fileAsBase64.toString()
+    return resized
   }
 
   const handleFileChange = async (uploadedImage: File) => {
     if (!uploadedImage) {
       return
     }
-
     // If there is only one option available then it would stay selected
     const documentType = fields.documentType || dropdownOptions[0].value
 
-    let fileAsBase64: string
+    let processedFile: File
     const optionValues: [IFormFieldValue, string] = [
       props.extraValue,
       documentType
@@ -194,7 +197,7 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
 
     try {
       // Start processing
-      ;[fileAsBase64] = await Promise.all([
+      ;[processedFile] = await Promise.all([
         processImage(uploadedImage),
         minimumProcessingTime
       ])
@@ -224,8 +227,8 @@ export const DocumentUploaderWithOption = (props: IFullProps) => {
     const newDocument: IFileValue = {
       optionValues,
       type: uploadedImage.type,
-      data: fileAsBase64.toString(),
-      fileSize: uploadedImage.size
+      data: await getBase64String(processedFile),
+      fileSize: processedFile.size
     }
 
     props.onComplete([...props.files, newDocument])
