@@ -86,6 +86,7 @@ export interface GQLMutation {
   markMarriageAsIssued: string
   markEventAsDuplicate: string
   confirmRegistration: string
+  rejectRegistration: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -574,6 +575,17 @@ export interface GQLCreatedIds {
 export interface GQLReinstated {
   taskEntryResourceID: string
   registrationStatus?: GQLRegStatus
+}
+
+export interface GQLConfirmRegistrationInput {
+  registrationNumber: string
+  error?: string
+  identifiers?: Array<GQLIdentifierInput>
+}
+
+export interface GQLRejectRegistrationInput {
+  reason: string
+  comment?: string
 }
 
 export interface GQLUserInput {
@@ -1167,6 +1179,11 @@ export const enum GQLRegStatus {
   CERTIFIED = 'CERTIFIED',
   REJECTED = 'REJECTED',
   ISSUED = 'ISSUED'
+}
+
+export interface GQLIdentifierInput {
+  type: string
+  value: string
 }
 
 export interface GQLHumanNameInput {
@@ -2452,6 +2469,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
+  rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2986,6 +3004,7 @@ export interface MutationToMarkEventAsDuplicateResolver<
 
 export interface MutationToConfirmRegistrationArgs {
   id: string
+  details: GQLConfirmRegistrationInput
 }
 export interface MutationToConfirmRegistrationResolver<
   TParent = any,
@@ -2994,6 +3013,22 @@ export interface MutationToConfirmRegistrationResolver<
   (
     parent: TParent,
     args: MutationToConfirmRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRejectRegistrationArgs {
+  id: string
+  details: GQLRejectRegistrationInput
+}
+export interface MutationToRejectRegistrationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRejectRegistrationArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
