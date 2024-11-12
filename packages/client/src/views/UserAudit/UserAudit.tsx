@@ -10,7 +10,7 @@
  */
 
 import { useQuery } from '@apollo/client'
-import { getLocalisedName } from '@client/utils/data-formatting'
+import { createNamesMap } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
@@ -30,7 +30,8 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  User
+  User,
+  HumanName
 } from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
@@ -80,7 +81,9 @@ const transformUserQueryResult = (
               '')) ||
         ''
     },
-    name: getLocalisedName(intl, userData.name[0]),
+    name:
+      createNamesMap(userData.name as HumanName[])[locale] ||
+      createNamesMap(userData.name as HumanName[])[LANG_EN],
     role: userData.role,
     number: userData.mobile,
     email: userData.email,

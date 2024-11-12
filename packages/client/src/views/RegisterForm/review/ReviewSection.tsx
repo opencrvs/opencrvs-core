@@ -1693,7 +1693,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         '') as string
     }
 
-    const informantName = getDeclarationFullName(declaration, intl)
+    const informantName = getDeclarationFullName(
+      declaration,
+      intl.locale,
+      this.isLastNameFirst()
+    )
     const draft = this.isDraft()
     const transformedSectionData = this.transformSectionData(
       formSections.filter(

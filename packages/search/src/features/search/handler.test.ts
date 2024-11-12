@@ -17,6 +17,8 @@ import { SearchDocument } from '@opencrvs/commons'
 import * as searchService from './service'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 
 jest.setTimeout(100000)
 
@@ -123,6 +125,7 @@ describe('Verify handlers', () => {
         scope: [SCOPES.PERFORMANCE_READ]
       })
 
+      fetch.mockResponses([JSON.stringify([{ id: '123' }]), { status: 200 }])
       const res = await t.callStatusWiseRegistrationCount({
         declarationJurisdictionId: '123',
         status: ['REGISTERED']

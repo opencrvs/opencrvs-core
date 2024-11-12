@@ -30,7 +30,7 @@ import { IStoreState } from '@client/store'
 import styled, { withTheme } from 'styled-components'
 import { SEARCH_USERS } from '@client/user/queries'
 import { LANG_EN } from '@client/utils/constants'
-import { createNamesMap, getLocalisedName } from '@client/utils/data-formatting'
+import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { getAddressName, UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -508,8 +508,15 @@ function UserListComponent(props: IProps) {
       return data.searchUsers.results.map(
         (user: User | null, index: number) => {
           if (user !== null) {
-            const name = getLocalisedName(intl, user.name[0])
-            const role = intl.formatMessage(user.role.label)
+            const name =
+              (user &&
+                user.name &&
+                ((createNamesMap(user.name)[intl.locale] as string) ||
+                  (createNamesMap(user.name)[LANG_EN] as string))) ||
+              ''
+            const role = intl.formatMessage({
+              id: getUserRoleIntlKey(user.role._id)
+            })
             const avatar = user.avatar
 
             return {

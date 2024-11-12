@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
+import {
+  logger,
+  SearchDocument,
+  EVENT,
+  getSearchTotalCount,
+  UUID
+} from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
 import { ISearchCriteria } from '@search/features/search/types'
@@ -27,11 +33,7 @@ import {
   searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
 import { capitalize } from 'lodash'
-import {
-  EVENT,
-  getSearchTotalCount,
-  SearchDocument
-} from '@opencrvs/commons/types'
+import { resolveLocationChildren } from './location'
 import { SCOPES } from '@opencrvs/commons/authentication'
 
 type IAssignmentPayload = {
@@ -138,9 +140,12 @@ export async function getStatusWiseRegistrationCountHandler(
       }
     ]
     if (payload.declarationJurisdictionId) {
+      const leafLevelJurisdictionIds = await resolveLocationChildren(
+        payload.declarationJurisdictionId as UUID
+      )
       matchRules.push({
-        match: {
-          declarationJurisdictionIds: payload.declarationJurisdictionId
+        terms: {
+          'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
         }
       })
     }
