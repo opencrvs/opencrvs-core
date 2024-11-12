@@ -332,11 +332,7 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
-          scope: [
-            SCOPES.USER_UPDATE,
-            SCOPES.USER_DATA_SEEDING,
-            SCOPES.USER_UPDATE
-          ]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
         }
       }
     },
