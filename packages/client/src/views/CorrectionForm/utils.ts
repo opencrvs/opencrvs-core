@@ -143,7 +143,6 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
       totalFileSize
     )
   }
-
   return totalFileSize > ACCUMULATED_FILE_SIZE
 }
 
