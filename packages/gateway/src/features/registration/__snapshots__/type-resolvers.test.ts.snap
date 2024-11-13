@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`running a full aggregated birth FHIR bundle through resolvers produces a BirthRegistration object 1`] = `
-Object {
-  "fetchBirthRegistration": Object {
-    "_fhirIDMap": Object {
+{
+  "fetchBirthRegistration": {
+    "_fhirIDMap": {
       "composition": "09f39e17-ca23-4905-9ab3-f3649c4e3162",
       "encounter": "e7ed42ae-bd54-4d7c-ad9d-0af7506d1d64",
       "eventLocation": "565d957a-109a-4bf3-a3af-f0ad52c719cd",
-      "observation": Object {
+      "observation": {
         "attendantAtBirth": "942901b9-e03f-4209-953d-fd094e5e8231",
         "birthType": "78e42deb-c50e-43c8-853f-71ccc6398512",
         "weightAtBirth": "d47d4a55-bf18-4704-ac3a-0066e3ecff6f",
@@ -16,14 +16,14 @@ Object {
     },
     "attendantAtBirth": "PHYSICIAN",
     "birthType": "SINGLE",
-    "child": Object {
+    "child": {
       "_fhirID": null,
       "address": null,
       "age": null,
       "ageOfIndividualInYears": null,
       "birthDate": "2023-07-11",
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -32,26 +32,26 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": "female",
       "id": "dfac3127-963e-4ef2-b875-3123e08da3d9",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2023B3VUXES",
           "otherType": null,
           "type": "BIRTH_REGISTRATION_NUMBER",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "",
           "otherType": null,
           "type": "BIRTH_CONFIGURABLE_IDENTIFIER_1",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "",
           "otherType": null,
           "type": "BIRTH_CONFIGURABLE_IDENTIFIER_2",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "",
           "otherType": null,
@@ -60,8 +60,8 @@ Object {
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Baumbach",
           "firstNames": "Isadore",
           "marriedLastName": null,
@@ -77,7 +77,7 @@ Object {
     },
     "childrenBornAliveToMother": null,
     "createdAt": "2023-08-11T05:26:26.000Z",
-    "eventLocation": Object {
+    "eventLocation": {
       "_fhirID": null,
       "address": null,
       "altitude": null,
@@ -92,16 +92,16 @@ Object {
       "telecom": null,
       "type": "HEALTH_FACILITY",
     },
-    "father": Object {
+    "father": {
       "_fhirID": null,
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": "South Jamelmouth",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -109,7 +109,7 @@ Object {
             "",
             "URBAN",
           ],
-          "lineName": Array [
+          "lineName": [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -131,7 +131,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "2003-07-11",
       "dateOfMarriage": "2021-07-11",
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -140,8 +140,8 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "3ee05cf9-a550-4d7f-abde-54313f7bd41a",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "8762475961",
           "otherType": null,
@@ -150,8 +150,8 @@ Object {
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Neil",
           "firstNames": "Baumbach",
           "marriedLastName": null,
@@ -159,7 +159,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": "Bookkeeper",
@@ -168,19 +168,19 @@ Object {
       "telecom": null,
     },
     "foetalDeathsToMother": null,
-    "history": Array [
-      Object {
-        "certificates": Array [
+    "history": [
+      {
+        "certificates": [
           null,
         ],
-        "comments": Array [],
+        "comments": [],
         "date": "2023-10-02T13:51:55.645+00:00",
         "dhis2Notification": false,
         "duplicateOf": null,
         "hasShowedVerifiedDocument": false,
-        "input": Array [],
+        "input": [],
         "ipAddress": null,
-        "location": Object {
+        "location": {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -197,7 +197,7 @@ Object {
         },
         "noSupportingDocumentationRequired": false,
         "note": "",
-        "office": Object {
+        "office": {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -213,7 +213,7 @@ Object {
           "type": "CRVS_OFFICE",
         },
         "otherReason": "",
-        "output": Array [],
+        "output": [],
         "payment": null,
         "reason": null,
         "requester": "",
@@ -225,17 +225,17 @@ Object {
       },
     ],
     "id": "09f39e17-ca23-4905-9ab3-f3649c4e3162",
-    "informant": Object {
+    "informant": {
       "_fhirID": null,
       "_fhirIDPatient": "cd5693ed-dd33-4c3a-a9fc-7479b132a4ea",
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": "South Jamelmouth",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -249,7 +249,7 @@ Object {
             "",
             "URBAN",
           ],
-          "lineName": Array [
+          "lineName": [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -278,7 +278,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "2003-07-11",
       "dateOfMarriage": "2021-07-11",
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -287,8 +287,8 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "a0fd7881-33e6-4751-a346-78f820aa3dbb",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2253499797",
           "otherType": null,
@@ -297,8 +297,8 @@ Object {
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": 2,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Baumbach",
           "firstNames": "Sophia",
           "marriedLastName": null,
@@ -306,7 +306,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": "Farmer",
@@ -317,16 +317,16 @@ Object {
       "telecom": null,
     },
     "lastPreviousLiveBirth": null,
-    "mother": Object {
+    "mother": {
       "_fhirID": null,
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": "South Jamelmouth",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -340,7 +340,7 @@ Object {
             "",
             "URBAN",
           ],
-          "lineName": Array [
+          "lineName": [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -368,7 +368,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "2003-07-11",
       "dateOfMarriage": "2021-07-11",
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -377,8 +377,8 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "cd5693ed-dd33-4c3a-a9fc-7479b132a4ea",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2253499797",
           "otherType": null,
@@ -387,8 +387,8 @@ Object {
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": 2,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Baumbach",
           "firstNames": "Sophia",
           "marriedLastName": null,
@@ -396,14 +396,14 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": "Farmer",
       "photo": null,
       "reasonNotApplying": null,
-      "telecom": Array [
-        Object {
+      "telecom": [
+        {
           "system": "phone",
           "use": null,
           "value": "+260711384538",
@@ -412,9 +412,9 @@ Object {
     },
     "otherAttendantAtBirth": null,
     "questionnaire": null,
-    "registration": Object {
+    "registration": {
       "_fhirID": null,
-      "assignment": Object {
+      "assignment": {
         "avatarURL": "https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name=Kennedy Mweene",
         "firstName": "Kennedy",
         "lastName": "Mweene",
@@ -424,7 +424,7 @@ Object {
       "attachments": null,
       "book": null,
       "brideSignature": null,
-      "certificates": Array [
+      "certificates": [
         null,
       ],
       "contact": "MOTHER",
@@ -443,11 +443,11 @@ Object {
       "page": null,
       "paperFormID": null,
       "registrationNumber": "2023B3VUXES",
-      "status": Array [
-        Object {
+      "status": [
+        {
           "comments": null,
           "id": "358c0c75-9855-4812-b560-c1b5fbf48e5a",
-          "location": Object {
+          "location": {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -462,7 +462,7 @@ Object {
             "telecom": null,
             "type": "ADMIN_STRUCTURE",
           },
-          "office": Object {
+          "office": {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -494,13 +494,13 @@ Object {
 `;
 
 exports[`running a full aggregated death FHIR bundle through resolvers produces a DeathRegistration object 1`] = `
-Object {
-  "fetchDeathRegistration": Object {
-    "_fhirIDMap": Object {
+{
+  "fetchDeathRegistration": {
+    "_fhirIDMap": {
       "composition": "a959c616-934a-4139-a123-37bb4a1be39e",
       "encounter": "e668f0dc-aacd-45be-bd5f-2a81c3161593",
       "eventLocation": "4ba43b39-547b-41a8-8af1-c515786f36e5",
-      "observation": Object {
+      "observation": {
         "causeOfDeath": "3cae74a3-042c-4faf-9dde-8b716d094033",
         "causeOfDeathEstablished": "fb98ff5b-3aa1-40c2-87bf-4bd6df091dd2",
         "causeOfDeathMethod": "ff9a538b-c551-4edc-9631-fa2169a37f20",
@@ -516,16 +516,16 @@ Object {
     "causeOfDeathMethod": "PHYSICIAN",
     "createdAt": "2023-08-16T06:55:19.000Z",
     "deathDescription": null,
-    "deceased": Object {
+    "deceased": {
       "_fhirID": null,
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": "Rudyboro",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "44444 Predovic Mount",
             "87740",
             "URBAN",
@@ -533,7 +533,7 @@ Object {
             "",
             "URBAN",
           ],
-          "lineName": Array [
+          "lineName": [
             "44444 Predovic Mount",
             "87740",
             "URBAN",
@@ -555,7 +555,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "1948-07-24",
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": "2023-07-24",
         "deceased": null,
       },
@@ -564,20 +564,20 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": "female",
       "id": "d55283fe-b5bc-497d-86f3-5370957b0642",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "8360781537",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "565195261",
           "otherType": null,
           "type": "SOCIAL_SECURITY_NO",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2023DL1W8FV",
           "otherType": null,
@@ -586,8 +586,8 @@ Object {
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Pacocha",
           "firstNames": "Zack",
           "marriedLastName": null,
@@ -595,7 +595,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": null,
@@ -603,7 +603,7 @@ Object {
       "reasonNotApplying": null,
       "telecom": null,
     },
-    "eventLocation": Object {
+    "eventLocation": {
       "_fhirID": null,
       "address": null,
       "altitude": null,
@@ -618,14 +618,14 @@ Object {
       "telecom": null,
       "type": "HEALTH_FACILITY",
     },
-    "father": Object {
+    "father": {
       "_fhirID": null,
       "address": null,
       "age": null,
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -637,8 +637,8 @@ Object {
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Pacocha",
           "firstNames": "",
           "marriedLastName": null,
@@ -653,17 +653,17 @@ Object {
       "telecom": null,
     },
     "femaleDependentsOfDeceased": 4,
-    "history": Array [
-      Object {
-        "certificates": Array [],
-        "comments": Array [],
+    "history": [
+      {
+        "certificates": [],
+        "comments": [],
         "date": "2023-09-22T11:52:48.611+00:00",
         "dhis2Notification": false,
         "duplicateOf": null,
         "hasShowedVerifiedDocument": false,
-        "input": Array [],
+        "input": [],
         "ipAddress": null,
-        "location": Object {
+        "location": {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -680,7 +680,7 @@ Object {
         },
         "noSupportingDocumentationRequired": false,
         "note": "",
-        "office": Object {
+        "office": {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -696,7 +696,7 @@ Object {
           "type": "CRVS_OFFICE",
         },
         "otherReason": "",
-        "output": Array [],
+        "output": [],
         "payment": null,
         "reason": null,
         "requester": "",
@@ -708,17 +708,17 @@ Object {
       },
     ],
     "id": "a959c616-934a-4139-a123-37bb4a1be39e",
-    "informant": Object {
+    "informant": {
       "_fhirID": null,
       "_fhirIDPatient": "9fbbb561-dd3c-4b9f-8765-829a4c75493e",
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": "New Julio",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "817 Avis Point",
             "06074",
             "URBAN",
@@ -726,7 +726,7 @@ Object {
             "",
             "URBAN",
           ],
-          "lineName": Array [
+          "lineName": [
             "817 Avis Point",
             "06074",
             "URBAN",
@@ -749,7 +749,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "2003-08-16",
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -758,8 +758,8 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "7106d752-1e34-47fe-8726-a9fd11042a4d",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2464716794",
           "otherType": null,
@@ -768,8 +768,8 @@ Object {
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Pacocha",
           "firstNames": "Frank",
           "marriedLastName": null,
@@ -777,7 +777,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": "consultant",
@@ -790,14 +790,14 @@ Object {
     "maleDependentsOfDeceased": 3,
     "mannerOfDeath": "NATURAL_CAUSES",
     "medicalPractitioner": null,
-    "mother": Object {
+    "mother": {
       "_fhirID": null,
       "address": null,
       "age": null,
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -809,8 +809,8 @@ Object {
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "Pacocha",
           "firstNames": "",
           "marriedLastName": null,
@@ -825,11 +825,11 @@ Object {
       "telecom": null,
     },
     "questionnaire": null,
-    "registration": Object {
+    "registration": {
       "_fhirID": null,
       "assignment": null,
-      "attachments": Array [
-        Object {
+      "attachments": [
+        {
           "_fhirID": null,
           "contentType": "image/png",
           "createdAt": null,
@@ -843,7 +843,7 @@ Object {
           "type": "OTHER",
           "uri": "/ocrvs/d40e904b-53ff-4639-bdcf-a2ba8fb236f5.png",
         },
-        Object {
+        {
           "_fhirID": null,
           "contentType": "image/png",
           "createdAt": null,
@@ -860,7 +860,7 @@ Object {
       ],
       "book": null,
       "brideSignature": null,
-      "certificates": Array [],
+      "certificates": [],
       "contact": "SPOUSE",
       "contactEmail": "Frank24@gmail.com",
       "contactPhoneNumber": "+260734085893",
@@ -877,11 +877,11 @@ Object {
       "page": null,
       "paperFormID": null,
       "registrationNumber": "2023DL1W8FV",
-      "status": Array [
-        Object {
+      "status": [
+        {
           "comments": null,
           "id": "b1a6925a-47ae-431e-8f61-4cd0929e8518",
-          "location": Object {
+          "location": {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -896,7 +896,7 @@ Object {
             "telecom": null,
             "type": "ADMIN_STRUCTURE",
           },
-          "office": Object {
+          "office": {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -928,27 +928,27 @@ Object {
 `;
 
 exports[`running a full aggregated marriage FHIR bundle through resolvers produces a MarriageRegistration object 1`] = `
-Object {
-  "fetchMarriageRegistration": Object {
-    "_fhirIDMap": Object {
+{
+  "fetchMarriageRegistration": {
+    "_fhirIDMap": {
       "composition": "b2e4d436-d7fb-4b0f-9674-628b5af8f42e",
       "encounter": "669cb7d8-5963-4b49-b647-7463d9e135b5",
       "eventLocation": "461a4ba8-5592-4b1a-a30b-747150a01623",
-      "observation": Object {
+      "observation": {
         "typeOfMarriage": "c01c802f-e5fe-46d8-b35c-deffe87a6fd9",
       },
       "questionnaireResponse": undefined,
     },
-    "bride": Object {
+    "bride": {
       "_fhirID": null,
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": null,
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "",
             "",
             "",
@@ -965,7 +965,7 @@ Object {
             "",
             "",
           ],
-          "lineName": Array [
+          "lineName": [
             "",
             "",
             "",
@@ -996,7 +996,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "2001-02-22",
       "dateOfMarriage": "2021-02-24",
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -1005,14 +1005,14 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "5b979fe9-eaa3-4c4e-87ab-ee48ea1abb16",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2323444434",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2023MTNJUSI",
           "otherType": null,
@@ -1021,8 +1021,8 @@ Object {
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "test",
           "firstNames": "genie",
           "marriedLastName": null,
@@ -1030,7 +1030,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": null,
@@ -1039,15 +1039,15 @@ Object {
       "telecom": null,
     },
     "createdAt": "2023-09-22T08:54:48.780Z",
-    "eventLocation": Object {
+    "eventLocation": {
       "_fhirID": null,
-      "address": Object {
+      "address": {
         "city": "",
         "country": "FAR",
         "district": "bbee20e1-68c4-4e0c-a0cd-44336341e005",
         "districtName": null,
         "from": null,
-        "line": Array [
+        "line": [
           "",
           "",
           "",
@@ -1064,7 +1064,7 @@ Object {
           "",
           "",
         ],
-        "lineName": Array [
+        "lineName": [
           "",
           "",
           "",
@@ -1102,16 +1102,16 @@ Object {
       "telecom": null,
       "type": null,
     },
-    "groom": Object {
+    "groom": {
       "_fhirID": null,
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": null,
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "",
             "",
             "",
@@ -1128,7 +1128,7 @@ Object {
             "",
             "",
           ],
-          "lineName": Array [
+          "lineName": [
             "",
             "",
             "",
@@ -1159,7 +1159,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "1999-11-13",
       "dateOfMarriage": "2021-02-24",
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -1168,14 +1168,14 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "1a5ad72e-9241-4358-a937-861cfdf44f4d",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "8675646566",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2023MTNJUSI",
           "otherType": null,
@@ -1184,8 +1184,8 @@ Object {
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "test",
           "firstNames": "george",
           "marriedLastName": null,
@@ -1193,7 +1193,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": null,
@@ -1201,17 +1201,17 @@ Object {
       "reasonNotApplying": null,
       "telecom": null,
     },
-    "history": Array [
-      Object {
-        "certificates": Array [],
-        "comments": Array [],
+    "history": [
+      {
+        "certificates": [],
+        "comments": [],
         "date": "2023-09-22T08:54:57.825+00:00",
         "dhis2Notification": false,
         "duplicateOf": null,
         "hasShowedVerifiedDocument": false,
-        "input": Array [],
+        "input": [],
         "ipAddress": null,
-        "location": Object {
+        "location": {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -1228,7 +1228,7 @@ Object {
         },
         "noSupportingDocumentationRequired": false,
         "note": "",
-        "office": Object {
+        "office": {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -1244,7 +1244,7 @@ Object {
           "type": "CRVS_OFFICE",
         },
         "otherReason": "",
-        "output": Array [],
+        "output": [],
         "payment": null,
         "reason": null,
         "requester": "",
@@ -1256,17 +1256,17 @@ Object {
       },
     ],
     "id": "b2e4d436-d7fb-4b0f-9674-628b5af8f42e",
-    "informant": Object {
+    "informant": {
       "_fhirID": null,
       "_fhirIDPatient": "1a5ad72e-9241-4358-a937-861cfdf44f4d",
-      "address": Array [
-        Object {
+      "address": [
+        {
           "city": null,
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": Array [
+          "line": [
             "",
             "",
             "",
@@ -1283,7 +1283,7 @@ Object {
             "",
             "",
           ],
-          "lineName": Array [
+          "lineName": [
             "",
             "",
             "",
@@ -1315,7 +1315,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": "1999-11-13",
       "dateOfMarriage": "2021-02-24",
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -1324,14 +1324,14 @@ Object {
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "4065eb20-d02b-48d7-a783-5d7e452c7a7d",
-      "identifier": Array [
-        Object {
+      "identifier": [
+        {
           "fieldsModifiedByIdentity": null,
           "id": "8675646566",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        Object {
+        {
           "fieldsModifiedByIdentity": null,
           "id": "2023MTNJUSI",
           "otherType": null,
@@ -1340,8 +1340,8 @@ Object {
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "test",
           "firstNames": "george",
           "marriedLastName": null,
@@ -1349,7 +1349,7 @@ Object {
           "use": "en",
         },
       ],
-      "nationality": Array [
+      "nationality": [
         "FAR",
       ],
       "occupation": null,
@@ -1360,9 +1360,9 @@ Object {
       "telecom": null,
     },
     "questionnaire": null,
-    "registration": Object {
+    "registration": {
       "_fhirID": null,
-      "assignment": Object {
+      "assignment": {
         "avatarURL": "https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name=Kennedy Mweene",
         "firstName": "Kennedy",
         "lastName": "Mweene",
@@ -1372,7 +1372,7 @@ Object {
       "attachments": null,
       "book": null,
       "brideSignature": "/mock-presigned-url",
-      "certificates": Array [],
+      "certificates": [],
       "contact": "GROOM",
       "contactEmail": "aaa@gmail.com",
       "contactPhoneNumber": null,
@@ -1389,11 +1389,11 @@ Object {
       "page": null,
       "paperFormID": null,
       "registrationNumber": "2023MTNJUSI",
-      "status": Array [
-        Object {
+      "status": [
+        {
           "comments": null,
           "id": "6cc01269-6b36-4aa5-9bb0-21944d685e42",
-          "location": Object {
+          "location": {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -1408,7 +1408,7 @@ Object {
             "telecom": null,
             "type": "ADMIN_STRUCTURE",
           },
-          "office": Object {
+          "office": {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -1435,7 +1435,7 @@ Object {
     },
     "typeOfMarriage": "MONOGAMY",
     "updatedAt": null,
-    "witnessOne": Object {
+    "witnessOne": {
       "_fhirID": null,
       "_fhirIDPatient": "4512feb1-a96d-40b4-bfdc-7f437993bfa8",
       "address": null,
@@ -1444,7 +1444,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -1456,8 +1456,8 @@ Object {
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "one",
           "firstNames": "wit",
           "marriedLastName": null,
@@ -1473,7 +1473,7 @@ Object {
       "relationship": "HEAD_OF_GROOM_FAMILY",
       "telecom": null,
     },
-    "witnessTwo": Object {
+    "witnessTwo": {
       "_fhirID": null,
       "_fhirIDPatient": "93de5304-f816-493e-968a-86c3a3d5ee7a",
       "address": null,
@@ -1482,7 +1482,7 @@ Object {
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": Object {
+      "deceased": {
         "deathDate": null,
         "deceased": null,
       },
@@ -1494,8 +1494,8 @@ Object {
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": Array [
-        Object {
+      "name": [
+        {
           "familyName": "two",
           "firstNames": "wit",
           "marriedLastName": null,
