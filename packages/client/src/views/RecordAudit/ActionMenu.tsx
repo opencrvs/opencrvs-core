@@ -203,7 +203,12 @@ export const ActionMenu: React.FC<{
               isDownloaded={isDownloaded}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_REGISTRATION_CORRECT]}>
+          <ProtectedComponent
+            scopes={[
+              SCOPES.RECORD_REGISTRATION_CORRECT,
+              SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+            ]}
+          >
             <CorrectRecordAction
               declarationId={id}
               declarationStatus={status}
