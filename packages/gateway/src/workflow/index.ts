@@ -36,6 +36,11 @@ import {
   GQLPaymentInput
 } from '@gateway/graphql/schema'
 
+export type IdentifierInput = {
+  type: string
+  value: string
+}
+
 const createRequest = async <T = any>(
   method: 'POST' | 'GET' | 'PUT' | 'DELETE',
   path: string,
@@ -233,6 +238,47 @@ export async function markNotADuplicate(id: string, authHeader: IAuthHeader) {
   )
 
   return getComposition(response)
+}
+
+export async function confirmRegistration(
+  id: string,
+  authHeader: IAuthHeader,
+  details: {
+    error: string | undefined
+    registrationNumber: string
+    identifiers?: IdentifierInput[]
+  }
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/records/${id}/confirm`,
+    authHeader,
+    details
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')
+  if (!taskEntry) {
+    throw new Error('No task entry found in the confirmation response')
+  }
+
+  return taskEntry
+}
+
+export async function rejectRegistration(
+  recordId: string,
+  authHeader: IAuthHeader,
+  details: { comment: string; reason: string }
+) {
+  const res: RejectedRecord = await createRequest(
+    'POST',
+    `/records/${recordId}/reject`,
+    authHeader,
+    details
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
 }
 
 export async function archiveRegistration(

@@ -513,65 +513,6 @@ const parsedFacilities = {
   }
 }
 
-const statuses = {
-  PENDING: 'pending',
-  ACTIVE: 'active',
-  DISABLED: 'disabled',
-  DEACTIVATED: 'deactivated'
-}
-
-const mockFetchConfig = {
-  config: {
-    API_GATEWAY_URL: 'http://localhost:7070/',
-    CONFIG_API_URL: 'http://localhost:2021',
-    LOGIN_URL: 'http://localhost:3020',
-    AUTH_URL: 'http://localhost:4040',
-    RESOURCES_URL: 'http://localhost:3040',
-    APPLICATION_NAME: 'Farajaland CRVS',
-    FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-    DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-    EXTERNAL_VALIDATION_WORKQUEUE: false,
-    PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
-    SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
-    NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
-    COUNTRY: 'zmb',
-    CURRENCY: {
-      isoCode: 'ZMW',
-      languagesAndCountry: ['en-ZM']
-    },
-    LANGUAGES: 'en',
-    INTEGRATIONS: [
-      {
-        name: 'MOSIP',
-        status: statuses.ACTIVE
-      }
-    ]
-  },
-  certificates: [
-    {
-      svgCode: '<svg></svg>'
-    },
-    {
-      svgCode: '<svg></svg>'
-    }
-  ],
-  systems: [
-    {
-      name: 'MOSIP',
-      status: statuses.ACTIVE
-    }
-  ]
-}
-
-const certificates = [
-  {
-    svgCode: '<svg></svg>'
-  },
-  {
-    svgCode: '<svg></svg>'
-  }
-]
-
 describe('referenceApi', () => {
   beforeEach(() => {
     fetch.resetMocks()
@@ -592,14 +533,5 @@ describe('referenceApi', () => {
 
     const data = await referenceApi.loadFacilities()
     expect(data).toEqual(parsedFacilities)
-  })
-
-  it('retrieves the config from the server', async () => {
-    fetch.mockResponseOnce(JSON.stringify(mockFetchConfig))
-    const data = await referenceApi.loadConfig()
-    expect(data).toEqual({
-      ...mockFetchConfig,
-      certificates
-    })
   })
 })

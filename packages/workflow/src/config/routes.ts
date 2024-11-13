@@ -61,7 +61,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/confirm/registration',
+      path: '/records/{id}/confirm',
       handler: markEventAsRegisteredCallbackHandler,
       config: {
         tags: ['api'],

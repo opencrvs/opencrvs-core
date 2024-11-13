@@ -1701,7 +1701,6 @@ export type Registration = {
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<Scalars['String']>
   informantsSignature?: Maybe<Scalars['String']>
-  mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
   paperFormID?: Maybe<Scalars['String']>
@@ -1735,7 +1734,6 @@ export type RegistrationInput = {
   informantType?: InputMaybe<Scalars['String']>
   informantsSignature?: InputMaybe<Scalars['String']>
   location?: InputMaybe<LocationInput>
-  mosipAid?: InputMaybe<Scalars['String']>
   otherInformantType?: InputMaybe<Scalars['String']>
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
@@ -3223,7 +3221,6 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -3570,7 +3567,6 @@ export type FetchBirthRegistrationForCertificateQuery = {
       informantsSignature?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
@@ -4750,7 +4746,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -5105,7 +5100,6 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -7827,7 +7821,6 @@ export type FetchViewRecordByCompositionQuery = {
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
-          mosipAid?: string | null
           duplicates?: Array<{
             __typename?: 'DuplicatesInfo'
             compositionId?: string | null
@@ -8213,7 +8206,6 @@ export type FetchViewRecordByCompositionQuery = {
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
-          mosipAid?: string | null
           duplicates?: Array<{
             __typename?: 'DuplicatesInfo'
             compositionId?: string | null
@@ -8531,7 +8523,6 @@ export type FetchViewRecordByCompositionQuery = {
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
-          mosipAid?: string | null
           duplicates?: Array<{
             __typename?: 'DuplicatesInfo'
             compositionId?: string | null

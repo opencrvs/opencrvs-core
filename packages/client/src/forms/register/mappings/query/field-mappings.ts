@@ -18,7 +18,6 @@ import {
   DeathRegistration,
   MarriageRegistration,
   Address,
-  IdentityType,
   EventRegistration
 } from '@client/utils/gateway'
 import {
@@ -240,36 +239,6 @@ export const identityToFieldTransformer =
 
     return transformedData
   }
-
-export const identityToNidVerificationFieldTransformer = (
-  transformedData: IFormData,
-  queryData: QueryData,
-  sectionId: SectionId,
-  field: IFormField
-) => {
-  identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
-    transformedData,
-    queryData,
-    sectionId,
-    field
-  )
-  const existingIdentity = queryData[sectionId]?.identifier?.find(
-    (identity: IdentityType) =>
-      (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
-  )
-  if (!transformedData[sectionId]) {
-    transformedData[sectionId] = {}
-  }
-
-  if (existingIdentity) {
-    const modifiedFields = existingIdentity[
-      'fieldsModifiedByIdentity'
-    ] as string[]
-    transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
-  }
-
-  return transformedData
-}
 
 export const addressQueryTransformer =
   (config: {
@@ -622,52 +591,6 @@ export const nestedValueToFieldTransformer =
       transformedData[sectionId][field.name] =
         queryData[sectionId][nestedFieldName][field.name]
     }
-    return transformedData
-  }
-
-export const nestedIdentityValueToFieldTransformer =
-  (nestedField: SectionId) =>
-  (
-    transformedData: IFormData,
-    queryData: QueryData,
-    sectionId: SectionId,
-    field: IFormField
-  ) => {
-    if (!queryData[sectionId] || !queryData[sectionId][nestedField]) {
-      return transformedData
-    }
-    const clonedData = cloneDeep(transformedData)
-    if (!clonedData[nestedField]) {
-      clonedData[nestedField] = {}
-    }
-
-    identityToFieldTransformer('id', 'MOSIP_PSUT_TOKEN_ID')(
-      clonedData,
-      queryData[sectionId],
-      nestedField,
-      field
-    )
-
-    if (clonedData[nestedField][field.name] === undefined) {
-      return transformedData
-    }
-    transformedData[sectionId][field.name] = clonedData[nestedField][field.name]
-
-    const existingIdentity = queryData[sectionId][nestedField].identifier?.find(
-      (identity: IdentityType) =>
-        (identity.type as string) === 'MOSIP_PSUT_TOKEN_ID'
-    )
-    if (!transformedData[sectionId]) {
-      transformedData[sectionId] = {}
-    }
-
-    if (existingIdentity) {
-      const modifiedFields = existingIdentity[
-        'fieldsModifiedByIdentity'
-      ] as string[]
-      transformedData[sectionId].fieldsModifiedByNidUserInfo = modifiedFields
-    }
-
     return transformedData
   }
 

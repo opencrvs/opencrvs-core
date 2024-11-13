@@ -34,31 +34,3 @@ export function getBirthRegistrationSectionTransformer(
     transformStatusData(transformedData, queryData[sectionId].status, sectionId)
   }
 }
-
-export function mosipAidTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string
-) {
-  if (queryData[sectionId].mosipAid) {
-    transformedData[targetSectionId || sectionId][
-      targetFieldName || 'mosipAid'
-    ] = queryData[sectionId].mosipAid
-  }
-}
-
-export function mosipAidLabelTransformer(
-  transformedData: IFormData,
-  queryData: any,
-  sectionId: string,
-  targetSectionId?: string,
-  targetFieldName?: string
-) {
-  if (queryData[sectionId].mosipAid) {
-    transformedData[targetSectionId || sectionId][
-      targetFieldName || 'mosipAIDLabel'
-    ] = 'MOSIP Application ID'
-  }
-}

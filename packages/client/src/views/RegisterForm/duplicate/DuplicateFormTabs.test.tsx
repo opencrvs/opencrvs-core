@@ -182,7 +182,6 @@ const viewRecordMock = {
         type: 'BIRTH',
         trackingId: 'BGVLQSH',
         registrationNumber: null,
-        mosipAid: null,
         __typename: 'Registration'
       },
       history: [
