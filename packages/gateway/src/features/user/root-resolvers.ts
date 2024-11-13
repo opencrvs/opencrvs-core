@@ -47,7 +47,17 @@ export const resolvers: GQLResolver = {
   Query: {
     getUser: rateLimitedResolver(
       { requestsPerMinute: 20 },
-      async (_, { userId }, { dataSources }) => {
+      async (_, { userId }, { headers: authHeader, dataSources }) => {
+        if (
+          !hasScope(authHeader, SCOPES.USER_UPDATE) &&
+          !isTokenOwner(authHeader, userId!)
+        ) {
+          return await Promise.reject(
+            new Error(
+              `Can not get user information. ${userId} is not the owner of the token`
+            )
+          )
+        }
         const user = await dataSources.usersAPI.getUserById(userId!)
         return user
       }
@@ -525,10 +535,7 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (
-        !inScope(authHeader, [
-          SCOPES.USER_UPDATE,
-          SCOPES.USER_DATA_SEEDING
-        ])
+        !inScope(authHeader, [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING])
       ) {
         return await Promise.reject(
           new Error(

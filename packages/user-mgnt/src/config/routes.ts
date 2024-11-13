@@ -299,14 +299,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Retrieves a user',
-        auth: {
-          scope: [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.USER_DATA_SEEDING
-          ]
-        },
         validate: {
           payload: getUserRequestSchema
         }
