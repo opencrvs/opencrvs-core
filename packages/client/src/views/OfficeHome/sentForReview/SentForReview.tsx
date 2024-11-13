@@ -52,7 +52,6 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 const ToolTipContainer = styled.span`
   text-align: center;

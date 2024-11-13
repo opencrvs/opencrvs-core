@@ -29,7 +29,6 @@ import {
   InternalRefetchQueriesInclude,
   useApolloClient
 } from '@apollo/client'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import type { AssignmentData } from '@client/utils/gateway'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
