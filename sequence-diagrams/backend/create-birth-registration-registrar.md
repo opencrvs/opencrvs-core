@@ -68,7 +68,7 @@ sequenceDiagram
     Workflow--)Metrics: POST bundle to /events/{event}/waiting-external-validation
 
     Workflow--)Country-Config: POST record to /event-registration
-    Country-Config->>Workflow: POST /confirm/registration
+    Country-Config->>Workflow: POST /records/{id}/confirm
     Workflow->>Search: Get record by id
 
     Workflow->>User management: Fetch user/system information

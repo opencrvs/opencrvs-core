@@ -150,7 +150,18 @@ export async function createTokenForRecordValidation(
       expiresIn: '7 days',
       audience: [
         'opencrvs:gateway-user', // to get to the gateway
-        'opencrvs:user-mgnt-user' // to allow the gateway to connect the 'sub' to an actual user
+        'opencrvs:user-mgnt-user', // to allow the gateway to connect the 'sub' to an actual user
+        'opencrvs:auth-user',
+        'opencrvs:hearth-user',
+        'opencrvs:notification-user',
+        'opencrvs:workflow-user',
+        'opencrvs:search-user',
+        'opencrvs:metrics-user',
+        'opencrvs:countryconfig-user',
+        'opencrvs:webhooks-user',
+        'opencrvs:config-user',
+        'opencrvs:documents-user',
+        'opencrvs:notification-api-user'
       ],
       issuer: JWT_ISSUER
     }

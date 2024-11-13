@@ -757,7 +757,6 @@ export const findPatientPrimaryIdentifier = (patient: Patient) =>
       [
         'PASSPORT',
         'NATIONAL_ID',
-        'MOSIP_PSUT_TOKEN_ID',
         'DECEASED_PATIENT_ENTRY',
         'BIRTH_PATIENT_ENTRY',
         'DRIVING_LICENSE',
