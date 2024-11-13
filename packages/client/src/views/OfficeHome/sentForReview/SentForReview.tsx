@@ -195,27 +195,22 @@ class SentForReviewComponent extends React.Component<
       const downloadStatus =
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: DownloadAction.LOAD_REVIEW_DECLARATION,
-                declarationStatus: reg.declarationStatus,
-                assignment: reg.assignment ?? undefined
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        actions.push({
-          actionComponent: <Downloaded />
-        })
-      }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
+              declarationStatus: reg.declarationStatus,
+              assignment: reg.assignment ?? undefined
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
+        )
+      })
+
       const event =
         (reg.event &&
           intl.formatMessage(

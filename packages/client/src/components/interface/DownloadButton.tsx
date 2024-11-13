@@ -254,8 +254,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   //const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
 
   const isDownloadable =
-    status !== DOWNLOAD_STATUS.DOWNLOADED &&
-    (!assignment || assignment.practitionerId === practitionerId)
+    !assignment || assignment.practitionerId === practitionerId
 
   const onDownloadClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -280,7 +279,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
               onCancel: hideModal
             },
             scopes ?? [],
-            status === DOWNLOAD_STATUS.DOWNLOADED
+            status === DOWNLOAD_STATUS.DOWNLOADED &&
+              assignment?.practitionerId === practitionerId
           )
         )
       } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
@@ -339,9 +339,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         className={className}
         aria-label={intl.formatMessage(constantsMessages.assignRecord)}
       >
-        {status === DOWNLOAD_STATUS.DOWNLOADED ? (
-          <Downloaded />
-        ) : assignment && assignment.practitionerId !== practitionerId ? (
+        {assignment ? (
           <AvatarSmall
             avatar={{
               data: assignment.avatarURL,
