@@ -46,7 +46,6 @@ export type OpenCRVSPatientName = Omit<fhir3.HumanName, 'use'> & {
 export const SUPPORTED_PATIENT_IDENTIFIER_CODES = [
   'PASSPORT',
   'NATIONAL_ID',
-  'MOSIP_PSUT_TOKEN_ID',
   'DECEASED_PATIENT_ENTRY',
   'BIRTH_PATIENT_ENTRY',
   'DRIVING_LICENSE',

@@ -96,6 +96,7 @@ services:
       - FHIR_URL=http://hearth:3447/fhir
       - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - AUTH_URL=http://auth:4040
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
     image: opencrvs/ocrvs-search:${VERSION}
