@@ -1491,6 +1491,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const practitionerId = user.valueReference.reference.split('/')[1]
+      console.log('practionerId', practitionerId)
       const practitionerRoleBundle =
         await dataSources.fhirAPI.getPractitionerRoleByPractitionerId(
           practitionerId
@@ -1509,6 +1510,10 @@ export const typeResolvers: GQLResolver = {
         practitionerRoleHistory,
         task.lastModified
       )
+
+      console.log('role', role)
+      console.log('-----')
+      console.log('systemRole', systemRole)
 
       if (role && systemRole) {
         return {
