@@ -20,6 +20,15 @@ import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
+import authenticateHandler, {
+  requestSchema as reqAuthSchema,
+  responseSchema as resAuthSchema
+} from '@gateway/routes/authenticate/handler'
+import getPublicKey from '@gateway/routes/getPublicKey/handler'
+import resendAuthCodeHandler, {
+  requestSchema as reqResendAuthenticationCodeSchema,
+  responseSchma as resResendAuthenticationCodeSchema
+} from '@gateway/routes/resendAuthenticationCode/handler'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -76,6 +85,54 @@ export const getRoutes = () => {
         }
       }
     },
+    {
+      method: 'GET',
+      path: '/.well-known',
+      handler: getPublicKey,
+      options: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/authenticate',
+      handler: authenticateHandler,
+      options: {
+        tags: ['api'],
+        description: 'Authenticate with username and password',
+        notes:
+          'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+          'Sends an SMS to the user mobile with verification code',
+        validate: {
+          payload: reqAuthSchema
+        },
+        response: {
+          schema: resAuthSchema
+        },
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: true
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/resendAuthenticationCode',
+      handler: resendAuthCodeHandler,
+      options: {
+        tags: ['api'],
+        description: 'Resend another authentication code',
+        notes:
+          'Sends a new authentication code to the user based on the phone number or email associated with the nonce',
+        validate: {
+          payload: reqResendAuthenticationCodeSchema
+        },
+        response: {
+          schema: resResendAuthenticationCodeSchema
+        }
+      }
+    },
 
     catchAllProxy.locations,
     catchAllProxy.locationsSuffix,
@@ -85,7 +142,6 @@ export const getRoutes = () => {
 
     catchAllProxy.auth,
     authProxy.token,
-    rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
     rateLimitedAuthProxy.verifyUser
   ]
