@@ -267,6 +267,7 @@ export const getApolloConfig = (): Config<Context> => {
   return {
     schema,
     introspection: true,
+    debug: true,
     dataSources: getDataSources,
     context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
       return {
