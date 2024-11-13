@@ -26,7 +26,7 @@
 - Deploy UI-Kit Storybook to [opencrvs.pages.dev](https://opencrvs.pages.dev) to allow extending OpenCRVS using the component library
 - Record audit action buttons are moved into action menu [#7390](https://github.com/opencrvs/opencrvs-core/issues/7390)
 - Reoder the sytem user add/edit field for surname to be first, also change labels from `Last name` to `User's surname` and lastly remove the NID question from the form [#6830](https://github.com/opencrvs/opencrvs-core/issues/6830)
-- Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
+- Auth now allows registrar's token to be exchanged for a new token that strictly allows confirming or rejecting a specific record. Core now passes this token to country configuration instead of the registrar's token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728) [#7849](https://github.com/opencrvs/opencrvs-core/issues/7849)
 
 ## Bug fixes
 
@@ -44,6 +44,7 @@
 - Internally we were storing the `family` name field as a required property which was limiting what how you could capture the name of a person in the forms. Now we are storing it as an optional property which would make more flexible.
 - Remove the leftover features from the application config pages, such as certificates and informant notification. [#7156](https://github.com/opencrvs/opencrvs-core/issues/7156)
 - **PDF page size** The generated PDF used to be defaulted to A4 size. Now it respects the SVG dimensions if specified
+- Support html content wrapped in `foreignObject` used in svg template in certificate PDF output
 
 ## Bug fixes
 
