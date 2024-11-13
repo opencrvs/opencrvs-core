@@ -192,7 +192,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         type
         trackingId
         registrationNumber
-        mosipAid
       }
       typeOfMarriage
       eventLocation {
@@ -514,7 +513,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         type
         trackingId
         registrationNumber
-        mosipAid
       }
       typeOfMarriage
       eventLocation {

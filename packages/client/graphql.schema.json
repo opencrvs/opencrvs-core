@@ -14854,18 +14854,6 @@
             "deprecationReason": null
           },
           {
-            "name": "mosipAid",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "otherInformantType",
             "description": null,
             "args": [],
@@ -15230,18 +15218,6 @@
             "type": {
               "kind": "INPUT_OBJECT",
               "name": "LocationInput",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "mosipAid",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
               "ofType": null
             },
             "defaultValue": null,

@@ -180,7 +180,6 @@ const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         type
         trackingId
         registrationNumber
-        mosipAid
       }
       attendantAtBirth
       weightAtBirth
@@ -489,7 +488,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         trackingId
         registrationNumber
-        mosipAid
       }
       attendantAtBirth
       weightAtBirth
