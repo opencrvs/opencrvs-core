@@ -19,7 +19,6 @@ import { TimeField } from '@opencrvs/components/lib/TimeField'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
-import { usePrevious } from '@client/hooks/usePrevious'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -880,37 +879,26 @@ const FormSectionComponent = (props: Props) => {
     showValidationErrors
   ])
 
-  const prevProps = usePrevious(props)
+  useEffect(() => {
+    onChange(values)
+  }, [values, onChange])
 
   useEffect(() => {
-    const userChangedForm = !isEqual(values, prevProps?.values)
-    const sectionChanged = prevProps?.id !== id
-
-    if (userChangedForm) {
-      onChange(values)
-    }
-
-    if (sectionChanged) {
-      resetForm()
-      if (setAllFieldsDirty) {
-        showValidationErrors(fields)
-      } else if (
-        fieldsToShowValidationErrors &&
-        fieldsToShowValidationErrors.length > 0
-      ) {
-        showValidationErrors(fieldsToShowValidationErrors)
-      }
+    resetForm()
+    if (setAllFieldsDirty) {
+      showValidationErrors(fields)
+    } else if (
+      fieldsToShowValidationErrors &&
+      fieldsToShowValidationErrors.length > 0
+    ) {
+      showValidationErrors(fieldsToShowValidationErrors)
     }
   }, [
-    values,
-    id,
-    onChange,
+    resetForm,
     setAllFieldsDirty,
     fields,
     fieldsToShowValidationErrors,
-    showValidationErrors,
-    resetForm,
-    prevProps
+    showValidationErrors
   ])
 
   const setFieldValuesWithDependency = (
