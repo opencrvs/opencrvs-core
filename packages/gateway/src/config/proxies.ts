@@ -11,6 +11,10 @@
 import { APPLICATION_CONFIG_URL, AUTH_URL } from '@gateway/constants'
 import { rateLimitedRoute } from '@gateway/rate-limit'
 import { ServerRoute } from '@hapi/hapi'
+import authenticateHandler, {
+  requestSchema as reqAuthSchema,
+  responseSchema as resAuthSchema
+} from '@gateway/features/authenticate/handler'
 
 export const catchAllProxy = {
   auth: {
@@ -117,21 +121,44 @@ export const authProxy = {
 } satisfies Record<string, ServerRoute>
 
 export const rateLimitedAuthProxy = {
+  // authenticate: {
+  //   method: 'POST',
+  //   path: '/auth/authenticate',
+  //   handler: rateLimitedRoute(
+  //     { requestsPerMinute: 10, pathForKey: 'username' },
+  //     (_, h) =>
+  //       h.proxy({
+  //         uri: AUTH_URL + '/authenticate'
+  //       })
+  //   ),
+  //   options: {
+  //     auth: false,
+  //     payload: {
+  //       output: 'data',
+  //       parse: false
+  //     }
+  //   }
+  // },
   authenticate: {
     method: 'POST',
     path: '/auth/authenticate',
-    handler: rateLimitedRoute(
-      { requestsPerMinute: 10, pathForKey: 'username' },
-      (_, h) =>
-        h.proxy({
-          uri: AUTH_URL + '/authenticate'
-        })
-    ),
+    handler: authenticateHandler,
     options: {
+      tags: ['api'],
+      description: 'Authenticate with username and password',
+      notes:
+        'Authenticates user and returns nonce to use for collating the login for 2 factor authentication.' +
+        'Sends an SMS to the user mobile with verification code',
+      validate: {
+        payload: reqAuthSchema
+      },
+      response: {
+        schema: resAuthSchema
+      },
       auth: false,
       payload: {
         output: 'data',
-        parse: false
+        parse: true
       }
     }
   },
