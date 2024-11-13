@@ -196,6 +196,7 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
+  qrData: string
   showConfirmationModal: boolean
   confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
@@ -655,6 +656,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isDataAltered: false,
       rejectFormOpen: false,
       hasError: false,
+      qrData: '',
       showConfirmationModal: false,
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
@@ -1215,8 +1217,23 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 <QRCodeScanner
                                   label="Scan QR code"
                                   fallbackErrorMessage="Video capture not allowed by the browser"
-                                  onScanSuccess={console.log}
+                                  onScanSuccess={(data) => {
+                                    this.modifyDeclaration(
+                                      {
+                                        ...declaration.data[activeSection.id],
+                                        qrCode: data
+                                      },
+                                      activeSection,
+                                      declaration
+                                    )
+                                    this.setState({ qrData: data })
+                                  }}
                                 />
+                              )}
+                              {this.state.qrData && (
+                                <p>{`${typeof this.state.qrData}:${
+                                  this.state.qrData
+                                }`}</p>
                               )}
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
