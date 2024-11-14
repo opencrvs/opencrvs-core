@@ -108,7 +108,7 @@ describe('Register record endpoint', () => {
 
   it('returns OK for a correctly authenticated user registering a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: [SCOPES.RECORD_REGISTER] },
+      { scope: [SCOPES.RECORD_CONFIRM_REGISTRATION] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
@@ -125,6 +125,13 @@ describe('Register record endpoint', () => {
           return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
+    )
+
+    // Notification endpoint mockcall
+    mswServer.use(
+      rest.get('http://localhost:3040/record-notification', (_, res, ctx) => {
+        return res(ctx.json({}))
+      })
     )
 
     // Mock response from hearth
