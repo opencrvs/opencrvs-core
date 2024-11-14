@@ -19,7 +19,8 @@ export const env = cleanEnv(process.env, {
   METRICS_URL: url({ devDefault: 'http://localhost:1050' }),
   NOTIFICATION_SERVICE_URL: url({ devDefault: 'http://localhost:2020/' }),
   DOMAIN: str({ devDefault: '*' }),
-  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }),
+  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040/' }), // used for external requests (CORS whitelist)
+  COUNTRY_CONFIG_URL_INTERNAL: url({ devDefault: 'http://localhost:3040/' }), // used for internal service-to-service communication
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
   CERT_PRIVATE_KEY_PATH: str({ devDefault: '../../.secrets/private-key.pem' }),

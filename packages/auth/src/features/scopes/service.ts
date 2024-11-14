@@ -18,7 +18,7 @@ import {
 
 export async function getUserRoleScopeMapping() {
   const roles = await fetchJSON<Roles>(
-    joinURL(env.COUNTRY_CONFIG_URL, '/roles')
+    joinURL(env.COUNTRY_CONFIG_URL_INTERNAL, '/roles')
   )
 
   logger.info(
