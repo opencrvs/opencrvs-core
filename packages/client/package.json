@@ -112,6 +112,7 @@
     "@graphql-codegen/introspection": "^3.0.0",
     "@graphql-codegen/typescript": "^3.0.0",
     "@graphql-codegen/typescript-operations": "^3.0.0",
+    "@types/browser-image-compression": "^1.0.13",
     "@types/csv2json": "^1.4.5",
     "@types/enzyme": "^3.1.13",
     "@types/fetch-mock": "^7.3.0",
