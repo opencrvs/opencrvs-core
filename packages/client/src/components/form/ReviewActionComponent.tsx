@@ -390,35 +390,27 @@ const ReviewActionComponent = ({
             </ProtectedComponent>
           ) : (
             <>
-              {!completeDeclaration && (
-                <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}>
-                  <Button
-                    type="primary"
-                    size="large"
-                    id="submit_incomplete"
-                    onClick={toggleSubmitModalOpen}
-                    disabled={hasErrorsOnFields || totalFileSizeExceeded}
-                  >
-                    <Upload />
-                    {intl.formatMessage(buttonMessages.sendIncomplete)}
-                  </Button>
-                </ProtectedComponent>
-              )}
-              <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_REVIEW]}>
+              <ProtectedComponent
+                scopes={[
+                  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+                  SCOPES.RECORD_SUBMIT_INCOMPLETE
+                ]}
+              >
                 <Button
                   type="primary"
                   size="large"
-                  id="submit_for_review"
-                  onClick={toggleSubmitModalOpen}
-                  disabled={
-                    hasErrorsOnFields ||
-                    totalFileSizeExceeded ||
-                    (!completeDeclaration &&
-                      !hasScope(SCOPES.RECORD_SUBMIT_INCOMPLETE))
+                  id={
+                    completeDeclaration
+                      ? 'submit_for_review'
+                      : 'submit_incomplete'
                   }
+                  onClick={toggleSubmitModalOpen}
+                  disabled={hasErrorsOnFields || totalFileSizeExceeded}
                 >
                   <Upload />
-                  {intl.formatMessage(buttonMessages.sendForReview)}
+                  {completeDeclaration
+                    ? intl.formatMessage(buttonMessages.sendForReview)
+                    : intl.formatMessage(buttonMessages.sendIncomplete)}
                 </Button>
               </ProtectedComponent>
             </>
