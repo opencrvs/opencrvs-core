@@ -48,6 +48,33 @@ import { printPDF } from '@client/pdfRenderer'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { ICertificateConfigData } from '@client/utils/referenceApi'
+import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+
+async function replaceMinioUrlWithBase64(template: Record<string, any>) {
+  const regex = /\/[^\/?]+\.(jpg|png|jpeg|svg)(?=\?|$)/
+
+  async function recursiveTransform(obj: any) {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj
+    }
+
+    const transformedObject = Array.isArray(obj) ? [...obj] : { ...obj }
+
+    for (const key in obj) {
+      const value = obj[key]
+      if (typeof value === 'string' && regex.test(value)) {
+        transformedObject[key] = await fetchImageAsBase64(value)
+      } else if (typeof value === 'object') {
+        transformedObject[key] = await recursiveTransform(value)
+      } else {
+        transformedObject[key] = value
+      }
+    }
+
+    return transformedObject
+  }
+  return recursiveTransform(template)
+}
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -201,9 +228,13 @@ export const usePrintableCertificate = () => {
       certificateTemplateConfig.svgUrl
     )
 
+    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
+      draft.data.template
+    )
+
     const svg = await compileSvg(
       svgTemplate,
-      { ...draft.data.template, preview: false },
+      { ...base64ReplacedTemplate, preview: false },
       state
     )
     draft.data.registration = {
