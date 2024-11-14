@@ -463,8 +463,7 @@ describe('Given a user with scopes views Navigation', () => {
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
       SCOPES.RECORD_REGISTRATION_CORRECT,
       SCOPES.RECORD_DECLARATION_ARCHIVE,
-      SCOPES.RECORD_DECLARATION_REINSTATE,
-      SCOPES.RECORD_REGISTRATION_REVOKE
+      SCOPES.RECORD_DECLARATION_REINSTATE
     ] as Scope[]
 
     const allOtherScopes = allScopes.filter(

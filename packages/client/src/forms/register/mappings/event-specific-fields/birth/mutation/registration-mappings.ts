@@ -26,10 +26,6 @@ export function setBirthRegistrationSectionTransformer(
       draftData[sectionId].registrationNumber
   }
 
-  if (draftData[sectionId].mosipAid) {
-    transformedData[sectionId].mosipAid = draftData[sectionId].mosipAid
-  }
-
   if (!transformedData[sectionId].status) {
     transformedData[sectionId].status = [
       {

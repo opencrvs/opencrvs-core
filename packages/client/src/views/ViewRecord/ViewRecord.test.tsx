@@ -212,7 +212,6 @@ describe('View Record for loading and success state', () => {
                 type: 'DEATH',
                 trackingId: 'DHN9T01',
                 registrationNumber: '2022DHN9T01',
-                mosipAid: null,
                 __typename: 'Registration'
               },
               history: [

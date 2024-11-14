@@ -1505,7 +1505,7 @@ describe('Reinstate action', () => {
 describe('Print action', () => {
   it('Draft', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1524,7 +1524,7 @@ describe('Print action', () => {
 
   it('In progress', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1543,7 +1543,7 @@ describe('Print action', () => {
 
   it('In review', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1562,7 +1562,7 @@ describe('Print action', () => {
 
   it('Potential duplicate', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1582,7 +1582,7 @@ describe('Print action', () => {
 
   it('Requires update', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1601,7 +1601,7 @@ describe('Print action', () => {
 
   it('Validated', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1620,7 +1620,7 @@ describe('Print action', () => {
 
   it('Archived', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1639,7 +1639,7 @@ describe('Print action', () => {
 
   it('Registered - Downloaded', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1684,7 +1684,7 @@ describe('Print action', () => {
 
   it('Registered - Not downloaded - Has scope', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1703,7 +1703,7 @@ describe('Print action', () => {
 
   it('Registered + Printed in advance', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1722,7 +1722,7 @@ describe('Print action', () => {
 
   it('Pending correction', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1762,7 +1762,7 @@ describe('Issue action', () => {
 
   it('In progress', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1781,7 +1781,7 @@ describe('Issue action', () => {
 
   it('In review', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1800,7 +1800,7 @@ describe('Issue action', () => {
 
   it('Potential duplicate', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1820,7 +1820,7 @@ describe('Issue action', () => {
 
   it('Requires update', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1839,7 +1839,7 @@ describe('Issue action', () => {
 
   it('Validated', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1858,7 +1858,7 @@ describe('Issue action', () => {
 
   it('Archived', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1877,7 +1877,7 @@ describe('Issue action', () => {
 
   it('Registered', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1958,7 +1958,7 @@ describe('Issue action', () => {
 
   it('Pending correction', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_PRINT_CERTIFIED_COPIES], store)
+    setScopes([SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{

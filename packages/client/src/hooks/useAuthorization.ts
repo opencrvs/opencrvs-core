@@ -58,10 +58,18 @@ export function usePermissions() {
     return false
   }
 
+  const canPrintRecord = () =>
+    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+
+  const canIssueRecord = () =>
+    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+
   return {
     hasScopes,
     hasScope,
     hasAnyScope,
+    canPrintRecord,
+    canIssueRecord,
     canReadUser,
     canEditUser,
     canReadOfficeUsers,

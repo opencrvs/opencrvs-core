@@ -10,7 +10,7 @@
  */
 
 export const SCOPES = {
-  // TODO Remove legacy scopes
+  // TODO v1.8 legacy scopes
   NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
 
@@ -59,24 +59,24 @@ export const SCOPES = {
   RECORD_DECLARATION_PRINT: 'record.declaration-print',
   RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
     'record.declaration-print-supporting-documents',
-  RECORD_REGISTRATION_PRINT: 'record.registration-print',
+  RECORD_REGISTRATION_PRINT: 'record.registration-print', // v1.8
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
-  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies',
+  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies', // v1.8
   RECORD_BULK_PRINT_CERTIFIED_COPIES:
-    'record.registration-bulk-print-certified-copies',
+    'record.registration-bulk-print-certified-copies', // v1.8
   RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
-    'record.registration-verify-certified-copies',
+    'record.registration-verify-certified-copies', // v1.8
 
   // correct
   RECORD_REGISTRATION_REQUEST_CORRECTION:
     'record.registration-request-correction',
   RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
   RECORD_REGISTRATION_REQUEST_REVOCATION:
-    'record.registration-request-revocation',
-  RECORD_REGISTRATION_REVOKE: 'record.registration-revoke',
+    'record.registration-request-revocation', // v1.8
+  RECORD_REGISTRATION_REVOKE: 'record.registration-revoke', // v1.8
   RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
-    'record.registration-request-reinstatement',
+    'record.registration-request-reinstatement', // v1.8
   RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
   RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
   RECORD_REJECT_REGISTRATION: 'record.reject-registration',
@@ -89,14 +89,14 @@ export const SCOPES = {
   SEARCH_MARRIAGE_MY_JURISDICTION: 'search.marriage:my-jurisdiction',
   SEARCH_MARRIAGE: 'search.marriage',
 
-  // audit
+  // audit v1.8
   RECORD_READ: 'record.read',
   RECORD_READ_AUDIT: 'record.read-audit',
   RECORD_READ_COMMENTS: 'record.read-comments',
   RECORD_CREATE_COMMENTS: 'record.create-comments',
 
   // profile
-  PROFILE_UPDATE: 'profile.update',
+  PROFILE_UPDATE: 'profile.update', //v1.8
   PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
 
   // performance

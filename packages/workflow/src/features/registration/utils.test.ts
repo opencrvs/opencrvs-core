@@ -10,19 +10,13 @@
  */
 import {
   generateTrackingIdForEvents,
-  convertStringToASCII,
-  getMosipUINToken
+  convertStringToASCII
 } from '@workflow/features/registration/utils'
-import {
-  mosipDeceasedPatientMock,
-  mosipSuccessMock
-} from '@workflow/test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { Bundle } from '@opencrvs/commons/types'
 import { server as mswServer } from '@test/setupServer'
 import { rest } from 'msw'
-import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
 
 const fetch = fetchAny as any
 
@@ -86,20 +80,5 @@ describe('Verify utility functions', () => {
 
     expect(ascii).toBeDefined()
     expect(ascii).toBe('66538771897469')
-  })
-})
-
-describe('getMosipUINToken functions', () => {
-  beforeAll(() => {
-    fetch.mockClear()
-  })
-  it('Calls mosip token seeder function and returns success', async () => {
-    mswServer.use(
-      rest.post(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, (_, res, ctx) =>
-        res(ctx.json(mosipSuccessMock))
-      )
-    )
-    const mosipResponse = await getMosipUINToken(mosipDeceasedPatientMock)
-    expect(mosipResponse).toEqual(mosipSuccessMock)
   })
 })
