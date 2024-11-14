@@ -28,7 +28,7 @@ export function stripTypename(obj: any): any {
   return obj
 }
 export function transformCertificateData(certificates: ICertificate[]) {
-  const certificateData = certificates[0]
+  const certificateData = stripTypename(certificates[0])
 
   // Prepare the base certificate data
   const updatedCertificates: ICertificate[] = [
