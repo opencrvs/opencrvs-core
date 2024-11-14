@@ -731,27 +731,6 @@ export const typeResolvers: GQLResolver = {
 
       return (foundIdentifier && foundIdentifier.value) || null
     },
-    async mosipAid(task: Task) {
-      const mosipAidType =
-        task &&
-        task.code &&
-        task.code.coding &&
-        task.code.coding[0] &&
-        task.code.coding[0].code
-
-      if (mosipAidType !== 'BIRTH') {
-        return null
-      }
-
-      const foundIdentifier =
-        task.identifier &&
-        task.identifier.find(
-          (identifier: Identifier) =>
-            identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/mosip-aid`
-        )
-
-      return (foundIdentifier && foundIdentifier.value) || null
-    },
     async attachments(task: Task, _, context) {
       if (!task.focus) {
         throw new Error(

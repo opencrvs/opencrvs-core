@@ -669,7 +669,6 @@ export interface GQLRegistration {
   _fhirID?: string
   draftId?: string
   trackingId?: string
-  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -1082,7 +1081,6 @@ export interface GQLRegistrationInput {
   _fhirID?: string
   draftId?: string
   trackingId?: string
-  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -5436,7 +5434,6 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
   draftId?: RegistrationToDraftIdResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
-  mosipAid?: RegistrationToMosipAidResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
@@ -5492,15 +5489,6 @@ export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToMosipAidResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
