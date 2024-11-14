@@ -29,6 +29,7 @@
     "focus-visible": "^5.0.2",
     "google-libphonenumber": "^3.2.32",
     "history": "^4.7.2",
+    "jsdom": "16.7.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "lodash-es": "^4.17.0",
