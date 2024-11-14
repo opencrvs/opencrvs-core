@@ -29,6 +29,14 @@ import resendAuthCodeHandler, {
   requestSchema as reqResendAuthenticationCodeSchema,
   responseSchma as resResendAuthenticationCodeSchema
 } from '@gateway/routes/resendAuthenticationCode/handler'
+import verifyAuthCodeHandler, {
+  requestSchema as reqVerifySchema,
+  responseSchma as resVerifySchema
+} from '@gateway/routes/verifyAuthCode/handler'
+import verifyRefreshTokenHandler, {
+  requestSchema as refreshTokenReqSchema,
+  responseSchma as refreshTokenResSchema
+} from '@gateway/routes/refreshToken/handler'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -85,14 +93,16 @@ export const getRoutes = () => {
         }
       }
     },
+    // Check where this API has been used
     {
       method: 'GET',
-      path: '/.well-known',
+      path: '/auth/.well-known',
       handler: getPublicKey,
       options: {
         tags: ['api']
       }
     },
+    // DONE
     {
       method: 'POST',
       path: '/auth/authenticate',
@@ -116,9 +126,10 @@ export const getRoutes = () => {
         }
       }
     },
+    // /resendAuthenticationCode Need to call from UI (need to check from where UI it is called)
     {
       method: 'POST',
-      path: '/resendAuthenticationCode',
+      path: '/auth/resendAuthenticationCode',
       handler: resendAuthCodeHandler,
       options: {
         tags: ['api'],
@@ -130,6 +141,43 @@ export const getRoutes = () => {
         },
         response: {
           schema: resResendAuthenticationCodeSchema
+        }
+      }
+    },
+    // /verifyCode Need to be called from UI
+    {
+      method: 'POST',
+      path: '/auth/verifyCode',
+      handler: verifyAuthCodeHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description: 'Verify the 2 factor auth code',
+        notes:
+          'Verifies the 2 factor auth code and returns the JWT API token for future requests',
+        validate: {
+          payload: reqVerifySchema
+        },
+        response: {
+          schema: resVerifySchema
+        }
+      }
+    },
+    // Need to check from where this API should be called in the UI
+    {
+      method: 'POST',
+      path: '/auth/refreshToken',
+      handler: verifyRefreshTokenHandler,
+      options: {
+        tags: ['api'],
+        description: 'Refresh an expiring token',
+        notes:
+          'Verifies the expired client token as true and returns a refreshed JWT API token for future requests',
+        validate: {
+          payload: refreshTokenReqSchema
+        },
+        response: {
+          schema: refreshTokenResSchema
         }
       }
     },
