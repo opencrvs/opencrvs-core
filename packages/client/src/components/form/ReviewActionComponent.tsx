@@ -388,35 +388,40 @@ const ReviewActionComponent = ({
                 {intl.formatMessage(buttonMessages.sendForApproval)}
               </Button>
             </ProtectedComponent>
-          ) : !completeDeclaration ? (
-            <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}>
-              <Button
-                type="primary"
-                size="large"
-                id="submit_incomplete"
-                onClick={toggleSubmitModalOpen}
-                disabled={hasErrorsOnFields || totalFileSizeExceeded}
-              >
-                <Upload />
-                {intl.formatMessage(buttonMessages.sendIncomplete)}
-              </Button>
-            </ProtectedComponent>
           ) : (
-            <ProtectedComponent
-              scopes={[SCOPES.RECORD_SUBMIT_FOR_REVIEW]}
-              denyScopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}
-            >
-              <Button
-                type="primary"
-                size="large"
-                id="submit_for_review"
-                onClick={toggleSubmitModalOpen}
-                disabled={hasErrorsOnFields || totalFileSizeExceeded}
-              >
-                <Upload />
-                {intl.formatMessage(buttonMessages.sendForReview)}
-              </Button>
-            </ProtectedComponent>
+            <>
+              {!completeDeclaration && (
+                <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    id="submit_incomplete"
+                    onClick={toggleSubmitModalOpen}
+                    disabled={hasErrorsOnFields || totalFileSizeExceeded}
+                  >
+                    <Upload />
+                    {intl.formatMessage(buttonMessages.sendIncomplete)}
+                  </Button>
+                </ProtectedComponent>
+              )}
+              <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_REVIEW]}>
+                <Button
+                  type="primary"
+                  size="large"
+                  id="submit_for_review"
+                  onClick={toggleSubmitModalOpen}
+                  disabled={
+                    hasErrorsOnFields ||
+                    totalFileSizeExceeded ||
+                    (!completeDeclaration &&
+                      !hasScope(SCOPES.RECORD_SUBMIT_INCOMPLETE))
+                  }
+                >
+                  <Upload />
+                  {intl.formatMessage(buttonMessages.sendForReview)}
+                </Button>
+              </ProtectedComponent>
+            </>
           )}
           {rejectDeclarationAction && !alreadyRejectedDeclaration && (
             <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_UPDATES]}>
