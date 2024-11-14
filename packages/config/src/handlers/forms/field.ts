@@ -110,6 +110,7 @@ const DividerField = base.extend({ type: z.literal('DIVIDER') })
 const Heading3Field = base.extend({ type: z.literal('HEADING3') })
 const SignatureField = base.extend({ type: z.literal('SIGNATURE') })
 const RedirectField = base.extend({ type: z.literal('REDIRECT') })
+const QRScannerField = base.extend({ type: z.literal('QR_SCANNER') })
 
 // completed types
 const HttpField = base.extend({
@@ -167,7 +168,8 @@ export const field = z.discriminatedUnion('type', [
   SignatureField,
   HttpField,
   ButtonField,
-  RedirectField
+  RedirectField,
+  QRScannerField
 ])
 
 type Field = z.infer<typeof field>

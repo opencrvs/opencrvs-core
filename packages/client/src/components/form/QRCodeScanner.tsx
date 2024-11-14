@@ -23,6 +23,8 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
   const [barcodeDetector, setBarcodeDetector] =
     useState<BarcodeDetector | null>(null)
   const [isScanInitiated, setIsScanInitiated] = useState(false)
+  const [isScanPermitted, setIsScanPermitted] = useState(true)
+  const [isScanComplete, setIsScanComplete] = useState(false)
 
   useEffect(() => {
     const videoCurrent = videoRef.current
@@ -50,6 +52,7 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
           }
         })
         .catch((err) => {
+          setIsScanPermitted(false)
           console.error('Error accessing the camera: ', err)
         })
 
@@ -75,6 +78,7 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
                 const stream = videoRef.current.srcObject as MediaStream
                 stream.getTracks().forEach((track) => track.stop())
               }
+              setIsScanComplete(true)
             }
           })
           .catch((err) => {
@@ -89,8 +93,8 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
 
   return (
     <div className="camera">
-      {isScanInitiated && (
-        <video ref={videoRef} id="video">
+      {isScanInitiated && isScanPermitted && !isScanComplete && (
+        <video ref={videoRef} id="video" muted>
           {props.fallbackErrorMessage}
         </video>
       )}

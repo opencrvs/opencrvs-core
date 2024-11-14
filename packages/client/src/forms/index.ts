@@ -75,6 +75,7 @@ export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
 export const REDIRECT = 'REDIRECT'
+export const QR_SCANNER = 'QR_SCANNER'
 
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
@@ -734,6 +735,10 @@ export interface IRedirectFormField extends IFormFieldBase {
   }
 }
 
+export interface IQRScannerFormField extends IFormFieldBase {
+  type: typeof QR_SCANNER
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -770,6 +775,7 @@ export type IFormField =
   | IHttpFormField
   | IButtonFormField
   | IRedirectFormField
+  | IQRScannerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1237,6 +1243,10 @@ interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   }
 }
 
+interface Ii18nQRScannerFormField extends Ii18nFormFieldBase {
+  type: typeof QR_SCANNER
+}
+
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1271,6 +1281,7 @@ export type Ii18nFormField =
   | Ii18nHttpFormField
   | Ii18nButtonFormField
   | Ii18nRedirectFormField
+  | Ii18nQRScannerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

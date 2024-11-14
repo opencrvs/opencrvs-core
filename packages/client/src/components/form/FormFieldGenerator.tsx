@@ -93,7 +93,8 @@ import {
   DependencyInfo,
   Ii18nButtonFormField,
   REDIRECT,
-  IDocumentUploaderWithOptionsFormField
+  IDocumentUploaderWithOptionsFormField,
+  QR_SCANNER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -135,6 +136,7 @@ import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { RedirectField } from '@client/components/form/Redirect'
+import QRCodeScanner from './QRCodeScanner'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -263,6 +265,21 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         </InputField>
       )
     }
+
+    if (fieldDefinition.type === QR_SCANNER) {
+      return (
+        <InputField {...inputFieldProps} hideInputHeader>
+          <QRCodeScanner
+            label="Scan QR code"
+            fallbackErrorMessage="Video capture not allowed by the browser"
+            onScanSuccess={(data) => {
+              setFieldValue(fieldDefinition.name, JSON.parse(data))
+            }}
+          />
+        </InputField>
+      )
+    }
+
     if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
       return (
         <InputField {...inputFieldProps}>

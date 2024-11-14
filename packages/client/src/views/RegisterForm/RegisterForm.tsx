@@ -1213,23 +1213,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     )}
                                   </Alert>
                                 )}
-                              {activeSection.id !== 'information' && (
-                                <QRCodeScanner
-                                  label="Scan QR code"
-                                  fallbackErrorMessage="Video capture not allowed by the browser"
-                                  onScanSuccess={(data) => {
-                                    this.modifyDeclaration(
-                                      {
-                                        ...declaration.data[activeSection.id],
-                                        qrCode: data
-                                      },
-                                      activeSection,
-                                      declaration
-                                    )
-                                    this.setState({ qrData: data })
-                                  }}
-                                />
-                              )}
                               {this.state.qrData && (
                                 <p>{`${typeof this.state.qrData}:${
                                   this.state.qrData
