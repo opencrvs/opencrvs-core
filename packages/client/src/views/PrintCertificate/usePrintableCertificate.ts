@@ -26,7 +26,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
-  getToken,
   hasRegisterScope,
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
@@ -45,13 +44,12 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { printPDF } from '@client/pdfRenderer'
-import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import { ICertificateConfigData } from '@client/utils/referenceApi'
+import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
-  const regex = /\/[^\/?]+\.(jpg|png|jpeg|svg)(?=\?|$)/
+  const regex = /\/[^\/?]+\.(jpg|png|jpeg|svg)(?=\?|$)/i
 
   async function recursiveTransform(obj: any) {
     if (typeof obj !== 'object' || obj === null) {
@@ -155,44 +153,22 @@ export const usePrintableCertificate = () => {
     declaration?.event !== Event.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
-  const [svgCode, setSvgCode] = useState<string>()
-  const certificateTemplateConfig: ICertificateConfigData | undefined =
+  const certificateTemplateConfig: ICertificateData | undefined =
     offlineData.templates.certificates.find(
       (x) =>
         x.id ===
         declaration?.data.registration.certificates[0].certificateTemplateId
     )
+  if (!certificateTemplateConfig) return { svgCode: null }
+
   const certificateFonts = certificateTemplateConfig?.fonts ?? {}
-
-  const downloadCertificateSvg = async (certificateUrl: string) => {
-    const response = await fetch(certificateUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
-    })
-    const svg = await response.text()
-    return svg
-  }
-
-  useEffect(() => {
-    const certificateUrl =
-      (declaration && certificateTemplateConfig?.svgUrl) || ''
-
-    if (certificateUrl && declaration) {
-      downloadCertificateSvg(certificateUrl).then((certificateTemplate) => {
-        if (!certificateTemplate) return
-        const svgWithoutFonts = compileSvg(
-          certificateTemplate,
-          { ...declaration.data.template, preview: true },
-          state
-        )
-        const svgWithFonts = addFontsToSvg(svgWithoutFonts, certificateFonts)
-        setSvgCode(svgWithFonts)
-      })
-    }
-    // eslint-disable-next-line
-  }, [declaration])
+  const svgTemplate = certificateTemplateConfig?.svg
+  const svgWithoutFonts = compileSvg(
+    svgTemplate,
+    { ...declaration?.data.template, preview: true },
+    state
+  )
+  const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async () => {
     if (!declaration || !certificateTemplateConfig) {
@@ -223,10 +199,6 @@ export const usePrintableCertificate = () => {
         date: new Date().toISOString()
       }
     }
-
-    const svgTemplate = await downloadCertificateSvg(
-      certificateTemplateConfig.svgUrl
-    )
 
     const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
       draft.data.template

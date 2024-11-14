@@ -36,7 +36,7 @@ import { identityHelperTextMapper, identityNameMapper } from './messages'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
-import { ICertificateConfigData } from '@client/utils/referenceApi'
+import { ICertificateData } from '@client/utils/referenceApi'
 
 interface INameField {
   firstNamesField: string
@@ -1014,7 +1014,7 @@ const marriageIssueCollectorFormOptions = [
 
 function getCertCollectorGroupForEvent(
   declaration: IDeclaration,
-  certificates: ICertificateConfigData[]
+  certificates: ICertificateData[]
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1079,7 +1079,7 @@ function getCertCollectorGroupForEvent(
 
 export function getCertificateCollectorFormSection(
   declaration: IDeclaration,
-  certificates: ICertificateConfigData[]
+  certificates: ICertificateData[]
 ): IFormSection {
   return {
     id: CertificateSection.Collector,

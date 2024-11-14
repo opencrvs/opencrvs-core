@@ -94,6 +94,12 @@ export interface ICertificateConfigData {
   svgUrl: string
   fonts?: Record<string, FontFamilyTypes>
 }
+
+export interface ICertificateData extends ICertificateConfigData {
+  hash?: string
+  svg: string
+}
+
 export interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]

@@ -28,7 +28,7 @@ import {
   CertificateConfiguration,
   IFacilitiesDataResponse,
   IOfficesDataResponse,
-  ICertificateConfigData
+  ICertificateData
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
@@ -45,6 +45,7 @@ import {
   configurationErrorNotification
 } from '@client/notification/actions'
 import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
+import { getToken } from '@client/utils/authUtils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -103,9 +104,10 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     fonts?: CertificateConfiguration['fonts']
-    // Certificates might not be defined in the case of
-    // a field agent using the app.
-    certificates: ICertificateConfigData[]
+    // TODO: Certificates need to be restricted in the case of
+    // a user who does not have permission to print certificate
+    // (ex: a field agent using the app)
+    certificates: ICertificateData[]
   }
   assets: {
     logo: string
@@ -132,6 +134,46 @@ const initialState: IOfflineDataState = {
 
 async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
+}
+
+async function loadSingleCertificate(certificate: ICertificateData) {
+  const { id } = certificate
+  const res = await fetch(
+    new URL(`/certificates/${id}`, window.config.COUNTRY_CONFIG_URL).toString(),
+    {
+      headers: {
+        Authorization: getToken(),
+        'If-None-Match': certificate?.hash ?? ''
+      }
+    }
+  )
+  if (res.status === 304) {
+    return {
+      ...certificate,
+      svg: certificate.svg,
+      hash: certificate!.hash!
+    }
+  }
+  if (!res.ok) {
+    return Promise.reject(
+      new Error(`Fetching certificate with id: "${id}" failed`)
+    )
+  }
+  return res.text().then((svg) => {
+    return {
+      ...certificate,
+      svg,
+      hash: res.headers.get('etag')!
+    }
+  })
+}
+
+async function loadCertificates(
+  savedCertificates: IOfflineData['templates']['certificates']
+) {
+  return await Promise.all(
+    savedCertificates.map((cert) => loadSingleCertificate(cert))
+  )
 }
 
 function checkIfDone(
@@ -362,7 +404,7 @@ function reducer(
         systems,
         templates: {
           ...state.offlineData.templates,
-          certificates: (certificates as ICertificateConfigData[]).map((x) => {
+          certificates: (certificates as ICertificateData[]).map((x) => {
             const baseUrl = window.location.origin
             if (x.fonts) {
               x.fonts = Object.fromEntries(
@@ -382,10 +424,30 @@ function reducer(
         }
       }
 
+      return loop(
+        {
+          ...state,
+          offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
+          offlineData: newOfflineData
+        },
+        Cmd.run(loadCertificates, {
+          successActionCreator: actions.certificatesLoaded,
+          args: [state.offlineData.templates?.certificates]
+        })
+      )
+    }
+
+    case actions.CERTIFICATES_LOADED: {
+      const certificates = action.payload
       return {
         ...state,
-        offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
-        offlineData: newOfflineData
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...state.offlineData.templates,
+            certificates
+          }
+        }
       }
     }
 
