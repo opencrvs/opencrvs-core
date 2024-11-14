@@ -21,12 +21,5 @@
     "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "typings"],
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
-  ]
+  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }
