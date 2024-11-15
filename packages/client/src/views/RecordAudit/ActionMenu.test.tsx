@@ -1449,7 +1449,7 @@ describe('Archive action', () => {
 describe('Reinstate action', () => {
   it('Draft', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_REGISTRATION_REINSTATE], store)
+    setScopes([SCOPES.RECORD_DECLARATION_REINSTATE], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1468,7 +1468,7 @@ describe('Reinstate action', () => {
 
   it('Archived - Assigned', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_REGISTRATION_REINSTATE], store)
+    setScopes([SCOPES.RECORD_DECLARATION_REINSTATE], store)
     const toggleDisplayDialogMock = vi.fn()
     const component = await createTestComponent(
       <ActionMenu
@@ -1513,7 +1513,7 @@ describe('Reinstate action', () => {
 
   it('Archived - Not downloaded - Has scope', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_REGISTRATION_REINSTATE], store)
+    setScopes([SCOPES.RECORD_DECLARATION_REINSTATE], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{
@@ -1532,7 +1532,7 @@ describe('Reinstate action', () => {
 
   it('Registered', async () => {
     const { store, history } = createStore()
-    setScopes([SCOPES.RECORD_REGISTRATION_REINSTATE], store)
+    setScopes([SCOPES.RECORD_DECLARATION_REINSTATE], store)
     const component = await createTestComponent(
       <ActionMenu
         declaration={{

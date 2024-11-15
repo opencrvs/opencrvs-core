@@ -12,6 +12,16 @@
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope, User, Location, SCOPES } from '@client/utils/gateway'
+import { SUBMISSION_STATUS } from '@client/declarations'
+import {
+  canBeCorrected,
+  canBeReinstated,
+  isArchivable,
+  isIssuable,
+  isPrintable,
+  isReviewableDeclaration,
+  isUpdatableDeclaration
+} from '@client/declarations/utils'
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
@@ -58,16 +68,54 @@ export function usePermissions() {
     return false
   }
 
+  const canUpdateRecord = () =>
+    hasScopes([
+      SCOPES.RECORD_REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+    ])
+
+  const canReviewRecord = () =>
+    hasScopes([
+      SCOPES.REGISTER,
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ])
+
   const canPrintRecord = () =>
     hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
 
   const canIssueRecord = () =>
     hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
 
+  const canCorrectRecord = () =>
+    hasScopes([
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    ])
+
+  const canArchiveRecord = () => hasScope(SCOPES.RECORD_DECLARATION_ARCHIVE)
+
+  const canReinstateRecord = () => hasScope(SCOPES.RECORD_DECLARATION_REINSTATE)
+
+  const isRecordActionable = (status: SUBMISSION_STATUS) =>
+    [
+      canUpdateRecord() && isUpdatableDeclaration(status),
+      canReviewRecord() && isReviewableDeclaration(status),
+      canPrintRecord() && isPrintable(status),
+      canIssueRecord() && isIssuable(status),
+      canCorrectRecord() && canBeCorrected(status),
+      canArchiveRecord() && isArchivable(status),
+      canReinstateRecord() && canBeReinstated(status)
+    ]
+      .map((p) => Boolean(p))
+      .some((p) => p)
+
   return {
     hasScopes,
     hasScope,
     hasAnyScope,
+    isRecordActionable,
     canPrintRecord,
     canIssueRecord,
     canReadUser,

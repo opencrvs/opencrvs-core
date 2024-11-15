@@ -55,8 +55,8 @@ import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import {
   canBeCorrected,
   isArchivable,
-  isArchived,
-  isCertified,
+  canBeReinstated,
+  isIssuable,
   isPendingCorrection,
   isPrintable,
   isRecordOrDeclaration,
@@ -182,7 +182,7 @@ export const ActionMenu: React.FC<{
               declarationStatus={status}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_REGISTRATION_REINSTATE]}>
+          <ProtectedComponent scopes={[SCOPES.RECORD_DECLARATION_REINSTATE]}>
             <ReinstateAction
               toggleDisplayDialog={toggleDisplayDialog}
               isActionable={isActionable}
@@ -321,7 +321,7 @@ const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
 > = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
-  if (!isArchived(declarationStatus)) return null
+  if (!canBeReinstated(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
@@ -448,7 +448,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  if (!isCertified(declarationStatus)) return null
+  if (!isIssuable(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
