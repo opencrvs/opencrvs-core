@@ -26,7 +26,8 @@ export const userScopes = {
   bypassRateLimit: 'bypassratelimit',
   teams: 'teams',
   config: 'config',
-  confirmRegistration: 'record.confirm-registration'
+  confirmRegistration: 'record.confirm-registration',
+  rejectRegistration: 'record.reject-registration'
 } as const
 
 export const userRoleScopes = {

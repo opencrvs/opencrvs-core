@@ -1456,7 +1456,6 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
-  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1490,7 +1489,6 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
-  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
