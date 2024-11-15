@@ -2,6 +2,10 @@
 
 ## 1.6.1 (TBD)
 
+## Bug fixes
+
+- Maximum upload file size limit is now based on the size of the uploaded files after compression and not before. [#7840](https://github.com/opencrvs/opencrvs-core/issues/7840)
+
 ## 1.6.0
 
 ## Improvements

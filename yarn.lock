@@ -7956,6 +7956,13 @@
   resolved "https://registry.npmjs.org/@types/boom/-/boom-7.3.5.tgz"
   integrity sha512-jBS0kU2s9W2sx+ILEyO4kxqIYLllqcUXTaVrBctvGptZ+4X3TWkkgY9+AmxdMPKrgiDDdLcfsaQCTu7bniLvgw==
 
+"@types/browser-image-compression@^1.0.13":
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/@types/browser-image-compression/-/browser-image-compression-1.0.13.tgz#184c293a0d88f29b1d23ecd5af54670d9242f7bc"
+  integrity sha512-S97bT2hBW/RPwFrB/tg62alucHzMJKgVCDFCHpTQkK4hS7OW9k5vOG1mvGBkc36OZVh9nHEATtysmw9MSRH1vQ==
+  dependencies:
+    browser-image-compression "*"
+
 "@types/bunyan@^1.8.4":
   version "1.8.11"
   resolved "https://registry.npmjs.org/@types/bunyan/-/bunyan-1.8.11.tgz"
@@ -10570,6 +10577,13 @@ browser-assert@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/browser-assert/-/browser-assert-1.2.1.tgz"
   integrity sha512-nfulgvOR6S4gt9UKCeGJOuSGBPGiFT6oQ/2UBnvTY/5aQ1PnksW72fhZkM30DzoRRv2WpwZf1vHHEr3mtuXIWQ==
+
+browser-image-compression@*:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/browser-image-compression/-/browser-image-compression-2.0.2.tgz#4d5ef8882e9e471d6d923715ceb9034499d14eaa"
+  integrity sha512-pBLlQyUf6yB8SmmngrcOw3EoS4RpQ1BcylI3T9Yqn7+4nrQTXJD4sJDe5ODnJdrvNMaio5OicFo75rDyJD2Ucw==
+  dependencies:
+    uzip "0.20201231.0"
 
 browser-image-compression@^1.0.6:
   version "1.0.17"
