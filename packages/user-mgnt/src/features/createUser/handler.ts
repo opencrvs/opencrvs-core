@@ -23,7 +23,12 @@ import {
   generateSaltedHash,
   generateRandomPassword
 } from '@user-mgnt/utils/hash'
-import { statuses, hasDemoScope, getUserId } from '@user-mgnt/utils/userUtils'
+import {
+  statuses,
+  hasDemoScope,
+  getUserId,
+  getValidRoles
+} from '@user-mgnt/utils/userUtils'
 import { userRoleScopes } from '@opencrvs/commons/authentication'
 import { QA_ENV } from '@user-mgnt/constants'
 import * as Hapi from '@hapi/hapi'
@@ -36,7 +41,9 @@ export default async function createUser(
 ) {
   const user = request.payload as IUser & { password?: string }
   const token = request.headers.authorization
-
+  if (!getValidRoles({}, 'asc', 'creationDate', token, user.systemRole)) {
+    return h.response().code(400)
+  }
   // construct Practitioner resource and save them
   let practitionerId = null
   let roleId = null

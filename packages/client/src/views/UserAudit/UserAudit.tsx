@@ -23,7 +23,10 @@ import { AvatarSmall } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Button } from '@opencrvs/components/lib/Button'
-import { getUserRoleIntlKey } from '@client/views/SysAdmin//Team/utils'
+import {
+  getUserRoleIntlKey,
+  canDeactivateUser
+} from '@client/views/SysAdmin/Team/utils'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
@@ -246,7 +249,11 @@ export const UserAudit = () => {
       )
     }
 
-    if (status === 'active') {
+    if (
+      status === 'active' &&
+      userDetails &&
+      canDeactivateUser(userId, userDetails)
+    ) {
       menuItems.push({
         label: intl.formatMessage(sysMessages.deactivate),
         handler: () => toggleUserActivationModal()

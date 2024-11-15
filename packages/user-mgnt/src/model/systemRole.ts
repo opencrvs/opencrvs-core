@@ -20,6 +20,31 @@ export const SYSTEM_ROLE_TYPES = [
   'REGISTRATION_AGENT'
 ] as const
 
+export const sysAdminAccessMap: Map<string, string[]> = new Map([
+  [
+    'LOCAL_SYSTEM_ADMIN',
+    [
+      'FIELD_AGENT',
+      'LOCAL_REGISTRAR',
+      'LOCAL_SYSTEM_ADMIN',
+      'PERFORMANCE_MANAGEMENT',
+      'REGISTRATION_AGENT'
+    ]
+  ],
+  [
+    'NATIONAL_SYSTEM_ADMIN',
+    [
+      'FIELD_AGENT',
+      'LOCAL_REGISTRAR',
+      'LOCAL_SYSTEM_ADMIN',
+      'NATIONAL_REGISTRAR',
+      'NATIONAL_SYSTEM_ADMIN',
+      'PERFORMANCE_MANAGEMENT',
+      'REGISTRATION_AGENT'
+    ]
+  ]
+])
+
 interface ISystemRole {
   value: (typeof SYSTEM_ROLE_TYPES)[number]
   roles: Types.ObjectId[]
