@@ -10,38 +10,29 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { IActionObject } from '@opencrvs/components/lib/Workqueue'
 import { Download } from '@opencrvs/components/lib/icons'
 import { Button } from '@opencrvs/components/lib/Button'
-import { connect } from 'react-redux'
-import {
-  downloadDeclaration,
-  DOWNLOAD_STATUS,
-  unassignDeclaration,
-  deleteDeclaration as deleteDeclarationAction
-} from '@client/declarations'
+import { useDispatch, useSelector } from 'react-redux'
+import { downloadDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event, Scope, SCOPES } from '@client/utils/gateway'
-import {
-  ApolloClient,
-  InternalRefetchQueriesInclude,
-  useApolloClient
-} from '@apollo/client'
+import { Event } from '@client/utils/gateway'
+import { InternalRefetchQueriesInclude, useApolloClient } from '@apollo/client'
 import type { AssignmentData } from '@client/utils/gateway'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
-import { Dispatch } from 'redux'
-import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { useIntl } from 'react-intl'
+import { constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
-import { getScope } from '@client/profile/profileSelectors'
+import { useModal } from '@client/hooks/useModal'
+import {
+  AssignModal,
+  ShowAssignmentModal
+} from '@client/components/Assignment/Modals'
 
-const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
   event: string
   compositionId: string
@@ -57,18 +48,6 @@ interface DownloadButtonProps {
   downloadConfigs: IDownloadConfig
   status?: DOWNLOAD_STATUS
 }
-
-interface IConnectProps {
-  practitionerId?: string
-  scopes?: Scope[] | null
-}
-interface IDispatchProps {
-  downloadDeclaration: typeof downloadDeclaration
-  unassignDeclaration: typeof unassignDeclaration
-  deleteDeclaration: typeof deleteDeclarationAction
-}
-
-type HOCProps = IConnectProps & IDispatchProps
 
 const StatusIndicator = styled.div<{
   isLoading?: boolean
@@ -87,82 +66,6 @@ const DownloadAction = styled(Button)`
     padding: 0px 0px;
   }
 `
-interface IModalAction extends Omit<IActionObject, 'label'> {
-  type: 'success' | 'danger' | 'tertiary'
-  id: string
-  label: MessageDescriptor
-}
-interface AssignModalOptions {
-  title: MessageDescriptor
-  actions: IModalAction[]
-  content: MessageDescriptor
-  contentArgs?: Record<string, string>
-}
-
-function getAssignModalOptions(
-  assignment: AssignmentData | undefined,
-  callbacks: {
-    onAssign: () => void
-    onUnassign: () => void
-    onCancel: () => void
-  },
-  scopes: Scope[],
-  isDownloadedBySelf?: boolean
-): AssignModalOptions {
-  const assignAction: IModalAction = {
-    id: 'assign',
-    label: buttonMessages.assign,
-    type: 'success',
-    handler: callbacks.onAssign
-  }
-  const unassignAction: IModalAction = {
-    id: 'unassign',
-    label: buttonMessages.unassign,
-    type: 'danger',
-    handler: callbacks.onUnassign
-  }
-  const cancelAction: IModalAction = {
-    id: 'cancel',
-    label: buttonMessages.cancel,
-    type: 'tertiary',
-    handler: callbacks.onCancel
-  }
-
-  if (isDownloadedBySelf) {
-    return {
-      title: conflictsMessages.unassignTitle,
-      content: conflictsMessages.selfUnassignDesc,
-      actions: [cancelAction, unassignAction]
-    }
-  } else if (assignment) {
-    if (scopes.includes(SCOPES.RECORD_UNASSIGN_OTHERS)) {
-      return {
-        title: conflictsMessages.unassignTitle,
-        content: conflictsMessages.regUnassignDesc,
-        contentArgs: {
-          name: [assignment.firstName, assignment.lastName].join(' '),
-          officeName: assignment.officeName || ''
-        },
-        actions: [cancelAction, unassignAction]
-      }
-    }
-    return {
-      title: conflictsMessages.assignedTitle,
-      content: conflictsMessages.assignedDesc,
-      contentArgs: {
-        name: [assignment.firstName, assignment.lastName].join(' '),
-        officeName: assignment.officeName || ''
-      },
-      actions: []
-    }
-  } else {
-    return {
-      title: conflictsMessages.assignTitle,
-      content: conflictsMessages.assignDesc,
-      actions: [cancelAction, assignAction]
-    }
-  }
-}
 const NoConnectionViewContainer = styled.div`
   height: 40px;
   width: 40px;
@@ -176,129 +79,67 @@ const NoConnectionViewContainer = styled.div`
   }
 `
 
-function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
-  let buttonType: 'positive' | 'negative' | 'tertiary'
-  if (action.type === 'success') {
-    buttonType = 'positive' as const
-  } else if (action.type === 'danger') {
-    buttonType = 'negative'
-  } else {
-    buttonType = 'tertiary'
-  }
+const LOADING_STATUSES = [
+  DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+  DOWNLOAD_STATUS.DOWNLOADING,
+  DOWNLOAD_STATUS.READY_TO_UNASSIGN,
+  DOWNLOAD_STATUS.UNASSIGNING
+]
 
-  return (
-    <Button id={action.id} type={buttonType} onClick={action.handler}>
-      {intl.formatMessage(action.label)}
-    </Button>
-  )
-}
-
-function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
+export function DownloadButton({
+  id,
+  status,
+  className,
+  downloadConfigs: { assignment, event, compositionId, action }
+}: DownloadButtonProps) {
   const intl = useIntl()
   const client = useApolloClient()
   const isOnline = useOnlineStatus()
-  const LOADING_STATUSES = useMemo(function () {
-    return [
-      DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-      DOWNLOAD_STATUS.DOWNLOADING,
-      DOWNLOAD_STATUS.READY_TO_UNASSIGN,
-      DOWNLOAD_STATUS.UNASSIGNING
-    ]
-  }, [])
-  const {
-    id,
-    status,
-    className,
-    downloadConfigs,
-    downloadDeclaration,
-    practitionerId,
-    unassignDeclaration,
-    scopes
-  } = props
-  const { assignment, compositionId } = downloadConfigs
-  const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
-    null
+  const dispatch = useDispatch()
+  const practitionerId = useSelector<IStoreState, string | undefined>(
+    (state) => {
+      const { userDetails } = state.profile
+      return userDetails?.practitionerId
+    }
   )
-  const download = useCallback(() => {
-    const { event, compositionId, action } = downloadConfigs
-    downloadDeclaration(
-      event.toLowerCase() as unknown as Event,
-      compositionId,
-      action,
-      client
+  const [modal, openModal] = useModal()
+
+  const isFailed =
+    status === DOWNLOAD_STATUS.FAILED ||
+    status === DOWNLOAD_STATUS.FAILED_NETWORK
+
+  const download = () =>
+    dispatch(
+      downloadDeclaration(
+        event.toLowerCase() as unknown as Event,
+        compositionId,
+        action,
+        client
+      )
     )
-  }, [downloadConfigs, client, downloadDeclaration])
-  const hideModal = useCallback(() => setAssignModal(null), [])
-  const unassign = useCallback(async () => {
-    unassignDeclaration(compositionId, client)
-  }, [compositionId, client, unassignDeclaration])
 
-  const isFailed = useMemo(
-    () =>
-      status === DOWNLOAD_STATUS.FAILED ||
-      status === DOWNLOAD_STATUS.FAILED_NETWORK,
-    [status]
-  )
-
-  // reg agent can only retrieve validated and correction requested declarations
-  const isRetrieveableDeclarationsOfRegAgent =
-    downloadConfigs.declarationStatus &&
-    ['VALIDATED', 'CORRECTION_REQUESTED'].includes(
-      downloadConfigs.declarationStatus
-    )
-  // && userRole === ROLE_REGISTRATION_AGENT
-
-  // @TODO: Ask JPF how this should be handled?
-  // field agents can only retrieve declarations
-  //const isNotFieldAgent = !FIELD_AGENT_ROLES.includes(String(userRole))
-
-  const isDownloadable =
-    !assignment || assignment.practitionerId === practitionerId
-
-  const onDownloadClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      if (
-        (assignment?.practitionerId !== practitionerId ||
-          status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        !isRetrieveableDeclarationsOfRegAgent
-        // && isNotFieldAgent
-      ) {
-        setAssignModal(
-          getAssignModalOptions(
-            assignment,
-            {
-              onAssign: () => {
-                download()
-                hideModal()
-              },
-              onUnassign: () => {
-                unassign()
-                hideModal()
-              },
-              onCancel: hideModal
-            },
-            scopes ?? [],
-            status === DOWNLOAD_STATUS.DOWNLOADED &&
-              assignment?.practitionerId === practitionerId
-          )
-        )
-      } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
-        // retrieve declaration
+  const handleDownload = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (!assignment) {
+      const assign = await openModal<boolean>((close) => (
+        <AssignModal close={close} />
+      ))
+      if (assign) {
         download()
       }
-      e.stopPropagation()
-    },
-    [
-      assignment,
-      practitionerId,
-      status,
-      isRetrieveableDeclarationsOfRegAgent,
-      scopes,
-      hideModal,
-      download,
-      unassign
-    ]
-  )
+    } else if (assignment && assignment.practitionerId !== practitionerId) {
+      await openModal<boolean>((close) => (
+        <ShowAssignmentModal close={close}>
+          {intl.formatMessage(conflictsMessages.assignedDesc, {
+            name: [assignment.firstName, assignment.lastName].join(' '),
+            officeName: assignment.officeName || ''
+          })}
+        </ShowAssignmentModal>
+      ))
+    }
+    e.stopPropagation()
+  }
 
   if (status && LOADING_STATUSES.includes(status)) {
     return (
@@ -334,7 +175,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       <DownloadAction
         type="icon"
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
-        onClick={isDownloadable ? onDownloadClick : undefined}
+        onClick={handleDownload}
         className={className}
         aria-label={intl.formatMessage(constantsMessages.assignRecord)}
       >
@@ -349,50 +190,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           <Download isFailed={isFailed} />
         )}
       </DownloadAction>
-      {assignModal !== null && (
-        <ResponsiveModal
-          id="assignment"
-          show
-          title={intl.formatMessage(assignModal.title)}
-          actions={assignModal.actions.map((action) =>
-            renderModalAction(action, intl)
-          )}
-          autoHeight
-          responsive={false}
-          preventClickOnParent
-          handleClose={hideModal}
-        >
-          {intl.formatMessage(assignModal.content, assignModal.contentArgs)}
-        </ResponsiveModal>
-      )}
+      {modal}
     </>
   )
 }
-
-const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  practitionerId: state.profile.userDetails?.practitionerId,
-  scopes: getScope(state)
-})
-
-const mapDispatchToProps = (
-  dispatch: Dispatch,
-  ownProps: DownloadButtonProps
-): IDispatchProps => ({
-  downloadDeclaration: (
-    event: Event,
-    compositionId: string,
-    action: Action,
-    client: ApolloClient<any>
-  ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
-  deleteDeclaration: (id: string, client: ApolloClient<any>) =>
-    dispatch(deleteDeclarationAction(id, client)),
-  unassignDeclaration: (id: string, client: ApolloClient<any>) =>
-    dispatch(
-      unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)
-    )
-})
-
-export const DownloadButton = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DownloadButtonComponent)
