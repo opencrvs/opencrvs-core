@@ -10,7 +10,7 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
-import uuid = require('uuid')
+import { v4 as uuid } from 'uuid'
 
 import { prune } from './prune'
 import { backupLegacyIndex, reindex, updateAliases } from './reindex'
