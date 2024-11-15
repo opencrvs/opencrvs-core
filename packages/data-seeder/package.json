@@ -22,7 +22,7 @@
     "envalid": "^8.0.0",
     "graphql": "^15.0.0",
     "graphql-tag": "^2.12.6",
-    "jwt-decode": "^2.2.0",
+    "jwt-decode": "^3.0.0",
     "node-fetch": "^2.6.1",
     "ts-node": "^6.1.1",
     "tsconfig-paths": "^3.13.0",

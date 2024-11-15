@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import decode = require('jwt-decode')
+import decode from 'jwt-decode'
 
 export enum USER_SCOPE {
   DECLARE = 'declare',
