@@ -49,6 +49,20 @@ jobs:
           scan-ref: '.'
           trivy-config: trivy.yaml
 
+  security-scan-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+
   security-scan-pull-request:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-22.04
