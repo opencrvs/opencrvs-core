@@ -31,3 +31,5 @@ webhooks:
   replicas: 1
 workflow:
   replicas: 1
+
+hostname: farajaland.com

@@ -12,22 +12,6 @@ spec:
     app: auth
   type: LoadBalancer
 ---
-# XXX: specialised to this app right now, could be generalised and then mixed/matched elsewhere
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: auth-middleware
-spec:
-  headers:
-    customResponseHeaders:
-      Pragma: "no-cache"
-      Cache-control: "no-store"
-      X-Robots-Tag: "none"
-    stsSeconds: 31536000
-    stsIncludeSubdomains: true
-    stsPreload: true
-
----
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -36,14 +20,14 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: PathPrefix(`/auth`) # FIXME: hardcoded hostname
+  - match: 'Host(`auth.{{ .Values.hostname }}`)'
     kind: Rule
     services:
     - name: auth
       namespace: opencrvs-services-dev
       port: 4040
     middlewares:
-      - name: auth-middleware
+      - name: sts-and-basic-response-headers
   tls:
     certResolver: myresolver
 ---

@@ -12,6 +12,26 @@ spec:
     app: client
   type: LoadBalancer
 ---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: client-route
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: 'Host(`register.{{ .Values.hostname }}`) || Host(`{{ .Values.hostname }}`)'
+    kind: Rule
+    services:
+    - name: client
+      namespace: opencrvs-services-dev
+      port: 3000
+    middlewares:
+      - name: sts-and-basic-response-headers
+      - name: enable-compression
+  tls:
+    certResolver: myresolver
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
