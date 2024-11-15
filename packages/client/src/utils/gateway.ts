@@ -15,9 +15,17 @@
 import { PlainDate } from '@client/utils/date-formatting'
 
 export const scopes = [
+  'natlsysadmin',
   'bypassratelimit',
+  'declare',
+  'register',
+  'validate',
   'demo',
+  'certify',
+  'performance',
+  'sysadmin',
   'teams',
+  'config',
   'webhook',
   'nationalId',
   'notification-api',
@@ -31,8 +39,8 @@ export const scopes = [
   'record.declaration-submit-incomplete',
   'record.declaration-submit-for-review',
   'record.unassign-others',
-  'record.submit-for-approval',
-  'record.submit-for-updates',
+  'record.declaration-submit-for-approval',
+  'record.declaration-submit-for-updates',
   'record.declaration-edit',
   'record.review-duplicates',
   'record.declaration-archive',
@@ -40,7 +48,7 @@ export const scopes = [
   'record.register',
   'record.export-records',
   'record.declaration-print',
-  'record.declaration.print-supporting-documents',
+  'record.declaration-print-supporting-documents',
   'record.registration-print',
   'record.registration-print&issue-certified-copies',
   'record.registration-print-certified-copies',
@@ -52,6 +60,8 @@ export const scopes = [
   'record.registration-revoke',
   'record.registration-request-reinstatement',
   'record.registration-reinstate',
+  'record.confirm-registration',
+  'record.reject-registration',
   'search.birth:my-jurisdiction',
   'search.birth',
   'search.death:my-jurisdiction',
@@ -67,6 +77,7 @@ export const scopes = [
   'performance.read',
   'performance.read-dashboards',
   'performance.vital-statistics-export',
+  'organisation.read',
   'organisation.read-locations:all',
   'organisation.read-locations:my-office',
   'organisation.read-locations:my-jurisdiction',
@@ -78,14 +89,23 @@ export const scopes = [
   'user.create:my-jurisdiction',
   'user.update:all',
   'user.update:my-jurisdiction',
-  'config.update:all'
+  'config.update:all',
+  'user.data-seeding'
 ] as const
 export type Scope = (typeof scopes)[number]
 
 export const SCOPES = {
+  NATLSYSADMIN: 'natlsysadmin',
   BYPASSRATELIMIT: 'bypassratelimit',
+  DECLARE: 'declare',
+  REGISTER: 'register',
+  VALIDATE: 'validate',
   DEMO: 'demo',
+  CERTIFY: 'certify',
+  PERFORMANCE: 'performance',
+  SYSADMIN: 'sysadmin',
   TEAMS: 'teams',
+  CONFIG: 'config',
   WEBHOOK: 'webhook',
   NATIONALID: 'nationalId',
   NOTIFICATION_API: 'notification-api',
@@ -100,8 +120,8 @@ export const SCOPES = {
   RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
   RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
   RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
-  RECORD_SUBMIT_FOR_APPROVAL: 'record.submit-for-approval',
-  RECORD_SUBMIT_FOR_UPDATES: 'record.submit-for-updates',
+  RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
+  RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',
   RECORD_DECLARATION_EDIT: 'record.declaration-edit',
   RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
   RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
@@ -110,7 +130,7 @@ export const SCOPES = {
   RECORD_EXPORT_RECORDS: 'record.export-records',
   RECORD_DECLARATION_PRINT: 'record.declaration-print',
   RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.declaration.print-supporting-documents',
+    'record.declaration-print-supporting-documents',
   RECORD_REGISTRATION_PRINT: 'record.registration-print',
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
@@ -128,6 +148,8 @@ export const SCOPES = {
   RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
     'record.registration-request-reinstatement',
   RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
+  RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
+  RECORD_REJECT_REGISTRATION: 'record.reject-registration',
   SEARCH_BIRTH_MY_JURISDICTION: 'search.birth:my-jurisdiction',
   SEARCH_BIRTH: 'search.birth',
   SEARCH_DEATH_MY_JURISDICTION: 'search.death:my-jurisdiction',
@@ -143,6 +165,7 @@ export const SCOPES = {
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
+  ORGANISATION_READ: 'organisation.read',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
@@ -156,7 +179,8 @@ export const SCOPES = {
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
   USER_UPDATE: 'user.update:all',
   USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
-  CONFIG_UPDATE_ALL: 'config.update:all'
+  CONFIG_UPDATE_ALL: 'config.update:all',
+  USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
 export type Maybe<T> = T | null
@@ -561,6 +585,12 @@ export type CommentInput = {
   user?: InputMaybe<UserInput>
 }
 
+export type ConfirmRegistrationInput = {
+  error?: InputMaybe<Scalars['String']>
+  identifiers?: InputMaybe<Array<IdentifierInput>>
+  registrationNumber: Scalars['String']
+}
+
 export type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
@@ -886,6 +916,11 @@ export type Identifier = {
   value?: Maybe<Scalars['String']>
 }
 
+export type IdentifierInput = {
+  type: Scalars['String']
+  value: Scalars['String']
+}
+
 export type IdentityInput = {
   fieldsModifiedByIdentity?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   id?: InputMaybe<Scalars['ID']>
@@ -1102,6 +1137,7 @@ export type Mutation = {
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
   registerSystem?: Maybe<SystemSecret>
+  rejectRegistration: Scalars['ID']
   rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
   requestRegistrationCorrection: Scalars['ID']
@@ -1170,6 +1206,7 @@ export type MutationChangePhoneArgs = {
 }
 
 export type MutationConfirmRegistrationArgs = {
+  details: ConfirmRegistrationInput
   id: Scalars['ID']
 }
 
@@ -1324,6 +1361,11 @@ export type MutationRefreshSystemSecretArgs = {
 
 export type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
+}
+
+export type MutationRejectRegistrationArgs = {
+  details: RejectRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationRejectRegistrationCorrectionArgs = {
@@ -1680,16 +1722,6 @@ export type QueryQueryRegistrationByIdentifierArgs = {
   identifier: Scalars['ID']
 }
 
-export type QuerySearchBirthRegistrationsArgs = {
-  fromDate?: InputMaybe<Scalars['Date']>
-  toDate?: InputMaybe<Scalars['Date']>
-}
-
-export type QuerySearchDeathRegistrationsArgs = {
-  fromDate?: InputMaybe<Scalars['Date']>
-  toDate?: InputMaybe<Scalars['Date']>
-}
-
 export type QuerySearchEventsArgs = {
   advancedSearchParameters: AdvancedSearchParametersInput
   count?: InputMaybe<Scalars['Int']>
@@ -1822,7 +1854,6 @@ export type Registration = {
   inCompleteFields?: Maybe<Scalars['String']>
   informantType?: Maybe<Scalars['String']>
   informantsSignature?: Maybe<Scalars['String']>
-  mosipAid?: Maybe<Scalars['String']>
   otherInformantType?: Maybe<Scalars['String']>
   page?: Maybe<Scalars['String']>
   paperFormID?: Maybe<Scalars['String']>
@@ -1856,7 +1887,6 @@ export type RegistrationInput = {
   informantType?: InputMaybe<Scalars['String']>
   informantsSignature?: InputMaybe<Scalars['String']>
   location?: InputMaybe<LocationInput>
-  mosipAid?: InputMaybe<Scalars['String']>
   otherInformantType?: InputMaybe<Scalars['String']>
   page?: InputMaybe<Scalars['String']>
   paperFormID?: InputMaybe<Scalars['String']>
@@ -1897,6 +1927,11 @@ export type Reinstated = {
   __typename?: 'Reinstated'
   registrationStatus?: Maybe<RegStatus>
   taskEntryResourceID: Scalars['ID']
+}
+
+export type RejectRegistrationInput = {
+  comment?: InputMaybe<Scalars['String']>
+  reason: Scalars['String']
 }
 
 export type RelatedPerson = {
@@ -3317,7 +3352,6 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -3683,7 +3717,6 @@ export type FetchBirthRegistrationForCertificateQuery = {
       informantsSignature?: string | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       status?: Array<{
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
@@ -4920,7 +4953,6 @@ export type FetchMarriageRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -5294,7 +5326,6 @@ export type FetchMarriageRegistrationForCertificateQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
-      mosipAid?: string | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -7764,7 +7795,6 @@ export type FetchViewRecordByCompositionQuery = {
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
-          mosipAid?: string | null
           duplicates?: Array<{
             __typename?: 'DuplicatesInfo'
             compositionId?: string | null
@@ -8149,7 +8179,6 @@ export type FetchViewRecordByCompositionQuery = {
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
-          mosipAid?: string | null
           duplicates?: Array<{
             __typename?: 'DuplicatesInfo'
             compositionId?: string | null
@@ -8466,7 +8495,6 @@ export type FetchViewRecordByCompositionQuery = {
           type?: RegistrationType | null
           trackingId?: string | null
           registrationNumber?: string | null
-          mosipAid?: string | null
           duplicates?: Array<{
             __typename?: 'DuplicatesInfo'
             compositionId?: string | null

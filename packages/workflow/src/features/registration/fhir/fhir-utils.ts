@@ -15,7 +15,6 @@ import {
   Composition,
   OpenCRVSPatientName,
   Patient,
-  Resource,
   Saved,
   Task,
   findExtension,
@@ -62,7 +61,7 @@ export async function getSharedContactEmail(fhirBundle: Bundle) {
   )
 }
 
-export function concatenateName(fhirNames: OpenCRVSPatientName[]) {
+function concatenateName(fhirNames: OpenCRVSPatientName[]) {
   const language = getDefaultLanguage()
   const name = fhirNames.find((humanName: OpenCRVSPatientName) => {
     return humanName.use === language
@@ -242,28 +241,6 @@ export async function postToHearth(payload: any) {
     )
   }
   return res.json()
-}
-
-export async function updateResourceInHearth(resource: Resource) {
-  const res = await fetch(
-    `${FHIR_URL}/${resource.resourceType}/${resource.id}`,
-    {
-      method: 'PUT',
-      body: JSON.stringify(resource),
-      headers: {
-        'Content-Type': 'application/fhir+json'
-      }
-    }
-  )
-  if (!res.ok) {
-    throw new Error(
-      `FHIR update to ${resource.resourceType} failed with [${
-        res.status
-      }] body: ${await res.text()}`
-    )
-  }
-
-  return res.text()
 }
 
 //TODO: need to modifty for marriage event

@@ -192,9 +192,7 @@ export const ActionMenu: React.FC<{
           <ProtectedComponent
             scopes={[
               SCOPES.RECORD_DECLARATION_PRINT,
-              SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
-              SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES,
-              SCOPES.RECORD_PRINT_CERTIFIED_COPIES
+              SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
             ]}
           >
             <PrintAction
@@ -213,7 +211,12 @@ export const ActionMenu: React.FC<{
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_REGISTRATION_CORRECT]}>
+          <ProtectedComponent
+            scopes={[
+              SCOPES.RECORD_REGISTRATION_CORRECT,
+              SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+            ]}
+          >
             <CorrectRecordAction
               declarationId={id}
               declarationStatus={status}

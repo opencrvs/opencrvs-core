@@ -233,31 +233,24 @@ class SearchResultView extends React.Component<
   }
 
   hasIssueScope() {
-    return (
-      this.props.scope &&
-      this.props.scope.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+    return this.props.scope?.includes(
+      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
     )
   }
 
   hasPrintScope() {
-    const printScopes = [
-      SCOPES.RECORD_PRINT_CERTIFIED_COPIES,
+    return this.props.scope?.includes(
       SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
-    ] as Scope[]
-
-    return (
-      this.props.scope &&
-      this.props.scope.some((scope) => printScopes.includes(scope))
     )
   }
 
   canSearchAnywhere() {
-    return (
-      (this.props.scope?.includes('search.birth') ||
-        this.props.scope?.includes('search.death') ||
-        this.props.scope?.includes('search.marriage')) ??
-      false
-    )
+    const searchScopes: Scope[] = [
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_MARRIAGE
+    ]
+    return this.props.scope?.some((scope) => searchScopes.includes(scope))
   }
 
   transformSearchContent = (data: QueryData) => {

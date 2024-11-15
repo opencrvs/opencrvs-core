@@ -6,7 +6,7 @@
 
 - Removed unused searchBirthRegistrations and searchDeathRegistrations queries, as they are no longer used by the client.
 
-- **Title** Description
+- **Dashboard:** Changes made to the dashboard configuration will reset after upgrading OpenCRVS.
 
 ## Improvements
 

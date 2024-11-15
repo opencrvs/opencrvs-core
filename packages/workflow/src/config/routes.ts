@@ -67,7 +67,7 @@ export const getRoutes = () => {
       handler: markEventAsRegisteredCallbackHandler,
       options: {
         auth: {
-          scope: [SCOPES.RECORD_REGISTER]
+          scope: [SCOPES.RECORD_CONFIRM_REGISTRATION]
         },
         tags: ['api'],
         description:

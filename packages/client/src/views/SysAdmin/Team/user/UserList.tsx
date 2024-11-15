@@ -514,9 +514,7 @@ function UserListComponent(props: IProps) {
                 ((createNamesMap(user.name)[intl.locale] as string) ||
                   (createNamesMap(user.name)[LANG_EN] as string))) ||
               ''
-            const role = intl.formatMessage({
-              id: getUserRoleIntlKey(user.role._id)
-            })
+            const role = intl.formatMessage(user.role.label)
             const avatar = user.avatar
 
             return {

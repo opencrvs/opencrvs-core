@@ -384,7 +384,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_PRINT
+                                                SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
                                               ]}
                                               path={routes.VERIFY_COLLECTOR}
                                               component={VerifyCollector}

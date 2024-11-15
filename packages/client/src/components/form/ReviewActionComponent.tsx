@@ -388,35 +388,32 @@ const ReviewActionComponent = ({
                 {intl.formatMessage(buttonMessages.sendForApproval)}
               </Button>
             </ProtectedComponent>
-          ) : !completeDeclaration ? (
-            <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}>
-              <Button
-                type="primary"
-                size="large"
-                id="submit_incomplete"
-                onClick={toggleSubmitModalOpen}
-                disabled={hasErrorsOnFields || totalFileSizeExceeded}
-              >
-                <Upload />
-                {intl.formatMessage(buttonMessages.sendIncomplete)}
-              </Button>
-            </ProtectedComponent>
           ) : (
-            <ProtectedComponent
-              scopes={[SCOPES.RECORD_SUBMIT_FOR_REVIEW]}
-              denyScopes={[SCOPES.RECORD_SUBMIT_INCOMPLETE]}
-            >
-              <Button
-                type="primary"
-                size="large"
-                id="submit_for_review"
-                onClick={toggleSubmitModalOpen}
-                disabled={hasErrorsOnFields || totalFileSizeExceeded}
+            <>
+              <ProtectedComponent
+                scopes={[
+                  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+                  SCOPES.RECORD_SUBMIT_INCOMPLETE
+                ]}
               >
-                <Upload />
-                {intl.formatMessage(buttonMessages.sendForReview)}
-              </Button>
-            </ProtectedComponent>
+                <Button
+                  type="primary"
+                  size="large"
+                  id={
+                    completeDeclaration
+                      ? 'submit_for_review'
+                      : 'submit_incomplete'
+                  }
+                  onClick={toggleSubmitModalOpen}
+                  disabled={hasErrorsOnFields || totalFileSizeExceeded}
+                >
+                  <Upload />
+                  {completeDeclaration
+                    ? intl.formatMessage(buttonMessages.sendForReview)
+                    : intl.formatMessage(buttonMessages.sendIncomplete)}
+                </Button>
+              </ProtectedComponent>
+            </>
           )}
           {rejectDeclarationAction && !alreadyRejectedDeclaration && (
             <ProtectedComponent scopes={[SCOPES.RECORD_SUBMIT_FOR_UPDATES]}>
