@@ -33,6 +33,7 @@ import {
 import { errorMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {Text} from '@opencrvs/components/lib/Text'
 
 interface IReviewProps {
   theme: ITheme
@@ -50,13 +51,10 @@ type IProps = IReviewProps &
   IntlShapeProps &
   RouteComponentProps<{}>
 
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
+const ErrorText = styled(Text)`
   text-align: center;
   margin-top: 100px;
 `
-
 class ReviewFormView extends React.Component<IProps> {
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
@@ -70,7 +68,7 @@ class ReviewFormView extends React.Component<IProps> {
     const { intl, declaration } = this.props
     if (!this.userHasRegisterScope() && !this.userHasValidateScope()) {
       return (
-        <ErrorText id="review-unauthorized-error-text">
+        <ErrorText id="review-unauthorized-error-text" variant='reg16' color='negative' element='span'>
           {intl.formatMessage(errorMessages.unauthorized)}
         </ErrorText>
       )

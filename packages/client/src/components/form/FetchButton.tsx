@@ -25,6 +25,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
 import { isNavigatorOnline } from '@client/utils'
+import { Text } from '@opencrvs/components/lib/Text'
 
 interface IFetchButtonProps {
   id: string
@@ -78,16 +79,12 @@ const ModalContent = styled.div`
   position: relative;
 `
 
-const Heading = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+const Heading = styled(Text)`
   text-align: center;
-  ${({ theme }) => theme.fonts.bold16};
 `
 
-const Info = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+const Info = styled(Text)`
   text-align: center;
-  ${({ theme }) => theme.fonts.reg16};
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -185,8 +182,8 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
     const { variables, modalInfoText } = this.props.queryData as IQuery
     return (
       <>
-        {modalInfoText && <Info>{intl.formatMessage(modalInfoText)}</Info>}
-        {variables && <Info>{Object.values(variables)}</Info>}
+        {modalInfoText && <Info variant='reg16' color='copy' element='span'>{intl.formatMessage(modalInfoText)}</Info>}
+        {variables && <Info variant='reg16' color='copy' element='span'>{Object.values(variables)}</Info>}
       </>
     )
   }
@@ -225,7 +222,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
                     <ModalContent>
                       {success && (
                         <>
-                          <Heading>{successTitle}</Heading>
+                          <Heading variant='bold16' color='copy' element='span'>{successTitle}</Heading>
                           {this.getModalInfo(intl)}
                           <StyledSuccess id="loader-button-success" />
                         </>
@@ -233,11 +230,11 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
 
                       {error && (
                         <>
-                          <Heading>{errorTitle}</Heading>
+                          <Heading variant='bold16' color='copy' element='span'>{errorTitle}</Heading>
                           {this.getModalInfo(intl)}
                           <StyledError id="loader-button-error" />
                           {queryData && (
-                            <Info>
+                            <Info variant='reg16' color='copy' element='span'>
                               {!networkError
                                 ? intl.formatMessage(queryData.errorText)
                                 : intl.formatMessage(
@@ -250,7 +247,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
 
                       {loading && (
                         <>
-                          <Heading>{modalTitle}</Heading>
+                          <Heading variant='bold16' color='copy' element='span'>{modalTitle}</Heading>
                           {this.getModalInfo(intl)}
                           <StyledSpinner id="loader-button-spinner" />
                           <ConfirmButton onClick={this.hideModal}>

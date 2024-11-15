@@ -12,6 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
+import { Text } from 'src/Text'
 
 const InputHeader = styled.div`
   display: flex;
@@ -20,10 +21,8 @@ const InputHeader = styled.div`
 const ComponentWrapper = styled.span`
   display: flex;
 `
-const InputDescription = styled.p`
-  ${({ theme }) => theme.fonts.reg16};
-  color: ${({ theme }) => theme.colors.copy};
-`
+const InputDescription = styled(Text)``
+
 export interface IInputFieldProps {
   id: string
   label?: string
@@ -106,7 +105,7 @@ export const InputField = (props: IInputFieldProps) => {
         <InputError id={props.id + '_error'}>{error}</InputError>
       )}
 
-      {description && <InputDescription>{description}</InputDescription>}
+      {description && <InputDescription variant='reg16' color='copy' element='p'>{description}</InputDescription>}
     </div>
   )
 }

@@ -20,6 +20,7 @@ import styled from 'styled-components'
 import React, { useState } from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
+import { Text } from '@opencrvs/components/lib/Text'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
@@ -72,10 +73,10 @@ const UnderLayBackground = styled.div<{ background: string }>`
   height: 100%;
 `
 
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2}
+const Title = styled(Text)`
   margin-bottom: 12px;
 `
+
 const Description = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   margin-bottom: 32px;
@@ -340,7 +341,7 @@ const ReviewActionComponent = ({
     <Container id={id}>
       <UnderLayBackground background={background} />
       <Content>
-        <Title>
+        <Title variant='h2' element='h2'>
           {intl.formatMessage(
             actionContent.title.message,
             actionContent.title.payload

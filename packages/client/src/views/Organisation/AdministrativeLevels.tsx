@@ -40,6 +40,7 @@ import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { Text } from '@opencrvs/components/lib/Text'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -52,14 +53,11 @@ type IGetNewLevel = {
   breadCrumb: IBreadCrumbData[]
 }
 
-const NoRecord = styled.div<{ isFullPage?: boolean }>`
-  ${({ theme }) => theme.fonts.h3};
+const NoRecord = styled(Text)<{ isFullPage?: boolean }>`
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
-  color: ${({ theme }) => theme.colors.copy};
   margin-top: 20px;
 `
-
 // const con
 
 export function AdministrativeLevels() {
@@ -214,7 +212,7 @@ export function AdministrativeLevels() {
                   />
                 ))
             ) : (
-              <NoRecord id="no-record">
+              <NoRecord id="no-record" variant='h3' color='copy' element='h3'>
                 {intl.formatMessage(constantsMessages.noResults)}
               </NoRecord>
             )}

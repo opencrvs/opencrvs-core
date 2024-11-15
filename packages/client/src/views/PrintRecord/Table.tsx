@@ -57,13 +57,13 @@ const StyledTD = styled.td<{ bold?: boolean }>`
   :not(:last-child) {
     border-right: 0.5px solid ${({ theme }) => theme.colors.grey500};
   }
-  ${({ theme, bold }) => (bold ? theme.fonts.bold14 : theme.fonts.reg14)}
+  ${({ theme, bold }) => (bold ? theme.fonts.bold14 : reg14)}
 `
 
 const BorderlessTD = styled.td<{ bold?: boolean }>`
   vertical-align: top;
   padding: 0 8px;
-  ${({ theme, bold }) => (bold ? theme.fonts.bold14 : theme.fonts.reg14)}
+  ${({ theme, bold }) => (bold ? bold14 : theme.fonts.reg14)}
 `
 const StyledEM = styled.em`
   ${({ theme }) => theme.fonts.reg14}

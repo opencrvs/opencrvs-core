@@ -74,10 +74,9 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { SearchCriteria } from '@client/utils/referenceApi'
+import { Text } from '@opencrvs/components'
 
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
+const ErrorText = styled(Text)`
   text-align: center;
   margin-top: 100px;
 `
@@ -530,7 +529,7 @@ class SearchResultView extends React.Component<
                       <LoadingIndicator loading={true} />
                     </div>
                   ) : error ? (
-                    <ErrorText id="search-result-error-text">
+                    <ErrorText id="search-result-error-text" variant='reg16' color='negative' element='span'>
                       {intl.formatMessage(errorMessages.queryError)}
                     </ErrorText>
                   ) : (
