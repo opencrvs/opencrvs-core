@@ -740,6 +740,7 @@ export interface IHttpFormField extends IFormFieldBase {
     headers: Record<string, string>
     body: Record<string, any>
   } & Omit<Request, 'body' | 'headers'>
+  shouldWaitTriggeredEventCompletion?: boolean
 }
 export interface IButtonFormField extends IFormFieldBase {
   type: typeof BUTTON
@@ -749,6 +750,7 @@ export interface IButtonFormField extends IFormFieldBase {
   options: {
     trigger: string
     shouldHandleLoadingState?: boolean
+    shouldWaitTriggeredEventCompletion?: boolean
   }
 }
 
@@ -1269,6 +1271,7 @@ export interface Ii18nHttpFormField extends Ii18nFormFieldBase {
     headers: Record<string, string>
     body: Record<string, any>
   } & Omit<Request, 'body' | 'headers'>
+  shouldWaitTriggeredEventCompletion?: boolean
 }
 
 export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
@@ -1279,6 +1282,7 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   options: {
     trigger: string
     shouldHandleLoadingState?: boolean
+    shouldWaitTriggeredEventCompletion?: boolean
   }
 }
 

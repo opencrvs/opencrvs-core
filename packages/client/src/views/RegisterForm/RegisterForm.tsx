@@ -197,6 +197,7 @@ type State = {
   showConfirmationModal: boolean
   confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
+  shouldWaitTriggeredEventCompletion: boolean
   startTime: number
   selectedDuplicateComId: string
   isDuplicateDeclarationLoading: boolean
@@ -651,6 +652,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       showConfirmationModal: false,
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
+      shouldWaitTriggeredEventCompletion: false,
       startTime: 0,
       selectedDuplicateComId: props.declaration.id,
       isDuplicateDeclarationLoading: false,
@@ -763,6 +765,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     this.setState({
       ...this.state,
       isFileUploading: isUploading
+    })
+  }
+
+  onWaitingRequiredStateChanged = (shouldWaitTriggeredEventCompletion: boolean) => {
+    this.setState({
+      ...this.state,
+      shouldWaitTriggeredEventCompletion
     })
   }
 
@@ -1131,7 +1140,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     declaration.event.toLowerCase()
                                   )
                                 }}
-                                disabled={this.state.isFileUploading}
+                                disabled={this.state.isFileUploading || this.state.shouldWaitTriggeredEventCompletion}
                               >
                                 {intl.formatMessage(
                                   buttonMessages.continueButton
@@ -1229,6 +1238,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 }}
                                 onUploadingStateChanged={
                                   this.onUploadingStateChanged
+                                }
+                                onWaitingRequiredStateChanged={
+                                  this.onWaitingRequiredStateChanged
                                 }
                               />
                             </form>

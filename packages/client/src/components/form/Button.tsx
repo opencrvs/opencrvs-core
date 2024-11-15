@@ -31,6 +31,7 @@ interface ButtonFieldProps extends Omit<ButtonProps, 'type'> {
   draftData: IFormData
   setFieldValue: (name: string, value: IFormFieldValue) => void
   setFieldTouched: (name: string, isTouched?: boolean) => void
+  onWaitingRequiredStateChanged?: (shouldWaitTriggeredEventCompletion: boolean) => void
 }
 
 export function ButtonField(props: ButtonFieldProps) {
@@ -41,6 +42,7 @@ export function ButtonField(props: ButtonFieldProps) {
     setFieldTouched,
     values,
     draftData,
+    onWaitingRequiredStateChanged,
     ...buttonProps
   } = props
   const { icon, loadingLabel, buttonLabel } = fieldDefinition
@@ -55,8 +57,9 @@ export function ButtonField(props: ButtonFieldProps) {
     error,
     loading,
     isCompleted
-  }) => {
+  }) => {    
     if (isCompleted) {
+      onWaitingRequiredStateChanged?.(false)
       /**
        * Form can have buttons having the same triggers. For example, if a button works as an id
        * generator and is required, then it prevents the user in review page to submit the declaration
@@ -91,6 +94,7 @@ export function ButtonField(props: ButtonFieldProps) {
       ? loadingLabel
       : buttonLabel
   const onClick = () => {
+    fieldDefinition.options.shouldWaitTriggeredEventCompletion && onWaitingRequiredStateChanged?.(true)
     call()
   }
   return (

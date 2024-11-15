@@ -188,6 +188,7 @@ type GeneratedInputFieldProps = {
   draftData: IFormData
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
+  onWaitingRequiredStateChanged?: (shouldWaitTriggeredEventCompletion: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched: (name: string, isTouched?: boolean) => void
 } & Omit<IDispatchProps, 'writeDeclaration'>
@@ -208,6 +209,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     disabled,
     dynamicDispatch,
     onUploadingStateChanged,
+    onWaitingRequiredStateChanged,
     setFieldTouched,
     requiredErrorMessage,
     fields,
@@ -698,6 +700,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             setFieldValue={setFieldValue}
             disabled={disabled}
             setFieldTouched={setFieldTouched}
+            onWaitingRequiredStateChanged={onWaitingRequiredStateChanged}
           />
         </InputField>
       )
@@ -785,6 +788,7 @@ interface IFormSectionProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
+  onWaitingRequiredStateChanged?: (shouldWaitTriggeredEventCompletion: boolean) => void
   initialValues?: IAdvancedSearchFormState
 }
 
@@ -960,7 +964,8 @@ class FormSectionComponent extends React.Component<Props> {
       draftData,
       userDetails,
       setValues,
-      dynamicDispatch
+      dynamicDispatch,
+      onWaitingRequiredStateChanged
     } = this.props
 
     const language = this.props.intl.locale
@@ -1159,6 +1164,7 @@ class FormSectionComponent extends React.Component<Props> {
                       draftData={draftData}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
+                      onWaitingRequiredStateChanged={onWaitingRequiredStateChanged}
                     />
                   )}
                 </Field>
@@ -1222,6 +1228,9 @@ class FormSectionComponent extends React.Component<Props> {
                             onUploadingStateChanged={
                               this.props.onUploadingStateChanged
                             }
+                            onWaitingRequiredStateChanged={
+                              this.props.onWaitingRequiredStateChanged
+                            }
                           />
                         )}
                       </FastField>
@@ -1258,6 +1267,7 @@ class FormSectionComponent extends React.Component<Props> {
                       values={values}
                       draftData={draftData}
                       dynamicDispatch={dynamicDispatch}
+                      onWaitingRequiredStateChanged={onWaitingRequiredStateChanged}
                     />
                   )}
                 </Field>
@@ -1292,6 +1302,9 @@ class FormSectionComponent extends React.Component<Props> {
                         disabled={isFieldDisabled}
                         onUploadingStateChanged={
                           this.props.onUploadingStateChanged
+                        }
+                        onWaitingRequiredStateChanged={
+                          this.props.onWaitingRequiredStateChanged
                         }
                       />
                     )
