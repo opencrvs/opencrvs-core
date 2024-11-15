@@ -19,7 +19,7 @@ beforeEach(async () => {
   server = await createServer()
 })
 
-const token = jwt.sign(
+const localSysAdmintoken = jwt.sign(
   { scope: ['sysadmin'] },
   readFileSync('./test/cert.key'),
   {
@@ -28,7 +28,16 @@ const token = jwt.sign(
     audience: 'opencrvs:user-mgnt-user'
   }
 )
-const dummyRoleList = [
+const nationalSysAdmintoken = jwt.sign(
+  { scope: ['natlsysadmin', 'sysadmin'] },
+  readFileSync('./test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:user-mgnt-user'
+  }
+)
+const dummyRoleListNatlSysAdmin = [
   {
     _id: '63a06b979538ca7ab52f9759',
     active: true,
@@ -207,24 +216,169 @@ const dummyRoleList = [
   }
 ]
 
+const dummyRoleListLocalSysAdmin = [
+  {
+    _id: '63a06b979538ca7ab52f9759',
+    active: true,
+    value: 'FIELD_AGENT',
+    creationDate: 1671457687106,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Healthcare Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Professionnel de Santé'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Police Officer'
+          },
+          {
+            lang: 'fr',
+            label: 'Agent de Police'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Social Worker'
+          },
+          {
+            lang: 'fr',
+            label: 'Travailleur Social'
+          }
+        ]
+      },
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local Leader'
+          },
+          {
+            lang: 'fr',
+            label: 'Leader Local'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975a',
+    active: true,
+    value: 'REGISTRATION_AGENT',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Registration Agent'
+          },
+          {
+            lang: 'fr',
+            label: "Agent d'enregistrement"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975b',
+    active: true,
+    value: 'LOCAL_REGISTRAR',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local Registrar'
+          },
+          {
+            lang: 'fr',
+            label: 'Registraire local'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975c',
+    active: true,
+    value: 'LOCAL_SYSTEM_ADMIN',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Local System_admin'
+          },
+          {
+            lang: 'fr',
+            label: 'Administrateur système local'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    _id: '63a06b979538ca7ab52f975e',
+    active: true,
+    value: 'PERFORMANCE_MANAGEMENT',
+    creationDate: 1671457687107,
+    roles: [
+      {
+        labels: [
+          {
+            lang: 'en',
+            label: 'Performance Management'
+          },
+          {
+            lang: 'fr',
+            label: 'Gestion des performances'
+          }
+        ]
+      }
+    ]
+  }
+]
+
 describe('getSystemRoles tests', () => {
   it('Successfully returns full role list', async () => {
-    SystemRole.find = jest.fn().mockReturnValue(dummyRoleList)
-    SystemRole.find().sort = jest.fn().mockReturnValue(dummyRoleList)
-    SystemRole.find().populate = jest.fn().mockReturnValue(dummyRoleList)
+    SystemRole.find = jest.fn().mockReturnValue(dummyRoleListNatlSysAdmin)
+    SystemRole.find().sort = jest
+      .fn()
+      .mockReturnValue(dummyRoleListNatlSysAdmin)
+    SystemRole.find().populate = jest
+      .fn()
+      .mockReturnValue(dummyRoleListNatlSysAdmin)
 
     const res = await server.server.inject({
       method: 'POST',
       url: '/getSystemRoles',
       payload: {},
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${nationalSysAdmintoken}`
       }
     })
-    expect(res.result).toEqual(dummyRoleList)
+    expect(JSON.stringify(res.result)).toEqual(
+      JSON.stringify(dummyRoleListNatlSysAdmin)
+    )
   })
   it('Successfully returns filtered user list', async () => {
-    const filteredList = [dummyRoleList[2]]
+    const filteredList = [dummyRoleListNatlSysAdmin[2]]
     SystemRole.find = jest.fn().mockReturnValue(filteredList)
     SystemRole.find().sort = jest.fn().mockReturnValue(filteredList)
     SystemRole.find().populate = jest.fn().mockReturnValue(filteredList)
@@ -240,10 +394,31 @@ describe('getSystemRoles tests', () => {
         active: true
       },
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${nationalSysAdmintoken}`
       }
     })
 
-    expect(res.result).toEqual(filteredList)
+    expect(JSON.stringify(res.result)).toEqual(JSON.stringify(filteredList))
+  })
+  it('Successfully returns local sys admin role list minus national roles', async () => {
+    SystemRole.find = jest.fn().mockReturnValue(dummyRoleListNatlSysAdmin)
+    SystemRole.find().sort = jest
+      .fn()
+      .mockReturnValue(dummyRoleListNatlSysAdmin)
+    SystemRole.find().populate = jest
+      .fn()
+      .mockReturnValue(dummyRoleListNatlSysAdmin)
+
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/getSystemRoles',
+      payload: {},
+      headers: {
+        Authorization: `Bearer ${localSysAdmintoken}`
+      }
+    })
+    expect(JSON.stringify(res.result)).toEqual(
+      JSON.stringify(dummyRoleListLocalSysAdmin)
+    )
   })
 })
