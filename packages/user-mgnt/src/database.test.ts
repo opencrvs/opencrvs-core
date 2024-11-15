@@ -9,12 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 jest.mock('mongoose', () => ({
-  connection: {
-    on: jest.fn()
-  },
-  set: () => {},
-  connect: () => Promise.reject(),
-  disconnect: () => {}
+  default: {
+    connection: {
+      on: jest.fn()
+    },
+    set: () => {},
+    connect: () => Promise.reject(),
+    disconnect: () => {}
+  }
 }))
 
 import mongoose from 'mongoose'
