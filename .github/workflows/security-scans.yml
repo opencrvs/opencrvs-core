@@ -12,7 +12,9 @@ on:
   push:
     branches:
       - develop
+      - release-*
   pull_request:
+  workflow_dispatch:
   schedule:
     # Run every day at midnight
     - cron: '0 0 * * *'
