@@ -15,7 +15,7 @@ import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import { Types } from 'mongoose'
-import { dummyRoleListNatlSysAdmin } from '../getRoles/handler.test'
+import { dummyRoleListNatlSysAdmin } from '@user-mgnt/features/getRoles/handler.test'
 import SystemRole from '@user-mgnt/model/systemRole'
 
 const fetch = fetchMock as fetchMock.FetchMock
