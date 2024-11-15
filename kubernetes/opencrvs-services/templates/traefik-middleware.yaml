@@ -26,6 +26,6 @@ kind: Middleware
 metadata:
   name: block-internal-routes
 spec:
-  IPAllowList:
+  ipAllowList:
     sourceRange:
       - 255.255.255.255
