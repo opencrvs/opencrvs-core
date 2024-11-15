@@ -37,7 +37,7 @@ const nationalSysAdmintoken = jwt.sign(
     audience: 'opencrvs:user-mgnt-user'
   }
 )
-const dummyRoleListNatlSysAdmin = [
+export const dummyRoleListNatlSysAdmin = [
   {
     _id: '63a06b979538ca7ab52f9759',
     active: true,

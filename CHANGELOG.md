@@ -45,6 +45,13 @@
 
 - Add an optional configurable field in section `canContinue` which takes an expression. Falsy value of this expression will disable the continue button in forms. This can be used to work with fetch field which has a loading state and prevent the user to get past the section while the request is still in progress.
 
+## 1.6.1
+
+## Bug fixes
+
+- Stops local sys admins creating national level users. [#7698](https://github.com/opencrvs/opencrvs-core/issues/7698)
+- Stops sys admins deactivating themselves by mistake. [#7691](https://github.com/opencrvs/opencrvs-core/issues/7691)
+
 ## 1.6.0 Release candidate
 
 ## Improvements

@@ -15,6 +15,8 @@ import * as fetchMock from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import { Types } from 'mongoose'
+import { dummyRoleListNatlSysAdmin } from '../getRoles/handler.test'
+import SystemRole from '@user-mgnt/model/systemRole'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -71,10 +73,18 @@ describe('createUser handler', () => {
     mockingoose.resetAll()
     server = await createServer()
     fetch.resetMocks()
+    SystemRole.find = jest.fn().mockReturnValue(dummyRoleListNatlSysAdmin)
+    SystemRole.find().sort = jest
+      .fn()
+      .mockReturnValue(dummyRoleListNatlSysAdmin)
+    SystemRole.find().populate = jest
+      .fn()
+      .mockReturnValue(dummyRoleListNatlSysAdmin)
   })
 
   it('creates and saves fhir resources and adds user using mongoose', async () => {
     fetch.mockResponses(
+      ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }],
       ['', { status: 200 }]
