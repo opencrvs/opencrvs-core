@@ -20,8 +20,7 @@
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
     "types": ["fhir", "jest"],
-    "esModuleInterop": true,
-    "allowJs": true
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "typings"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
