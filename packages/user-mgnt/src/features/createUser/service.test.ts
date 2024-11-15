@@ -10,7 +10,7 @@
  */
 import { generateUsername, sendCredentialsNotification } from './service'
 import User from '@user-mgnt/model/user'
-import mockingoose = require('mockingoose')
+import * as mockingoose from 'mockingoose'
 import fetchMock from 'jest-fetch-mock'
 import jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
