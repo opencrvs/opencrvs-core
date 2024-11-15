@@ -7,7 +7,7 @@
     "allowJs": true,
     "moduleResolution": "node16",
     "target": "esnext",
-    "module": "node16",
+    "module": "esnext",
     "esModuleInterop": true,
     "rootDir": ".",
     "outDir": "build/dist",

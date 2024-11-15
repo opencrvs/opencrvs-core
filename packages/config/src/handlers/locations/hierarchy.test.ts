@@ -30,7 +30,7 @@ describe('resolveLocationParents', () => {
     })
     const child = fixtures.savedLocation({
       id: 'uuid2' as UUID,
-      partOf: { reference: 'Location/uuid1' as `Location/${UUID}` }
+      partOf: { reference: 'Location/uuid1' }
     })
 
     const result = resolveLocationParents(child, [child, parent])
@@ -44,11 +44,11 @@ describe('resolveLocationParents', () => {
     })
     const parent = fixtures.savedLocation({
       id: 'uuid2' as UUID,
-      partOf: { reference: 'Location/uuid1' as `Location/${UUID}` }
+      partOf: { reference: 'Location/uuid1' }
     })
     const child = fixtures.savedLocation({
       id: 'uuid3' as UUID,
-      partOf: { reference: 'Location/uuid2' as `Location/${UUID}` }
+      partOf: { reference: 'Location/uuid2' }
     })
     const locations = [child, parent, grandparent]
 

@@ -6,7 +6,7 @@
       "@gateway/*": ["./*"]
     },
     "target": "es6",
-    "module": "node16",
+    "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node16",
@@ -19,9 +19,7 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"],
-    "esModuleInterop": true,
-    "allowJs": true
+    "types": ["fhir", "jest"]
   },
   "include": ["src/**/*.ts", "typings"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]

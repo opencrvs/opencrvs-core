@@ -2,25 +2,44 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@metrics/*": ["./*"]
+      "@metrics/*": [
+        "./*"
+      ]
     },
     "target": "es6",
-    "module": "node16",
+    "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": [
+      "fhir",
+      "jest"
+    ]
   },
-  "include": ["src/**/*.ts", "scripts", "typings"],
-  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
+  "include": [
+    "src/**/*.ts",
+    "scripts",
+    "typings"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests"
+  ]
 }

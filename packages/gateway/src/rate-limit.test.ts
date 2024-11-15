@@ -22,7 +22,6 @@ import {
 import { StartedTestContainer } from 'testcontainers'
 import { savedAdministrativeLocation } from '@opencrvs/commons/fixtures'
 import { createServer } from '@gateway/server'
-import { UUID } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 const resolvers = rootResolvers as any
@@ -227,9 +226,7 @@ describe('Rate limit', () => {
     const resolverCalls = Array.from({ length: 20 }, async () => {
       fetch.mockResponseOnce(
         JSON.stringify([
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          })
+          savedAdministrativeLocation({ partOf: { reference: 'Location/1' } })
         ])
       )
       await locationResolvers.Query!.isLeafLevelLocation(

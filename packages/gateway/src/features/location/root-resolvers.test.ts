@@ -14,7 +14,6 @@ import {
 } from '@opencrvs/commons/fixtures'
 import { resolvers } from '@gateway/features/location/root-resolvers'
 import * as fetchAny from 'jest-fetch-mock'
-import { UUID } from '@opencrvs/commons'
 
 const fetch = fetchAny as any
 
@@ -23,9 +22,7 @@ describe('Location root resolvers', () => {
     it('returns false if a location has administrative locations as its children', async () => {
       fetch.mockResponseOnce(
         JSON.stringify([
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          })
+          savedAdministrativeLocation({ partOf: { reference: 'Location/1' } })
         ])
       )
       // @ts-ignore
@@ -40,12 +37,8 @@ describe('Location root resolvers', () => {
     it('returns true if a location has no administrative locations as its children', async () => {
       fetch.mockResponseOnce(
         JSON.stringify([
-          savedLocation({
-            partOf: { reference: 'Location/1' as `Location/${UUID}` }
-          }),
-          savedAdministrativeLocation({
-            partOf: { reference: 'Location/2' as `Location/${UUID}` }
-          })
+          savedLocation({ partOf: { reference: 'Location/1' } }),
+          savedAdministrativeLocation({ partOf: { reference: 'Location/2' } })
         ])
       )
       // @ts-ignore

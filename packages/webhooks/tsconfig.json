@@ -2,25 +2,45 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@webhooks/*": ["./*"]
+      "@webhooks/*": [
+        "./*"
+      ]
     },
     "target": "es6",
-    "module": "node16",
+    "module": "commonjs",
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": [
+      "fhir",
+      "jest"
+    ]
   },
-  "include": ["resources/**/*.ts", "src/**/*.ts", "typings"],
-  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
+  "include": [
+    "resources/**/*.ts",
+    "src/**/*.ts",
+    "typings"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "src/setupTests.ts"
+  ]
 }

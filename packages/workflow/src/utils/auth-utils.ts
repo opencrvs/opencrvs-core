@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import decode = require('jwt-decode')
+import * as decode from 'jwt-decode'
 import * as Hapi from '@hapi/hapi'
 import { hasScope } from '@opencrvs/commons/authentication'
 

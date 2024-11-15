@@ -13,13 +13,13 @@ import { mockTaskBundle } from '@gateway/utils/testUtils'
 import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
-import { sign } from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 
 import { UserInputError } from 'apollo-server-hapi'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
-const registerCertifyToken = sign(
+const registerCertifyToken = jwt.sign(
   { scope: ['register', 'certify'] },
   readFileSync('./test/cert.key'),
   {
@@ -30,7 +30,7 @@ const registerCertifyToken = sign(
   }
 )
 
-const validateToken = sign(
+const validateToken = jwt.sign(
   { scope: ['validate'] },
   readFileSync('./test/cert.key'),
   {
@@ -41,7 +41,7 @@ const validateToken = sign(
   }
 )
 
-const declareToken = sign(
+const declareToken = jwt.sign(
   { scope: ['declare'] },
   readFileSync('./test/cert.key'),
   {
@@ -52,7 +52,7 @@ const declareToken = sign(
   }
 )
 
-const certifyToken = sign(
+const certifyToken = jwt.sign(
   { scope: ['certify'] },
   readFileSync('./test/cert.key'),
   {
@@ -62,7 +62,7 @@ const certifyToken = sign(
   }
 )
 
-const sysAdminToken = sign(
+const sysAdminToken = jwt.sign(
   { scope: ['sysadmin'] },
   readFileSync('./test/cert.key'),
   {

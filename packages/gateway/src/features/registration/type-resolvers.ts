@@ -95,7 +95,7 @@ import {
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
-import validateUUID from 'uuid-validate'
+import * as validateUUID from 'uuid-validate'
 import { fetchTaskByCompositionIdFromHearth } from '@gateway/features/fhir/service'
 import { TaskInput } from 'fhir/r3'
 

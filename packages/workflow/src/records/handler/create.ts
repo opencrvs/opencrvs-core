@@ -74,7 +74,7 @@ import {
   toValidated,
   toWaitingForExternalValidationState
 } from '@workflow/records/state-transitions'
-import { logger, UUID } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 
 const requestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
@@ -175,7 +175,7 @@ async function createRecord(
   recordDetails: z.TypeOf<typeof requestSchema>['record'],
   event: z.TypeOf<typeof requestSchema>['event'],
   token: string,
-  duplicateIds: Array<{ id: UUID; trackingId: string }>
+  duplicateIds: Array<{ id: string; trackingId: string }>
 ): Promise<InProgressRecord | ReadyForReviewRecord> {
   const inputBundle = buildFHIRBundle(recordDetails, event)
   const trackingId = await generateTrackingIdForEvents(

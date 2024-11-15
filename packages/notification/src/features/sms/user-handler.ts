@@ -31,7 +31,7 @@ interface IRetrieveUserNamePayload extends IMessageRecipient {
 
 interface IUserAuthCodePayload extends IMessageRecipient {
   code: string
-  notificationEvent: keyof typeof templateNames
+  notificationEvent: string
 }
 
 export async function sendUserCredentials(

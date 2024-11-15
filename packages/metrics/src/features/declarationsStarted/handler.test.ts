@@ -97,8 +97,7 @@ describe('verify declarationsStarted', () => {
           fixtures.savedLocation({
             id: 'uuid2' as UUID,
             partOf: {
-              reference:
-                'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294' as `Location/${UUID}`
+              reference: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294'
             }
           })
         ])
@@ -123,7 +122,7 @@ describe('verify declarationsStarted', () => {
       const res = await service.fetchLocationWiseDeclarationsStarted(
         '1552469068679',
         '1554814894419',
-        'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294' as `Location/${UUID}`
+        'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294'
       )
 
       expect(res).toEqual({

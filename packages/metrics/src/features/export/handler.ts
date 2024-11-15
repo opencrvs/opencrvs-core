@@ -11,9 +11,9 @@
 
 import * as Hapi from '@hapi/hapi'
 import { query, getCSV } from '@metrics/influxdb/client'
-import archiver from 'archiver'
+import * as archiver from 'archiver'
 import { metricsHandler } from '@metrics/features/metrics/handler'
-import stringify from 'csv-stringify'
+import * as stringify from 'csv-stringify'
 import { fetchLocation } from '@metrics/api'
 import { EVENT } from '@metrics/features/metrics/constants'
 //import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'

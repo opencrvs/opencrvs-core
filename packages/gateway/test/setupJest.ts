@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { join } from 'path'
-import fetch from 'jest-fetch-mock'
+import * as fetch from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', fetch)
-jest.setMock('@opencrvs/commons/monitoring', {})
+const f = jest.requireActual('node-fetch')
+
+jest.setMock('node-fetch', { default: fetch, Headers: f.Headers })
+jest.setMock('@opencrvs/commons/monitoring')
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')

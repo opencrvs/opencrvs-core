@@ -365,8 +365,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f' as `Location/${UUID}`
+                  reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
                 }
               }
             ]
@@ -415,8 +414,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           ]
         },
         focus: {
-          reference:
-            'Composition/7a790b68-9433-47b8-b595-66aae80d044a' as `Composition/${UUID}`
+          reference: 'Composition/7a790b68-9433-47b8-b595-66aae80d044a'
         },
         id: 'df49e854-25b3-46b0-b6ea-e2f7f82ea297' as UUID,
         requester: {
@@ -450,15 +448,13 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference:
-                'Practitioner/1a3cf855-1132-427f-b125-93c03d79b57f' as `Practitioner/${UUID}`
+              reference: 'Practitioner/1a3cf855-1132-427f-b125-93c03d79b57f'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference:
-                'Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84' as `Location/${UUID}`
+              reference: 'Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84'
             }
           }
         ],
@@ -523,8 +519,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference:
-            'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f' as `Location/${UUID}`
+          reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
         },
         type: {
           coding: [
@@ -570,8 +565,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference:
-            'Location/3fba5456-91e9-4a36-951d-d433173203e8' as `Location/${UUID}`
+          reference: 'Location/3fba5456-91e9-4a36-951d-d433173203e8'
         },
         type: {
           coding: [
@@ -641,8 +635,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference:
-            'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f' as `Location/${UUID}`
+          reference: 'Location/c535b9a2-da47-41d0-b0ac-5891e31eeb9f'
         },
         type: {
           coding: [
@@ -695,8 +688,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         ],
         location: [
           {
-            reference:
-              'Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84' as `Location/${UUID}`
+            reference: 'Location/0fad590a-41e4-4b82-a9ab-e8f32c2e7e84'
           }
         ],
         meta: {
@@ -727,7 +719,7 @@ export const REGISTERED_BIRTH_RECORD: SavedBundle<
         status: 'active',
         mode: 'instance',
         partOf: {
-          reference: 'Location/0' as `Location/${UUID}`
+          reference: 'Location/0'
         },
         type: {
           coding: [

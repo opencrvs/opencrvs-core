@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`running a full aggregated birth FHIR bundle through resolvers produces a BirthRegistration object 1`] = `
-{
-  "fetchBirthRegistration": {
-    "_fhirIDMap": {
+Object {
+  "fetchBirthRegistration": Object {
+    "_fhirIDMap": Object {
       "composition": "09f39e17-ca23-4905-9ab3-f3649c4e3162",
       "encounter": "e7ed42ae-bd54-4d7c-ad9d-0af7506d1d64",
       "eventLocation": "565d957a-109a-4bf3-a3af-f0ad52c719cd",
-      "observation": {
+      "observation": Object {
         "attendantAtBirth": "942901b9-e03f-4209-953d-fd094e5e8231",
         "birthType": "78e42deb-c50e-43c8-853f-71ccc6398512",
         "weightAtBirth": "d47d4a55-bf18-4704-ac3a-0066e3ecff6f",
@@ -16,14 +16,14 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
     },
     "attendantAtBirth": "PHYSICIAN",
     "birthType": "SINGLE",
-    "child": {
+    "child": Object {
       "_fhirID": null,
       "address": null,
       "age": null,
       "ageOfIndividualInYears": null,
       "birthDate": "2023-07-11",
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -32,26 +32,26 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "exactDateOfBirthUnknown": null,
       "gender": "female",
       "id": "dfac3127-963e-4ef2-b875-3123e08da3d9",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2023B3VUXES",
           "otherType": null,
           "type": "BIRTH_REGISTRATION_NUMBER",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "",
           "otherType": null,
           "type": "BIRTH_CONFIGURABLE_IDENTIFIER_1",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "",
           "otherType": null,
           "type": "BIRTH_CONFIGURABLE_IDENTIFIER_2",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "",
           "otherType": null,
@@ -60,8 +60,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Baumbach",
           "firstNames": "Isadore",
           "marriedLastName": null,
@@ -77,7 +77,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
     },
     "childrenBornAliveToMother": null,
     "createdAt": "2023-08-11T05:26:26.000Z",
-    "eventLocation": {
+    "eventLocation": Object {
       "_fhirID": null,
       "address": null,
       "altitude": null,
@@ -92,16 +92,16 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "telecom": null,
       "type": "HEALTH_FACILITY",
     },
-    "father": {
+    "father": Object {
       "_fhirID": null,
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": "South Jamelmouth",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -109,7 +109,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
             "",
             "URBAN",
           ],
-          "lineName": [
+          "lineName": Array [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -131,7 +131,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "ageOfIndividualInYears": null,
       "birthDate": "2003-07-11",
       "dateOfMarriage": "2021-07-11",
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -140,8 +140,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "3ee05cf9-a550-4d7f-abde-54313f7bd41a",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "8762475961",
           "otherType": null,
@@ -150,8 +150,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Neil",
           "firstNames": "Baumbach",
           "marriedLastName": null,
@@ -159,7 +159,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": "Bookkeeper",
@@ -168,19 +168,19 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "telecom": null,
     },
     "foetalDeathsToMother": null,
-    "history": [
-      {
-        "certificates": [
+    "history": Array [
+      Object {
+        "certificates": Array [
           null,
         ],
-        "comments": [],
+        "comments": Array [],
         "date": "2023-10-02T13:51:55.645+00:00",
         "dhis2Notification": false,
         "duplicateOf": null,
         "hasShowedVerifiedDocument": false,
-        "input": [],
+        "input": Array [],
         "ipAddress": null,
-        "location": {
+        "location": Object {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -197,7 +197,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
         },
         "noSupportingDocumentationRequired": false,
         "note": "",
-        "office": {
+        "office": Object {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -213,7 +213,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
           "type": "CRVS_OFFICE",
         },
         "otherReason": "",
-        "output": [],
+        "output": Array [],
         "payment": null,
         "reason": null,
         "requester": "",
@@ -225,17 +225,17 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       },
     ],
     "id": "09f39e17-ca23-4905-9ab3-f3649c4e3162",
-    "informant": {
+    "informant": Object {
       "_fhirID": null,
       "_fhirIDPatient": "cd5693ed-dd33-4c3a-a9fc-7479b132a4ea",
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": "South Jamelmouth",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -249,7 +249,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
             "",
             "URBAN",
           ],
-          "lineName": [
+          "lineName": Array [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -278,7 +278,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "ageOfIndividualInYears": null,
       "birthDate": "2003-07-11",
       "dateOfMarriage": "2021-07-11",
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -287,8 +287,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "a0fd7881-33e6-4751-a346-78f820aa3dbb",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2253499797",
           "otherType": null,
@@ -297,8 +297,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": 2,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Baumbach",
           "firstNames": "Sophia",
           "marriedLastName": null,
@@ -306,7 +306,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": "Farmer",
@@ -317,16 +317,16 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "telecom": null,
     },
     "lastPreviousLiveBirth": null,
-    "mother": {
+    "mother": Object {
       "_fhirID": null,
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": "South Jamelmouth",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -340,7 +340,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
             "",
             "URBAN",
           ],
-          "lineName": [
+          "lineName": Array [
             "12",
             "Usual Street",
             "Usual Residental Area",
@@ -368,7 +368,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "ageOfIndividualInYears": null,
       "birthDate": "2003-07-11",
       "dateOfMarriage": "2021-07-11",
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -377,8 +377,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "cd5693ed-dd33-4c3a-a9fc-7479b132a4ea",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2253499797",
           "otherType": null,
@@ -387,8 +387,8 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": 2,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Baumbach",
           "firstNames": "Sophia",
           "marriedLastName": null,
@@ -396,14 +396,14 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": "Farmer",
       "photo": null,
       "reasonNotApplying": null,
-      "telecom": [
-        {
+      "telecom": Array [
+        Object {
           "system": "phone",
           "use": null,
           "value": "+260711384538",
@@ -412,9 +412,9 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
     },
     "otherAttendantAtBirth": null,
     "questionnaire": null,
-    "registration": {
+    "registration": Object {
       "_fhirID": null,
-      "assignment": {
+      "assignment": Object {
         "avatarURL": "https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name=Kennedy Mweene",
         "firstName": "Kennedy",
         "lastName": "Mweene",
@@ -424,7 +424,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "attachments": null,
       "book": null,
       "brideSignature": null,
-      "certificates": [
+      "certificates": Array [
         null,
       ],
       "contact": "MOTHER",
@@ -442,11 +442,11 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
       "page": null,
       "paperFormID": null,
       "registrationNumber": "2023B3VUXES",
-      "status": [
-        {
+      "status": Array [
+        Object {
           "comments": null,
           "id": "358c0c75-9855-4812-b560-c1b5fbf48e5a",
-          "location": {
+          "location": Object {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -461,7 +461,7 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
             "telecom": null,
             "type": "ADMIN_STRUCTURE",
           },
-          "office": {
+          "office": Object {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -493,13 +493,13 @@ exports[`running a full aggregated birth FHIR bundle through resolvers produces 
 `;
 
 exports[`running a full aggregated death FHIR bundle through resolvers produces a DeathRegistration object 1`] = `
-{
-  "fetchDeathRegistration": {
-    "_fhirIDMap": {
+Object {
+  "fetchDeathRegistration": Object {
+    "_fhirIDMap": Object {
       "composition": "a959c616-934a-4139-a123-37bb4a1be39e",
       "encounter": "e668f0dc-aacd-45be-bd5f-2a81c3161593",
       "eventLocation": "4ba43b39-547b-41a8-8af1-c515786f36e5",
-      "observation": {
+      "observation": Object {
         "causeOfDeath": "3cae74a3-042c-4faf-9dde-8b716d094033",
         "causeOfDeathEstablished": "fb98ff5b-3aa1-40c2-87bf-4bd6df091dd2",
         "causeOfDeathMethod": "ff9a538b-c551-4edc-9631-fa2169a37f20",
@@ -515,16 +515,16 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
     "causeOfDeathMethod": "PHYSICIAN",
     "createdAt": "2023-08-16T06:55:19.000Z",
     "deathDescription": null,
-    "deceased": {
+    "deceased": Object {
       "_fhirID": null,
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": "Rudyboro",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "44444 Predovic Mount",
             "87740",
             "URBAN",
@@ -532,7 +532,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
             "",
             "URBAN",
           ],
-          "lineName": [
+          "lineName": Array [
             "44444 Predovic Mount",
             "87740",
             "URBAN",
@@ -554,7 +554,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "ageOfIndividualInYears": null,
       "birthDate": "1948-07-24",
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": "2023-07-24",
         "deceased": null,
       },
@@ -563,20 +563,20 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "exactDateOfBirthUnknown": null,
       "gender": "female",
       "id": "d55283fe-b5bc-497d-86f3-5370957b0642",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "8360781537",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "565195261",
           "otherType": null,
           "type": "SOCIAL_SECURITY_NO",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2023DL1W8FV",
           "otherType": null,
@@ -585,8 +585,8 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       ],
       "maritalStatus": "MARRIED",
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Pacocha",
           "firstNames": "Zack",
           "marriedLastName": null,
@@ -594,7 +594,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": null,
@@ -602,7 +602,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "reasonNotApplying": null,
       "telecom": null,
     },
-    "eventLocation": {
+    "eventLocation": Object {
       "_fhirID": null,
       "address": null,
       "altitude": null,
@@ -617,14 +617,14 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "telecom": null,
       "type": "HEALTH_FACILITY",
     },
-    "father": {
+    "father": Object {
       "_fhirID": null,
       "address": null,
       "age": null,
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -636,8 +636,8 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Pacocha",
           "firstNames": "",
           "marriedLastName": null,
@@ -652,17 +652,17 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "telecom": null,
     },
     "femaleDependentsOfDeceased": 4,
-    "history": [
-      {
-        "certificates": [],
-        "comments": [],
+    "history": Array [
+      Object {
+        "certificates": Array [],
+        "comments": Array [],
         "date": "2023-09-22T11:52:48.611+00:00",
         "dhis2Notification": false,
         "duplicateOf": null,
         "hasShowedVerifiedDocument": false,
-        "input": [],
+        "input": Array [],
         "ipAddress": null,
-        "location": {
+        "location": Object {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -679,7 +679,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
         },
         "noSupportingDocumentationRequired": false,
         "note": "",
-        "office": {
+        "office": Object {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -695,7 +695,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
           "type": "CRVS_OFFICE",
         },
         "otherReason": "",
-        "output": [],
+        "output": Array [],
         "payment": null,
         "reason": null,
         "requester": "",
@@ -707,17 +707,17 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       },
     ],
     "id": "a959c616-934a-4139-a123-37bb4a1be39e",
-    "informant": {
+    "informant": Object {
       "_fhirID": null,
       "_fhirIDPatient": "9fbbb561-dd3c-4b9f-8765-829a4c75493e",
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": "New Julio",
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "817 Avis Point",
             "06074",
             "URBAN",
@@ -725,7 +725,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
             "",
             "URBAN",
           ],
-          "lineName": [
+          "lineName": Array [
             "817 Avis Point",
             "06074",
             "URBAN",
@@ -748,7 +748,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "ageOfIndividualInYears": null,
       "birthDate": "2003-08-16",
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -757,8 +757,8 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "7106d752-1e34-47fe-8726-a9fd11042a4d",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2464716794",
           "otherType": null,
@@ -767,8 +767,8 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Pacocha",
           "firstNames": "Frank",
           "marriedLastName": null,
@@ -776,7 +776,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": "consultant",
@@ -789,14 +789,14 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
     "maleDependentsOfDeceased": 3,
     "mannerOfDeath": "NATURAL_CAUSES",
     "medicalPractitioner": null,
-    "mother": {
+    "mother": Object {
       "_fhirID": null,
       "address": null,
       "age": null,
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -808,8 +808,8 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "Pacocha",
           "firstNames": "",
           "marriedLastName": null,
@@ -824,11 +824,11 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "telecom": null,
     },
     "questionnaire": null,
-    "registration": {
+    "registration": Object {
       "_fhirID": null,
       "assignment": null,
-      "attachments": [
-        {
+      "attachments": Array [
+        Object {
           "_fhirID": null,
           "contentType": "image/png",
           "createdAt": null,
@@ -842,7 +842,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
           "type": "OTHER",
           "uri": "/ocrvs/d40e904b-53ff-4639-bdcf-a2ba8fb236f5.png",
         },
-        {
+        Object {
           "_fhirID": null,
           "contentType": "image/png",
           "createdAt": null,
@@ -859,7 +859,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       ],
       "book": null,
       "brideSignature": null,
-      "certificates": [],
+      "certificates": Array [],
       "contact": "SPOUSE",
       "contactEmail": "Frank24@gmail.com",
       "contactPhoneNumber": "+260734085893",
@@ -875,11 +875,11 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
       "page": null,
       "paperFormID": null,
       "registrationNumber": "2023DL1W8FV",
-      "status": [
-        {
+      "status": Array [
+        Object {
           "comments": null,
           "id": "b1a6925a-47ae-431e-8f61-4cd0929e8518",
-          "location": {
+          "location": Object {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -894,7 +894,7 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
             "telecom": null,
             "type": "ADMIN_STRUCTURE",
           },
-          "office": {
+          "office": Object {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -926,27 +926,27 @@ exports[`running a full aggregated death FHIR bundle through resolvers produces 
 `;
 
 exports[`running a full aggregated marriage FHIR bundle through resolvers produces a MarriageRegistration object 1`] = `
-{
-  "fetchMarriageRegistration": {
-    "_fhirIDMap": {
+Object {
+  "fetchMarriageRegistration": Object {
+    "_fhirIDMap": Object {
       "composition": "b2e4d436-d7fb-4b0f-9674-628b5af8f42e",
       "encounter": "669cb7d8-5963-4b49-b647-7463d9e135b5",
       "eventLocation": "461a4ba8-5592-4b1a-a30b-747150a01623",
-      "observation": {
+      "observation": Object {
         "typeOfMarriage": "c01c802f-e5fe-46d8-b35c-deffe87a6fd9",
       },
       "questionnaireResponse": undefined,
     },
-    "bride": {
+    "bride": Object {
       "_fhirID": null,
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": null,
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "",
             "",
             "",
@@ -963,7 +963,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
             "",
             "",
           ],
-          "lineName": [
+          "lineName": Array [
             "",
             "",
             "",
@@ -994,7 +994,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "ageOfIndividualInYears": null,
       "birthDate": "2001-02-22",
       "dateOfMarriage": "2021-02-24",
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -1003,14 +1003,14 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "5b979fe9-eaa3-4c4e-87ab-ee48ea1abb16",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2323444434",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2023MTNJUSI",
           "otherType": null,
@@ -1019,8 +1019,8 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "test",
           "firstNames": "genie",
           "marriedLastName": null,
@@ -1028,7 +1028,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": null,
@@ -1037,15 +1037,15 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "telecom": null,
     },
     "createdAt": "2023-09-22T08:54:48.780Z",
-    "eventLocation": {
+    "eventLocation": Object {
       "_fhirID": null,
-      "address": {
+      "address": Object {
         "city": "",
         "country": "FAR",
         "district": "bbee20e1-68c4-4e0c-a0cd-44336341e005",
         "districtName": null,
         "from": null,
-        "line": [
+        "line": Array [
           "",
           "",
           "",
@@ -1062,7 +1062,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
           "",
           "",
         ],
-        "lineName": [
+        "lineName": Array [
           "",
           "",
           "",
@@ -1100,16 +1100,16 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "telecom": null,
       "type": null,
     },
-    "groom": {
+    "groom": Object {
       "_fhirID": null,
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": null,
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "",
             "",
             "",
@@ -1126,7 +1126,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
             "",
             "",
           ],
-          "lineName": [
+          "lineName": Array [
             "",
             "",
             "",
@@ -1157,7 +1157,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "ageOfIndividualInYears": null,
       "birthDate": "1999-11-13",
       "dateOfMarriage": "2021-02-24",
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -1166,14 +1166,14 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "1a5ad72e-9241-4358-a937-861cfdf44f4d",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "8675646566",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2023MTNJUSI",
           "otherType": null,
@@ -1182,8 +1182,8 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "test",
           "firstNames": "george",
           "marriedLastName": null,
@@ -1191,7 +1191,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": null,
@@ -1199,17 +1199,17 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "reasonNotApplying": null,
       "telecom": null,
     },
-    "history": [
-      {
-        "certificates": [],
-        "comments": [],
+    "history": Array [
+      Object {
+        "certificates": Array [],
+        "comments": Array [],
         "date": "2023-09-22T08:54:57.825+00:00",
         "dhis2Notification": false,
         "duplicateOf": null,
         "hasShowedVerifiedDocument": false,
-        "input": [],
+        "input": Array [],
         "ipAddress": null,
-        "location": {
+        "location": Object {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -1226,7 +1226,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
         },
         "noSupportingDocumentationRequired": false,
         "note": "",
-        "office": {
+        "office": Object {
           "_fhirID": null,
           "address": null,
           "altitude": null,
@@ -1242,7 +1242,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
           "type": "CRVS_OFFICE",
         },
         "otherReason": "",
-        "output": [],
+        "output": Array [],
         "payment": null,
         "reason": null,
         "requester": "",
@@ -1254,17 +1254,17 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       },
     ],
     "id": "b2e4d436-d7fb-4b0f-9674-628b5af8f42e",
-    "informant": {
+    "informant": Object {
       "_fhirID": null,
       "_fhirIDPatient": "1a5ad72e-9241-4358-a937-861cfdf44f4d",
-      "address": [
-        {
+      "address": Array [
+        Object {
           "city": null,
           "country": "FAR",
           "district": "e66643ac-9ea9-4314-b842-f4fb3ad9e83a",
           "districtName": "Ibombo",
           "from": null,
-          "line": [
+          "line": Array [
             "",
             "",
             "",
@@ -1281,7 +1281,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
             "",
             "",
           ],
-          "lineName": [
+          "lineName": Array [
             "",
             "",
             "",
@@ -1313,7 +1313,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "ageOfIndividualInYears": null,
       "birthDate": "1999-11-13",
       "dateOfMarriage": "2021-02-24",
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -1322,14 +1322,14 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "exactDateOfBirthUnknown": null,
       "gender": null,
       "id": "4065eb20-d02b-48d7-a783-5d7e452c7a7d",
-      "identifier": [
-        {
+      "identifier": Array [
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "8675646566",
           "otherType": null,
           "type": "NATIONAL_ID",
         },
-        {
+        Object {
           "fieldsModifiedByIdentity": null,
           "id": "2023MTNJUSI",
           "otherType": null,
@@ -1338,8 +1338,8 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       ],
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "test",
           "firstNames": "george",
           "marriedLastName": null,
@@ -1347,7 +1347,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
           "use": "en",
         },
       ],
-      "nationality": [
+      "nationality": Array [
         "FAR",
       ],
       "occupation": null,
@@ -1358,9 +1358,9 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "telecom": null,
     },
     "questionnaire": null,
-    "registration": {
+    "registration": Object {
       "_fhirID": null,
-      "assignment": {
+      "assignment": Object {
         "avatarURL": "https://eu.ui-avatars.com/api/?background=DEE5F2&color=222&name=Kennedy Mweene",
         "firstName": "Kennedy",
         "lastName": "Mweene",
@@ -1370,7 +1370,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "attachments": null,
       "book": null,
       "brideSignature": "/mock-presigned-url",
-      "certificates": [],
+      "certificates": Array [],
       "contact": "GROOM",
       "contactEmail": "aaa@gmail.com",
       "contactPhoneNumber": null,
@@ -1386,11 +1386,11 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "page": null,
       "paperFormID": null,
       "registrationNumber": "2023MTNJUSI",
-      "status": [
-        {
+      "status": Array [
+        Object {
           "comments": null,
           "id": "6cc01269-6b36-4aa5-9bb0-21944d685e42",
-          "location": {
+          "location": Object {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -1405,7 +1405,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
             "telecom": null,
             "type": "ADMIN_STRUCTURE",
           },
-          "office": {
+          "office": Object {
             "_fhirID": null,
             "address": null,
             "altitude": null,
@@ -1432,7 +1432,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
     },
     "typeOfMarriage": "MONOGAMY",
     "updatedAt": null,
-    "witnessOne": {
+    "witnessOne": Object {
       "_fhirID": null,
       "_fhirIDPatient": "4512feb1-a96d-40b4-bfdc-7f437993bfa8",
       "address": null,
@@ -1441,7 +1441,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -1453,8 +1453,8 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "one",
           "firstNames": "wit",
           "marriedLastName": null,
@@ -1470,7 +1470,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "relationship": "HEAD_OF_GROOM_FAMILY",
       "telecom": null,
     },
-    "witnessTwo": {
+    "witnessTwo": Object {
       "_fhirID": null,
       "_fhirIDPatient": "93de5304-f816-493e-968a-86c3a3d5ee7a",
       "address": null,
@@ -1479,7 +1479,7 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "ageOfIndividualInYears": null,
       "birthDate": null,
       "dateOfMarriage": null,
-      "deceased": {
+      "deceased": Object {
         "deathDate": null,
         "deceased": null,
       },
@@ -1491,8 +1491,8 @@ exports[`running a full aggregated marriage FHIR bundle through resolvers produc
       "identifier": null,
       "maritalStatus": null,
       "multipleBirth": null,
-      "name": [
-        {
+      "name": Array [
+        Object {
           "familyName": "two",
           "firstNames": "wit",
           "marriedLastName": null,

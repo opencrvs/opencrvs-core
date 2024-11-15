@@ -20,7 +20,7 @@ import {
 import { internal } from '@hapi/boom'
 import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@opencrvs/commons'
-import uuid = require('uuid/v4')
+import * as uuid from 'uuid/v4'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
 
@@ -40,7 +40,7 @@ export async function subscribeWebhooksHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { hub } = request.payload as ISubscribePayload
-  if (!(hub.topic in TRIGGERS)) {
+  if (!TRIGGERS[TRIGGERS[hub.topic]]) {
     return h
       .response({
         hub: {
@@ -109,7 +109,7 @@ export async function subscribeWebhooksHandler(
       createdBy,
       address: hub.callback,
       sha_secret: hub.secret,
-      trigger: hub.topic in TRIGGERS ? hub.topic : undefined
+      trigger: TRIGGERS[TRIGGERS[hub.topic]]
     }
     const challenge = generateChallenge()
 

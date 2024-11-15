@@ -12,13 +12,13 @@ import { createServer } from '@webhooks/server'
 import Webhook, { IWebhook } from '@webhooks/model/webhook'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
-import { sign } from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import * as service from '@webhooks/features/manage/service'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
-const token = sign(
+const token = jwt.sign(
   { scope: ['sysadmin', 'demo'] },
   readFileSync('./test/cert.key'),
   {

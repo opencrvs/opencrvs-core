@@ -383,8 +383,7 @@ export const MARRIAGE_BUNDLE: Saved<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
                 }
               }
             ]
@@ -491,8 +490,7 @@ export const MARRIAGE_BUNDLE: Saved<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
                 }
               }
             ]
@@ -519,8 +517,7 @@ export const MARRIAGE_BUNDLE: Saved<
           ]
         },
         focus: {
-          reference:
-            'Composition/b2e4d436-d7fb-4b0f-9674-628b5af8f42e' as `Composition/${UUID}`
+          reference: 'Composition/b2e4d436-d7fb-4b0f-9674-628b5af8f42e'
         },
         id: '6cc01269-6b36-4aa5-9bb0-21944d685e42' as UUID,
         identifier: [
@@ -569,15 +566,13 @@ export const MARRIAGE_BUNDLE: Saved<
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference:
-                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
+              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference:
-                'Practitioner/48455871-1636-46a1-8279-aaa76dec03d4' as `Practitioner/${UUID}`
+              reference: 'Practitioner/48455871-1636-46a1-8279-aaa76dec03d4'
             }
           },
           {
@@ -870,8 +865,7 @@ export const MARRIAGE_BUNDLE: Saved<
             {
               url: 'http://opencrvs.org/specs/extension/part-of',
               valueReference: {
-                reference:
-                  'Location/bbee20e1-68c4-4e0c-a0cd-44336341e005' as `Location/${UUID}`
+                reference: 'Location/bbee20e1-68c4-4e0c-a0cd-44336341e005'
               }
             }
           ]
@@ -912,8 +906,7 @@ export const MARRIAGE_BUNDLE: Saved<
         ],
         location: [
           {
-            reference:
-              'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
+            reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
           }
         ],
         id: '5f675c08-9494-462f-9fac-043755b865ad' as UUID,

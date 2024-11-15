@@ -314,8 +314,7 @@ export const BIRTH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
                 }
               }
             ]
@@ -456,8 +455,7 @@ export const BIRTH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
                 }
               }
             ]
@@ -591,8 +589,7 @@ export const BIRTH_BUNDLE: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference:
-                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
+              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
             }
           },
           {
@@ -970,8 +967,7 @@ export const BIRTH_BUNDLE: SavedBundle<
         ],
         location: [
           {
-            reference:
-              'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
+            reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
           }
         ],
         id: '5f675c08-9494-462f-9fac-043755b865ad' as UUID,

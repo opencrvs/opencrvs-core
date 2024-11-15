@@ -373,8 +373,7 @@ export const DEATH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
                 }
               }
             ]
@@ -531,15 +530,13 @@ export const DEATH_BUNDLE: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference:
-                'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
+              reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference:
-                'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f' as `Practitioner/${UUID}`
+              reference: 'Practitioner/525094f5-3c5f-4e72-af3b-adda8617839f'
             }
           },
           {
@@ -631,8 +628,7 @@ export const DEATH_BUNDLE: SavedBundle<
               {
                 url: 'http://opencrvs.org/specs/extension/part-of',
                 valueReference: {
-                  reference:
-                    'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a' as `Location/${UUID}`
+                  reference: 'Location/e66643ac-9ea9-4314-b842-f4fb3ad9e83a'
                 }
               }
             ]
@@ -1149,8 +1145,7 @@ export const DEATH_BUNDLE: SavedBundle<
         ],
         location: [
           {
-            reference:
-              'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4' as `Location/${UUID}`
+            reference: 'Location/e9e1b362-27c9-4ce1-82ad-57fe9d5650e4'
           }
         ],
         meta: {

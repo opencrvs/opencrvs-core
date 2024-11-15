@@ -10,8 +10,8 @@
  */
 import { resolvers as rootResolvers } from '@gateway/features/correction/root-resolvers'
 import { readFileSync } from 'fs'
-import fetchAny from 'jest-fetch-mock'
-import jwt from 'jsonwebtoken'
+import * as fetchAny from 'jest-fetch-mock'
+import * as jwt from 'jsonwebtoken'
 const resolvers = rootResolvers as any
 describe('Correction root resolvers', () => {
   let registerCertifyToken: string
