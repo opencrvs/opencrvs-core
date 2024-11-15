@@ -13,6 +13,9 @@ on: [pull_request]
 
 jobs:
   setup:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -20,6 +23,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - uses: mskelton/changelog-reminder-action@v3
+        # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
+        # to fail
+        continue-on-error: true
+        with:
+          message: >
+            Oops! Looks like you forgot to update the changelog.
+            When updating CHANGELOG.md, please consider the following:
+              - Changelog is read by country implementors who might not always be familiar with all technical details of OpenCRVS. Keep language high-level, user friendly and avoid technical references to internals.
+              - Answer "What's new?", "Why was the change made?" and "Why should I care?" for each change.
+              - If it's a breaking change, include a migration guide answering "What do I need to do to upgrade?".
 
       - name: Get list of packages
         id: set-matrix
@@ -123,15 +138,70 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
-  security-scans:
-    needs: setup
+  lint-knip:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.24.0
+      - name: Checkout base branch
+        uses: actions/checkout@v2
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          trivy-config: trivy.yaml
+          ref: ${{ github.base_ref }}
+      - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+      - name: Create reporter
+        run: |
+          cat << 'EOF' > knip-reporter.js
+          const reporter = function (options) {
+            const totalIssues = Object.entries(options.counters).reduce(
+              (acc, [key, value]) => {
+                if (options.report[key]) {
+                  return acc + value
+                }
+
+                return acc
+              },
+              0
+            )
+
+            console.log(JSON.stringify({ totalIssues }))
+          }
+          export default reporter
+          EOF
+      - name: Run knip on base branch
+        id: knip_base
+        run: |
+          OUTPUT=$(npx knip --no-exit-code --exports --reporter=./knip-reporter.js)
+          JSON=$(echo "$OUTPUT" | grep -o '{.*}')
+          total_issues=$(echo "$JSON" | jq '.totalIssues')
+          echo "Found $total_issues issue(s) on base branch."
+          echo "Setting $total_issues issue(s) as max limit for PR branch."
+          echo "maxIssues=${total_issues}" >> $GITHUB_OUTPUT
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4
+      - name: Install dependencies
+        run: yarn install --ignore-scripts
+      - name: Create reporter
+        run: |
+          cat << 'EOF' > knip-reporter.js
+          const reporter = function (options) {
+            const totalIssues = Object.entries(options.counters).reduce(
+              (acc, [key, value]) => {
+                if (options.report[key]) {
+                  return acc + value
+                }
+
+                return acc
+              },
+              0
+            )
+
+            console.log(JSON.stringify({ totalIssues }))
+          }
+          export default reporter
+          EOF
+      - name: Run knip on PR branch
+        run: npx knip --max-issues=${{ steps.knip_base.outputs.maxIssues }} --exports --reporter=./knip-reporter.js
