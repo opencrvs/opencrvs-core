@@ -54,4 +54,7 @@ spec:
           ports:
             - containerPort: 80 #FIXME: non-low end port
               protocol: TCP
+          env:
+            - name: AUTH_API_URL
+              value: https://auth.localhost # FIXME: harcoded
       restartPolicy: Always
