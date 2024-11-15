@@ -39,12 +39,12 @@
     "packages/scheduler/crontab",
     "packages/scheduler/jobs/*",
     ".nvmrc",
-    ".npmignore",
     ".idea",
     "packages/dashboards/*.jar",
     "packages/dashboards/plugins/*.jar",
     "packages/dashboards/data/metabase/*.db",
-    "packages/client/dev-dist"
+    "packages/client/dev-dist",
+    "packages/toolkit/.npmignore"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
