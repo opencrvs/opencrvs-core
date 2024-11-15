@@ -109,7 +109,6 @@ import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import QRCodeScanner from '@client/components/form/QRCodeScanner'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -196,7 +195,6 @@ type State = {
   isDataAltered: boolean
   rejectFormOpen: boolean
   hasError: boolean
-  qrData: string
   showConfirmationModal: boolean
   confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
@@ -656,7 +654,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isDataAltered: false,
       rejectFormOpen: false,
       hasError: false,
-      qrData: '',
       showConfirmationModal: false,
       confirmDeleteDeclarationModal: false,
       isFileUploading: false,
@@ -1213,11 +1210,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     )}
                                   </Alert>
                                 )}
-                              {this.state.qrData && (
-                                <p>{`${typeof this.state.qrData}:${
-                                  this.state.qrData
-                                }`}</p>
-                              )}
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
                                 key={this.state.formFieldKey}
