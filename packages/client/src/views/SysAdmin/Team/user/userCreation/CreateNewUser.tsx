@@ -108,17 +108,23 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   } = props
 
   useEffect(() => {
-    if (match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])) {
-      clearUserFormData()
+    const initialize = async () => {
+      if (match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])) {
+        clearUserFormData()
+      }
+      if (userId) {
+        fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
+          userId
+        })
+      }
     }
-    if (userId) {
-      fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, { userId })
-    }
+
+    initialize()
 
     return () => {
       clearUserFormData()
     }
-  }, [match, userId, client, clearUserFormData, fetchAndStoreUserData])
+  }, [userId, match.path, clearUserFormData, fetchAndStoreUserData, client])
 
   const renderLoadingPage = () => (
     <ActionPageLight
@@ -158,7 +164,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   if (section.viewType === 'preview') {
     return <UserReviewForm client={client as ApolloClient<any>} {...props} />
   }
-  // return null
+  return null
 }
 
 function getNextSectionIds(
@@ -273,4 +279,4 @@ export const CreateNewUser = connect(mapStateToProps, {
   goBack,
   clearUserFormData,
   fetchAndStoreUserData
-})(injectIntl(withApollo<Props>(CreateNewUserComponent as any)))
+})(injectIntl(withApollo<Props>(CreateNewUserComponent)))

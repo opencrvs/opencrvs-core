@@ -58,7 +58,7 @@ function isFormPage(pathname: string): boolean {
 }
 
 function setLocationKey(currLocation: Location, prevLocation: Location) {
-  const locationKey = 'locationkey'
+  const defaultLocationKey = 'locationkey'
   const prevLocPathname = prevLocation.pathname
   const currLocPathname = currLocation.pathname
 
@@ -72,7 +72,8 @@ function setLocationKey(currLocation: Location, prevLocation: Location) {
   if (isUserHome(currLocPathname) && isFormPage(prevLocPathname)) {
     return currLocation.key as string
   }
-  return locationKey
+
+  return defaultLocationKey
 }
 
 interface IProps {
@@ -85,7 +86,7 @@ const TransitionWrapper = ({ location, children }: IProps) => {
 
   useEffect(() => {
     setLocations([location, locations[0]])
-  }, [location, locations])
+  }, [location])
 
   const [currLocation, prevLocation] = locations
 
