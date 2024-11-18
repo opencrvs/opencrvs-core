@@ -11,9 +11,15 @@
 
 // eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
-import { server } from './server'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
+
+import { appRouter } from './router'
+import { createHTTPServer } from '@trpc/server/adapters/standalone'
+
+const server = createHTTPServer({
+  router: appRouter
+})
 
 server.listen(5555)

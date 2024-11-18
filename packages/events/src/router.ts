@@ -10,10 +10,10 @@
  */
 
 import { initTRPC } from '@trpc/server'
-import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { z } from 'zod'
-import { createRecord, EventInput, getRecordById } from './storage'
 import superjson from 'superjson'
+import { z } from 'zod'
+import { createEvent, EventInput, getEventById } from './service/events'
+
 export const t = initTRPC.create({
   transformer: superjson
 })
@@ -22,7 +22,6 @@ const router = t.router
 const publicProcedure = t.procedure
 
 export type AppRouter = typeof appRouter
-
 export const appRouter = router({
   event: router({
     create: publicProcedure
@@ -33,14 +32,10 @@ export const appRouter = router({
         })
       )
       .mutation(async (options) => {
-        return createRecord(options.input.record, options.input.transactionId)
+        return createEvent(options.input.record, options.input.transactionId)
       }),
     get: publicProcedure.input(z.string()).query(async ({ input }) => {
-      return getRecordById(input)
+      return getEventById(input)
     })
   })
-})
-
-export const server = createHTTPServer({
-  router: appRouter
 })

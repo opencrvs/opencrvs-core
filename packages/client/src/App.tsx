@@ -71,6 +71,7 @@ import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAct
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import { Workqueues } from './v2-events/workqueues'
+import { V2_ROOT_ROUTE } from './v2-events/routes'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -540,7 +541,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              path={'/v2'}
+                                              path={V2_ROOT_ROUTE}
                                               component={Workqueues}
                                             />
                                           </Switch>

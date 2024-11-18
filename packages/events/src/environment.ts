@@ -9,4 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './mongodb'
+import { cleanEnv, url } from 'envalid'
+
+export const env = cleanEnv(process.env, {
+  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' })
+})

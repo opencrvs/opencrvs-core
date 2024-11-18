@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { env } from '@events/environment'
 import { MongoClient } from 'mongodb'
 
-const url = 'mongodb://localhost:27017'
+const url = env.MONGO_URL
 const client = new MongoClient(url)
 
 export async function getClient() {
   await client.connect()
-  const db = client.db('records')
+  const db = client.db('events')
   return db
 }
