@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { InputError } from './InputError'
 import { InputLabel } from './InputLabel'
-import { Text } from '../../lib/Text'
+import { Text } from 'src/Text'
 
 const InputHeader = styled.div`
   display: flex;
