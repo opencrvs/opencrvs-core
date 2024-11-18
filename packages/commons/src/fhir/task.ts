@@ -15,7 +15,6 @@ import {
   BundleEntry,
   Coding,
   DOWNLOADED_EXTENSION_URL,
-  DUPLICATE_TRACKING_ID,
   Extension,
   FLAGGED_AS_POTENTIAL_DUPLICATE,
   MAKE_CORRECTION_EXTENSION_URL,
@@ -47,10 +46,6 @@ export type TrackingID = Nominal<string, 'TrackingID'>
 export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
 
 export type TaskIdentifier =
-  | {
-      system: 'http://opencrvs.org/specs/id/mosip-aid'
-      value: string
-    }
   | {
       system: 'http://opencrvs.org/specs/id/draft-id'
       value: string
@@ -91,8 +86,6 @@ export type TaskIdentifier =
       system: 'http://opencrvs.org/specs/id/dhis2_event_identifier'
       value: string
     }
-
-export type ExtractValue<T> = Extract<TaskIdentifier, { system: T }>['value']
 
 type ExtractSystem<T> = T extends { system: string } ? T['system'] : never
 export type TaskIdentifierSystem = ExtractSystem<TaskIdentifier>
@@ -174,19 +167,13 @@ export function getBusinessStatus<T extends Task | TaskHistory>(task: T) {
   return code.code
 }
 
-export function isTaskBundleEntry<T extends BundleEntry>(
-  entry: T
-): entry is (T & BundleEntry<Task>) | (T & Saved<BundleEntry<SavedTask>>) {
-  return entry.resource.resourceType === 'Task'
-}
-
 export function isTask<T extends Resource>(
   resource: T
 ): resource is (T & Task) | (T & SavedTask) {
   return resource.resourceType === 'Task'
 }
 
-export function isTaskHistory<T extends Resource>(
+function isTaskHistory<T extends Resource>(
   resource: T
 ): resource is T & TaskHistory {
   return resource.resourceType === 'TaskHistory'
@@ -209,9 +196,7 @@ export function getTaskFromSavedBundle<T extends SavedBundle>(
   return task
 }
 
-export function sortTasksAscending<T extends { lastModified: string }>(
-  tasks: T[]
-) {
+function sortTasksAscending<T extends { lastModified: string }>(tasks: T[]) {
   return tasks.slice().sort((a, b) => {
     return (
       new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
@@ -285,7 +270,7 @@ export function getTasksInAscendingOrder<
   )
 }
 
-export const enum TaskAction {
+const enum TaskAction {
   VERIFIED = 'VERIFIED',
   ASSIGNED = 'ASSIGNED',
   UNASSIGNED = 'UNASSIGNED',
@@ -410,32 +395,6 @@ export function addExtensionsToTask(
           })
       )
       .concat(extensions)
-  }
-}
-
-export const TaskActionExtension = [
-  ASSIGNED_EXTENSION_URL,
-  VERIFIED_EXTENSION_URL,
-  UNASSIGNED_EXTENSION_URL,
-  DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL,
-  MAKE_CORRECTION_EXTENSION_URL,
-  VIEWED_EXTENSION_URL,
-  MARKED_AS_NOT_DUPLICATE,
-  MARKED_AS_DUPLICATE,
-  DUPLICATE_TRACKING_ID,
-  FLAGGED_AS_POTENTIAL_DUPLICATE
-]
-
-export function clearActionExtension(task: Task) {
-  return {
-    ...task,
-    extension: (task.extension ?? []).filter(
-      (ext) =>
-        !TaskActionExtension.includes(
-          ext.url as (typeof TaskActionExtension)[number]
-        )
-    )
   }
 }
 

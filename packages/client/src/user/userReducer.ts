@@ -178,7 +178,7 @@ export interface IRoleLoadedAction {
   }
 }
 
-export function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
+function rolesLoaded(systemRoles: SystemRole[]): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {

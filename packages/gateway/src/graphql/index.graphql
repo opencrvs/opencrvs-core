@@ -19,7 +19,6 @@
 # import Mutation.* from '../features/systems/schema.graphql'
 # import Query.* from '../features/systems/schema.graphql'
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
-# import Query.* from '../features/OIDPUserInfo/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO
