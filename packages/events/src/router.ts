@@ -21,7 +21,11 @@ export const t = initTRPC.create({
 const router = t.router
 const publicProcedure = t.procedure
 
+/**
+ * @public
+ */
 export type AppRouter = typeof appRouter
+
 export const appRouter = router({
   event: router({
     create: publicProcedure
