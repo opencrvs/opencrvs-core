@@ -62,10 +62,6 @@ export const SIGNATURE_KEYS = [
   'informantsSignature'
 ] as const
 
-export const PAGE_TRANSITIONS_CLASSNAME = 'page-transition'
-export const PAGE_TRANSITIONS_ENTER_TIME = 500
-export const PAGE_TRANSITIONS_EXIT_TIME = PAGE_TRANSITIONS_ENTER_TIME - 10
-
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
