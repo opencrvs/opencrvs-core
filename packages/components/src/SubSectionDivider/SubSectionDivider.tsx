@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Text } from 'src/Text'
+import { Text } from '../../lib/Text'
 
 const SubSectionWrapper = styled.div`
   border-top: solid 1px ${({ theme }) => theme.colors.grey200};
