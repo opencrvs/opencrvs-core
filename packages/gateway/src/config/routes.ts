@@ -37,6 +37,13 @@ import verifyRefreshTokenHandler, {
   requestSchema as refreshTokenReqSchema,
   responseSchma as refreshTokenResSchema
 } from '@gateway/routes/refreshToken/handler'
+import invalidateTokenHandler, {
+  reqInvalidateTokenSchema
+} from '@gateway/routes/invalidateToken/handler'
+import verifyUserHandler, {
+  requestSchema as reqVerifyUserSchema,
+  responseSchema as resVerifyUserSchema
+} from '@gateway/routes/verifyUser/handler'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -178,6 +185,48 @@ export const getRoutes = () => {
         },
         response: {
           schema: refreshTokenResSchema
+        }
+      }
+    },
+    // DONE
+    {
+      method: 'POST',
+      path: '/auth/invalidateToken',
+      handler: invalidateTokenHandler,
+      options: {
+        tags: ['api'],
+        description: 'Marks token as invalid until it expires',
+        auth: false,
+        notes:
+          'Adds a token to the invalid tokens stored in Redis, ' +
+          'these are stored as individual key value pairs to that we can set their expiry TTL individually',
+
+        validate: {
+          payload: reqInvalidateTokenSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/verifyUser',
+      handler: verifyUserHandler,
+      options: {
+        tags: ['api'],
+        description:
+          'First step of password or username retrieval steps.' +
+          'Check if user exists for given mobile number or not.',
+        notes:
+          'Verifies user and returns nonce to use for next step of password reset flow.' +
+          'Sends an SMS to the user mobile with verification code',
+        auth: false,
+        validate: {
+          payload: reqVerifyUserSchema
+        },
+        response: {
+          schema: resVerifyUserSchema
         }
       }
     },
