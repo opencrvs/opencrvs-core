@@ -12,7 +12,6 @@ import * as jwt from 'jsonwebtoken'
 import * as t from 'io-ts'
 import { function as f, either as e } from 'fp-ts'
 import { publicCert } from '@config/server'
-import * as decode from 'jwt-decode'
 
 const tokenPayload = t.type({
   sub: t.string,
@@ -37,16 +36,4 @@ function safeVerifyJwt(token: string) {
 
 export function verifyToken(token: string) {
   return f.pipe(token, safeVerifyJwt, e.chainW(tokenPayload.decode))
-}
-
-export const getTokenPayload = (token: string) => {
-  let decoded: ITokenPayload
-  try {
-    decoded = decode(token)
-  } catch (err) {
-    throw new Error(
-      `getTokenPayload: Error occurred during token decode : ${err}`
-    )
-  }
-  return decoded
 }

@@ -17,7 +17,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 import { RadioButton } from '@opencrvs/components/lib/Radio'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
@@ -34,137 +34,124 @@ interface BaseProps {
   goToHome: typeof goToHome
   goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
 }
-interface State {
-  forgottenItem: string
-  error: boolean
-}
 
 type Props = BaseProps & WrappedComponentProps
 
-class ForgottenItemComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      forgottenItem: '',
-      error: false
-    }
-  }
+const ForgottenItemComponent = ({
+  goToHome,
+  goToPhoneNumberVerificationForm,
+  intl
+}: Props) => {
+  const [forgottenItem, setForgottenItem] = useState<string>('')
+  const [error, setError] = useState<boolean>(false)
 
-  handleContinue = (event: React.FormEvent) => {
+  const handleContinue = (event: React.FormEvent) => {
     event.preventDefault()
-    if (this.state.forgottenItem === '') {
-      this.setState({ error: true })
-    } else {
-      this.props.goToPhoneNumberVerificationForm(this.state.forgottenItem)
+    if (forgottenItem === '') {
+      return setError(true)
     }
+    return goToPhoneNumberVerificationForm(forgottenItem)
   }
 
-  render() {
-    const { intl, goToHome } = this.props
-
-    const forgottenItems = [
-      {
-        id: 'usernameOption',
-        option: {
-          label: intl.formatMessage(messages.usernameOptionLabel),
-          value: 'username'
-        }
-      },
-      {
-        id: 'passwordOption',
-        option: {
-          label: intl.formatMessage(messages.passwordOptionLabel),
-          value: 'password'
-        }
+  const forgottenItems = [
+    {
+      id: 'usernameOption',
+      option: {
+        label: intl.formatMessage(messages.usernameOptionLabel),
+        value: 'username'
       }
-    ]
+    },
+    {
+      id: 'passwordOption',
+      option: {
+        label: intl.formatMessage(messages.passwordOptionLabel),
+        value: 'password'
+      }
+    }
+  ]
 
-    return (
-      <>
-        <Frame
-          header={
-            <AppBar
-              desktopLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={goToHome}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
-              }
-              mobileLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={goToHome}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
-              }
-              mobileTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
-              desktopTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
-            />
-          }
-          skipToContentText={intl.formatMessage(
-            constantsMessages.skipToMainContent
-          )}
-        >
-          <form id="forgotten-item-form" onSubmit={this.handleContinue}>
-            <Content
-              size={ContentSize.SMALL}
-              title={intl.formatMessage(messages.forgottenItemFormBodyHeader)}
-              bottomActionButtons={[
-                <Button
-                  key="1"
-                  id="continue"
-                  onClick={this.handleContinue}
-                  type="primary"
-                  size="large"
-                  fullWidth
-                >
-                  {intl.formatMessage(messages.continueButtonLabel)}
-                </Button>
-              ]}
-              showTitleOnMobile
-            >
-              <Actions id="forgotten-item-options">
-                {this.state.error && (
-                  <ErrorText id="error-text">
-                    {intl.formatMessage(messages.error)}
-                  </ErrorText>
-                )}
-                {forgottenItems.map((item) => {
-                  return (
-                    <RadioButton
-                      id={item.id}
-                      size="large"
-                      key={item.id}
-                      name="forgottenItemOptions"
-                      label={item.option.label}
-                      value={item.option.value}
-                      selected={
-                        this.state.forgottenItem === item.option.value
-                          ? item.option.value
-                          : ''
-                      }
-                      onChange={() =>
-                        this.setState({ forgottenItem: item.option.value })
-                      }
-                    />
-                  )
-                })}
-              </Actions>
-            </Content>
-          </form>
-        </Frame>
-      </>
-    )
-  }
+  return (
+    <>
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={goToHome}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={goToHome}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
+            desktopTitle={intl.formatMessage(messages.forgottenItemFormTitle)}
+          />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <form id="forgotten-item-form" onSubmit={handleContinue}>
+          <Content
+            size={ContentSize.SMALL}
+            title={intl.formatMessage(messages.forgottenItemFormBodyHeader)}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={handleContinue}
+                type="primary"
+                size="large"
+                fullWidth
+              >
+                {intl.formatMessage(messages.continueButtonLabel)}
+              </Button>
+            ]}
+            showTitleOnMobile
+          >
+            <Actions id="forgotten-item-options">
+              {error && (
+                <ErrorText id="error-text">
+                  {intl.formatMessage(messages.error)}
+                </ErrorText>
+              )}
+              {forgottenItems.map((item) => {
+                return (
+                  <RadioButton
+                    id={item.id}
+                    size="large"
+                    key={item.id}
+                    name="forgottenItemOptions"
+                    label={item.option.label}
+                    value={item.option.value}
+                    selected={
+                      forgottenItem === item.option.value
+                        ? item.option.value
+                        : ''
+                    }
+                    onChange={() => setForgottenItem(item.option.value)}
+                  />
+                )
+              })}
+            </Actions>
+          </Content>
+        </form>
+      </Frame>
+    </>
+  )
 }
-
 export const ForgottenItem = connect(null, {
   goToHome,
   goToPhoneNumberVerificationForm

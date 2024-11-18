@@ -100,7 +100,7 @@ interface IRange {
   value: string
 }
 
-export const internationaliseOptions = (
+const internationaliseOptions = (
   intl: IntlShape,
   options: Array<ISelectOption | IRadioOption | ICheckboxOption>
 ) => {
@@ -115,7 +115,7 @@ export const internationaliseOptions = (
   })
 }
 
-export const internationaliseListFieldObject = (
+const internationaliseListFieldObject = (
   intl: IntlShape,
   options: MessageDescriptor[]
 ) => {
@@ -202,7 +202,7 @@ export const internationaliseFieldObject = (
   return base as Ii18nFormField
 }
 
-export const generateOptions = (
+const generateOptions = (
   options: ILocation[],
   optionType: string
 ): ISelectOption[] => {
@@ -524,7 +524,7 @@ interface IVars {
   [key: string]: any
 }
 
-export function getInputValues(
+function getInputValues(
   inputs: IFieldInput[],
   values: IFormSectionData
 ): IDynamicValues {
@@ -716,13 +716,11 @@ export const isRadioGroupWithNestedField = (
   return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
 }
 
-export const isDynamicField = (
-  field: IFormField
-): field is IDynamicFormField => {
+const isDynamicField = (field: IFormField): field is IDynamicFormField => {
   return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
 }
 
-export const isDateField = (
+const isDateField = (
   field: IFormField,
   sectionData: IFormSectionData
 ): field is IDateFormField => {
@@ -778,7 +776,7 @@ export function isFieldRedirect(
   return field.type === REDIRECT
 }
 
-export function isInitialValueDependencyInfo(
+function isInitialValueDependencyInfo(
   value: InitialValue
 ): value is DependencyInfo {
   return typeof value === 'object' && value !== null && 'dependsOn' in value

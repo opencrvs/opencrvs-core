@@ -31,7 +31,7 @@ export interface ILanguageState {
   [key: string]: ILanguage
 }
 
-export const initLanguages = () => {
+const initLanguages = () => {
   const initLanguages: ILanguageState = {}
   getAvailableLanguages().forEach((lang) => {
     initLanguages[lang] = {
@@ -50,7 +50,7 @@ export type IntlState = {
 
 const DEFAULT_MESSAGES = { default: 'default' }
 
-export const initialState: IntlState = {
+const initialState: IntlState = {
   language: getDefaultLanguage(),
   messages: DEFAULT_MESSAGES,
   languages: initLanguages()

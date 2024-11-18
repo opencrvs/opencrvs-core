@@ -26,7 +26,6 @@ import type {
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
 import {
@@ -291,14 +290,6 @@ const getLocation = (
     }
   }
   return EMPTY_STRING
-}
-
-export const getFormattedDate = (date: Date) => {
-  return formatLongDate(
-    date.toLocaleString(),
-    window.config.LANGUAGES,
-    'MMMM dd, yyyy · hh.mm a'
-  )
 }
 
 export const getCaptitalizedWord = (word: string | undefined): string => {
