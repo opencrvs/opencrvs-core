@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createTestComponent,
+  createTestStore,
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes
+} from '@client/tests/util'
 import { DownloadButton } from './DownloadButton'
 import { AppStore } from '@client/store'
 import { History } from 'history'
@@ -34,16 +39,17 @@ describe('download button tests', () => {
         store = testStore.store
         history = testStore.history
         client = createClient(store)
+        setScopes(REGISTRAR_DEFAULT_SCOPES, store)
         testComponent = await createTestComponent(
           <DownloadButton
             downloadConfigs={{
               event: 'birth',
               compositionId: '123',
               action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: undefined,
-              declarationStatus: ''
+              assignment: undefined
             }}
             status={DOWNLOAD_STATUS.DOWNLOADED}
+            declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
           />,
           { store, history, apolloClient: client }
         )
@@ -58,6 +64,7 @@ describe('download button tests', () => {
         const testStore = await createTestStore()
         store = testStore.store
         history = testStore.history
+        setScopes(REGISTRAR_DEFAULT_SCOPES, store)
         client = createClient(store)
         testComponent = await createTestComponent(
           <DownloadButton
@@ -71,9 +78,9 @@ describe('download button tests', () => {
                 officeName: 'Ibombo District Office',
                 practitionerId: '456',
                 avatarURL: '/ocrvs/4c3645fc-f3f9-4c89-b109-05daa8f49b3b.jpg'
-              },
-              declarationStatus: ''
+              }
             }}
+            declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
             status={DOWNLOAD_STATUS.DOWNLOADED}
           />,
           { store, history, apolloClient: client }

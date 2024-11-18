@@ -81,14 +81,12 @@ export const ShowDownloadButton = ({
       refetchQueries
     }
     return (
-      declaration.status && (
-        <DownloadButton
-          key={id}
-          downloadConfigs={downLoadConfig}
-          status={downloadStatus as DOWNLOAD_STATUS}
-          declarationStatus={declaration.status}
-        />
-      )
+      <DownloadButton
+        key={id}
+        downloadConfigs={downLoadConfig}
+        status={downloadStatus as DOWNLOAD_STATUS}
+        declarationStatus={declaration.status as SUBMISSION_STATUS}
+      />
     )
   }
 
