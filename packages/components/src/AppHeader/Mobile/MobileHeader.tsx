@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { CircleButton } from '../../buttons'
 import { IDomProps } from '../AppHeader'
-import {Text} from '@opencrvs/components/lib/Text'
+import { Text } from 'src/Text'
 
 interface IMenuAction {
   icon: () => React.ReactNode

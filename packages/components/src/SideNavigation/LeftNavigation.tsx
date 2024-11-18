@@ -11,7 +11,7 @@
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Text } from 'src/Text'
 
 export interface ILeftNavigationProps {
   applicationName: string
