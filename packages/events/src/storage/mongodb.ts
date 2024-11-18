@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-unassigned-import
-import '@opencrvs/commons/monitoring'
-import { server } from './server'
+import { MongoClient } from 'mongodb'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
+const url = 'mongodb://localhost:27017'
+const client = new MongoClient(url)
 
-server.listen(5555)
+export async function getClient() {
+  await client.connect()
+  const db = client.db('records')
+  return db
+}

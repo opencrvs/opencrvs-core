@@ -10,13 +10,9 @@
  */
 
 import { getUUID } from '@opencrvs/commons'
-import { MongoClient, ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { z } from 'zod'
-
-const url = 'mongodb://localhost:27017'
-const client = new MongoClient(url)
-
-const dbName = 'records'
+import { getClient } from './mongodb'
 
 export const EventInput = z.object({
   type: z.string(),
@@ -94,12 +90,6 @@ export type Event = z.infer<typeof Event>
 const EventWithTransactionId = Event.extend({
   transactionId: z.string()
 })
-
-async function getClient() {
-  await client.connect()
-  const db = client.db(dbName)
-  return db
-}
 
 async function getRecordByTransactionId(transactionId: string) {
   const db = await getClient()
