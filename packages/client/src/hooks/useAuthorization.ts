@@ -69,14 +69,14 @@ export function usePermissions() {
   }
 
   const canUpdateRecord = () =>
-    hasScopes([
+    hasAnyScope([
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES,
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL
     ])
 
   const canReviewRecord = () =>
-    hasScopes([
+    hasAnyScope([
       SCOPES.REGISTER,
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES
@@ -89,7 +89,7 @@ export function usePermissions() {
     hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
 
   const canCorrectRecord = () =>
-    hasScopes([
+    hasAnyScope([
       SCOPES.RECORD_REGISTRATION_CORRECT,
       SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
     ])
