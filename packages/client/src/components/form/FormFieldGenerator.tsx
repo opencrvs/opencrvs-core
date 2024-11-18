@@ -135,6 +135,7 @@ import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { RedirectField } from '@client/components/form/Redirect'
+import { usePrevious } from '@client/hooks/usePrevious'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -879,26 +880,37 @@ const FormSectionComponent = (props: Props) => {
     showValidationErrors
   ])
 
-  useEffect(() => {
-    onChange(values)
-  }, [values, onChange])
+  const prevProps = usePrevious(props)
 
   useEffect(() => {
-    resetForm()
-    if (setAllFieldsDirty) {
-      showValidationErrors(fields)
-    } else if (
-      fieldsToShowValidationErrors &&
-      fieldsToShowValidationErrors.length > 0
-    ) {
-      showValidationErrors(fieldsToShowValidationErrors)
+    const userChangedForm = !isEqual(values, prevProps?.values)
+    const sectionChanged = prevProps?.id !== id
+
+    if (userChangedForm) {
+      onChange(values)
+    }
+
+    if (sectionChanged) {
+      resetForm()
+      if (setAllFieldsDirty) {
+        showValidationErrors(fields)
+      } else if (
+        fieldsToShowValidationErrors &&
+        fieldsToShowValidationErrors.length > 0
+      ) {
+        showValidationErrors(fieldsToShowValidationErrors)
+      }
     }
   }, [
-    resetForm,
+    values,
+    id,
+    onChange,
     setAllFieldsDirty,
     fields,
     fieldsToShowValidationErrors,
-    showValidationErrors
+    showValidationErrors,
+    resetForm,
+    prevProps
   ])
 
   const setFieldValuesWithDependency = (
