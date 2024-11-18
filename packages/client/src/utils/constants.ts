@@ -62,6 +62,7 @@ export const SIGNATURE_KEYS = [
   'informantsSignature'
 ] as const
 
+export const SYNC_WORKQUEUE_TIME = 500
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
