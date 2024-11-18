@@ -33,7 +33,11 @@ import {
   dynamicConstantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import {
@@ -239,6 +243,7 @@ class RequiresUpdateComponent extends React.Component<
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })

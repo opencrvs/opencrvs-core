@@ -14,7 +14,11 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Download } from '@opencrvs/components/lib/icons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { useDispatch, useSelector } from 'react-redux'
-import { downloadDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  downloadDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { Action } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { InternalRefetchQueriesInclude, useApolloClient } from '@apollo/client'
@@ -32,6 +36,7 @@ import {
   AssignModal,
   ShowAssignmentModal
 } from '@client/components/Assignment/Modals'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 interface IDownloadConfig {
   event: string
@@ -39,7 +44,6 @@ interface IDownloadConfig {
   action: Action
   assignment?: AssignmentData
   refetchQueries?: InternalRefetchQueriesInclude
-  declarationStatus?: string
 }
 
 interface DownloadButtonProps {
@@ -47,6 +51,7 @@ interface DownloadButtonProps {
   className?: string
   downloadConfigs: IDownloadConfig
   status?: DOWNLOAD_STATUS
+  declarationStatus: SUBMISSION_STATUS
 }
 
 const StatusIndicator = styled.div<{
@@ -90,6 +95,7 @@ export function DownloadButton({
   id,
   status,
   className,
+  declarationStatus,
   downloadConfigs: { assignment, event, compositionId, action }
 }: DownloadButtonProps) {
   const intl = useIntl()
@@ -103,6 +109,10 @@ export function DownloadButton({
     }
   )
   const [modal, openModal] = useModal()
+  const { isRecordActionable } = usePermissions()
+
+  const assignedToSomeoneElse = assignment?.practitionerId !== practitionerId
+  const assignedToMe = assignment?.practitionerId === practitionerId
 
   const isFailed =
     status === DOWNLOAD_STATUS.FAILED ||
@@ -178,8 +188,11 @@ export function DownloadButton({
         onClick={handleDownload}
         className={className}
         aria-label={intl.formatMessage(constantsMessages.assignRecord)}
+        disabled={!isRecordActionable(declarationStatus as SUBMISSION_STATUS)}
       >
-        {assignment ? (
+        {assignment &&
+        (assignedToSomeoneElse ||
+          (assignedToMe && status === DOWNLOAD_STATUS.DOWNLOADED)) ? (
           <AvatarSmall
             avatar={{
               data: assignment.avatarURL,

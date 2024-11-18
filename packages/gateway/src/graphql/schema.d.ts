@@ -1681,7 +1681,6 @@ export interface GQLResolver {
   Location?: GQLLocationTypeResolver
   QuestionnaireQuestion?: GQLQuestionnaireQuestionTypeResolver
   History?: GQLHistoryTypeResolver
-  MedicalPractitioner?: GQLMedicalPractitionerTypeResolver
   IdentityType?: GQLIdentityTypeTypeResolver
   HumanName?: GQLHumanNameTypeResolver
   ContactPoint?: GQLContactPointTypeResolver
@@ -1689,6 +1688,7 @@ export interface GQLResolver {
   Address?: GQLAddressTypeResolver
   Attachment?: GQLAttachmentTypeResolver
   Deceased?: GQLDeceasedTypeResolver
+  MedicalPractitioner?: GQLMedicalPractitionerTypeResolver
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Identifier?: GQLIdentifierTypeResolver

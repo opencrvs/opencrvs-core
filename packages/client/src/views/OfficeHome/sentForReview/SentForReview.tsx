@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -201,11 +205,11 @@ class SentForReviewComponent extends React.Component<
               event: reg.event,
               compositionId: reg.id,
               action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              declarationStatus: reg.declarationStatus,
               assignment: reg.assignment ?? undefined
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })

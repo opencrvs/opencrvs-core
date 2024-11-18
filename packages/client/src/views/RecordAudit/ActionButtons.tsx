@@ -78,15 +78,17 @@ export const ShowDownloadButton = ({
       compositionId: id,
       action: DownloadAction.LOAD_REVIEW_DECLARATION,
       assignment: declaration?.assignment,
-      declarationStatus: declaration.status,
       refetchQueries
     }
     return (
-      <DownloadButton
-        key={id}
-        downloadConfigs={downLoadConfig}
-        status={downloadStatus as DOWNLOAD_STATUS}
-      />
+      declaration.status && (
+        <DownloadButton
+          key={id}
+          downloadConfigs={downLoadConfig}
+          status={downloadStatus as DOWNLOAD_STATUS}
+          declarationStatus={declaration.status}
+        />
+      )
     )
   }
 
