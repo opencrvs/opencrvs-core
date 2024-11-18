@@ -28,21 +28,80 @@ afterEach(async () => {
   resetServer()
 })
 
-test('creating a declaration is an idempotent operation', async () => {
+function createClient() {
   const createCaller = createCallerFactory(appRouter)
-
   const caller = createCaller({})
-  const db = await getClient()
+  return caller
+}
 
-  await caller.event.create({
+const client = createClient()
+test('event can be created and fetched', async () => {
+  const event = await client.event.create({
     transactionId: '1',
-    record: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
   })
 
-  await caller.event.create({
+  const fetchedEvent = await client.event.get(event.id)
+
+  expect(fetchedEvent).toEqual(event)
+})
+
+test('creating an event is an idempotent operation', async () => {
+  const db = await getClient()
+
+  await client.event.create({
     transactionId: '1',
-    record: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
+  })
+
+  await client.event.create({
+    transactionId: '1',
+    event: { type: 'birth' }
   })
 
   expect(await db.collection('events').find().toArray()).toHaveLength(1)
+})
+
+test('stored events can be modified', async () => {
+  const originalEvent = await client.event.create({
+    transactionId: '1',
+    event: { type: 'birth' }
+  })
+
+  const event = await client.event.patch({
+    id: originalEvent.id,
+    type: 'death'
+  })
+
+  expect(event.updatedAt).not.toBe(originalEvent.updatedAt)
+  expect(event.type).toBe('death')
+})
+
+test('actions can be added to created events', async () => {
+  const originalEvent = await client.event.create({
+    transactionId: '1',
+    event: { type: 'birth' }
+  })
+
+  const event = await client.event.actions.create({
+    eventId: originalEvent.id,
+    action: {
+      type: 'REGISTERED',
+      fields: [],
+      identifiers: {
+        trackingId: '123',
+        registrationNumber: '456'
+      }
+    }
+  })
+
+  expect(event.actions).toContainEqual(
+    expect.objectContaining({
+      type: 'REGISTERED',
+      identifiers: {
+        trackingId: '123',
+        registrationNumber: '456'
+      }
+    })
+  )
 })

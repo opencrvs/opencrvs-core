@@ -12,7 +12,15 @@
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
-import { createEvent, EventInput, getEventById } from './service/events'
+import {
+  ActionInput,
+  addAction,
+  createEvent,
+  EventInput,
+  EventInputWithId,
+  getEventById,
+  patchEvent
+} from './service/events'
 
 export const t = initTRPC.create({
   transformer: superjson
@@ -32,14 +40,29 @@ export const appRouter = router({
       .input(
         z.object({
           transactionId: z.string(),
-          record: EventInput
+          event: EventInput
         })
       )
       .mutation(async (options) => {
-        return createEvent(options.input.record, options.input.transactionId)
+        return createEvent(options.input.event, options.input.transactionId)
       }),
+    patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
+      return patchEvent(options.input)
+    }),
     get: publicProcedure.input(z.string()).query(async ({ input }) => {
       return getEventById(input)
+    }),
+    actions: router({
+      create: publicProcedure
+        .input(
+          z.object({
+            eventId: z.string(),
+            action: ActionInput
+          })
+        )
+        .mutation(async (options) => {
+          return addAction(options.input.eventId, options.input.action)
+        })
     })
   })
 })
