@@ -432,7 +432,7 @@ function reducer(
         },
         Cmd.run(loadCertificates, {
           successActionCreator: actions.certificatesLoaded,
-          args: [state.offlineData.templates?.certificates]
+          args: [newOfflineData.templates?.certificates]
         })
       )
     }

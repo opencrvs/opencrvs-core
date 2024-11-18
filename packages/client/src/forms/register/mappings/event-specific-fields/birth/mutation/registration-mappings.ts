@@ -46,7 +46,11 @@ export function setBirthRegistrationSectionTransformer(
 
   const certificates: ICertificate[] = draftData[sectionId]
     .certificates as ICertificate[]
-  if (Array.isArray(certificates) && certificates.length) {
+  if (
+    Array.isArray(certificates) &&
+    certificates.length &&
+    !draftData[sectionId].correction
+  ) {
     const updatedCertificates = transformCertificateData(certificates.slice(-1))
     transformedData[sectionId].certificates =
       updatedCertificates.length > 0 &&
