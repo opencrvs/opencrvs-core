@@ -26,7 +26,6 @@ import {
   SavedBundle,
   Task,
   TrackingID,
-  getBusinessStatus,
   getComposition,
   getStatusFromTask,
   getTaskFromSavedBundle,
@@ -34,12 +33,6 @@ import {
   isTask
 } from './fhir'
 import { NestedNominal, Nominal } from './nominal'
-
-export enum EVENT_TYPE {
-  BIRTH = 'BIRTH',
-  DEATH = 'DEATH',
-  MARRIAGE = 'MARRIAGE'
-}
 
 export function getEventLabelFromBundle(bundle: Bundle) {
   const composition = getComposition(bundle)
@@ -57,8 +50,6 @@ export function getEventLabelFromBundle(bundle: Bundle) {
     return 'MarriageRegistration'
   }
 }
-
-type RecordBase = Bundle
 
 export type ReadyForReviewRecord = Nominal<SavedBundle, 'ReadyForReview'>
 
@@ -150,14 +141,6 @@ export function changeState<R extends Bundle, A extends keyof StateIdenfitiers>(
   nextState: A | A[]
 ) {
   return record as any as StateIdenfitiers[A]
-}
-
-export function getState(record: RecordBase) {
-  const task = record.entry.map(({ resource }) => resource).find(isTask)
-  if (!task) {
-    throw new Error('No task found')
-  }
-  return getBusinessStatus(task) as keyof StateIdenfitiers
 }
 
 export function isInProgress(record: ValidRecord): record is InProgressRecord {

@@ -32,7 +32,7 @@ const dependencyInfo = z.object({
   dependsOn: z.array(z.string()),
   expression: z.string()
 })
-export const initialValue = z
+const initialValue = z
   .union([dependencyInfo, z.string(), z.number(), z.boolean()])
   .optional()
 

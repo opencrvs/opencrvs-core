@@ -11,9 +11,7 @@
 import {
   Bundle,
   Resource,
-  Task,
   WithStrictExtensions,
-  findExtension,
   WithUUID,
   SavedReference
 } from '.'
@@ -47,12 +45,6 @@ export function isPractitionerRole<T extends Resource>(
   return resource.resourceType === 'PractitionerRole'
 }
 
-export function isPractitionerRoleHistory<T extends Resource>(
-  resource: T
-): resource is T & PractitionerRoleHistory {
-  return resource.resourceType === 'PractitionerRoleHistory'
-}
-
 export function isPractitionerRoleOrPractitionerRoleHistory<T extends Resource>(
   resource: T
 ): resource is (T & PractitionerRoleHistory) | (T & PractitionerRole) {
@@ -71,17 +63,6 @@ export function getPractitioner(id: string, bundle: Bundle) {
     throw new Error(`Practitioner ${id} not found in bundle`)
   }
   return practitioner
-}
-
-export function getPractitionerIdFromTask(task: Task) {
-  const extension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastUser',
-    task.extension
-  )
-  if (!extension) {
-    throw new Error('No practitioner found in task')
-  }
-  return extension.valueReference.reference.split('/')[1]
 }
 
 export function getPractitionerContactDetails(practitioner: Practitioner) {

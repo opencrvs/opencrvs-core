@@ -181,7 +181,6 @@ export interface Registration {
   _fhirID?: string
   draftId?: string
   trackingId?: string
-  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
