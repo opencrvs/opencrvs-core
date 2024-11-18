@@ -138,7 +138,7 @@ export function DownloadButton({
       if (assign) {
         download()
       }
-    } else if (assignment && assignment.practitionerId !== practitionerId) {
+    } else if (assignment.practitionerId !== practitionerId) {
       await openModal<boolean>((close) => (
         <ShowAssignmentModal close={close}>
           {intl.formatMessage(conflictsMessages.assignedDesc, {
