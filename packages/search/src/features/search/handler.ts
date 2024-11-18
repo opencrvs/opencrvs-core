@@ -13,7 +13,8 @@ import {
   logger,
   SearchDocument,
   EVENT,
-  getSearchTotalCount
+  getSearchTotalCount,
+  UUID
 } from '@opencrvs/commons'
 import { badRequest, internal } from '@hapi/boom'
 import { DEFAULT_SIZE, advancedSearch } from '@search/features/search/service'
@@ -33,6 +34,7 @@ import {
   searchForBirthDuplicates
 } from '@search/features/registration/deduplicate/service'
 import { capitalize } from 'lodash'
+import { resolveLocationChildren } from './location'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -138,9 +140,12 @@ export async function getStatusWiseRegistrationCountHandler(
       }
     ]
     if (payload.declarationJurisdictionId) {
+      const leafLevelJurisdictionIds = await resolveLocationChildren(
+        payload.declarationJurisdictionId as UUID
+      )
       matchRules.push({
-        match: {
-          declarationJurisdictionIds: payload.declarationJurisdictionId
+        terms: {
+          'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
         }
       })
     }
