@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi, test, beforeAll, afterEach, expect } from 'vitest'
+import { vi } from 'vitest'
 import { appRouter, t } from './router'
 import {
   setupServer,
@@ -18,7 +18,7 @@ import {
 
 const { createCallerFactory } = t
 
-vi.mock('./storage/mongodb.ts')
+vi.mock('@events/storage/mongodb')
 
 beforeAll(async () => {
   await setupServer()
@@ -38,10 +38,11 @@ test('creating a declaration is an idempotent operation', async () => {
     transactionId: '1',
     record: { type: 'birth', fields: [] }
   })
+
   await caller.event.create({
     transactionId: '1',
     record: { type: 'birth', fields: [] }
   })
 
-  expect(await db.collection('records').find().toArray()).toHaveLength(1)
+  expect(await db.collection('events').find().toArray()).toHaveLength(1)
 })

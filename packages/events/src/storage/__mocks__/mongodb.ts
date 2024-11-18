@@ -26,5 +26,6 @@ export async function getClient() {
   const uri = server.getUri()
   const client = new MongoClient(uri)
   await client.connect()
+
   return client.db(databaseName)
 }
