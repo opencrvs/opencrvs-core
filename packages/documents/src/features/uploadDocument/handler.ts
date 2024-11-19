@@ -31,15 +31,36 @@ export async function documentUploadHandler(
   const payload = request.payload as IDocumentPayload
   const ref = uuid()
   try {
-    const base64String = payload.fileData.split(',')[1]
-    const base64Decoded = Buffer.from(base64String, 'base64')
-    const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
-    const generateFileName = `${ref}.${fileType.ext}`
+    // payload is an image
+    const regex = /^data:image/
+    let generateFileName
+    if (regex.test(payload.fileData)) {
+      const base64String = payload.fileData.split(',')[1]
+      const base64Decoded = Buffer.from(base64String, 'base64')
+      const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
+      generateFileName = `${ref}.${fileType.ext}`
 
-    await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
-      'content-type': fileType.mime,
-      ...payload.metaData
-    })
+      await minioClient.putObject(
+        MINIO_BUCKET,
+        generateFileName,
+        base64Decoded,
+        {
+          'content-type': fileType.mime,
+          ...payload.metaData
+        }
+      )
+    } else {
+      // payload is an svg cert
+      const generateFileName = `${ref}.CERTIFICATE`
+      await minioClient.putObject(
+        MINIO_BUCKET,
+        generateFileName,
+        payload.fileData,
+        {
+          'content-type': 'image/svg+xml'
+        }
+      )
+    }
 
     return h
       .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
