@@ -1,24 +1,38 @@
-import { GetValues, NonEmptyArray } from 'src/types'
+import { GetValues, NonEmptyArray } from '../types'
 import { z } from 'zod'
+import { Label, SystemRoleType, systemRoleTypes } from './utils'
+import { Form } from './Form'
 
-// @TODO: UNIFY
+/**
+ * Actions recognized by the system
+ */
 export const ActionType = {
-  CREATED: 'CREATED',
-  ASSIGNMENT: 'ASSIGNMENT',
-  UNASSIGNMENT: 'UNASSIGNMENT',
-  REGISTERED: 'REGISTERED',
-  VALIDATED: 'VALIDATED',
-  CORRECTION: 'CORRECTION',
-  DUPLICATES_DETECTED: 'DUPLICATES_DETECTED',
-  NOTIFICATION: 'NOTIFICATION',
-  DECLARATION: 'DECLARATION'
+  CREATE: 'CREATE',
+  ASSIGN: 'ASSIGN',
+  UNASSIGN: 'UNASSIGN',
+  REGISTER: 'REGISTER',
+  VALIDATE: 'VALIDATE',
+  CORRECT: 'CORRECT',
+  DETECT_DUPLICATE: 'DETECT_DUPLICATE',
+  NOTIFY: 'NOTIFY',
+  DECLARE: 'DECLARE'
 } as const
 
 export const actionTypes = Object.values(ActionType)
 export type ActionType = GetValues<typeof ActionType>
 
-// @TODO: Go through
-const ActionBase = z.object({
+/**
+ * Configuration of action performed on an event.
+ * Includes roles that can perform the action, label and forms involved.
+ */
+export const ActionConfig = z.object({
+  type: z.enum(actionTypes as NonEmptyArray<ActionType>),
+  roles: z.array(z.enum(systemRoleTypes as NonEmptyArray<SystemRoleType>)),
+  label: Label,
+  forms: z.array(Form)
+})
+
+export const ActionInputBase = z.object({
   type: z.enum(actionTypes as NonEmptyArray<ActionType>),
   createdAt: z.date(),
   createdBy: z.string(),
@@ -41,17 +55,26 @@ const ActionBase = z.object({
   )
 })
 
-export const Action = z.union([
-  ActionBase.extend({
-    type: z.enum([ActionType.CREATED])
+export const ActionInput = z.union([
+  ActionInputBase.extend({
+    type: z.enum([ActionType.CREATE])
   }),
-  ActionBase.extend({
-    type: z.enum([ActionType.REGISTERED]),
+  ActionInputBase.extend({
+    type: z.enum([ActionType.REGISTER]),
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
     })
   })
 ])
+
+export type ActionInput = z.infer<typeof ActionInput>
+
+export const Action = ActionInput.and(
+  z.object({
+    createdAt: z.date(),
+    createdBy: z.string()
+  })
+)
 
 export type Action = z.infer<typeof Action>
