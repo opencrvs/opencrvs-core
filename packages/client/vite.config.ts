@@ -94,7 +94,9 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        crypto: 'crypto-js'
+        crypto: 'crypto-js',
+        pino: 'pino-pretty',
+        'node-fetch': 'whatwg-fetch'
       }
     },
     plugins: [
