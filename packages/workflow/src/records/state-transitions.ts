@@ -325,19 +325,13 @@ export async function toViewed<T extends ValidRecord>(
 
 export async function toDownloaded(
   record: ValidRecord,
-  token: string,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
+  token: string
 ): Promise<{
   downloadedRecord: ValidRecord
   downloadedRecordWithTaskOnly: Bundle<SavedTask>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerDetails = createDownloadTask(
-    previousTask,
-    extensionUrl
-  )
+  const taskWithoutPractitionerDetails = createDownloadTask(previousTask)
   const [downloadedTask, practitionerDetailsBundle] =
     await withPractitionerDetails(taskWithoutPractitionerDetails, token)
 

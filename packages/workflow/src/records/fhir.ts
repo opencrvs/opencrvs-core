@@ -684,13 +684,10 @@ export async function createViewTask(
   return viewedTask
 }
 
-export function createDownloadTask(
-  previousTask: SavedTask,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
-) {
-  return createNewTaskResource(previousTask, [{ url: extensionUrl }])
+export function createDownloadTask(previousTask: SavedTask) {
+  return createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regAssigned' }
+  ])
 }
 
 export function createRejectTask(
