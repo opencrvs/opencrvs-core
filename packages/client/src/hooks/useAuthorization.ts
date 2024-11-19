@@ -18,6 +18,7 @@ import {
   canBeReinstated,
   isArchivable,
   isIssuable,
+  isPendingCorrection,
   isPrintable,
   isReviewableDeclaration,
   isUpdatableDeclaration
@@ -41,7 +42,8 @@ export const RECORD_ALLOWED_SCOPES = {
     SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
   ],
   ARCHIVE: [SCOPES.RECORD_DECLARATION_ARCHIVE],
-  REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE]
+  REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE],
+  APPROVE_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
 }
 
 export function usePermissions() {
@@ -103,6 +105,9 @@ export function usePermissions() {
 
   const canReinstateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REINSTATE)
 
+  const canApproveCorrection = () =>
+    hasAnyScope(RECORD_ALLOWED_SCOPES.APPROVE_CORRECTION)
+
   const isRecordActionable = (status: SUBMISSION_STATUS) =>
     [
       canUpdateRecord() && isUpdatableDeclaration(status),
@@ -110,6 +115,7 @@ export function usePermissions() {
       canPrintRecord() && isPrintable(status),
       canIssueRecord() && isIssuable(status),
       canCorrectRecord() && canBeCorrected(status),
+      canApproveCorrection() && isPendingCorrection(status),
       canArchiveRecord() && isArchivable(status),
       canReinstateRecord() && canBeReinstated(status)
     ]
