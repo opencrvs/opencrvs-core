@@ -56,7 +56,8 @@ describe('verify monthWiseEventEstimations handler', () => {
         fixtures.savedLocation({
           id: 'uuid2' as UUID,
           partOf: {
-            reference: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294'
+            reference:
+              'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294' as `Location/${UUID}`
           }
         })
       ])
