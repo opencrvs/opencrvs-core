@@ -270,7 +270,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <InputField {...inputFieldProps} hideInputHeader>
           <QRCodeScanner
-            label="Scan QR code"
+            label={fieldDefinition.label}
             fallbackErrorMessage="Video capture not allowed by the browser"
             onScanSuccess={(data) => {
               setFieldValue(fieldDefinition.name, JSON.parse(data))

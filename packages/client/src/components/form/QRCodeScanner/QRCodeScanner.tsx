@@ -8,8 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PrimaryButton } from '@client/../../components/lib/buttons'
+import {
+  PrimaryButton,
+  SecondaryButton
+} from '@client/../../components/lib/buttons'
 import React, { useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
 import Scanner1 from './variants/Scanner1'
 import Scanner2 from './variants/Scanner2'
 
@@ -39,6 +43,7 @@ function useScanner(
     isScanPermitted,
     isScanComplete,
     initiateScan: () => setIsScanInitiated(true),
+    stopScan: () => setIsScanInitiated(false),
     renderScanner: () =>
       variant === 1 ? (
         <Scanner1
@@ -62,17 +67,20 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
     isScanPermitted,
     isScanComplete,
     initiateScan,
+    stopScan,
     renderScanner
   } = useScanner(
     props.variant_Experimental,
     props.onScanSuccess,
     props.fallbackErrorMessage
   )
+  const handleClickButton =
+    isScanInitiated && !isScanComplete ? stopScan : initiateScan
   return (
     <div>
       {isScanInitiated && isScanPermitted && !isScanComplete && renderScanner()}
-      <PrimaryButton id="start-button" onClick={initiateScan}>
-        {props.label}
+      <PrimaryButton id="start-button" onClick={handleClickButton}>
+        {isScanInitiated ? 'Close scan' : props.label}
       </PrimaryButton>
     </div>
   )

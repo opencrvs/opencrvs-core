@@ -80,7 +80,10 @@ const Scanner2 = (props: ScannerProps) => {
     }
 
     return () => {
-      if (!currentVideoElement) {
+      if (currentVideoElement && currentVideoElement.srcObject) {
+        const stream = currentVideoElement.srcObject as MediaStream
+        stream.getTracks().forEach((track) => track.stop())
+      } else {
         scanner?.current?.stop()
       }
     }
@@ -91,7 +94,7 @@ const Scanner2 = (props: ScannerProps) => {
   }, [qrOn, fallbackErrorMessage])
 
   return (
-    <QRReader className="qr-reader">
+    <QRReader>
       <Video ref={videoElement}></Video>
       <QRBox ref={qrBoxElement}>
         <QRFrame src={QRFrameSVG} alt="Qr Frame" width={256} height={256} />
