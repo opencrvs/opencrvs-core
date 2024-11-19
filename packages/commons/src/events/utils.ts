@@ -1,15 +1,16 @@
+import { GetValues } from '../types'
 import { z } from 'zod'
 
 export const Label = z.object({
   defaultMessage: z.string(),
-  description: z.string(), // check if optional
-  id: z.string() // check if optional
+  description: z.string(),
+  id: z.string()
 })
 
 export const Value = z.object({
   defaultMessage: z.string(),
-  description: z.string(), // check if optional
-  id: z.string() // check if optional
+  description: z.string(),
+  id: z.string()
 })
 
 // Ask whether these are always together
@@ -34,3 +35,16 @@ export const Query = z.object({
     })
   })
 })
+
+export const SystemRoleType = {
+  FieldAgent: 'FIELD_AGENT',
+  LocalRegistrar: 'LOCAL_REGISTRAR',
+  LocalSystemAdmin: 'LOCAL_SYSTEM_ADMIN',
+  NationalRegistrar: 'NATIONAL_REGISTRAR',
+  NationalSystemAdmin: 'NATIONAL_SYSTEM_ADMIN',
+  PerformanceManagement: 'PERFORMANCE_MANAGEMENT',
+  RegistrationAgent: 'REGISTRATION_AGENT'
+} as const
+
+export type SystemRoleType = GetValues<typeof SystemRoleType>
+export const systemRoleTypes = Object.values(SystemRoleType)
