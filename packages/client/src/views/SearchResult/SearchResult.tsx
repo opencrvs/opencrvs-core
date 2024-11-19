@@ -390,7 +390,7 @@ class SearchResultView extends React.Component<
                         name:
                           searchType === SearchCriteria.NAME ? searchText : '',
                         declarationLocationId:
-                          this.canSearchAnywhere() && userDetails
+                          !this.canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -500,7 +500,7 @@ class SearchResultView extends React.Component<
             variables={{
               advancedSearchParameters: {
                 declarationLocationId:
-                  this.canSearchAnywhere() && userDetails
+                  !this.canSearchAnywhere() && userDetails
                     ? getUserLocation(userDetails).id
                     : '',
                 trackingId:
