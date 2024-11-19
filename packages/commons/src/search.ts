@@ -15,6 +15,8 @@ export enum EVENT {
   MARRIAGE = 'marriage'
 }
 
+export const test = 'Test'
+
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
 export const ARCHIVED_STATUS = 'ARCHIVED'
 export const DECLARED_STATUS = 'DECLARED'

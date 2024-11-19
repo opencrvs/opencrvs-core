@@ -8,30 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import pino from 'pino'
-export const logger =
-  process.env.NODE_ENV === 'production'
-    ? pino({
-        redact: [
-          'req.headers.authorization',
-          'req.remoteAddress',
-          "req.headers['x-real-ip']"
-        ]
-      })
-    : pino({
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            ignore: 'pid,hostname'
-          }
-        }
-      })
-
-const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
-if (level) {
-  logger.level = level
+// import pino from 'pino'
+export const logger = {
+  info: (a: any) => {
+    console.log(a)
+  }
 }
+//   process.env.NODE_ENV === 'production'
+//     ? pino({
+//         redact: [
+//           'req.headers.authorization',
+//           'req.remoteAddress',
+//           "req.headers['x-real-ip']"
+//         ]
+//       })
+//     : pino({
+//         transport: {
+//           target: 'pino-pretty',
+//           options: {
+//             colorize: true,
+//             ignore: 'pid,hostname'
+//           }
+//         }
+//       })
+
+// const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
+// if (level) {
+//   logger.level = level
+// }
 
 export function maskEmail(email: string) {
   if (email.length <= 10)
