@@ -65,13 +65,15 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100'
+              reference:
+                'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100' as `Practitioner/${UUID}`
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/7d9f973f-f606-42f8-a92e-58953f0576ba'
+              reference:
+                'Location/7d9f973f-f606-42f8-a92e-58953f0576ba' as `Location/${UUID}`
             }
           }
         ],
@@ -104,7 +106,8 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
           ]
         },
         focus: {
-          reference: 'Composition/ef1bd844-a72b-42c3-b12b-13cb2a7c157c'
+          reference:
+            'Composition/ef1bd844-a72b-42c3-b12b-13cb2a7c157c' as `Composition/${UUID}`
         },
         meta: {
           lastUpdated: '2023-12-21T13:04:28.938+00:00',
@@ -129,12 +132,14 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
           ]
         },
         focus: {
-          reference: 'Composition/ef1bd844-a72b-42c3-b12b-13cb2a7c157c'
+          reference:
+            'Composition/ef1bd844-a72b-42c3-b12b-13cb2a7c157c' as `Composition/${UUID}`
         },
         id: '529a2252-597f-4651-9c53-fb0b68403247' as UUID,
         requester: {
           agent: {
-            reference: 'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100'
+            reference:
+              'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100' as `Practitioner/${UUID}`
           }
         },
         identifier: [
@@ -155,13 +160,15 @@ export const ARCHIVED_BIRTH_RECORD: SavedBundle<
           {
             url: 'http://opencrvs.org/specs/extension/regLastUser',
             valueReference: {
-              reference: 'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100'
+              reference:
+                'Practitioner/8c3ce648-5a04-4e19-8ffb-5b98019ef100' as `Practitioner/${UUID}`
             }
           },
           {
             url: 'http://opencrvs.org/specs/extension/regLastOffice',
             valueReference: {
-              reference: 'Location/7d9f973f-f606-42f8-a92e-58953f0576ba'
+              reference:
+                'Location/7d9f973f-f606-42f8-a92e-58953f0576ba' as `Location/${UUID}`
             }
           }
         ],
