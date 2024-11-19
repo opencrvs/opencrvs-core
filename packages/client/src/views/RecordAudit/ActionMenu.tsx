@@ -64,7 +64,10 @@ import {
   isUpdatableDeclaration
 } from '@client/declarations/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
-import { usePermissions } from '@client/hooks/useAuthorization'
+import {
+  RECORD_ALLOWED_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
 export const ActionMenu: React.FC<{
@@ -146,13 +149,7 @@ export const ActionMenu: React.FC<{
             </>
           )}
           <ViewAction declarationId={id} declarationStatus={status} />
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_REGISTER,
-              SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-              SCOPES.RECORD_SUBMIT_FOR_UPDATES
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REVIEW}>
             <ReviewAction
               declarationId={id}
               declarationStatus={status}
@@ -161,13 +158,7 @@ export const ActionMenu: React.FC<{
               isDuplicate={isDuplicate}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_REGISTER,
-              SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-              SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
             <UpdateAction
               declarationId={id}
               declarationStatus={status}
@@ -175,26 +166,21 @@ export const ActionMenu: React.FC<{
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_DECLARATION_ARCHIVE]}>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ARCHIVE}>
             <ArchiveAction
               toggleDisplayDialog={toggleDisplayDialog}
               isActionable={isActionable}
               declarationStatus={status}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_DECLARATION_REINSTATE]}>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REINSTATE}>
             <ReinstateAction
               toggleDisplayDialog={toggleDisplayDialog}
               isActionable={isActionable}
               declarationStatus={status}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_DECLARATION_PRINT,
-              SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.PRINT}>
             <PrintAction
               declarationStatus={status}
               declarationId={id}
@@ -202,21 +188,14 @@ export const ActionMenu: React.FC<{
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ISSUE}>
             <IssueAction
               declarationStatus={status}
               declarationId={id}
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_REGISTRATION_CORRECT,
-              SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.CORRECT}>
             <CorrectRecordAction
               declarationId={id}
               declarationStatus={status}

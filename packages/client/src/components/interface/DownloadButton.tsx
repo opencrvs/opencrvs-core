@@ -26,17 +26,14 @@ import type { AssignmentData } from '@client/utils/gateway'
 import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
 import { useIntl } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { useOnlineStatus } from '@client/utils'
 import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
-import {
-  AssignModal,
-  ShowAssignmentModal
-} from '@client/components/Assignment/Modals'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { ResponsiveModal } from '@opencrvs/components'
 
 interface IDownloadConfig {
   event: string
@@ -90,6 +87,66 @@ const LOADING_STATUSES = [
   DOWNLOAD_STATUS.READY_TO_UNASSIGN,
   DOWNLOAD_STATUS.UNASSIGNING
 ]
+
+const ShowAssignmentModal: React.FC<{
+  close: (result: boolean) => void
+  children: React.ReactNode
+}> = ({ close, children }) => {
+  const intl = useIntl()
+
+  return (
+    <ResponsiveModal
+      id="assignment"
+      show
+      title={intl.formatMessage(conflictsMessages.assignedTitle)}
+      actions={[]}
+      autoHeight
+      responsive={false}
+      preventClickOnParent
+      handleClose={() => close(false)}
+    >
+      {children}
+    </ResponsiveModal>
+  )
+}
+
+const AssignModal: React.FC<{
+  close: (result: boolean) => void
+}> = ({ close }) => {
+  const intl = useIntl()
+
+  return (
+    <ResponsiveModal
+      id="assignment"
+      show
+      title={intl.formatMessage(conflictsMessages.assignTitle)}
+      actions={[
+        <Button
+          key="assign-btn"
+          id="assign"
+          type="positive"
+          onClick={() => close(true)}
+        >
+          {intl.formatMessage(buttonMessages.assign)}
+        </Button>,
+        <Button
+          key="cancel-btn"
+          id="cancel"
+          type="tertiary"
+          onClick={() => close(false)}
+        >
+          {intl.formatMessage(buttonMessages.cancel)}
+        </Button>
+      ]}
+      autoHeight
+      responsive={false}
+      preventClickOnParent
+      handleClose={() => close(false)}
+    >
+      {intl.formatMessage(conflictsMessages.assignDesc)}
+    </ResponsiveModal>
+  )
+}
 
 export function DownloadButton({
   id,

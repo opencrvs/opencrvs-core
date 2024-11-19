@@ -23,6 +23,27 @@ import {
   isUpdatableDeclaration
 } from '@client/declarations/utils'
 
+export const RECORD_ALLOWED_SCOPES = {
+  UPDATE: [
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+  ],
+  REVIEW: [
+    SCOPES.REGISTER,
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES
+  ],
+  PRINT: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  ISSUE: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  CORRECT: [
+    SCOPES.RECORD_REGISTRATION_CORRECT,
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  ],
+  ARCHIVE: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE]
+}
+
 export function usePermissions() {
   const userScopes = useSelector(getScope)
   const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
@@ -68,35 +89,19 @@ export function usePermissions() {
     return false
   }
 
-  const canUpdateRecord = () =>
-    hasAnyScope([
-      SCOPES.RECORD_REGISTER,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-      SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-    ])
+  const canUpdateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.UPDATE)
 
-  const canReviewRecord = () =>
-    hasAnyScope([
-      SCOPES.REGISTER,
-      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES
-    ])
+  const canReviewRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW)
 
-  const canPrintRecord = () =>
-    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  const canPrintRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.PRINT)
 
-  const canIssueRecord = () =>
-    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  const canIssueRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ISSUE)
 
-  const canCorrectRecord = () =>
-    hasAnyScope([
-      SCOPES.RECORD_REGISTRATION_CORRECT,
-      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
-    ])
+  const canCorrectRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.CORRECT)
 
-  const canArchiveRecord = () => hasScope(SCOPES.RECORD_DECLARATION_ARCHIVE)
+  const canArchiveRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ARCHIVE)
 
-  const canReinstateRecord = () => hasScope(SCOPES.RECORD_DECLARATION_REINSTATE)
+  const canReinstateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REINSTATE)
 
   const isRecordActionable = (status: SUBMISSION_STATUS) =>
     [
