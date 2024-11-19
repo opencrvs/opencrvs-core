@@ -392,6 +392,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
                                                 SCOPES.RECORD_REGISTRATION_CORRECT
                                               ]}
                                               path={routes.VERIFY_CORRECTOR}
@@ -410,7 +411,8 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+                                                SCOPES.RECORD_REGISTRATION_CORRECT
                                               ]}
                                               path={
                                                 routes.CERTIFICATE_CORRECTION
@@ -420,7 +422,8 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               scopes={[
-                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+                                                SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+                                                SCOPES.RECORD_REGISTRATION_CORRECT
                                               ]}
                                               path={
                                                 routes.CERTIFICATE_CORRECTION_REVIEW
