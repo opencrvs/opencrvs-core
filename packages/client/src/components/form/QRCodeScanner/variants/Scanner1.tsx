@@ -8,62 +8,56 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PrimaryButton } from '@client/../../components/lib/buttons'
 import { BarcodeDetector } from 'barcode-detector'
 import React, { useEffect, useRef, useState } from 'react'
 
-interface QRCodeScannerProps {
-  label: string
+interface ScannerProps {
+  onPermissionDenined: () => void
   fallbackErrorMessage: string
   onScanSuccess: (data: any) => void
 }
 
-const QRCodeScanner = (props: QRCodeScannerProps) => {
+const Scanner1 = (props: ScannerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [barcodeDetector, setBarcodeDetector] =
     useState<BarcodeDetector | null>(null)
-  const [isScanInitiated, setIsScanInitiated] = useState(false)
-  const [isScanPermitted, setIsScanPermitted] = useState(true)
-  const [isScanComplete, setIsScanComplete] = useState(false)
-
+  const { onPermissionDenined } = props
   useEffect(() => {
     const videoCurrent = videoRef.current
     if (!('BarcodeDetector' in window)) {
       console.error('Barcode Detector is not supported by this browser.')
       return
     }
-    if (isScanInitiated) {
-      const detector = new BarcodeDetector({ formats: ['qr_code'] })
-      setBarcodeDetector(detector)
+    const detector = new BarcodeDetector({ formats: ['qr_code'] })
+    setBarcodeDetector(detector)
 
-      const constraints = {
-        video: {
-          width: 518,
-          facingMode: 'environment'
-        }
-      }
-
-      navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then((stream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream
-            videoRef.current.play()
-          }
-        })
-        .catch((err) => {
-          setIsScanPermitted(false)
-          console.error('Error accessing the camera: ', err)
-        })
-
-      return () => {
-        if (videoCurrent && videoCurrent.srcObject) {
-          const stream = videoCurrent.srcObject as MediaStream
-          stream.getTracks().forEach((track) => track.stop())
-        }
+    const constraints = {
+      video: {
+        width: 518,
+        facingMode: 'environment'
       }
     }
-  }, [isScanInitiated])
+
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          videoRef.current.play()
+        }
+      })
+      .catch((err) => {
+        onPermissionDenined()
+        console.error('Error accessing the camera: ', err)
+      })
+
+    return () => {
+      if (videoCurrent && videoCurrent.srcObject) {
+        const stream = videoCurrent.srcObject as MediaStream
+        stream.getTracks().forEach((track) => track.stop())
+      }
+    }
+  }, [onPermissionDenined])
 
   useEffect(() => {
     const detectQRCode = () => {
@@ -78,7 +72,6 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
                 const stream = videoRef.current.srcObject as MediaStream
                 stream.getTracks().forEach((track) => track.stop())
               }
-              setIsScanComplete(true)
             }
           })
           .catch((err) => {
@@ -92,17 +85,12 @@ const QRCodeScanner = (props: QRCodeScannerProps) => {
   }, [barcodeDetector, props])
 
   return (
-    <div className="camera">
-      {isScanInitiated && isScanPermitted && !isScanComplete && (
-        <video ref={videoRef} id="video" muted>
-          {props.fallbackErrorMessage}
-        </video>
-      )}
-      <PrimaryButton id="start-button" onClick={() => setIsScanInitiated(true)}>
-        {props.label}
-      </PrimaryButton>
+    <div>
+      <video ref={videoRef} id="video" muted>
+        {props.fallbackErrorMessage}
+      </video>
     </div>
   )
 }
 
-export default QRCodeScanner
+export default Scanner1

@@ -136,7 +136,7 @@ import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { RedirectField } from '@client/components/form/Redirect'
-import QRCodeScanner from './QRCodeScanner'
+import QRCodeScanner from './QRCodeScanner/QRCodeScanner'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -275,6 +275,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             onScanSuccess={(data) => {
               setFieldValue(fieldDefinition.name, JSON.parse(data))
             }}
+            variant_Experimental={fieldDefinition.variant_Experimental}
           />
         </InputField>
       )

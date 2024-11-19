@@ -737,6 +737,7 @@ export interface IRedirectFormField extends IFormFieldBase {
 
 export interface IQRScannerFormField extends IFormFieldBase {
   type: typeof QR_SCANNER
+  variant_Experimental: number
 }
 
 export type IFormField =
@@ -1245,6 +1246,7 @@ interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
 
 interface Ii18nQRScannerFormField extends Ii18nFormFieldBase {
   type: typeof QR_SCANNER
+  variant_Experimental: number
 }
 
 export type Ii18nFormField =

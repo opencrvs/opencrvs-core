@@ -77,6 +77,7 @@
     "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
+    "qr-scanner": "^1.4.2",
     "query-string": "^6.1.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
