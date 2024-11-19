@@ -51,7 +51,7 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
-import { Event } from '@client/utils/gateway'
+// import { Event } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
@@ -65,7 +65,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-
+import { test, EVENT } from '@opencrvs/commons'
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
   scope: Scope
@@ -73,6 +73,9 @@ export const ActionMenu: React.FC<{
   duplicates?: string[]
   toggleDisplayDialog: () => void
 }> = ({ declaration, scope, draft, toggleDisplayDialog, duplicates }) => {
+  console.log(EVENT)
+  console.log(test)
+
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
 
@@ -239,7 +242,7 @@ const CorrectRecordAction: React.FC<
   const intl = useIntl()
 
   const isBirthOrDeathEvent =
-    type && [Event.Birth, Event.Death].includes(type as Event)
+    type && [EVENT.BIRTH, EVENT.DEATH].includes(type as EVENT)
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =

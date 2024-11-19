@@ -77,6 +77,9 @@ export default defineConfig(({ mode }) => {
       'process.env': {},
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
+    optimizeDeps: {
+      include: ['@opencrvs/commons']
+    },
     // This changes the output dir from dist to build
     build: {
       outDir: 'build',
@@ -84,7 +87,8 @@ export default defineConfig(({ mode }) => {
         plugins: [noTreeshakingForEvalPlugin()]
       },
       commonjsOptions: {
-        transformMixedEsModules: true
+        transformMixedEsModules: true,
+        include: ['@opencrvs/commons']
       },
       sourcemap: true
     },
