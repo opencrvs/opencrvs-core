@@ -158,6 +158,14 @@ export const ActionMenu: React.FC<{
               isDuplicate={isDuplicate}
             />
           </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION}>
+            <ReviewCorrectionAction
+              declarationId={id}
+              declarationStatus={status}
+              type={type}
+              isActionable={isActionable}
+            />
+          </ProtectedComponent>
           <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
             <UpdateAction
               declarationId={id}
@@ -316,18 +324,11 @@ const ReviewAction: React.FC<
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  return isPendingCorrection(declarationStatus) ? (
-    <DropdownMenu.Item
-      onClick={() => {
-        type &&
-          dispatch(goToPage(REVIEW_CORRECTION, declarationId, 'review', type))
-      }}
-      disabled={!isActionable}
-    >
-      <Icon name="PencilLine" color="currentColor" size="large" />
-      {intl.formatMessage(messages.reviewCorrection)}
-    </DropdownMenu.Item>
-  ) : isReviewableDeclaration(declarationStatus) ? (
+  if (!isReviewableDeclaration(declarationStatus)) {
+    return null
+  }
+
+  return (
     <DropdownMenu.Item
       onClick={() => {
         dispatch(
@@ -344,7 +345,31 @@ const ReviewAction: React.FC<
       <Icon name="PencilLine" color="currentColor" size="large" />
       {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
     </DropdownMenu.Item>
-  ) : null
+  )
+}
+
+const ReviewCorrectionAction: React.FC<
+  IActionItemCommonProps & IDeclarationProps
+> = ({ declarationId, declarationStatus, type, isActionable }) => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+
+  if (!isPendingCorrection(declarationStatus)) {
+    return null
+  }
+
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        type &&
+          dispatch(goToPage(REVIEW_CORRECTION, declarationId, 'review', type))
+      }}
+      disabled={!isActionable}
+    >
+      <Icon name="PencilLine" color="currentColor" size="large" />
+      {intl.formatMessage(messages.reviewCorrection)}
+    </DropdownMenu.Item>
+  )
 }
 
 const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({

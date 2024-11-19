@@ -33,7 +33,8 @@ export const RECORD_ALLOWED_SCOPES = {
   REVIEW: [
     SCOPES.REGISTER,
     SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+    SCOPES.RECORD_REVIEW_DUPLICATES
   ],
   PRINT: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
   ISSUE: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
@@ -43,7 +44,7 @@ export const RECORD_ALLOWED_SCOPES = {
   ],
   ARCHIVE: [SCOPES.RECORD_DECLARATION_ARCHIVE],
   REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE],
-  APPROVE_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
+  REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
 }
 
 export function usePermissions() {
@@ -105,8 +106,8 @@ export function usePermissions() {
 
   const canReinstateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REINSTATE)
 
-  const canApproveCorrection = () =>
-    hasAnyScope(RECORD_ALLOWED_SCOPES.APPROVE_CORRECTION)
+  const canReviewCorrection = () =>
+    hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
 
   const isRecordActionable = (status: SUBMISSION_STATUS) =>
     [
@@ -115,7 +116,7 @@ export function usePermissions() {
       canPrintRecord() && isPrintable(status),
       canIssueRecord() && isIssuable(status),
       canCorrectRecord() && canBeCorrected(status),
-      canApproveCorrection() && isPendingCorrection(status),
+      canReviewCorrection() && isPendingCorrection(status),
       canArchiveRecord() && isArchivable(status),
       canReinstateRecord() && canBeReinstated(status)
     ]
@@ -132,6 +133,11 @@ export function usePermissions() {
     canReadUser,
     canEditUser,
     canReadOfficeUsers,
-    canAddOfficeUsers
+    canAddOfficeUsers,
+    canUpdateRecord,
+    canReviewRecord,
+    canCorrectRecord,
+    canArchiveRecord,
+    canReinstateRecord
   }
 }
