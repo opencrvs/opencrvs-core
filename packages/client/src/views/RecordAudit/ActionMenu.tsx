@@ -65,7 +65,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { test, EVENT } from '@opencrvs/commons'
+import { EVENT } from '@opencrvs/commons'
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
   scope: Scope
@@ -73,9 +73,6 @@ export const ActionMenu: React.FC<{
   duplicates?: string[]
   toggleDisplayDialog: () => void
 }> = ({ declaration, scope, draft, toggleDisplayDialog, duplicates }) => {
-  console.log(EVENT)
-  console.log(test)
-
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
 
