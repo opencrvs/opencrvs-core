@@ -7,16 +7,9 @@ export const Label = z.object({
   id: z.string()
 })
 
-export const Value = z.object({
-  defaultMessage: z.string(),
-  description: z.string(),
-  id: z.string()
-})
-
 // Ask whether these are always together
 export const Field = z.object({
-  label: Label,
-  value: Value
+  label: Label
 })
 
 export const Summary = z.object({

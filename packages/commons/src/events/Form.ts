@@ -1,13 +1,12 @@
-import { NonEmptyArray } from 'src/types'
 import { z } from 'zod'
-import { Field, Label, SystemRoleType, systemRoleTypes } from './utils'
+import { Field, Label } from './utils'
 
 export const FormGroupField = Field.extend({
   id: z.string(),
   type: z.string(), // @TODO: Get enums from somewhere, field types
   required: z.boolean(),
-  searchable: z.boolean(),
-  analytics: z.boolean()
+  searchable: z.boolean().optional(),
+  analytics: z.boolean().optional()
 })
 
 export const FormSection = z.object({
@@ -21,6 +20,5 @@ export const Form = z.object({
     id: z.string(),
     label: Label
   }),
-  roles: z.array(z.enum(systemRoleTypes as NonEmptyArray<SystemRoleType>)),
   form: z.array(FormSection)
 })
