@@ -168,7 +168,8 @@ export function DownloadButton({
   const [modal, openModal] = useModal()
   const { isRecordActionable } = usePermissions()
 
-  const assignedToSomeoneElse = assignment?.practitionerId !== practitionerId
+  const assignedToSomeoneElse =
+    assignment && assignment.practitionerId !== practitionerId
   const assignedToMe = assignment?.practitionerId === practitionerId
 
   const isFailed =
@@ -195,7 +196,7 @@ export function DownloadButton({
       if (assign) {
         download()
       }
-    } else if (assignment.practitionerId !== practitionerId) {
+    } else if (assignedToSomeoneElse) {
       await openModal<boolean>((close) => (
         <ShowAssignmentModal close={close}>
           {intl.formatMessage(conflictsMessages.assignedDesc, {
@@ -204,6 +205,8 @@ export function DownloadButton({
           })}
         </ShowAssignmentModal>
       ))
+    } else if (assignedToMe && status !== DOWNLOAD_STATUS.DOWNLOADED) {
+      download()
     }
     e.stopPropagation()
   }
