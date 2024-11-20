@@ -87,8 +87,7 @@ export default defineConfig(({ mode }) => {
         plugins: [noTreeshakingForEvalPlugin()]
       },
       commonjsOptions: {
-        transformMixedEsModules: true,
-        include: ['@opencrvs/commons/client']
+        transformMixedEsModules: true
       },
       sourcemap: true
     },
