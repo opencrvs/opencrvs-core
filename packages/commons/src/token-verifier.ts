@@ -29,6 +29,7 @@ export const verifyToken = async (token: string, authUrl: string) => {
 
   return false
 }
+
 export const validateFunc = async (
   payload: any,
   request: Hapi.Request,
