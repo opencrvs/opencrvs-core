@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import nodeFetch from 'node-fetch'
-import { IAuthHeader } from '@opencrvs/commons'
+import { IAuthHeader, UUID } from '@opencrvs/commons'
 import {
   addExtensionsToTask,
   addRelatesToToComposition,
@@ -90,7 +90,7 @@ const searchBirthDuplicates = async (
 async function findBirthDuplicateIds(
   authHeader: IAuthHeader,
   birthRegDetails: BirthRegistration
-): Promise<{ id: string; trackingId: string }[]> {
+): Promise<{ id: UUID; trackingId: string }[]> {
   if (!birthRegDetails || !birthRegDetails.child) {
     return []
   }
@@ -111,7 +111,7 @@ async function findBirthDuplicateIds(
 async function findDeathDuplicateIds(
   authHeader: IAuthHeader,
   deathRegDetails: DeathRegistration
-): Promise<{ id: string; trackingId: string }[]> {
+): Promise<{ id: UUID; trackingId: string }[]> {
   if (!deathRegDetails || !deathRegDetails.deceased) {
     return []
   }
@@ -168,7 +168,7 @@ export function updateTaskWithDuplicateIds(
 
 export function updateCompositionWithDuplicateIds(
   composition: Composition,
-  duplicateIds: { id: string; trackingId: string }[]
+  duplicateIds: { id: UUID; trackingId: string }[]
 ) {
   const relatesTo: NonNullable<Composition['relatesTo']> = duplicateIds.map(
     (duplicate) => ({
