@@ -5,8 +5,8 @@
       "src/*": ["./src/*"]
     },
     "target": "es6",
-    "module": "commonjs",
-    "outDir": "build/dist/common",
+    "module": "ESNext",
+    "outDir": "build/dist/esm",
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": "src",
