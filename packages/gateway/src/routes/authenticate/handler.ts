@@ -5,6 +5,7 @@ import { AUTH_URL } from '@gateway/constants'
 import { RateLimitError } from '@gateway/rate-limit'
 import { logger } from '@opencrvs/commons'
 import { forbidden, unauthorized } from '@hapi/boom'
+import { get } from 'lodash'
 
 interface IAuthPayload {
   username: string
@@ -30,10 +31,25 @@ export default async function authenticateHandler(
   h: Hapi.ResponseToolkit
 ): Promise<IAuthResponse> {
   const payload = request.payload as IAuthPayload
-  const path = request.route.path
-  const key = `${payload.username}:${path}`
 
-  const [requests] = await client.incrementWithTTL(key, TTL_IN_MS)
+  // Rate Limitation
+  const pathOptionsForKey = ['username']
+  const route = request.path
+
+  const key = pathOptionsForKey!.find(
+    (path) => get(payload, path) !== undefined
+  )
+  const value = get(payload, key!)
+  if (!value) {
+    throw new Error(
+      "Couldn't find the value for a rate limiting key in payload"
+    )
+  }
+
+  const [requests] = await client.incrementWithTTL(
+    `${value}:${route}`,
+    TTL_IN_MS
+  )
   if (requests > requestsPerMinute) {
     throw new RateLimitError(
       'Too many requests within a minute. Please throttle your requests.'
