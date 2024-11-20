@@ -14,27 +14,14 @@ import { getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
 
 export const EventInput = z.object({
-  type: z.string(),
-  fields: z.array(
-    z.object({
-      id: z.string(),
-      value: z.union([
-        z.string(),
-        z.number(),
-        z.array(
-          z.object({
-            optionValues: z.array(z.string()),
-            type: z.string(),
-            data: z.string(),
-            fileSize: z.number()
-          })
-        )
-      ])
-    })
-  )
+  type: z.string()
 })
 
-const ActionBase = z.object({
+export const EventInputWithId = EventInput.extend({
+  id: z.string()
+})
+
+const ActionInputBase = z.object({
   type: z.enum([
     'CREATED',
     'ASSIGNMENT',
@@ -44,8 +31,6 @@ const ActionBase = z.object({
     'CORRECTION',
     'DUPLICATES_DETECTED'
   ]),
-  createdAt: z.date(),
-  createdBy: z.string(),
   fields: z.array(
     z.object({
       id: z.string(),
@@ -65,11 +50,11 @@ const ActionBase = z.object({
   )
 })
 
-const Action = z.union([
-  ActionBase.extend({
+export const ActionInput = z.union([
+  ActionInputBase.extend({
     type: z.enum(['CREATED'])
   }),
-  ActionBase.extend({
+  ActionInputBase.extend({
     type: z.enum(['REGISTERED']),
     identifiers: z.object({
       trackingId: z.string(),
@@ -78,10 +63,20 @@ const Action = z.union([
   })
 ])
 
+const Action = ActionInput.and(
+  z.object({
+    createdAt: z.date(),
+    createdBy: z.string()
+  })
+)
+
+type ActionInput = z.infer<typeof ActionInput>
+
 export const Event = EventInput.extend({
   id: z.string(),
   type: z.string(), // Should be replaced by a reference to a form version
   createdAt: z.date(),
+  updatedAt: z.date(),
   actions: z.array(Action)
 })
 export type Event = z.infer<typeof Event>
@@ -107,6 +102,7 @@ class EventNotFoundError extends Error {
 
 export async function getEventById(id: string) {
   const db = await getClient()
+
   const collection = db.collection<z.infer<typeof Event>>('events')
   const event = await collection.findOne({ id: id })
   if (!event) {
@@ -136,6 +132,7 @@ export async function createEvent(
     id,
     transactionId,
     createdAt: now,
+    updatedAt: now,
     actions: [
       {
         type: 'CREATED',
@@ -147,4 +144,58 @@ export async function createEvent(
   })
 
   return getEventById(id)
+}
+
+export async function addAction(eventId: string, action: ActionInput) {
+  const db = await getClient()
+  const collection = db.collection<z.infer<typeof Event>>('events')
+
+  const now = new Date()
+
+  await collection.updateOne(
+    {
+      id: eventId
+    },
+    {
+      $push: {
+        actions: {
+          ...action,
+          createdAt: now,
+          createdBy: '123-123-123'
+        }
+      }
+    }
+  )
+
+  return getEventById(eventId)
+}
+
+export async function patchEvent(
+  event: z.infer<typeof EventInputWithId>
+): Promise<Event> {
+  const existingEvent = await getEventById(event.id)
+
+  if (!existingEvent) {
+    throw new EventNotFoundError(event.id)
+  }
+
+  const db = await getClient()
+  const collection =
+    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+
+  const now = new Date()
+
+  await collection.updateOne(
+    {
+      id: event.id
+    },
+    {
+      $set: {
+        ...event,
+        updatedAt: now
+      }
+    }
+  )
+
+  return getEventById(event.id)
 }
