@@ -41,7 +41,9 @@ export async function documentUploadHandler(
       ...payload.metaData
     })
 
-    return h.response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
+    return h
+      .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
+      .code(200)
   } catch (error) {
     return Promise.reject(new Error(`request failed: ${error.message}`))
   }
