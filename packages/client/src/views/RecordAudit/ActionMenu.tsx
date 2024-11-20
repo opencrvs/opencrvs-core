@@ -65,7 +65,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { EVENT } from '@opencrvs/commons'
+import { EVENT } from '@opencrvs/commons/client'
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
   scope: Scope
