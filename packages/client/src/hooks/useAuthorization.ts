@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope, User, Location, SCOPES } from '@client/utils/gateway'
@@ -23,6 +22,8 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
+import { isUnderJurisdiction } from '@client/utils/locationUtils'
+import { getOfflineData } from '@client/offline/selectors'
 
 export const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
@@ -50,6 +51,8 @@ export const RECORD_ALLOWED_SCOPES = {
 export function usePermissions() {
   const userScopes = useSelector(getScope)
   const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
+  const locations = useSelector(getOfflineData).locations
+  const offices = useSelector(getOfflineData).offices
 
   const hasScopes = (neededScopes: Scope[]) =>
     neededScopes.every((scope) => userScopes?.includes(scope))
@@ -76,11 +79,25 @@ export function usePermissions() {
     return false
   }
 
-  const canReadOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) return true
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE))
-      return office.id === userPrimaryOffice?.id
+  const canAccessOffice = (office: Pick<Location, 'id'>) => {
+    if (!userPrimaryOffice?.id) {
+      return false
+    }
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) {
+      return true
+    }
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
+      return office.id === userPrimaryOffice.id
+    }
 
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
+      return isUnderJurisdiction(
+        userPrimaryOffice.id,
+        office.id,
+        locations,
+        offices
+      )
+    }
     return false
   }
 
@@ -132,7 +149,7 @@ export function usePermissions() {
     canIssueRecord,
     canReadUser,
     canEditUser,
-    canReadOfficeUsers,
+    canAccessOffice,
     canAddOfficeUsers,
     canUpdateRecord,
     canReviewRecord,

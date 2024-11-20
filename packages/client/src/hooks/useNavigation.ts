@@ -113,7 +113,11 @@ const routeAccess: NavigationConfig[] = [
     tabs: [
       {
         name: WORKQUEUE_TABS.organisation,
-        scopes: [SCOPES.ORGANISATION_READ_LOCATIONS]
+        scopes: [
+          SCOPES.ORGANISATION_READ_LOCATIONS,
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+        ]
       },
       {
         name: WORKQUEUE_TABS.team,
