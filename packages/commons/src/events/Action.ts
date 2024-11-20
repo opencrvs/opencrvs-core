@@ -1,7 +1,7 @@
-import { GetValues, NonEmptyArray } from '../types'
 import { z } from 'zod'
-import { Label, SystemRoleType, systemRoleTypes } from './utils'
+import { GetValues, NonEmptyArray } from '../types'
 import { Form } from './Form'
+import { Label } from './utils'
 
 /**
  * Actions recognized by the system
@@ -27,7 +27,6 @@ export type ActionType = GetValues<typeof ActionType>
  */
 export const ActionConfig = z.object({
   type: z.enum(actionTypes as NonEmptyArray<ActionType>),
-  roles: z.array(z.enum(systemRoleTypes as NonEmptyArray<SystemRoleType>)),
   label: Label,
   forms: z.array(Form)
 })
