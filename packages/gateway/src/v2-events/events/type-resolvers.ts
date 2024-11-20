@@ -8,13 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-module.exports = {
-  rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: ['@gateway/*', '!@gateway/v2-events', '!@gateway/graphql']
-      }
-    ]
-  }
-}
+import { GQLResolver } from '@gateway/graphql/schema'
+
+export const recordResolvers: GQLResolver = {}
