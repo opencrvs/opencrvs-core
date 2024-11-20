@@ -11,7 +11,6 @@ scalar DateTime
 
 type Event {
   type: String!
-  fields: [Field!]!
   id: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -65,57 +64,46 @@ type RegisterAction {
 }
 
 input NotifyActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input DeclareActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RegisterActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input CertifyActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input IssueActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RevokeActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input ReinstateActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RevokeCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RequestCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input ApproveCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RejectCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
@@ -135,7 +123,7 @@ type Query {
 
 type Mutation {
   createEvent(event: EventInput!): Event!
-  nofifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
+  notifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
   declareEvent(eventId: ID!, input: DeclareActionInput!): Event!
   registerEvent(eventId: ID!, input: RegisterActionInput!): Event!
   certifyEvent(eventId: ID!, input: CertifyActionInput!): Event!

@@ -19,8 +19,8 @@
 # import Mutation.* from '../features/systems/schema.graphql'
 # import Query.* from '../features/systems/schema.graphql'
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
-# import Mutation from '../v2-events/events/schema.graphql'
-# import Query from '../v2-events/events/schema.graphql'
+# import Mutation.* from '../v2-events/events/schema.graphql'
+# import Query.* from '../v2-events/events/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO

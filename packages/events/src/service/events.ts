@@ -51,6 +51,7 @@ export async function getEventById(id: string) {
 
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
+  createdBy: string,
   transactionId: string
 ): Promise<Event> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -75,7 +76,7 @@ export async function createEvent(
       {
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy: '123-123-123',
+        createdBy,
         fields: []
       }
     ]
@@ -96,8 +97,7 @@ export async function addAction(eventId: string, action: ActionInput) {
       $push: {
         actions: {
           ...action,
-          createdAt: now,
-          createdBy: '123-123-123'
+          createdAt: now
         }
       }
     }

@@ -266,7 +266,7 @@ type Mutation {
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
   createEvent(event: EventInput!): Event!
-  nofifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
+  notifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
   declareEvent(eventId: ID!, input: DeclareActionInput!): Event!
   registerEvent(eventId: ID!, input: RegisterActionInput!): Event!
   certifyEvent(eventId: ID!, input: CertifyActionInput!): Event!
@@ -524,7 +524,7 @@ type EventSearchResultSet {
 }
 
 input AdvancedSearchParametersInput {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -636,10 +636,12 @@ type System {
   settings: SystemSettings
 }
 
-enum Event {
-  birth
-  death
-  marriage
+type Event {
+  type: String!
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  actions: [Action!]!
 }
 
 input CorrectionInput {
@@ -819,57 +821,46 @@ input EventInput {
 }
 
 input NotifyActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input DeclareActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RegisterActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input CertifyActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input IssueActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RevokeActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input ReinstateActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RevokeCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RequestCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input ApproveCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
 input RejectCorrectionActionInput {
-  type: String!
   fields: [FieldInput!]!
 }
 
@@ -1166,6 +1157,12 @@ interface EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
+enum EventType {
+  birth
+  death
+  marriage
+}
+
 type EventProgressSet {
   id: ID!
   type: String
@@ -1202,6 +1199,10 @@ type SystemSettings {
   openIdProviderBaseUrl: String
   openIdProviderClaims: String
 }
+
+scalar DateTime
+
+union Action = CreateAction | RegisterAction | NotifyAction | DeclareAction
 
 input AttachmentInput {
   _fhirID: ID
@@ -1496,7 +1497,7 @@ type RoleLabel {
 }
 
 type AdvancedSeachParameters {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -1685,6 +1686,36 @@ type WebhookPermission {
   permissions: [String!]!
 }
 
+type CreateAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+}
+
+type RegisterAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+  identifiers: Identifiers!
+}
+
+type NotifyAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+}
+
+type DeclareAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+  identifiers: Identifiers!
+}
+
 enum AttachmentInputStatus {
   approved
   validated
@@ -1793,6 +1824,16 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type Field {
+  id: String!
+  value: FieldValue!
+}
+
+type Identifiers {
+  trackingId: String!
+  registrationNumber: String!
 }
 
 enum TelecomSystem {

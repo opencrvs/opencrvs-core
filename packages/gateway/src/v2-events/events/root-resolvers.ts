@@ -11,18 +11,24 @@
 import { env } from '@gateway/environment'
 import { GQLResolver } from '@gateway/graphql/schema'
 import type { AppRouter } from '@opencrvs/events/src/router'
-import { createTRPCClient, httpBatchLink } from '@trpc/client'
+import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 
 import superjson from 'superjson'
+import uuid from 'uuid'
 
 const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: env.EVENTS_URL,
-      transformer: superjson
+      transformer: superjson,
+      headers({ opList }) {
+        const headers = opList[0].context?.headers
+        return headers as HTTPHeaders
+      }
     })
   ]
 })
+
 export const resolvers: GQLResolver = {
   Query: {
     async getEvent(_, { eventId }, { headers: authHeader }) {
@@ -30,13 +36,35 @@ export const resolvers: GQLResolver = {
     }
   },
   Mutation: {
-    async createEvent(_, { event }, { headers: authHeader }) {
-      const createdEvent = await trpc.event.create.mutate({
-        event: event,
-        transactionId: '@todo'
-      })
-
-      return { id: createdEvent.id }
+    async createEvent(_, { event }, { headers }) {
+      const createdEvent = await trpc.event.create.mutate(
+        {
+          event: event,
+          transactionId: uuid.v4()
+        },
+        { context: { headers } }
+      )
+      return createdEvent
+    },
+    async notifyEvent(_, { eventId, input }, { headers }) {
+      return trpc.event.actions.notify.mutate(
+        {
+          eventId: eventId,
+          transactionId: uuid.v4(),
+          action: input
+        },
+        { context: { headers } }
+      )
+    },
+    async declareEvent(_, { eventId, input }, { headers }) {
+      return trpc.event.actions.declare.mutate(
+        {
+          eventId: eventId,
+          transactionId: uuid.v4(),
+          action: input
+        },
+        { context: { headers } }
+      )
     }
   }
 }
