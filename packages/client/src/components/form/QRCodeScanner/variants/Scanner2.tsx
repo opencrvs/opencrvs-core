@@ -30,8 +30,8 @@ const QRReader = styled.div`
   }
 `
 const Video = styled.video`
-  width: 100%;
-  height: 100%;
+  width: 518px;
+  height: 518px;
   object-fit: cover;
 `
 
@@ -47,6 +47,14 @@ const QRFrame = styled.img`
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
 `
+const withValidation = (callback: (data: any) => void) => {
+  return (data: any) => {
+    if (Boolean(data)) {
+      callback(data)
+    }
+  }
+}
+
 const Scanner2 = (props: ScannerProps) => {
   const scanner = useRef<QRScanner>()
   const videoElement = useRef<HTMLVideoElement>(null)
@@ -61,13 +69,17 @@ const Scanner2 = (props: ScannerProps) => {
   useEffect(() => {
     const currentVideoElement = videoElement?.current
     if (currentVideoElement && !scanner.current) {
-      scanner.current = new QRScanner(currentVideoElement, onScanSuccess, {
-        onDecodeError: onScanFail,
-        preferredCamera: 'environment',
-        highlightCodeOutline: true,
-        highlightScanRegion: true,
-        overlay: qrBoxElement?.current || undefined
-      })
+      scanner.current = new QRScanner(
+        currentVideoElement,
+        withValidation(onScanSuccess),
+        {
+          onDecodeError: onScanFail,
+          preferredCamera: 'environment',
+          highlightCodeOutline: true,
+          highlightScanRegion: true,
+          overlay: qrBoxElement?.current || undefined
+        }
+      )
 
       scanner?.current
         ?.start()
