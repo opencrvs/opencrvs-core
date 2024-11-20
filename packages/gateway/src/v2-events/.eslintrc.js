@@ -13,7 +13,12 @@ module.exports = {
     'no-restricted-imports': [
       'error',
       {
-        patterns: ['@gateway/*', '!@gateway/v2-events', '!@gateway/graphql']
+        patterns: [
+          '@gateway/*',
+          '!@gateway/v2-events',
+          '!@gateway/graphql',
+          '!@gateway/environment'
+        ]
       }
     ]
   }

@@ -50,6 +50,7 @@ export interface GQLQuery {
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
   fetchSystem?: GQLSystem
+  getEvent: GQLEvent
 }
 
 export interface GQLMutation {
@@ -106,6 +107,18 @@ export interface GQLMutation {
   deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
+  createEvent: GQLEvent
+  nofifyEvent: GQLEvent
+  declareEvent: GQLEvent
+  registerEvent: GQLEvent
+  certifyEvent: GQLEvent
+  issueEvent: GQLEvent
+  revokeEvent: GQLEvent
+  reinstateEvent: GQLEvent
+  revokeCorrectionEvent: GQLEvent
+  requestCorrectionEvent: GQLEvent
+  approveCorrectionEvent: GQLEvent
+  rejectCorrectionEvent: GQLEvent
 }
 
 export interface GQLDummy {
@@ -490,6 +503,12 @@ export interface GQLSystem {
   settings?: GQLSystemSettings
 }
 
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death',
+  marriage = 'marriage'
+}
+
 export interface GQLCorrectionInput {
   requester: string
   requesterOther?: string
@@ -660,6 +679,65 @@ export interface GQLBookmarkSearchInput {
 export interface GQLRemoveBookmarkedSeachInput {
   userId: string
   searchId: string
+}
+
+export interface GQLEventInput {
+  type: string
+}
+
+export interface GQLNotifyActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLDeclareActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLRegisterActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLCertifyActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLIssueActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLRevokeActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLReinstateActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLRevokeCorrectionActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLRequestCorrectionActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLApproveCorrectionActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
+}
+
+export interface GQLRejectCorrectionActionInput {
+  type: string
+  fields: Array<GQLFieldInput>
 }
 
 export type GQLMap = any
@@ -979,12 +1057,6 @@ export interface GQLEventSearchSetNameMap {
   MarriageEventSearchSet: GQLMarriageEventSearchSet
 }
 
-export const enum GQLEvent {
-  birth = 'birth',
-  death = 'death',
-  marriage = 'marriage'
-}
-
 export interface GQLEventProgressSet {
   id: string
   type?: string
@@ -1216,6 +1288,11 @@ export interface GQLSystemSettingsInput {
 export interface GQLWebhookInput {
   event: string
   permissions: Array<string | null>
+}
+
+export interface GQLFieldInput {
+  id: string
+  value: GQLFieldValue
 }
 
 export interface GQLAssignmentData {
@@ -1832,6 +1909,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
+  getEvent?: QueryToGetEventResolver<TParent>
 }
 
 export interface QueryToSendNotificationToAllUsersArgs {
@@ -2433,6 +2511,18 @@ export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface QueryToGetEventArgs {
+  eventId: string
+}
+export interface QueryToGetEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
@@ -2487,6 +2577,18 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
+  createEvent?: MutationToCreateEventResolver<TParent>
+  nofifyEvent?: MutationToNofifyEventResolver<TParent>
+  declareEvent?: MutationToDeclareEventResolver<TParent>
+  registerEvent?: MutationToRegisterEventResolver<TParent>
+  certifyEvent?: MutationToCertifyEventResolver<TParent>
+  issueEvent?: MutationToIssueEventResolver<TParent>
+  revokeEvent?: MutationToRevokeEventResolver<TParent>
+  reinstateEvent?: MutationToReinstateEventResolver<TParent>
+  revokeCorrectionEvent?: MutationToRevokeCorrectionEventResolver<TParent>
+  requestCorrectionEvent?: MutationToRequestCorrectionEventResolver<TParent>
+  approveCorrectionEvent?: MutationToApproveCorrectionEventResolver<TParent>
+  rejectCorrectionEvent?: MutationToRejectCorrectionEventResolver<TParent>
 }
 
 export interface MutationToRequestRegistrationCorrectionArgs {
@@ -3302,6 +3404,176 @@ export interface MutationToRemoveBookmarkedAdvancedSearchResolver<
   (
     parent: TParent,
     args: MutationToRemoveBookmarkedAdvancedSearchArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCreateEventArgs {
+  event: GQLEventInput
+}
+export interface MutationToCreateEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToCreateEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToNofifyEventArgs {
+  eventId: string
+  input: GQLNotifyActionInput
+}
+export interface MutationToNofifyEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToNofifyEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToDeclareEventArgs {
+  eventId: string
+  input: GQLDeclareActionInput
+}
+export interface MutationToDeclareEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToDeclareEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRegisterEventArgs {
+  eventId: string
+  input: GQLRegisterActionInput
+}
+export interface MutationToRegisterEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToRegisterEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToCertifyEventArgs {
+  eventId: string
+  input: GQLCertifyActionInput
+}
+export interface MutationToCertifyEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToCertifyEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToIssueEventArgs {
+  eventId: string
+  input: GQLIssueActionInput
+}
+export interface MutationToIssueEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToIssueEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRevokeEventArgs {
+  eventId: string
+  input: GQLRevokeActionInput
+}
+export interface MutationToRevokeEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToRevokeEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToReinstateEventArgs {
+  eventId: string
+  input: GQLReinstateActionInput
+}
+export interface MutationToReinstateEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToReinstateEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRevokeCorrectionEventArgs {
+  eventId: string
+  input: GQLRevokeCorrectionActionInput
+}
+export interface MutationToRevokeCorrectionEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRevokeCorrectionEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRequestCorrectionEventArgs {
+  eventId: string
+  input: GQLRequestCorrectionActionInput
+}
+export interface MutationToRequestCorrectionEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRequestCorrectionEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToApproveCorrectionEventArgs {
+  eventId: string
+  input: GQLApproveCorrectionActionInput
+}
+export interface MutationToApproveCorrectionEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToApproveCorrectionEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToRejectCorrectionEventArgs {
+  eventId: string
+  input: GQLRejectCorrectionActionInput
+}
+export interface MutationToRejectCorrectionEventResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToRejectCorrectionEventArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

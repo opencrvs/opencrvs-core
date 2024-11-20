@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { env } from '@gateway/environment'
 import { GQLResolver } from '@gateway/graphql/schema'
-import { type AppRouter } from '@opencrvs/events/src/router'
+import type { AppRouter } from '@opencrvs/events/src/router'
 import { createTRPCClient, httpBatchLink } from '@trpc/client'
 
 import superjson from 'superjson'
@@ -17,7 +18,7 @@ import superjson from 'superjson'
 const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: 'http://localhost:5555',
+      url: env.EVENTS_URL,
       transformer: superjson
     })
   ]
@@ -25,17 +26,17 @@ const trpc = createTRPCClient<AppRouter>({
 export const resolvers: GQLResolver = {
   Query: {
     async getEvent(_, { eventId }, { headers: authHeader }) {
-      return trpc.getEvent.query(eventId)
+      return trpc.event.get.query(eventId)
     }
   },
   Mutation: {
-    async createEvent(_, { eventInput }, { headers: authHeader }) {
-      const event = await trpc.createEvent.mutate({
-        event: eventInput,
+    async createEvent(_, { event }, { headers: authHeader }) {
+      const createdEvent = await trpc.event.create.mutate({
+        event: event,
         transactionId: '@todo'
       })
 
-      return { id: event.id }
+      return { id: createdEvent.id }
     }
   }
 }

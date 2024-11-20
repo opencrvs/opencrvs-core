@@ -6,25 +6,7 @@ import { Label, Summary } from './utils'
  * A subset of an event. Describes fields that can be sent to the system with the intention of either creating or mutating a an event
  */
 export const EventInput = z.object({
-  type: z.string(),
-  fields: z.array(
-    z.object({
-      id: z.string(),
-      value: z.union([
-        z.string(),
-        z.number(),
-        z.array(
-          // @TODO: Check if we could make this stricter
-          z.object({
-            optionValues: z.array(z.string()),
-            type: z.string(),
-            data: z.string(),
-            fileSize: z.number()
-          })
-        )
-      ])
-    })
-  )
+  type: z.string()
 })
 export type EventInput = z.infer<typeof EventInput>
 

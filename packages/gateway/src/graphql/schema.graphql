@@ -147,6 +147,7 @@ type Query {
     sortOrder: String
   ): [SystemRole!]
   fetchSystem(clientId: ID!): System
+  getEvent(eventId: ID!): Event!
 }
 
 type Mutation {
@@ -264,6 +265,30 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createEvent(event: EventInput!): Event!
+  nofifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
+  declareEvent(eventId: ID!, input: DeclareActionInput!): Event!
+  registerEvent(eventId: ID!, input: RegisterActionInput!): Event!
+  certifyEvent(eventId: ID!, input: CertifyActionInput!): Event!
+  issueEvent(eventId: ID!, input: IssueActionInput!): Event!
+  revokeEvent(eventId: ID!, input: RevokeActionInput!): Event!
+  reinstateEvent(eventId: ID!, input: ReinstateActionInput!): Event!
+  revokeCorrectionEvent(
+    eventId: ID!
+    input: RevokeCorrectionActionInput!
+  ): Event!
+  requestCorrectionEvent(
+    eventId: ID!
+    input: RequestCorrectionActionInput!
+  ): Event!
+  approveCorrectionEvent(
+    eventId: ID!
+    input: ApproveCorrectionActionInput!
+  ): Event!
+  rejectCorrectionEvent(
+    eventId: ID!
+    input: RejectCorrectionActionInput!
+  ): Event!
 }
 
 type Dummy {
@@ -611,6 +636,12 @@ type System {
   settings: SystemSettings
 }
 
+enum Event {
+  birth
+  death
+  marriage
+}
+
 input CorrectionInput {
   requester: String!
   requesterOther: String
@@ -781,6 +812,65 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+input EventInput {
+  type: String!
+}
+
+input NotifyActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input DeclareActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input RegisterActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input CertifyActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input IssueActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input RevokeActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input ReinstateActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input RevokeCorrectionActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input RequestCorrectionActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input ApproveCorrectionActionInput {
+  type: String!
+  fields: [FieldInput!]!
+}
+
+input RejectCorrectionActionInput {
+  type: String!
+  fields: [FieldInput!]!
 }
 
 scalar Map
@@ -1076,12 +1166,6 @@ interface EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-enum Event {
-  birth
-  death
-  marriage
-}
-
 type EventProgressSet {
   id: ID!
   type: String
@@ -1313,6 +1397,11 @@ input SystemSettingsInput {
 input WebhookInput {
   event: String!
   permissions: [String]!
+}
+
+input FieldInput {
+  id: String!
+  value: FieldValue!
 }
 
 type AssignmentData {

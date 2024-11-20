@@ -10,4 +10,4 @@
  */
 import { GQLResolver } from '@gateway/graphql/schema'
 
-export const recordResolvers: GQLResolver = {}
+export const eventResolvers: GQLResolver = {}
