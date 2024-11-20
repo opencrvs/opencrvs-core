@@ -112,10 +112,6 @@ const routeAccess: NavigationConfig[] = [
     ],
     tabs: [
       {
-        name: WORKQUEUE_TABS.performance,
-        scopes: [SCOPES.PERFORMANCE_READ]
-      },
-      {
         name: WORKQUEUE_TABS.organisation,
         scopes: [SCOPES.ORGANISATION_READ_LOCATIONS]
       },
@@ -165,7 +161,7 @@ const routeAccess: NavigationConfig[] = [
         scopes: [SCOPES.PERFORMANCE_READ]
       },
       {
-        name: WORKQUEUE_TABS.report,
+        name: WORKQUEUE_TABS.performance,
         scopes: [SCOPES.PERFORMANCE_READ]
       },
       {

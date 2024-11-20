@@ -438,23 +438,6 @@ const NavigationView = (props: IFullProps) => {
         <NavigationGroup>
           {userDetails && (
             <>
-              {hasAccess(WORKQUEUE_TABS.performance) && (
-                <NavigationItem
-                  icon={() => <Icon name="Activity" size="medium" />}
-                  id={`navigation_${WORKQUEUE_TABS.performance}`}
-                  label={intl.formatMessage(
-                    navigationMessages[WORKQUEUE_TABS.performance]
-                  )}
-                  onClick={() => {
-                    props.goToPerformanceViewAction()
-                  }}
-                  isSelected={
-                    enableMenuSelection &&
-                    activeMenuItem === WORKQUEUE_TABS.performance
-                  }
-                />
-              )}
-
               {hasAccess(WORKQUEUE_TABS.organisation) && (
                 <NavigationItem
                   icon={() => <Icon name="Buildings" size="medium" />}
@@ -600,12 +583,12 @@ const NavigationView = (props: IFullProps) => {
                   }
                 />
               )}
-              {userDetails && hasAccess(WORKQUEUE_TABS.report) && (
+              {userDetails && hasAccess(WORKQUEUE_TABS.performance) && (
                 <NavigationItem
                   icon={() => <Icon name="ChartBar" size="medium" />}
                   label={intl.formatMessage(navigationMessages['performance'])}
                   onClick={() => props.goToPerformanceViewAction()}
-                  id={`navigation_${WORKQUEUE_TABS.report}`}
+                  id={`navigation_${WORKQUEUE_TABS.performance}`}
                   isSelected={
                     enableMenuSelection &&
                     activeMenuItem === WORKQUEUE_TABS.performance
