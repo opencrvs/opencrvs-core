@@ -77,7 +77,6 @@ export const scopes = [
   'performance.read',
   'performance.read-dashboards',
   'performance.vital-statistics-export',
-  'organisation.read',
   'organisation.read-locations:all',
   'organisation.read-locations:my-office',
   'organisation.read-locations:my-jurisdiction',
@@ -165,7 +164,6 @@ export const SCOPES = {
   PERFORMANCE_READ: 'performance.read',
   PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
-  ORGANISATION_READ: 'organisation.read',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
