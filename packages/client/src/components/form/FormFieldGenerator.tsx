@@ -1178,6 +1178,7 @@ class FormSectionComponent extends React.Component<Props> {
                   }
 
                   const nestedFieldName = `${field.name}.nestedFields.${nestedField.name}`
+
                   const nestedFieldTouched =
                     touched[field.name] &&
                     (touched[field.name] as unknown as ITouchedNestedFields)
