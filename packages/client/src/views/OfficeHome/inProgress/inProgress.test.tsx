@@ -76,9 +76,9 @@ storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
 const { store, history } = createStore()
-beforeAll(async () => {
+beforeAll(() => {
   getItem.mockReturnValue(registerScopeToken)
-  await store.dispatch(checkAuth())
+  store.dispatch(checkAuth())
 })
 
 describe('In Progress tab', () => {

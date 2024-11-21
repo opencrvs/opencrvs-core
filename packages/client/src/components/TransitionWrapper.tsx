@@ -16,7 +16,7 @@ import {
   PAGE_TRANSITIONS_EXIT_TIME
 } from '@client/utils/constants'
 import * as routes from '@client/navigation/routes'
-import { matchPath } from 'react-router'
+import { matchPath } from 'react-router-dom'
 import { Location } from 'history'
 
 function isPathExactmatch(pathname: string, routesPath: string): boolean {

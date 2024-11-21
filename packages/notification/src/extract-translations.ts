@@ -10,9 +10,9 @@
  */
 /* eslint-disable */
 import { messageKeys } from '@notification/i18n/messages'
-import * as chalk from 'chalk'
+import chalk from 'chalk'
 import { Options, stringify } from 'csv-stringify'
-import * as csv2json from 'csv2json'
+import csv2json from 'csv2json'
 import * as fs from 'fs'
 import { promisify } from 'util'
 const csvStringify = promisify<Array<Record<string, any>>, Options, string>(

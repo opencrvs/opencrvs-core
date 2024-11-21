@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export const enum EVENT {
+export enum EVENT {
   BIRTH = 'birth',
   DEATH = 'death',
   MARRIAGE = 'marriage'

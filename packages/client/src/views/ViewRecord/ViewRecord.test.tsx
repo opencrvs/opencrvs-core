@@ -15,7 +15,7 @@ import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
 import { ViewRecord } from './ViewRecord'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import { Mock } from 'vitest'
 
 describe('View Record for loading and success state', () => {
@@ -212,7 +212,6 @@ describe('View Record for loading and success state', () => {
                 type: 'DEATH',
                 trackingId: 'DHN9T01',
                 registrationNumber: '2022DHN9T01',
-                mosipAid: null,
                 __typename: 'Registration'
               },
               history: [
