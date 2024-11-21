@@ -18,7 +18,6 @@ import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
 import type { LegendProps } from 'recharts'
-import { useState, useEffect } from 'react'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
@@ -295,6 +294,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const customizedTooltip = (dataPoint: any) => {
     const wrapperPayload = dataPoint.payload[0]
 
@@ -307,7 +307,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mouseMoveHandler = (data: any) => {
     if (data && data.activePayload) {
       setState({
@@ -325,7 +325,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
           value: data.activePayload[0].value || 0,
           stroke: theme.colors.grey200
         }
-      }))
+      })
     }
   }
   const mouseLeaveHandler = () => {
@@ -448,7 +448,6 @@ const RegRatesLineChartComponent = (props: IProps) => {
     return getLoadingIndicatorForMobileView()
   }
 
-
   if (data) {
     return (
       <LineChart
@@ -473,7 +472,6 @@ const RegRatesLineChartComponent = (props: IProps) => {
   }
 
   return getLoadingIndicator()
-
 }
 
 export const RegRatesLineChart = withTheme(
