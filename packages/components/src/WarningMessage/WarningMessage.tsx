@@ -11,7 +11,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Warning } from '../icons'
-import { Text } from 'src/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 interface IWarningProps {
   children: string

@@ -11,7 +11,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Cross } from '../icons'
-import { Text } from 'src/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 interface IProps {
   title?: string

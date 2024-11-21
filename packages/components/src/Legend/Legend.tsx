@@ -12,7 +12,7 @@ import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { IDataPoint, ICategoryDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
-import { Text } from '@opencrvs/components/lib/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 interface ILegendDataPoint extends IDataPoint {
   percentage: number

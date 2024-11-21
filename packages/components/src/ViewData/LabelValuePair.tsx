@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Text } from 'src/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 const Label = styled(Text)``
 

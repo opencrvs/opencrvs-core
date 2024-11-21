@@ -17,7 +17,7 @@ import {
   ColumnContentAlignment
 } from '../Workqueue'
 import { Pagination } from '../Pagination'
-import { Text } from 'src/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 const Wrapper = styled.div<{
   fixedWidth: number | undefined

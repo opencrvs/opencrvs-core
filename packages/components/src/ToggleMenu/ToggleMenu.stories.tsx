@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { Icon } from '../Icon'
 import { IToggleMenuItem, ToggleMenu } from './ToggleMenu'
 import React from 'react'
-import { Text } from 'src/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 interface IProps {
   id: string

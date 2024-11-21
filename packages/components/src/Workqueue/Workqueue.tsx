@@ -19,7 +19,7 @@ import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
 import { ListItemAction } from './components/ListItemAction'
 import { useWindowSize } from '../hooks'
-import { Text } from 'src/Text'
+import { Text } from '@opencrvs/components/src/Text'
 
 const Wrapper = styled.div`
   width: 100%;
