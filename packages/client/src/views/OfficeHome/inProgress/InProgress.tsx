@@ -133,7 +133,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       ? COLUMNS.NOTIFICATION_SENT
       : COLUMNS.LAST_UPDATED
   )
-  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.DESCENDING)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
