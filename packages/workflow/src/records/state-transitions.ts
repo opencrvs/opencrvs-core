@@ -60,8 +60,7 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN,
-  validateDeceasedDetails
+  updatePatientIdentifierWithRN
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -474,7 +473,7 @@ export async function toRegistered(
   record: WaitingForValidationRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
-  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
+  identifiers?: EventRegistrationPayload['identifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
   const registeredTaskWithoutPractitionerExtensions =
@@ -507,10 +506,10 @@ export async function toRegistered(
     value: registrationNumber as RegistrationNumber
   })
 
-  if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
+  if (event === EVENT_TYPE.BIRTH && identifiers) {
     // For birth event patients[0] is child and it should
     // already be initialized with the RN identifier
-    childIdentifiers.forEach((childIdentifier) => {
+    identifiers.forEach((childIdentifier) => {
       const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
         ({ type }) => type?.coding?.[0].code === childIdentifier.type
       )
@@ -530,16 +529,6 @@ export async function toRegistered(
         previousIdentifier.value = childIdentifier.value
       }
     })
-  }
-
-  if (event === EVENT_TYPE.DEATH) {
-    /** using first patient because for death event there is only one patient */
-    patientsWithRegNumber[0] = await validateDeceasedDetails(
-      patientsWithRegNumber[0],
-      {
-        Authorization: request.headers.authorization
-      }
-    )
   }
 
   const patientIds = patientsWithRegNumber.map((p) => p.id)

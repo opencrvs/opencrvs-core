@@ -14,7 +14,7 @@ import {
   ISystemModelData,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
 

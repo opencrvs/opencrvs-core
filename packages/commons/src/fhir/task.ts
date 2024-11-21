@@ -47,10 +47,6 @@ export type RegistrationNumber = Nominal<string, 'RegistrationNumber'>
 
 export type TaskIdentifier =
   | {
-      system: 'http://opencrvs.org/specs/id/mosip-aid'
-      value: string
-    }
-  | {
       system: 'http://opencrvs.org/specs/id/draft-id'
       value: string
     }
