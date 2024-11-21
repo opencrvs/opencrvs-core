@@ -11,12 +11,12 @@
 
 import { getClient } from '@events/storage/mongodb'
 import {
-  getUUID,
   EventInput,
   Event,
   ActionInput,
   ActionType
-} from '@opencrvs/commons'
+} from '@opencrvs/commons/events'
+import { getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
 
 const EventWithTransactionId = Event.extend({

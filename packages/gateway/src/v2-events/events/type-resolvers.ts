@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { Action, ActionType } from '@opencrvs/commons'
+import { Action, ActionType } from '@opencrvs/commons/events'
 
 export const eventResolvers: GQLResolver = {
   Action: {
