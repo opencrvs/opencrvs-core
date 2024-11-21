@@ -710,6 +710,12 @@ export const getFormattedAdvanceSearchParamPills = (
   intl: IntlShape,
   offlineData: IOfflineData
 ): pillKeyValueMap => {
+  const pillLabelFromTimePeriod = {
+    [TIME_PERIOD.LAST_90_DAYS]: advancedSearchForm.timePeriodLast90Days,
+    [TIME_PERIOD.LAST_30_DAYS]: advancedSearchForm.timePeriodLast30Days,
+    [TIME_PERIOD.LAST_7_DAYS]: advancedSearchForm.timePeriodLast7Days,
+    [TIME_PERIOD.LAST_YEAR]: advancedSearchForm.timePeriodLastYear
+  }
   const intlFormattedMapOfParams: pillKeyValueMap = {
     event:
       advancedSearchParamsState.event === 'birth'
@@ -725,7 +731,13 @@ export const getFormattedAdvanceSearchParamPills = (
           )
         : '',
 
-    timePeriodFrom: advancedSearchParamsState.timePeriodFrom,
+    timePeriodFrom:
+      advancedSearchParamsState.timePeriodFrom &&
+      intl.formatMessage(
+        pillLabelFromTimePeriod[
+          advancedSearchParamsState.timePeriodFrom as TIME_PERIOD
+        ]
+      ),
     trackingId: advancedSearchParamsState.trackingId,
     regNumber: advancedSearchParamsState.registrationNumber,
     childFirstName: advancedSearchParamsState.childFirstNames,
