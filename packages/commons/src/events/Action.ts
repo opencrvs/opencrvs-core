@@ -43,8 +43,6 @@ export const ActionConfig = z.object({
 
 export const ActionInputBase = z.object({
   type: z.enum(actionTypes as NonEmptyArray<ActionType>),
-  createdAt: z.date(),
-  createdBy: z.string(),
   fields: z.array(
     z.object({
       id: z.string(),
