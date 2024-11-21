@@ -171,7 +171,7 @@ type ReferenceType =
 
 export type CompositionSectionCode = ReferenceType['code']
 
-type ReferenceTypeByCode<U extends CompositionSectionCode> = Extract<
+export type ReferenceTypeByCode<U extends CompositionSectionCode> = Extract<
   ReferenceType,
   { code: U }
 >

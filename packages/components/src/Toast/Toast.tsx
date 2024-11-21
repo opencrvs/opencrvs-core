@@ -103,6 +103,7 @@ export interface IToastProps extends React.HTMLAttributes<HTMLDivElement> {
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
   duration?: number | null
+  'data-testid'?: string
 }
 
 export function Toast({
