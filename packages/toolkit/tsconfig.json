@@ -13,9 +13,9 @@
     "outDir": "dist",
     "paths": {
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
-    },
-    "composite": true
+    }
   },
   "references": [{ "path": "../commons" }],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist"]
 }
