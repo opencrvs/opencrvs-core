@@ -106,11 +106,11 @@ export async function addAction(eventId: string, action: ActionInput) {
   return getEventById(eventId)
 }
 
-const EventInputWithId = EventInput.extend({
+export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-type EventInputWithId = z.infer<typeof EventInputWithId>
+export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 export async function patchEvent(event: EventInputWithId): Promise<Event> {
   const existingEvent = await getEventById(event.id)

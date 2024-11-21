@@ -25,7 +25,6 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
-import { ActionInput, EventInput } from '@opencrvs/commons'
 
 export const ContextSchema = z.object({
   user: z.object({
