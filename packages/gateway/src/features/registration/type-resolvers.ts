@@ -95,7 +95,7 @@ import {
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
-import * as validateUUID from 'uuid-validate'
+import validateUUID from 'uuid-validate'
 import { fetchTaskByCompositionIdFromHearth } from '@gateway/features/fhir/service'
 import { TaskInput } from 'fhir/r3'
 
@@ -727,27 +727,6 @@ export const typeResolvers: GQLResolver = {
           (identifier: Identifier) =>
             identifier.system ===
             `${OPENCRVS_SPECIFICATION_URL}id/${specificationIdentifier}`
-        )
-
-      return (foundIdentifier && foundIdentifier.value) || null
-    },
-    async mosipAid(task: Task) {
-      const mosipAidType =
-        task &&
-        task.code &&
-        task.code.coding &&
-        task.code.coding[0] &&
-        task.code.coding[0].code
-
-      if (mosipAidType !== 'BIRTH') {
-        return null
-      }
-
-      const foundIdentifier =
-        task.identifier &&
-        task.identifier.find(
-          (identifier: Identifier) =>
-            identifier.system === `${OPENCRVS_SPECIFICATION_URL}id/mosip-aid`
         )
 
       return (foundIdentifier && foundIdentifier.value) || null

@@ -95,7 +95,7 @@ import {
   CompositionSectionTitleByCode,
   EVENT_TYPE
 } from '..'
-import { getUUID } from '../..'
+import { getUUID, UUID } from '../..'
 import { replaceFromBundle } from '../../record'
 import {
   AddressInput,
@@ -508,7 +508,7 @@ function createAddressBuilder<T extends CompositionSectionCode>(
           {
             url: 'http://opencrvs.org/specs/extension/part-of',
             valueReference: {
-              reference: `Location/${fieldValue}`
+              reference: `Location/${fieldValue as UUID}`
             }
           }
         ],
@@ -642,7 +642,7 @@ function createLocationAddressBuilder(
         context
       )
 
-      location.partOf = { reference: `Location/${fieldValue}` }
+      location.partOf = { reference: `Location/${fieldValue as UUID}` }
     }
   }
 }
@@ -2090,7 +2090,7 @@ const builders: IFieldBuilders = {
             {
               url: 'http://opencrvs.org/specs/extension/part-of',
               valueReference: {
-                reference: `Location/${fieldValue}`
+                reference: `Location/${fieldValue as UUID}`
               }
             }
           ],
@@ -2553,10 +2553,6 @@ const builders: IFieldBuilders = {
         trackingId = 'marriage-tracking-id'
       }
       return setResourceIdentifier(taskResource, `${trackingId}`, fieldValue)
-    },
-    mosipAid: (fhirBundle, fieldValue, context) => {
-      const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
-      return setResourceIdentifier(taskResource, 'mosip-aid', fieldValue)
     },
     registrationNumber: (fhirBundle, fieldValue, context) => {
       let regNumber:

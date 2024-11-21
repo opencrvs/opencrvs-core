@@ -21,8 +21,6 @@ export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const WEBHOOKS_URL = process.env.WEBHOOKS_URL || 'http://localhost:2525/'
 export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050/'
 
-export const MOSIP_TOKEN_SEEDER_URL =
-  process.env.MOSIP_TOKEN_SEEDER_URL || 'http://localhost:8085'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const CERT_PUBLIC_KEY_PATH =
@@ -33,6 +31,7 @@ export const DOCUMENTS_URL =
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 export const SENTRY_DSN = process.env.SENTRY_DSN
+export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040/'
 
 function getAvailableLanguages() {
   const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,fr'
