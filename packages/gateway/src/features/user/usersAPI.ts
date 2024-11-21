@@ -10,23 +10,18 @@
  */
 
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
-import { AuthenticationError } from 'apollo-server-errors'
+import { ContextValue } from '@gateway/graphql/context'
+import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { AuthenticationError } from '@gateway/utils/graphql-errors'
 import { IUserModelData } from './type-resolvers'
 
-export class UsersAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = USER_MANAGEMENT_URL
-    this.memoizedResults = new Map()
-  }
+export class UsersAPI extends OpenCRVSRestDataSource {
+  override baseURL = USER_MANAGEMENT_URL
+  private memoizedResults: Map<string, IUserModelData>
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
+  constructor(options: { contextValue: ContextValue }) {
+    super(options)
+    this.memoizedResults = new Map()
   }
 
   async getUserByEmail(email: string): Promise<IUserModelData | null> {
@@ -39,11 +34,11 @@ export class UsersAPI extends RESTDataSource {
     }
 
     try {
-      const response = this.post('getUser', { email })
+      const response = await this.post('getUser', { body: { email } })
 
       this.memoizedResults.set(cacheKey, response)
 
-      return await response
+      return response
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this email
       if (e instanceof AuthenticationError) return null
@@ -61,11 +56,11 @@ export class UsersAPI extends RESTDataSource {
     }
 
     try {
-      const response = this.post('getUser', { mobile })
+      const response = await this.post('getUser', { body: { mobile } })
 
       this.memoizedResults.set(cacheKey, response)
 
-      return await response
+      return response
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this mobile
       if (e instanceof AuthenticationError) return null
@@ -81,7 +76,7 @@ export class UsersAPI extends RESTDataSource {
       return cachedResponse
     }
 
-    const response = this.post('getUser', { userId: id })
+    const response = await this.post('getUser', { body: { userId: id } })
 
     this.memoizedResults.set(cacheKey, response)
 
@@ -96,7 +91,9 @@ export class UsersAPI extends RESTDataSource {
     if (cachedResponse) {
       return cachedResponse
     }
-    const response = this.post('getUser', { practitionerId: id })
+    const response = await this.post('getUser', {
+      body: { practitionerId: id }
+    })
 
     this.memoizedResults.set(cacheKey, response)
 

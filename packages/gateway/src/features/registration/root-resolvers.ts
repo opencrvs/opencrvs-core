@@ -34,14 +34,14 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import { UnassignError } from '@gateway/utils/unassignError'
+
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 import { checkUserAssignment } from '@gateway/authorisation'
-import { UserInputError } from 'apollo-server-hapi'
+
 import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
@@ -63,6 +63,7 @@ import {
   confirmRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
+import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())

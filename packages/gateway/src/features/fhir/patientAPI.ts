@@ -9,32 +9,32 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { getResourceFromBundleById } from '@opencrvs/commons/types'
+import { AugmentedRequest } from '@apollo/datasource-rest'
 import { FHIR_URL } from '@gateway/constants'
-import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
+import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { getResourceFromBundleById } from '@opencrvs/commons/types'
+import { parse } from 'url'
 
-export default class PatientAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = `${FHIR_URL}/Patient`
-  }
+const fhirPath = parse(FHIR_URL).path || ''
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
-    request.headers.set('Content-Type', 'application/fhir+json')
+export default class PatientAPI extends OpenCRVSRestDataSource {
+  override baseURL = FHIR_URL
+
+  override willSendRequest(
+    _path: string,
+    request: AugmentedRequest
+  ): void | Promise<void> {
+    super.willSendRequest(_path, request)
+    request.headers['Content-Type'] = 'application/fhir+json'
   }
 
   getPatient(id: string) {
-    const inBundle = getResourceFromBundleById(this.context.record, id)
+    const inBundle = getResourceFromBundleById(this.context.record!, id)
 
     if (inBundle) {
       return { entry: [{ resource: inBundle }] }
     }
 
-    return this.get(`/${id}`)
+    return this.get(`${fhirPath}/Patient/${id}`)
   }
 }

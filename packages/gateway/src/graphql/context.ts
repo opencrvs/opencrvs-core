@@ -10,7 +10,7 @@
  */
 /* eslint-disable import/no-relative-parent-imports */
 import PatientAPI from '../features/fhir/patientAPI'
-import { IAuthHeader } from '@opencrvs/commons'
+import { getAuthHeader, IAuthHeader } from '@opencrvs/commons'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PaymentsAPI from '../features/fhir/paymentsAPI'
 import DocumentsAPI from '../features/fhir/documentsAPI'
@@ -36,4 +36,40 @@ export interface Context {
     metricsAPI: MetricsAPI
   }
   headers: IAuthHeader
+}
+
+function getDataSources(contextValue: ContextValue): Context['dataSources'] {
+  return {
+    documentsAPI: new DocumentsAPI({ contextValue }),
+    paymentsAPI: new PaymentsAPI({ contextValue }),
+    locationsAPI: new LocationsAPI({ contextValue }),
+    usersAPI: new UsersAPI({ contextValue }),
+    fhirAPI: new FHIRAPI({ contextValue }),
+    patientAPI: new PatientAPI({ contextValue }),
+    minioAPI: new MinioAPI({ contextValue }),
+    metricsAPI: new MetricsAPI({ contextValue })
+  }
+}
+
+export class ContextValue {
+  public record?: Saved<Bundle>
+  public dataSources: {
+    locationsAPI: LocationsAPI
+    documentsAPI: DocumentsAPI
+    usersAPI: UsersAPI
+    paymentsAPI: PaymentsAPI
+    fhirAPI: FHIRAPI
+    patientAPI: PatientAPI
+    minioAPI: MinioAPI
+    metricsAPI: MetricsAPI
+  }
+  public request: Request
+  public headers: IAuthHeader
+  public presignDocumentUrls = true
+
+  constructor(request: Request) {
+    this.dataSources = getDataSources(this)
+    this.request = request
+    this.headers = getAuthHeader(request)
+  }
 }

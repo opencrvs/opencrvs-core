@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { Context } from '@gateway/graphql/context'
+import { AugmentedRequest } from '@apollo/datasource-rest'
 import {
   Practitioner,
   isCompositionOrCompositionHistory,
@@ -19,22 +19,22 @@ import {
   isPractitionerRoleOrPractitionerRoleHistory,
   isSaved
 } from '@opencrvs/commons/types'
-import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+
 import { FHIR_URL } from '@gateway/constants'
+import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { parse } from 'url'
 
-export default class FHIRAPI extends RESTDataSource<Context> {
-  constructor() {
-    super()
-    this.baseURL = `${FHIR_URL}`
-  }
+const fhirPath = parse(FHIR_URL).path || ''
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each as keyof typeof headers]!)
-    }
-    request.headers.set('Content-Type', 'application/fhir+json')
+export default class FHIRAPI extends OpenCRVSRestDataSource {
+  override baseURL = FHIR_URL
+
+  override willSendRequest(
+    _path: string,
+    request: AugmentedRequest
+  ): void | Promise<void> {
+    super.willSendRequest(_path, request)
+    request.headers['Content-Type'] = 'application/fhir+json'
   }
 
   async getPractitioner(practitionerId: string) {
@@ -49,7 +49,10 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       }
     }
 
-    return this.get<Practitioner>(`/Practitioner/${practitionerId}`)
+    const res = await this.get<Practitioner>(
+      `${fhirPath}/Practitioner/${practitionerId}`
+    )
+    return res
   }
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
     if (this.context.record) {
@@ -67,7 +70,9 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       }
     }
 
-    return this.get(`/PractitionerRole?practitioner=${practitionerId}`)
+    return this.get(
+      `${fhirPath}/PractitionerRole?practitioner=${practitionerId}`
+    )
   }
 
   async getPractionerRoleHistory(id: string) {
@@ -106,6 +111,6 @@ export default class FHIRAPI extends RESTDataSource<Context> {
     if (reference) {
       return reference
     }
-    return this.get(`/DocumentReference/${id}`)
+    return this.get(`${fhirPath}/DocumentReference/${id}`)
   }
 }
