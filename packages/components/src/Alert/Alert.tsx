@@ -82,6 +82,7 @@ export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
   customIcon?: React.ReactNode
+  'data-testid'?: string
 }
 
 /**

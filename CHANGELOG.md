@@ -4,7 +4,7 @@
 
 ### Breaking changes
 
-- **Title** Description
+- **Dashboard:** Changes made to the dashboard configuration will reset after upgrading OpenCRVS. 
 
 ## Improvements
 

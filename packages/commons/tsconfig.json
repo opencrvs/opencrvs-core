@@ -6,7 +6,7 @@
     },
     "target": "es6",
     "module": "commonjs",
-    "outDir": "build/dist",
+    "outDir": "build/dist/common",
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": "src",
