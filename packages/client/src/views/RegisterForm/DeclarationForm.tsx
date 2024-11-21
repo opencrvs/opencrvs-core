@@ -25,7 +25,7 @@ import { connect } from 'react-redux'
 import { IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 
 interface IFormProps {
   declaration?: IDeclaration
