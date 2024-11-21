@@ -165,7 +165,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
   ) {
     transformedStoreState.registrationStatuses =
       localState.registrationStatuses === RegStatus.Registered
-        ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
+        ? [RegStatus.Registered, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
@@ -318,7 +318,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
         ? 'IN_REVIEW'
         : isEqual(
             [...reduxState.registrationStatuses].sort(),
-            [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued].sort()
+            [RegStatus.Registered, RegStatus.Issued].sort()
           )
         ? 'REGISTERED'
         : 'ALL'
@@ -609,10 +609,11 @@ const getLabelForRegistrationStatus = (
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
     DECLARED: [RegStatus.Declared],
     IN_PROGRESS: [RegStatus.InProgress],
-    REGISTERED: [RegStatus.Registered],
+    REGISTERED: [RegStatus.Registered, RegStatus.Issued],
     REJECTED: [RegStatus.Rejected],
     VALIDATED: [RegStatus.Validated],
-    WAITING_VALIDATION: [RegStatus.WaitingValidation]
+    WAITING_VALIDATION: [RegStatus.WaitingValidation],
+    CORRECTION_REQUESTED: [RegStatus.CorrectionRequested]
   }
   const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
@@ -648,6 +649,16 @@ const getLabelForRegistrationStatus = (
     {
       value: RegStatus.Archived,
       label: intl.formatMessage(advancedSearchForm.recordStatusAchived)
+    },
+    {
+      value: RegStatus.CorrectionRequested,
+      label: intl.formatMessage(
+        advancedSearchForm.recordStatusCorrectionRequested
+      )
+    },
+    {
+      value: RegStatus.Validated,
+      label: intl.formatMessage(advancedSearchForm.recordStatusValidated)
     }
   ]
 
