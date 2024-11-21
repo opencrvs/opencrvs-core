@@ -91,6 +91,7 @@ const AuthDetailsVerificationComponent = ({
 
     if (notificationMethod === 'sms' && (!phone || error)) {
       setError(true)
+      setTouched(true)
       setErrorMessage(
         !phone
           ? intl.formatMessage(validationMessages.phoneNumberFormat)
@@ -100,6 +101,7 @@ const AuthDetailsVerificationComponent = ({
     }
     if (notificationMethod === 'email' && (!email || error)) {
       setError(true)
+      setTouched(true)
       setErrorMessage(
         !email
           ? intl.formatMessage(validationMessages.emailAddressFormat)
