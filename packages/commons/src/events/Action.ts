@@ -61,9 +61,9 @@ export const ActionInputBase = z.object({
   )
 })
 
-export const CreateActionInput = ActionInputBase
-export const NotifyActionInput = ActionInputBase
-export const DeclareActionInput = ActionInputBase
+export const CreateActionInput = ActionInputBase.extend({})
+export const NotifyActionInput = ActionInputBase.extend({})
+export const DeclareActionInput = ActionInputBase.extend({})
 export const RegisterActionInput = ActionInputBase.extend({
   identifiers: z.object({
     trackingId: z.string(),
