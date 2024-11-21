@@ -14,7 +14,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 
 export const RedirectField = ({
   to,
