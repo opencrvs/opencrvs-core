@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {

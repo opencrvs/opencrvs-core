@@ -33,7 +33,7 @@ import {
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Spinner, Stack } from '@opencrvs/components'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import formatDate, { formatPlainDate } from '@client/utils/date-formatting'
 import {
   BirthRegistration,
