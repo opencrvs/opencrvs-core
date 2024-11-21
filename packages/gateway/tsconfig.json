@@ -4,7 +4,7 @@
     "baseUrl": "./src",
     "paths": {
       "@gateway/*": ["./*"],
-      "@events/*": ["../../events/src/*"]
+      "@events/*": ["../../events/src/index.ts"]
     },
     "target": "es6",
     "module": "node16",
@@ -23,6 +23,7 @@
     "types": ["fhir", "jest"],
     "esModuleInterop": true
   },
+  "references": [{ "path": "../events" }],
   "include": ["src/**/*.ts", "typings"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }
