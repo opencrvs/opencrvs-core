@@ -34,7 +34,7 @@ interface IFetchButtonProps {
   modalTitle: string
   successTitle: string
   errorTitle: string
-  onFetch?: (response: any) => void
+  onFetch?: (response: void) => void
   isDisabled?: boolean
 }
 

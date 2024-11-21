@@ -414,6 +414,13 @@ function renderValue(
   return value
 }
 
+type NestedItem =
+  | {
+      label: string
+      value: IFormFieldValue | JSX.Element | undefined
+    }
+  | undefined
+
 export function PrintRecordBody(props: PrintRecordTableProps) {
   const offlineCountryConfiguration = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
@@ -605,7 +612,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   ) {
     const { declaration: draft } = props
     const visitedTags: string[] = []
-    const nestedItems: any[] = []
+    const nestedItems: NestedItem[] = []
     // parent field
     nestedItems.push(getSinglePreviewField(section, group, field))
     ;(
