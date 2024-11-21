@@ -63,7 +63,6 @@ import {
   confirmRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
-import { Scope } from '@opencrvs/commons/authentication'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
