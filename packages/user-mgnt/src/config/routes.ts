@@ -101,7 +101,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
-import * as mongoose from 'mongoose'
+import mongoose from 'mongoose'
 
 const enum RouteScope {
   DECLARE = 'declare',

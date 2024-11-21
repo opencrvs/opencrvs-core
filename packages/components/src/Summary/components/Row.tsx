@@ -54,6 +54,7 @@ export interface ISummaryRowProps
   placeholder?: React.ReactNode
   /** Is the summary value greyed / locked out */
   locked?: boolean
+  'data-testid'?: string
 }
 
 const RowValue = ({

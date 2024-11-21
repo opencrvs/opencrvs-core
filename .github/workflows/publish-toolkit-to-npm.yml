@@ -17,9 +17,51 @@ on:
   push:
     branches:
       - develop
+
 jobs:
   publish:
-    runs-on: 'ubuntu-latest'
+    runs-on: ubuntu-latest
     steps:
-      - name: Placeholder for publish
-        run: echo "Placeholder for publish"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Check if version exists on npm
+        id: check-version
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if npm view @opencrvs/toolkit@$PACKAGE_VERSION > /dev/null 2>&1; then
+            echo "Version $PACKAGE_VERSION already exists on npm."
+            echo "version-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $PACKAGE_VERSION does not exist on npm."
+            echo "version-exists=false" >> $GITHUB_OUTPUT
+          fi
+        working-directory: packages/toolkit
+
+      - name: Install dependencies
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: yarn install
+        working-directory: packages/toolkit
+
+      - name: Build
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: yarn build
+        working-directory: packages/toolkit
+
+      - name: Authenticate to npm
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        working-directory: packages/toolkit
+
+      - name: Publish to npm
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: npm publish --access public
+        working-directory: packages/toolkit
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
