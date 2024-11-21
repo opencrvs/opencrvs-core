@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { type EventConfig } from '../Event'
+import { defineConfig } from '../Event'
 
-export const tennisClubMembershipEvent: EventConfig = {
+export const tennisClubMembershipEvent = defineConfig({
   id: 'TENNIS_CLUB_MEMBERSHIP',
   summary: {
     title: {
@@ -129,4 +129,4 @@ export const tennisClubMembershipEvent: EventConfig = {
       ]
     }
   ]
-}
+})
