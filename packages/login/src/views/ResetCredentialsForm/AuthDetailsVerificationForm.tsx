@@ -121,19 +121,19 @@ const AuthDetailsVerificationComponent = ({
       })
 
       if (securityQuestionKey) {
-        goToSecurityQuestionForm(
+        return goToSecurityQuestionForm(
           nonce,
           securityQuestionKey,
           location.state.forgottenItem
         )
-      } else {
-        goToRecoveryCodeEntryForm(
-          nonce,
-          location.state.forgottenItem,
-          phone,
-          email
-        )
       }
+
+      goToRecoveryCodeEntryForm(
+        nonce,
+        location.state.forgottenItem,
+        phone,
+        email
+      )
     } catch (err) {
       setError(true)
       setErrorMessage(
