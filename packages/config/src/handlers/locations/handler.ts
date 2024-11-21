@@ -26,8 +26,9 @@ import {
   Location as FhirLocation
 } from '@opencrvs/commons/types'
 import { fetchFromHearth, sendToFhir } from '@config/services/hearth'
+import { UUID } from '@opencrvs/commons'
 
-export enum Code {
+enum Code {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   HEALTH_FACILITY = 'HEALTH_FACILITY'
@@ -234,7 +235,7 @@ async function batchLocationsHandler(
         }))
         .map(
           (location): BundleEntry<FhirLocation> => ({
-            fullUrl: `urn:uuid:${uuid()}`,
+            fullUrl: `urn:uuid:${uuid() as UUID}`,
             resource: {
               ...composeFhirLocation(location),
               ...(location.statistics && {

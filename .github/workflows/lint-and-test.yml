@@ -138,15 +138,56 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
-  security-scans:
-    needs: setup
+  lint-knip:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
+      - name: Checkout base branch
         uses: actions/checkout@v4
-      - name: Run Trivy vulnerability scanner in fs mode
-        uses: aquasecurity/trivy-action@0.24.0
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          trivy-config: trivy.yaml
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: Checkout the PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          path: pr
+
+      - uses: actions/setup-node@v4
+
+      - name: Install base dependencies
+        run: yarn install --ignore-scripts
+        working-directory: base
+
+      - name: Install PR dependencies
+        run: yarn install --ignore-scripts
+        working-directory: pr
+
+      - name: Run knip on base branch
+        id: knip_base
+        run: |
+          npx knip --no-exit-code --exports --reporter=markdown > knip_report.md
+          TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
+          echo "Total $TOTAL issue(s) on base branch."
+          echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+        working-directory: base
+
+      - name: Run knip on PR branch
+        id: knip_pr
+        run: |
+          npx knip --no-exit-code --exports --reporter=markdown > knip_report.md
+          TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
+          echo "Total $TOTAL issue(s) on PR branch."
+          echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+        working-directory: pr
+
+      - name: Compare base and PR totals
+        if: ${{ steps.knip_pr.outputs.total > steps.knip_base.outputs.total }}
+        run: |
+          echo "## ⚠️ Total issues have increased in the PR branch." >> $GITHUB_STEP_SUMMARY
+          echo "Differences:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
+          diff base/knip_report.md pr/knip_report.md >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+          exit 1

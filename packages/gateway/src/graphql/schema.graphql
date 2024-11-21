@@ -31,7 +31,7 @@ type Query {
   ): RegistrationCountResult
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
-  hasChildLocation(parentId: String!): Location
+  isLeafLevelLocation(locationId: String!): Boolean!
   getUser(userId: String): User
   getUserByMobile(mobile: String): User
   getUserByEmail(email: String): User
@@ -147,12 +147,6 @@ type Query {
     sortOrder: String
   ): [SystemRole!]
   fetchSystem(clientId: ID!): System
-  getOIDPUserInfo(
-    code: String!
-    clientId: String!
-    redirectUri: String!
-    grantType: String
-  ): UserInfo
 }
 
 type Mutation {
@@ -222,6 +216,8 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
+  confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
+  rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -390,25 +386,6 @@ type MarriageRegistration implements EventRegistration {
 }
 
 union RecordDetails = BirthRegistration | DeathRegistration
-
-type Location {
-  id: ID!
-  _fhirID: ID
-  identifier: [Identifier!]
-  status: String
-  name: String
-  alias: [String!]
-  description: String
-  partOf: String
-  type: String
-  telecom: [ContactPoint]
-  address: Address
-  longitude: Float
-  latitude: Float
-  altitude: Float
-  geoData: String
-  hierarchy: [Location!]
-}
 
 type User {
   id: ID!
@@ -634,13 +611,6 @@ type System {
   settings: SystemSettings
 }
 
-type UserInfo {
-  oidpUserInfo: OIDPUserInfo
-  districtFhirId: String
-  stateFhirId: String
-  locationLevel3FhirId: String
-}
-
 input CorrectionInput {
   requester: String!
   requesterOther: String
@@ -728,6 +698,17 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
+input ConfirmRegistrationInput {
+  registrationNumber: String!
+  error: String
+  identifiers: [IdentifierInput!]
+}
+
+input RejectRegistrationInput {
+  reason: String!
+  comment: String
+}
+
 input UserInput {
   id: ID
   name: [HumanNameInput!]!
@@ -809,7 +790,6 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
-  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -860,6 +840,25 @@ type RelatedPerson {
   educationalAttainment: String
   ageOfIndividualInYears: Int
   exactDateOfBirthUnknown: Boolean
+}
+
+type Location {
+  id: ID!
+  _fhirID: ID
+  identifier: [Identifier!]
+  status: String
+  name: String
+  alias: [String!]
+  description: String
+  partOf: String
+  type: String
+  telecom: [ContactPoint]
+  address: Address
+  longitude: Float
+  latitude: Float
+  altitude: Float
+  geoData: String
+  hierarchy: [Location!]
 }
 
 type QuestionnaireQuestion {
@@ -968,11 +967,6 @@ type StatusWiseRegistrationCount {
   count: Int!
 }
 
-type Identifier {
-  system: String
-  value: String
-}
-
 enum SystemRoleType {
   FIELD_AGENT
   REGISTRATION_AGENT
@@ -999,6 +993,11 @@ type LocalRegistrar {
   name: [HumanName]!
   role: SystemRoleType!
   signature: Signature
+}
+
+type Identifier {
+  system: String
+  value: String
 }
 
 type Signature {
@@ -1120,29 +1119,6 @@ type SystemSettings {
   openIdProviderClaims: String
 }
 
-type OIDPUserInfo {
-  sub: String!
-  name: String
-  given_name: String
-  family_name: String
-  middle_name: String
-  nickname: String
-  preferred_username: String
-  profile: String
-  picture: String
-  website: String
-  email: String
-  email_verified: Boolean
-  gender: String
-  birthdate: String
-  zoneinfo: String
-  locale: String
-  phone_number: String
-  phone_number_verified: Boolean
-  address: OIDPUserAddress
-  updated_at: Int
-}
-
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -1202,7 +1178,6 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
-  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1299,6 +1274,11 @@ enum RegStatus {
   CERTIFIED
   REJECTED
   ISSUED
+}
+
+input IdentifierInput {
+  type: String!
+  value: String!
 }
 
 input HumanNameInput {
@@ -1614,16 +1594,6 @@ type EventProgressData {
 type WebhookPermission {
   event: String!
   permissions: [String!]!
-}
-
-type OIDPUserAddress {
-  formatted: String
-  street_address: String
-  locality: String
-  region: String
-  postal_code: String
-  city: String
-  country: String
 }
 
 enum AttachmentInputStatus {

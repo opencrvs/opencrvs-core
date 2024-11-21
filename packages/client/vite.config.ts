@@ -77,6 +77,9 @@ export default defineConfig(({ mode }) => {
       'process.env': {},
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
+    optimizeDeps: {
+      include: ['@opencrvs/commons/client']
+    },
     // This changes the output dir from dist to build
     build: {
       outDir: 'build',
@@ -93,7 +96,24 @@ export default defineConfig(({ mode }) => {
         crypto: 'crypto-js'
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), VitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react({
+        babel: {
+          plugins: [
+            [
+              'babel-plugin-styled-components',
+              {
+                displayName: true,
+                fileName: false
+              }
+            ]
+          ]
+        }
+      }),
+      tsconfigPaths(),
+      VitePWAPlugin()
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',

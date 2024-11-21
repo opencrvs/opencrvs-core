@@ -63,7 +63,6 @@ import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeL
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import { OIDPVerificationCallback } from './views/OIDPVerificationCallback/OIDPVerificationCallback'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
@@ -71,6 +70,8 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
+import { Workqueues } from './v2-events/workqueues'
+import { V2_ROOT_ROUTE } from './v2-events/routes'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -535,17 +536,13 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              path={
-                                                routes.OIDP_VERIFICATION_CALLBACK
-                                              }
-                                              component={
-                                                OIDPVerificationCallback
-                                              }
+                                              path={routes.PRINT_RECORD}
+                                              component={PrintRecord}
                                             />
                                             <ProtectedRoute
                                               exact
-                                              path={routes.PRINT_RECORD}
-                                              component={PrintRecord}
+                                              path={V2_ROOT_ROUTE}
+                                              component={Workqueues}
                                             />
                                           </Switch>
                                         </TransitionWrapper>

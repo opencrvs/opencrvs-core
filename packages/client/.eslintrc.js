@@ -22,6 +22,7 @@ module.exports = {
   },
   rules: {
     'react-hooks/exhaustive-deps': 'error',
+    '@typescript-eslint/no-explicit-any': 'warn',
     'no-restricted-imports': [
       'error',
       {

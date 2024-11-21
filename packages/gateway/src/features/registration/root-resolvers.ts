@@ -10,7 +10,11 @@
  */
 import { AUTH_URL, COUNTRY_CONFIG_URL, SEARCH_URL } from '@gateway/constants'
 import { fetchFHIR } from '@gateway/features/fhir/service'
-import { hasScope, inScope } from '@gateway/features/user/utils'
+import {
+  hasRecordAccess,
+  hasScope,
+  inScope
+} from '@gateway/features/user/utils'
 import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import {
@@ -54,7 +58,9 @@ import {
   duplicateRegistration,
   viewDeclaration,
   verifyRegistration,
-  markNotADuplicate
+  markNotADuplicate,
+  rejectRegistration,
+  confirmRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 
@@ -631,6 +637,47 @@ export const resolvers: GQLResolver = {
       )
 
       return taskEntry.resource.id
+    },
+    async confirmRegistration(_, { id, details }, { headers: authHeader }) {
+      if (!inScope(authHeader, ['record.confirm-registration'])) {
+        throw new Error('User does not have a Confirm Registration scope')
+      }
+
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      try {
+        const taskEntry = await confirmRegistration(id, authHeader, {
+          error: details.error,
+          registrationNumber: details.registrationNumber,
+          identifiers: details.identifiers
+        })
+
+        return taskEntry.resource.id
+      } catch (error) {
+        throw new Error(`Failed to confirm registration: ${error.message}`)
+      }
+    },
+    async rejectRegistration(_, { id, details }, { headers: authHeader }) {
+      if (!inScope(authHeader, ['record.reject-registration'])) {
+        throw new Error('User does not have a Reject Registration" scope')
+      }
+
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      try {
+        const taskEntry = await rejectRegistration(id, authHeader, {
+          comment: details.comment || 'No comment provided',
+          reason: details.reason
+        })
+
+        return taskEntry.resource.id
+      } catch (error) {
+        throw new Error(`Error in rejectRegistration: ${error.message}`)
+      }
     }
   }
 }

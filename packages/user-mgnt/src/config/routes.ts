@@ -101,7 +101,7 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
-import * as mongoose from 'mongoose'
+import mongoose from 'mongoose'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -374,7 +374,9 @@ export const getRoutes: () => Hapi.ServerRoute[] = () => {
             RouteScope.SYSADMIN,
             RouteScope.VALIDATE,
             RouteScope.VERIFY,
-            RouteScope.RECORDSEARCH
+            RouteScope.RECORDSEARCH,
+            // @TODO: Refer to an enum / constant
+            'record.confirm-registration'
           ]
         },
         validate: {

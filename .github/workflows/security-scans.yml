@@ -1,0 +1,107 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Scan files for vulnerabilities
+
+on:
+  push:
+    branches:
+      - develop
+      - release-*
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Run every day at midnight
+    - cron: '0 0 * * *'
+jobs:
+  security-scan-scheduled:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: 'develop'
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+
+  security-scan-development:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+
+  security-scan-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner in fs mode
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+
+  security-scan-pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: 'base'
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          path: 'branch'
+
+      - name: Gather Trivy output from base branch
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'base'
+          trivy-config: ./branch/trivy.yaml
+          format: 'sarif'
+          output: './trivy-results-base.sarif'
+          exit-code: '0'
+
+      - name: Gather Trivy output from PR branch
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'branch'
+          trivy-config: ./branch/trivy.yaml
+          format: 'sarif'
+          output: './trivy-results-branch.sarif'
+          exit-code: '0'
+
+      - name: Remove lines that are always expected to be different
+        run: |
+          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ./trivy-results-base.sarif > ./trivy-results-base.sarif
+          jq '.runs |= map(del(.originalUriBaseIds, .properties))' ./trivy-results-branch.sarif > ./trivy-results-branch.sarif
+
+      - name: Diff Trivy results to catch newly introduced vulnerabilities
+        run: diff -u ./trivy-results-base.sarif ./trivy-results-branch.sarif

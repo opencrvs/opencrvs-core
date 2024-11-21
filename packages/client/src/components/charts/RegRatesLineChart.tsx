@@ -12,7 +12,7 @@ import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import * as React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
@@ -133,38 +133,8 @@ function LegendDot(props: React.HTMLAttributes<SVGElement>) {
   )
 }
 
-function RegRatesLineChartComponent(props: IProps) {
-
-  const [state, setState] = useState<IState>({
-    legendMarginTop: 0,
-    legendMarginLeft: 0,
-    chartTop: 0,
-    chartRight: 0,
-    chartBottom: 0,
-    chartLeft: 0,
-    maximizeXAxisInterval: false,
-    legendLayout: 'horizontal',
-    activeLabel: '',
-    activeRegisteredInTargetDays: {
-      value: 0,
-      stroke: props.theme.colors.teal
-    },
-    activeTotalRegistered: {
-      value: 0,
-      stroke: props.theme.colors.tealLight
-    },
-    activeTotalEstimate: {
-      value: 0,
-      stroke: props.theme.colors.grey300
-    }
-  })
-
-  useEffect(() => {
-    window.addEventListener('resize', recordWindowWidth)
-    return () => {
-      window.removeEventListener('resize', recordWindowWidth)
-    }
-  })
+const RegRatesLineChartComponent = (props: IProps) => {
+  const { theme, data, intl, eventType, completenessRateTime } = props
 
   const getStatePropertiesForSmallWindowChart = () => {
     return {
@@ -192,16 +162,14 @@ function RegRatesLineChartComponent(props: IProps) {
     }
   }
 
-  const getStatePropertiesForChart = () => {
-    if (window.innerWidth > props.theme.grid.breakpoints.md) {
+  const getStatePropertiesForChart = useCallback(() => {
+    if (window.innerWidth > theme.grid.breakpoints.md) {
       return getStatePropertiesForLargeWindowChart()
-    } else {
-      return getStatePropertiesForSmallWindowChart()
     }
-  }
+    return getStatePropertiesForSmallWindowChart()
+  }, [theme])
 
   const getLatestData = () => {
-    const { data, theme } = props
     const latestData = data && data[data.length - 1]
     return {
       activeLabel: (latestData && latestData.label) || '',
@@ -220,12 +188,35 @@ function RegRatesLineChartComponent(props: IProps) {
     }
   }
 
-  const recordWindowWidth = () => {
-    setState({
-      ...state,
-      ...getStatePropertiesForChart()
-    })
-  }
+  const [state, setState] = useState<IState>(() => ({
+    ...getStatePropertiesForChart(),
+    ...getLatestData()
+  }))
+  const {
+    chartTop,
+    chartRight,
+    chartBottom,
+    chartLeft,
+    maximizeXAxisInterval,
+    legendLayout,
+    legendMarginLeft,
+    legendMarginTop
+  } = state
+
+  useEffect(() => {
+    const recordWindowWidth = () => {
+      const latesProperties = getStatePropertiesForChart()
+      setState((prev) => ({
+        ...prev,
+        ...latesProperties
+      }))
+    }
+
+    window.addEventListener('resize', recordWindowWidth)
+    return () => {
+      window.removeEventListener('resize', recordWindowWidth)
+    }
+  }, [getStatePropertiesForChart])
 
   const customizedLegend = () => {
     const {
@@ -234,11 +225,10 @@ function RegRatesLineChartComponent(props: IProps) {
       activeTotalRegistered,
       activeTotalEstimate
     } = state.activeLabel ? state : getLatestData()
-    const { intl, eventType, completenessRateTime } = props
     return (
       <CustomLegendContainer
-        marginLeft={state.legendMarginLeft}
-        marginTop={state.legendMarginTop}
+        marginLeft={legendMarginLeft}
+        marginTop={legendMarginTop}
       >
         <LegendHeader>{activeLabel}</LegendHeader>
         <LegendDetails>
@@ -317,12 +307,11 @@ function RegRatesLineChartComponent(props: IProps) {
     )
   }
 
-  const mouseMoveHandler = (data: any) => {
-    const { theme } = props
 
+  const mouseMoveHandler = (data: any) => {
     if (data && data.activePayload) {
-      setState((prevState) => ({
-        ...prevState,
+      setState({
+        ...state,
         activeLabel: data.activeLabel || '',
         activeRegisteredInTargetDays: {
           value: data.activePayload[2].value || 0,
@@ -339,151 +328,128 @@ function RegRatesLineChartComponent(props: IProps) {
       }))
     }
   }
-
   const mouseLeaveHandler = () => {
-    setState({
-      ...state,
-      ...getLatestData(),
-      legendMarginTop: 0,
-      legendMarginLeft: 0,
-      chartTop: 0,
-      chartRight: 0,
-      chartBottom: 0,
-      chartLeft: 0,
-      maximizeXAxisInterval: false,
-      legendLayout: 'horizontal'
-    })
+    const latestState = getLatestData()
+    setState((prev) => ({ ...prev, ...latestState }))
   }
 
-  const getLoadingIndicatorForMobileView = () => {
-    return (
-      <LoadingIndicator id="reg-rates-line-chart-loader" flexDirection="column">
-        <LegendLoadingIndicator>
-          <CustomLegendContainer
-            marginLeft={state.legendMarginLeft}
-            marginTop={state.legendMarginTop}
-          >
-            <LegendHeader>
-              <LoaderBox width={40} />
-            </LegendHeader>
-            <LegendDetails>
-              <div>
-                <LegendDot color={props.theme.colors.grey300} />
-              </div>
-              <LegendData>
-                <LoaderBox width={60} />
-                <br />
-                <LoaderBox width={20} />
-              </LegendData>
-            </LegendDetails>
-            <LegendDetails>
-              <div>
-                <LegendDot color={props.theme.colors.grey300} />
-              </div>
-              <LegendData>
-                <LegendDataLabel>
-                  <LoaderBox width={60} />
-                </LegendDataLabel>
-                <br />
-                <LegendDataValue>
-                  <LoaderBox width={20} />
-                </LegendDataValue>
-              </LegendData>
-            </LegendDetails>
-            <LegendDetails>
-              <div>
-                <LegendDot color={props.theme.colors.grey300} />
-              </div>
-              <LegendData>
-                <LegendDataLabel>
-                  <LoaderBox width={60} />
-                </LegendDataLabel>
-                <br />
-                <LegendDataValue>
-                  <LoaderBox width={20} />
-                </LegendDataValue>
-              </LegendData>
-            </LegendDetails>
-          </CustomLegendContainer>
-        </LegendLoadingIndicator>
-        <MobileChartLoadingIndicator />
-      </LoadingIndicator>
-    )
-  }
-
-  const getLoadingIndicatorForDesktopView = () => {
-    return (
-      <LoadingIndicator id="reg-rates-line-chart-loader" flexDirection="row">
-        <DesktopChartLoadingIndicator />
-        <LegendLoadingIndicator>
-          <CustomLegendContainer
-            marginLeft={state.legendMarginLeft}
-            marginTop={state.legendMarginTop}
-          >
-            <LegendHeader>
+  const getLoadingIndicatorForMobileView = () => (
+    <LoadingIndicator id="reg-rates-line-chart-loader" flexDirection="column">
+      <LegendLoadingIndicator>
+        <CustomLegendContainer
+          marginLeft={legendMarginLeft}
+          marginTop={legendMarginTop}
+        >
+          <LegendHeader>
+            <LoaderBox width={40} />
+          </LegendHeader>
+          <LegendDetails>
+            <div>
+              <LegendDot color={theme.colors.grey300} />
+            </div>
+            <LegendData>
               <LoaderBox width={60} />
-            </LegendHeader>
-            <LegendDetails>
-              <div>
-                <LegendDot color={props.theme.colors.grey300} />
-              </div>
-              <LegendData>
+              <br />
+              <LoaderBox width={20} />
+            </LegendData>
+          </LegendDetails>
+          <LegendDetails>
+            <div>
+              <LegendDot color={theme.colors.grey300} />
+            </div>
+            <LegendData>
+              <LegendDataLabel>
+                <LoaderBox width={60} />
+              </LegendDataLabel>
+              <br />
+              <LegendDataValue>
+                <LoaderBox width={20} />
+              </LegendDataValue>
+            </LegendData>
+          </LegendDetails>
+          <LegendDetails>
+            <div>
+              <LegendDot color={theme.colors.grey300} />
+            </div>
+            <LegendData>
+              <LegendDataLabel>
+                <LoaderBox width={60} />
+              </LegendDataLabel>
+              <br />
+              <LegendDataValue>
+                <LoaderBox width={20} />
+              </LegendDataValue>
+            </LegendData>
+          </LegendDetails>
+        </CustomLegendContainer>
+      </LegendLoadingIndicator>
+      <MobileChartLoadingIndicator />
+    </LoadingIndicator>
+  )
+
+  const getLoadingIndicatorForDesktopView = () => (
+    <LoadingIndicator id="reg-rates-line-chart-loader" flexDirection="row">
+      <DesktopChartLoadingIndicator />
+      <LegendLoadingIndicator>
+        <CustomLegendContainer
+          marginLeft={legendMarginLeft}
+          marginTop={legendMarginTop}
+        >
+          <LegendHeader>
+            <LoaderBox width={60} />
+          </LegendHeader>
+          <LegendDetails>
+            <div>
+              <LegendDot color={theme.colors.grey300} />
+            </div>
+            <LegendData>
+              <LoaderBox width={80} />
+              <br />
+              <LoaderBox width={40} />
+            </LegendData>
+          </LegendDetails>
+          <LegendDetails>
+            <div>
+              <LegendDot color={theme.colors.grey300} />
+            </div>
+            <LegendData>
+              <LegendDataLabel>
                 <LoaderBox width={80} />
-                <br />
+              </LegendDataLabel>
+              <br />
+              <LegendDataValue>
                 <LoaderBox width={40} />
-              </LegendData>
-            </LegendDetails>
-            <LegendDetails>
-              <div>
-                <LegendDot color={props.theme.colors.grey300} />
-              </div>
-              <LegendData>
-                <LegendDataLabel>
-                  <LoaderBox width={80} />
-                </LegendDataLabel>
-                <br />
-                <LegendDataValue>
-                  <LoaderBox width={40} />
-                </LegendDataValue>
-              </LegendData>
-            </LegendDetails>
-            <LegendDetails>
-              <div>
-                <LegendDot color={props.theme.colors.grey300} />
-              </div>
-              <LegendData>
-                <LegendDataLabel>
-                  <LoaderBox width={80} />
-                </LegendDataLabel>
-                <br />
-                <LegendDataValue>
-                  <LoaderBox width={40} />
-                </LegendDataValue>
-              </LegendData>
-            </LegendDetails>
-          </CustomLegendContainer>
-        </LegendLoadingIndicator>
-      </LoadingIndicator>
-    )
-  }
+              </LegendDataValue>
+            </LegendData>
+          </LegendDetails>
+          <LegendDetails>
+            <div>
+              <LegendDot color={theme.colors.grey300} />
+            </div>
+            <LegendData>
+              <LegendDataLabel>
+                <LoaderBox width={80} />
+              </LegendDataLabel>
+              <br />
+              <LegendDataValue>
+                <LoaderBox width={40} />
+              </LegendDataValue>
+            </LegendData>
+          </LegendDetails>
+        </CustomLegendContainer>
+      </LegendLoadingIndicator>
+    </LoadingIndicator>
+  )
 
   const getLoadingIndicator = () => {
-    if (window.innerWidth > props.theme.grid.breakpoints.md) {
+    if (window.innerWidth > theme.grid.breakpoints.md) {
       return getLoadingIndicatorForDesktopView()
-    } else {
-      return getLoadingIndicatorForMobileView()
     }
+    return getLoadingIndicatorForMobileView()
   }
 
-  const getChart = (data: ILineDataPoint[]) => {
-    const {
-      chartTop,
-      chartRight,
-      chartBottom,
-      chartLeft,
-      maximizeXAxisInterval,
-      legendLayout
-    } = state
+
+  if (data) {
     return (
       <LineChart
         data={data}
@@ -506,10 +472,8 @@ function RegRatesLineChartComponent(props: IProps) {
     )
   }
 
-  const { data } = props
+  return getLoadingIndicator()
 
-  if (data) return getChart(data)
-  else return getLoadingIndicator()
 }
 
 export const RegRatesLineChart = withTheme(

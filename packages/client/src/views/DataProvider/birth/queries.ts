@@ -11,7 +11,7 @@
 import { gql } from '@apollo/client'
 import { Action, DownloadAction } from '@client/forms'
 
-export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
+const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
   query fetchBirthRegistrationForReview($id: ID!) {
     fetchBirthRegistration(id: $id) {
       _fhirIDMap
@@ -180,7 +180,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         type
         trackingId
         registrationNumber
-        mosipAid
       }
       attendantAtBirth
       weightAtBirth
@@ -474,7 +473,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         }
         trackingId
         registrationNumber
-        mosipAid
       }
       attendantAtBirth
       weightAtBirth
