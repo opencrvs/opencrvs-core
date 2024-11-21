@@ -32,7 +32,7 @@ export const ContextSchema = z.object({
   })
 })
 
-export type Context = z.infer<typeof ContextSchema>
+type Context = z.infer<typeof ContextSchema>
 
 export const t = initTRPC.context<Context>().create({
   transformer: superjson
