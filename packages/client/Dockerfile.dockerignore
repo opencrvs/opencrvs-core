@@ -21,3 +21,4 @@ packages/*
 !packages/components
 !packages/client
 !packages/gateway
+!packages/events
