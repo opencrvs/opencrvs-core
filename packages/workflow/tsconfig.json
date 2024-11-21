@@ -3,10 +3,10 @@
     "baseUrl": "./src",
     "paths": {
       "@test/*": ["../test/*"],
-      "@workflow/*": ["./*"],
+      "@workflow/*": ["./*"]
     },
     "target": "es6",
-    "module": "commonjs",
+    "module": "node16",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node16",

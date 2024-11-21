@@ -8,30 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { server as mswServer } from '@test/setupServer'
-import { rest } from 'msw'
 import {
   setupRegistrationWorkflow,
-  setupLastRegUser,
-  validateDeceasedDetails
+  setupLastRegUser
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
-import {
-  testFhirBundle,
-  mosipSuccessMock,
-  mosipConfigMock,
-  mosipDeceasedPatientMock,
-  mosipBirthPatientBundleMock,
-  mosipUpdatedDeceasedPatientMock
-} from '@workflow/test/utils'
+import { testFhirBundle } from '@workflow/test/utils'
 import { Practitioner, Task } from '@opencrvs/commons/types'
 import { cloneDeep } from 'lodash'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
-import * as fetchAny from 'jest-fetch-mock'
-import { MOSIP_TOKEN_SEEDER_URL } from '@workflow/constants'
-
-const fetch = fetchAny as any
 
 describe('Verify fhir bundle modifier functions', () => {
   describe('SetupRegistrationWorkflow', () => {
@@ -215,57 +199,5 @@ describe('Verify fhir bundle modifier functions', () => {
         }
       }
     })
-  })
-})
-
-describe('validateDeceasedDetails functions', () => {
-  let token: string
-  let authHeader: { Authorization: string }
-  beforeEach(async () => {
-    fetch.resetMocks()
-    token = jwt.sign({ scope: ['register'] }, readFileSync('./test/cert.key'), {
-      algorithm: 'RS256',
-      issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:workflow-user'
-    })
-
-    authHeader = {
-      Authorization: `Bearer ${token}`
-    }
-  })
-  it('Validates deceased details and modifies bundle', async () => {
-    mswServer.use(
-      rest.get('http://localhost:2021/integrationConfig', (_, res, ctx) => {
-        return res(ctx.json(mosipConfigMock))
-      })
-    )
-
-    mswServer.use(
-      rest.post(`${MOSIP_TOKEN_SEEDER_URL}/authtoken/json`, (_, res, ctx) =>
-        res(ctx.json(mosipSuccessMock))
-      )
-    )
-
-    mswServer.use(
-      rest.get('http://localhost:3447/fhir/Patient', (_, res, ctx) =>
-        res(ctx.json(mosipBirthPatientBundleMock))
-      )
-    )
-
-    mswServer.use(
-      rest.put(
-        'http://localhost:3447/fhir/Patient/1c9add9b-9215-49d7-bfaa-226c82ac47d2',
-        (_, res, ctx) => res(ctx.json({}))
-      )
-    )
-
-    const validateResponse = await validateDeceasedDetails(
-      mosipDeceasedPatientMock,
-      authHeader
-    )
-    expect(validateResponse).toEqual(mosipUpdatedDeceasedPatientMock)
-  })
-  afterAll(async () => {
-    jest.clearAllMocks()
   })
 })
