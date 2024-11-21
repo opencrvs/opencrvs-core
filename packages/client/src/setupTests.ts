@@ -280,7 +280,7 @@ vi.mock('./utils', async () => ({
 }))
 
 vi.mock('react-router-dom', async () => ({
-  ...((await vi.importActual('react-router')) as any),
+  ...((await vi.importActual('react-router-dom')) as any),
   useParams: vi.fn().mockImplementation(() => ({
     event: 'birth',
     section: 'child'
