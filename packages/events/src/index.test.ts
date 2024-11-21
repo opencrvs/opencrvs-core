@@ -15,6 +15,7 @@ import {
   getClient,
   resetServer
 } from './storage/__mocks__/mongodb'
+import { ActionType } from '@opencrvs/commons'
 
 const { createCallerFactory } = t
 
@@ -40,7 +41,7 @@ const client = createClient()
 test('event can be created and fetched', async () => {
   const event = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    event: { type: 'birth', fields: [] }
   })
 
   const fetchedEvent = await client.event.get(event.id)
@@ -53,12 +54,12 @@ test('creating an event is an idempotent operation', async () => {
 
   await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    event: { type: 'birth', fields: [] }
   })
 
   await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    event: { type: 'birth', fields: [] }
   })
 
   expect(await db.collection('events').find().toArray()).toHaveLength(1)
@@ -67,12 +68,13 @@ test('creating an event is an idempotent operation', async () => {
 test('stored events can be modified', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    event: { type: 'birth', fields: [] }
   })
 
   const event = await client.event.patch({
     id: originalEvent.id,
-    type: 'death'
+    type: 'death',
+    fields: []
   })
 
   expect(event.updatedAt).not.toBe(originalEvent.updatedAt)
@@ -82,7 +84,7 @@ test('stored events can be modified', async () => {
 test('actions can be added to created events', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    event: { type: 'birth', fields: [] }
   })
 
   const event = await client.event.actions.declare({

@@ -106,13 +106,13 @@ export async function addAction(eventId: string, action: ActionInput) {
   return getEventById(eventId)
 }
 
-export const EventInputWithId = EventInput.extend({
+const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-export async function patchEvent(
-  event: z.infer<typeof EventInputWithId>
-): Promise<Event> {
+type EventInputWithId = z.infer<typeof EventInputWithId>
+
+export async function patchEvent(event: EventInputWithId): Promise<Event> {
   const existingEvent = await getEventById(event.id)
 
   if (!existingEvent) {
@@ -120,8 +120,7 @@ export async function patchEvent(
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventInputWithId>('events')
 
   const now = new Date()
 

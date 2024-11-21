@@ -60,3 +60,10 @@ export const Event = EventInput.extend({
 })
 
 export type Event = z.infer<typeof Event>
+
+/**
+ * Builds a validated configuration for an event
+ * @param config - Event specific configuration
+ */
+export const defineConfig = (config: EventConfig) =>
+  EventConfig.safeParse(config)

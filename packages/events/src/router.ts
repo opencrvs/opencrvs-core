@@ -17,6 +17,7 @@ import {
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
+
 import {
   addAction,
   createEvent,
@@ -24,6 +25,7 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
+import { ActionInput, EventInput } from '@opencrvs/commons'
 
 export const ContextSchema = z.object({
   user: z.object({
