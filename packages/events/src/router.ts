@@ -12,15 +12,15 @@
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
+
 import {
-  ActionInput,
   addAction,
   createEvent,
-  EventInput,
   EventInputWithId,
   getEventById,
   patchEvent
 } from './service/events'
+import { ActionInput, EventInput } from '@opencrvs/commons'
 
 export const t = initTRPC.create({
   transformer: superjson

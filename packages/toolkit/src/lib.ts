@@ -8,14 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './fhir'
-export * from './fhir/transformers/input'
-export * from './record'
-export * from './test-resources'
-export * from './nominal'
-export * from './search'
 
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+export type Noop = () => void
 
-export type GetValues<T extends Record<string, string>> = T[keyof T]
-export type NonEmptyArray<T> = [T, ...T[]]
+export const noop: Noop = () => {}
