@@ -361,6 +361,7 @@ export const resolvers: GQLResolver = {
           "Something went wrong on user-mgnt service. Couldn't change user password"
         )
       }
+      return true
     },
     async changePhone(
       _,
@@ -392,6 +393,7 @@ export const resolvers: GQLResolver = {
           "Something went wrong on user-mgnt service. Couldn't change user phone number"
         )
       }
+      return true
     },
     async changeEmail(
       _,
@@ -423,6 +425,7 @@ export const resolvers: GQLResolver = {
           "Something went wrong on user-mgnt service. Couldn't change user email"
         )
       }
+      return true
     },
     async changeAvatar(_, { userId, avatar }, { headers: authHeader }) {
       try {
@@ -495,6 +498,7 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't audit user ${userId}`
         )
       }
+      return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -519,6 +523,7 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
         )
       }
+      return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -542,6 +547,7 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
         )
       }
+      return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'sysadmin')) {
@@ -565,6 +571,7 @@ export const resolvers: GQLResolver = {
           `Something went wrong on user-mgnt service. Couldn't reset password and send sms to ${userId}`
         )
       }
+      return true
     }
   }
 }
