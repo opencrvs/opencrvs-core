@@ -26,7 +26,7 @@ import {
   patchEvent
 } from './service/events'
 
-export const ContextSchema = z.object({
+const ContextSchema = z.object({
   user: z.object({
     id: z.string()
   })
