@@ -147,7 +147,7 @@ const FetchButton = (props: IFullProps) => {
     setNetworkError(false)
   }
 
-  const performQuery = async (client: any) => {
+  const performQuery = async (client: ApolloClient<any>) => {
     const { query, variables, responseTransformer } = queryData as IQuery
     try {
       setShow(true)
