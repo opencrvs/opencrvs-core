@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export function createServerWithEnvironment(env: any) {
+export function createServerWithEnvironment(env: Record<string, string>) {
   jest.resetModules()
   process.env = { ...process.env, ...env }
   // eslint-disable-next-line @typescript-eslint/no-var-requires

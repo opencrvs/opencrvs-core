@@ -106,3 +106,11 @@ export const responseSchema = Joi.object({
   status: Joi.string(),
   token: Joi.string().optional()
 })
+
+export type AuthenticateResponse = {
+  nonce: string
+  mobile?: string
+  email?: string
+  status: string
+  token?: string
+}
