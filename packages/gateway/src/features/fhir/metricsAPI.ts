@@ -10,14 +10,14 @@
  */
 // eslint-disable-next-line import/no-relative-parent-imports
 import { METRICS_URL } from '@gateway/constants'
-import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
 }
 
-export default class MetricsAPI extends OpenCRVSRestDataSource {
+export default class MetricsAPI extends OpenCRVSRESTDataSource {
   override baseURL = `${METRICS_URL}`
 
   getTimeLogged(recordId: string) {

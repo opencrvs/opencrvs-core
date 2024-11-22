@@ -11,9 +11,9 @@
 // eslint-disable-next-line import/no-relative-parent-imports
 import { AugmentedRequest } from '@apollo/datasource-rest'
 import { DOCUMENTS_URL } from '@gateway/constants'
-import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
-export default class MinioAPI extends OpenCRVSRestDataSource {
+export default class MinioAPI extends OpenCRVSRESTDataSource {
   override baseURL = `${DOCUMENTS_URL}/presigned-url`
 
   override willSendRequest(

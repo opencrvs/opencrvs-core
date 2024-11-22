@@ -11,11 +11,11 @@
 
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { ContextValue } from '@gateway/graphql/context'
-import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 import { AuthenticationError } from '@gateway/utils/graphql-errors'
 import { IUserModelData } from './type-resolvers'
 
-export class UsersAPI extends OpenCRVSRestDataSource {
+export class UsersAPI extends OpenCRVSRESTDataSource {
   override baseURL = USER_MANAGEMENT_URL
   private memoizedResults: Map<string, IUserModelData>
 

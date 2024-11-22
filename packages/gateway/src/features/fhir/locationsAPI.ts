@@ -11,7 +11,7 @@
 // eslint-disable-next-line import/no-relative-parent-imports
 import { AugmentedRequest } from '@apollo/datasource-rest'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
-import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 import { UUID } from '@opencrvs/commons'
 import {
   Location,
@@ -19,7 +19,7 @@ import {
   findResourceFromBundleById
 } from '@opencrvs/commons/types'
 
-export default class LocationsAPI extends OpenCRVSRestDataSource {
+export default class LocationsAPI extends OpenCRVSRESTDataSource {
   override baseURL = APPLICATION_CONFIG_URL
 
   override willSendRequest(

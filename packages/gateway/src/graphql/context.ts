@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable import/no-relative-parent-imports */
-import PatientAPI from '../features/fhir/patientAPI'
+
 import { getAuthHeader, IAuthHeader } from '@opencrvs/commons'
 import LocationsAPI from '../features/fhir/locationsAPI'
 import PaymentsAPI from '../features/fhir/paymentsAPI'
@@ -31,7 +31,6 @@ export interface Context {
     usersAPI: UsersAPI
     paymentsAPI: PaymentsAPI
     fhirAPI: FHIRAPI
-    patientAPI: PatientAPI
     minioAPI: MinioAPI
     metricsAPI: MetricsAPI
   }
@@ -45,7 +44,6 @@ function getDataSources(contextValue: ContextValue): Context['dataSources'] {
     locationsAPI: new LocationsAPI({ contextValue }),
     usersAPI: new UsersAPI({ contextValue }),
     fhirAPI: new FHIRAPI({ contextValue }),
-    patientAPI: new PatientAPI({ contextValue }),
     minioAPI: new MinioAPI({ contextValue }),
     metricsAPI: new MetricsAPI({ contextValue })
   }
@@ -59,7 +57,6 @@ export class ContextValue {
     usersAPI: UsersAPI
     paymentsAPI: PaymentsAPI
     fhirAPI: FHIRAPI
-    patientAPI: PatientAPI
     minioAPI: MinioAPI
     metricsAPI: MetricsAPI
   }

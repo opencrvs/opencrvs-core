@@ -27,7 +27,9 @@ export const PORT = env.PORT
 export const HOSTNAME = env.DOMAIN
 export const LOGIN_URL = env.LOGIN_URL
 export const CLIENT_APP_URL = env.CLIENT_APP_URL
-export const FHIR_URL = env.FHIR_URL
+export const FHIR_URL = env.FHIR_URL.endsWith('/')
+  ? env.FHIR_URL
+  : env.FHIR_URL + '/'
 export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
 export const SEARCH_URL = env.SEARCH_URL
 export const METRICS_URL = env.METRICS_URL

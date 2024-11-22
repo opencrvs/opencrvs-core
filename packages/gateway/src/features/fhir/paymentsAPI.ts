@@ -12,13 +12,10 @@
 // eslint-disable-next-line import/no-relative-parent-imports
 import { AugmentedRequest } from '@apollo/datasource-rest'
 import { FHIR_URL } from '@gateway/constants'
-import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 import { PaymentReconciliation } from '@opencrvs/commons/types'
 
-import { parse } from 'url'
-
-const fhirPath = parse(FHIR_URL).path || ''
-export default class PaymentsAPI extends OpenCRVSRestDataSource {
+export default class PaymentsAPI extends OpenCRVSRESTDataSource {
   override baseURL = FHIR_URL
 
   override willSendRequest(
@@ -30,6 +27,6 @@ export default class PaymentsAPI extends OpenCRVSRestDataSource {
   }
 
   getPayment(id: string): Promise<PaymentReconciliation> {
-    return this.get(`${fhirPath}/PaymentReconciliation/${id}`)
+    return this.get(`/PaymentReconciliation/${id}`)
   }
 }

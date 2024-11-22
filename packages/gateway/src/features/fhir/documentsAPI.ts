@@ -14,11 +14,9 @@ import { FHIR_URL } from '@gateway/constants'
 import { Bundle, BundleEntry, DocumentReference } from '@opencrvs/commons/types'
 
 import { AugmentedRequest } from '@apollo/datasource-rest'
-import { OpenCRVSRestDataSource } from '@gateway/graphql/data-source'
-import { parse } from 'url'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
-const fhirPath = parse(FHIR_URL).path || ''
-export default class DocumentsAPI extends OpenCRVSRestDataSource {
+export default class DocumentsAPI extends OpenCRVSRESTDataSource {
   override baseURL = FHIR_URL
 
   override willSendRequest(
@@ -30,11 +28,11 @@ export default class DocumentsAPI extends OpenCRVSRestDataSource {
   }
 
   getDocument(id: string) {
-    return this.get(`${fhirPath}/DocumentReference//${id}`)
+    return this.get(`/DocumentReference/${id}`)
   }
   async findBySubject(reference: `${string}/${string}`) {
     const bundle: Bundle = await this.get(
-      `${fhirPath}/DocumentReference/?subject=${reference}`
+      `/DocumentReference/?subject=${reference}`
     )
     if (!bundle.entry) {
       return []
