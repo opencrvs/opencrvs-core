@@ -100,7 +100,13 @@ export const rateLimitedRoute =
     if (pathForKey) pathOptionsForKey = [pathForKey]
 
     const route = args[1].request.path
-    const payload = JSON.parse(args[0].payload.toString())
+
+    let payload: any
+    if (args[0].route.settings.payload?.parse) {
+      payload = args[0].payload
+    } else {
+      payload = JSON.parse(args[0].payload.toString())
+    }
 
     const key = pathOptionsForKey!.find(
       (path) => get(payload, path) !== undefined

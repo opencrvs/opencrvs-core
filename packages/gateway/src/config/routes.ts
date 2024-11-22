@@ -15,7 +15,7 @@ import {
   validationFailedAction
 } from '@gateway/features/eventNotification/eventNotificationHandler'
 import { ServerRoute } from '@hapi/hapi'
-import { authProxy, catchAllProxy, rateLimitedAuthProxy } from './proxies'
+import { catchAllProxy, rateLimitedAuthProxy } from './proxies'
 import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
@@ -44,6 +44,22 @@ import verifyUserHandler, {
   requestSchema as reqVerifyUserSchema,
   responseSchema as resVerifyUserSchema
 } from '@gateway/routes/verifyUser/handler'
+import verifyNumberHandler, {
+  requestSchema as reqVerifyNumberSchema,
+  responseSchema as resVerifyNumberSchema
+} from '@gateway/routes/verifyNumber/handler'
+import verifySecurityQuestionHandler, {
+  verifySecurityQuestionSchema,
+  verifySecurityQuestionResSchema
+} from '@gateway/routes/verifySecurityAnswer/handler'
+import changePasswordHandler, {
+  reqChangePasswordSchema
+} from '@gateway/routes/changePassword/handler'
+import sendUserNameHandler, {
+  requestSchema as reqSendUserNameSchema
+} from '@gateway/routes/sendUserName/handler'
+import tokenHandler from '@gateway/routes/token/handler'
+import { rateLimitedRoute } from '@gateway/rate-limit'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -100,7 +116,6 @@ export const getRoutes = () => {
         }
       }
     },
-    // Check where this API has been used
     {
       method: 'GET',
       path: '/auth/.well-known',
@@ -109,11 +124,13 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-    // DONE
     {
       method: 'POST',
       path: '/auth/authenticate',
-      handler: authenticateHandler,
+      handler: rateLimitedRoute(
+        { requestsPerMinute: 10, pathForKey: 'username' },
+        authenticateHandler
+      ),
       options: {
         tags: ['api'],
         description: 'Authenticate with username and password',
@@ -133,7 +150,6 @@ export const getRoutes = () => {
         }
       }
     },
-    // /resendAuthenticationCode Need to call from UI (need to check from where UI it is called)
     {
       method: 'POST',
       path: '/auth/resendAuthenticationCode',
@@ -151,7 +167,6 @@ export const getRoutes = () => {
         }
       }
     },
-    // /verifyCode Need to be called from UI
     {
       method: 'POST',
       path: '/auth/verifyCode',
@@ -170,7 +185,6 @@ export const getRoutes = () => {
         }
       }
     },
-    // Need to check from where this API should be called in the UI
     {
       method: 'POST',
       path: '/auth/refreshToken',
@@ -188,7 +202,6 @@ export const getRoutes = () => {
         }
       }
     },
-    // DONE
     {
       method: 'POST',
       path: '/auth/invalidateToken',
@@ -211,8 +224,11 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/verifyUser',
-      handler: verifyUserHandler,
+      path: '/auth/verifyUser',
+      handler: rateLimitedRoute(
+        { requestsPerMinute: 10, pathOptionsForKey: ['mobile', 'email'] },
+        verifyUserHandler
+      ),
       options: {
         tags: ['api'],
         description:
@@ -230,6 +246,99 @@ export const getRoutes = () => {
         }
       }
     },
+    {
+      method: 'POST',
+      path: '/auth/verifyNumber',
+      handler: verifyNumberHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Second step of password or username retrieval steps.' +
+          'Check if provided verification code is valid or not.',
+        notes:
+          'Verifies code for given nonce and returns a random security question for that user.',
+        validate: {
+          payload: reqVerifyNumberSchema
+        },
+        response: {
+          schema: resVerifyNumberSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/verifySecurityAnswer',
+      handler: verifySecurityQuestionHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Third step of password or username retrieval steps.' +
+          'Checks if the submitted security question answer is right',
+        notes:
+          'Verifies security answer and updates the nonce information so that it can be used for changing the password' +
+          'In-case of a wrong answer, it will return an another question key.',
+        validate: {
+          payload: verifySecurityQuestionSchema
+        },
+        response: {
+          schema: verifySecurityQuestionResSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/changePassword',
+      handler: changePasswordHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Final step of password retrieval flow.' +
+          'Changes the user password',
+        notes:
+          'Expects the nonce parameter to be coming from the reset password journey',
+        validate: {
+          payload: reqChangePasswordSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/sendUserName',
+      handler: sendUserNameHandler,
+      options: {
+        tags: ['api'],
+        auth: false,
+        description:
+          'Final step of username retrieval flow.' +
+          'Sends the username to user mobile number',
+        notes:
+          'Expects the nonce parameter to be coming from the retrieve username journey',
+        validate: {
+          payload: reqSendUserNameSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/auth/token',
+      handler: tokenHandler,
+      options: {
+        auth: false,
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
 
     catchAllProxy.locations,
     catchAllProxy.locationsSuffix,
@@ -238,9 +347,7 @@ export const getRoutes = () => {
     catchAllProxy.locationId,
 
     catchAllProxy.auth,
-    authProxy.token,
-    rateLimitedAuthProxy.authenticateSuperUser,
-    rateLimitedAuthProxy.verifyUser
+    rateLimitedAuthProxy.authenticateSuperUser
   ]
 
   return routes

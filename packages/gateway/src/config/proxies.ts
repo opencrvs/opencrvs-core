@@ -98,24 +98,6 @@ export const catchAllProxy = {
   }
 } satisfies Record<string, ServerRoute>
 
-export const authProxy = {
-  token: {
-    method: 'POST',
-    path: '/auth/token',
-    handler: (req, h) =>
-      h.proxy({
-        uri: AUTH_URL + `/token${req.url.search}`
-      }),
-    options: {
-      auth: false,
-      payload: {
-        output: 'data',
-        parse: false
-      }
-    }
-  }
-} satisfies Record<string, ServerRoute>
-
 export const rateLimitedAuthProxy = {
   authenticateSuperUser: {
     method: 'POST',
@@ -125,24 +107,6 @@ export const rateLimitedAuthProxy = {
       (_, h) =>
         h.proxy({
           uri: AUTH_URL + '/authenticate-super-user'
-        })
-    ),
-    options: {
-      auth: false,
-      payload: {
-        output: 'data',
-        parse: false
-      }
-    }
-  },
-  verifyUser: {
-    method: 'POST',
-    path: '/auth/verifyUser',
-    handler: rateLimitedRoute(
-      { requestsPerMinute: 10, pathOptionsForKey: ['mobile', 'email'] },
-      (_, h) =>
-        h.proxy({
-          uri: AUTH_URL + '/verifyUser'
         })
     ),
     options: {
