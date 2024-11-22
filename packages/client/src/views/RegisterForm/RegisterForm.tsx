@@ -17,7 +17,7 @@ import {
   useIntl
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {

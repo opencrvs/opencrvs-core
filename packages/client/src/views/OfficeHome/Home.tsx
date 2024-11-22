@@ -12,7 +12,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 import { getDefaultPerformanceLocationId } from '@client/navigation'
 import { UserDetails } from '@client/utils/userUtils'
 import {

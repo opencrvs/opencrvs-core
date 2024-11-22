@@ -32,7 +32,7 @@ import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import {
   IPerformanceSelectOption,
   PerformanceSelect
