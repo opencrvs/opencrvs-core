@@ -63,3 +63,6 @@ export const isArchivable = (status?: SUBMISSION_STATUS) =>
 
 export const isArchived = (status?: SUBMISSION_STATUS) =>
   status === SUBMISSION_STATUS.ARCHIVED
+
+export const isViewAble = (status: SUBMISSION_STATUS | undefined) =>
+  status !== SUBMISSION_STATUS.DRAFT
