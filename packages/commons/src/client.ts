@@ -8,17 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, ReactNode } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+export * from './search'
 
-type ScrollToTopProps = RouteComponentProps & { children?: ReactNode }
-
-const ScrollToTop = ({ children, location }: ScrollToTopProps) => {
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [location])
-
-  return <>{children}</>
-}
-
-export default withRouter(ScrollToTop)
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
