@@ -28,7 +28,7 @@ import { Event } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
 const mockSvgTemplate = '<svg><text>Sample Certificate</text></svg>'
 const birthDeclaration = {

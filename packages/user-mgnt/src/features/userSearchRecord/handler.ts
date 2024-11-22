@@ -12,8 +12,8 @@ import { logger } from '@opencrvs/commons'
 import User, { IUserModel, Event } from '@user-mgnt/model/user'
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import * as uuid from 'uuid/v4'
+import Joi from 'joi'
+import uuid from 'uuid/v4'
 
 enum RegStatus {
   IN_PROGRESS = 'IN_PROGRESS',

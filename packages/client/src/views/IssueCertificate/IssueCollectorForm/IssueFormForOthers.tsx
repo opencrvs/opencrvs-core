@@ -31,7 +31,7 @@ import {
   collectMarriageCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Event } from '@client/utils/gateway'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'

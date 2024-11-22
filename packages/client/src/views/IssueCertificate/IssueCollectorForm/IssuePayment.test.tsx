@@ -25,7 +25,7 @@ import * as React from 'react'
 import { Mock, vi } from 'vitest'
 import { IssuePayment } from './IssuePayment'
 import { storeDeclaration } from '@client/declarations'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
 const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)

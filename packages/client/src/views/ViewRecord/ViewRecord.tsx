@@ -17,7 +17,7 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'

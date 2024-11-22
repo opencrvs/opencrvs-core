@@ -271,8 +271,8 @@ vi.mock('./utils', async () => ({
   getUserRole: vi.fn().mockImplementation((lang, role) => 'ENTREPENEUR')
 }))
 
-vi.mock('react-router', async () => ({
-  ...((await vi.importActual('react-router')) as any),
+vi.mock('react-router-dom', async () => ({
+  ...((await vi.importActual('react-router-dom')) as any),
   useParams: vi.fn().mockImplementation(() => ({
     event: 'birth',
     section: 'child'
