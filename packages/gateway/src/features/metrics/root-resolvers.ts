@@ -62,9 +62,7 @@ export const resolvers: GQLResolver = {
     },
     async getVSExports(_, variables, { headers: authHeader }) {
       let results
-      if (
-        inScope(authHeader, [SCOPES.CONFIG_UPDATE_ALL, SCOPES.PERFORMANCE_READ])
-      ) {
+      if (inScope(authHeader, [SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS])) {
         results = await getMetrics('/fetchVSExport', variables, authHeader)
         return {
           results
