@@ -40,7 +40,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
@@ -61,6 +61,7 @@ import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
+import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -456,11 +457,12 @@ class OfficeHomeView extends React.Component<
         )}
 
         <FABContainer>
-          <FloatingActionButton
-            id="new_event_declaration"
-            onClick={this.props.goToEvents}
-            icon={() => <PlusTransparentWhite />}
-          />
+          <Link to={SELECT_VITAL_EVENT}>
+            <FloatingActionButton
+              id="new_event_declaration"
+              icon={() => <PlusTransparentWhite />}
+            />
+          </Link>
         </FABContainer>
 
         {this.state.showCertificateToast && (

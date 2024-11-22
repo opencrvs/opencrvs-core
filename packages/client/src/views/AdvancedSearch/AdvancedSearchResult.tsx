@@ -43,7 +43,7 @@ import { messages as advancedSearchResultMessages } from '@client/i18n/messages/
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router-dom'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {

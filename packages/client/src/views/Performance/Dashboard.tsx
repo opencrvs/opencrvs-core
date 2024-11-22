@@ -20,7 +20,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import styled from 'styled-components'
 import IframeResizer from 'iframe-resizer-react'
 import { messages } from '@client/i18n/messages/views/dashboard'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import { constantsMessages } from '@client/i18n/messages'
 
 const StyledIFrame = styled(IframeResizer)`
