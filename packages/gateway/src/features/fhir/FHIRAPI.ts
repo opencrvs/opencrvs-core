@@ -22,7 +22,6 @@ import {
 
 import { FHIR_URL } from '@gateway/constants'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
-console.log({ FHIR_URL })
 
 export default class FHIRAPI extends OpenCRVSRESTDataSource {
   override baseURL = FHIR_URL

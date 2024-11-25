@@ -17,7 +17,7 @@ import { IUserModelData } from './type-resolvers'
 
 export class UsersAPI extends OpenCRVSRESTDataSource {
   override baseURL = USER_MANAGEMENT_URL
-  private memoizedResults: Map<string, IUserModelData>
+  private memoizedResults: Map<string, Promise<IUserModelData>>
 
   constructor(options: { contextValue: ContextValue }) {
     super(options)
@@ -34,11 +34,11 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
     }
 
     try {
-      const response = await this.post('getUser', { body: { email } })
+      const response = this.post('getUser', { body: { email } })
 
       this.memoizedResults.set(cacheKey, response)
 
-      return response
+      return await response
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this email
       if (e instanceof AuthenticationError) return null
@@ -56,11 +56,11 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
     }
 
     try {
-      const response = await this.post('getUser', { body: { mobile } })
+      const response = this.post('getUser', { body: { mobile } })
 
       this.memoizedResults.set(cacheKey, response)
 
-      return response
+      return await response
     } catch (e) {
       // Don't need to throw errors if unauthorized error is found for no user with this mobile
       if (e instanceof AuthenticationError) return null
@@ -76,7 +76,7 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
       return cachedResponse
     }
 
-    const response = await this.post('getUser', { body: { userId: id } })
+    const response = this.post('getUser', { body: { userId: id } })
 
     this.memoizedResults.set(cacheKey, response)
 
@@ -91,7 +91,7 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
     if (cachedResponse) {
       return cachedResponse
     }
-    const response = await this.post('getUser', {
+    const response = this.post('getUser', {
       body: { practitionerId: id }
     })
 
