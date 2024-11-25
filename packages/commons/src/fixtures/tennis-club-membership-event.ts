@@ -8,10 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
-import { EventConfig } from '../events/EventConfig'
+import { defineEvent } from '@opencrvs/commons'
 
-export const tennisClubMembershipEvent = {
+export const tennisClubMembershipEvent = defineEvent({
   id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {
     defaultMessage: 'Tennis club membership application',
@@ -121,4 +120,4 @@ export const tennisClubMembershipEvent = {
       ]
     }
   ]
-} satisfies z.infer<typeof EventConfig>
+})
