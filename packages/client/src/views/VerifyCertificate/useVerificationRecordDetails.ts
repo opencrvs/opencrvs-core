@@ -11,7 +11,7 @@
 
 import { gql, useQuery } from '@apollo/client'
 import { FetchRecordDetailsForVerificationQuery } from '@client/utils/gateway'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
 const FETCH_RECORD_DETAILS_FOR_VERIFICATION = gql`
   query fetchRecordDetailsForVerification($id: String!) {
