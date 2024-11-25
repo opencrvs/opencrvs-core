@@ -16,3 +16,6 @@ export * from './nominal'
 export * from './search'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+export type GetValues<T extends Record<string, string>> = T[keyof T]
+export type NonEmptyArray<T> = [T, ...T[]]

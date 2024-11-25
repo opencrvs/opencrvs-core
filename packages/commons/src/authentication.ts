@@ -113,3 +113,8 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   }
   return decoded
 }
+
+export const getUserId = (token: string): string => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  return tokenPayload.sub
+}
