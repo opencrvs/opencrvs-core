@@ -165,7 +165,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
   ) {
     transformedStoreState.registrationStatuses =
       localState.registrationStatuses === RegStatus.Registered
-        ? [RegStatus.Registered, RegStatus.Issued]
+        ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
         ? [RegStatus.WaitingValidation, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
@@ -318,7 +318,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
         ? 'IN_REVIEW'
         : isEqual(
             [...reduxState.registrationStatuses].sort(),
-            [RegStatus.Registered, RegStatus.Issued].sort()
+            [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued].sort()
           )
         ? 'REGISTERED'
         : 'ALL'
@@ -609,7 +609,7 @@ const getLabelForRegistrationStatus = (
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
     DECLARED: [RegStatus.Declared],
     IN_PROGRESS: [RegStatus.InProgress],
-    REGISTERED: [RegStatus.Registered, RegStatus.Issued],
+    REGISTERED: [RegStatus.Registered, RegStatus.Issued, RegStatus.Certified],
     REJECTED: [RegStatus.Rejected],
     VALIDATED: [RegStatus.Validated],
     WAITING_VALIDATION: [RegStatus.WaitingValidation],
