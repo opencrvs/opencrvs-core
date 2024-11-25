@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineEvent } from '@opencrvs/commons'
+import { defineEvent } from '../events'
 
 export const tennisClubMembershipEvent = defineEvent({
   id: 'TENNIS_CLUB_MEMBERSHIP',
@@ -28,11 +28,19 @@ export const tennisClubMembershipEvent = defineEvent({
       },
       forms: [
         {
-          id: '1.0.0',
           label: {
-            defaultMessage: 'Version 1',
-            description: 'This is the first version of the form',
-            id: 'event.tennis-club-membership.action.declare.form.version.1'
+            id: 'event.tennis-club-membership.action.declare.form.label',
+            defaultMessage: 'Tennis club membership application',
+            description: 'This is what this form is referred as in the system'
+          },
+          active: true,
+          version: {
+            id: '1.0.0',
+            label: {
+              id: 'event.tennis-club-membership.action.declare.form.version.1',
+              defaultMessage: 'Version 1',
+              description: 'This is the first version of the form'
+            }
           },
           pages: [
             {

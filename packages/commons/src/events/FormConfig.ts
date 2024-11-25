@@ -9,21 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Field } from './FieldConfig'
-import { Translation } from './TranslationConfig'
+import { FieldConfig } from './FieldConfig'
+import { TranslationConfig } from './TranslationConfig'
 
-export const Form = z.object({
-  id: z
-    .string()
-    .describe('Form version. Semantic versioning recommended. Example: 0.0.1'),
-  label: Translation.describe('Human readable description of the form'),
+export const FormConfig = z.object({
+  label: TranslationConfig.describe('Human readable description of the form'),
+  version: z.object({
+    id: z
+      .string()
+      .describe(
+        'Form version. Semantic versioning recommended. Example: 0.0.1'
+      ),
+    label: TranslationConfig.describe(
+      'Human readable description of the version'
+    )
+  }),
+  active: z.boolean().default(false).describe('Whether the form is active'),
   pages: z.array(
     z.object({
       id: z.string().describe('Unique identifier for the page'),
-      title: Translation.describe('Header title of the page'),
-      fields: z.array(Field).describe('Fields to be rendered on the page')
+      title: TranslationConfig.describe('Header title of the page'),
+      fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
     })
   )
 })
 
-export type Form = z.infer<typeof Form>
+export type FormConfig = z.infer<typeof FormConfig>

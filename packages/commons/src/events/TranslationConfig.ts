@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 
-export const Translation = z.object({
+export const TranslationConfig = z.object({
   id: z
     .string()
     .describe(

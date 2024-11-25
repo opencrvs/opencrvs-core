@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Form } from './FormConfig'
-import { Translation } from './TranslationConfig'
+import { FormConfig } from './FormConfig'
+import { TranslationConfig } from './TranslationConfig'
 
 export const ActionConfigBase = z.object({
-  label: Translation,
-  forms: z.array(Form)
+  label: TranslationConfig,
+  forms: z.array(FormConfig)
 })
 
 /**

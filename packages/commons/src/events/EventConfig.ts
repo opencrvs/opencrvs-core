@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
-import { Translation } from './TranslationConfig'
+import { TranslationConfig } from './TranslationConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -23,7 +23,7 @@ export const EventConfig = z.object({
     .describe(
       'A machine-readable identifier for the event, e.g. "birth" or "death"'
     ),
-  label: Translation,
+  label: TranslationConfig,
   actions: z.array(ActionConfig)
 })
 

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export const tennisClubMembershipEvent = {
-  id: 'tennis-club-membership',
+  id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -26,14 +26,23 @@ export const tennisClubMembershipEvent = {
       },
       forms: [
         {
-          id: '1.0.0',
           label: {
-            defaultMessage: 'Version 1',
-            description: 'This is the first version of the form',
-            id: 'event.tennis-club-membership.action.declare.form.version.1'
+            id: 'event.tennis-club-membership.action.declare.form.label',
+            defaultMessage: 'Tennis club membership application',
+            description: 'This is what this form is referred as in the system'
+          },
+          active: true,
+          version: {
+            id: '1.0.0',
+            label: {
+              id: 'event.tennis-club-membership.action.declare.form.version.1',
+              defaultMessage: 'Version 1',
+              description: 'This is the first version of the form'
+            }
           },
           pages: [
             {
+              id: 'applicant',
               title: {
                 id: 'event.tennis-club-membership.action.declare.form.section.who.title',
                 defaultMessage: 'Who is applying for the membership?',
@@ -73,6 +82,7 @@ export const tennisClubMembershipEvent = {
               ]
             },
             {
+              id: 'recommender',
               title: {
                 id: 'event.tennis-club-membership.action.declare.form.section.recommender.title',
                 defaultMessage: 'Who is recommending the applicant?',
