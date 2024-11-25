@@ -45,6 +45,9 @@ jobs:
           export VERSION=`git log -1 --pretty=format:%h`
           echo "Pushing version $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          echo "Triggered by event: ${{ github.event_name }}"
+
           if [ "${{ github.event_name }}" == 'push' ]; then
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           else
