@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Translation } from './Translation'
+import { Translation } from './TranslationConfig'
 
 const BaseField = z.object({
   id: z.string(),

@@ -10,27 +10,18 @@
  */
 
 import { getClient } from '@events/storage/mongodb'
-import {
-  getUUID,
-  EventInput,
-  Event,
-  ActionInput,
-  ActionType
-} from '@opencrvs/commons'
+import { getUUID, ActionType } from '@opencrvs/commons'
+import { EventInput, ActionInput } from '@events/schema'
 import { z } from 'zod'
+import { EventDocument } from '@events/schema/EventDocument'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-const EventWithTransactionId = Event.extend({
-  transactionId: z.string()
-})
-
 async function getEventByTransactionId(transactionId: string) {
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventInput>('events')
 
   const document = await collection.findOne({ transactionId })
 
@@ -56,15 +47,15 @@ export async function getEventById(id: string) {
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
   transactionId: string
-): Promise<Event> {
+) {
   const existingEvent = await getEventByTransactionId(transactionId)
+
   if (existingEvent) {
     return existingEvent
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const now = new Date()
   const id = getUUID()
@@ -122,8 +113,7 @@ export async function patchEvent(
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventInput>('events')
 
   const now = new Date()
 

@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Form } from './Form'
-import { Translation } from './Translation'
+import { Form } from './FormConfig'
+import { Translation } from './TranslationConfig'
 
-export const ActionBase = z.object({
+export const ActionConfigBase = z.object({
   label: Translation,
   forms: z.array(Form)
 })
@@ -32,23 +32,26 @@ export const ActionType = {
   DECLARE: 'DECLARE'
 } as const
 
-const Create = ActionBase.merge(
+const CreateConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE)
   })
 )
 
-const Declare = ActionBase.merge(
+const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE)
   })
 )
 
-const Register = ActionBase.merge(
+const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER)
   })
 )
 
-export const Action = z.discriminatedUnion('type', [Create, Declare, Register])
-export type ActionType = z.infer<typeof Action>['type']
+export const ActionConfig = z.discriminatedUnion('type', [
+  CreateConfig,
+  DeclareConfig,
+  RegisterConfig
+])

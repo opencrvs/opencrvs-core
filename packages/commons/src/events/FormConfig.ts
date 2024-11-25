@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Field } from './Field'
-import { Translation } from './Translation'
+import { Field } from './FieldConfig'
+import { Translation } from './TranslationConfig'
 
 export const Form = z.object({
   id: z

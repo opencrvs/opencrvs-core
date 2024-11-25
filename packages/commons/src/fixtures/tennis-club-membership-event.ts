@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Event } from '../events/Event'
+import { EventConfig } from '../events/EventConfig'
 
 export const tennisClubMembershipEvent = {
   id: 'TENNIS_CLUB_MEMBERSHIP',
@@ -121,4 +121,4 @@ export const tennisClubMembershipEvent = {
       ]
     }
   ]
-} satisfies z.infer<typeof Event>
+} satisfies z.infer<typeof EventConfig>

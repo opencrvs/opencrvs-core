@@ -20,7 +20,7 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
-import { ActionInput, EventInput } from '@opencrvs/commons'
+import { ActionInput, EventInput } from '@events/schema'
 
 export const t = initTRPC.create({
   transformer: superjson

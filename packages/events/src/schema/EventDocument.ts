@@ -8,7 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './ActionConfig'
-export * from './EventConfig'
-export * from './FieldConfig'
-export * from './FormConfig'
+
+import { z } from 'zod'
+import { ActionDocument } from './ActionDocument'
+
+export const EventDocument = z.object({
+  id: z.string(),
+  transactionId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  actions: z.array(ActionDocument)
+})
+
+export type EventDocument = z.infer<typeof EventDocument>
