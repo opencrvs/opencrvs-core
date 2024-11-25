@@ -29,4 +29,8 @@ export const EventConfig = z.object({
 
 export type EventConfig = z.infer<typeof EventConfig>
 
-export const defineEvent = (config: EventConfig) => EventConfig.parse(config)
+/**
+ * Builds a validated configuration for an event
+ * @param config - Event specific configuration
+ */
+export const defineConfig = (config: EventConfig) => EventConfig.parse(config)

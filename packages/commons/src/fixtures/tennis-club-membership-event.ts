@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineEvent } from '../events'
+import { defineConfig } from '../events'
 
-export const tennisClubMembershipEvent = defineEvent({
+export const tennisClubMembershipEvent = defineConfig({
   id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {
     defaultMessage: 'Tennis club membership application',
