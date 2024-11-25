@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useHistory } from 'react-router-dom'
+import { useLocation, useNavigate, useNavigation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -32,20 +32,22 @@ export function HistoryNavigator({
 }: {
   hideForward?: boolean
 }) {
-  const history = useHistory()
   const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
   const role = userDetails && userDetails.systemRole
-  const location = history.location.pathname
+  const location = useLocation()
+  const pathname = location.pathname
+  const navigation = useNavigation()
+
   const isLandingPage = () => {
     if (
-      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(pathname)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
+        PERFORMANCE_HOME.includes(pathname)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
+        PERFORMANCE_HOME.includes(pathname)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
-        REGISTRAR_HOME.includes(location))
+        REGISTRAR_HOME.includes(pathname))
     ) {
       return true
     } else {
@@ -58,10 +60,10 @@ export function HistoryNavigator({
         id="header-go-back-button"
         type="icon"
         size="medium"
-        disabled={
-          (history.action === 'POP' || history.action === 'REPLACE') &&
-          isLandingPage()
-        }
+        // disabled={
+        //   (history.action === 'POP' || history.action === 'REPLACE') &&
+        //   isLandingPage()
+        // }
         onClick={() => dispatch(goBack())}
       >
         <Icon name="ArrowLeft" />
@@ -70,7 +72,7 @@ export function HistoryNavigator({
         <Button
           type="icon"
           size="medium"
-          disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
+          // disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
           onClick={() => dispatch(goForward())}
         >
           <Icon name="ArrowRight" />

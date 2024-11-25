@@ -31,7 +31,8 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps } from '@client/components/WithRouter'
 import {
   CERTIFICATE_CORRECTION_REVIEW,
   REGISTRAR_HOME_TAB
@@ -204,11 +205,25 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const { corrector } = this.props.match.params
+    const { corrector } = this.props.router.params
+
+    if (!corrector) {
+      console.error('corrector missing from URL')
+
+      // @TODO: Check right redirect
+      return (
+        <Navigate
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyForReview,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     const { intl, declaration } = this.props
     if (!declaration) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyForReview,
             selectorId: ''
@@ -260,7 +275,7 @@ const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { declarationId } = ownProps.match.params
+  const { declarationId } = ownProps.router.match.params
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === declarationId
@@ -275,7 +290,12 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCorrector = connect(mapStateToProps, {
+export const VerifyCorrector = connect<
+  IStateProps,
+  IDispatchProps,
+  any,
+  IStoreState
+>(mapStateToProps, {
   goBack,
   modifyDeclaration,
   writeDeclaration,

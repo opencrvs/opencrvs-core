@@ -65,7 +65,8 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps } from '@client/components/WithRouter'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
@@ -190,7 +191,7 @@ type BaseProps = {
 
 type IProps = BaseProps &
   IntlShapeProps &
-  RouteComponentProps &
+  RouteComponentProps<any> &
   IOnlineStatusProps
 
 interface IStatusProps {
@@ -248,7 +249,9 @@ function UserListComponent(props: IProps) {
     offlineOffices,
     isOnline,
     offlineCountryConfig,
-    location: { search }
+    router: {
+      location: { search }
+    }
   } = props
   const isNatlSysAdmin = userDetails?.systemRole
     ? NATL_ADMIN_ROLES.includes(userDetails.systemRole)
@@ -827,7 +830,7 @@ function UserListComponent(props: IProps) {
    * it can happen that it gets removed as part of the login redirect mechanism causing the user to land on /team/users without a search parameter
    */
   if (!locationId) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
 
   return (

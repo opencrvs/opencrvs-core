@@ -28,7 +28,9 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+
 import { withTheme } from 'styled-components'
 import {
   calculatePrice,
@@ -45,19 +47,26 @@ import { UserDetails } from '@client/utils/userUtils'
 
 interface IProps {
   event: Event
-  registrationId: string
+  registrationId?: string
   language: string
   declaration: IPrintableDeclaration
   theme: ITheme
-  modifyDeclaration: typeof modifyDeclaration
-  goToReviewCertificate: typeof goToReviewCertificateAction
-  goBack: typeof goBackAction
-  goToHomeTab: typeof goToHomeTab
+  // modifyDeclaration: typeof modifyDeclaration
+  // goToReviewCertificate: typeof goToReviewCertificateAction
+  // goBack: typeof goBackAction
+  // goToHomeTab: typeof goToHomeTab
   userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
 
-type IFullProps = IProps & IntlShapeProps
+interface IDispatchProps {
+  modifyDeclaration: typeof modifyDeclaration
+  goToReviewCertificate: typeof goToReviewCertificateAction
+  goBack: typeof goBackAction
+  goToHomeTab: typeof goToHomeTab
+}
+
+type IFullProps = IProps & IntlShapeProps & IDispatchProps
 
 const PaymentComponent = ({
   declaration,
@@ -96,12 +105,17 @@ const PaymentComponent = ({
       }
     })
 
+    if (!registrationId) {
+      console.error('No registrationId in URL')
+      return
+    }
+
     goToReviewCertificate(registrationId, event)
   }
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToPrint,
           selectorId: ''
@@ -196,7 +210,7 @@ function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
-  const { registrationId, eventType } = props.match.params
+  const { registrationId, eventType } = props.router.params
   const event = getEvent(eventType)
   const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
@@ -212,9 +226,14 @@ function mapStatetoProps(
   }
 }
 
-export const Payment = connect(mapStatetoProps, {
-  goBack: goBackAction,
-  goToHomeTab,
-  modifyDeclaration,
-  goToReviewCertificate: goToReviewCertificateAction
-})(injectIntl(withTheme(PaymentComponent)))
+export const Payment = withRouter(
+  connect<ReturnType<typeof mapStatetoProps>, IDispatchProps, any, IStoreState>(
+    mapStatetoProps,
+    {
+      goBack: goBackAction,
+      goToHomeTab,
+      modifyDeclaration,
+      goToReviewCertificate: goToReviewCertificateAction
+    }
+  )(injectIntl(withTheme(PaymentComponent)))
+)

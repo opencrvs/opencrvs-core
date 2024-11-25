@@ -13,11 +13,12 @@ import styled from 'styled-components'
 
 import { IntlShape, useIntl } from 'react-intl'
 import {
-  Redirect,
-  useHistory,
+  Navigate,
   useLocation,
-  useParams,
-  useRouteMatch
+  useMatch,
+  useMatches,
+  useNavigate,
+  useParams
 } from 'react-router-dom'
 import { useRecord } from '@client/hooks/useRecord'
 import { formatUrl } from '@client/navigation'
@@ -695,13 +696,13 @@ function applyCorrectionToData(record: IDeclaration) {
 
 export function ReviewCorrection() {
   const { declarationId } = useParams<URLParams>()
-  const match = useRouteMatch()
+  const match = useMatches() // @TODO: useMatch() instead
 
   const location = useLocation()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const records = useRecord()
-  const record = records.findById(declarationId)
+  const record = declarationId ? records.findById(declarationId) : undefined
 
   const registerForm = useSelector(
     (state: IStoreState) => record && getEventReviewForm(state, record.event)
@@ -709,7 +710,7 @@ export function ReviewCorrection() {
 
   if (!record) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyForReview,
           selectorId: ''
@@ -723,20 +724,23 @@ export function ReviewCorrection() {
   return (
     <>
       <RegisterForm
-        match={{
-          ...match,
-          params: {
-            declarationId: record.id,
-            pageId: 'review',
-            groupId: 'review-view-group'
-          }
-        }}
+        // @ts-ignore
+        match={
+          {
+            ...(match[0] ?? {}),
+            params: {
+              declarationId: record.id,
+              pageId: 'review',
+              groupId: 'review-view-group'
+            }
+          } as any
+        }
         reviewSummaryHeader={
           <ReviewSummarySection declaration={recordWithProposedChanges} />
         }
         pageRoute={''}
         location={location}
-        history={history}
+        navigate={navigate}
         registerForm={registerForm!}
         declaration={recordWithProposedChanges}
       />

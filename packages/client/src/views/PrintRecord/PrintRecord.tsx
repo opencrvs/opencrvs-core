@@ -15,7 +15,7 @@ import { formatUrl, goBack } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams, Redirect } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
 import {
@@ -70,7 +70,7 @@ export function PrintRecord() {
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyForReview,
           selectorId: ''

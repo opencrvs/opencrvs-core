@@ -25,7 +25,8 @@ import { connect } from 'react-redux'
 import { IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 interface IFormProps {
   declaration?: IDeclaration
@@ -40,18 +41,19 @@ const pageRoute: { [key in Event]: string } = {
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
 }
 
-const DeclarationFormView = (props: IFormProps & RouteProps) => {
+const DeclarationFormView = (props: RouteComponentProps<IFormProps>) => {
   const { declaration, ...rest } = props
+
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
+
   return <RegisterForm declaration={declaration} {...rest} />
 }
 
 function mapStatetoProps(state: IStoreState, props: RouteProps) {
-  const { match } = props
   const declaration = state.declarationsState.declarations.find(
-    ({ id }) => id === match.params.declarationId
+    ({ id }) => id === props.router.params.declarationId
   )
 
   const event = declaration?.event || Event.Birth
@@ -64,6 +66,6 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
   }
 }
 
-export const DeclarationForm = connect<IFormProps, {}, RouteProps, IStoreState>(
-  mapStatetoProps
-)(DeclarationFormView)
+export const DeclarationForm = withRouter(
+  connect(mapStatetoProps)(DeclarationFormView)
+)

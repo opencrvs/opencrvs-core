@@ -19,7 +19,7 @@ import {
 import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
-import { Redirect, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
@@ -71,6 +71,10 @@ export const IssuePayment = () => {
   const draft = useDeclaration<IDeclaration>(registrationId)
 
   const readyToIssue = () => {
+    if (draft === undefined) {
+      console.log('DRAFT UNDEFINED')
+      return
+    }
     const registeredDate = getRegisteredDate(declaration.data)
     const certificate = declaration.data.registration.certificates[0]
     const eventDate = getEventDate(declaration.data, event)
@@ -100,7 +104,7 @@ export const IssuePayment = () => {
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToIssue,
           selectorId: ''

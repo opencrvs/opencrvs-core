@@ -32,7 +32,8 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 import { getEventDate, getRegisteredDate, isFreeOfCost } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -90,6 +91,11 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         hasShowedVerifiedDocument
     }
 
+    if (!this.props.router.match.params.registrationId) {
+      console.error('No registrationId in URL')
+      return
+    }
+
     this.props.modifyDeclaration(declaration)
     this.props.writeDeclaration(declaration)
 
@@ -103,24 +109,24 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     ) {
       if (!isIssueUrl) {
         this.props.goToReviewCertificate(
-          this.props.match.params.registrationId,
+          this.props.router.match.params.registrationId,
           event
         )
       } else {
         this.props.goToIssueCertificatePayment(
-          this.props.match.params.registrationId,
+          this.props.router.match.params.registrationId,
           event
         )
       }
     } else {
       if (!isIssueUrl) {
         this.props.goToPrintCertificatePayment(
-          this.props.match.params.registrationId,
+          this.props.router.match.params.registrationId,
           event
         )
       } else {
         this.props.goToIssueCertificatePayment(
-          this.props.match.params.registrationId,
+          this.props.router.match.params.registrationId,
           event
         )
       }
@@ -193,16 +199,29 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const { collector } = this.props.match.params
+    const { collector } = this.props.router.params // @todo: implement match
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl
       ? intl.formatMessage(issueMessages.issueCertificate)
       : intl.formatMessage(messages.certificateCollectionTitle)
 
+    if (!collector) {
+      console.error('No collector in URL')
+      // @TODO: check where to redirect
+      return (
+        <Navigate
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
+
     if (!this.props.declaration) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToPrint,
             selectorId: ''
@@ -212,7 +231,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
     if (!this.props.declaration && isIssueUrl) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToIssue,
             selectorId: ''
@@ -255,7 +274,7 @@ const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { registrationId } = ownProps.match.params
+  const { registrationId } = ownProps.router.match.params // @todo: implement match
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === registrationId
@@ -286,12 +305,14 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCollector = connect(mapStateToProps, {
-  goBack,
-  goToHomeTab,
-  modifyDeclaration,
-  writeDeclaration,
-  goToReviewCertificate,
-  goToPrintCertificatePayment,
-  goToIssueCertificatePayment
-})(injectIntl(VerifyCollectorComponent))
+export const VerifyCollector = withRouter(
+  connect<IStateProps, IDispatchProps, any, IStoreState>(mapStateToProps, {
+    goBack,
+    goToHomeTab,
+    modifyDeclaration,
+    writeDeclaration,
+    goToReviewCertificate,
+    goToPrintCertificatePayment,
+    goToIssueCertificatePayment
+  })(injectIntl(VerifyCollectorComponent))
+)

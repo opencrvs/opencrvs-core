@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
@@ -32,6 +31,7 @@ import { isRegisterFormReady } from '@client/forms/register/declaration-selector
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { withRouter } from './WithRouter'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
@@ -69,12 +69,11 @@ interface IDispatchProps {
 }
 
 class Component extends React.Component<
-  RouteComponentProps<{}> & IPageProps & IDispatchProps
+  // RouteComponentProps<{}> & IPageProps & IDispatchProps
+  IPageProps & IDispatchProps & any
 > {
-  componentDidUpdate(
-    prevProps: RouteComponentProps<{}> & IPageProps & IDispatchProps
-  ) {
-    const { hash } = this.props.location
+  componentDidUpdate(prevProps: any & IPageProps & IDispatchProps) {
+    const hash = this.props.location?.hash
     const hashChanged = hash && hash !== prevProps.location.hash
     const appName = this.props.offlineData
       ? this.props.offlineData.config.APPLICATION_NAME
@@ -119,6 +118,7 @@ class Component extends React.Component<
     if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
       return (
         <div id="readyDeclaration">
+          {/* @ts-ignore */}
           <StyledPage {...this.props}>{children}</StyledPage>
         </div>
       )

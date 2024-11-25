@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Redirect, Route } from 'react-router-dom'
+import { Route, Navigate, RouteProps, useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
@@ -19,24 +19,33 @@ import { HOME } from '@client/navigation/routes'
 
 interface IProps {
   roles?: SystemRoleType[]
+  exact?: boolean
 }
 
-class ProtectedRouteWrapper extends Route<
-  IProps & ReturnType<typeof mapStateToProps>
-> {
-  public render() {
-    const { authenticated, userDetailsFetched, userDetails, roles, ...rest } =
-      this.props
-    if (!authenticated && !userDetailsFetched) {
-      return <div />
+export const ProtectedRouteWrapper = (
+  props: IProps & ReturnType<typeof mapStateToProps> & RouteProps
+) => {
+  const { children, authenticated, userDetailsFetched, userDetails, roles } =
+    props
+
+  // if (!authenticated && !userDetailsFetched) {
+  //   return <Route {...rest} element={<div></div>} />
+  // }
+
+  if (roles && userDetails) {
+    if (!hasAccessToRoute(roles, userDetails)) {
+      return <Navigate to={HOME} />
     }
-    if (roles && userDetails) {
-      if (!hasAccessToRoute(roles, userDetails)) {
-        return <Redirect to={HOME} />
-      }
-    }
-    return <Route {...rest} />
   }
+
+  return (
+    <>
+      {React.Children.map(children, (child, index) =>
+        React.cloneElement(child as any, props)
+      )}
+      /
+    </>
+  )
 }
 
 const mapStateToProps = (store: IStoreState, props: IProps) => {

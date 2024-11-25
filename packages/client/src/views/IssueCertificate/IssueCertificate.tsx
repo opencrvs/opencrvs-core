@@ -14,7 +14,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { constantsMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
-import { Redirect, useParams } from 'react-router-dom'
+import { Navigate, Redirect, useParams } from 'react-router-dom'
 import { IPrintableDeclaration } from '@client/declarations'
 import { useDispatch } from 'react-redux'
 import { useDeclaration } from '@client/declarations/selectors'
@@ -39,7 +39,7 @@ export function IssueCertificate() {
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToIssue,
           selectorId: ''

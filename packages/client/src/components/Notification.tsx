@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
@@ -37,6 +36,7 @@ import {
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { goToDeclarationRecordAudit } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { withRouter } from './WithRouter'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
   children?: React.ReactNode
@@ -63,7 +63,8 @@ type DispatchProps = {
 type Props = NotificationProps &
   DispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{}> & { isOnline: boolean }
+  // RouteComponentProps<{}> & { isOnline: boolean }
+  any
 
 const Component = ({
   hideConfigurationErrorNotification,

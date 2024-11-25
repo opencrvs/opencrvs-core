@@ -20,7 +20,8 @@ import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { Event } from '@client/utils/gateway'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 type IStateProps = {
   declaration: IDeclaration | undefined
@@ -28,17 +29,21 @@ type IStateProps = {
   pageRoute: string
 }
 
-type IProps = IStateProps & RouteProps
+type IProps = RouteComponentProps<IStateProps & RouteProps>
 
 function CorrectionReviewFormComponent({ declaration, ...props }: IProps) {
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
+
   return <RegisterForm declaration={declaration} {...props} />
 }
 
-function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { match } = props
+function mapStateToProps(
+  state: IStoreState,
+  props: RouteComponentProps<RouteProps>
+): IStateProps {
+  const { match } = props.router
 
   const { declarationId } = match.params
 
@@ -57,6 +62,6 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
   }
 }
 
-export const CorrectionReviewForm = connect(mapStateToProps)(
-  CorrectionReviewFormComponent
+export const CorrectionReviewForm = withRouter(
+  connect(mapStateToProps)(CorrectionReviewFormComponent)
 )

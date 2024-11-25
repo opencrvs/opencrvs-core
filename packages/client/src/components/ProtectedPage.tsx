@@ -12,7 +12,16 @@ import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  RouterProps,
+  RouteProps,
+  Location,
+  NavigateFunction,
+  Params
+} from 'react-router-dom'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
@@ -31,6 +40,9 @@ import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { RouteComponentProps, withRouter } from './WithRouter'
+import { getAuthenticated } from '@client/profile/profileSelectors'
+import { IStoreState } from '@client/store'
 export const SCREEN_LOCK = 'screenLock'
 
 type OwnProps = PropsWithChildren<{
@@ -51,7 +63,13 @@ interface IProtectPageState {
   passwordVerified: boolean
 }
 
-type Props = OwnProps & DispatchProps & RouteComponentProps<{}>
+type Props = OwnProps &
+  DispatchProps &
+  RouteComponentProps<any> & {
+    authenticated: boolean
+    userDetailsFetched: boolean
+    userDetails: UserDetails | null
+  }
 
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
@@ -109,8 +127,8 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   async handleVisibilityChange(isVisible: boolean) {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
-    const onUnprotectedPage = this.props.unprotectedRouteElements.some(
-      (route) => this.props.location.pathname.includes(route)
+    const onUnprotectedPage = this.props.unprotectedRouteElements?.some(
+      (route: any) => this.props.router.location.pathname.includes(route)
     )
 
     const newState = { ...this.state }
@@ -172,12 +190,14 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   conditionalRenderUponSecuredState() {
     const { secured, loading, forgotPin } = this.state
 
-    if (loading) {
+    const { children, authenticated, userDetailsFetched } = this.props
+
+    if (loading || (!authenticated && !userDetailsFetched)) {
       return this.renderLoadingScreen()
     }
 
     if (secured) {
-      return this.props.children
+      return children
     }
 
     if (!secured) {
@@ -238,8 +258,22 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     )
   }
 }
-export const ProtectedPage = connect<{}, DispatchProps, OwnProps>(null, {
+
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    authenticated: getAuthenticated(store),
+    userDetails: store.profile.userDetails,
+    userDetailsFetched: store.profile.userDetailsFetched
+  }
+}
+
+const mapDispatchToProps = {
   onNumPadVisible: refreshOfflineData,
   showPINUpdateSuccessToast,
   redirectToAuthentication
-})(withRouter(ProtectedPageComponent))
+}
+
+export const ProtectedPage = connect<any, any, any>(
+  mapStateToProps as any,
+  mapDispatchToProps
+)(withRouter(ProtectedPageComponent as any))

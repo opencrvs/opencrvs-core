@@ -43,7 +43,8 @@ import { messages as advancedSearchResultMessages } from '@client/i18n/messages/
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {
@@ -474,7 +475,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
           }}
         </Query>
       )}
-      {!isEnoughParams() && <Redirect to={HOME} />}
+      {!isEnoughParams() && <Navigate to={HOME} />}
     </Frame>
   )
 }
@@ -518,19 +519,27 @@ const SearchModifierComponent = () => {
     </>
   )
 }
-
-export const AdvancedSearchResult = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language,
-    scope: getScope(state),
-    userDetails: getUserDetails(state),
-    outboxDeclarations: state.declarationsState.declarations
-  }),
-  {
-    goToEvents: goToEventsAction,
-    goToPage: goToPageAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    goToIssueCertificate: goToIssueCertificateAction,
-    goToDeclarationRecordAudit
-  }
-)(withTheme(AdvancedSearchResultComp))
+type Foo = {
+  goToEvents: typeof goToEventsAction
+  goToPage: typeof goToPageAction
+  goToPrintCertificate: typeof goToPrintCertificateAction
+  goToIssueCertificate: typeof goToIssueCertificateAction
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+}
+export const AdvancedSearchResult = withRouter(
+  connect<{}, Foo, any, IStoreState>(
+    (state: IStoreState) => ({
+      language: state.i18n.language,
+      scope: getScope(state),
+      userDetails: getUserDetails(state),
+      outboxDeclarations: state.declarationsState.declarations
+    }),
+    {
+      goToEvents: goToEventsAction,
+      goToPage: goToPageAction,
+      goToPrintCertificate: goToPrintCertificateAction,
+      goToIssueCertificate: goToIssueCertificateAction,
+      goToDeclarationRecordAudit
+    }
+  )(withTheme(AdvancedSearchResultComp))
+)

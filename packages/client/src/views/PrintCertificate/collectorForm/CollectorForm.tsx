@@ -66,7 +66,7 @@ import { flatten } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
@@ -77,6 +77,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -102,6 +103,18 @@ type PropsWhenDeclarationIsNotFound = {
 
 interface IBaseProps {
   theme?: ITheme
+  goBack: typeof goBack
+  goToHomeTab: typeof goToHomeTab
+  storeDeclaration: typeof storeDeclaration
+  writeDeclaration: typeof writeDeclaration
+  modifyDeclaration: typeof modifyDeclaration
+  goToPrintCertificate: typeof goToPrintCertificate
+  goToVerifyCollector: typeof goToVerifyCollector
+  goToReviewCertificate: typeof goToReviewCertificate
+  goToPrintCertificatePayment: typeof goToPrintCertificatePayment
+}
+
+interface DispatchProps {
   goBack: typeof goBack
   goToHomeTab: typeof goToHomeTab
   storeDeclaration: typeof storeDeclaration
@@ -356,7 +369,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const declarationToBeCertified = declaration
     if (!declarationToBeCertified) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToPrint,
             selectorId: ''
@@ -487,8 +500,8 @@ const mapStateToProps = (
     eventType: string
     groupId: string
   }>
-): PropsWhenDeclarationIsFound | PropsWhenDeclarationIsNotFound => {
-  const { registrationId, eventType, groupId } = props.match.params
+) => {
+  const { registrationId, eventType, groupId } = props.router.match.params // @todo: implement match
   const event = getEvent(eventType)
   const userDetails = getUserDetails(state)
   const offlineCountryConfiguration = getOfflineData(state)
@@ -556,7 +569,7 @@ const mapStateToProps = (
     registerForm: getRegisterForm(state)[event],
     event,
     pageRoute: CERTIFICATE_COLLECTOR,
-    declarationId: registrationId,
+    declarationId: registrationId as any, // @TODO
     declaration,
     formSection: certFormSection,
     formGroup: {
@@ -568,14 +581,19 @@ const mapStateToProps = (
   }
 }
 
-export const CollectorForm = connect(mapStateToProps, {
-  goBack,
-  goToHomeTab,
-  storeDeclaration,
-  writeDeclaration,
-  modifyDeclaration,
-  goToPrintCertificate,
-  goToVerifyCollector,
-  goToReviewCertificate,
-  goToPrintCertificatePayment
-})(injectIntl<'intl', IProps>(withTheme(CollectorFormComponent)))
+export const CollectorForm = withRouter(
+  connect<ReturnType<typeof mapStateToProps>, DispatchProps, any, IStoreState>(
+    mapStateToProps,
+    {
+      goBack,
+      goToHomeTab,
+      storeDeclaration,
+      writeDeclaration,
+      modifyDeclaration,
+      goToPrintCertificate,
+      goToVerifyCollector,
+      goToReviewCertificate,
+      goToPrintCertificatePayment
+    }
+  )(injectIntl(withTheme(CollectorFormComponent)))
+)

@@ -22,7 +22,7 @@ import {
   Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps, Redirect, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import {
   goToHomeTab,
   goToPage,
@@ -106,6 +106,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { ActionMenu } from './ActionMenu'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -143,9 +144,9 @@ interface IStateProps {
   language: string
   resources: IOfflineData
   scope: Scope | null
-  declarationId: string
+  declarationId?: string
   draft: IDeclaration | null
-  tab: IRecordAuditTabs
+  tab?: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
@@ -166,10 +167,16 @@ interface IDispatchProps {
 
 export type IRecordAuditTabs = keyof IQueryData | 'search'
 
+// @TOOD: Handle types?
 type RouteProps = RouteComponentProps<{
-  tab: IRecordAuditTabs
-  declarationId: string
+  tab?: IRecordAuditTabs
+  declarationId?: string
 }>
+
+type ValidatedProps = Omit<IFullProps, 'declarationId' | 'tab'> & {
+  declarationId: string
+  tab: IRecordAuditTabs
+}
 
 type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
 
@@ -202,7 +209,7 @@ function ReinstateButton({
   const declaration = useDeclaration(declarationId)
 
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
 
   /* TODO: handle error */
@@ -499,7 +506,7 @@ const BodyContent = ({
   workqueueDeclaration,
   goBack,
   ...actionProps
-}: IFullProps) => {
+}: ValidatedProps) => {
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
   if (
     tab === 'search' ||
@@ -625,6 +632,10 @@ const BodyContent = ({
 }
 
 const RecordAuditComp = (props: IFullProps) => {
+  if (!props.declarationId || !props.tab) {
+    return null
+  }
+
   return (
     <Frame
       header={<DesktopHeader />}
@@ -635,15 +646,16 @@ const RecordAuditComp = (props: IFullProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      <BodyContent {...props} />
+      <BodyContent {...(props as ValidatedProps)} />
     </Frame>
   )
 }
 
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { declarationId, tab } = props.match.params
+  const { declarationId, tab } = props.router.match.params
+
   return {
-    declarationId,
+    declarationId: props.router.match.params.declarationId,
     draft:
       state.declarationsState.declarations.find(
         (declaration) => declaration.id === declarationId
@@ -651,33 +663,34 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     language: getLanguage(state),
     resources: getOfflineData(state),
     scope: getScope(state),
-    tab,
+    tab: tab as IRecordAuditTabs,
     userDetails: state.profile.userDetails,
     registerForm: state.registerForm,
     offlineData: state.offline.offlineData,
     workqueueDeclaration:
       (tab !== 'search' &&
+        // @ts-ignore
         state.workqueueState.workqueue.data[tab]?.results?.find(
-          (gqlSearchSet) => gqlSearchSet?.id === declarationId
+          (gqlSearchSet: any) => gqlSearchSet?.id === declarationId
         )) ||
       null,
     reviewForm: state.reviewForm
   }
 }
 
-export const RecordAudit = connect<
-  IStateProps,
-  IDispatchProps,
-  RouteProps,
-  IStoreState
->(mapStateToProps, {
-  archiveDeclaration,
-  clearCorrectionAndPrintChanges,
-  goToCertificateCorrection,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab,
-  goToUserProfile,
-  goToTeamUserList,
-  goBack
-})(injectIntl(RecordAuditComp))
+export const RecordAudit = withRouter(
+  connect<IStateProps, IDispatchProps, RouteProps, IStoreState>(
+    mapStateToProps,
+    {
+      archiveDeclaration,
+      clearCorrectionAndPrintChanges,
+      goToCertificateCorrection,
+      goToPage,
+      goToPrintCertificate,
+      goToHomeTab,
+      goToUserProfile,
+      goToTeamUserList,
+      goBack
+    }
+  )(injectIntl(RecordAuditComp))
+)

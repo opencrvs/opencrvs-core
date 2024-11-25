@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps } from '@client/components/WithRouter'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -77,7 +78,7 @@ class ReviewFormView extends React.Component<IProps> {
     }
     if (!declaration) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyForReview,
             selectorId: ''
@@ -116,8 +117,8 @@ function mapStatetoProps(
     event: string
   }>
 ) {
-  const { match } = props
-  if (!match.params.event) {
+  const match = props.router.match
+  if (!match?.params?.event) {
     throw new Error('Event is not provided as path param')
   }
   const reviewFormState: IReviewFormState = getReviewForm(

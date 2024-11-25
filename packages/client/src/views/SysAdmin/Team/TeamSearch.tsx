@@ -23,12 +23,12 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 interface BaseProps {
   goToTeamUserList: typeof goToTeamUserList
@@ -41,7 +41,7 @@ type IOnlineStatusProps = {
 type Props = BaseProps &
   WrappedComponentProps &
   IOnlineStatusProps &
-  Pick<RouteComponentProps, 'history'> & {
+  RouteComponentProps<IOnlineStatusProps> & {
     offlineCountryConfiguration: IOfflineData
   }
 
@@ -69,10 +69,10 @@ const Text = styled.div`
 class TeamSearchComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    const historyState = props.history.location.state as any
+    const historyState = props.router.location.state // @TODO: Check if this is true
     this.state = {
       selectedLocation:
-        (historyState && historyState.selectedLocation) || undefined
+        (historyState && historyState?.selectedLocation) || undefined
     }
   }
 
@@ -134,6 +134,11 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const TeamSearch = connect(mapStateToProps, {
-  goToTeamUserList
-})(injectIntl(withOnlineStatus(TeamSearchComponent)))
+export const TeamSearch = withRouter(
+  connect<ReturnType<typeof mapStateToProps>, {}, any, IStoreState>(
+    mapStateToProps,
+    {
+      goToTeamUserList
+    }
+  )(injectIntl(withOnlineStatus(TeamSearchComponent)))
+)

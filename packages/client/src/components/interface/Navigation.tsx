@@ -62,8 +62,8 @@ import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -288,7 +288,7 @@ const getSettingsAndLogout = (props: IFullProps) => {
 const NavigationView = (props: IFullProps) => {
   const {
     intl,
-    match,
+    router,
     userDetails,
     advancedSearchParams,
     deselectAllTabs,
@@ -315,8 +315,9 @@ const NavigationView = (props: IFullProps) => {
   } = props
   const tabId = deselectAllTabs
     ? ''
-    : match.params.tabId
-    ? match.params.tabId
+    : // @todo actually provide match somehow
+    router?.match?.params?.tabId
+    ? router.match.params.tabId
     : activeMenuItem
     ? activeMenuItem
     : 'review'
@@ -874,7 +875,7 @@ const NavigationView = (props: IFullProps) => {
                 label={bookmarkResult.name}
                 disabled={
                   advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
                 }
                 onClick={() => {
                   const filteredParam = omit(
@@ -890,7 +891,7 @@ const NavigationView = (props: IFullProps) => {
                 }}
                 isSelected={
                   advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
                 }
               />
             )
@@ -976,7 +977,7 @@ export const Navigation = connect<
   goToLeaderBoardsView,
   goToDashboardView,
   goToAllUserEmail
-})(injectIntl(withRouter(NavigationView)))
+})(injectIntl(withRouter(NavigationView as any)))
 
 /** @deprecated since the introduction of `<Frame>` */
 export const FixedNavigation = styled(Navigation)`

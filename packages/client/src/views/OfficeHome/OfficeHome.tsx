@@ -40,7 +40,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { Link, RouteComponentProps } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
@@ -62,6 +62,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -489,7 +490,7 @@ function mapStateToProps(
     pageId?: string
   }>
 ) {
-  const { match } = props
+  const match = props.router.match
   const userDetails = getUserDetails(state)
   const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
   const scope = getScope(state)
@@ -532,12 +533,17 @@ function mapStateToProps(
   }
 }
 
-export const OfficeHome = connect(mapStateToProps, {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab,
-  getOfflineData,
-  updateRegistrarWorkqueue,
-  updateWorkqueuePagination
-})(injectIntl(OfficeHomeView))
+export const OfficeHome = withRouter(
+  connect<IBaseOfficeHomeStateProps, IDispatchProps, any, IStoreState>(
+    mapStateToProps,
+    {
+      goToEvents,
+      goToPage,
+      goToPrintCertificate,
+      goToHomeTab,
+      getOfflineData,
+      updateRegistrarWorkqueue,
+      updateWorkqueuePagination
+    }
+  )(injectIntl(OfficeHomeView))
+)

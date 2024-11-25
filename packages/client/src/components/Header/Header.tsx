@@ -44,7 +44,7 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
@@ -53,6 +53,7 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 type IStateProps = {
   userDetails: UserDetails | null
@@ -71,7 +72,7 @@ type IDispatchProps = {
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
-interface IProps extends RouteComponentProps {
+type IProps = {
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -90,7 +91,7 @@ interface IProps extends RouteComponentProps {
 type IFullProps = IntlShapeProps &
   IStateProps &
   IDispatchProps &
-  IProps &
+  RouteComponentProps<IProps> &
   IDomProps
 
 enum ACTIVE_MENU_ITEM {
@@ -133,7 +134,7 @@ const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
 
 const HeaderComponent = (props: IFullProps) => {
   const {
-    location,
+    router,
     userDetails,
     mobileSearchBar,
     offlineData,
@@ -154,7 +155,9 @@ const HeaderComponent = (props: IFullProps) => {
   } = props
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
-    const locationId = new URLSearchParams(location.search).get('locationId')
+    const locationId = new URLSearchParams(router.location.search).get(
+      'locationId'
+    )
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [

@@ -17,7 +17,6 @@ import {
   useIntl
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
@@ -109,6 +108,7 @@ import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -156,12 +156,7 @@ interface IFormProps {
   reviewSummaryHeader?: React.ReactNode
 }
 
-export type RouteProps = RouteComponentProps<{
-  pageId: string
-  groupId: string
-  declarationId: string
-}>
-
+export type RouteProps = RouteComponentProps<{}>
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
@@ -189,7 +184,7 @@ export type FullProps = IFormProps &
   Props &
   DispatchProps &
   IntlShapeProps &
-  RouteProps
+  RouteComponentProps<RouteProps>
 
 type State = {
   isDataAltered: boolean
@@ -706,8 +701,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   componentDidUpdate(prevProps: FullProps) {
-    const oldHash = prevProps.location && prevProps.location.hash
-    const newHash = this.props.location && this.props.location.hash
+    const oldHash = prevProps.router.location && prevProps.router.location.hash
+    const newHash =
+      this.props.router.location && this.props.router.location.hash
     const { declaration } = this.props
     const informantTypeChanged =
       prevProps.declaration?.data?.informant?.informantType !==
@@ -758,9 +754,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
-      this.props.history.replace({
-        pathname: this.props.history.location.pathname,
-        hash: newHash + '-form-input'
+      this.props.router.navigate(this.props.router.location.pathname, {
+        replace: true,
+        state: {
+          hash: newHash + '-form-input'
+        }
       })
     }
   }
@@ -815,7 +813,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
     }
     this.props.writeDeclaration(updatedDeclaration)
-    this.props.history.push(HOME)
+    this.props.router.navigate(HOME)
   }
 
   generateSectionListForReview = (
@@ -1015,7 +1013,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
-    const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
+    const isDocumentUploadPage =
+      this.props?.router.match?.params?.pageId === 'documents'
     const introSection =
       findFirstVisibleSection(registerForm.sections).id === activeSection.id
     return (
@@ -1409,7 +1408,8 @@ function findFirstVisibleSection(sections: IFormSection[]) {
 }
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
-  const { match, registerForm, declaration } = props
+  const { router, registerForm, declaration } = props
+  const match = router.match
   const sectionId =
     match.params.pageId || findFirstVisibleSection(registerForm.sections).id
   const user = getUserDetails(state)
@@ -1458,24 +1458,45 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state),
     config,
-    userDetails: user
+    userDetails: user,
+    location: router.location,
+    navigate: router.navigate
   }
 }
 
-export const RegisterForm = connect<
-  Props,
-  DispatchProps,
-  IFormProps & RouteProps,
-  IStoreState
->(mapStateToProps, {
-  writeDeclaration,
-  modifyDeclaration,
-  deleteDeclaration,
-  goToPageGroup: goToPageGroupAction,
-  goBack: goBackAction,
-  goToCertificateCorrection,
-  goToHome,
-  goToHomeTab,
-  toggleDraftSavedNotification,
-  goToPrintRecord: goToPrintRecordView
-})(injectIntl<'intl', FullProps>(RegisterFormView))
+export const RegisterForm = withRouter(
+  connect<Props, DispatchProps, IFormProps & RouteProps, IStoreState>(
+    mapStateToProps,
+    {
+      writeDeclaration,
+      modifyDeclaration,
+      deleteDeclaration,
+      goToPageGroup: goToPageGroupAction,
+      goBack: goBackAction,
+      goToCertificateCorrection,
+      goToHome,
+      goToHomeTab,
+      toggleDraftSavedNotification,
+      goToPrintRecord: goToPrintRecordView
+    }
+  )(injectIntl(RegisterFormView))
+)
+
+// export const RegisterForm = connect<
+//   Props,
+//   DispatchProps,
+//   IFormProps & RouteProps,
+//   IStoreState
+// >(mapStateToProps, {
+//   writeDeclaration,
+//   modifyDeclaration,
+//   deleteDeclaration,
+//   goToPageGroup: goToPageGroupAction,
+//   goBack: goBackAction,
+//   goToCertificateCorrection,
+//   goToHome,
+//   goToHomeTab,
+//   toggleDraftSavedNotification,
+//   goToPrintRecord: goToPrintRecordView
+//   })(injectIntl(RegisterFormView))
+// )

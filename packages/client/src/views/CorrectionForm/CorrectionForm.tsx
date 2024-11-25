@@ -11,7 +11,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
@@ -39,7 +40,7 @@ type IProps = IStateProps & IDispatchProps
 function CorrectionFormComponent({ sectionId, declaration, ...props }: IProps) {
   const { modifyDeclaration } = props
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
 
   const logTime = (timeMs: number) => {
@@ -82,7 +83,7 @@ function FormSection({
 }
 
 function mapStateToProps(state: IStoreState, props: IRouteProps) {
-  const { declarationId, pageId: sectionId } = props.match.params
+  const { declarationId, pageId: sectionId } = props.router.match.params
   const declaration = state.declarationsState.declarations.find(
     ({ id }) => id === declarationId
   )
@@ -100,13 +101,13 @@ type IDispatchProps = {
 }
 
 type IRouteProps = RouteComponentProps<{
-  declarationId: string
-  pageId: string
+  declarationId?: string
+  pageId?: string
 }>
 
-export const CorrectionForm = connect<
-  IStateProps,
-  IDispatchProps,
-  IRouteProps,
-  IStoreState
->(mapStateToProps, { modifyDeclaration })(CorrectionFormComponent)
+export const CorrectionForm = withRouter(
+  connect<IStateProps, IDispatchProps, IRouteProps, IStoreState>(
+    mapStateToProps,
+    { modifyDeclaration }
+  )(CorrectionFormComponent)
+)
