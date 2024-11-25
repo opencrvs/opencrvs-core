@@ -10,13 +10,13 @@
  */
 
 import { IDeclaration } from '@client/declarations'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { isCorrection } from './utils'
 
 let declaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: {},
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 describe('isCorrection()', () => {

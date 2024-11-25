@@ -22,6 +22,7 @@ import {
 
 import { FHIR_URL } from '@gateway/constants'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
+console.log({ FHIR_URL })
 
 export default class FHIRAPI extends OpenCRVSRESTDataSource {
   override baseURL = FHIR_URL
@@ -46,7 +47,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
       }
     }
 
-    const res = await this.get<Practitioner>(`/Practitioner/${practitionerId}`)
+    const res = await this.get<Practitioner>(`Practitioner/${practitionerId}`)
     return res
   }
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
@@ -65,7 +66,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
       }
     }
 
-    return this.get(`/PractitionerRole?practitioner=${practitionerId}`)
+    return this.get(`PractitionerRole?practitioner=${practitionerId}`)
   }
 
   async getPractionerRoleHistory(id: string) {
@@ -104,6 +105,6 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
     if (reference) {
       return reference
     }
-    return this.get(`/DocumentReference/${id}`)
+    return this.get(`DocumentReference/${id}`)
   }
 }

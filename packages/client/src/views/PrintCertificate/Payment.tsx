@@ -13,7 +13,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Currency } from '@opencrvs/components/lib/Currency'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
@@ -44,7 +44,7 @@ import { Summary } from '@opencrvs/components/lib/Summary'
 import { UserDetails } from '@client/utils/userUtils'
 
 interface IProps {
-  event: Event
+  event: EventType
   registrationId: string
   language: string
   declaration: IPrintableDeclaration
@@ -184,11 +184,11 @@ const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.Birth
+      return EventType.Birth
     case 'death':
-      return Event.Death
+      return EventType.Death
     case 'marriage':
-      return Event.Marriage
+      return EventType.Marriage
   }
 }
 

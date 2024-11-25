@@ -40,10 +40,13 @@ import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Query: {
-    getUser: async (_, { userId }, { dataSources }) => {
-      const user = await dataSources.usersAPI.getUserById(userId)
-      return user
-    },
+    getUser: rateLimitedResolver(
+      { requestsPerMinute: 20 },
+      async (_, { userId }, { dataSources }) => {
+        const user = await dataSources.usersAPI.getUserById(userId!)
+        return user
+      }
+    ),
     getUserByMobile: rateLimitedResolver(
       { requestsPerMinute: 20 },
       async (_, { mobile }, { dataSources }) => {

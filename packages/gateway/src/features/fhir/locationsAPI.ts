@@ -41,10 +41,10 @@ export default class LocationsAPI extends OpenCRVSRESTDataSource {
       }
     }
 
-    return this.get<Saved<Location>>(`/locations/${id}`)
+    return this.get<Saved<Location>>(`locations/${id}`)
   }
 
   async getHierarchy(id: UUID): Promise<Array<Saved<Location>>> {
-    return this.get<Array<Saved<Location>>>(`/locations/${id}/hierarchy`)
+    return this.get<Array<Saved<Location>>>(`locations/${id}/hierarchy`)
   }
 }

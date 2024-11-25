@@ -28,11 +28,11 @@ export default class DocumentsAPI extends OpenCRVSRESTDataSource {
   }
 
   getDocument(id: string) {
-    return this.get(`/DocumentReference/${id}`)
+    return this.get(`DocumentReference/${id}`)
   }
   async findBySubject(reference: `${string}/${string}`) {
     const bundle: Bundle = await this.get(
-      `/DocumentReference/?subject=${reference}`
+      `DocumentReference/?subject=${reference}`
     )
     if (!bundle.entry) {
       return []

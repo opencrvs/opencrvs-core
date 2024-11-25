@@ -19,7 +19,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
@@ -55,19 +55,19 @@ class SelectVitalEventView extends React.Component<
       this.setState({ noEventSelectedError: true })
     } else {
       let declaration: IDeclaration
-      switch (this.state.goTo as Event) {
-        case Event.Birth:
-          declaration = createDeclaration(Event.Birth)
+      switch (this.state.goTo as EventType) {
+        case EventType.Birth:
+          declaration = createDeclaration(EventType.Birth)
           this.props.storeDeclaration(declaration)
           this.props.goToBirthRegistrationAsParent(declaration.id)
           break
-        case Event.Death:
-          declaration = createDeclaration(Event.Death)
+        case EventType.Death:
+          declaration = createDeclaration(EventType.Death)
           this.props.storeDeclaration(declaration)
           this.props.goToDeathInformant(declaration.id)
           break
-        case Event.Marriage:
-          declaration = createDeclaration(Event.Marriage)
+        case EventType.Marriage:
+          declaration = createDeclaration(EventType.Marriage)
           this.props.storeDeclaration(declaration)
           this.props.goToMarriageInformant(declaration.id)
           break

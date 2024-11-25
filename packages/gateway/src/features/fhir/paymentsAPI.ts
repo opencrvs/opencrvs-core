@@ -27,6 +27,6 @@ export default class PaymentsAPI extends OpenCRVSRESTDataSource {
   }
 
   getPayment(id: string): Promise<PaymentReconciliation> {
-    return this.get(`/PaymentReconciliation/${id}`)
+    return this.get(`PaymentReconciliation/${id}`)
   }
 }

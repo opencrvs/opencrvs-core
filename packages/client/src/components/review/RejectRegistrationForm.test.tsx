@@ -13,7 +13,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { RejectRegistrationForm } from '@opencrvs/client/src/components/review/RejectRegistrationForm'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { createDeclaration } from '@client/declarations'
 import { vi } from 'vitest'
 
@@ -22,7 +22,7 @@ const mockHandler = vi.fn()
 
 describe('reject registration form', () => {
   let component: ReactWrapper<{}, {}>
-  const draftDeclaration = createDeclaration(Event.Birth)
+  const draftDeclaration = createDeclaration(EventType.Birth)
   beforeEach(async () => {
     component = await createTestComponent(
       <RejectRegistrationForm
@@ -31,7 +31,7 @@ describe('reject registration form', () => {
         confirmRejectionEvent={mockHandler}
         declaration={draftDeclaration}
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
-        event={Event.Birth}
+        event={EventType.Birth}
       />,
       { store, history }
     )

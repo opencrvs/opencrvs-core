@@ -8,43 +8,43 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  loop,
-  Cmd,
-  Loop,
-  liftState,
-  getModel,
-  getCmd,
-  RunCmd
-} from 'redux-loop'
-import * as actions from '@client/offline/actions'
-import * as profileActions from '@client/profile/profileActions'
-import { storage } from '@client/storage'
-import {
-  IApplicationConfig,
-  IApplicationConfigAnonymous,
-  ILocationDataResponse,
-  referenceApi,
-  CertificateConfiguration,
-  IFacilitiesDataResponse,
-  IOfficesDataResponse
-} from '@client/utils/referenceApi'
-import { ILanguage } from '@client/i18n/reducer'
-import { filterLocations } from '@client/utils/locationUtils'
-import { Event, System } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { isOfflineDataLoaded } from './selectors'
-import { ISVGTemplate } from '@client/pdfRenderer'
-import { merge } from 'lodash'
-import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { initConditionals } from '@client/forms/conditionals'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { initValidators } from '@client/forms/validators'
+import { ILanguage } from '@client/i18n/reducer'
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
-import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
+import * as actions from '@client/offline/actions'
+import { ISVGTemplate } from '@client/pdfRenderer'
+import * as profileActions from '@client/profile/profileActions'
+import { storage } from '@client/storage'
+import { isNavigatorOnline } from '@client/utils'
+import { EventType, System } from '@client/utils/gateway'
+import { filterLocations } from '@client/utils/locationUtils'
+import {
+  CertificateConfiguration,
+  IApplicationConfig,
+  IApplicationConfigAnonymous,
+  IFacilitiesDataResponse,
+  ILocationDataResponse,
+  IOfficesDataResponse,
+  referenceApi
+} from '@client/utils/referenceApi'
+import { UserDetails } from '@client/utils/userUtils'
+import { merge } from 'lodash'
+import {
+  Cmd,
+  Loop,
+  RunCmd,
+  getCmd,
+  getModel,
+  liftState,
+  loop
+} from 'redux-loop'
+import { isOfflineDataLoaded } from './selectors'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -369,15 +369,15 @@ function reducer(
       const { certificates, config, systems } = action.payload
       merge(window.config, config)
       const birthCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Birth
+        ({ event }) => event === EventType.Birth
       )
 
       const deathCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Death
+        ({ event }) => event === EventType.Death
       )
 
       const marriageCertificateTemplate = certificates.find(
-        ({ event }) => event === Event.Marriage
+        ({ event }) => event === EventType.Marriage
       )
 
       let newOfflineData: Partial<IOfflineData>

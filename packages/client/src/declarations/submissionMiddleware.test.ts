@@ -10,13 +10,15 @@
  */
 import { ApolloError } from '@apollo/client'
 import { SubmissionAction } from '@client/forms'
+import { offlineDataReady } from '@client/offline/actions'
+import { createStore } from '@client/store'
 import {
   ACTION_STATUS_MAP,
   mockDeclarationData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { GraphQLError } from 'graphql'
 import { SpyInstance, vi } from 'vitest'
 import { SUBMISSION_STATUS } from '.'
@@ -24,8 +26,6 @@ import {
   declarationReadyForStatusChange,
   submissionMiddleware
 } from './submissionMiddleware'
-import { createStore } from '@client/store'
-import { offlineDataReady } from '@client/offline/actions'
 
 describe('Submission middleware', () => {
   const dispatch = vi.fn()
@@ -63,7 +63,7 @@ describe('Submission middleware', () => {
     const action = declarationReadyForStatusChange({
       id: 'mockDeclaration',
       data: mockDeclarationData,
-      event: Event.Birth,
+      event: EventType.Birth,
       action: SubmissionAction.SUBMIT_FOR_REVIEW,
       submissionStatus: SUBMISSION_STATUS.READY_TO_SUBMIT
     })
@@ -82,7 +82,7 @@ describe('Submission middleware', () => {
     const action = declarationReadyForStatusChange({
       id: 'mockDeclaration',
       data: mockDeclarationData,
-      event: Event.Birth,
+      event: EventType.Birth,
       action: SubmissionAction.REJECT_DECLARATION,
       submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT
     })
@@ -112,7 +112,7 @@ describe('Submission middleware', () => {
     const action = declarationReadyForStatusChange({
       id: 'mockDeclaration',
       data: mockDeclarationData,
-      event: Event.Birth,
+      event: EventType.Birth,
       action: SubmissionAction.SUBMIT_FOR_REVIEW,
       submissionStatus: SUBMISSION_STATUS.READY_TO_SUBMIT
     })
@@ -128,7 +128,7 @@ describe('Submission middleware', () => {
   Object.values(Event).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
       if (
-        event === Event.Marriage &&
+        event === EventType.Marriage &&
         [
           SubmissionAction.APPROVE_CORRECTION,
           SubmissionAction.REJECT_CORRECTION,
