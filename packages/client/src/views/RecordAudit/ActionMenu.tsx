@@ -63,7 +63,7 @@ import {
   isRecordOrDeclaration,
   isReviewableDeclaration,
   isUpdatableDeclaration,
-  isViewAble
+  isViewable
 } from '@client/declarations/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -249,7 +249,7 @@ const ViewAction: React.FC<{
 }> = ({ declarationStatus, declarationId }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
-  if (!isViewAble(declarationStatus)) return null
+  if (!isViewable(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
