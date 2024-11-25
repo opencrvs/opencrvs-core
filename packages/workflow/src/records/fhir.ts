@@ -917,8 +917,21 @@ export function createCertifiedTask(previousTask: SavedTask): SavedTask {
   return createNewTaskResource(previousTask, [], 'CERTIFIED')
 }
 
-export function createIssuedTask(previousTask: SavedTask): SavedTask {
-  return createNewTaskResource(previousTask, [], 'ISSUED')
+export function createIssuedTask(
+  previousTask: SavedTask,
+  paymentReconciliation?: BundleEntry<PaymentReconciliation>
+): SavedTask {
+  const nextExtentions: Extension[] = paymentReconciliation?.fullUrl
+    ? [
+        {
+          url: 'http://opencrvs.org/specs/extension/paymentDetails',
+          valueReference: {
+            reference: paymentReconciliation.fullUrl
+          }
+        }
+      ]
+    : []
+  return createNewTaskResource(previousTask, nextExtentions, 'ISSUED')
 }
 
 export function createVerifyRecordTask(
@@ -1377,6 +1390,50 @@ export function toSavedBundle<T extends Resource>(
             resourceBundle,
             responseBundle
           )
+        }
+      }
+      if (
+        isTask(entry.resource) &&
+        entry.resource.extension &&
+        entry.resource.extension.some(
+          (x) => x.url === 'http://opencrvs.org/specs/extension/paymentDetails'
+        )
+      ) {
+        return {
+          ...entry,
+          fullUrl: responseBundle.entry[index].response.location,
+          resource: {
+            ...entry.resource,
+            id: urlReferenceToUUID(
+              responseBundle.entry[index].response.location
+            ),
+            extension: entry.resource.extension.map((x: any) => {
+              if (
+                x.url ===
+                  'http://opencrvs.org/specs/extension/paymentDetails' &&
+                x.valueReference &&
+                x.valueReference.reference &&
+                resourceBundle.entry.some(
+                  (y) => y.fullUrl === x.valueReference.reference
+                )
+              ) {
+                const newLocation = responseBundle.entry.find((y) =>
+                  y.response.location.includes('PaymentReconciliation')
+                )?.response.location
+
+                if (newLocation) {
+                  return {
+                    ...x,
+                    valueReference: {
+                      ...x.valueReference,
+                      reference: newLocation
+                    }
+                  }
+                }
+              }
+              return x
+            })
+          }
         }
       }
 

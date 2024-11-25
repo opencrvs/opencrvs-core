@@ -1031,8 +1031,14 @@ export async function toIssued(
   eventType: EVENT_TYPE,
   certificateDetails: IssueInput
 ): Promise<IssuedRecord> {
+  const [paymentReconciliation] = createPaymentResources(
+    certificateDetails.payment
+  )
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerExtensions = createIssuedTask(previousTask)
+  const taskWithoutPractitionerExtensions = createIssuedTask(
+    previousTask,
+    paymentReconciliation
+  )
 
   const [issuedTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
@@ -1046,16 +1052,15 @@ export async function toIssued(
     record
   )
 
-  const [paymentEntry] = createPaymentResources(certificateDetails.payment)
-
   const collectorReference = `urn:uuid:${temporaryRelatedPersonId}` as const
+
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
     collectorReference,
     undefined,
-    paymentEntry.fullUrl
+    paymentReconciliation.fullUrl
   )
 
   const certificateSection: CompositionSection = {
@@ -1108,7 +1113,7 @@ export async function toIssued(
       { resource: compositionWithCertificateSection },
       { resource: issuedTask },
       ...relatedPersonEntries,
-      paymentEntry,
+      paymentReconciliation,
       documentReferenceEntry
     ]
   }
