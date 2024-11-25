@@ -140,7 +140,18 @@ function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
   return task as fhir.Task[]
 }
 
-export function getPaymentReconciliation(bundle: fhir.Bundle) {
+export function getPaymentReconciliation(
+  bundle: fhir.Bundle,
+  task?: fhir.Task
+) {
+  if (task) {
+    const paymentDetailsReference = task.extension?.find((x) =>
+      x.url.includes('paymentDetails')
+    )?.valueReference?.reference
+    return bundle.entry?.find((x) => x.fullUrl === paymentDetailsReference)
+      ?.resource as fhir.PaymentReconciliation
+  }
+
   return getResourceByType<fhir.PaymentReconciliation>(
     bundle,
     FHIR_RESOURCE_TYPE.PAYMENT_RECONCILIATION

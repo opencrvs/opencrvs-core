@@ -1016,6 +1016,12 @@ export const testDeathCertPayload = {
             valueReference: {
               reference: 'Practitioner/ec1f4476-182f-408f-9da2-aff0c9bd1f26'
             }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/paymentDetails',
+            valueReference: {
+              reference: 'urn:uuid:2aead0f3-55a4-4e7c-a7ac-720f36580f66'
+            }
           }
         ],
         lastModified: '2019-11-30T15:19:54.168Z',
