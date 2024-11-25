@@ -22,6 +22,7 @@ export function createProductionEnvironmentServer() {
     AUTH_PORT: '4040',
     CLIENT_APP_URL: 'http://localhost:3000/',
     COUNTRY_CONFIG_URL: 'http://localhost:3040/',
+    COUNTRY_CONFIG_URL_INTERNAL: 'http://localhost:3040/',
     DOMAIN: '*',
     LOGIN_URL: 'http://localhost:3020/',
     METRICS_URL: 'http://localhost:1050',
