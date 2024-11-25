@@ -31,6 +31,7 @@ export const env = cleanEnv(process.env, {
   APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   NOTIFICATION_URL: url({ devDefault: 'http://localhost:2020/' }),
   WORKFLOW_URL: url({ devDefault: 'http://localhost:5050/' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   DISABLE_RATE_LIMIT: bool({
