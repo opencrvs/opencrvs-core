@@ -23,7 +23,7 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
-import { isNavigatorOnline } from '@client/utils'
+import { isNavigatorOnline, useOnlineStatus } from '@client/utils'
 
 interface IFetchButtonProps {
   id: string
@@ -118,27 +118,8 @@ const FetchButton = (props: IFullProps) => {
   const [error, setError] = useState(false)
   const [success, setSuccess] = useState(false)
   const [show, setShow] = useState(false)
-  const [isDisconnected, setIsDisconnected] = useState(!isNavigatorOnline())
   const [networkError, setNetworkError] = useState(false)
-
-  const handleConnectionChange = () => {
-    const condition = isNavigatorOnline() ? 'online' : 'offline'
-    if (condition === 'online') {
-      return setIsDisconnected(false)
-    }
-    return setIsDisconnected(true)
-  }
-
-  useEffect(() => {
-    handleConnectionChange()
-    window.addEventListener('online', handleConnectionChange)
-    window.addEventListener('offline', handleConnectionChange)
-
-    return () => {
-      window.removeEventListener('online', handleConnectionChange)
-      window.removeEventListener('offline', handleConnectionChange)
-    }
-  }, [])
+  const isOnline = useOnlineStatus()
 
   const hideModal = () => {
     setShow(false)
@@ -194,7 +175,7 @@ const FetchButton = (props: IFullProps) => {
             <div>
               <StyledPrimaryButton
                 type={'button'}
-                disabled={isDisabled || isDisconnected}
+                disabled={isDisabled || !isOnline}
                 onClick={async (event: React.MouseEvent<HTMLElement>) => {
                   performQuery(client)
                   event.preventDefault()
