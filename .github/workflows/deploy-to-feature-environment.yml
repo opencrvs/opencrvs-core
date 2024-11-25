@@ -102,6 +102,13 @@ jobs:
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
 
+  trigger-build:
+    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    needs: generate_stack_name_and_branch
+    uses: ./.github/workflows/build-images-from-branch.yml
+    with:
+      branch_name: ${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+
   trigger-e2e:
     if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
     runs-on: ubuntu-22.04

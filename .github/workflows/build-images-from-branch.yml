@@ -15,10 +15,6 @@ on:
         description: Branch to build from
         default: develop
         required: true
-  pull_request:
-    branches-ignore:
-      - 'dependabot/**'
-      - 'renovate/**'
   push:
     branches:
       - develop
@@ -34,11 +30,6 @@ jobs:
 
       - uses: actions/checkout@v4
         if: github.event_name == 'push'
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - uses: actions/checkout@v4
-        if: github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
