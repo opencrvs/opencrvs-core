@@ -20,7 +20,7 @@ import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { Event } from '@client/utils/gateway'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 
 type IStateProps = {
   declaration: IDeclaration | undefined

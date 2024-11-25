@@ -11,9 +11,9 @@
 import { vi } from 'vitest'
 import { appRouter, t } from './router'
 import {
-  setupServer,
   getClient,
-  resetServer
+  resetServer,
+  setupServer
 } from './storage/__mocks__/mongodb'
 
 const { createCallerFactory } = t
@@ -30,7 +30,9 @@ afterEach(async () => {
 
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
-  const caller = createCaller({})
+  const caller = createCaller({
+    user: { id: '1' }
+  })
   return caller
 }
 
@@ -83,25 +85,16 @@ test('actions can be added to created events', async () => {
     event: { type: 'birth' }
   })
 
-  const event = await client.event.actions.create({
+  const event = await client.event.actions.declare({
     eventId: originalEvent.id,
+    transactionId: '2',
     action: {
-      type: 'REGISTERED',
-      fields: [],
-      identifiers: {
-        trackingId: '123',
-        registrationNumber: '456'
-      }
+      fields: []
     }
   })
 
-  expect(event.actions).toContainEqual(
-    expect.objectContaining({
-      type: 'REGISTERED',
-      identifiers: {
-        trackingId: '123',
-        registrationNumber: '456'
-      }
-    })
-  )
+  expect(event.actions).toEqual([
+    expect.objectContaining({ type: 'CREATE' }),
+    expect.objectContaining({ type: 'DECLARE' })
+  ])
 })

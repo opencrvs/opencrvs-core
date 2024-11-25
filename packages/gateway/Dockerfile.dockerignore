@@ -19,3 +19,4 @@ grafana
 packages/
 !packages/commons
 !packages/gateway
+!packages/events

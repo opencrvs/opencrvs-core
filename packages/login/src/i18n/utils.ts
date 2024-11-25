@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { storage } from '@login/storage'
-import { useLocation } from 'react-router'
+import { useLocation } from 'react-router-dom'
 
 export function getAvailableLanguages() {
   return window.config.LANGUAGES.split(',')

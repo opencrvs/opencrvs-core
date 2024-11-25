@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { messages } from '@client/i18n/messages/views/notifications'
 import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
