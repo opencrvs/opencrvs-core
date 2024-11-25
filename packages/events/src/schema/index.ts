@@ -9,4 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './EventInput'
+export * from './EventDocument'
 export * from './ActionInput'
+export * from './ActionDocument'
