@@ -9,6 +9,11 @@
 name: Publish images to Dockerhub from any branch
 
 on:
+  workflow_call:
+    inputs:
+      branch_name:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       branch_name:
