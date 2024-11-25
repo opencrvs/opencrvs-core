@@ -113,7 +113,7 @@ jobs:
   trigger-e2e:
     if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
     runs-on: ubuntu-22.04
-    needs: [generate_stack_name_and_branch, trigger-build]
+    needs: generate_stack_name_and_branch
     environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
