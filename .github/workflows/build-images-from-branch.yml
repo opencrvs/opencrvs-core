@@ -12,6 +12,7 @@ on:
   workflow_call:
     inputs:
       branch_name:
+        description: Branch to build from
         required: true
         type: string
   workflow_dispatch:
@@ -29,7 +30,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
 
@@ -46,8 +47,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [ "${{ github.event_name }}" == 'push' ]; then
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          elif [ "${{ github.event_name }}" == 'pull_request' ]; then
-          BRANCH=${{ github.event.pull_request.head.ref }}
           else
           BRANCH=${{ inputs.branch_name }}
           fi
