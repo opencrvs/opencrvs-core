@@ -49,6 +49,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
+// eslint-disable-next-line no-restricted-imports
 import { captureException } from '@sentry/browser'
 
 type IReadyDeclaration = IDeclaration & {
