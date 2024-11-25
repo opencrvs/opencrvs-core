@@ -62,7 +62,8 @@ import {
   isPrintable,
   isRecordOrDeclaration,
   isReviewableDeclaration,
-  isUpdatableDeclaration
+  isUpdatableDeclaration,
+  isViewAble
 } from '@client/declarations/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { usePermissions } from '@client/hooks/useAuthorization'
@@ -222,6 +223,7 @@ export const ActionMenu: React.FC<{
             handleUnassign={handleUnassign}
             isDownloaded={isDownloaded}
             assignment={assignment}
+            declarationStatus={status}
           />
         </DropdownMenu.Content>
       </DropdownMenu>
@@ -246,6 +248,7 @@ const ViewAction: React.FC<{
 }> = ({ declarationStatus, declarationId }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  if (!isViewAble(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
@@ -471,14 +474,16 @@ const UnassignAction: React.FC<{
   handleUnassign: () => void
   isDownloaded: boolean
   assignment?: GQLAssignmentData
-}> = ({ handleUnassign, isDownloaded, assignment }) => {
+  declarationStatus?: SUBMISSION_STATUS
+}> = ({ handleUnassign, isDownloaded, assignment, declarationStatus }) => {
   const { hasScope } = usePermissions()
   const intl = useIntl()
   const isAssignedToSomeoneElse = !isDownloaded && assignment
 
   if (
-    !isDownloaded &&
-    (!isAssignedToSomeoneElse || !hasScope(SCOPES.RECORD_UNASSIGN_OTHERS))
+    declarationStatus === SUBMISSION_STATUS.DRAFT ||
+    (!isDownloaded &&
+      (!isAssignedToSomeoneElse || !hasScope(SCOPES.RECORD_UNASSIGN_OTHERS)))
   )
     return null
 
