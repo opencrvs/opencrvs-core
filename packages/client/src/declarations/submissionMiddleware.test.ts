@@ -125,7 +125,7 @@ describe('Submission middleware', () => {
     )
   })
 
-  Object.values(Event).forEach((event) => {
+  Object.values(EventType).forEach((event) => {
     Object.values(SubmissionAction).forEach((submissionAction) => {
       if (
         event === EventType.Marriage &&
