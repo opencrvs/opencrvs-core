@@ -11,11 +11,10 @@
 import { vi } from 'vitest'
 import { appRouter, t } from './router'
 import {
-  setupServer,
   getClient,
-  resetServer
+  resetServer,
+  setupServer
 } from './storage/__mocks__/mongodb'
-import { ActionType } from '@opencrvs/commons'
 
 const { createCallerFactory } = t
 
@@ -31,7 +30,9 @@ afterEach(async () => {
 
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
-  const caller = createCaller({})
+  const caller = createCaller({
+    user: { id: '1' }
+  })
   return caller
 }
 
@@ -39,7 +40,7 @@ const client = createClient()
 test('event can be created and fetched', async () => {
   const event = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
   })
 
   const fetchedEvent = await client.event.get(event.id)
@@ -52,12 +53,12 @@ test('creating an event is an idempotent operation', async () => {
 
   await client.event.create({
     transactionId: '1',
-    event: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
   })
 
   await client.event.create({
     transactionId: '1',
-    event: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
   })
 
   expect(await db.collection('events').find().toArray()).toHaveLength(1)
@@ -66,13 +67,12 @@ test('creating an event is an idempotent operation', async () => {
 test('stored events can be modified', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
   })
 
   const event = await client.event.patch({
     id: originalEvent.id,
-    type: 'death',
-    fields: []
+    type: 'death'
   })
 
   expect(event.updatedAt).not.toBe(originalEvent.updatedAt)
@@ -82,28 +82,19 @@ test('stored events can be modified', async () => {
 test('actions can be added to created events', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth', fields: [] }
+    event: { type: 'birth' }
   })
 
-  const event = await client.event.actions.create({
+  const event = await client.event.actions.declare({
     eventId: originalEvent.id,
+    transactionId: '2',
     action: {
-      type: ActionType.REGISTER,
-      fields: [],
-      identifiers: {
-        trackingId: '123',
-        registrationNumber: '456'
-      }
+      fields: []
     }
   })
 
-  expect(event.actions).toContainEqual(
-    expect.objectContaining({
-      type: ActionType.REGISTER,
-      identifiers: {
-        trackingId: '123',
-        registrationNumber: '456'
-      }
-    })
-  )
+  expect(event.actions).toEqual([
+    expect.objectContaining({ type: 'CREATE' }),
+    expect.objectContaining({ type: 'DECLARE' })
+  ])
 })
