@@ -118,15 +118,16 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/auth/.well-known',
+      path: '/api/auth/.well-known',
       handler: getPublicKey,
       options: {
-        tags: ['api']
+        tags: ['api'],
+        auth: false
       }
     },
     {
       method: 'POST',
-      path: '/auth/authenticate',
+      path: '/api/auth/authenticate',
       handler: rateLimitedRoute(
         { requestsPerMinute: 10, pathForKey: 'username' },
         authenticateHandler
@@ -152,7 +153,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/resendAuthenticationCode',
+      path: '/api/auth/resendAuthenticationCode',
       handler: resendAuthCodeHandler,
       options: {
         tags: ['api'],
@@ -169,7 +170,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/verifyCode',
+      path: '/api/auth/verifyCode',
       handler: verifyAuthCodeHandler,
       options: {
         tags: ['api'],
@@ -187,7 +188,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/refreshToken',
+      path: '/api/auth/refreshToken',
       handler: verifyRefreshTokenHandler,
       options: {
         tags: ['api'],
@@ -204,7 +205,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/invalidateToken',
+      path: '/api/auth/invalidateToken',
       handler: invalidateTokenHandler,
       options: {
         tags: ['api'],
@@ -224,7 +225,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/verifyUser',
+      path: '/api/auth/verifyUser',
       handler: rateLimitedRoute(
         { requestsPerMinute: 10, pathOptionsForKey: ['mobile', 'email'] },
         verifyUserHandler
@@ -248,7 +249,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/verifyNumber',
+      path: '/api/auth/verifyNumber',
       handler: verifyNumberHandler,
       options: {
         tags: ['api'],
@@ -268,7 +269,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/verifySecurityAnswer',
+      path: '/api/auth/verifySecurityAnswer',
       handler: verifySecurityQuestionHandler,
       options: {
         tags: ['api'],
@@ -289,7 +290,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/changePassword',
+      path: '/api/auth/changePassword',
       handler: changePasswordHandler,
       options: {
         tags: ['api'],
@@ -309,7 +310,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/sendUserName',
+      path: '/api/auth/sendUserName',
       handler: sendUserNameHandler,
       options: {
         tags: ['api'],
@@ -329,7 +330,7 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/auth/token',
+      path: '/api/auth/token',
       handler: tokenHandler,
       options: {
         auth: false,
@@ -346,7 +347,6 @@ export const getRoutes = () => {
     catchAllProxy.location,
     catchAllProxy.locationId,
 
-    catchAllProxy.auth,
     rateLimitedAuthProxy.authenticateSuperUser
   ]
 

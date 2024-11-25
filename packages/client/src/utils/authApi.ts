@@ -38,7 +38,10 @@ function request<T>(options: AxiosRequestConfig) {
 
 const invalidateToken = (token: string): Promise<void> => {
   return request({
-    url: new URL('invalidateToken', window.config.AUTH_URL).toString(),
+    url: new URL(
+      'api/auth/invalidateToken',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data: { token }
   })

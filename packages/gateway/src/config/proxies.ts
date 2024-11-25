@@ -13,21 +13,6 @@ import { rateLimitedRoute } from '@gateway/rate-limit'
 import { ServerRoute } from '@hapi/hapi'
 
 export const catchAllProxy = {
-  auth: {
-    method: 'POST',
-    path: '/auth/{suffix}',
-    handler: (_, h) =>
-      h.proxy({
-        uri: AUTH_URL + '/{suffix}'
-      }),
-    options: {
-      auth: false,
-      payload: {
-        output: 'data',
-        parse: false
-      }
-    }
-  },
   /** @deprecated old naming strategy from Hearth.
    * These are included for backwards compability but `locationS` should be preferred */
   location: {

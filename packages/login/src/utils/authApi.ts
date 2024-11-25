@@ -122,7 +122,10 @@ const getApplicationConfig = () => {
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    url: new URL('authenticate', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/authenticate',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data
   })
@@ -135,8 +138,8 @@ const resendAuthenticationCode = (
 ) => {
   return request({
     url: new URL(
-      'resendAuthenticationCode',
-      window.config.AUTH_API_URL
+      'api/auth/resendAuthenticationCode',
+      window.config.API_GATEWAY_URL
     ).toString(),
     method: 'POST',
     data: { nonce, notificationEvent, retrievalFlow }
@@ -145,7 +148,10 @@ const resendAuthenticationCode = (
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    url: new URL('verifyCode', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/verifyCode',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data
   })
@@ -166,7 +172,10 @@ const verifyUser = (
   verificationDetails: IUserVerificationDetails
 ): Promise<IUserVerifyResponse> => {
   return request({
-    url: new URL('verifyUser', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/verifyUser',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data: verificationDetails
   })
@@ -182,7 +191,10 @@ const verifyNumber = (
   code: string
 ): Promise<IVerifyNumberResponse> => {
   return request({
-    url: new URL('verifyNumber', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/verifyNumber',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data: { nonce, code }
   })
@@ -201,7 +213,10 @@ const verifySecurityAnswer = (
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> => {
   return request({
-    url: new URL('verifySecurityAnswer', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/verifySecurityAnswer',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data: { nonce, answer }
   })
@@ -209,7 +224,10 @@ const verifySecurityAnswer = (
 
 const changePassword = (nonce: string, newPassword: string): Promise<void> => {
   return request({
-    url: new URL('changePassword', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/changePassword',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data: { nonce, newPassword }
   })
@@ -217,7 +235,10 @@ const changePassword = (nonce: string, newPassword: string): Promise<void> => {
 
 const sendUserName = (nonce: string): Promise<void> => {
   return request({
-    url: new URL('sendUserName', window.config.AUTH_API_URL).toString(),
+    url: new URL(
+      'api/auth/sendUserName',
+      window.config.API_GATEWAY_URL
+    ).toString(),
     method: 'POST',
     data: { nonce }
   })
