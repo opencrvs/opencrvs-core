@@ -1226,7 +1226,7 @@ function toSavedTask(
 
 function toSavedRelatedPerson(
   relatedPersion: RelatedPerson & {
-    patient: { reference: `urn:uuid:${string}` }
+    patient: { reference: `urn:uuid:${UUID}` }
   },
   id: UUID,
   resourceBundle: Bundle,
@@ -1368,8 +1368,10 @@ export function toSavedBundle<T extends Resource>(
           fullUrl: responseBundle.entry[index].response.location,
           resource: toSavedTask(
             {
-              ...entry.resource,
-              focus: { reference: entry.resource.focus.reference }
+              ...(entry.resource as Task),
+              focus: {
+                reference: entry.resource.focus.reference
+              }
             },
             urlReferenceToUUID(responseBundle.entry[index].response.location),
             resourceBundle,

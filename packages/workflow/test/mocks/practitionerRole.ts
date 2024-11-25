@@ -39,7 +39,8 @@ export const practitionerRoleBundle: SavedBundle<PractitionerRole> = {
         ],
         location: [
           {
-            reference: 'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957'
+            reference:
+              'Location/ce73938d-a188-4a78-9d19-35dfd4ca6957' as `Location/${UUID}`
           }
         ],
         meta: {

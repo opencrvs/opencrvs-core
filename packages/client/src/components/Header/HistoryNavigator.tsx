@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { goBack, goForward } from '@client/navigation'
 import { Icon } from '@opencrvs/components/lib/Icon'

@@ -21,6 +21,7 @@ import {
   getAvgTimeSpentOnAppByPractitioners
 } from '@metrics/features/declarationsStarted/service'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
+import { UUID } from '@opencrvs/commons'
 
 export async function declarationsStartedHandler(
   request: Hapi.Request,
@@ -69,7 +70,7 @@ export async function declarationStartedMetricsByPractitionersHandler(
 ) {
   const { timeStart, timeEnd, locationId, practitionerIds, event } =
     request.payload as IDeclarationStartedMetricsPayload
-  const locId = `Location/${locationId}` as const
+  const locId = `Location/${locationId}` as `Location/${UUID}`
   let declarationStartedMetricsByPractitioners: IDeclarationStartedMetricsByPractitioner[] =
     []
   try {

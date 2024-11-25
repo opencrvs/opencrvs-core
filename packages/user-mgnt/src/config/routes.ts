@@ -95,8 +95,8 @@ import changeEmailHandler, {
   changeEmailRequestSchema
 } from '@user-mgnt/features/changeEmail/handler'
 import { getAllSystemsHandler } from '@user-mgnt/features/getAllSystems/handler'
-import * as mongoose from 'mongoose'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import mongoose from 'mongoose'
 
 export const getRoutes = () => {
   return [

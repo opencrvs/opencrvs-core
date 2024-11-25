@@ -29,7 +29,7 @@ import { pickSystem, types } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
-import * as uuid from 'uuid/v4'
+import uuid from 'uuid/v4'
 
 export enum EventType {
   Birth = 'birth',
@@ -47,7 +47,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: string
+  type: keyof typeof systemRoleScopes
   integratingSystemType: string
 }
 

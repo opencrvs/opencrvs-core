@@ -34,10 +34,8 @@ echo
 
 cd ../
 
-BRANCH=master
-if [[ $CI == "true" ]]; then
-  BRANCH=develop
-fi
+BRANCH=develop
+
 
 git clone --branch $BRANCH --depth 1 https://github.com/opencrvs/opencrvs-countryconfig.git
 

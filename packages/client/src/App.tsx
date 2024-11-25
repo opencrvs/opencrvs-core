@@ -41,7 +41,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { Route, Switch } from 'react-router'
+import { Route, Switch } from 'react-router-dom'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
@@ -70,6 +70,8 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import { SCOPES } from './utils/gateway'
+import { Workqueues } from './v2-events/workqueues'
+import { V2_ROOT_ROUTE } from './v2-events/routes'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -622,6 +624,11 @@ export function App(props: IAppProps) {
                                               exact
                                               path={routes.PRINT_RECORD}
                                               component={PrintRecord}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={V2_ROOT_ROUTE}
+                                              component={Workqueues}
                                             />
                                           </Switch>
                                         </TransitionWrapper>

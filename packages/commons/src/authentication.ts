@@ -10,7 +10,7 @@
  */
 
 import { IAuthHeader } from './http'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 
 import { Scope, SCOPES } from './scopes'
 export { scopes, Scope, SCOPES } from './scopes'

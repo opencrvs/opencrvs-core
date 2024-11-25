@@ -50,7 +50,7 @@ import { messages } from '@client/i18n/messages/views/action'
 import { useModal } from '@client/hooks/useModal'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
-import { Event, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
@@ -66,6 +66,7 @@ import {
 } from '@client/declarations/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import { EVENT } from '@opencrvs/commons/client'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -268,7 +269,7 @@ const CorrectRecordAction: React.FC<
   const intl = useIntl()
 
   const isBirthOrDeathEvent =
-    type && [Event.Birth, Event.Death].includes(type as Event)
+    type && [EVENT.BIRTH, EVENT.DEATH].includes(type as EVENT)
 
   if (!isBirthOrDeathEvent || !canBeCorrected(declarationStatus)) {
     return null

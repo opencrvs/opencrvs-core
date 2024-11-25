@@ -35,9 +35,9 @@ import { SortArrow } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { WrappedComponentProps, injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -320,7 +320,7 @@ function FieldAgentListComponent(props: IProps) {
     const content =
       data &&
       data.results &&
-      data.results.map((row, idx) => {
+      data.results.map((row) => {
         if (row === null) {
           return {
             name: '',

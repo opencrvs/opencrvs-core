@@ -74,6 +74,7 @@ storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
 const { store, history } = createStore()
+
 beforeAll(async () => {
   setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 })
