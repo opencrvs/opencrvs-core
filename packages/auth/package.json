@@ -84,7 +84,7 @@
     ],
     "moduleNameMapper": {
       "@auth/(.*)": "<rootDir>/src/$1",
-      "@opencrvs/commons/(.*)": "@opencrvs/commons/build/dist/$1"
+      "@opencrvs/commons/(.*)": "<rootDir>/../commons/src/$1"
     },
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "setupFiles": [
