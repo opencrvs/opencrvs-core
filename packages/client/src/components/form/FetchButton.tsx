@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { ApolloError, ApolloConsumer } from '@apollo/client'
+import { ApolloError, ApolloConsumer, ApolloClient } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import {
@@ -23,7 +23,7 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
-import { isNavigatorOnline, useOnlineStatus } from '@client/utils'
+import { useOnlineStatus } from '@client/utils'
 
 interface IFetchButtonProps {
   id: string
@@ -170,7 +170,7 @@ const FetchButton = (props: IFullProps) => {
   return (
     <Container {...props}>
       <ApolloConsumer>
-        {(client) => {
+        {(client: ApolloClient<any>) => {
           return (
             <div>
               <StyledPrimaryButton
