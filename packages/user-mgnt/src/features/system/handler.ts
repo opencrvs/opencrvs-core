@@ -47,7 +47,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: keyof typeof systemRoleScopes
+  type: keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES
   integratingSystemType: string
 }
 
