@@ -38,7 +38,7 @@ class EventNotFoundError extends Error {
 export async function getEventById(id: string) {
   const db = await getClient()
 
-  const collection = db.collection<Event>('events')
+  const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
   if (!event) {
     throw new EventNotFoundError(id)
@@ -107,7 +107,7 @@ export async function addAction(
   return getEventById(eventId)
 }
 
-export async function patchEvent(event: EventInputWithId): Promise<Event> {
+export async function patchEvent(event: EventInputWithId) {
   const existingEvent = await getEventById(event.id)
 
   if (!existingEvent) {

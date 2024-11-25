@@ -38,13 +38,13 @@ const BaseActionInput = z.object({
 
 const ActionCreateInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.CREATE)
+    type: z.literal(ActionType.CREATE).default(ActionType.CREATE)
   })
 )
 
 const ActionRegisterInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.REGISTER),
+    type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
@@ -54,13 +54,13 @@ const ActionRegisterInput = BaseActionInput.merge(
 
 export const ActionNotifyInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY)
+    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
 )
 
 export const ActionDeclareInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE)
+    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
   })
 )
 
