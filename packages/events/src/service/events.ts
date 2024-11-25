@@ -23,7 +23,7 @@ export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await getClient()
-  const collection = db.collection<EventInput>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const document = await collection.findOne({ transactionId })
 
@@ -115,7 +115,7 @@ export async function patchEvent(event: EventInputWithId): Promise<Event> {
   }
 
   const db = await getClient()
-  const collection = db.collection<EventInput>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const now = new Date()
 
