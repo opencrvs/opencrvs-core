@@ -81,7 +81,8 @@ import {
   getSectionFields,
   getNextSectionIds,
   VIEW_TYPE,
-  handleInitialValue
+  handleInitialValue,
+  evalExpressionInFieldDefinition
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
@@ -1010,7 +1011,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSection,
       activeSectionGroup,
       reviewSummaryHeader,
-      userDetails
+      userDetails,
+      config
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -1026,6 +1028,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
     const introSection =
       findFirstVisibleSection(registerForm.sections).id === activeSection.id
+    const canContinue =
+      'canContinue' in activeSection
+        ? evalExpressionInFieldDefinition(
+            activeSection.canContinue!,
+            declaration.data[activeSection.id],
+            config,
+            declaration.data,
+            userDetails
+          )
+        : true
+
     return (
       <>
         <TimeMounted
@@ -1145,7 +1158,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     declaration.event.toLowerCase()
                                   )
                                 }}
-                                disabled={this.state.isFileUploading}
+                                disabled={
+                                  !canContinue || this.state.isFileUploading
+                                }
                               >
                                 {intl.formatMessage(
                                   buttonMessages.continueButton

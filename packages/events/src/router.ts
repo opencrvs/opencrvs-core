@@ -9,6 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import {
+  DeclareActionInput,
+  EventInput,
+  NotifyActionInput
+} from '@opencrvs/commons'
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
@@ -20,9 +25,16 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
-import { ActionInput, EventInput } from '@opencrvs/commons'
 
-export const t = initTRPC.create({
+const ContextSchema = z.object({
+  user: z.object({
+    id: z.string()
+  })
+})
+
+type Context = z.infer<typeof ContextSchema>
+
+export const t = initTRPC.context<Context>().create({
   transformer: superjson
 })
 
@@ -44,7 +56,11 @@ export const appRouter = router({
         })
       )
       .mutation(async (options) => {
-        return createEvent(options.input.event, options.input.transactionId)
+        return createEvent(
+          options.input.event,
+          options.ctx.user.id,
+          options.input.transactionId
+        )
       }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
       return patchEvent(options.input)
@@ -53,15 +69,35 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      create: publicProcedure
+      notify: publicProcedure
         .input(
           z.object({
             eventId: z.string(),
-            action: ActionInput
+            transactionId: z.string(),
+            action: NotifyActionInput
           })
         )
         .mutation(async (options) => {
-          return addAction(options.input.eventId, options.input.action)
+          return addAction(options.input.eventId, {
+            ...options.input.action,
+            type: 'NOTIFY',
+            createdBy: options.ctx.user.id
+          })
+        }),
+      declare: publicProcedure
+        .input(
+          z.object({
+            eventId: z.string(),
+            transactionId: z.string(),
+            action: DeclareActionInput
+          })
+        )
+        .mutation(async (options) => {
+          return addAction(options.input.eventId, {
+            ...options.input.action,
+            type: 'DECLARE',
+            createdBy: options.ctx.user.id
+          })
         })
     })
   })

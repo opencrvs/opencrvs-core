@@ -17,6 +17,8 @@ import {
   defaultFieldResolver
 } from 'graphql'
 
+import { resolvers as eventsV2Resolvers } from '@gateway/v2-events/events/root-resolvers'
+import { eventResolvers as eventsV2TypeResolvers } from '@gateway/v2-events/events/type-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
@@ -69,6 +71,8 @@ interface IStringIndexSignatureInterface {
 type StringIndexed<T> = T & IStringIndexSignatureInterface
 
 export const resolvers: StringIndexed<IResolvers> = merge(
+  eventsV2Resolvers,
+  eventsV2TypeResolvers,
   notificationRootResolvers as IResolvers,
   registrationRootResolvers as IResolvers,
   locationRootResolvers as IResolvers,

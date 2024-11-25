@@ -39,6 +39,12 @@
 - Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
 - Fix prefix text overlap issue in form text inputs
 
+## 1.6.1 Release candidate
+
+### New features
+
+- Add an optional configurable field in section `canContinue` which takes an expression. Falsy value of this expression will disable the continue button in forms. This can be used to work with fetch field which has a loading state and prevent the user to get past the section while the request is still in progress.
+
 ## 1.6.0 Release candidate
 
 ## Improvements
