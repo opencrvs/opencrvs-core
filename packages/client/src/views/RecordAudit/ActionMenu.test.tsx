@@ -133,14 +133,9 @@ describe('View action', () => {
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
-    expect(status).toBe(ACTION_STATUS.ENABLED)
+    const { status } = actionStatus(component, [ACTION.VIEW_DECLARATION])
 
-    node?.simulate('click')
-
-    expect(window.location.href).toContain(
-      defaultDeclaration.id + '/viewRecord'
-    )
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
 
   it('In progress', async () => {
