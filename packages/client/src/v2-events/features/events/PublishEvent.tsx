@@ -20,11 +20,10 @@ import {
 import React from 'react'
 import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
-import { EventFieldRenderer } from './EventFieldRenderer'
 
 export function PublishEvent() {
   const { eventType } = useParams<{ eventType: string }>()
-  const { title, fields, form, exit, saveAndExit, previous, next, finish } =
+  const { title, exit, saveAndExit, previous, next, finish } =
     useEvent(eventType)
 
   return (
@@ -74,7 +73,7 @@ export function PublishEvent() {
               </Button>
             ]}
           >
-            <EventFieldRenderer fields={fields} />
+            <b>This is where the form will be rendered</b>
           </Content>
         </Frame.Section>
       </Frame.LayoutForm>
