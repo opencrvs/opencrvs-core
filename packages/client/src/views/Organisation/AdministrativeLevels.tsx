@@ -29,7 +29,7 @@ import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ILocation } from '@client/offline/reducer'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import {
   goToOrganizationList,
   goToPerformanceHome,

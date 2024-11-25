@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router-dom'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
