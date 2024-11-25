@@ -19,6 +19,8 @@ export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
+export type EventInputWithId = z.infer<typeof EventInputWithId>
+
 async function getEventByTransactionId(transactionId: string) {
   const db = await getClient()
   const collection = db.collection<EventInput>('events')
@@ -46,6 +48,7 @@ export async function getEventById(id: string) {
 
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
+  createdBy: string,
   transactionId: string
 ) {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -70,7 +73,7 @@ export async function createEvent(
       {
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy: '123-123-123',
+        createdBy,
         fields: []
       }
     ]
@@ -79,22 +82,23 @@ export async function createEvent(
   return getEventById(id)
 }
 
-export async function addAction(eventId: string, action: ActionInput) {
+export async function addAction(
+  input: ActionInput,
+  { eventId, createdBy }: { eventId: string; createdBy: string }
+) {
   const db = await getClient()
-  const collection = db.collection<Event>('events')
-
   const now = new Date()
 
-  await collection.updateOne(
+  await db.collection<EventDocument>('events').updateOne(
     {
       id: eventId
     },
     {
       $push: {
         actions: {
-          ...action,
-          createdAt: now,
-          createdBy: '123-123-123'
+          ...input,
+          createdBy,
+          createdAt: now
         }
       }
     }
@@ -103,9 +107,7 @@ export async function addAction(eventId: string, action: ActionInput) {
   return getEventById(eventId)
 }
 
-export async function patchEvent(
-  event: z.infer<typeof EventInputWithId>
-): Promise<Event> {
+export async function patchEvent(event: EventInputWithId): Promise<Event> {
   const existingEvent = await getEventById(event.id)
 
   if (!existingEvent) {

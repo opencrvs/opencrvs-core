@@ -30,23 +30,45 @@ export const ActionInputFields = z.array(
   })
 )
 
-const ActionCreateInput = z.object({
-  type: z.literal(ActionType.CREATE),
+const BaseActionInput = z.object({
+  eventId: z.string(),
+  transactionId: z.string(),
   fields: ActionInputFields
 })
 
-const ActionRegisterInput = z.object({
-  type: z.literal(ActionType.REGISTER),
-  fields: ActionInputFields,
-  identifiers: z.object({
-    trackingId: z.string(),
-    registrationNumber: z.string()
+const ActionCreateInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.CREATE)
   })
-})
+)
+
+const ActionRegisterInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.REGISTER),
+    identifiers: z.object({
+      trackingId: z.string(),
+      registrationNumber: z.string()
+    })
+  })
+)
+
+export const ActionNotifyInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.NOTIFY)
+  })
+)
+
+export const ActionDeclareInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.DECLARE)
+  })
+)
 
 export const ActionInput = z.discriminatedUnion('type', [
   ActionCreateInput,
-  ActionRegisterInput
+  ActionRegisterInput,
+  ActionNotifyInput,
+  ActionDeclareInput
 ])
 
 export type ActionInput = z.infer<typeof ActionInput>
