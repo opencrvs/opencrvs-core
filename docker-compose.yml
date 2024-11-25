@@ -47,6 +47,17 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+
+  events:
+    image: opencrvs/ocrvs-events:${VERSION}
+    #platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./packages/events/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - base
+
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64
