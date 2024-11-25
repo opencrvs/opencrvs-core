@@ -21,13 +21,11 @@ import React from 'react'
 import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
 import { EventFieldRenderer } from './EventFieldRenderer'
-import { useEventForm } from './useEventForm'
 
 export function PublishEvent() {
   const { eventType } = useParams<{ eventType: string }>()
   const { title, fields, form, exit, saveAndExit, previous, next, finish } =
     useEvent(eventType)
-  const formik = useEventForm()
 
   return (
     <Frame
