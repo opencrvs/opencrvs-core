@@ -48,20 +48,13 @@ export type AppRouter = typeof appRouter
 
 export const appRouter = router({
   event: router({
-    create: publicProcedure
-      .input(
-        z.object({
-          transactionId: z.string(),
-          event: EventInput
-        })
+    create: publicProcedure.input(EventInput).mutation(async (options) => {
+      return createEvent(
+        options.input,
+        options.ctx.user.id,
+        options.input.transactionId
       )
-      .mutation(async (options) => {
-        return createEvent(
-          options.input.event,
-          options.ctx.user.id,
-          options.input.transactionId
-        )
-      }),
+    }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
       return patchEvent(options.input)
     }),
