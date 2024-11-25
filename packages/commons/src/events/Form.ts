@@ -9,26 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Field, Label } from './utils'
-
-export const FormGroupField = Field.extend({
-  id: z.string(),
-  type: z.string(), // @TODO: Get enums from somewhere, field types
-  required: z.boolean(),
-  searchable: z.boolean().optional(),
-  analytics: z.boolean().optional()
-})
-
-export const FormSection = z.object({
-  title: Label,
-  groups: z.array(FormGroupField)
-})
+import { Field } from './Field'
+import { Translation } from './Translation'
 
 export const Form = z.object({
-  active: z.boolean(),
-  version: z.object({
-    id: z.string(),
-    label: Label
-  }),
-  form: z.array(FormSection)
+  id: z
+    .string()
+    .describe('Form version. Semantic versioning recommended. Example: 0.0.1'),
+  label: Translation.describe('Human readable description of the form'),
+  pages: z.array(
+    z.object({
+      id: z.string().describe('Unique identifier for the page'),
+      title: Translation.describe('Header title of the page'),
+      fields: z.array(Field).describe('Fields to be rendered on the page')
+    })
+  )
 })
+
+export type Form = z.infer<typeof Form>

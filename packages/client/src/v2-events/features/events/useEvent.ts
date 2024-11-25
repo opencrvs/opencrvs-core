@@ -9,25 +9,40 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useParams } from 'react-router-dom'
 import { tennisClubMembershipEvent } from './fixtures'
 import { useIntl } from 'react-intl'
 import { usePagination } from './usePagination'
+import { Field } from '@opencrvs/commons'
 
-export function useEvent() {
+const eventTypes = { 'tennis-club-membership': tennisClubMembershipEvent }
+
+export function useEvent(anyEventType: string) {
   const intl = useIntl()
-  const { eventType } = useParams<{ eventType: string }>()
 
-  const formConfig = tennisClubMembershipEvent.actions[0].forms[0]
-  const pages = formConfig.form
+  if (!eventTypes[anyEventType as keyof typeof eventTypes]) {
+    throw new Error(`Event type ${anyEventType} not found`)
+  }
 
-  const { next, previous } = usePagination(pages.length)
+  const type = anyEventType as keyof typeof eventTypes
+  const { pages, label } = eventTypes[type].actions[0].forms[0]
+
+  const { next, previous, page } = usePagination(pages.length)
 
   const exit = () => alert('exit')
   const saveAndExit = () => alert('save and exit')
   const finish = () => alert('finish')
 
-  const title = intl.formatMessage(formConfig.version.label)
+  const title = intl.formatMessage(label)
 
-  return { eventType, title, exit, saveAndExit, previous, next, finish }
+  return {
+    type,
+    title,
+    exit,
+    saveAndExit,
+    previous,
+    next,
+    finish,
+    form: pages,
+    fields: pages[page].fields as Field[]
+  }
 }

@@ -1,13 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { z } from 'zod'
+import { Event } from '../events/Event'
+
 export const tennisClubMembershipEvent = {
   id: 'TENNIS_CLUB_MEMBERSHIP',
-  summary: {
-    title: {
-      defaultMessage: 'Tennis club membership application',
-      description: 'This is the title of the form',
-      id: 'event.tennis-club-membership.summary.title'
-    },
-    fields: []
-  },
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -24,23 +29,21 @@ export const tennisClubMembershipEvent = {
       },
       forms: [
         {
-          active: true,
-          version: {
-            id: '1',
-            label: {
-              defaultMessage: 'Version 1',
-              description: 'This is the first version of the form',
-              id: 'event.tennis-club-membership.action.declare.form.version.1'
-            }
+          id: '1.0.0',
+          label: {
+            defaultMessage: 'Version 1',
+            description: 'This is the first version of the form',
+            id: 'event.tennis-club-membership.action.declare.form.version.1'
           },
-          form: [
+          pages: [
             {
+              id: 'applicant',
               title: {
                 id: 'event.tennis-club-membership.action.declare.form.section.who.title',
                 defaultMessage: 'Who is applying for the membership?',
                 description: 'This is the title of the section'
               },
-              groups: [
+              fields: [
                 {
                   id: 'applicant.firstname',
                   type: 'TEXT',
@@ -74,12 +77,13 @@ export const tennisClubMembershipEvent = {
               ]
             },
             {
+              id: 'recommender',
               title: {
                 id: 'event.tennis-club-membership.action.declare.form.section.recommender.title',
                 defaultMessage: 'Who is recommending the applicant?',
                 description: 'This is the title of the section'
               },
-              groups: [
+              fields: [
                 {
                   id: 'recommender.firstname',
                   type: 'TEXT',
@@ -117,4 +121,4 @@ export const tennisClubMembershipEvent = {
       ]
     }
   ]
-}
+} satisfies z.infer<typeof Event>

@@ -19,9 +19,15 @@ import {
 } from '@opencrvs/components'
 import React from 'react'
 import { useEvent } from './useEvent'
+import { useParams } from 'react-router-dom'
+import { EventFieldRenderer } from './EventFieldRenderer'
+import { useEventForm } from './useEventForm'
 
-export function Event() {
-  const { title, exit, saveAndExit, previous, next, finish } = useEvent()
+export function PublishEvent() {
+  const { eventType } = useParams<{ eventType: string }>()
+  const { title, fields, form, exit, saveAndExit, previous, next, finish } =
+    useEvent(eventType)
+  const formik = useEventForm()
 
   return (
     <Frame
@@ -70,15 +76,7 @@ export function Event() {
               </Button>
             ]}
           >
-            {/* <Form>
-              {fields.map((field) => (
-                <Field
-                  key={field.id}
-                  field={field}
-                  onChange={(value) => setValue(field.id, value)}
-                />
-              ))}
-            </Form> */}
+            <EventFieldRenderer fields={fields} />
           </Content>
         </Frame.Section>
       </Frame.LayoutForm>

@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Action'
-export * from './Event'
-export * from './Field'
-export * from './Form'
+import React from 'react'
+
+export const Workqueues = () => {
+  return <div>Workqueues</div>
+}

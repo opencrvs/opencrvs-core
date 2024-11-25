@@ -9,22 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { Action } from './Action'
-import { Translation } from './Translation'
 
-/**
- * Description of event features defined by the country. Includes configuration for process steps and forms involved.
- *
- * `Event.parse(config)` will throw an error if the configuration is invalid.
- */
-export const Event = z.object({
+export const Translation = z.object({
   id: z
     .string()
     .describe(
-      'A machine-readable identifier for the event, e.g. "birth" or "death"'
+      'The identifier of the translation referred in translation CSV files'
     ),
-  label: Translation,
-  actions: z.array(Action)
+  defaultMessage: z.string().describe('Default translation message'),
+  description: z
+    .string()
+    .describe(
+      'Describe the translation for a translator to be able to identify it.'
+    )
 })
-
-export const defineEvent = (config: z.infer<typeof Event>) => Event.parse(config)

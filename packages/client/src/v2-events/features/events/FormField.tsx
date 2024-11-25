@@ -9,4 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export function noop() {}
+import React from 'react'
+import { Field } from '@opencrvs/commons'
+
+const TextField = () => {
+  return <input type="text" />
+}
+
+export const FormField = ({
+  type: fieldType
+}: {
+  type: Field['type']
+}) => {
+  if (fieldType === 'TEXT') {
+    return <TextField />
+  }
+
+  if (fieldType === 'DATE') {
+    return <input type="date" />
+  }
+
+  if (fieldType === 'PARAGRAPH') {
+    return <p>moro</p>
+  }
+
+  return fieldType satisfies never
+}

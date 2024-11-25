@@ -8,18 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineConfig } from '../Event'
-
-export const tennisClubMembershipEvent = defineConfig({
-  id: 'TENNIS_CLUB_MEMBERSHIP',
-  summary: {
-    title: {
-      defaultMessage: 'Tennis club membership application',
-      description: 'This is the title of the form',
-      id: 'event.tennis-club-membership.summary.title'
-    },
-    fields: []
-  },
+export const tennisClubMembershipEvent = {
+  id: 'tennis-club-membership',
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -36,23 +26,20 @@ export const tennisClubMembershipEvent = defineConfig({
       },
       forms: [
         {
-          active: true,
-          version: {
-            id: '1',
-            label: {
-              defaultMessage: 'Version 1',
-              description: 'This is the first version of the form',
-              id: 'event.tennis-club-membership.action.declare.form.version.1'
-            }
+          id: '1.0.0',
+          label: {
+            defaultMessage: 'Version 1',
+            description: 'This is the first version of the form',
+            id: 'event.tennis-club-membership.action.declare.form.version.1'
           },
-          form: [
+          pages: [
             {
               title: {
                 id: 'event.tennis-club-membership.action.declare.form.section.who.title',
                 defaultMessage: 'Who is applying for the membership?',
                 description: 'This is the title of the section'
               },
-              groups: [
+              fields: [
                 {
                   id: 'applicant.firstname',
                   type: 'TEXT',
@@ -91,7 +78,7 @@ export const tennisClubMembershipEvent = defineConfig({
                 defaultMessage: 'Who is recommending the applicant?',
                 description: 'This is the title of the section'
               },
-              groups: [
+              fields: [
                 {
                   id: 'recommender.firstname',
                   type: 'TEXT',
@@ -129,4 +116,4 @@ export const tennisClubMembershipEvent = defineConfig({
       ]
     }
   ]
-})
+}
