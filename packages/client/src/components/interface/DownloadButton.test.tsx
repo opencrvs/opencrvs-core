@@ -89,7 +89,7 @@ describe('download button', () => {
       client = createClient(store)
     })
 
-    it.only('if assigned to current user & not downloaded then should not show avatar', async () => {
+    it('if assigned to current user & not downloaded then should not show avatar', async () => {
       setScopes([SCOPES.RECORD_REGISTER], store)
       const testComponent = await createTestComponent(
         <DownloadButton
