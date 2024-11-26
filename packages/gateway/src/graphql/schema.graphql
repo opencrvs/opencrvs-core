@@ -147,6 +147,7 @@ type Query {
     sortOrder: String
   ): [SystemRole!]
   fetchSystem(clientId: ID!): System
+  getEvent(eventId: ID!): Event!
 }
 
 type Mutation {
@@ -264,6 +265,30 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createEvent(event: EventInput!): Event!
+  notifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
+  declareEvent(eventId: ID!, input: DeclareActionInput!): Event!
+  registerEvent(eventId: ID!, input: RegisterActionInput!): Event!
+  certifyEvent(eventId: ID!, input: CertifyActionInput!): Event!
+  issueEvent(eventId: ID!, input: IssueActionInput!): Event!
+  revokeEvent(eventId: ID!, input: RevokeActionInput!): Event!
+  reinstateEvent(eventId: ID!, input: ReinstateActionInput!): Event!
+  revokeCorrectionEvent(
+    eventId: ID!
+    input: RevokeCorrectionActionInput!
+  ): Event!
+  requestCorrectionEvent(
+    eventId: ID!
+    input: RequestCorrectionActionInput!
+  ): Event!
+  approveCorrectionEvent(
+    eventId: ID!
+    input: ApproveCorrectionActionInput!
+  ): Event!
+  rejectCorrectionEvent(
+    eventId: ID!
+    input: RejectCorrectionActionInput!
+  ): Event!
 }
 
 type Dummy {
@@ -499,7 +524,7 @@ type EventSearchResultSet {
 }
 
 input AdvancedSearchParametersInput {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -609,6 +634,14 @@ type System {
   type: SystemType!
   integratingSystemType: IntegratingSystemType
   settings: SystemSettings
+}
+
+type Event {
+  type: String!
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  actions: [Action!]!
 }
 
 input CorrectionInput {
@@ -781,6 +814,54 @@ input BookmarkSearchInput {
 input RemoveBookmarkedSeachInput {
   userId: String!
   searchId: String!
+}
+
+input EventInput {
+  type: String!
+}
+
+input NotifyActionInput {
+  fields: [FieldInput!]!
+}
+
+input DeclareActionInput {
+  fields: [FieldInput!]!
+}
+
+input RegisterActionInput {
+  fields: [FieldInput!]!
+}
+
+input CertifyActionInput {
+  fields: [FieldInput!]!
+}
+
+input IssueActionInput {
+  fields: [FieldInput!]!
+}
+
+input RevokeActionInput {
+  fields: [FieldInput!]!
+}
+
+input ReinstateActionInput {
+  fields: [FieldInput!]!
+}
+
+input RevokeCorrectionActionInput {
+  fields: [FieldInput!]!
+}
+
+input RequestCorrectionActionInput {
+  fields: [FieldInput!]!
+}
+
+input ApproveCorrectionActionInput {
+  fields: [FieldInput!]!
+}
+
+input RejectCorrectionActionInput {
+  fields: [FieldInput!]!
 }
 
 scalar Map
@@ -1077,7 +1158,7 @@ interface EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-enum Event {
+enum EventType {
   birth
   death
   marriage
@@ -1119,6 +1200,10 @@ type SystemSettings {
   openIdProviderBaseUrl: String
   openIdProviderClaims: String
 }
+
+scalar DateTime
+
+union Action = CreateAction | RegisterAction | NotifyAction | DeclareAction
 
 input AttachmentInput {
   _fhirID: ID
@@ -1316,6 +1401,11 @@ input WebhookInput {
   permissions: [String]!
 }
 
+input FieldInput {
+  id: String!
+  value: FieldValue!
+}
+
 type AssignmentData {
   practitionerId: String
   firstName: String
@@ -1408,7 +1498,7 @@ type RoleLabel {
 }
 
 type AdvancedSeachParameters {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -1597,6 +1687,36 @@ type WebhookPermission {
   permissions: [String!]!
 }
 
+type CreateAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+}
+
+type RegisterAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+  identifiers: Identifiers!
+}
+
+type NotifyAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+}
+
+type DeclareAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  fields: [Field!]!
+  identifiers: Identifiers!
+}
+
 enum AttachmentInputStatus {
   approved
   validated
@@ -1705,6 +1825,16 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type Field {
+  id: String!
+  value: FieldValue!
+}
+
+type Identifiers {
+  trackingId: String!
+  registrationNumber: String!
 }
 
 enum TelecomSystem {
