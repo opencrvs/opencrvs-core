@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers as appResolvers } from '@gateway/features/registration/root-resolvers'
+import { UserInputError } from '@gateway/utils/graphql-errors'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
 import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { sign } from 'jsonwebtoken'
-
-import { UserInputError } from 'apollo-server-hapi'
+import RecordsAPI from '@gateway/features/fhir/recordsAPI'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
@@ -168,7 +168,8 @@ const mockContext = {
   headers: authHeaderRegCert,
   dataSources: {
     locationsAPI: { getLocation: () => mockLocation },
-    usersAPI: { getUserById: () => mockUserDetails }
+    usersAPI: { getUserById: () => mockUserDetails },
+    recordsAPI: new RecordsAPI()
   }
 }
 

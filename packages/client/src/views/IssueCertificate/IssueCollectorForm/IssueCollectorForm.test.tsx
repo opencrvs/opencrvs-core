@@ -14,7 +14,7 @@ import { createLocation, History } from 'history'
 import { ReactWrapper } from 'enzyme'
 import { IssueCollectorForm } from './IssueCollectorForm'
 import { createTestComponent, mockDeclarationData } from '@client/tests/util'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { IssueCollectorFormForOthers } from './IssueFormForOthers'
 
 let store: AppStore
@@ -173,7 +173,7 @@ mockDeclarationData['history'] = declarationsHistory
 const birthDeclarationForIssuance = {
   id: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
   data: mockDeclarationData,
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 beforeEach(() => {

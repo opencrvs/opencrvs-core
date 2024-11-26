@@ -15,7 +15,7 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   IDeclaration,
   storeDeclaration,
@@ -36,7 +36,7 @@ let history: History
 const declaration: IDeclaration = createReviewDeclaration(
   '72c18939-70c1-40b4-9b80-b162c4871160',
   mockDeclarationData,
-  Event.Birth,
+  EventType.Birth,
   RegStatus.Registered
 )
 
