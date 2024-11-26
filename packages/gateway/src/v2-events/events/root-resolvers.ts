@@ -39,7 +39,8 @@ export const resolvers: GQLResolver = {
     async createEvent(_, { event }, { headers }) {
       const createdEvent = await trpc.event.create.mutate(
         {
-          event: event,
+          type: event.type,
+          fields: [],
           transactionId: uuid.v4()
         },
         { context: { headers } }
@@ -50,8 +51,9 @@ export const resolvers: GQLResolver = {
       return trpc.event.actions.notify.mutate(
         {
           eventId: eventId,
-          transactionId: uuid.v4(),
-          action: input
+          type: 'NOTIFY',
+          fields: input.fields,
+          transactionId: uuid.v4()
         },
         { context: { headers } }
       )
@@ -60,8 +62,9 @@ export const resolvers: GQLResolver = {
       return trpc.event.actions.declare.mutate(
         {
           eventId: eventId,
-          transactionId: uuid.v4(),
-          action: input
+          type: 'DECLARE',
+          fields: input.fields,
+          transactionId: uuid.v4()
         },
         { context: { headers } }
       )

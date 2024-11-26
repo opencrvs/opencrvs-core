@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import { Action, ActionType } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons'
+import { ActionDocument } from '@opencrvs/events/src/schema'
 
 export const eventResolvers: GQLResolver = {
   Action: {
-    __resolveType: (obj: Action) => {
+    __resolveType: (obj: ActionDocument) => {
       if (obj.type === ActionType.NOTIFY) {
         return 'NotifyAction'
       }
