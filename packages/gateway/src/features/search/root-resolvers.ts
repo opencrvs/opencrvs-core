@@ -97,10 +97,16 @@ export const resolvers: GQLResolver = {
         !inScope(authHeader, [
           SCOPES.SEARCH_BIRTH,
           SCOPES.SEARCH_DEATH,
-          SCOPES.SEARCH_MARRIAGE
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
       )
-        return await Promise.reject(new Error('Not enough scope to search'))
+        return {
+          totalItems: 0,
+          results: []
+        }
 
       if (count) {
         searchCriteria.size = count
