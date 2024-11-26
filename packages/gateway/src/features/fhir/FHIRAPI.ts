@@ -35,7 +35,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
   }
 
   async getPractitioner(practitionerId: string) {
-    const record = this.context.dataSources.recordsAPI.getRecord()
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
     if (record) {
       const inBundle = record.entry
         .map(({ resource }) => resource)
@@ -51,7 +51,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
     return res
   }
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
-    const record = this.context.dataSources.recordsAPI.getRecord()
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
     if (record) {
       const inBundle = record.entry
         .map(({ resource }) => resource)
@@ -71,7 +71,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
   }
 
   async getPractionerRoleHistory(id: string) {
-    const record = this.context.dataSources.recordsAPI.getRecord()
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
     if (!record) {
       throw new Error('No record in context. This should never happen')
     }
@@ -82,7 +82,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
   }
 
   getCompositionHistory(id: string) {
-    const record = this.context.dataSources.recordsAPI.getRecord()
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
     if (!record) {
       throw new Error('No record in context. This should never happen')
     }
@@ -98,7 +98,7 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
       })
   }
   getDocumentReference(id: string) {
-    const record = this.context.dataSources.recordsAPI.getRecord()
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
     if (!record) {
       throw new Error('No record in context. This should never happen')
     }

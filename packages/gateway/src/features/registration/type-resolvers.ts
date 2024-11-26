@@ -990,7 +990,7 @@ export const typeResolvers: GQLResolver = {
     },
     status: async (task: Saved<Task>, _, context) => {
       return context.dataSources.recordsAPI
-        .getRecord()
+        .fetchRecord()
         ?.entry.map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
         .sort(sortDescending)
@@ -1055,10 +1055,10 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
       )
-      const record = context.dataSources.recordsAPI.getRecord()
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const office = record && findLastOfficeFromSavedBundle(record)
 
-      if (assignmentExtension && context.dataSources.recordsAPI.getRecord()) {
+      if (assignmentExtension && record) {
         const regLastUserExtension = findExtension(
           `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
           task.extension
@@ -1104,7 +1104,7 @@ export const typeResolvers: GQLResolver = {
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
     location: async (task, _, context) => {
-      const record = context.dataSources.recordsAPI.getRecord()
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
@@ -1525,7 +1525,7 @@ export const typeResolvers: GQLResolver = {
       return JSON.parse(systemIdentifier.value)
     },
     location: async (task: Task, _: any, context) => {
-      const record = context.dataSources.recordsAPI.getRecord()
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const officeExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension

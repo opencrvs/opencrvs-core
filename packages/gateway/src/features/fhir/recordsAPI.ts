@@ -26,4 +26,7 @@ export default class RecordsAPI {
     }
     return this.cachedRecord!
   }
+  fetchRecord() {
+    return this.cachedRecord
+  }
 }
