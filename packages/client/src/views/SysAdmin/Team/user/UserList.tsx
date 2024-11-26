@@ -588,7 +588,7 @@ function UserListComponent(props: IProps) {
             props.goToTeamUserList(locationId)
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
-          requiredLocationTypes={'CRVS_OFFICE'}
+          locationFilter={(location) => location.type === 'CRVS_OFFICE'}
         />
       )
       buttons.push(

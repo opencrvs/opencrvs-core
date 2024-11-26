@@ -719,8 +719,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   event
                 )
               }}
-              requiredJurisdictionTypes={
+              locationFilter={
                 window.config.DECLARATION_AUDIT_LOCATIONS
+                  ? ({ jurisdictionType }) =>
+                      Boolean(
+                        jurisdictionType &&
+                          window.config.DECLARATION_AUDIT_LOCATIONS.split(
+                            ','
+                          ).includes(jurisdictionType)
+                      )
+                  : undefined
               }
             />
             <PerformanceSelect
