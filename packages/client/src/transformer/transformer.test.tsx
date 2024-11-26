@@ -31,7 +31,7 @@ import { draftToGqlTransformer } from '@client/transformer'
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { getOfflineDataSuccess } from '@client/offline/actions'
 import { IForm } from '@opencrvs/client/src/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { clone } from 'lodash'
 import { birthDraftData } from '@client/tests/mock-drafts'
 import createFetchMock from 'vitest-fetch-mock'
@@ -66,11 +66,11 @@ describe('when draft data is transformed to graphql', () => {
     customDraft = {
       id: uuid(),
       data: birthDraftData,
-      event: Event.Birth,
+      event: EventType.Birth,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
     store.dispatch(storeDeclaration(customDraft))
-    form = getRegisterForm(store.getState())[Event.Birth]
+    form = getRegisterForm(store.getState())[EventType.Birth]
     history.replace(
       DRAFT_BIRTH_PARENT_FORM.replace(
         ':declarationId',

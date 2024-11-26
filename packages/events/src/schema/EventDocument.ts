@@ -8,27 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { z } from 'zod'
-import { Field, Label } from './utils'
+import { ActionDocument } from './ActionDocument'
 
-export const FormGroupField = Field.extend({
+export const EventDocument = z.object({
   id: z.string(),
-  type: z.string(), // @TODO: Get enums from somewhere, field types
-  required: z.boolean(),
-  searchable: z.boolean().optional(),
-  analytics: z.boolean().optional()
+  type: z.string(),
+  transactionId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  actions: z.array(ActionDocument)
 })
 
-export const FormSection = z.object({
-  title: Label,
-  groups: z.array(FormGroupField)
-})
-
-export const Form = z.object({
-  active: z.boolean(),
-  version: z.object({
-    id: z.string(),
-    label: Label
-  }),
-  form: z.array(FormSection)
-})
+export type EventDocument = z.infer<typeof EventDocument>

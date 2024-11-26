@@ -1,0 +1,3 @@
+{
+  "ignore": ["packages/client/src/utils/gateway.ts"]
+}

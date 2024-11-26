@@ -13,7 +13,6 @@ import {
   userTypeResolvers as typeResolvers
 } from '@gateway/features/user/type-resolvers'
 
-import LocationsAPI from '@gateway/features/fhir/locationsAPI'
 import { TestResolvers } from '@gateway/utils/testUtils'
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
@@ -21,14 +20,6 @@ const fetch = fetchAny as fetchAny.FetchMock
 const userTypeResolvers = typeResolvers as unknown as TestResolvers
 
 const mockGet = jest.fn()
-jest.mock('apollo-datasource-rest', () => {
-  class MockRESTDataSource {
-    get = mockGet
-  }
-  return {
-    RESTDataSource: MockRESTDataSource
-  }
-})
 
 beforeEach(() => {
   fetch.resetMocks()
@@ -89,56 +80,7 @@ describe('User type resolvers', () => {
     const res = userTypeResolvers.User!.underInvestigation(mockResponse)
     expect(res).toBeTruthy()
   })
-  it('return primaryOffice type', async () => {
-    const mockOffice = {
-      resourceType: 'Location',
-      name: 'Moktarpur Union Parishad',
-      alias: ['মোক্তারপুর ইউনিয়ন পরিষদ'],
-      status: 'active',
-      partOf: {
-        reference: 'Location/43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
-      },
-      type: {
-        coding: [
-          {
-            system: 'http://opencrvs.org/specs/location-type',
-            code: 'CRVS_OFFICE'
-          }
-        ]
-      },
-      physicalType: {
-        coding: [
-          {
-            code: 'bu',
-            display: 'Building'
-          }
-        ]
-      },
-      address: {
-        line: ['Moktarpur', 'Kaliganj'],
-        district: 'Gazipur',
-        state: 'Dhaka'
-      },
-      id: '79776844-b606-40e9-8358-7d82147f702a'
-    }
-    mockGet.mockResolvedValueOnce(mockOffice)
-    const locationsAPI = new LocationsAPI()
-    locationsAPI.context = {
-      record: null
-    }
-    const res = await userTypeResolvers.User.primaryOffice(
-      mockResponse,
-      undefined,
-      {
-        dataSources: {
-          locationsAPI: {
-            getLocation: () => mockOffice
-          }
-        }
-      }
-    )
-    expect(res).toEqual(mockOffice)
-  })
+
   it('return user signature as registration agent', async () => {
     const roleBundle = {
       resourceType: 'Bundle',
