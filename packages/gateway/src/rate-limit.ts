@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as client from '@gateway/utils/redis'
-import { ApolloError } from 'apollo-server-hapi'
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLError } from 'graphql'
 import { Context } from '@gateway/graphql/context'
 import { getUserId, hasScope } from '@gateway/features/user/utils'
 import { DISABLE_RATE_LIMIT } from './constants'
@@ -21,10 +20,16 @@ import { userScopes } from '@opencrvs/commons/authentication'
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
  */
-export class RateLimitError extends ApolloError {
-  constructor(message: string) {
-    super(message, 'RATE_LIMIT_ERROR')
-    Object.defineProperty(this, 'name', { value: 'RateLimitError' })
+export class RateLimitError extends GraphQLError {
+  constructor(message = 'You are being rate limited') {
+    super(message, {
+      extensions: {
+        code: 'RATE_LIMIT_EXCEEDED',
+        http: {
+          status: 429
+        }
+      }
+    })
   }
 }
 

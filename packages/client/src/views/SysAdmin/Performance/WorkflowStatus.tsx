@@ -12,7 +12,7 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -195,7 +195,7 @@ interface DispatchProps {
 interface ISearchParams {
   locationId: string
   status?: keyof IStatusMapping
-  event?: Event
+  event?: EventType
 }
 export interface IHistoryStateProps {
   timeStart: Date | string
@@ -733,7 +733,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   new Date(timeStart),
                   new Date(timeEnd),
                   status,
-                  value as Event
+                  value as EventType
                 )
               }}
               id="event-select"

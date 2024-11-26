@@ -10,26 +10,23 @@
  */
 
 // eslint-disable-next-line import/no-relative-parent-imports
+import { AugmentedRequest } from '@apollo/datasource-rest'
 import { FHIR_URL } from '@gateway/constants'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 import { PaymentReconciliation } from '@opencrvs/commons/types'
-import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
 
-export default class PaymentsAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = `${FHIR_URL}/PaymentReconciliation`
-  }
+export default class PaymentsAPI extends OpenCRVSRESTDataSource {
+  override baseURL = FHIR_URL
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
-    request.headers.set('Content-Type', 'application/fhir+json')
+  override willSendRequest(
+    _path: string,
+    request: AugmentedRequest
+  ): void | Promise<void> {
+    super.willSendRequest(_path, request)
+    request.headers['Content-Type'] = 'application/fhir+json'
   }
 
   getPayment(id: string): Promise<PaymentReconciliation> {
-    return this.get(`/${id}`)
+    return this.get(`PaymentReconciliation/${id}`)
   }
 }
