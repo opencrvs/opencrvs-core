@@ -1068,7 +1068,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 }
 
 export const CorrectionSummary = withRouter(
-  connect<IProps, IDispatchProps, IState, IStoreState>(
+  connect(
     (state: IStoreState) => ({
       registerForm: getRegisterForm(state),
       offlineResources: getOfflineData(state),

@@ -687,7 +687,11 @@ const NavigationView = (props: IFullProps) => {
                         navigationMessages[WORKQUEUE_TABS.organisation]
                       )}
                       onClick={() =>
-                        router.navigate(routes.ORGANISATIONS_INDEX)
+                        router.navigate(
+                          formatUrl(routes.ORGANISATIONS_INDEX, {
+                            locationId: '' // NOTE: Empty string is required
+                          })
+                        )
                       }
                       isSelected={
                         enableMenuSelection &&

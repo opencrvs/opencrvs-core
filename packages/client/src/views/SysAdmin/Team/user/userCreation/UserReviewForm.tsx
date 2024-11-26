@@ -129,7 +129,6 @@ const UserReviewFormComponent = ({
   offlineCountryConfiguration,
   userId,
   submitForm,
-
   section
 }: IFullProps & IDispatchProps) => {
   const navigate = useNavigate()
@@ -434,7 +433,5 @@ export const UserReviewForm = withRouter(
       offlineCountryConfiguration: getOfflineData(store),
       userDetails: getUserDetails(store)
     }
-  }, mapDispatchToProps)(
-    injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)
-  )
+  }, mapDispatchToProps)(injectIntl(UserReviewFormComponent))
 )
