@@ -16,9 +16,9 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { connect, useSelector } from 'react-redux'
 import {
   formatUrl,
+  generateGoToPageUrl,
   generateIssueCertificateUrl,
-  generatePrintCertificateUrl,
-  goToPage as goToPageAction
+  generatePrintCertificateUrl
 } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import {
@@ -108,7 +108,6 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
-  goToPage: typeof goToPageAction
 }
 
 interface IMatchParams {
@@ -320,13 +319,16 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                   ? intl.formatMessage(constantsMessages.update)
                   : intl.formatMessage(constantsMessages.review),
               handler: () =>
-                props.goToPage(
-                  reg.declarationStatus === 'CORRECTION_REQUESTED'
-                    ? REVIEW_CORRECTION
-                    : REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
+                props.router.navigate(
+                  generateGoToPageUrl({
+                    pageRoute:
+                      reg.declarationStatus === 'CORRECTION_REQUESTED'
+                        ? REVIEW_CORRECTION
+                        : REVIEW_EVENT_PARENT_FORM_PAGE,
+                    declarationId: reg.id,
+                    pageId: 'review',
+                    event: reg.event.toLowerCase()
+                  })
                 ),
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -534,19 +536,12 @@ const SearchModifierComponent = () => {
     </>
   )
 }
-type IDispatchProps = {
-  goToPage: typeof goToPageAction
-}
+
 export const AdvancedSearchResult = withRouter(
-  connect<{}, IDispatchProps, any, IStoreState>(
-    (state: IStoreState) => ({
-      language: state.i18n.language,
-      scope: getScope(state),
-      userDetails: getUserDetails(state),
-      outboxDeclarations: state.declarationsState.declarations
-    }),
-    {
-      goToPage: goToPageAction
-    }
-  )(withTheme(AdvancedSearchResultComp))
+  connect<{}, null, any, IStoreState>((state: IStoreState) => ({
+    language: state.i18n.language,
+    scope: getScope(state),
+    userDetails: getUserDetails(state),
+    outboxDeclarations: state.declarationsState.declarations
+  }))(withTheme(AdvancedSearchResultComp))
 )

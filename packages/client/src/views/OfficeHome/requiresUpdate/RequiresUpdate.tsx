@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { formatUrl, goToPage } from '@client/navigation'
+import { formatUrl, generateGoToPageUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
@@ -62,7 +62,6 @@ import { useNavigate } from 'react-router-dom'
 interface IBaseRejectTabProps {
   theme: ITheme
   scope: Scope | null
-  goToPage: typeof goToPage
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -178,12 +177,17 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
-              e && e.stopPropagation()
-              props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
+              if (e) {
+                e.stopPropagation()
+              }
+
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+                  declarationId: reg.id,
+                  pageId: 'review',
+                  event: reg.event ? reg.event.toLowerCase() : ''
+                })
               )
             }
           })
@@ -325,6 +329,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const RequiresUpdate = connect(mapStateToProps, {
-  goToPage
-})(injectIntl(withTheme(RequiresUpdateComponent)))
+export const RequiresUpdate = connect(mapStateToProps)(
+  injectIntl(withTheme(RequiresUpdateComponent))
+)

@@ -25,8 +25,7 @@ import {
 } from '@client/i18n/messages'
 import {
   generateCreateUserSectionUrl,
-  generateUserReviewFormUrl,
-  goToTeamUserList
+  generateUserReviewFormUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -49,6 +48,8 @@ import { selectSystemRoleMap } from '@client/user/selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -72,7 +73,6 @@ type IState = {
 }
 
 type IDispatchProps = {
-  goToTeamUserList: typeof goToTeamUserList
   modifyUserFormData: typeof modifyUserFormData
   clearUserFormData: typeof clearUserFormData
 }
@@ -154,8 +154,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
-      this.props
+    const { section, intl, activeGroup, userId, formData } = this.props
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
@@ -169,7 +168,14 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               : section.title && intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
-          goHome={() => goToTeamUserList(String(formData.registrationOffice))}
+          goHome={() =>
+            this.props.router.navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId: String(formData.registrationOffice)
+              })
+            })
+          }
           hideBackground={true}
         >
           <Content size={ContentSize.SMALL} title={title}>
@@ -225,7 +231,6 @@ const mapStateToProps = (
 export const UserForm = withRouter(
   connect(mapStateToProps, {
     modifyUserFormData,
-    goToTeamUserList,
     clearUserFormData
   })(injectIntl(UserFormComponent))
 )

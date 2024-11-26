@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { formatUrl, goToPage } from '@client/navigation'
+import { formatUrl, generateGoToPageUrl } from '@client/navigation'
 import {
   REVIEW_CORRECTION,
   REVIEW_EVENT_PARENT_FORM_PAGE
@@ -72,7 +72,6 @@ const ToolTipContainer = styled.span`
 interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
-  goToPage: typeof goToPage
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -89,7 +88,6 @@ type IReviewTabProps = IntlShapeProps & IBaseReviewTabProps
 const ReadyForReviewComponent = ({
   theme,
   scope,
-  goToPage,
   outboxDeclarations,
   queryData,
   paginationId,
@@ -146,14 +144,21 @@ const ReadyForReviewComponent = ({
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
-              e && e.stopPropagation()
-              goToPage(
-                reg.declarationStatus === 'CORRECTION_REQUESTED'
-                  ? REVIEW_CORRECTION
-                  : REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
+              if (e) {
+                e.stopPropagation()
+              }
+
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute:
+                    reg.declarationStatus === 'CORRECTION_REQUESTED'
+                      ? REVIEW_CORRECTION
+                      : REVIEW_EVENT_PARENT_FORM_PAGE,
+
+                  declarationId: reg.id,
+                  pageId: 'review',
+                  event: reg.event ? reg.event.toLowerCase() : ''
+                })
               )
             }
           })
@@ -370,6 +375,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const ReadyForReview = connect(mapStateToProps, {
-  goToPage
-})(injectIntl(withTheme(ReadyForReviewComponent)))
+export const ReadyForReview = connect(mapStateToProps)(
+  injectIntl(withTheme(ReadyForReviewComponent))
+)

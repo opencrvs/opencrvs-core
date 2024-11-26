@@ -11,10 +11,9 @@
 
 import React from 'react'
 import {
-  goToPage,
-  goToTeamUserList,
   generatePrintCertificateUrl,
-  generateIssueCertificateUrl
+  generateIssueCertificateUrl,
+  generateGoToPageUrl
 } from '@client/navigation'
 import { IntlShape } from 'react-intl'
 import {
@@ -51,8 +50,6 @@ export type CMethodParams = {
   userDetails: UserDetails | null
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
-  goToPage?: typeof goToPage
-  goToTeamUserList?: typeof goToTeamUserList
 }
 
 export const ShowDownloadButton = ({
@@ -110,9 +107,9 @@ export const ShowUpdateButton = ({
   declaration,
   intl,
   userDetails,
-  draft,
-  goToPage
+  draft
 }: CMethodParams) => {
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
 
   const isDownloaded =
@@ -160,10 +157,10 @@ export const ShowUpdateButton = ({
       declaration?.status as string
     )
   ) {
-    let PAGE_ROUTE: string, PAGE_ID: string
+    let PAGE_ROUTE: string, pageId: 'preview' | 'review'
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
-      PAGE_ID = 'preview'
+      pageId = 'preview'
       if (type.toString() === 'birth') {
         PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (type.toString() === 'death') {
@@ -173,7 +170,7 @@ export const ShowUpdateButton = ({
       }
     } else {
       PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
-      PAGE_ID = 'review'
+      pageId = 'review'
     }
     if (!isDownloaded) {
       return (
@@ -193,7 +190,14 @@ export const ShowUpdateButton = ({
         id={`update-application-${id}`}
         size={'medium'}
         onClick={() => {
-          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+          navigate(
+            generateGoToPageUrl({
+              pageRoute: PAGE_ROUTE,
+              declarationId: id,
+              pageId,
+              event: type
+            })
+          )
         }}
       >
         {intl.formatMessage(buttonMessages.update)}
@@ -371,9 +375,9 @@ export const ShowReviewButton = ({
   declaration,
   intl,
   userDetails,
-  draft,
-  goToPage
+  draft
 }: CMethodParams) => {
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
@@ -431,14 +435,17 @@ export const ShowReviewButton = ({
         size={'medium'}
         id={`review-btn-${id}`}
         onClick={() => {
-          if (!goToPage) {
-            return
-          }
-          if (declaration.status === EVENT_STATUS.CORRECTION_REQUESTED) {
-            goToPage(REVIEW_CORRECTION, id, 'review', type)
-          } else {
-            goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
-          }
+          navigate(
+            generateGoToPageUrl({
+              pageRoute:
+                declaration.status === EVENT_STATUS.CORRECTION_REQUESTED
+                  ? REVIEW_CORRECTION
+                  : REVIEW_EVENT_PARENT_FORM_PAGE,
+              declarationId: id,
+              pageId: 'review',
+              event: type
+            })
+          )
         }}
       >
         {intl.formatMessage(constantsMessages.review)}

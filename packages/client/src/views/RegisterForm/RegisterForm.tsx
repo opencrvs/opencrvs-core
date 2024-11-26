@@ -63,7 +63,7 @@ import {
   formatUrl,
   generateCertificateCorrectionUrl,
   generateGoToHomeTabUrl,
-  goToPageGroup as goToPageGroupAction
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
@@ -158,7 +158,6 @@ interface IFormProps {
 
 export type RouteProps = RouteComponentProps<{}>
 type DispatchProps = {
-  goToPageGroup: typeof goToPageGroupAction
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
   deleteDeclaration: typeof deleteDeclaration
@@ -946,7 +945,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
       this.props.declaration
     )
 
-    this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute,
+        declarationId,
+        pageId, // @TODO: Double check this is review | preview
+        groupId,
+        event
+      })
+    )
   }
 
   updateVisitedGroups = () => {
@@ -1497,7 +1504,7 @@ export const RegisterForm = withRouter(
       writeDeclaration,
       modifyDeclaration,
       deleteDeclaration,
-      goToPageGroup: goToPageGroupAction,
+
       toggleDraftSavedNotification
     }
   )(injectIntl(RegisterFormView))

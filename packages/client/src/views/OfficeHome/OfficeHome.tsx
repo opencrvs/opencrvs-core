@@ -20,7 +20,7 @@ import {
   selectWorkqueuePagination
 } from '@client/workqueue'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import { generateGoToHomeTabUrl, goToPage } from '@client/navigation'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -69,7 +69,6 @@ const FABContainer = styled.div`
 `
 
 interface IDispatchProps {
-  goToPage: typeof goToPage
   getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   updateWorkqueuePagination: typeof updateWorkqueuePagination
@@ -537,7 +536,6 @@ export const OfficeHome = withRouter(
   connect<IBaseOfficeHomeStateProps, IDispatchProps, any, IStoreState>(
     mapStateToProps,
     {
-      goToPage,
       getOfflineData,
       updateRegistrarWorkqueue,
       updateWorkqueuePagination

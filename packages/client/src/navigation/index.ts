@@ -15,21 +15,16 @@ import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER_SECTION,
   EVENT_COMPLETENESS_RATES,
-  PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
   REVIEW_USER_FORM,
-  TEAM_SEARCH,
   VERIFY_COLLECTOR,
-  TEAM_USER_LIST,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
   REGISTRAR_HOME_TAB_PAGE,
-  VIEW_RECORD,
   PERFORMANCE_REGISTRATIONS_LIST,
-  ORGANISATIONS_INDEX,
   ISSUE_COLLECTOR,
   ISSUE_VERIFY_COLLECTOR,
   ISSUE_CERTIFICATE_PAYMENT,
@@ -45,7 +40,6 @@ import {
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
 import { stringify } from 'query-string'
-import { Cmd, loop } from 'redux-loop'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
@@ -124,15 +118,6 @@ export function generatePerformanceHomeUrl({
       timeEnd: timeEnd.toISOString()
     })
   }
-}
-
-export function goToTeamUserList(id: string) {
-  return push({
-    pathname: TEAM_USER_LIST,
-    search: stringify({
-      locationId: id
-    })
-  })
 }
 
 // @TODO: Check if format url does anything
@@ -375,28 +360,46 @@ export const generateCreateUserSectionUrl = ({
   }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
 // action.payload.formHistoryState
 
-export function goToPageGroup(
-  pageRoute: string,
-  declarationId: string,
-  pageId: string,
-  groupId: string,
-  event: string,
-  fieldNameHash?: string,
+export const generateGoToPageGroupUrl = ({
+  pageRoute,
+  declarationId,
+  pageId,
+  groupId,
+  event,
+  fieldNameHash,
+  historyState
+}: {
+  pageRoute: string
+  declarationId: string
+  pageId: string
+  groupId: string
+  event: string
+  fieldNameHash?: string
   historyState?: IDynamicValues
-) {
-  return {
-    type: GO_TO_PAGE,
-    payload: {
-      declarationId,
-      pageId,
-      groupId,
-      event,
-      fieldNameHash,
-      pageRoute,
-      historyState
-    }
-  }
-}
+}) =>
+  formatUrl(pageRoute, {
+    declarationId: declarationId.toString(),
+    pageId,
+    groupId,
+    event
+  }) + (fieldNameHash ? `#${fieldNameHash}` : '')
+
+export const generateGoToPageUrl = ({
+  pageRoute,
+  declarationId,
+  pageId,
+  event
+}: {
+  pageRoute: string
+  declarationId: string
+  pageId: string
+  event: string
+}) =>
+  formatUrl(pageRoute, {
+    declarationId: declarationId.toString(),
+    pageId,
+    event
+  })
 
 export function goToPage(
   pageRoute: string,
@@ -436,43 +439,4 @@ export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
   throw new Error(
     `Performance view no default location selected for role: ${role}`
   )
-}
-
-export function goToTeamView(userDetails: UserDetails) {
-  if (userDetails && userDetails.systemRole) {
-    return goToTeamUserList(
-      (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-    )
-  }
-}
-
-export type INavigationState = undefined
-
-export function navigationReducer(state: INavigationState, action: any) {
-  switch (action.type) {
-    case GO_TO_PAGE:
-      const {
-        fieldNameHash,
-        declarationId,
-        pageId,
-        groupId,
-        event,
-        pageRoute,
-        historyState
-      } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(
-            formatUrl(pageRoute, {
-              declarationId: declarationId.toString(),
-              pageId,
-              groupId,
-              event
-            }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
-            historyState
-          )
-        )
-      )
-  }
 }

@@ -10,7 +10,7 @@
  */
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
-import { goToTeamUserList } from '@client/navigation'
+
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -29,17 +29,14 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
-
-interface BaseProps {
-  goToTeamUserList: typeof goToTeamUserList
-}
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 type IOnlineStatusProps = {
   isOnline: boolean
 }
 
-type Props = BaseProps &
-  WrappedComponentProps &
+type Props = WrappedComponentProps &
   IOnlineStatusProps &
   RouteComponentProps<IOnlineStatusProps> & {
     offlineCountryConfiguration: IOfflineData
@@ -83,8 +80,14 @@ class TeamSearchComponent extends React.Component<Props, State> {
   }
 
   searchButtonHandler = () => {
-    this.state.selectedLocation &&
-      this.props.goToTeamUserList(this.state.selectedLocation.id)
+    if (this.state.selectedLocation) {
+      this.props.router.navigate({
+        pathname: routes.TEAM_USER_LIST,
+        search: stringify({
+          locationId: this.state.selectedLocation.id
+        })
+      })
+    }
   }
 
   render() {
@@ -136,9 +139,6 @@ function mapStateToProps(state: IStoreState) {
 
 export const TeamSearch = withRouter(
   connect<ReturnType<typeof mapStateToProps>, {}, any, IStoreState>(
-    mapStateToProps,
-    {
-      goToTeamUserList
-    }
+    mapStateToProps
   )(injectIntl(withOnlineStatus(TeamSearchComponent)))
 )

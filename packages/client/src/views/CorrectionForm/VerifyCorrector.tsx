@@ -18,9 +18,9 @@ import {
 import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
-  goToPageGroup,
   formatUrl,
-  generateGoToHomeTabUrl
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
@@ -83,7 +83,6 @@ interface IStateProps {
 interface IDispatchProps {
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
-  goToPageGroup: typeof goToPageGroup
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams>
@@ -107,12 +106,14 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
 
     this.props.writeDeclaration(changed)
 
-    this.props.goToPageGroup(
-      CERTIFICATE_CORRECTION_REVIEW,
-      this.props.declaration.id,
-      ReviewSection.Review,
-      'review-view-group',
-      this.props.declaration.event
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+        declarationId: this.props.declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group',
+        event: this.props.declaration.event
+      })
     )
   }
 
@@ -296,7 +297,6 @@ const mapStateToProps = (
 export const VerifyCorrector = withRouter(
   connect<IStateProps, IDispatchProps, any, IStoreState>(mapStateToProps, {
     modifyDeclaration,
-    writeDeclaration,
-    goToPageGroup
+    writeDeclaration
   })(injectIntl(VerifyCorrectorComponent))
 )

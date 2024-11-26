@@ -25,7 +25,7 @@ import {
   wqMessages
 } from '@client/i18n/messages'
 import { connect } from 'react-redux'
-import { goToPage, formatUrl } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   formattedDuration,
@@ -56,10 +56,6 @@ interface IBaseProps {
   onPageChange: (newPageNumber: number) => void
   loading?: boolean
   error?: boolean
-}
-
-interface IDispatchProps {
-  goToPage: typeof goToPage
 }
 
 type IProps = IBaseProps & IntlShapeProps & IDispatchProps
@@ -251,6 +247,6 @@ function InExternalValidationComponent(props: IProps) {
   )
 }
 
-export const InExternalValidationTab = connect(null, {
-  goToPage
-})(injectIntl(withTheme(InExternalValidationComponent)))
+export const InExternalValidationTab = injectIntl(
+  withTheme(InExternalValidationComponent)
+)

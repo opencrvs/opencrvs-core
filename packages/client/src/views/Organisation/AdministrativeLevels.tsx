@@ -30,17 +30,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ILocation } from '@client/offline/reducer'
 import { useParams, useNavigate } from 'react-router-dom'
-import {
-  formatUrl,
-  generatePerformanceHomeUrl,
-  goToTeamUserList
-} from '@client/navigation'
+import { formatUrl, generatePerformanceHomeUrl } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import * as routes from '@client/navigation/routes'
+import { stringify } from 'querystring'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -186,8 +183,15 @@ export function AdministrativeLevels() {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
                           }
-                          if (level.type === 'CRVS_OFFICE')
-                            dispatch(goToTeamUserList(level.id))
+
+                          if (level.type === 'CRVS_OFFICE') {
+                            navigate({
+                              pathname: routes.TEAM_USER_LIST,
+                              search: stringify({
+                                locationId: level.id
+                              })
+                            })
+                          }
                         }}
                       >
                         {getLocalizedLocationName(intl, level)}

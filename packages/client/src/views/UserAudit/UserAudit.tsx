@@ -29,7 +29,7 @@ import { Loader } from '@opencrvs/components/lib/Loader'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
-import { formatUrl, goToTeamUserList } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
@@ -55,6 +55,7 @@ import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Scope } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
+import { stringify } from 'query-string'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -362,7 +363,12 @@ export const UserAudit = () => {
                   <Link
                     id="office-link"
                     onClick={() =>
-                      dispatch(goToTeamUserList(user.primaryOffice!.id))
+                      navigate({
+                        pathname: routes.TEAM_USER_LIST,
+                        search: stringify({
+                          locationId: user.primaryOffice.id
+                        })
+                      })
                     }
                   >
                     {user.primaryOffice && user.primaryOffice.displayLabel}

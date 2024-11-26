@@ -26,9 +26,9 @@ import {
   ITaskHistory
 } from '@client/declarations'
 import {
-  goToPage as goToPageAction,
   formatUrl,
-  generateGoToHomeTabUrl
+  generateGoToHomeTabUrl,
+  generateGoToPageUrl
 } from '@client/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -96,7 +96,6 @@ interface IQueryData {
 
 interface IBaseRegistrarHomeProps {
   theme: ITheme
-  goToPage: typeof goToPageAction
   selectorId: string
   drafts: IDeclaration[]
   outboxDeclarations: IDeclaration[]
@@ -215,11 +214,13 @@ function InProgressComponent(props: IRegistrarHomeProps) {
           label: intl.formatMessage(buttonMessages.update),
           handler: () => {
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              props.goToPage(
-                pageRoute,
-                regId,
-                'review',
-                (event && event.toLowerCase()) || ''
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute,
+                  declarationId: regId,
+                  pageId: 'review',
+                  event: (event && event.toLowerCase()) || ''
+                })
               )
             }
           },
@@ -350,12 +351,17 @@ function InProgressComponent(props: IRegistrarHomeProps) {
           handler: (
             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
           ) => {
-            e && e.stopPropagation()
-            props.goToPage(
-              pageRoute,
-              draft.id,
-              'preview',
-              (draft.event && draft.event.toString()) || ''
+            if (e) {
+              e.stopPropagation()
+            }
+
+            navigate(
+              generateGoToPageUrl({
+                pageRoute,
+                declarationId: draft.id,
+                pageId: 'review',
+                event: (draft.event && draft.event.toString()) || ''
+              })
             )
           }
         })
@@ -701,6 +707,7 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const InProgress = connect(mapStateToProps, {
-  goToPage: goToPageAction
-})(injectIntl(withTheme(InProgressComponent)))
+export const InProgress = connect(
+  mapStateToProps,
+  {}
+)(injectIntl(withTheme(InProgressComponent)))

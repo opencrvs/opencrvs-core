@@ -24,7 +24,6 @@ import {
   registerFormReducer
 } from '@client/forms/register/reducer'
 import { intlReducer, IntlState } from '@client/i18n/reducer'
-import { INavigationState, navigationReducer } from '@client/navigation'
 import {
   notificationReducer,
   NotificationState
@@ -53,11 +52,9 @@ import {
 
 export interface IStoreState {
   profile: ProfileState
-  // router: RouterState
   i18n: IntlState
   declarationsState: IDeclarationsState
   registerForm: IRegisterFormState
-  navigation: INavigationState
   notification: NotificationState
   reviewForm: IReviewFormState
   offline: IOfflineDataState
@@ -81,7 +78,6 @@ export const createStore = <T>(
     i18n: intlReducer,
     declarationsState: declarationsReducer,
     registerForm: registerFormReducer,
-    navigation: navigationReducer,
     notification: notificationReducer,
     reviewForm: reviewReducer,
     offline: offlineDataReducer,

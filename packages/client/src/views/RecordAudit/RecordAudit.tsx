@@ -23,11 +23,7 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { connect, useDispatch } from 'react-redux'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import {
-  generateGoToHomeTabUrl,
-  goToPage,
-  goToTeamUserList
-} from '@client/navigation'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import {
   injectIntl,
   IntlShape,
@@ -152,8 +148,6 @@ interface IStateProps {
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-  goToPage: typeof goToPage
-  goToTeamUserList: typeof goToTeamUserList
 }
 
 export type IRecordAuditTabs = keyof IQueryData | 'search'
@@ -255,7 +249,6 @@ function RecordAuditBody({
   refetchDeclarationInfo,
   userDetails,
   registerForm,
-  goToTeamUserList,
   offlineData,
   reviewForm
 }: {
@@ -420,7 +413,6 @@ function RecordAuditBody({
           intl={intl}
           draft={draft}
           userDetails={userDetails}
-          goToTeamUserList={goToTeamUserList}
           toggleActionDetails={toggleActionDetails}
         />
       </Content>
@@ -673,9 +665,7 @@ export const RecordAudit = withRouter(
     mapStateToProps,
     {
       archiveDeclaration,
-      clearCorrectionAndPrintChanges,
-      goToPage,
-      goToTeamUserList
+      clearCorrectionAndPrintChanges
     }
   )(injectIntl(RecordAuditComp))
 )

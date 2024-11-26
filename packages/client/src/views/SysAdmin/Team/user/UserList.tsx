@@ -16,7 +16,7 @@ import {
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
 import { messages as headerMessages } from '@client/i18n/messages/views/header'
-import { formatUrl, goToTeamUserList } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -77,6 +77,7 @@ import { Link } from '@opencrvs/components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
+import { stringify } from 'querystring'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
@@ -175,7 +176,6 @@ type BaseProps = {
   offlineOffices: ILocation[]
   userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
-  goToTeamUserList: typeof goToTeamUserList
 }
 
 type IProps = BaseProps & IntlShapeProps & IOnlineStatusProps
@@ -641,7 +641,13 @@ function UserListComponent(props: IProps) {
           key={`location-picker-${locationId}`}
           selectedLocationId={locationId}
           onChangeLocation={(locationId) => {
-            props.goToTeamUserList(locationId)
+            navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId
+              })
+            })
+
             setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
           }}
           requiredLocationTypes={'CRVS_OFFICE'}
@@ -997,13 +1003,8 @@ function UserListComponent(props: IProps) {
   )
 }
 
-export const UserList = connect(
-  (state: IStoreState) => ({
-    offlineOffices: Object.values(getOfflineData(state).offices),
-    userDetails: getUserDetails(state),
-    offlineCountryConfig: getOfflineData(state)
-  }),
-  {
-    goToTeamUserList
-  }
-)(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
+export const UserList = connect((state: IStoreState) => ({
+  offlineOffices: Object.values(getOfflineData(state).offices),
+  userDetails: getUserDetails(state),
+  offlineCountryConfig: getOfflineData(state)
+}))(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

@@ -29,9 +29,9 @@ import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
 import { messages } from '@client/i18n/messages/views/search'
 import {
   formatUrl,
+  generateGoToPageUrl,
   generateIssueCertificateUrl,
-  generatePrintCertificateUrl,
-  goToPage as goToPageAction
+  generatePrintCertificateUrl
 } from '@client/navigation'
 import {
   REVIEW_CORRECTION,
@@ -121,7 +121,6 @@ interface IBaseSearchResultProps {
   scope: Scope | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
-  goToPage: typeof goToPageAction
 }
 
 interface IMatchParams {
@@ -296,13 +295,16 @@ function SearchResultView(props: ISearchResultProps) {
                   ? props.intl.formatMessage(constantsMessages.update)
                   : props.intl.formatMessage(constantsMessages.review),
               handler: () =>
-                props.goToPage(
-                  reg.declarationStatus === 'CORRECTION_REQUESTED'
-                    ? REVIEW_CORRECTION
-                    : REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
+                navigate(
+                  generateGoToPageUrl({
+                    pageRoute:
+                      reg.declarationStatus === 'CORRECTION_REQUESTED'
+                        ? REVIEW_CORRECTION
+                        : REVIEW_EVENT_PARENT_FORM_PAGE,
+                    declarationId: reg.id,
+                    pageId: 'review',
+                    event: reg.event.toLowerCase()
+                  })
                 ),
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -548,14 +550,9 @@ function SearchResultView(props: ISearchResultProps) {
     </Frame>
   )
 }
-export const SearchResult = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language,
-    scope: getScope(state),
-    userDetails: getUserDetails(state),
-    outboxDeclarations: state.declarationsState.declarations
-  }),
-  {
-    goToPage: goToPageAction
-  }
-)(injectIntl(withTheme(SearchResultView)))
+export const SearchResult = connect((state: IStoreState) => ({
+  language: state.i18n.language,
+  scope: getScope(state),
+  userDetails: getUserDetails(state),
+  outboxDeclarations: state.declarationsState.declarations
+}))(injectIntl(withTheme(SearchResultView)))

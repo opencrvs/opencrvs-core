@@ -17,7 +17,6 @@ import {
   UserSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/deserializer/deserializer'
-import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
   ShowCreateUserErrorToast,
@@ -142,7 +141,7 @@ interface ISubmitSuccessAction {
   }
 }
 
-function submitSuccess(
+export function submitSuccess(
   locationId: string,
   isUpdate = false
 ): ISubmitSuccessAction {
@@ -162,7 +161,7 @@ interface ISubmitFailedAction {
   }
 }
 
-function submitFail(errorData: ApolloError): ISubmitFailedAction {
+export function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
     type: SUBMIT_USER_FORM_DATA_FAIL,
     payload: {
@@ -379,22 +378,17 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case SUBMIT_USER_FORM_DATA_SUCCESS:
-      const list = Cmd.list<
-        | ReturnType<typeof clearUserFormData>
-        | ReturnType<typeof goToTeamUserList>
-        | ReturnType<typeof showSubmitFormSuccessToast>
-      >([
-        Cmd.action(clearUserFormData()),
-        Cmd.action(goToTeamUserList(action.payload.locationId)),
-        Cmd.action(
-          showSubmitFormSuccessToast(
-            action.payload.isUpdate
-              ? TOAST_MESSAGES.UPDATE_SUCCESS
-              : TOAST_MESSAGES.SUCCESS
-          )
-        )
-      ])
-      return loop({ ...state, submitting: false, submissionError: false }, list)
+      //   Cmd.action(clearUserFormData()),
+      //   Cmd.action(goToTeamUserList(action.payload.locationId)),
+      //   Cmd.action(
+      //     showSubmitFormSuccessToast(
+      //       action.payload.isUpdate
+      //         ? TOAST_MESSAGES.UPDATE_SUCCESS
+      //         : TOAST_MESSAGES.SUCCESS
+      //     )
+      //   )
+      // ])
+      return { ...state, submitting: false, submissionError: false }
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload

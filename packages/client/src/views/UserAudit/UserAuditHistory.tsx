@@ -46,7 +46,7 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import * as routes from '@client/navigation/routes'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 
 const DEFAULT_LIST_SIZE = 10

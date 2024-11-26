@@ -17,7 +17,6 @@ import { SegmentedControl } from '@client/components/SegmentedControl'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
-  goToTeamUserList,
   formatUrl,
   generateRegistrationsListUrlConfig
 } from '@client/navigation'
@@ -59,6 +58,7 @@ import { Link } from '@opencrvs/components/lib/Link'
 import { useAuthorization } from '@client/hooks/useAuthorization'
 import formatDate from '@client/utils/date-formatting'
 import * as routes from '@client/navigation/routes'
+import { stringify } from 'querystring'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -108,10 +108,7 @@ interface IConnectProps {
   offlineLocations: { [key: string]: ILocation }
 }
 
-interface IDispatchProps {
-  goToTeamUserList: typeof goToTeamUserList
-}
-type IProps = WrappedComponentProps & IConnectProps & IDispatchProps
+type IProps = WrappedComponentProps & IConnectProps
 
 enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
@@ -438,9 +435,13 @@ function RegistrationListComponent(props: IProps) {
           <Link
             font="bold14"
             onClick={() => {
-              props.goToTeamUserList(
-                result.registrarPractitioner?.primaryOffice?.id as string
-              )
+              navigate({
+                pathname: routes.TEAM_USER_LIST,
+                search: stringify({
+                  locationId: result.registrarPractitioner?.primaryOffice
+                    ?.id as string
+                })
+              })
             }}
           >
             {result.registrarPractitioner?.primaryOffice?.name}
@@ -764,16 +765,11 @@ function RegistrationListComponent(props: IProps) {
   )
 }
 
-export const RegistrationList = connect(
-  (state: IStoreState) => {
-    const offlineOffices = getOfflineData(state).offices
-    const offlineLocations = getOfflineData(state).locations
-    return {
-      offlineOffices,
-      offlineLocations
-    }
-  },
-  {
-    goToTeamUserList
+export const RegistrationList = connect((state: IStoreState) => {
+  const offlineOffices = getOfflineData(state).offices
+  const offlineLocations = getOfflineData(state).locations
+  return {
+    offlineOffices,
+    offlineLocations
   }
-)(injectIntl(RegistrationListComponent))
+})(injectIntl(RegistrationListComponent))

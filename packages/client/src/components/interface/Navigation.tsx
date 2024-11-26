@@ -20,8 +20,7 @@ import {
   formatUrl,
   generateGoToHomeTabUrl,
   generatePerformanceHomeUrl,
-  getDefaultPerformanceLocationId,
-  goToTeamView
+  getDefaultPerformanceLocationId
 } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
@@ -58,6 +57,7 @@ import { connect } from 'react-redux'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -213,7 +213,6 @@ interface IProps {
 
 interface IDispatchProps {
   redirectToAuthentication: typeof redirectToAuthentication
-  goToTeamViewAction: typeof goToTeamView
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
@@ -706,7 +705,20 @@ const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.team]
                       )}
-                      onClick={() => props.goToTeamViewAction(userDetails)}
+                      onClick={() => {
+                        if (
+                          userDetails &&
+                          userDetails.systemRole &&
+                          userDetails.primaryOffice
+                        ) {
+                          props.router.navigate({
+                            pathname: routes.TEAM_USER_LIST,
+                            search: stringify({
+                              locationId: userDetails.primaryOffice.id
+                            })
+                          })
+                        }
+                      }}
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === WORKQUEUE_TABS.team
@@ -1014,7 +1026,6 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
 
 export const Navigation = withRouter(
   connect<IStateProps, IDispatchProps, IProps, IStoreState>(mapStateToProps, {
-    goToTeamViewAction: goToTeamView,
     redirectToAuthentication,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam

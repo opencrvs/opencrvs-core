@@ -25,7 +25,7 @@ import {
 import {
   generateCertificateCorrectionUrl,
   generateGoToHomeTabUrl,
-  goToPageGroup
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages } from '@client/i18n/messages/views/correction'
@@ -110,7 +110,6 @@ type IState = {
 
 type IDispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
-  goToPageGroup: typeof goToPageGroup
   writeDeclaration: typeof writeDeclaration
 }
 
@@ -1056,12 +1055,14 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   }
 
   gotoReviewPage = () => {
-    this.props.goToPageGroup(
-      CERTIFICATE_CORRECTION_REVIEW,
-      this.props.declaration.id,
-      ReviewSection.Review,
-      'review-view-group',
-      this.props.declaration.event
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+        declarationId: this.props.declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group',
+        event: this.props.declaration.event
+      })
     )
   }
 }
@@ -1076,8 +1077,7 @@ export const CorrectionSummary = withRouter(
     }),
     {
       modifyDeclaration,
-      writeDeclaration,
-      goToPageGroup
+      writeDeclaration
     }
   )(injectIntl(CorrectionSummaryComponent))
 )

@@ -21,9 +21,9 @@ import {
 import { connect, useSelector } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
-  goToPageGroup,
   generateVerifyCorrectorUrl,
-  generateGoToHomeTabUrl
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { IFormSection, IFormSectionData, ReviewSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -46,7 +46,6 @@ type IProps = {
 }
 
 type IDispatchProps = {
-  goToPageGroup: typeof goToPageGroup
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
 }
@@ -111,12 +110,14 @@ function CorrectorFormComponent(props: IFullProps) {
       }
       props.modifyDeclaration(changed)
       props.writeDeclaration(changed)
-      props.goToPageGroup(
-        CERTIFICATE_CORRECTION_REVIEW,
-        declaration.id,
-        ReviewSection.Review,
-        'review-view-group',
-        declaration.event
+      navigate(
+        generateGoToPageGroupUrl({
+          pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+          declarationId: declaration.id,
+          pageId: ReviewSection.Review,
+          groupId: 'review-view-group',
+          event: declaration.event
+        })
       )
     } else {
       props.writeDeclaration(declaration)
@@ -193,6 +194,5 @@ function CorrectorFormComponent(props: IFullProps) {
 
 export const CorrectorForm = connect(undefined, {
   modifyDeclaration,
-  writeDeclaration,
-  goToPageGroup
+  writeDeclaration
 })(injectIntl(CorrectorFormComponent))

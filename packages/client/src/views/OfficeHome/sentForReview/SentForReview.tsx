@@ -15,7 +15,7 @@ import {
   wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { formatUrl, goToPage } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
@@ -65,7 +65,6 @@ const ToolTipContainer = styled.span`
 `
 interface IBaseApprovalTabProps {
   theme: ITheme
-  goToPage: typeof goToPage
   outboxDeclarations: IDeclaration[]
   scope: Scope | null
   queryData: {
@@ -358,6 +357,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const SentForReview = connect(mapStateToProps, {
-  goToPage
-})(injectIntl(withTheme(SentForReviewComponent)))
+export const SentForReview = connect(mapStateToProps)(
+  injectIntl(withTheme(SentForReviewComponent))
+)
