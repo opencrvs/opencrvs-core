@@ -11,8 +11,8 @@
 import { generateUsername, sendCredentialsNotification } from './service'
 import User from '@user-mgnt/model/user'
 import * as mockingoose from 'mockingoose'
-import * as fetchMock from 'jest-fetch-mock'
-import * as jwt from 'jsonwebtoken'
+import fetchMock from 'jest-fetch-mock'
+import jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { logger } from '@opencrvs/commons'
 

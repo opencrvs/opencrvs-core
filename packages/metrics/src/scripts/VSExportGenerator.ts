@@ -48,12 +48,11 @@ interface IInformant extends IPatient {
   relationship: string
 }
 
-const TITLE_MAP = {
+const TITLE_MAP: { [key: string]: keyof IPatientComposition } = {
   'Child details': 'child',
   'Deceased details': 'deceased',
   [`Mother's details`]: 'mother',
-  [`Father's details`]: 'father',
-  [`Informant's details`]: 'informant'
+  [`Father's details`]: 'father'
 }
 
 type IBirthRow = {
@@ -113,12 +112,15 @@ type IDeathRow = {
   informantState: string
 }
 
-interface IFullComposition {
-  event: 'Birth' | 'Death'
+interface IPatientComposition {
   deceased: IPatient
   child: IPatient
   father: IPatient
   mother: IPatient
+}
+
+interface IFullComposition extends IPatientComposition {
+  event: 'Birth' | 'Death'
   informant: IInformant
   observations: IObservation
   officeLocation: string
@@ -152,7 +154,7 @@ const OBSERVATION_CODE = {
   PRESENT_AT_BIRTH_REG: 'present-at-birth-reg'
 }
 
-const EDUCATION_LEVEL_MAP = {
+const EDUCATION_LEVEL_MAP: { [key: string]: string } = {
   PRIMARY_ISCED_1: 'Primary',
   POST_SECONDARY_ISCED_4: 'Secondary',
   FIRST_STAGE_TERTIARY_ISCED_5: 'Tertiary',

@@ -10,7 +10,7 @@
  */
 
 import { IAuthHeader } from './http'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 
 /** All the scopes user can be assigned to */
 export const userScopes = {
@@ -112,4 +112,9 @@ export const getTokenPayload = (token: string): ITokenPayload => {
     )
   }
   return decoded
+}
+
+export const getUserId = (token: string): string => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  return tokenPayload.sub
 }
