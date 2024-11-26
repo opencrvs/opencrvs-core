@@ -17,9 +17,33 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import { appRouter } from './router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
+import { getUserId } from '@opencrvs/commons/authentication'
+import { TRPCError } from '@trpc/server'
 
 const server = createHTTPServer({
-  router: appRouter
+  router: appRouter,
+  createContext: function createContext(opts) {
+    const token = opts.req.headers.authorization
+    if (!token) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED'
+      })
+    }
+
+    const userId = getUserId(token)
+
+    if (!userId) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED'
+      })
+    }
+
+    return {
+      user: {
+        id: userId
+      }
+    }
+  }
 })
 
 server.listen(5555)

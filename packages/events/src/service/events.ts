@@ -19,10 +19,6 @@ import {
 } from '@opencrvs/commons'
 import { z } from 'zod'
 
-export const EventInputWithId = EventInput.extend({
-  id: z.string()
-})
-
 const EventWithTransactionId = Event.extend({
   transactionId: z.string()
 })
@@ -55,6 +51,7 @@ export async function getEventById(id: string) {
 
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
+  createdBy: string,
   transactionId: string
 ): Promise<Event> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -79,7 +76,7 @@ export async function createEvent(
       {
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy: '123-123-123',
+        createdBy,
         fields: []
       }
     ]
@@ -90,11 +87,9 @@ export async function createEvent(
 
 export async function addAction(eventId: string, action: ActionInput) {
   const db = await getClient()
-  const collection = db.collection<Event>('events')
-
   const now = new Date()
 
-  await collection.updateOne(
+  await db.collection<Event>('events').updateOne(
     {
       id: eventId
     },
@@ -102,8 +97,7 @@ export async function addAction(eventId: string, action: ActionInput) {
       $push: {
         actions: {
           ...action,
-          createdAt: now,
-          createdBy: '123-123-123'
+          createdAt: now
         }
       }
     }
@@ -112,9 +106,13 @@ export async function addAction(eventId: string, action: ActionInput) {
   return getEventById(eventId)
 }
 
-export async function patchEvent(
-  event: z.infer<typeof EventInputWithId>
-): Promise<Event> {
+export const EventInputWithId = EventInput.extend({
+  id: z.string()
+})
+
+export type EventInputWithId = z.infer<typeof EventInputWithId>
+
+export async function patchEvent(event: EventInputWithId): Promise<Event> {
   const existingEvent = await getEventById(event.id)
 
   if (!existingEvent) {
@@ -122,8 +120,7 @@ export async function patchEvent(
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventInputWithId>('events')
 
   const now = new Date()
 

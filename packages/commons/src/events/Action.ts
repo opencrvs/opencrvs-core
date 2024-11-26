@@ -42,7 +42,6 @@ export const ActionConfig = z.object({
 })
 
 export const ActionInputBase = z.object({
-  type: z.enum(actionTypes as NonEmptyArray<ActionType>),
   fields: z.array(
     z.object({
       id: z.string(),
@@ -62,18 +61,28 @@ export const ActionInputBase = z.object({
   )
 })
 
-export const ActionInput = z.union([
-  ActionInputBase.extend({
-    type: z.enum([ActionType.CREATE])
-  }),
-  ActionInputBase.extend({
-    type: z.enum([ActionType.REGISTER]),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
+export const CreateActionInput = ActionInputBase.extend({})
+export const NotifyActionInput = ActionInputBase.extend({})
+export const DeclareActionInput = ActionInputBase.extend({})
+export const RegisterActionInput = ActionInputBase.extend({
+  identifiers: z.object({
+    trackingId: z.string(),
+    registrationNumber: z.string()
   })
-])
+})
+
+export const ActionInput = z
+  .union([
+    CreateActionInput.extend({ type: z.enum([ActionType.CREATE]) }),
+    NotifyActionInput.extend({ type: z.enum([ActionType.NOTIFY]) }),
+    DeclareActionInput.extend({ type: z.enum([ActionType.DECLARE]) }),
+    RegisterActionInput.extend({ type: z.enum([ActionType.REGISTER]) })
+  ])
+  .and(
+    z.object({
+      createdBy: z.string()
+    })
+  )
 
 export type ActionInput = z.infer<typeof ActionInput>
 
