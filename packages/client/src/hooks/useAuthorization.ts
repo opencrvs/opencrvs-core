@@ -105,24 +105,6 @@ export function usePermissions() {
     return false
   }
 
-  const canCreateUser = (office: Pick<Location, 'id'>) => {
-    if (!userPrimaryOffice?.id) {
-      return false
-    }
-    if (hasScope(SCOPES.USER_CREATE)) {
-      return true
-    }
-    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isUnderJurisdiction(
-        userPrimaryOffice.id,
-        office.id,
-        locations,
-        offices
-      )
-    }
-    return false
-  }
-
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOffice?.id) {
       return false
@@ -146,10 +128,20 @@ export function usePermissions() {
   }
 
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope(SCOPES.USER_CREATE)) return true
-    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION))
-      return office.id === userPrimaryOffice?.id
-
+    if (!userPrimaryOffice?.id) {
+      return false
+    }
+    if (hasScope(SCOPES.USER_CREATE)) {
+      return true
+    }
+    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
+      return isUnderJurisdiction(
+        userPrimaryOffice.id,
+        office.id,
+        locations,
+        offices
+      )
+    }
     return false
   }
 
@@ -193,7 +185,6 @@ export function usePermissions() {
     canIssueRecord,
     canReadUser,
     canEditUser,
-    canCreateUser,
     canAccessOffice,
     canAddOfficeUsers,
     canUpdateRecord,
