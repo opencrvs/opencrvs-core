@@ -39,9 +39,7 @@ export const resolvers: GQLResolver = {
     },
     async deactivateSystem(_, { clientId }, { headers: authHeader }) {
       if (!hasScope(authHeader, 'natlsysadmin')) {
-        return await Promise.reject(
-          new Error('Deactivate user is only allowed for natlsysadmin')
-        )
+        throw new Error('Deactivate user is only allowed for natlsysadmin')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystem`, {
         method: 'POST',
@@ -78,10 +76,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 201) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user management service. Couldn't register new system`
-          )
+        throw new Error(
+          `Something went wrong on user management service. Couldn't register new system`
         )
       }
       return res.json()
@@ -154,9 +150,7 @@ export const resolvers: GQLResolver = {
   Query: {
     async fetchSystem(_, { clientId }, { headers: authHeader }) {
       if (authHeader && !hasScope(authHeader, 'natlsysadmin')) {
-        return await Promise.reject(
-          new Error('Fetch integration is only allowed for natlsysadmin')
-        )
+        throw new Error('Fetch integration is only allowed for natlsysadmin')
       }
 
       return getSystem({ clientId }, authHeader)
