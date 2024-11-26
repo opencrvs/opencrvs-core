@@ -38,7 +38,7 @@ import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { ConnectedRouter } from 'connected-react-router'
+
 import { History, Location } from 'history'
 import * as React from 'react'
 import { Provider } from 'react-redux'

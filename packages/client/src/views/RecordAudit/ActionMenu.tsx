@@ -20,12 +20,11 @@ import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { useDispatch } from 'react-redux'
 import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {
-  goToCertificateCorrection,
-  goToHome,
-  goToIssueCertificate,
-  goToPage,
-  goToPrintCertificate,
-  goToViewRecordPage
+  formatUrl,
+  generateCertificateCorrectionUrl,
+  generateIssueCertificateUrl,
+  generatePrintCertificateUrl,
+  goToPage
 } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import { Scope } from '@sentry/react'
@@ -65,6 +64,9 @@ import {
   isUpdatableDeclaration
 } from '@client/declarations/utils'
 import { EVENT } from '@opencrvs/commons/client'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
+
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
   scope: Scope
@@ -73,6 +75,7 @@ export const ActionMenu: React.FC<{
   toggleDisplayDialog: () => void
 }> = ({ declaration, scope, draft, toggleDisplayDialog, duplicates }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [modal, openModal] = useModal()
 
   const intl = useIntl()
@@ -91,7 +94,7 @@ export const ActionMenu: React.FC<{
     ))
     if (deleteConfirm) {
       dispatch(deleteDeclaration(id, client))
-      dispatch(goToHome())
+      navigate(routes.HOME)
     }
     return
   }
@@ -214,13 +217,17 @@ const ViewAction: React.FC<{
   declarationStatus?: SUBMISSION_STATUS
   declarationId: string
 }> = ({ declarationStatus, declarationId }) => {
+  const navigate = useNavigate()
   const intl = useIntl()
-  const dispatch = useDispatch()
 
   return (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(goToViewRecordPage(declarationId))
+        navigate(
+          formatUrl(routes.VIEW_RECORD, {
+            declarationId
+          })
+        )
       }}
     >
       <Icon name="Eye" color="currentColor" size="large" />
@@ -234,6 +241,7 @@ const ViewAction: React.FC<{
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
 > = ({ declarationId, declarationStatus, type, isDownloaded, scope }) => {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const intl = useIntl()
 
@@ -258,11 +266,12 @@ const CorrectRecordAction: React.FC<
     <DropdownMenu.Item
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(
-          goToCertificateCorrection(
-            declarationId as string,
-            CorrectionSection.Corrector
-          )
+
+        navigate(
+          generateCertificateCorrectionUrl({
+            declarationId,
+            pageId: CorrectionSection.Corrector
+          })
         )
       }}
       disabled={!isDownloaded}
@@ -432,6 +441,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   // @ToDo use: `record.print-records` or other appropriate scope after configurable role pr is merged
   const userHasPrintScope =
@@ -445,11 +455,12 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     <DropdownMenu.Item
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(
-          goToPrintCertificate(
-            declarationId as string,
-            (type as string).toLocaleLowerCase()
-          )
+
+        navigate(
+          generatePrintCertificateUrl({
+            registrationId: declarationId,
+            event: (type as string)?.toLocaleLowerCase()
+          })
         )
       }}
       disabled={!isDownloaded}
@@ -468,6 +479,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   // @ToDo use: `record.print-issue-certified-copies` or other appropriate scope after configurable role pr is merged
   const userHasIssueScope =
@@ -481,7 +493,11 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     <DropdownMenu.Item
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(goToIssueCertificate(declarationId as string))
+        navigate(
+          generateIssueCertificateUrl({
+            registrationId: declarationId
+          })
+        )
       }}
       disabled={!isDownloaded}
     >

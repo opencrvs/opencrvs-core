@@ -20,12 +20,9 @@ import { matchPath } from 'react-router-dom'
 import { Location } from 'history'
 
 function isPathExactmatch(pathname: string, routesPath: string): boolean {
-  const match = matchPath(pathname, routesPath)
-  if (match) {
-    return match.isExact
-  }
-
-  return false
+  // @todo, check the validation
+  const match = matchPath({ path: routesPath }, pathname)
+  return !!match
 }
 
 function isUserHome(pathname: string): boolean {

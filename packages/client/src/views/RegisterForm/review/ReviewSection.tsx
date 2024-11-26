@@ -2092,6 +2092,7 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
   }
   return readyOnlyField
 }
+
 export const ReviewSection = connect(
   (state: IStoreState, { form }: { form: IForm }) => {
     const registrationSection = form.sections.find(

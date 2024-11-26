@@ -13,14 +13,12 @@ import { Header } from '@client/components/Header/Header'
 import { Navigation } from '@client/components/interface/Navigation'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import {
-  goToAdvancedSearch,
-  goToDeclarationRecordAudit,
-  goToEvents as goToEventsAction,
-  goToIssueCertificate as goToIssueCertificateAction,
-  goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction
+  formatUrl,
+  generateIssueCertificateUrl,
+  generatePrintCertificateUrl,
+  goToPage as goToPageAction
 } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import {
@@ -43,7 +41,7 @@ import { messages as advancedSearchResultMessages } from '@client/i18n/messages/
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
@@ -87,6 +85,7 @@ import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/Bookm
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { UserDetails } from '@client/utils/userUtils'
 import { changeSortedColumn } from '@client/views/OfficeHome/utils'
+import * as routes from '@client/navigation/routes'
 
 const SearchParamContainer = styled.div`
   margin: 16px 0px;
@@ -107,13 +106,9 @@ interface IBaseSearchResultProps {
   theme: ITheme
   language: string
   scope: Scope | null
-  goToEvents: typeof goToEventsAction
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
-  goToPrintCertificate: typeof goToPrintCertificateAction
-  goToIssueCertificate: typeof goToIssueCertificateAction
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 interface IMatchParams {
@@ -292,7 +287,13 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToPrintCertificate(reg.id, reg.event)
+
+                props.router.navigate(
+                  generatePrintCertificateUrl({
+                    registrationId: reg.id,
+                    event: reg.event
+                  })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -303,7 +304,12 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToIssueCertificate(reg.id)
+
+                props.router.navigate(
+                  generateIssueCertificateUrl({
+                    registrationId: reg.id
+                  })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -368,14 +374,28 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         const NameComponent = reg.name ? (
           <NameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              props.router.navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {reg.name}
           </NameContainer>
         ) : (
           <NoNameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              props.router.navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {intl.formatMessage(constantsMessages.noNameProvided)}
           </NoNameContainer>
@@ -481,7 +501,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
 }
 
 const SearchModifierComponent = () => {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsState)
   const offlineData = useSelector(getOfflineData)
   const intl = useIntl()
@@ -507,27 +527,18 @@ const SearchModifierComponent = () => {
             ></Pill>
           )
         })}
-        <Link
-          font="bold14"
-          onClick={() => {
-            dispatch(goToAdvancedSearch())
-          }}
-        >
+        <Link font="bold14" onClick={() => navigate(routes.ADVANCED_SEARCH)}>
           {intl.formatMessage(buttonMessages.edit)}
         </Link>
       </SearchParamContainer>
     </>
   )
 }
-type Foo = {
-  goToEvents: typeof goToEventsAction
+type IDispatchProps = {
   goToPage: typeof goToPageAction
-  goToPrintCertificate: typeof goToPrintCertificateAction
-  goToIssueCertificate: typeof goToIssueCertificateAction
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 export const AdvancedSearchResult = withRouter(
-  connect<{}, Foo, any, IStoreState>(
+  connect<{}, IDispatchProps, any, IStoreState>(
     (state: IStoreState) => ({
       language: state.i18n.language,
       scope: getScope(state),
@@ -535,11 +546,7 @@ export const AdvancedSearchResult = withRouter(
       outboxDeclarations: state.declarationsState.declarations
     }),
     {
-      goToEvents: goToEventsAction,
-      goToPage: goToPageAction,
-      goToPrintCertificate: goToPrintCertificateAction,
-      goToIssueCertificate: goToIssueCertificateAction,
-      goToDeclarationRecordAudit
+      goToPage: goToPageAction
     }
   )(withTheme(AdvancedSearchResultComp))
 )

@@ -22,7 +22,10 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import { FormFieldGenerator } from '@client/components/form'
 import { useDispatch, useSelector } from 'react-redux'
-import { formatUrl, goToIssueCertificatePayment } from '@client/navigation'
+import {
+  formatUrl,
+  generateIssueCertificatePaymentUrl
+} from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import {
@@ -31,7 +34,7 @@ import {
   collectMarriageCertificateFormSection
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { Event } from '@client/utils/gateway'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'
@@ -57,6 +60,7 @@ export const IssueCollectorFormForOthers = ({
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
 
@@ -101,7 +105,13 @@ export const IssueCollectorFormForOthers = ({
 
   function continueButtonHandler() {
     const event = declaration.event
-    dispatch(goToIssueCertificatePayment(declaration.id, event))
+
+    navigate(
+      generateIssueCertificatePaymentUrl({
+        registrationId: declaration.id,
+        event
+      })
+    )
   }
 
   return (

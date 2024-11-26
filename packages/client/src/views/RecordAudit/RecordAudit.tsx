@@ -22,13 +22,10 @@ import {
   Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect, useDispatch } from 'react-redux'
-import { Navigate, useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import {
-  goToHomeTab,
+  generateGoToHomeTabUrl,
   goToPage,
-  goToCertificateCorrection,
-  goToPrintCertificate,
-  goToUserProfile,
   goToTeamUserList
 } from '@client/navigation'
 import {
@@ -78,7 +75,6 @@ import {
 } from '@client/utils/gateway'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
-import { goBack } from 'connected-react-router'
 import {
   IDeclarationData,
   getGQLDeclaration,
@@ -156,13 +152,8 @@ interface IStateProps {
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-  goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToHomeTab: typeof goToHomeTab
-  goToUserProfile: typeof goToUserProfile
   goToTeamUserList: typeof goToTeamUserList
-  goBack: typeof goBack
 }
 
 export type IRecordAuditTabs = keyof IQueryData | 'search'
@@ -260,14 +251,11 @@ function RecordAuditBody({
   draft,
   duplicates,
   intl,
-  goToHomeTab,
   scope,
   refetchDeclarationInfo,
   userDetails,
   registerForm,
-  goToUserProfile,
   goToTeamUserList,
-  goBack,
   offlineData,
   reviewForm
 }: {
@@ -283,6 +271,7 @@ function RecordAuditBody({
   tab: IRecordAuditTabs
   reviewForm: IReviewFormState
 } & IDispatchProps) {
+  const navigate = useNavigate()
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
@@ -354,7 +343,6 @@ function RecordAuditBody({
     toggleActionDetails,
     intl,
     userDetails,
-    goToUser: goToUserProfile,
     registerForm: regForm,
     offlineData,
     draft,
@@ -367,7 +355,7 @@ function RecordAuditBody({
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
       <BackButtonDiv key="go-back">
-        <BackButton onClick={() => goBack()}>
+        <BackButton onClick={() => navigate(-1)}>
           <BackArrow />
         </BackButton>
       </BackButtonDiv>
@@ -432,7 +420,6 @@ function RecordAuditBody({
           intl={intl}
           draft={draft}
           userDetails={userDetails}
-          goToUserProfile={goToUserProfile}
           goToTeamUserList={goToTeamUserList}
           toggleActionDetails={toggleActionDetails}
         />
@@ -474,7 +461,12 @@ function RecordAuditBody({
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
-                goToHomeTab(WORKQUEUE_TABS.readyForReview)
+
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyForReview
+                  })
+                )
               }}
             >
               {intl.formatMessage(buttonMessages.archive)}
@@ -504,9 +496,9 @@ const BodyContent = ({
   tab,
   userDetails,
   workqueueDeclaration,
-  goBack,
   ...actionProps
 }: ValidatedProps) => {
+  const navigate = useNavigate()
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
   if (
     tab === 'search' ||
@@ -577,7 +569,6 @@ const BodyContent = ({
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
-                goBack={goBack}
               />
             )
           }}
@@ -625,7 +616,6 @@ const BodyContent = ({
         intl={intl}
         scope={scope}
         userDetails={userDetails}
-        goBack={goBack}
       />
     )
   }
@@ -684,13 +674,8 @@ export const RecordAudit = withRouter(
     {
       archiveDeclaration,
       clearCorrectionAndPrintChanges,
-      goToCertificateCorrection,
       goToPage,
-      goToPrintCertificate,
-      goToHomeTab,
-      goToUserProfile,
-      goToTeamUserList,
-      goBack
+      goToTeamUserList
     }
   )(injectIntl(RecordAuditComp))
 )

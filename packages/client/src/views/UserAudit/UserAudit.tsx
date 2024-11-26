@@ -16,7 +16,7 @@ import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { IntlShape, useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { GET_USER } from '@client/user/queries'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
@@ -29,7 +29,7 @@ import { Loader } from '@opencrvs/components/lib/Loader'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { useDispatch, useSelector } from 'react-redux'
-import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
+import { formatUrl, goToTeamUserList } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
@@ -53,16 +53,14 @@ import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Scope } from '@client/utils/authUtils'
+import * as routes from '@client/navigation/routes'
+import { UserSection } from '@client/forms'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
-
-interface IRouteProps {
-  userId: string
-}
 
 const transformUserQueryResult = (
   userData: NonNullable<GetUserQuery['getUser']>,
@@ -132,7 +130,8 @@ function canEditUserDetails(
 
 export const UserAudit = () => {
   const intl = useIntl()
-  const { userId } = useParams<IRouteProps>()
+  const navigate = useNavigate()
+  const { userId } = useParams()
   const dispatch = useDispatch()
   const [showResendInviteSuccess, setShowResendInviteSuccess] =
     useState<boolean>(false)
@@ -162,6 +161,14 @@ export const UserAudit = () => {
   const toggleUserActivationModal = () => {
     setModalVisible(!modalVisible)
   }
+
+  const goToReviewUserDetails = (userId: string) =>
+    navigate(
+      formatUrl(routes.REVIEW_USER_DETAILS, {
+        userId,
+        sectionId: UserSection.Preview
+      })
+    )
 
   const toggleUsernameReminderModal = () => {
     setToggleUsernameReminder((prevValue) => !prevValue)
@@ -225,7 +232,7 @@ export const UserAudit = () => {
     const menuItems: { label: string; handler: () => void }[] = [
       {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
-        handler: () => dispatch(goToReviewUserDetails(userId))
+        handler: () => goToReviewUserDetails(userId)
       }
     ]
 
@@ -414,7 +421,7 @@ export const UserAudit = () => {
                 id="username-reminder-send"
                 key="username-reminder-send"
                 onClick={() => {
-                  if (toggleUsernameReminder) {
+                  if (toggleUsernameReminder && userId) {
                     usernameReminder(userId)
                   }
                   toggleUsernameReminderModal()
@@ -453,7 +460,7 @@ export const UserAudit = () => {
                 id="reset-password-send"
                 key="reset-password-send"
                 onClick={() => {
-                  if (toggleResetPassword) {
+                  if (toggleResetPassword && userId) {
                     resetPassword(userId)
                   }
                   toggleUserResetPasswordModal()

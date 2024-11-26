@@ -40,7 +40,7 @@ WebFont.load({
 
 storage.configStorage('OpenCRVS')
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 if (
   window.location.hostname !== 'localhost' &&

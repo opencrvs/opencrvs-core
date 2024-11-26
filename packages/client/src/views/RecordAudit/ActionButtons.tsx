@@ -12,10 +12,9 @@
 import React from 'react'
 import {
   goToPage,
-  goToPrintCertificate,
-  goToUserProfile,
   goToTeamUserList,
-  goToIssueCertificate
+  generatePrintCertificateUrl,
+  generateIssueCertificateUrl
 } from '@client/navigation'
 import { IntlShape } from 'react-intl'
 import {
@@ -44,6 +43,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
 import { useDispatch } from 'react-redux'
 import { Button } from '@client/../../components/src/Button'
+import { useNavigate } from 'react-router-dom'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -52,9 +52,6 @@ export type CMethodParams = {
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
   goToPage?: typeof goToPage
-  goToPrintCertificate?: typeof goToPrintCertificate
-  goToIssueCertificate?: typeof goToIssueCertificate
-  goToUserProfile?: typeof goToUserProfile
   goToTeamUserList?: typeof goToTeamUserList
 }
 
@@ -212,9 +209,9 @@ export const ShowPrintButton = ({
   intl,
   userDetails,
   draft,
-  goToPrintCertificate,
   clearCorrectionAndPrintChanges
 }: CMethodParams) => {
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
   const systemRole = userDetails ? userDetails.systemRole : ''
   const showActionButton = systemRole
@@ -278,8 +275,13 @@ export const ShowPrintButton = ({
         onClick={() => {
           clearCorrectionAndPrintChanges &&
             clearCorrectionAndPrintChanges(declaration.id)
-          goToPrintCertificate &&
-            goToPrintCertificate(id, type.toLocaleLowerCase())
+
+          navigate(
+            generatePrintCertificateUrl({
+              registrationId: id,
+              event: type.toLocaleLowerCase()
+            })
+          )
         }}
       >
         {intl.formatMessage(buttonMessages.print)}
@@ -296,6 +298,7 @@ export const ShowIssueButton = ({
   draft
 }: CMethodParams) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
   const role = userDetails ? userDetails.systemRole : ''
   const showActionButton = role
@@ -353,7 +356,7 @@ export const ShowIssueButton = ({
         id={`issue-${id}`}
         onClick={() => {
           dispatch(clearCorrectionAndPrintChanges(id))
-          dispatch(goToIssueCertificate(id))
+          navigate(generateIssueCertificateUrl({ registrationId: id }))
         }}
         type={'primary'}
       >

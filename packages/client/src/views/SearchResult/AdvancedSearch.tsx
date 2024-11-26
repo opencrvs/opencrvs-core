@@ -28,7 +28,6 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { goToAdvancedSearchResult } from '@client/navigation'
 import { pick } from 'lodash'
 import { IDateRangePickerValue, IFormSectionData } from '@client/forms'
 import { getOfflineData } from '@client/offline/selectors'
@@ -43,6 +42,8 @@ import {
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 enum TabId {
   BIRTH = 'birth',
@@ -107,6 +108,7 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
 
 const BirthSection = () => {
   const intl = useIntl()
+  const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
   const [formState, setFormState] = useState<IAdvancedSearchFormState>({
@@ -296,6 +298,7 @@ const BirthSection = () => {
         size="large"
         disabled={isDisabled}
         onClick={() => {
+          // @TODO: Check that these are updated
           dispatch(
             setAdvancedSearchParam({
               ...transformAdvancedSearchLocalStateToStoreData(
@@ -305,7 +308,7 @@ const BirthSection = () => {
               event: 'birth'
             })
           )
-          dispatch(goToAdvancedSearchResult())
+          navigate(routes.ADVANCED_SEARCH_RESULT)
         }}
       >
         {' '}
@@ -318,6 +321,7 @@ const BirthSection = () => {
 
 const DeathSection = () => {
   const intl = useIntl()
+  const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
   const offlineData = useSelector(getOfflineData)
   const [formState, setFormState] = useState<IAdvancedSearchFormState>({
@@ -469,7 +473,8 @@ const DeathSection = () => {
               event: 'death'
             })
           )
-          dispatch(goToAdvancedSearchResult())
+
+          navigate(routes.ADVANCED_SEARCH_RESULT)
         }}
       >
         {' '}

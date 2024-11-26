@@ -21,7 +21,10 @@ import {
   IFormSectionData,
   SubmissionAction
 } from '@client/forms'
-import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
+import {
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl
+} from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
@@ -44,6 +47,7 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getLocationHierarchy } from '@client/utils/locationUtils'
 import { printPDF } from '@client/pdfRenderer'
+import { useNavigate } from 'react-router-dom'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -101,6 +105,7 @@ const withEnhancedTemplateVariables = (
 }
 
 export const usePrintableCertificate = (declarationId: string) => {
+  const navigate = useNavigate()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
   >(declarationId)
@@ -191,7 +196,12 @@ export const usePrintableCertificate = (declarationId: string) => {
 
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(draft))
-    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+
+    navigate(
+      generateGoToHomeTabUrl({
+        tabId: WORKQUEUE_TABS.readyToPrint
+      })
+    )
   }
 
   const handleEdit = () => {
@@ -213,8 +223,11 @@ export const usePrintableCertificate = (declarationId: string) => {
       dispatch(writeDeclaration(updatedDeclaration))
     }
 
-    dispatch(
-      goToCertificateCorrection(declarationId, CorrectionSection.Corrector)
+    navigate(
+      generateCertificateCorrectionUrl({
+        declarationId,
+        pageId: CorrectionSection.Corrector
+      })
     )
   }
 

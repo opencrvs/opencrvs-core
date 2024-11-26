@@ -20,12 +20,7 @@ import {
   selectWorkqueuePagination
 } from '@client/workqueue'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab
-} from '@client/navigation'
+import { generateGoToHomeTabUrl, goToPage } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -75,9 +70,6 @@ const FABContainer = styled.div`
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToEvents: typeof goToEvents
-  goToHomeTab: typeof goToHomeTab
   getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   updateWorkqueuePagination: typeof updateWorkqueuePagination
@@ -93,7 +85,8 @@ interface IOfficeHomeState {
 
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
-  IBaseOfficeHomeStateProps
+  IBaseOfficeHomeStateProps &
+  RouteComponentProps<{}>
 
 const DECLARATION_WORKQUEUE_TABS = [
   WORKQUEUE_TABS.inProgress,
@@ -241,16 +234,23 @@ class OfficeHomeView extends React.Component<
 
     if (isDeclarationWorkqueueTab(tabId)) {
       if (tabId === WORKQUEUE_TABS.inProgress) {
-        this.props.goToHomeTab(
-          WORKQUEUE_TABS.inProgress,
-          Object.values(SELECTOR_ID).includes(selectorId)
-            ? selectorId
-            : SELECTOR_ID.ownDrafts,
-          newPageNumber
+        this.props.router.navigate(
+          generateGoToHomeTabUrl({
+            tabId: WORKQUEUE_TABS.inProgress,
+            selectorId: Object.values(SELECTOR_ID).includes(selectorId)
+              ? selectorId
+              : SELECTOR_ID.ownDrafts,
+            pageId: newPageNumber
+          })
         )
-        return
       }
-      this.props.goToHomeTab(tabId, '', newPageNumber)
+
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId,
+          pageId: newPageNumber
+        })
+      )
     }
   }
 
@@ -537,10 +537,7 @@ export const OfficeHome = withRouter(
   connect<IBaseOfficeHomeStateProps, IDispatchProps, any, IStoreState>(
     mapStateToProps,
     {
-      goToEvents,
       goToPage,
-      goToPrintCertificate,
-      goToHomeTab,
       getOfflineData,
       updateRegistrarWorkqueue,
       updateWorkqueuePagination

@@ -60,12 +60,10 @@ import {
 } from '@client/forms'
 import { Event, RegStatus } from '@client/utils/gateway'
 import {
-  goBack as goBackAction,
-  goToCertificateCorrection,
-  goToHome,
-  goToHomeTab,
-  goToPageGroup as goToPageGroupAction,
-  goToPrintRecordView
+  formatUrl,
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl,
+  goToPageGroup as goToPageGroupAction
 } from '@client/navigation'
 import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
@@ -109,6 +107,8 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -159,15 +159,10 @@ interface IFormProps {
 export type RouteProps = RouteComponentProps<{}>
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
-  goBack: typeof goBackAction
-  goToCertificateCorrection: typeof goToCertificateCorrection
-  goToHome: typeof goToHome
-  goToHomeTab: typeof goToHomeTab
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
   deleteDeclaration: typeof deleteDeclaration
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
-  goToPrintRecord: typeof goToPrintRecordView
 }
 
 type Props = {
@@ -263,6 +258,7 @@ function FormAppBar({
   deleteDeclarationMethod: (declration: IDeclaration) => void
   printDeclarationMethod: (declarationId: string) => void
 }) {
+  const navigate = useNavigate()
   const intl = useIntl()
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
@@ -343,14 +339,24 @@ function FormAppBar({
       declaration.localData = declaration.data
       // save declaration and exit
       dispatch(writeDeclaration(declaration))
-      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: getRedirectionTabOnSaveOrExit()
+        })
+      )
     }
   }
 
   const handleExit = async () => {
     const isDataAltered = isFormDataAltered()
     if (!isDataAltered) {
-      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: getRedirectionTabOnSaveOrExit()
+        })
+      )
+
       return
     }
     const [exitModalTitle, exitModalDescription] =
@@ -419,7 +425,11 @@ function FormAppBar({
           data: declaration.localData
         })
       }
-      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: getRedirectionTabOnSaveOrExit()
+        })
+      )
     }
   }
 
@@ -880,7 +890,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   writeDeclarationAndGoToHome = () => {
     this.props.writeDeclaration(this.props.declaration)
-    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+    this.props.router.navigate(
+      generateGoToHomeTabUrl({
+        tabId: this.getRedirectionTabOnSaveOrExit()
+      })
+    )
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
@@ -888,7 +902,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onCloseDeclaration = () => {
-    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+    this.props.router.navigate(
+      generateGoToHomeTabUrl({
+        tabId: this.getRedirectionTabOnSaveOrExit()
+      })
+    )
   }
 
   continueButtonHandler = async (
@@ -1032,7 +1050,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
               duplicate={duplicate}
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
-              printDeclarationMethod={this.props.goToPrintRecord}
+              printDeclarationMethod={(declarationId: string) =>
+                this.props.router.navigate(
+                  formatUrl(routes.PRINT_RECORD, {
+                    declarationId
+                  })
+                )
+              }
             />
           }
           key={activeSection.id}
@@ -1078,9 +1102,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       reviewSummaryHeader={reviewSummaryHeader}
                       userDetails={userDetails}
                       onContinue={() => {
-                        this.props.goToCertificateCorrection(
-                          this.props.declaration.id,
-                          CorrectionSection.SupportingDocuments
+                        this.props.router.navigate(
+                          generateCertificateCorrectionUrl({
+                            declarationId: this.props.declaration.id,
+                            pageId: CorrectionSection.SupportingDocuments
+                          })
                         )
                       }}
                     />
@@ -1097,7 +1123,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           <Button
                             type="tertiary"
                             size="small"
-                            onClick={this.props.goBack}
+                            onClick={() => this.props.router.navigate(-1)}
                           >
                             <Icon name="ArrowLeft" size="medium" />
                             {intl.formatMessage(buttonMessages.back)}
@@ -1472,31 +1498,7 @@ export const RegisterForm = withRouter(
       modifyDeclaration,
       deleteDeclaration,
       goToPageGroup: goToPageGroupAction,
-      goBack: goBackAction,
-      goToCertificateCorrection,
-      goToHome,
-      goToHomeTab,
-      toggleDraftSavedNotification,
-      goToPrintRecord: goToPrintRecordView
+      toggleDraftSavedNotification
     }
   )(injectIntl(RegisterFormView))
 )
-
-// export const RegisterForm = connect<
-//   Props,
-//   DispatchProps,
-//   IFormProps & RouteProps,
-//   IStoreState
-// >(mapStateToProps, {
-//   writeDeclaration,
-//   modifyDeclaration,
-//   deleteDeclaration,
-//   goToPageGroup: goToPageGroupAction,
-//   goBack: goBackAction,
-//   goToCertificateCorrection,
-//   goToHome,
-//   goToHomeTab,
-//   toggleDraftSavedNotification,
-//   goToPrintRecord: goToPrintRecordView
-//   })(injectIntl(RegisterFormView))
-// )

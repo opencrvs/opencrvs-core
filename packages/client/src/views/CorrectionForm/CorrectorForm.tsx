@@ -21,10 +21,9 @@ import {
 import { connect, useSelector } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import {
-  goBack,
-  goToVerifyCorrector,
   goToPageGroup,
-  goToHomeTab
+  generateVerifyCorrectorUrl,
+  generateGoToHomeTabUrl
 } from '@client/navigation'
 import { IFormSection, IFormSectionData, ReviewSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -40,23 +39,22 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { useNavigate } from 'react-router-dom'
 
 type IProps = {
   declaration: IDeclaration
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
-  goToVerifyCorrector: typeof goToVerifyCorrector
   goToPageGroup: typeof goToPageGroup
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
-  goToHomeTab: typeof goToHomeTab
 }
 
 type IFullProps = IProps & IDispatchProps & IntlShapeProps
 
 function CorrectorFormComponent(props: IFullProps) {
+  const navigate = useNavigate()
   const { declaration, intl } = props
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
@@ -94,12 +92,12 @@ function CorrectorFormComponent(props: IFullProps) {
     })
   }
   const continueButtonHandler = () => {
-    const relationShip = (
+    const relationship = (
       declaration.data.corrector.relationship as IFormSectionData
     ).value as string
     if (
-      relationShip === CorrectorRelationship.REGISTRAR ||
-      relationShip === CorrectorRelationship.ANOTHER_AGENT
+      relationship === CorrectorRelationship.REGISTRAR ||
+      relationship === CorrectorRelationship.ANOTHER_AGENT
     ) {
       const changed = {
         ...declaration,
@@ -122,7 +120,12 @@ function CorrectorFormComponent(props: IFullProps) {
       )
     } else {
       props.writeDeclaration(declaration)
-      props.goToVerifyCorrector(declaration.id, relationShip)
+      navigate(
+        generateVerifyCorrectorUrl({
+          declarationId: declaration.id,
+          corrector: relationship
+        })
+      )
     }
   }
 
@@ -152,8 +155,14 @@ function CorrectorFormComponent(props: IFullProps) {
         id="corrector_form"
         title={section.title && intl.formatMessage(section.title)}
         hideBackground
-        goBack={props.goBack}
-        goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+        goBack={() => navigate(-1)}
+        goHome={() =>
+          navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          )
+        }
       >
         <Content
           size={ContentSize.SMALL}
@@ -183,10 +192,7 @@ function CorrectorFormComponent(props: IFullProps) {
 }
 
 export const CorrectorForm = connect(undefined, {
-  goBack,
   modifyDeclaration,
   writeDeclaration,
-  goToVerifyCorrector,
-  goToPageGroup,
-  goToHomeTab
+  goToPageGroup
 })(injectIntl(CorrectorFormComponent))

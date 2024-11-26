@@ -18,10 +18,9 @@ import {
 import { IForm, ReviewSection } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/correction'
 import {
-  goBack,
   goToPageGroup,
-  goToHomeTab,
-  formatUrl
+  formatUrl,
+  generateGoToHomeTabUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
@@ -32,7 +31,7 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 import {
   CERTIFICATE_CORRECTION_REVIEW,
   REGISTRAR_HOME_TAB
@@ -82,11 +81,9 @@ interface IStateProps {
   user: UserDetails | null
 }
 interface IDispatchProps {
-  goBack: typeof goBack
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
   goToPageGroup: typeof goToPageGroup
-  goToHomeTab: typeof goToHomeTab
 }
 
 type IOwnProps = RouteComponentProps<IMatchParams>
@@ -239,8 +236,14 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
     return (
       <TimeMounted onUnmount={this.logTime}>
         <ActionPageLight
-          goBack={this.props.goBack}
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+          goBack={() => this.props.router.navigate(-1)}
+          goHome={() =>
+            this.props.router.navigate(
+              generateGoToHomeTabUrl({
+                tabId: WORKQUEUE_TABS.readyForReview
+              })
+            )
+          }
           title={intl.formatMessage(messages.title)}
           hideBackground
         >
@@ -290,15 +293,10 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCorrector = connect<
-  IStateProps,
-  IDispatchProps,
-  any,
-  IStoreState
->(mapStateToProps, {
-  goBack,
-  modifyDeclaration,
-  writeDeclaration,
-  goToPageGroup,
-  goToHomeTab
-})(injectIntl(VerifyCorrectorComponent))
+export const VerifyCorrector = withRouter(
+  connect<IStateProps, IDispatchProps, any, IStoreState>(mapStateToProps, {
+    modifyDeclaration,
+    writeDeclaration,
+    goToPageGroup
+  })(injectIntl(VerifyCorrectorComponent))
+)

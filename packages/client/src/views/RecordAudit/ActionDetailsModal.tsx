@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { goToUserProfile, IDynamicValues } from '@client/navigation'
+import { IDynamicValues } from '@client/navigation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
@@ -636,7 +636,6 @@ export const ActionDetailsModal = ({
   toggleActionDetails,
   intl,
   userDetails,
-  goToUser,
   registerForm,
   reviewForm,
   offlineData,
@@ -648,7 +647,6 @@ export const ActionDetailsModal = ({
   toggleActionDetails: (param: History | null) => void
   intl: IntlShape
   userDetails: UserDetails | null
-  goToUser: typeof goToUserProfile
   registerForm: IForm
   reviewForm: IReviewFormState
   offlineData: Partial<IOfflineData>

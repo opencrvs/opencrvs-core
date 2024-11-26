@@ -21,11 +21,11 @@ import {
 } from '@opencrvs/components'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { goToHomeTab, goBack } from '@client/navigation'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import { useModal } from '@client/hooks/useModal'
 
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
@@ -47,18 +47,24 @@ const ReviewCertificateFrame = ({
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const location = useLocation<{ isNavigatedInsideApp: boolean }>()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const back = () => {
+    // @TODO: CHECK if this needs to be changed
     const historyState = location.state
     const navigatedFromInsideApp = Boolean(
       historyState && historyState.isNavigatedInsideApp
     )
 
     if (navigatedFromInsideApp) {
-      dispatch(goBack())
+      navigate(-1)
     } else {
-      dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: WORKQUEUE_TABS.readyToPrint
+        })
+      )
     }
   }
 
@@ -77,7 +83,13 @@ const ReviewCertificateFrame = ({
           desktopRight={
             <Button
               type="icon"
-              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
+              onClick={() =>
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyToPrint
+                  })
+                )
+              }
             >
               <Icon name="X" size="large" />
             </Button>
@@ -93,7 +105,13 @@ const ReviewCertificateFrame = ({
           mobileRight={
             <Button
               type="icon"
-              onClick={() => dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))}
+              onClick={() =>
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyToPrint
+                  })
+                )
+              }
             >
               <Icon name="X" size="large" />
             </Button>
@@ -118,7 +136,9 @@ export const ReviewCertificate = () => {
     isPrintInAdvance,
     canUserEditRecord,
     handleEdit
-  } = usePrintableCertificate(registrationId)
+    // @TODO: Can this be typed?
+  } = usePrintableCertificate(registrationId!)
+
   const intl = useIntl()
   const [modal, openModal] = useModal()
 

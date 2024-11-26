@@ -1297,6 +1297,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       ) {
         return state
       }
+
       const modifiedDeclaration = {
         ...declaration,
         data: {
@@ -1304,6 +1305,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           [action.payload.pageId]: {}
         }
       }
+
       return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
     }
     case STORE_DECLARATION:

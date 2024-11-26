@@ -20,13 +20,7 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Event } from '@client/utils/gateway'
-import {
-  goBack,
-  goToHome,
-  goToDeathInformant,
-  goToBirthRegistrationAsParent,
-  goToMarriageInformant
-} from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 
@@ -35,16 +29,15 @@ import {
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { IStoreState } from '@client/store'
+import * as routes from '@client/navigation/routes'
 
+type DispatchProps = {
+  storeDeclaration: typeof storeDeclaration
+}
 class SelectVitalEventView extends React.Component<
-  IntlShapeProps & {
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    storeDeclaration: typeof storeDeclaration
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    goToDeathInformant: typeof goToDeathInformant
-    goToMarriageInformant: typeof goToMarriageInformant
-  }
+  RouteComponentProps<IntlShapeProps> & DispatchProps
 > {
   state = {
     goTo: '',
@@ -59,17 +52,31 @@ class SelectVitalEventView extends React.Component<
         case Event.Birth:
           declaration = createDeclaration(Event.Birth)
           this.props.storeDeclaration(declaration)
-          this.props.goToBirthRegistrationAsParent(declaration.id)
+
+          this.props.router.navigate(
+            formatUrl(routes.DRAFT_BIRTH_PARENT_FORM, {
+              declarationId: declaration.id
+            })
+          )
           break
         case Event.Death:
           declaration = createDeclaration(Event.Death)
           this.props.storeDeclaration(declaration)
-          this.props.goToDeathInformant(declaration.id)
+
+          this.props.router.navigate(
+            formatUrl(routes.DRAFT_DEATH_FORM, {
+              declarationId: declaration.id
+            })
+          )
           break
         case Event.Marriage:
           declaration = createDeclaration(Event.Marriage)
           this.props.storeDeclaration(declaration)
-          this.props.goToMarriageInformant(declaration.id)
+          this.props.router.navigate(
+            formatUrl(routes.DRAFT_MARRIAGE_FORM, {
+              declarationId: declaration.id
+            })
+          )
           break
         default:
           throw new Error(`Unknown eventType ${this.state.goTo}`)
@@ -90,7 +97,7 @@ class SelectVitalEventView extends React.Component<
                 id="goBack"
                 type="secondary"
                 size="small"
-                onClick={this.props.goToHome}
+                onClick={() => this.props.router.navigate(routes.HOME)}
               >
                 <Icon name="X" />
                 {intl.formatMessage(buttonMessages.exitButton)}
@@ -99,7 +106,11 @@ class SelectVitalEventView extends React.Component<
             mobileLeft={<Icon name="Draft" size="large" />}
             mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
             mobileRight={
-              <Button type="icon" size="medium" onClick={this.props.goToHome}>
+              <Button
+                type="icon"
+                size="medium"
+                onClick={() => this.props.router.navigate(routes.HOME)}
+              >
                 <Icon name="X" />
               </Button>
             }
@@ -186,11 +197,13 @@ class SelectVitalEventView extends React.Component<
   }
 }
 
-export const SelectVitalEvent = connect(null, {
-  goBack,
-  goToHome,
-  storeDeclaration,
-  goToBirthRegistrationAsParent,
-  goToDeathInformant,
-  goToMarriageInformant
-})(injectIntl(SelectVitalEventView))
+export const SelectVitalEvent = withRouter(
+  connect<
+    null,
+    DispatchProps,
+    RouteComponentProps<IntlShapeProps>,
+    IStoreState
+  >(null, {
+    storeDeclaration
+  })(injectIntl(SelectVitalEventView))
+)

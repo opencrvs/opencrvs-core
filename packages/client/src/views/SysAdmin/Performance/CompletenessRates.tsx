@@ -19,7 +19,7 @@ import {
   QueryIsLeafLevelLocationArgs
 } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToCompletenessRates } from '@client/navigation'
+import { generateCompletenessRatesUrl } from '@client/navigation'
 
 import {
   CompletenessRateTime,
@@ -31,8 +31,8 @@ import type { GQLMonthWiseEstimationMetric } from '@client/utils/gateway-depreca
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
-import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+
 import {
   IPerformanceSelectOption,
   PerformanceSelect
@@ -48,6 +48,7 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
 import { useQuery } from '@apollo/client'
+import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -61,12 +62,8 @@ interface ISearchParams {
   timeEnd: string
   time: CompletenessRateTime
 }
-interface IDispatchProps {
-  goToCompletenessRates: typeof goToCompletenessRates
-}
-type ICompletenessRateProps = RouteComponentProps<{ eventType: string }> &
-  WrappedComponentProps &
-  IDispatchProps
+
+type ICompletenessRateProps = { eventType: string } & WrappedComponentProps
 
 export interface IEstimationBase {
   baseType: COMPLETENESS_RATE_REPORT_BASE
@@ -122,6 +119,7 @@ function Filter({
   time: CompletenessRateTime
   onBaseChange: (base: COMPLETENESS_RATE_REPORT_BASE) => void
 }) {
+  const navigate = useNavigate()
   const intl = useIntl()
   const { data } = useQuery<
     IsLeafLevelLocationQuery,
@@ -168,14 +166,14 @@ function Filter({
         selectedLocationId={locationId}
         requiredLocationTypes={'ADMIN_STRUCTURE'}
         onChangeLocation={(newLocationId) => {
-          dispatch(
-            goToCompletenessRates(
-              event,
-              newLocationId,
-              dateStart,
-              dateEnd,
+          navigate(
+            generateCompletenessRatesUrl({
+              eventType: event,
+              locationId: newLocationId,
+              timeStart: dateStart,
+              timeEnd: dateEnd,
               time
-            )
+            })
           )
         }}
       />
@@ -184,27 +182,28 @@ function Filter({
         endDate={dateEnd}
         onDatesChange={({ startDate, endDate }) => {
           startDate.setDate(startDate.getDate() + 1)
-          dispatch(
-            goToCompletenessRates(
-              event,
-              locationId as string,
-              startDate,
-              endDate,
+
+          navigate(
+            generateCompletenessRatesUrl({
+              eventType: event,
+              locationId,
+              timeStart: startDate,
+              timeEnd: endDate,
               time
-            )
+            })
           )
         }}
       />
       <PerformanceSelect
         onChange={(option) =>
-          dispatch(
-            goToCompletenessRates(
-              event,
+          navigate(
+            generateCompletenessRatesUrl({
+              eventType: event,
               locationId,
-              dateStart,
-              dateEnd,
-              option.value as CompletenessRateTime
-            )
+              timeStart: dateStart,
+              timeEnd: dateEnd,
+              time: option.value as CompletenessRateTime
+            })
           )
         }
         id="completenessRateTimeSelect"
@@ -242,15 +241,14 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     baseType: COMPLETENESS_RATE_REPORT_BASE.TIME
   })
 
-  const {
-    intl,
-    location: { search },
-    match: {
-      params: { eventType }
-    }
-  } = props
+  const navigate = useNavigate()
+  const location = useLocation()
+  const params = useParams()
+
+  const { intl } = props
+
   const { locationId, timeStart, timeEnd, time } = parse(
-    search
+    location.search
   ) as unknown as ISearchParams
 
   const dateStart = new Date(timeStart)
@@ -271,7 +269,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             locationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
             base={base.baseType}
             time={time}
-            event={eventType as Event}
+            event={params.eventType as Event}
             dateStart={dateStart}
             dateEnd={dateEnd}
             onBaseChange={(base) => setBase({ baseType: base })}
@@ -285,7 +283,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
               : FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
           }
           variables={{
-            event: eventType.toUpperCase(),
+            event: params?.eventType?.toUpperCase(),
             timeStart: timeStart,
             timeEnd: timeEnd,
             locationId:
@@ -320,7 +318,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                         time
                       )}
                       completenessRateTime={time}
-                      eventType={eventType as Event}
+                      eventType={params.eventType as Event}
                     />
                   )}
                   <CompletenessDataTable
@@ -332,7 +330,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                         ? data.fetchMonthWiseEventMetrics
                         : data.fetchLocationWiseEventMetrics)
                     }
-                    eventType={eventType as Event}
+                    eventType={params.eventType as Event}
                     completenessRateTime={time}
                   />
                 </>
@@ -345,6 +343,4 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
   )
 }
 
-export const CompletenessRates = connect(null, {
-  goToCompletenessRates
-})(injectIntl(CompletenessRatesComponent))
+export const CompletenessRates = injectIntl(CompletenessRatesComponent)

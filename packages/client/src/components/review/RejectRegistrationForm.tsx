@@ -32,11 +32,12 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { isEmpty } from 'lodash'
-import { goToHome } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { UserDetails } from '@client/utils/userUtils'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import * as routes from '@client/navigation/routes'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -48,14 +49,10 @@ interface IState {
 }
 interface IProps {
   draftId: string
-  config: IOfflineData
-  user: UserDetails | null
   declaration: IDeclaration
   event: Event
   duplicate?: boolean
   onClose: () => void
-  archiveDeclaration: typeof archiveDeclaration
-  goToHome: typeof goToHome
   confirmRejectionEvent: (
     declaration: IDeclaration,
     status: string,
@@ -64,7 +61,20 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = IntlShapeProps & IProps & { form: IRejectRegistrationForm }
+type IDispatchProps = {
+  archiveDeclaration: typeof archiveDeclaration
+}
+
+type StateProps = {
+  config: IOfflineData
+  user: UserDetails | null
+  form: IRejectRegistrationForm
+}
+
+type IFullProps = IntlShapeProps &
+  RouteComponentProps<IProps> &
+  StateProps &
+  IDispatchProps
 
 class RejectRegistrationView extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
@@ -167,7 +177,8 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
                   payload.reason as string,
                   payload.comment as string
                 )
-                this.props.goToHome()
+
+                this.props.router.navigate(routes.HOME)
               }}
               disabled={!this.state.enableArchiveBtn}
             >
@@ -208,14 +219,16 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
   }
 }
 
-export const RejectRegistrationForm = connect(
-  (state: IStoreState) => ({
-    form: rejectRegistration,
-    config: getOfflineData(state),
-    user: getUserDetails(state)
-  }),
-  {
-    archiveDeclaration,
-    goToHome
-  }
-)(injectIntl(RejectRegistrationView))
+export const RejectRegistrationForm = withRouter(
+  // @TODO
+  connect<StateProps, IDispatchProps, RouteComponentProps<IProps>, IStoreState>(
+    (state: IStoreState) => ({
+      form: rejectRegistration,
+      config: getOfflineData(state),
+      user: getUserDetails(state)
+    }),
+    {
+      archiveDeclaration
+    }
+  )(injectIntl(RejectRegistrationView))
+)

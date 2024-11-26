@@ -16,19 +16,14 @@ import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
-import {
-  formatUrl,
-  goBack as goBackAction,
-  goToHomeTab,
-  goToReviewCertificate as goToReviewCertificateAction
-} from '@client/navigation'
+import { formatUrl, generateReviewCertificateUrl } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
 import { withTheme } from 'styled-components'
@@ -51,19 +46,12 @@ interface IProps {
   language: string
   declaration: IPrintableDeclaration
   theme: ITheme
-  // modifyDeclaration: typeof modifyDeclaration
-  // goToReviewCertificate: typeof goToReviewCertificateAction
-  // goBack: typeof goBackAction
-  // goToHomeTab: typeof goToHomeTab
   userDetails: UserDetails | null
   offlineCountryConfig: IOfflineData
 }
 
 interface IDispatchProps {
   modifyDeclaration: typeof modifyDeclaration
-  goToReviewCertificate: typeof goToReviewCertificateAction
-  goBack: typeof goBackAction
-  goToHomeTab: typeof goToHomeTab
 }
 
 type IFullProps = IProps & IntlShapeProps & IDispatchProps
@@ -72,12 +60,11 @@ const PaymentComponent = ({
   declaration,
   intl,
   event,
-  goBack,
   offlineCountryConfig,
   modifyDeclaration,
-  goToReviewCertificate,
   registrationId
 }: IFullProps) => {
+  const navigate = useNavigate()
   const handleContinue = (paymentAmount: string) => {
     const certificates =
       declaration && declaration.data.registration.certificates
@@ -110,7 +97,15 @@ const PaymentComponent = ({
       return
     }
 
-    goToReviewCertificate(registrationId, event)
+    navigate(
+      generateReviewCertificateUrl({
+        registrationId,
+        event
+      }),
+      {
+        state: { isNavigatedInsideApp: true }
+      }
+    )
   }
 
   if (!declaration) {
@@ -147,7 +142,7 @@ const PaymentComponent = ({
     <>
       <ActionPageLight
         title={intl.formatMessage(messages.print)}
-        goBack={goBack}
+        goBack={() => navigate(-1)}
         hideBackground
         goHome={() => goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
@@ -230,10 +225,7 @@ export const Payment = withRouter(
   connect<ReturnType<typeof mapStatetoProps>, IDispatchProps, any, IStoreState>(
     mapStatetoProps,
     {
-      goBack: goBackAction,
-      goToHomeTab,
-      modifyDeclaration,
-      goToReviewCertificate: goToReviewCertificateAction
+      modifyDeclaration
     }
   )(injectIntl(withTheme(PaymentComponent)))
 )

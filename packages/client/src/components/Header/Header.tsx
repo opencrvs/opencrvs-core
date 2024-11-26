@@ -12,15 +12,7 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  goToEvents as goToEventsAction,
-  goToSearch,
-  goToSearchResult,
-  goToSettings,
-  goToCreateNewUserWithLocationId,
-  goToCreateNewUser,
-  goToAdvancedSearch
-} from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -54,6 +46,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 type IStateProps = {
   userDetails: UserDetails | null
@@ -63,12 +57,6 @@ type IStateProps = {
 }
 
 type IDispatchProps = {
-  goToEvents: typeof goToEventsAction
-  goToSearch: typeof goToSearch
-  goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
-  goToCreateNewUser: typeof goToCreateNewUser
-  goToAdvancedSearch: typeof goToAdvancedSearch
-  goToSearchResult: typeof goToSearchResult
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
@@ -143,12 +131,6 @@ const HeaderComponent = (props: IFullProps) => {
     activeMenuItem,
     title,
     mobileRight,
-    goToSearch,
-    goToEvents,
-    goToCreateNewUserWithLocationId,
-    goToCreateNewUser,
-    goToAdvancedSearch,
-    goToSearchResult,
     setAdvancedSearchParam,
     mapPerformanceClickHandler,
     changeTeamLocation
@@ -194,9 +176,11 @@ const HeaderComponent = (props: IFullProps) => {
             icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
             handler: () => {
               if (locationId) {
-                return goToCreateNewUserWithLocationId(locationId)
+                router.navigate(formatUrl(routes.CREATE_USER, { locationId }))
+                return
               }
-              goToCreateNewUser()
+
+              router.navigate(routes.CREATE_USER)
             }
           }
         ]
@@ -219,9 +203,14 @@ const HeaderComponent = (props: IFullProps) => {
             icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
             handler: () => {
               if (locationId) {
-                return goToCreateNewUserWithLocationId(locationId)
+                router.navigate(
+                  formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                )
+
+                return
               }
-              goToCreateNewUser()
+
+              router.navigate(routes.CREATE_USER)
             }
           }
         ]
@@ -273,7 +262,7 @@ const HeaderComponent = (props: IFullProps) => {
           icon: () => (
             <Icon name="MagnifyingGlass" size="medium" color="primary" />
           ),
-          handler: () => goToSearch()
+          handler: () => router.navigate(routes.SEARCH)
         }
       ]
     }
@@ -339,7 +328,7 @@ const HeaderComponent = (props: IFullProps) => {
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
           setAdvancedSearchParam(advancedSearchInitialState)
-          goToAdvancedSearch()
+          router.navigate(routes.ADVANCED_SEARCH)
         }
       }
     ]
@@ -358,7 +347,20 @@ const HeaderComponent = (props: IFullProps) => {
             ? undefined
             : navigationList
         }
-        searchHandler={(text, type) => goToSearchResult(text, type, isMobile)}
+        searchHandler={(text, type) =>
+          router.navigate(
+            {
+              pathname: routes.SEARCH_RESULT,
+              search: stringify({
+                searchText: text,
+                searchType: type
+              })
+            },
+            {
+              replace: isMobile
+            }
+          )
+        }
       />
     )
   }
@@ -401,7 +403,7 @@ const HeaderComponent = (props: IFullProps) => {
                 size="medium"
                 key="newEvent"
                 id="header_new_event"
-                onClick={goToEvents}
+                onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
               >
                 <Icon name="Plus" size="medium" />
               </Button>
@@ -454,45 +456,40 @@ const HeaderComponent = (props: IFullProps) => {
   )
 }
 
-export const Header = connect(
-  (store: IStoreState) => ({
-    activeMenuItem: window.location.href.includes('performance')
-      ? ACTIVE_MENU_ITEM.PERFORMANCE
-      : window.location.href.includes(TEAM_USER_LIST)
-      ? ACTIVE_MENU_ITEM.USERS
-      : window.location.href.includes('team')
-      ? ACTIVE_MENU_ITEM.TEAM
-      : window.location.href.includes('config/certificate')
-      ? ACTIVE_MENU_ITEM.CERTIFICATE
-      : window.location.href.includes('config/application')
-      ? ACTIVE_MENU_ITEM.APPLICATION
-      : window.location.href.includes('config/form')
-      ? ACTIVE_MENU_ITEM.FORM
-      : window.location.href.includes('config/integration')
-      ? ACTIVE_MENU_ITEM.INTEGRATION
-      : window.location.href.includes('vsexports')
-      ? ACTIVE_MENU_ITEM.VSEXPORTS
-      : ACTIVE_MENU_ITEM.DECLARATIONS,
-    language: store.i18n.language,
-    userDetails: getUserDetails(store),
-    offlineData: getOfflineData(store),
-    fieldNames: Object.values(getRegisterForm(store))
-      .flatMap((form) => form.sections)
-      .flatMap((section) => section.groups)
-      .flatMap((group) => group.fields)
-      .map((field) => field.name)
-  }),
-  {
-    goToSearch,
-    goToSettings,
-    goToEvents: goToEventsAction,
-    goToCreateNewUserWithLocationId,
-    goToCreateNewUser,
-    goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam,
-    goToSearchResult
-  }
-)(injectIntl(withRouter(HeaderComponent)))
+export const Header = withRouter(
+  connect(
+    (store: IStoreState) => ({
+      activeMenuItem: window.location.href.includes('performance')
+        ? ACTIVE_MENU_ITEM.PERFORMANCE
+        : window.location.href.includes(TEAM_USER_LIST)
+        ? ACTIVE_MENU_ITEM.USERS
+        : window.location.href.includes('team')
+        ? ACTIVE_MENU_ITEM.TEAM
+        : window.location.href.includes('config/certificate')
+        ? ACTIVE_MENU_ITEM.CERTIFICATE
+        : window.location.href.includes('config/application')
+        ? ACTIVE_MENU_ITEM.APPLICATION
+        : window.location.href.includes('config/form')
+        ? ACTIVE_MENU_ITEM.FORM
+        : window.location.href.includes('config/integration')
+        ? ACTIVE_MENU_ITEM.INTEGRATION
+        : window.location.href.includes('vsexports')
+        ? ACTIVE_MENU_ITEM.VSEXPORTS
+        : ACTIVE_MENU_ITEM.DECLARATIONS,
+      language: store.i18n.language,
+      userDetails: getUserDetails(store),
+      offlineData: getOfflineData(store),
+      fieldNames: Object.values(getRegisterForm(store))
+        .flatMap((form) => form.sections)
+        .flatMap((section) => section.groups)
+        .flatMap((group) => group.fields)
+        .map((field) => field.name)
+    }),
+    {
+      setAdvancedSearchParam: setAdvancedSearchParam
+    }
+  )(injectIntl(HeaderComponent))
+)
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`

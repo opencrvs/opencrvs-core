@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useLocation, useNavigate, useNavigation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -24,7 +24,6 @@ import {
   PERFORMANCE_HOME,
   REGISTRAR_HOME
 } from '@client/navigation/routes'
-import { goBack, goForward } from '@client/navigation'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 export function HistoryNavigator({
@@ -32,12 +31,11 @@ export function HistoryNavigator({
 }: {
   hideForward?: boolean
 }) {
-  const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
   const role = userDetails && userDetails.systemRole
   const location = useLocation()
   const pathname = location.pathname
-  const navigation = useNavigation()
+  const navigate = useNavigate()
 
   const isLandingPage = () => {
     if (
@@ -64,7 +62,7 @@ export function HistoryNavigator({
         //   (history.action === 'POP' || history.action === 'REPLACE') &&
         //   isLandingPage()
         // }
-        onClick={() => dispatch(goBack())}
+        onClick={() => navigate(-1)}
       >
         <Icon name="ArrowLeft" />
       </Button>
@@ -73,7 +71,7 @@ export function HistoryNavigator({
           type="icon"
           size="medium"
           // disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
-          onClick={() => dispatch(goForward())}
+          onClick={() => navigate(1)}
         >
           <Icon name="ArrowRight" />
         </Button>

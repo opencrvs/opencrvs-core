@@ -32,10 +32,9 @@ import {
   constantsMessages
 } from '@client/i18n/messages'
 import {
-  goBack,
-  goToCreateUserSection,
-  goToTeamUserList,
-  goToUserReviewForm
+  generateCreateUserSectionUrl,
+  generateUserReviewFormUrl,
+  goToTeamUserList
 } from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -55,7 +54,6 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { RouteComponentProps } from 'react-router-dom'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -69,6 +67,8 @@ import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { Link } from '@opencrvs/components'
+import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { useNavigate } from 'react-router-dom'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -78,12 +78,9 @@ interface IUserReviewFormProps {
 }
 
 interface IDispatchProps {
-  goToCreateUserSection: typeof goToCreateUserSection
-  goToUserReviewForm: typeof goToUserReviewForm
   submitForm: (variables: Record<string, any>) => void
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
-  goBack: typeof goBack
   goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
   userDetails: UserDetails | null
@@ -124,12 +121,12 @@ const UserReviewFormComponent = ({
   formData,
   offlineCountryConfiguration,
   userId,
-  goToUserReviewForm,
-  goToCreateUserSection,
   submitForm,
-  goBack,
+
   section
 }: IFullProps & IDispatchProps) => {
+  const navigate = useNavigate()
+
   const getValue = (field: IFormField) => {
     if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations = field.searchableResource.reduce(
@@ -219,16 +216,21 @@ const UserReviewFormComponent = ({
                       id={`btn_change_${field.name}`}
                       onClick={() => {
                         userId
-                          ? goToUserReviewForm(
-                              userId,
-                              userFormSection.id,
-                              group.id,
-                              field.name
+                          ? navigate(
+                              generateUserReviewFormUrl({
+                                userId,
+                                sectionId: userFormSection.id,
+                                groupId: group.id,
+                                userFormFieldNameHash: field.name
+                              })
                             )
-                          : goToCreateUserSection(
-                              userFormSection.id,
-                              group.id,
-                              field.name
+                          : navigate(
+                              generateCreateUserSectionUrl({
+                                sectionId: userFormSection.id,
+                                groupId: group.id,
+                                // @TODO: check if this is the one?
+                                userFormFieldNameHash: field.name
+                              })
                             )
                       }}
                     >
@@ -324,7 +326,7 @@ const UserReviewFormComponent = ({
   return (
     <ActionPageLight
       title={title}
-      goBack={goBack}
+      goBack={() => navigate(-1)}
       goHome={() =>
         locationDetails
           ? goToTeamUserList(locationDetails.id)
@@ -362,15 +364,6 @@ const UserReviewFormComponent = ({
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
   return {
-    goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
-      dispatch(goToCreateUserSection(sec, group, fieldName)),
-    goToUserReviewForm: (
-      userId: string,
-      sec: string,
-      group: string,
-      fieldName?: string
-    ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
-    goBack: () => dispatch(goBack()),
     goToTeamUserList: (id: string) => dispatch(goToTeamUserList(id)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (variables: Record<string, any>) => {
@@ -380,18 +373,20 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
           createOrUpdateUserMutation,
           variables,
           props.formData.registrationOffice as string,
-          Boolean(props.match.params.userId) // to detect if update or create
+          Boolean(props.router.params.userId) // to detect if update or create
         )
       )
     }
   }
 }
-export const UserReviewForm = connect((store: IStoreState) => {
-  return {
-    userFormSection: store.userForm.userForm!.sections[0],
-    offlineCountryConfiguration: getOfflineData(store),
-    userDetails: getUserDetails(store)
-  }
-}, mapDispatchToProps)(
-  injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)
+export const UserReviewForm = withRouter(
+  connect((store: IStoreState) => {
+    return {
+      userFormSection: store.userForm.userForm!.sections[0],
+      offlineCountryConfiguration: getOfflineData(store),
+      userDetails: getUserDetails(store)
+    }
+  }, mapDispatchToProps)(
+    injectIntl<'intl', IFullProps & IDispatchProps>(UserReviewFormComponent)
+  )
 )

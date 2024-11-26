@@ -8,11 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  connectRouter,
-  routerMiddleware,
-  RouterState
-} from 'connected-react-router'
 import { createBrowserHistory, History } from 'history'
 import {
   AnyAction,
@@ -58,7 +53,7 @@ import {
 
 export interface IStoreState {
   profile: ProfileState
-  router: RouterState
+  // router: RouterState
   i18n: IntlState
   declarationsState: IDeclarationsState
   registerForm: IRegisterFormState
@@ -80,11 +75,9 @@ const config = { DONT_LOG_ERRORS_ON_HANDLED_FAILURES: true }
 
 export const createStore = <T>(
   existingHistory?: History<T>
-): { store: AppStore; history: History } => {
-  const history = existingHistory || createBrowserHistory()
+): { store: AppStore } => {
   const reducers = combineReducers<IStoreState>({
     profile: profileReducer,
-    router: connectRouter(history) as any, // @todo
     i18n: intlReducer,
     declarationsState: declarationsReducer,
     registerForm: registerFormReducer,
@@ -102,7 +95,6 @@ export const createStore = <T>(
     applyMiddleware(submissionMiddleware),
     install(config),
     applyMiddleware(persistenceMiddleware),
-    applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
@@ -115,5 +107,5 @@ export const createStore = <T>(
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
-  return { store, history }
+  return { store }
 }

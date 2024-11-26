@@ -23,7 +23,6 @@ import { connect } from 'react-redux'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/register'
 import { buttonMessages } from '@client/i18n/messages'
-import { goToHomeTab } from '@client/navigation'
 import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { IRejectCorrectionForm } from '@client/review/reject-correction'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
@@ -33,6 +32,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { generateGoToHomeTabUrl } from '@client/navigation'
+import { RouteComponentProps } from '@client/components/WithRouter'
 
 interface IChildrenProps {
   toggleRejectModal: () => void
@@ -51,11 +52,10 @@ interface IConnectProps {
 
 type DispatchProps = {
   writeDeclaration: typeof writeDeclaration
-  goToHomeTab: typeof goToHomeTab
   modifyDeclaration: typeof modifyDeclaration
 }
 
-type FullProps = IProps &
+type FullProps = RouteComponentProps<IProps> &
   IntlShapeProps &
   DispatchProps & { form: IRejectCorrectionForm } & IConnectProps
 
@@ -103,7 +103,12 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     }
     this.props.modifyDeclaration(recordWithSubmissionStatus)
     this.props.writeDeclaration(recordWithSubmissionStatus)
-    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+
+    this.props.router.navigate(
+      generateGoToHomeTabUrl({
+        tabId: WORKQUEUE_TABS.readyToPrint
+      })
+    )
   }
 
   rejectCorrectionAction = () => {
@@ -130,7 +135,11 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
     }
 
     this.props.writeDeclaration(updatedDeclaration)
-    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+    this.props.router.navigate(
+      generateGoToHomeTabUrl({
+        tabId: WORKQUEUE_TABS.readyToPrint
+      })
+    )
   }
 
   storeData = (rejectionFormData: IFormSectionData) => {
@@ -240,6 +249,5 @@ export const ReviewSectionCorrection = connect<
   IStoreState
 >((state) => ({ config: getOfflineData(state), user: getUserDetails(state) }), {
   writeDeclaration,
-  goToHomeTab,
   modifyDeclaration
 })(injectIntl<'intl', FullProps>(ReviewSectionCorrectionComp))

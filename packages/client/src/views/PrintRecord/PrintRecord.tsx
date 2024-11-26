@@ -11,11 +11,11 @@
 import React from 'react'
 import { PrintRecordHeader as Header } from '@client/views/PrintRecord/Header'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { formatUrl, goBack } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams, Navigate } from 'react-router-dom'
+import { useParams, Navigate, useNavigate } from 'react-router-dom'
 import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
 import {
@@ -54,6 +54,7 @@ const StyledAppBar = styled(AppBar)`
 `
 
 export function PrintRecord() {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
   const offlineData = useSelector(getOfflineData)
@@ -83,12 +84,12 @@ export function PrintRecord() {
     <>
       <StyledAppBar
         desktopRight={
-          <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+          <Button type="icon" size="small" onClick={() => navigate(-1)}>
             <Icon name="X" />
           </Button>
         }
         mobileRight={
-          <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+          <Button type="icon" size="small" onClick={() => navigate(-1)}>
             <Icon name="X" />
           </Button>
         }

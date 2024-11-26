@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { formatUrl, goToPage } from '@client/navigation'
 import {
   REVIEW_CORRECTION,
   REVIEW_EVENT_PARENT_FORM_PAGE
@@ -63,6 +63,8 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -71,7 +73,6 @@ interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
   goToPage: typeof goToPage
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -89,7 +90,6 @@ const ReadyForReviewComponent = ({
   theme,
   scope,
   goToPage,
-  goToDeclarationRecordAudit,
   outboxDeclarations,
   queryData,
   paginationId,
@@ -99,6 +99,7 @@ const ReadyForReviewComponent = ({
   error,
   intl
 }: IReviewTabProps) => {
+  const navigate = useNavigate()
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_REVIEW)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
@@ -206,14 +207,28 @@ const ReadyForReviewComponent = ({
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() => goToDeclarationRecordAudit('reviewTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'reviewTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() => goToDeclarationRecordAudit('reviewTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'reviewTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -356,6 +371,5 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const ReadyForReview = connect(mapStateToProps, {
-  goToPage,
-  goToDeclarationRecordAudit
+  goToPage
 })(injectIntl(withTheme(ReadyForReviewComponent)))
