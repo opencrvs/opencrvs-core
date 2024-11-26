@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { ApolloError, ApolloConsumer, ApolloClient } from '@apollo/client'
 // eslint-disable-next-line no-restricted-imports
@@ -23,7 +23,7 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
-import { useOnlineStatus } from '@client/utils'
+import { isNavigatorOnline } from '@client/utils'
 
 interface IFetchButtonProps {
   id: string
@@ -103,6 +103,10 @@ const StyledPrimaryButton = styled(PrimaryButton)`
     }`
   }}
 `
+
+const ONLINE = 'online'
+const OFFLINE = 'offline'
+
 const FetchButton = (props: IFullProps) => {
   const {
     intl,
@@ -119,7 +123,22 @@ const FetchButton = (props: IFullProps) => {
   const [success, setSuccess] = useState(false)
   const [show, setShow] = useState(false)
   const [networkError, setNetworkError] = useState(false)
-  const isOnline = useOnlineStatus()
+  const [isOnline, setIsOnline] = useState(true)
+
+  useEffect(() => {
+    const handleConnectionChange = () => {
+      setIsOnline(isNavigatorOnline())
+    }
+
+    handleConnectionChange()
+    window.addEventListener(ONLINE, handleConnectionChange)
+    window.addEventListener(OFFLINE, handleConnectionChange)
+
+    return () => {
+      window.removeEventListener(ONLINE, handleConnectionChange)
+      window.removeEventListener(OFFLINE, handleConnectionChange)
+    }
+  }, [])
 
   const hideModal = () => {
     setShow(false)
