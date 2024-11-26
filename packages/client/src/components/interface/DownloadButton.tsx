@@ -88,28 +88,6 @@ const LOADING_STATUSES = [
   DOWNLOAD_STATUS.UNASSIGNING
 ]
 
-const ShowAssignmentModal: React.FC<{
-  close: (result: boolean) => void
-  children: React.ReactNode
-}> = ({ close, children }) => {
-  const intl = useIntl()
-
-  return (
-    <ResponsiveModal
-      id="assignment"
-      show
-      title={intl.formatMessage(conflictsMessages.assignedTitle)}
-      actions={[]}
-      autoHeight
-      responsive={false}
-      preventClickOnParent
-      handleClose={() => close(false)}
-    >
-      {children}
-    </ResponsiveModal>
-  )
-}
-
 const AssignModal: React.FC<{
   close: (result: boolean) => void
 }> = ({ close }) => {
@@ -168,7 +146,8 @@ export function DownloadButton({
   const [modal, openModal] = useModal()
   const { isRecordActionable } = usePermissions()
 
-  const assignedToSomeoneElse = assignment?.practitionerId !== practitionerId
+  const assignedToSomeoneElse =
+    assignment && assignment.practitionerId !== practitionerId
   const assignedToMe = assignment?.practitionerId === practitionerId
 
   const isFailed =
@@ -195,15 +174,8 @@ export function DownloadButton({
       if (assign) {
         download()
       }
-    } else if (assignment.practitionerId !== practitionerId) {
-      await openModal<boolean>((close) => (
-        <ShowAssignmentModal close={close}>
-          {intl.formatMessage(conflictsMessages.assignedDesc, {
-            name: [assignment.firstName, assignment.lastName].join(' '),
-            officeName: assignment.officeName || ''
-          })}
-        </ShowAssignmentModal>
-      ))
+    } else if (assignedToMe && status !== DOWNLOAD_STATUS.DOWNLOADED) {
+      download()
     }
     e.stopPropagation()
   }

@@ -62,7 +62,7 @@ import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 import { useNavigation } from '@client/hooks/useNavigation'
 import {

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Redirect, Route, RouteProps } from 'react-router'
+import { Redirect, Route, RouteProps } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'

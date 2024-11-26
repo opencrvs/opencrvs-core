@@ -25,7 +25,7 @@ import { GET_USER } from '@client/user/queries'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { userMutations } from '@client/user/mutations'
 import { vi, Mock } from 'vitest'
-import * as Router from 'react-router'
+import * as Router from 'react-router-dom'
 import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 import { GetUserQuery, Status } from '@client/utils/gateway'
 

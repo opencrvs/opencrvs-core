@@ -112,10 +112,13 @@ export const usePrintableCertificate = (declarationId: string) => {
   const state = useSelector((store: IStoreState) => store)
   const isPrintInAdvance = isCertificateForPrintInAdvance(declaration)
   const dispatch = useDispatch()
-  const { hasScope } = usePermissions()
+  const { hasAnyScope } = usePermissions()
   const canUserCorrectRecord =
     declaration?.event !== Event.Marriage &&
-    hasScope(SCOPES.RECORD_REGISTRATION_CORRECT)
+    hasAnyScope([
+      SCOPES.RECORD_REGISTRATION_CORRECT,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    ])
 
   let svg = undefined
   const certificateTemplate =

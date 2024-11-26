@@ -19,7 +19,7 @@ import {
 import { formatUrl, goBack, goToHomeTab } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import * as React from 'react'
-import { Redirect, useParams } from 'react-router'
+import { Redirect, useParams } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {

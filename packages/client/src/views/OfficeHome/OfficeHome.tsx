@@ -20,12 +20,7 @@ import {
   selectWorkqueuePagination
 } from '@client/workqueue'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab
-} from '@client/navigation'
+import { goToPage, goToPrintCertificate, goToHomeTab } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -37,7 +32,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
@@ -57,6 +52,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event, SCOPES } from '@client/utils/gateway'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -70,7 +66,6 @@ const FABContainer = styled.div`
 interface IDispatchProps {
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
-  goToEvents: typeof goToEvents
   goToHomeTab: typeof goToHomeTab
   getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
@@ -125,7 +120,7 @@ class OfficeHomeView extends React.Component<
 > {
   pageSize = 10
   showPaginated = false
-  interval: any = undefined
+  interval: ReturnType<typeof setInterval> | undefined = undefined
 
   constructor(props: IOfficeHomeProps) {
     super(props)
@@ -424,11 +419,12 @@ class OfficeHomeView extends React.Component<
           ]}
         >
           <FABContainer>
-            <FloatingActionButton
-              id="new_event_declaration"
-              onClick={this.props.goToEvents}
-              icon={() => <PlusTransparentWhite />}
-            />
+            <Link to={SELECT_VITAL_EVENT}>
+              <FloatingActionButton
+                id="new_event_declaration"
+                icon={() => <PlusTransparentWhite />}
+              />
+            </Link>
           </FABContainer>
         </ProtectedComponent>
 
@@ -500,7 +496,6 @@ function mapStateToProps(
 }
 
 export const OfficeHome = connect(mapStateToProps, {
-  goToEvents,
   goToPage,
   goToPrintCertificate,
   goToHomeTab,

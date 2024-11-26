@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/components'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation, useParams } from 'react-router'
+import { useLocation, useParams } from 'react-router-dom'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
