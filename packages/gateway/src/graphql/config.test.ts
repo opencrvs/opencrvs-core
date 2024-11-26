@@ -14,7 +14,7 @@ import { getApolloConfig } from './config'
 import { cloneDeep } from 'lodash'
 
 import * as fetchAny from 'jest-fetch-mock'
-import { ContextValue } from './context'
+import { Context } from './context'
 import { Request } from '@hapi/hapi'
 import { ApolloServer } from '@apollo/server'
 import { Headers } from 'node-fetch'
@@ -71,7 +71,7 @@ describe('Test apollo server config', () => {
       }
     }
 
-    const context = new ContextValue(request as unknown as Request)
+    const context = new Context(request as unknown as Request)
     const { dataSources, ...config } = context
 
     expect(config).toStrictEqual({
@@ -115,7 +115,7 @@ describe('Test apollo server config', () => {
         variables: { id: '123-123-123-123' }
       },
       {
-        contextValue: new ContextValue(request as unknown as Request)
+        contextValue: new Context(request as unknown as Request)
       }
     )
     expect(
@@ -152,7 +152,7 @@ describe('Test apollo server config', () => {
         variables: { id: '123-123-123-123' }
       },
       {
-        contextValue: new ContextValue(request as unknown as Request)
+        contextValue: new Context(request as unknown as Request)
       }
     )
     expect(
@@ -192,7 +192,7 @@ describe('Test apollo server config', () => {
         variables: { id: '123-123-123-123' }
       },
       {
-        contextValue: new ContextValue(request as unknown as Request)
+        contextValue: new Context(request as unknown as Request)
       }
     )
     expect(

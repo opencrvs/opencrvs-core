@@ -31,11 +31,9 @@ export default class LocationsAPI extends OpenCRVSRESTDataSource {
   }
 
   async getLocation(id: string): Promise<Saved<Location>> {
-    if (this.context.record) {
-      const inBundle = findResourceFromBundleById<Saved<Location>>(
-        this.context.record,
-        id
-      )
+    const record = this.context.dataSources.recordsAPI.getRecord()
+    if (record) {
+      const inBundle = findResourceFromBundleById<Saved<Location>>(record, id)
       if (inBundle) {
         return inBundle
       }

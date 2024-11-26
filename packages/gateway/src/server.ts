@@ -32,7 +32,7 @@ import hapiApollo from '@as-integrations/hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/utils/redis'
 import { badRequest, Boom, isBoom } from '@hapi/boom'
-import { ContextValue } from './graphql/context'
+import { Context } from './graphql/context'
 import { RateLimitError } from './rate-limit'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -155,7 +155,7 @@ export async function createServer() {
             }
           }
         },
-        context: async ({ request }) => new ContextValue(request),
+        context: async ({ request }) => new Context(request),
         apolloServer
       }
     })

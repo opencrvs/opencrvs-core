@@ -10,15 +10,15 @@
  */
 
 import { AugmentedRequest, RESTDataSource } from '@apollo/datasource-rest'
-import { ContextValue } from '@gateway/graphql/context'
+import { Context } from '@gateway/graphql/context'
 
 export class OpenCRVSRESTDataSource extends RESTDataSource {
-  public context: ContextValue
+  public context: Context
   override willSendRequest(_path: string, request: AugmentedRequest) {
     const { authorization } = this.context.request.headers
     request.headers = { authorization }
   }
-  constructor(options: { contextValue: ContextValue }) {
+  constructor(options: { contextValue: Context }) {
     super()
     this.context = options.contextValue
   }

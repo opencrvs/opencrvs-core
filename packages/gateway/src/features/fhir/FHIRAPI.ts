@@ -35,8 +35,9 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
   }
 
   async getPractitioner(practitionerId: string) {
-    if (this.context.record) {
-      const inBundle = this.context.record.entry
+    const record = this.context.dataSources.recordsAPI.getRecord()
+    if (record) {
+      const inBundle = record.entry
         .map(({ resource }) => resource)
         .filter(isPractitioner)
         .find((resource) => resource.id === practitionerId)
@@ -50,8 +51,9 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
     return res
   }
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
-    if (this.context.record) {
-      const inBundle = this.context.record.entry
+    const record = this.context.dataSources.recordsAPI.getRecord()
+    if (record) {
+      const inBundle = record.entry
         .map(({ resource }) => resource)
         .filter(isPractitionerRole)
         .find(
@@ -69,20 +71,22 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
   }
 
   async getPractionerRoleHistory(id: string) {
-    if (!this.context.record) {
+    const record = this.context.dataSources.recordsAPI.getRecord()
+    if (!record) {
       throw new Error('No record in context. This should never happen')
     }
-    return this.context.record.entry
+    return record.entry
       .map(({ resource }) => resource)
       .filter(isPractitionerRoleOrPractitionerRoleHistory)
       .filter((role) => role.id === id)
   }
 
   getCompositionHistory(id: string) {
-    if (!this.context.record) {
+    const record = this.context.dataSources.recordsAPI.getRecord()
+    if (!record) {
       throw new Error('No record in context. This should never happen')
     }
-    return this.context.record.entry
+    return record.entry
       .map(({ resource }) => resource)
       .filter((composition) => composition.id === id)
       .filter(isCompositionOrCompositionHistory)
@@ -94,10 +98,11 @@ export default class FHIRAPI extends OpenCRVSRESTDataSource {
       })
   }
   getDocumentReference(id: string) {
-    if (!this.context.record) {
+    const record = this.context.dataSources.recordsAPI.getRecord()
+    if (!record) {
       throw new Error('No record in context. This should never happen')
     }
-    const reference = this.context.record.entry
+    const reference = record.entry
       .map(({ resource }) => resource)
       .filter(isDocumentReference)
       .find((documentReference) => documentReference.id === id)

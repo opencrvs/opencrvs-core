@@ -10,34 +10,18 @@
  */
 /* eslint-disable import/no-relative-parent-imports */
 
+import MetricsAPI from '@gateway/features/fhir/metricsAPI'
+import { UsersAPI } from '@gateway/features/user/usersAPI'
+import { Request } from '@hapi/hapi'
 import { getAuthHeader, IAuthHeader } from '@opencrvs/commons'
-import LocationsAPI from '../features/fhir/locationsAPI'
-import PaymentsAPI from '../features/fhir/paymentsAPI'
 import DocumentsAPI from '../features/fhir/documentsAPI'
 import FHIRAPI from '../features/fhir/FHIRAPI'
+import LocationsAPI from '../features/fhir/locationsAPI'
 import MinioAPI from '../features/fhir/minioAPI'
-import { Request } from '@hapi/hapi'
-import { Bundle, Saved } from '@opencrvs/commons/types'
-import { UsersAPI } from '@gateway/features/user/usersAPI'
-import MetricsAPI from '@gateway/features/fhir/metricsAPI'
+import PaymentsAPI from '../features/fhir/paymentsAPI'
+import RecordsAPI from '../features/fhir/recordsAPI'
 
-export interface Context {
-  request: Request
-  record?: Saved<Bundle>
-  presignDocumentUrls?: boolean
-  dataSources: {
-    locationsAPI: LocationsAPI
-    documentsAPI: DocumentsAPI
-    usersAPI: UsersAPI
-    paymentsAPI: PaymentsAPI
-    fhirAPI: FHIRAPI
-    minioAPI: MinioAPI
-    metricsAPI: MetricsAPI
-  }
-  headers: IAuthHeader
-}
-
-function getDataSources(contextValue: ContextValue): Context['dataSources'] {
+function getDataSources(contextValue: Context) {
   return {
     documentsAPI: new DocumentsAPI({ contextValue }),
     paymentsAPI: new PaymentsAPI({ contextValue }),
@@ -45,21 +29,13 @@ function getDataSources(contextValue: ContextValue): Context['dataSources'] {
     usersAPI: new UsersAPI({ contextValue }),
     fhirAPI: new FHIRAPI({ contextValue }),
     minioAPI: new MinioAPI({ contextValue }),
-    metricsAPI: new MetricsAPI({ contextValue })
+    metricsAPI: new MetricsAPI({ contextValue }),
+    recordsAPI: new RecordsAPI()
   }
 }
 
-export class ContextValue {
-  public record?: Saved<Bundle>
-  public dataSources: {
-    locationsAPI: LocationsAPI
-    documentsAPI: DocumentsAPI
-    usersAPI: UsersAPI
-    paymentsAPI: PaymentsAPI
-    fhirAPI: FHIRAPI
-    minioAPI: MinioAPI
-    metricsAPI: MetricsAPI
-  }
+export class Context {
+  public dataSources: ReturnType<typeof getDataSources>
   public request: Request
   public headers: IAuthHeader
   public presignDocumentUrls = true
