@@ -87,6 +87,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     $externalValidationSkip: Int
     $printSkip: Int
     $issueSkip: Int
+    $isWorkqueueData: Boolean!
   ) {
     inProgressTab: searchEvents(
       advancedSearchParameters: {
@@ -100,6 +101,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $inProgressSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -118,6 +120,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $healthSystemSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -131,6 +134,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $reviewSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -146,6 +150,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
       sort: "asc"
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -159,6 +164,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $approvalSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -172,6 +178,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $externalValidationSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -185,6 +192,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $printSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {
@@ -198,6 +206,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
       count: $pageSize
       skip: $issueSkip
+      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {

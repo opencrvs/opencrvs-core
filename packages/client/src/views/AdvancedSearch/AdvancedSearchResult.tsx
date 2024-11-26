@@ -153,7 +153,8 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     sortColumn: getSortColumn(
       sortedCol,
       advancedSearchParamsState.event || 'birth'
-    )
+    ),
+    isWorkqueueData: false
   }
 
   const isEnoughParams = () => {

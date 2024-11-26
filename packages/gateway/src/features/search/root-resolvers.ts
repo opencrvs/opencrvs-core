@@ -85,7 +85,8 @@ export const resolvers: GQLResolver = {
         skip,
         sortColumn,
         sort = 'desc',
-        sortBy
+        sortBy,
+        isWorkqueueData
       },
       { headers: authHeader }
     ) {
@@ -95,10 +96,14 @@ export const resolvers: GQLResolver = {
       }
       // Only registrar, registration agent & field agent should be able to search user
       if (
+        !isWorkqueueData &&
         !inScope(authHeader, [
           SCOPES.SEARCH_BIRTH,
           SCOPES.SEARCH_DEATH,
-          SCOPES.SEARCH_MARRIAGE
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
       ) {
         return await Promise.reject(

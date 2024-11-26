@@ -355,7 +355,8 @@ function SearchResultView(props: ISearchResultProps) {
                             ? getUserLocation(userDetails).id
                             : ''
                       },
-                      sort: SEARCH_RESULT_SORT
+                      sort: SEARCH_RESULT_SORT,
+                      isWorkqueueData: false
                     }
                   }
                 ],
