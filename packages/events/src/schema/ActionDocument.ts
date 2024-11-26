@@ -8,7 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './ActionConfig'
-export * from './EventConfig'
-export * from './FieldConfig'
-export * from './FormConfig'
+import { z } from 'zod'
+import { ActionInputFields } from './ActionInput'
+import { ActionType } from '@opencrvs/commons'
+
+export const ActionDocument = z.object({
+  type: z.nativeEnum(ActionType),
+  fields: ActionInputFields,
+  createdBy: z.string().describe('The user who created the action'),
+  createdAt: z.date()
+})
+
+export type ActionDocument = z.infer<typeof ActionDocument>
