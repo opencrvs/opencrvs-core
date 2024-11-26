@@ -12,39 +12,22 @@
 import { ActionType } from '@opencrvs/commons'
 import { z } from 'zod'
 
-export const ActionInputFields = z.array(
-  z.object({
-    id: z.string(),
-    value: z.union([
-      z.string(),
-      z.number(),
-      z.array(
-        z.object({
-          optionValues: z.array(z.string()),
-          type: z.string(),
-          data: z.string(),
-          fileSize: z.number()
-        })
-      )
-    ])
-  })
-)
-
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  fields: ActionInputFields
+  data: z.object({})
 })
 
-const ActionCreateInput = BaseActionInput.merge(
+const CreateActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.CREATE).default(ActionType.CREATE)
+    type: z.literal(ActionType.CREATE),
+    createdAtLocation: z.string()
   })
 )
 
-const ActionRegisterInput = BaseActionInput.merge(
+const RegisterActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
+    type: z.literal(ActionType.REGISTER),
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
@@ -52,23 +35,37 @@ const ActionRegisterInput = BaseActionInput.merge(
   })
 )
 
-export const ActionNotifyInput = BaseActionInput.merge(
+export const NotifyActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
+    type: z.literal(ActionType.NOTIFY),
+    createdAtLocation: z.string()
   })
 )
 
-export const ActionDeclareInput = BaseActionInput.merge(
+export const DeclareActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
+    type: z.literal(ActionType.DECLARE)
+  })
+)
+export const AssignActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.ASSIGN),
+    assignedTo: z.string()
+  })
+)
+export const UnassignActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.UNASSIGN)
   })
 )
 
 export const ActionInput = z.discriminatedUnion('type', [
-  ActionCreateInput,
-  ActionRegisterInput,
-  ActionNotifyInput,
-  ActionDeclareInput
+  CreateActionInput,
+  RegisterActionInput,
+  NotifyActionInput,
+  DeclareActionInput,
+  AssignActionInput,
+  UnassignActionInput
 ])
 
 export type ActionInput = z.infer<typeof ActionInput>

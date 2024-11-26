@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/mongodb'
-import { getUUID, ActionType } from '@opencrvs/commons'
-import { EventInput, ActionInput } from '@events/schema'
-import { z } from 'zod'
+import { ActionInput, EventInput } from '@events/schema'
 import { EventDocument } from '@events/schema/EventDocument'
+import { getClient } from '@events/storage/mongodb'
+import { ActionType, getUUID } from '@opencrvs/commons'
+import { z } from 'zod'
+import { indexEvent } from './indexing/indexing'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -49,6 +50,7 @@ export async function getEventById(id: string) {
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
   createdBy: string,
+  createdAtLocation: string,
   transactionId: string
 ) {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -74,12 +76,15 @@ export async function createEvent(
         type: ActionType.CREATE,
         createdAt: now,
         createdBy,
-        fields: []
+        createdAtLocation,
+        data: []
       }
     ]
   })
 
-  return getEventById(id)
+  const event = await getEventById(id)
+  await indexEvent(event)
+  return event
 }
 
 export async function addAction(
