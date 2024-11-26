@@ -90,7 +90,7 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              declarationLocationId: '',
               trackingId: '',
               nationalId: '',
               registrationNumber: '',
@@ -334,7 +334,7 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '+8801622688232',
-              declarationLocationId: '1234567s2323289',
+              declarationLocationId: '',
               contactEmail: ''
             },
             sort: 'DESC'
@@ -404,7 +404,7 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -498,7 +498,7 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -600,7 +600,7 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -706,7 +706,7 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -803,7 +803,7 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
+              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
