@@ -15,7 +15,7 @@ import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { sign } from 'jsonwebtoken'
-import RecordsAPI from '../fhir/recordsAPI'
+import RecordsAPI from '@gateway/features/fhir/recordsAPI'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
