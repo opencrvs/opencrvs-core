@@ -8,9 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
 import { createDeclaration } from '@client/declarations'
-import { Event as DeclarationEvent, Event } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { createStore } from '@client/store'
 import {
@@ -20,16 +18,18 @@ import {
   selectOption,
   userDetails
 } from '@client/tests/util'
-import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
-import { ReactWrapper } from 'enzyme'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { vi, Mock, SpyInstance } from 'vitest'
+import { EventType } from '@client/utils/gateway'
+import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { Mock, SpyInstance, vi } from 'vitest'
 
 const { store, history } = createStore()
 const mockHandler = vi.fn()
 
-const draft = createDeclaration(DeclarationEvent.Birth)
+const draft = createDeclaration(EventType.Birth)
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: {
@@ -61,7 +61,7 @@ describe('when in device of large viewport', () => {
 
   beforeEach(async () => {
     const { store } = await createTestStore()
-    form = await getRegisterFormFromStore(store, Event.Birth)
+    form = await getRegisterFormFromStore(store, EventType.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
 

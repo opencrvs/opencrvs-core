@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
+import { EventType } from '@client/utils/gateway'
 
 export function getBirthRegistrationSectionTransformer(
   transformedData: IFormData,
@@ -27,7 +27,7 @@ export function getBirthRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
-    transformedData[sectionId].type = Event.Birth
+    transformedData[sectionId].type = EventType.Birth
   }
 
   if (queryData[sectionId].status) {

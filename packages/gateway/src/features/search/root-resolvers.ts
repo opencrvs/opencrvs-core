@@ -19,17 +19,23 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
-import { ApolloError } from 'apollo-server-hapi'
+import { GraphQLError } from 'graphql'
 
 type ApiResponse<T> = {
   body: T
   statusCode: number
 }
 
-export class RateLimitError extends ApolloError {
-  constructor(message: string) {
-    super(message, 'DAILY_QUOTA_EXCEEDED')
-    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
+class RateLimitError extends GraphQLError {
+  constructor(message = 'You are being rate limited') {
+    super(message, {
+      extensions: {
+        code: 'DAILY_QUOTA_EXCEEDED',
+        http: {
+          status: 429
+        }
+      }
+    })
   }
 }
 

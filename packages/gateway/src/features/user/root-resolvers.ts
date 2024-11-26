@@ -30,12 +30,13 @@ import {
 } from '@gateway/graphql/schema'
 import { logger, isBase64FileString } from '@opencrvs/commons'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
-import { UserInputError } from 'apollo-server-hapi'
+
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
+import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -46,18 +47,17 @@ export const resolvers: GQLResolver = {
         return user
       }
     ),
-
     getUserByMobile: rateLimitedResolver(
       { requestsPerMinute: 20 },
       async (_, { mobile }, { dataSources }) => {
-        return dataSources.usersAPI.getUserByMobile(mobile!)
+        return dataSources.usersAPI.getUserByMobile(mobile)
       }
     ),
 
     getUserByEmail: rateLimitedResolver(
       { requestsPerMinute: 20 },
       (_, { email }, { dataSources }) => {
-        return dataSources.usersAPI.getUserByEmail(email!)
+        return dataSources.usersAPI.getUserByEmail(email)
       }
     ),
 
@@ -116,7 +116,7 @@ export const resolvers: GQLResolver = {
             ...authHeader
           }
         })
-        return await res.json()
+        return res.json()
       }
     ),
 
