@@ -47,6 +47,20 @@ export const RECORD_ALLOWED_SCOPES = {
   REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
 }
 
+export const RECORD_SEARCH_SCOPES = {
+  BIRTH: [SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION],
+  DEATH: [SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION],
+  MARRIAGE: [SCOPES.SEARCH_MARRIAGE, SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION],
+  ALL_EVENT_SEARCH: [
+    SCOPES.SEARCH_BIRTH,
+    SCOPES.SEARCH_DEATH,
+    SCOPES.SEARCH_MARRIAGE,
+    SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+    SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+    SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+  ]
+}
+
 export function usePermissions() {
   const userScopes = useSelector(getScope)
   const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
@@ -109,11 +123,12 @@ export function usePermissions() {
   const canReviewCorrection = () =>
     hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
 
-  const hasBirthSearchScopes = () =>
-    hasAnyScope([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION])
+  const hasSearchScopes = () =>
+    hasAnyScope(RECORD_SEARCH_SCOPES.ALL_EVENT_SEARCH)
 
-  const hasDeathSearchScopes = () =>
-    hasAnyScope([SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION])
+  const hasBirthSearchScopes = () => hasAnyScope(RECORD_SEARCH_SCOPES.BIRTH)
+
+  const hasDeathSearchScopes = () => hasAnyScope(RECORD_SEARCH_SCOPES.DEATH)
 
   const isRecordActionable = (status: SUBMISSION_STATUS) =>
     [
@@ -145,6 +160,7 @@ export function usePermissions() {
     canCorrectRecord,
     canArchiveRecord,
     canReinstateRecord,
+    hasSearchScopes,
     hasBirthSearchScopes,
     hasDeathSearchScopes
   }
