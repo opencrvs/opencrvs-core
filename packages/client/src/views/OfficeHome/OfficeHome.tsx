@@ -32,10 +32,7 @@ import styled from 'styled-components'
 import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import {
-  PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES
-} from '@client/utils/constants'
+import { SYNC_WORKQUEUE_TIME, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -160,7 +157,7 @@ class OfficeHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    setTimeout(() => this.updateWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
+    setTimeout(() => this.updateWorkqueue(), SYNC_WORKQUEUE_TIME)
     if (this.interval) {
       clearInterval(this.interval)
     }
