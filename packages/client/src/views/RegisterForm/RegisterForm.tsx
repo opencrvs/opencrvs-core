@@ -260,7 +260,8 @@ function FormAppBar({
   duplicate,
   modifyDeclarationMethod,
   deleteDeclarationMethod,
-  printDeclarationMethod
+  printDeclarationMethod,
+  canSaveAndExit
 }: {
   duplicate: boolean | undefined
   section: IFormSection
@@ -268,6 +269,7 @@ function FormAppBar({
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
   printDeclarationMethod: (declarationId: string) => void
+  canSaveAndExit: boolean
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -551,6 +553,7 @@ function FormAppBar({
                     id="save-exit-btn"
                     type="primary"
                     size="small"
+                    disabled={!canSaveAndExit}
                     onClick={handleSaveAndExit}
                   >
                     <Icon name="DownloadSimple" />
@@ -609,7 +612,12 @@ function FormAppBar({
             mobileRight={
               <>
                 {!isCorrection(declaration) && (
-                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                  <Button
+                    type="icon"
+                    size="small"
+                    disabled={!canSaveAndExit}
+                    onClick={handleSaveAndExit}
+                  >
                     <Icon name="DownloadSimple" />
                   </Button>
                 )}
@@ -1047,6 +1055,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
               printDeclarationMethod={this.props.goToPrintRecord}
+              canSaveAndExit={canContinue}
             />
           }
           key={activeSection.id}
