@@ -109,6 +109,12 @@ export function usePermissions() {
   const canReviewCorrection = () =>
     hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
 
+  const hasBirthSearchScopes = () =>
+    hasAnyScope([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION])
+
+  const hasDeathSearchScopes = () =>
+    hasAnyScope([SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION])
+
   const isRecordActionable = (status: SUBMISSION_STATUS) =>
     [
       canUpdateRecord() && isUpdatableDeclaration(status),
@@ -138,6 +144,8 @@ export function usePermissions() {
     canReviewRecord,
     canCorrectRecord,
     canArchiveRecord,
-    canReinstateRecord
+    canReinstateRecord,
+    hasBirthSearchScopes,
+    hasDeathSearchScopes
   }
 }

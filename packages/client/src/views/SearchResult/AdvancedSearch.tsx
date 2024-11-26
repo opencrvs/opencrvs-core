@@ -18,7 +18,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, ContentSize, FormTabs } from '@opencrvs/components'
+import { Content, ContentSize, FormTabs, IFormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -43,6 +43,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 enum TabId {
   BIRTH = 'birth',
@@ -482,18 +483,19 @@ const DeathSection = () => {
 
 const AdvancedSearch = () => {
   const intl = useIntl()
-  const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
-  const activeTabId = advancedSearchParamState.event || TabId.BIRTH
+  const { hasBirthSearchScopes, hasDeathSearchScopes } = usePermissions()
+  const activeTabId = hasBirthSearchScopes() ? TabId.BIRTH : TabId.DEATH
   const dispatch = useDispatch()
-
-  const tabSections = [
+  const tabSections: IFormTabs<TabId>[] = [
     {
       id: TabId.BIRTH,
-      title: intl.formatMessage(messages.birthTabTitle)
+      title: intl.formatMessage(messages.birthTabTitle),
+      showTab: hasBirthSearchScopes()
     },
     {
       id: TabId.DEATH,
-      title: intl.formatMessage(messages.deathTabTitle)
+      title: intl.formatMessage(messages.deathTabTitle),
+      showTab: hasDeathSearchScopes()
     }
   ]
   return (
