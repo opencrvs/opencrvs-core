@@ -17,7 +17,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {
   goToCertificateCorrection,
@@ -52,12 +52,11 @@ import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { client } from '@client/utils/apolloClient'
 import { SCOPES } from '@client/utils/gateway'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   canBeCorrected,
   isArchivable,
-  isArchived,
-  isCertified,
+  canBeReinstated,
+  isIssuable,
   isPendingCorrection,
   isPrintable,
   isRecordOrDeclaration,
@@ -66,7 +65,11 @@ import {
   isViewable
 } from '@client/declarations/utils'
 import ProtectedComponent from '@client/components/ProtectedComponent'
-import { usePermissions } from '@client/hooks/useAuthorization'
+import {
+  RECORD_ALLOWED_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { EVENT } from '@opencrvs/commons/client'
 
 export const ActionMenu: React.FC<{
@@ -76,15 +79,24 @@ export const ActionMenu: React.FC<{
   toggleDisplayDialog: () => void
 }> = ({ declaration, draft, toggleDisplayDialog, duplicates }) => {
   const dispatch = useDispatch()
+  const userDetails = useSelector(getUserDetails)
   const [modal, openModal] = useModal()
 
   const intl = useIntl()
 
   const { id, type, assignment, status } = declaration
 
+  const assignedToSelf =
+    assignment?.practitionerId === userDetails?.practitionerId
+  const assignedToOther = !!(
+    assignment && assignment?.practitionerId !== userDetails?.practitionerId
+  )
+
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  const isActionable = isDownloaded && assignedToSelf
 
   const isDuplicate = (duplicates ?? []).length > 0
 
@@ -98,6 +110,7 @@ export const ActionMenu: React.FC<{
     }
     return
   }
+
   const handleUnassign = async () => {
     const { firstName, lastName, officeName } = assignment || {}
     const unassignConfirm = await openModal<boolean | null>(
@@ -105,10 +118,10 @@ export const ActionMenu: React.FC<{
         assignment && (
           <UnassignModal
             close={close}
-            isDownloaded={isDownloaded}
             name={firstName + ' ' + lastName}
+            assignedSelf={assignedToSelf}
             officeName={officeName}
-          ></UnassignModal>
+          />
         )
     )
     if (unassignConfirm) {
@@ -126,7 +139,7 @@ export const ActionMenu: React.FC<{
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {!isDownloaded && assignment && (
+          {assignment && assignedToOther && (
             <>
               <DropdownMenu.Label>
                 {intl.formatMessage(messages.assignedTo, {
@@ -138,82 +151,66 @@ export const ActionMenu: React.FC<{
             </>
           )}
           <ViewAction declarationId={id} declarationStatus={status} />
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_REGISTER,
-              SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-              SCOPES.RECORD_SUBMIT_FOR_UPDATES
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REVIEW}>
             <ReviewAction
               declarationId={id}
               declarationStatus={status}
               type={type}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
               isDuplicate={isDuplicate}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_REGISTER,
-              SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-              SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION}>
+            <ReviewCorrectionAction
+              declarationId={id}
+              declarationStatus={status}
+              type={type}
+              isActionable={isActionable}
+            />
+          </ProtectedComponent>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
             <UpdateAction
               declarationId={id}
               declarationStatus={status}
               type={type}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_DECLARATION_ARCHIVE]}>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ARCHIVE}>
             <ArchiveAction
               toggleDisplayDialog={toggleDisplayDialog}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
               declarationStatus={status}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={[SCOPES.RECORD_REGISTRATION_REINSTATE]}>
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.REINSTATE}>
             <ReinstateAction
               toggleDisplayDialog={toggleDisplayDialog}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
               declarationStatus={status}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_DECLARATION_PRINT,
-              SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.PRINT}>
             <PrintAction
               declarationStatus={status}
               declarationId={id}
               type={type}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ISSUE}>
             <IssueAction
               declarationStatus={status}
               declarationId={id}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={[
-              SCOPES.RECORD_REGISTRATION_CORRECT,
-              SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
-            ]}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.CORRECT}>
             <CorrectRecordAction
               declarationId={id}
               declarationStatus={status}
               type={type}
-              isDownloaded={isDownloaded}
+              isActionable={isActionable}
             />
           </ProtectedComponent>
           <DeleteAction
@@ -222,8 +219,8 @@ export const ActionMenu: React.FC<{
           />
           <UnassignAction
             handleUnassign={handleUnassign}
-            isDownloaded={isDownloaded}
-            assignment={assignment}
+            assignedOther={assignedToOther}
+            assignedSelf={assignedToSelf}
             declarationStatus={status}
           />
         </DropdownMenu.Content>
@@ -234,7 +231,7 @@ export const ActionMenu: React.FC<{
 }
 
 interface IActionItemCommonProps {
-  isDownloaded: boolean
+  isActionable: boolean
   declarationStatus?: SUBMISSION_STATUS
 }
 
@@ -267,7 +264,7 @@ const ViewAction: React.FC<{
 
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
-> = ({ declarationId, declarationStatus, type, isDownloaded }) => {
+> = ({ declarationId, declarationStatus, type, isActionable }) => {
   const dispatch = useDispatch()
   const intl = useIntl()
 
@@ -289,7 +286,7 @@ const CorrectRecordAction: React.FC<
           )
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="NotePencil" color="currentColor" size="large" />
       {intl.formatMessage(messages.correctRecord)}
@@ -299,12 +296,12 @@ const CorrectRecordAction: React.FC<
 
 const ArchiveAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, declarationStatus }) => {
+> = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
   if (!isArchivable(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
       <Icon name="Archive" color="currentColor" size="large" />
       {intl.formatMessage(messages.archiveRecord)}
     </DropdownMenu.Item>
@@ -313,12 +310,12 @@ const ArchiveAction: React.FC<
 
 const ReinstateAction: React.FC<
   IActionItemCommonProps & { toggleDisplayDialog?: () => void }
-> = ({ toggleDisplayDialog, isDownloaded, declarationStatus }) => {
+> = ({ toggleDisplayDialog, isActionable, declarationStatus }) => {
   const intl = useIntl()
-  if (!isArchived(declarationStatus)) return null
+  if (!canBeReinstated(declarationStatus)) return null
 
   return (
-    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isDownloaded}>
+    <DropdownMenu.Item onClick={toggleDisplayDialog} disabled={!isActionable}>
       <Icon name="FileArrowUp" color="currentColor" size="large" />
       {intl.formatMessage(messages.reinstateRecord)}
     </DropdownMenu.Item>
@@ -327,22 +324,15 @@ const ReinstateAction: React.FC<
 
 const ReviewAction: React.FC<
   IActionItemCommonProps & IDeclarationProps & { isDuplicate: boolean }
-> = ({ declarationId, declarationStatus, type, isDownloaded, isDuplicate }) => {
+> = ({ declarationId, declarationStatus, type, isActionable, isDuplicate }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  return isPendingCorrection(declarationStatus) ? (
-    <DropdownMenu.Item
-      onClick={() => {
-        type &&
-          dispatch(goToPage(REVIEW_CORRECTION, declarationId, 'review', type))
-      }}
-      disabled={!isDownloaded}
-    >
-      <Icon name="PencilLine" color="currentColor" size="large" />
-      {intl.formatMessage(messages.reviewCorrection)}
-    </DropdownMenu.Item>
-  ) : isReviewableDeclaration(declarationStatus) ? (
+  if (!isReviewableDeclaration(declarationStatus)) {
+    return null
+  }
+
+  return (
     <DropdownMenu.Item
       onClick={() => {
         dispatch(
@@ -354,19 +344,43 @@ const ReviewAction: React.FC<
           )
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="PencilLine" color="currentColor" size="large" />
       {intl.formatMessage(messages.reviewDeclaration, { isDuplicate })}
     </DropdownMenu.Item>
-  ) : null
+  )
+}
+
+const ReviewCorrectionAction: React.FC<
+  IActionItemCommonProps & IDeclarationProps
+> = ({ declarationId, declarationStatus, type, isActionable }) => {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+
+  if (!isPendingCorrection(declarationStatus)) {
+    return null
+  }
+
+  return (
+    <DropdownMenu.Item
+      onClick={() => {
+        type &&
+          dispatch(goToPage(REVIEW_CORRECTION, declarationId, 'review', type))
+      }}
+      disabled={!isActionable}
+    >
+      <Icon name="PencilLine" color="currentColor" size="large" />
+      {intl.formatMessage(messages.reviewCorrection)}
+    </DropdownMenu.Item>
+  )
 }
 
 const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   declarationStatus,
   type,
-  isDownloaded
+  isActionable
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -396,7 +410,7 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
           goToPage(PAGE_ROUTE, declarationId as string, PAGE_ID, type as string)
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="PencilCircle" color="currentColor" size="large" />
       {intl.formatMessage(messages.updateDeclaration)}
@@ -408,7 +422,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
   declarationStatus,
   type,
-  isDownloaded
+  isActionable
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -426,7 +440,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
           )
         )
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="Printer" color="currentColor" size="large" />
       {intl.formatMessage(messages.printDeclaration)}
@@ -436,13 +450,13 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 
 const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   declarationId,
-  isDownloaded,
+  isActionable,
   declarationStatus
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
 
-  if (!isCertified(declarationStatus)) return null
+  if (!isIssuable(declarationStatus)) return null
 
   return (
     <DropdownMenu.Item
@@ -450,7 +464,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
         dispatch(goToIssueCertificate(declarationId as string))
       }}
-      disabled={!isDownloaded}
+      disabled={!isActionable}
     >
       <Icon name="Handshake" color="currentColor" size="large" />
       {intl.formatMessage(messages.issueCertificate)}
@@ -473,18 +487,17 @@ const DeleteAction: React.FC<{
 }
 const UnassignAction: React.FC<{
   handleUnassign: () => void
-  isDownloaded: boolean
-  assignment?: GQLAssignmentData
+  assignedOther: boolean
+  assignedSelf: boolean
   declarationStatus?: SUBMISSION_STATUS
-}> = ({ handleUnassign, isDownloaded, assignment, declarationStatus }) => {
+}> = ({ handleUnassign, assignedOther, assignedSelf, declarationStatus }) => {
   const { hasScope } = usePermissions()
   const intl = useIntl()
-  const isAssignedToSomeoneElse = !isDownloaded && assignment
 
   if (
     declarationStatus === SUBMISSION_STATUS.DRAFT ||
-    (!isDownloaded &&
-      (!isAssignedToSomeoneElse || !hasScope(SCOPES.RECORD_UNASSIGN_OTHERS)))
+    (!assignedSelf &&
+      (!assignedOther || !hasScope(SCOPES.RECORD_UNASSIGN_OTHERS)))
   )
     return null
 
@@ -498,10 +511,10 @@ const UnassignAction: React.FC<{
 
 const UnassignModal: React.FC<{
   close: (result: boolean | null) => void
-  isDownloaded: boolean
+  assignedSelf: boolean
   name: string
-  officeName?: string
-}> = ({ close, isDownloaded, name, officeName }) => {
+  officeName?: string | null
+}> = ({ close, assignedSelf, name, officeName }) => {
   const intl = useIntl()
   return (
     <ResponsiveModal
@@ -531,7 +544,7 @@ const UnassignModal: React.FC<{
       show={true}
       handleClose={() => close(null)}
     >
-      {isDownloaded
+      {assignedSelf
         ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
         : intl.formatMessage(conflictsMessages.regUnassignDesc, {
             name,

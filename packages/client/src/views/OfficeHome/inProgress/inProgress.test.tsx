@@ -15,8 +15,7 @@ import {
   storeDeclaration,
   SUBMISSION_STATUS,
   makeDeclarationReadyToDownload,
-  DOWNLOAD_STATUS,
-  modifyDeclaration
+  DOWNLOAD_STATUS
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { Event } from '@client/utils/gateway'
@@ -27,7 +26,7 @@ import {
 } from '@client/navigation/routes'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
-import { createStore } from '@client/store'
+import { AppStore, createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
@@ -46,6 +45,7 @@ import type {
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
+import { History } from 'history'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -684,6 +684,8 @@ describe('In Progress tab', () => {
     })
 
     describe('handles download status', () => {
+      let store: AppStore
+      let history: History
       const TIME_STAMP = '1562912635549'
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       const inprogressProps = {
@@ -699,7 +701,8 @@ describe('In Progress tab', () => {
                 type: Event.Birth,
                 registration: {
                   trackingId: 'BQ2IDOP',
-                  modifiedAt: TIME_STAMP
+                  modifiedAt: TIME_STAMP,
+                  status: 'IN_PROGRESS'
                 },
                 childName: [
                   {
@@ -722,6 +725,13 @@ describe('In Progress tab', () => {
         pageSize: 10,
         onPageChange: (pageId: number) => {}
       }
+
+      beforeEach(() => {
+        const newStore = createStore()
+        store = newStore.store
+        history = newStore.history
+      })
+
       it('renders download button when not downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.Birth,
@@ -729,7 +739,7 @@ describe('In Progress tab', () => {
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = undefined
-        store.dispatch(modifyDeclaration(downloadableDeclaration))
+        store.dispatch(storeDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
@@ -746,7 +756,7 @@ describe('In Progress tab', () => {
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
-        store.dispatch(modifyDeclaration(downloadableDeclaration))
+        store.dispatch(storeDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
@@ -763,7 +773,7 @@ describe('In Progress tab', () => {
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
-        store.dispatch(modifyDeclaration(downloadableDeclaration))
+        store.dispatch(storeDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
@@ -798,7 +808,7 @@ describe('In Progress tab', () => {
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
-        store.dispatch(modifyDeclaration(downloadableDeclaration))
+        store.dispatch(storeDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }

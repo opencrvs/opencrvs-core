@@ -24,24 +24,12 @@ import {
   DOWNLOAD_STATUS,
   clearCorrectionAndPrintChanges
 } from '@client/declarations'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { EVENT_STATUS } from '@client/workqueue'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  DRAFT_MARRIAGE_FORM_PAGE,
-  REVIEW_CORRECTION,
-  REVIEW_EVENT_PARENT_FORM_PAGE
-} from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { IDeclarationData } from './utils'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
-import { useDispatch } from 'react-redux'
-import { Button } from '@client/../../components/src/Button'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { SCOPES } from '@client/utils/gateway'
 
@@ -90,7 +78,6 @@ export const ShowDownloadButton = ({
       compositionId: id,
       action: DownloadAction.LOAD_REVIEW_DECLARATION,
       assignment: declaration?.assignment,
-      declarationStatus: declaration.status,
       refetchQueries
     }
     return (
@@ -98,218 +85,10 @@ export const ShowDownloadButton = ({
         key={id}
         downloadConfigs={downLoadConfig}
         status={downloadStatus as DOWNLOAD_STATUS}
+        declarationStatus={declaration.status as SUBMISSION_STATUS}
       />
     )
   }
 
-  return <></>
-}
-
-export const ShowUpdateButton = ({
-  declaration,
-  intl,
-  draft,
-  goToPage
-}: CMethodParams) => {
-  const { id, type } = declaration || {}
-  const { hasScope } = usePermissions()
-
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-  // @TODO: Here in "ShowUpdateButton", is submit-for-updates correct?
-  const showActionButton = hasScope(SCOPES.RECORD_SUBMIT_FOR_UPDATES)
-
-  if (!showActionButton && !isDownloaded) {
-    return <></>
-  }
-
-  if (showActionButton && type) {
-    let PAGE_ROUTE: string, PAGE_ID: string
-
-    if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
-      PAGE_ID = 'preview'
-      if (type.toString() === 'birth') {
-        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
-      } else if (type.toString() === 'death') {
-        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
-      } else if (type.toString() === 'marriage') {
-        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
-      }
-    } else {
-      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
-      PAGE_ID = 'review'
-    }
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          id={`update-application-${id}`}
-          size={'medium'}
-          disabled={true}
-        >
-          {intl.formatMessage(buttonMessages.update)}
-        </PrimaryButton>
-      )
-    }
-    return (
-      <PrimaryButton
-        key={id}
-        id={`update-application-${id}`}
-        size={'medium'}
-        onClick={() => {
-          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
-        }}
-      >
-        {intl.formatMessage(buttonMessages.update)}
-      </PrimaryButton>
-    )
-  }
-
-  return <></>
-}
-
-export const ShowPrintButton = ({
-  declaration,
-  intl,
-  draft,
-  goToPrintCertificate,
-  clearCorrectionAndPrintChanges
-}: CMethodParams) => {
-  const { id, type } = declaration || {}
-  const { hasScope } = usePermissions()
-
-  const showActionButton = hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-
-  if (type && showActionButton) {
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          size={'medium'}
-          id={`print-${id}`}
-          disabled={true}
-        >
-          {intl.formatMessage(buttonMessages.print)}
-        </PrimaryButton>
-      )
-    }
-    return (
-      <PrimaryButton
-        key={id}
-        size={'medium'}
-        id={`print-${id}`}
-        onClick={() => {
-          clearCorrectionAndPrintChanges &&
-            clearCorrectionAndPrintChanges(declaration.id)
-          goToPrintCertificate &&
-            goToPrintCertificate(id, type.toLocaleLowerCase())
-        }}
-      >
-        {intl.formatMessage(buttonMessages.print)}
-      </PrimaryButton>
-    )
-  }
-  return <></>
-}
-
-export const ShowIssueButton = ({
-  declaration,
-  intl,
-  userDetails,
-  draft
-}: CMethodParams) => {
-  const dispatch = useDispatch()
-  const { hasScope } = usePermissions()
-  const { id, type } = declaration || {}
-  const showActionButton = hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-
-  if (type && showActionButton) {
-    if (!isDownloaded) {
-      return (
-        <Button
-          key={id}
-          size={'medium'}
-          id={`issue-${id}`}
-          disabled={true}
-          type={'primary'}
-        >
-          {intl.formatMessage(buttonMessages.issue)}
-        </Button>
-      )
-    }
-    return (
-      <Button
-        key={id}
-        size={'medium'}
-        id={`issue-${id}`}
-        onClick={() => {
-          dispatch(clearCorrectionAndPrintChanges(id))
-          dispatch(goToIssueCertificate(id))
-        }}
-        type={'primary'}
-      >
-        {intl.formatMessage(buttonMessages.issue)}
-      </Button>
-    )
-  }
-  return <></>
-}
-
-export const ShowReviewButton = ({
-  declaration,
-  intl,
-  userDetails,
-  draft,
-  goToPage
-}: CMethodParams) => {
-  const { id, type } = declaration || {}
-  const { hasAnyScope } = usePermissions()
-
-  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-  const showActionButton = hasAnyScope([
-    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-    SCOPES.RECORD_SUBMIT_FOR_UPDATES
-  ])
-
-  if (type && showActionButton) {
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          size={'medium'}
-          id={`review-btn-${id}`}
-          disabled={true}
-        >
-          {intl.formatMessage(constantsMessages.review)}
-        </PrimaryButton>
-      )
-    }
-    return (
-      <PrimaryButton
-        key={id}
-        size={'medium'}
-        id={`review-btn-${id}`}
-        onClick={() => {
-          if (!goToPage) {
-            return
-          }
-          if (declaration.status === EVENT_STATUS.CORRECTION_REQUESTED) {
-            goToPage(REVIEW_CORRECTION, id, 'review', type)
-          } else {
-            goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
-          }
-        }}
-      >
-        {intl.formatMessage(constantsMessages.review)}
-      </PrimaryButton>
-    )
-  }
   return <></>
 }

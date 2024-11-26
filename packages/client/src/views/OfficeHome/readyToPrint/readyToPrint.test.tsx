@@ -721,14 +721,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
       expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
 
       testComponent.find('#assign').hostNodes().simulate('click')
-      expect(
-        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
-      ).toHaveLength(1)
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
 
       const action = await waitForElement(
         testComponent,

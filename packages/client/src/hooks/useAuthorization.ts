@@ -12,6 +12,40 @@
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { Scope, User, Location, SCOPES } from '@client/utils/gateway'
+import { SUBMISSION_STATUS } from '@client/declarations'
+import {
+  canBeCorrected,
+  canBeReinstated,
+  isArchivable,
+  isIssuable,
+  isPendingCorrection,
+  isPrintable,
+  isReviewableDeclaration,
+  isUpdatableDeclaration
+} from '@client/declarations/utils'
+
+export const RECORD_ALLOWED_SCOPES = {
+  UPDATE: [
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL
+  ],
+  REVIEW: [
+    SCOPES.RECORD_REGISTER,
+    SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+    SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+    SCOPES.RECORD_REVIEW_DUPLICATES
+  ],
+  PRINT: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  ISSUE: [SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES],
+  CORRECT: [
+    SCOPES.RECORD_REGISTRATION_CORRECT,
+    SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+  ],
+  ARCHIVE: [SCOPES.RECORD_DECLARATION_ARCHIVE],
+  REINSTATE: [SCOPES.RECORD_DECLARATION_REINSTATE],
+  REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
+}
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
@@ -58,21 +92,52 @@ export function usePermissions() {
     return false
   }
 
-  const canPrintRecord = () =>
-    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  const canUpdateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.UPDATE)
 
-  const canIssueRecord = () =>
-    hasScope(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
+  const canReviewRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW)
+
+  const canPrintRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.PRINT)
+
+  const canIssueRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ISSUE)
+
+  const canCorrectRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.CORRECT)
+
+  const canArchiveRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.ARCHIVE)
+
+  const canReinstateRecord = () => hasAnyScope(RECORD_ALLOWED_SCOPES.REINSTATE)
+
+  const canReviewCorrection = () =>
+    hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
+
+  const isRecordActionable = (status: SUBMISSION_STATUS) =>
+    [
+      canUpdateRecord() && isUpdatableDeclaration(status),
+      canReviewRecord() && isReviewableDeclaration(status),
+      canPrintRecord() && isPrintable(status),
+      canIssueRecord() && isIssuable(status),
+      canCorrectRecord() && canBeCorrected(status),
+      canReviewCorrection() && isPendingCorrection(status),
+      canArchiveRecord() && isArchivable(status),
+      canReinstateRecord() && canBeReinstated(status)
+    ]
+      .map((p) => Boolean(p))
+      .some((p) => p)
 
   return {
     hasScopes,
     hasScope,
     hasAnyScope,
+    isRecordActionable,
     canPrintRecord,
     canIssueRecord,
     canReadUser,
     canEditUser,
     canReadOfficeUsers,
-    canAddOfficeUsers
+    canAddOfficeUsers,
+    canUpdateRecord,
+    canReviewRecord,
+    canCorrectRecord,
+    canArchiveRecord,
+    canReinstateRecord
   }
 }

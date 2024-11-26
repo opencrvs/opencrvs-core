@@ -37,7 +37,8 @@ import { IStoreState } from '@client/store'
 import {
   IDeclaration,
   DOWNLOAD_STATUS,
-  clearCorrectionAndPrintChanges
+  clearCorrectionAndPrintChanges,
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
@@ -193,6 +194,7 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })

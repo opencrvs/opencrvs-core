@@ -22,7 +22,6 @@ import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLHumanName,
-  GQLAssignmentData,
   GQLMarriageEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { createNamesMap } from '@client/utils/data-formatting'
@@ -41,7 +40,8 @@ import {
   RegStatus,
   User,
   History,
-  HumanName
+  HumanName,
+  AssignmentData
 } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
@@ -61,7 +61,7 @@ export interface IDeclarationData {
   informant?: IInformantInfo
   registrationNo?: string
   nid?: string
-  assignment?: GQLAssignmentData
+  assignment?: AssignmentData
 }
 
 interface IInformantInfo {
@@ -79,7 +79,7 @@ interface IGQLDeclaration {
     trackingId: string
     type: string
     status: { type: string }[]
-    assignment?: GQLAssignmentData
+    assignment?: AssignmentData
   }
 }
 

@@ -166,6 +166,7 @@ const ReadyForReviewComponent = ({
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })

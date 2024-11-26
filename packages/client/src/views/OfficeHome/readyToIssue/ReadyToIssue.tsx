@@ -33,7 +33,8 @@ import {
 import { IStoreState } from '@client/store'
 import {
   DOWNLOAD_STATUS,
-  clearCorrectionAndPrintChanges
+  clearCorrectionAndPrintChanges,
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
@@ -197,6 +198,7 @@ export const ReadyToIssue = ({
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
           />
         )
       })

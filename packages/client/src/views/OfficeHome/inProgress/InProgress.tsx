@@ -227,20 +227,23 @@ function InProgressComponent(props: IRegistrarHomeProps) {
           disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
         })
       }
-      actions.push({
-        actionComponent: (
-          <DownloadButton
-            downloadConfigs={{
-              event: event as string,
-              compositionId: reg.id,
-              action: DownloadAction.LOAD_REVIEW_DECLARATION,
-              assignment: reg?.registration?.assignment
-            }}
-            key={`DownloadButton-${index}`}
-            status={downloadStatus}
-          />
-        )
-      })
+      if (reg.registration?.status) {
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: event as string,
+                compositionId: reg.id,
+                action: DownloadAction.LOAD_REVIEW_DECLARATION,
+                assignment: reg?.registration?.assignment
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus}
+              declarationStatus={reg.registration.status as SUBMISSION_STATUS}
+            />
+          )
+        })
+      }
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}

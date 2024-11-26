@@ -367,6 +367,7 @@ function SearchResultView(props: ISearchResultProps) {
                   DownloadAction.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
+              declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
             />
           )
         })

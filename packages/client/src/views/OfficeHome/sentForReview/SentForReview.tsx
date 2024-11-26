@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -52,7 +56,6 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -168,27 +171,22 @@ function SentForReviewComponent(props: IApprovalTabProps) {
       const downloadStatus =
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: DownloadAction.LOAD_REVIEW_DECLARATION,
-                declarationStatus: reg.declarationStatus,
-                assignment: reg.assignment || undefined
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        actions.push({
-          actionComponent: <Downloaded />
-        })
-      }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment ?? undefined
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus as DOWNLOAD_STATUS}
+            declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
+          />
+        )
+      })
+
       const event =
         (reg.event &&
           intl.formatMessage(
