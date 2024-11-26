@@ -31,7 +31,7 @@ import { isRegisterFormReady } from '@client/forms/register/declaration-selector
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
-import { RouteComponentProps, withRouter } from './WithRouter'
+import { RouteComponentProps, withRouter } from './withRouter'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};

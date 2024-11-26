@@ -47,7 +47,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 
@@ -76,10 +76,7 @@ type IDispatchProps = {
   modifyUserFormData: typeof modifyUserFormData
   clearUserFormData: typeof clearUserFormData
 }
-type IFullProps = IntlShapeProps &
-  IProps &
-  IDispatchProps &
-  RouteComponentProps<{}>
+type IFullProps = IntlShapeProps & IProps & IDispatchProps & RouteComponentProps
 
 class UserFormComponent extends React.Component<IFullProps, IState> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void

@@ -529,14 +529,13 @@ function InProgressComponent(props: IRegistrarHomeProps) {
     }
     const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
-      onTabClick: (tabId: string) => {
+      onTabClick: (selectorId: string) => {
         navigate(
           generateGoToHomeTabUrl({
-            tabId: WORKQUEUE_TABS.inProgress
+            tabId: WORKQUEUE_TABS.inProgress,
+            selectorId
           })
         )
-        // @TODO: Check whether this was intentionally "broken"
-        // props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
       },
       sections: [
         {

@@ -26,7 +26,7 @@ import { IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 interface IFormProps {
   declaration?: IDeclaration

@@ -136,19 +136,14 @@ export function clearUserFormData() {
 interface ISubmitSuccessAction {
   type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
   payload: {
-    locationId: string
     isUpdate: boolean
   }
 }
 
-export function submitSuccess(
-  locationId: string,
-  isUpdate = false
-): ISubmitSuccessAction {
+export function submitSuccess(isUpdate = false): ISubmitSuccessAction {
   return {
     type: SUBMIT_USER_FORM_DATA_SUCCESS,
     payload: {
-      locationId,
       isUpdate
     }
   }
@@ -343,7 +338,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       }
 
     case SUBMIT_USER_FORM_DATA:
-      const { client, mutation, variables, officeLocationId, isUpdate } = (
+      const { client, mutation, variables, isUpdate } = (
         action as IUserFormDataSubmitAction
       ).payload
       const token = getToken()
@@ -361,8 +356,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               ]
             }),
           {
-            successActionCreator: () =>
-              submitSuccess(officeLocationId, isUpdate),
+            successActionCreator: () => submitSuccess(isUpdate),
             failActionCreator: submitFail
           }
         )
@@ -378,17 +372,17 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case SUBMIT_USER_FORM_DATA_SUCCESS:
-      //   Cmd.action(clearUserFormData()),
-      //   Cmd.action(goToTeamUserList(action.payload.locationId)),
-      //   Cmd.action(
-      //     showSubmitFormSuccessToast(
-      //       action.payload.isUpdate
-      //         ? TOAST_MESSAGES.UPDATE_SUCCESS
-      //         : TOAST_MESSAGES.SUCCESS
-      //     )
-      //   )
-      // ])
-      return { ...state, submitting: false, submissionError: false }
+      const list = Cmd.list<ReturnType<typeof showSubmitFormSuccessToast>>([
+        Cmd.action(
+          showSubmitFormSuccessToast(
+            action.payload.isUpdate
+              ? TOAST_MESSAGES.UPDATE_SUCCESS
+              : TOAST_MESSAGES.SUCCESS
+          )
+        )
+      ])
+
+      return loop({ ...state, submitting: false, submissionError: false }, list)
 
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload

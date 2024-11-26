@@ -29,7 +29,7 @@ import {
   IDeclaration,
   createDeclaration
 } from '@client/declarations'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import { IStoreState } from '@client/store'
 import * as routes from '@client/navigation/routes'
 

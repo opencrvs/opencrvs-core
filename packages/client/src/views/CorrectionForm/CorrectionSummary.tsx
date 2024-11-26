@@ -83,7 +83,7 @@ import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import { SystemRoleType } from '@client/utils/gateway'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 const SupportingDocument = styled.div`
   display: flex;

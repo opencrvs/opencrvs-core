@@ -73,6 +73,11 @@ const MainSection = styled.section`
   background: ${({ theme }) => theme.colors.background};
 `
 
+/**
+ * The main application component that contains the routing logic for the application.
+ * In long run, router will be responsible for handling the routing logic for the entire application.
+ * When a new page is added, it should be added to the router rather than the App component.
+ */
 export const router = createBrowserRouter([
   {
     path: '*',
@@ -82,6 +87,7 @@ export const router = createBrowserRouter([
 
 export function App() {
   const location = useLocation()
+
   return (
     <ScrollToTop>
       <SessionExpireConfirmation />

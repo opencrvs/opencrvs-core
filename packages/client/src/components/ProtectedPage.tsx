@@ -12,16 +12,6 @@ import * as React from 'react'
 import PageVisibility from 'react-page-visibility'
 import { Unlock } from '@client/views/Unlock/Unlock'
 import { storage } from '@client/storage'
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  RouterProps,
-  RouteProps,
-  Location,
-  NavigateFunction,
-  Params
-} from 'react-router-dom'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import IdleTimer from 'react-idle-timer'
 import { USER_DETAILS, UserDetails } from '@client/utils/userUtils'
@@ -40,7 +30,7 @@ import { showPINUpdateSuccessToast } from '@client/notification/actions'
 import { CreatePin } from '@client/views/PIN/CreatePin'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
-import { RouteComponentProps, withRouter } from './WithRouter'
+import { RouteComponentProps, withRouter } from './withRouter'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 export const SCREEN_LOCK = 'screenLock'
@@ -128,7 +118,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     const alreadyLocked = isVisible || (await storage.getItem(SCREEN_LOCK))
 
     const onUnprotectedPage = this.props.unprotectedRouteElements?.some(
-      (route: any) => this.props.router.location.pathname.includes(route)
+      (route) => this.props.router.location.pathname.includes(route)
     )
 
     const newState = { ...this.state }

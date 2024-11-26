@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps } from '@client/components/WithRouter'
+import { RouteComponentProps } from '@client/components/withRouter'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -49,7 +49,7 @@ type IProps = IReviewProps &
   IDeclarationProp &
   FullProps &
   IntlShapeProps &
-  RouteComponentProps<{}>
+  RouteComponentProps
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};

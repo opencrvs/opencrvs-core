@@ -57,7 +57,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { Event } from '@client/utils/gateway'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -85,7 +85,7 @@ interface IOfficeHomeState {
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
   IBaseOfficeHomeStateProps &
-  RouteComponentProps<{}>
+  RouteComponentProps
 
 const DECLARATION_WORKQUEUE_TABS = [
   WORKQUEUE_TABS.inProgress,
@@ -481,7 +481,7 @@ class OfficeHomeView extends React.Component<
   }
 }
 
-function mapStateToProps(state: IStoreState, props: RouteComponentProps<{}>) {
+function mapStateToProps(state: IStoreState, props: RouteComponentProps) {
   const match = props.router.match
   const userDetails = getUserDetails(state)
   const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
@@ -529,7 +529,7 @@ export const OfficeHome = withRouter(
   connect<
     IBaseOfficeHomeStateProps,
     IDispatchProps,
-    RouteComponentProps<{}>,
+    RouteComponentProps,
     IStoreState
   >(mapStateToProps, {
     getOfflineData,

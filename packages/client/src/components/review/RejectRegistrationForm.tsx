@@ -36,7 +36,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { UserDetails } from '@client/utils/userUtils'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import * as routes from '@client/navigation/routes'
 
 const Instruction = styled.div`

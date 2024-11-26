@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  RouteProps,
-  RegisterForm
-} from '@client/views/RegisterForm/RegisterForm'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { IForm } from '@client/forms'
 import { IDeclaration } from '@client/declarations'
 import { IStoreState } from '@client/store'
@@ -21,7 +18,7 @@ import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { Event } from '@client/utils/gateway'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 type IStateProps = {
   declaration: IDeclaration | undefined
@@ -29,7 +26,7 @@ type IStateProps = {
   pageRoute: string
 }
 
-type IProps = RouteComponentProps<IStateProps & RouteProps>
+type IProps = RouteComponentProps<IStateProps>
 
 function CorrectionReviewFormComponent({ declaration, ...props }: IProps) {
   if (!declaration) {
@@ -41,7 +38,7 @@ function CorrectionReviewFormComponent({ declaration, ...props }: IProps) {
 
 function mapStateToProps(
   state: IStoreState,
-  props: RouteComponentProps<RouteProps>
+  props: RouteComponentProps
 ): IStateProps {
   const { match } = props.router
 

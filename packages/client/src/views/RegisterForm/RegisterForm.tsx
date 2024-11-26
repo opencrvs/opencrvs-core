@@ -106,7 +106,7 @@ import { useModal } from '@client/hooks/useModal'
 import { Text } from '@opencrvs/components/lib/Text'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import * as routes from '@client/navigation/routes'
 import { useNavigate } from 'react-router-dom'
 
@@ -148,15 +148,14 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-interface IFormProps {
+type IFormProps = RouteComponentProps<{
   declaration: IDeclaration
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
   reviewSummaryHeader?: React.ReactNode
-}
+}>
 
-export type RouteProps = RouteComponentProps<{}>
 type DispatchProps = {
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
@@ -178,7 +177,7 @@ export type FullProps = IFormProps &
   Props &
   DispatchProps &
   IntlShapeProps &
-  RouteComponentProps<RouteProps>
+  RouteComponentProps
 
 type State = {
   isDataAltered: boolean
@@ -952,7 +951,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       generateGoToPageGroupUrl({
         pageRoute,
         declarationId,
-        pageId, // @TODO: Double check this is review | preview
+        pageId,
         groupId,
         event
       })
@@ -1443,7 +1442,7 @@ function findFirstVisibleSection(sections: IFormSection[]) {
   return sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
-function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
+function mapStateToProps(state: IStoreState, props: IFormProps) {
   const { router, registerForm, declaration } = props
   const match = router.match
   const sectionId =
@@ -1501,13 +1500,10 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
 }
 
 export const RegisterForm = withRouter(
-  connect<Props, DispatchProps, IFormProps & RouteProps, IStoreState>(
-    mapStateToProps,
-    {
-      writeDeclaration,
-      modifyDeclaration,
-      deleteDeclaration,
-      toggleDraftSavedNotification
-    }
-  )(injectIntl(RegisterFormView))
+  connect<Props, DispatchProps, IFormProps, IStoreState>(mapStateToProps, {
+    writeDeclaration,
+    modifyDeclaration,
+    deleteDeclaration,
+    toggleDraftSavedNotification
+  })(injectIntl(RegisterFormView))
 )

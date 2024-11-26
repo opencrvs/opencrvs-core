@@ -36,7 +36,7 @@ import {
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import * as routes from '@client/navigation/routes'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { RouteComponentProps, withRouter } from './WithRouter'
+import { RouteComponentProps, withRouter } from './withRouter'
 import { formatUrl } from '@client/navigation'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
@@ -63,7 +63,7 @@ type DispatchProps = {
 type Props = NotificationProps &
   DispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{}> & { isOnline: boolean }
+  RouteComponentProps & { isOnline: boolean }
 
 const Component = ({
   hideConfigurationErrorNotification,

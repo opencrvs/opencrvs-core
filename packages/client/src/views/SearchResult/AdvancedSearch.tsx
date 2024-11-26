@@ -298,7 +298,6 @@ const BirthSection = () => {
         size="large"
         disabled={isDisabled}
         onClick={() => {
-          // @TODO: Check that these are updated
           dispatch(
             setAdvancedSearchParam({
               ...transformAdvancedSearchLocalStateToStoreData(

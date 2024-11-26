@@ -135,7 +135,7 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
 import { FormFieldGenerator } from '@client/components/form'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -300,7 +300,7 @@ export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
-type FullProps = IProps & IntlShapeProps & RouteComponentProps<{}>
+type FullProps = IProps & IntlShapeProps & RouteComponentProps
 
 function renderSelectOrRadioLabel(
   value: IFormFieldValue,

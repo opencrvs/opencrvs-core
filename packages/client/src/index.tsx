@@ -81,6 +81,11 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
+/**
+ * Starting from react-router v6, routes need to be renderd 'on-the-side' of the application.
+ * This changes the order of how provider components are rendered.
+ * Root component is the entry point of the application, and renders all the providers before application components, which are rendered by the RouterProvider.
+ */
 export const Root = () => {
   const { client } = useApolloClient(store)
 

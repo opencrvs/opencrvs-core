@@ -43,6 +43,7 @@ import {
   clearUserFormData,
   modifyUserFormData,
   submitFail,
+  submitSuccess,
   TOAST_MESSAGES
 } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
@@ -68,7 +69,7 @@ import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { Link } from '@opencrvs/components'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   CreateOrUpdateUserMutation,
@@ -154,15 +155,7 @@ const UserReviewFormComponent = ({
         })
       })
 
-      dispatch(
-        showSubmitFormSuccessToast(
-          Boolean(params.userId)
-            ? TOAST_MESSAGES.UPDATE_SUCCESS
-            : TOAST_MESSAGES.SUCCESS
-        )
-      )
-
-      // @TODO SUBMIT_USER_DATA_SUCCESS
+      dispatch(submitSuccess(Boolean(params.userId)))
     }
   })
 
@@ -318,7 +311,7 @@ const UserReviewFormComponent = ({
     }
 
     createOrUpdateUser({
-      variables: variables as CreateOrUpdateUserMutationVariables // @TODO: check if this is the correct type
+      variables: variables as CreateOrUpdateUserMutationVariables
     })
 
     submitForm(variables)

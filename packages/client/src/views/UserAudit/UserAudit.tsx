@@ -163,14 +163,6 @@ export const UserAudit = () => {
     setModalVisible(!modalVisible)
   }
 
-  const goToReviewUserDetails = (userId: string) =>
-    navigate(
-      formatUrl(routes.REVIEW_USER_DETAILS, {
-        userId,
-        sectionId: UserSection.Preview
-      })
-    )
-
   const toggleUsernameReminderModal = () => {
     setToggleUsernameReminder((prevValue) => !prevValue)
   }
@@ -233,7 +225,13 @@ export const UserAudit = () => {
     const menuItems: { label: string; handler: () => void }[] = [
       {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
-        handler: () => goToReviewUserDetails(userId)
+        handler: () =>
+          navigate(
+            formatUrl(routes.REVIEW_USER_DETAILS, {
+              userId,
+              sectionId: UserSection.Preview
+            })
+          )
       }
     ]
 

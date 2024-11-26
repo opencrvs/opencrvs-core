@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Route, Navigate, RouteProps, useNavigate } from 'react-router-dom'
+import { Navigate, RouteProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
@@ -22,15 +22,14 @@ interface IProps {
   exact?: boolean
 }
 
+/**
+ * Higher order component that wraps a route and checks if the user has access to it.
+ * If the user does not have access, they are redirected to the home page.
+ */
 export const ProtectedRouteWrapper = (
   props: IProps & ReturnType<typeof mapStateToProps> & RouteProps
 ) => {
-  const { children, authenticated, userDetailsFetched, userDetails, roles } =
-    props
-
-  // if (!authenticated && !userDetailsFetched) {
-  //   return <Route {...rest} element={<div></div>} />
-  // }
+  const { children, userDetails, roles } = props
 
   if (roles && userDetails) {
     if (!hasAccessToRoute(roles, userDetails)) {
@@ -38,14 +37,7 @@ export const ProtectedRouteWrapper = (
     }
   }
 
-  return (
-    <>
-      {React.Children.map(children, (child, index) =>
-        React.cloneElement(child as any, props)
-      )}
-      /
-    </>
-  )
+  return <>{children}</>
 }
 
 const mapStateToProps = (store: IStoreState, props: IProps) => {

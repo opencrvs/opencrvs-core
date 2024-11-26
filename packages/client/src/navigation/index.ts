@@ -57,21 +57,6 @@ export function formatUrl(url: string, props: { [key: string]: string }) {
   )
   return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
 }
-export const GO_TO_PAGE = 'navigation/GO_TO_PAGE'
-type GoToPageAction = {
-  type: typeof GO_TO_PAGE
-  payload: {
-    pageRoute: string
-    declarationId: string
-    pageId: string
-    groupId?: string
-    event: string
-    fieldNameHash?: string
-    historyState?: IDynamicValues
-  }
-}
-
-export type Action = GoToPageAction
 
 export const generateGoToHomeTabUrl = ({
   tabId,
@@ -343,7 +328,6 @@ export const generateUserReviewFormUrl = ({
     sectionId,
     groupId
   }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
-// action.payload.formHistoryState
 
 export const generateCreateUserSectionUrl = ({
   sectionId,
@@ -358,7 +342,6 @@ export const generateCreateUserSectionUrl = ({
     sectionId,
     groupId
   }) + (userFormFieldNameHash ? `#${userFormFieldNameHash}` : '')
-// action.payload.formHistoryState
 
 export const generateGoToPageGroupUrl = ({
   pageRoute,
@@ -400,27 +383,6 @@ export const generateGoToPageUrl = ({
     pageId,
     event
   })
-
-export function goToPage(
-  pageRoute: string,
-  declarationId: string,
-  pageId: string,
-  event: string,
-  fieldNameHash?: string,
-  historyState?: IDynamicValues
-) {
-  return {
-    type: GO_TO_PAGE,
-    payload: {
-      declarationId,
-      pageId,
-      event,
-      fieldNameHash,
-      pageRoute,
-      historyState
-    }
-  }
-}
 
 export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
   const role = userDetails?.systemRole

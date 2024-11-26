@@ -42,7 +42,7 @@ import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {
@@ -109,7 +109,7 @@ interface IBaseSearchResultProps {
   outboxDeclarations: IDeclaration[]
 }
 
-type IFullProps = IBaseSearchResultProps & RouteComponentProps<{}>
+type IFullProps = IBaseSearchResultProps & RouteComponentProps
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NONE)

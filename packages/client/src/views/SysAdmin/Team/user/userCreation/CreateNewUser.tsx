@@ -38,7 +38,7 @@ import { messages as userFormMessages } from '@client/i18n/messages/views/userFo
 import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 type IUserProps = {
   userId?: string
