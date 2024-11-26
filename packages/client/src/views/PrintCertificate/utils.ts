@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IFormData, IFormSectionGroup, ISelectOption } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { dynamicMessages } from '@client/i18n/messages/views/certificate'
-import { getAvailableLanguages } from '@client/i18n/utils'
-import { ILanguageState } from '@client/i18n/reducer'
 import { IPrintableDeclaration } from '@client/declarations'
-import { IntlShape } from 'react-intl'
+import { IFormData, IFormSectionGroup, ISelectOption } from '@client/forms'
+import { dynamicMessages } from '@client/i18n/messages/views/certificate'
+import { ILanguageState } from '@client/i18n/reducer'
+import { getAvailableLanguages } from '@client/i18n/utils'
 import { IOfflineData } from '@client/offline/reducer'
+import { EventType } from '@client/utils/gateway'
 import differenceInDays from 'date-fns/differenceInDays'
+import { IntlShape } from 'react-intl'
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365
@@ -58,7 +58,7 @@ export function getCountryTranslations(
 }
 
 interface IDayRange {
-  rangeData: { [key in Event]?: IRange[] }
+  rangeData: { [key in EventType]?: IRange[] }
 }
 
 function getDayRanges(offlineData: IOfflineData): IDayRange {
@@ -104,16 +104,16 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
 
   return {
     rangeData: {
-      [Event.Birth]: birthRanges,
-      [Event.Death]: deathRanges,
-      [Event.Marriage]: marriageRanges
+      [EventType.Birth]: birthRanges,
+      [EventType.Death]: deathRanges,
+      [EventType.Marriage]: marriageRanges
     }
   }
 }
 
 function getValue(
   offlineData: IOfflineData,
-  event: Event,
+  event: EventType,
   check: number
 ): IRange['value'] {
   const rangeByEvent = getDayRanges(offlineData).rangeData[event] as IRange[]
@@ -159,7 +159,7 @@ export function timeElapsed(days: number) {
 }
 
 export function calculatePrice(
-  event: Event,
+  event: EventType,
   eventDate: string,
   registeredDate: string,
   offlineData: IOfflineData
@@ -171,14 +171,14 @@ export function calculatePrice(
 
 export function getServiceMessage(
   intl: IntlShape,
-  event: Event,
+  event: EventType,
   eventDate: string,
   registeredDate: string,
   offlineData: IOfflineData
 ) {
   const days = calculateDays(eventDate, registeredDate)
 
-  if (event === Event.Birth) {
+  if (event === EventType.Birth) {
     if (days <= offlineData.config.BIRTH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.BIRTH.REGISTRATION_TARGET
@@ -196,7 +196,7 @@ export function getServiceMessage(
         target: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       })
     }
-  } else if (event === Event.Death) {
+  } else if (event === EventType.Death) {
     if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.DEATH.REGISTRATION_TARGET
@@ -206,7 +206,7 @@ export function getServiceMessage(
         target: offlineData.config.DEATH.REGISTRATION_TARGET
       })
     }
-  } else if (event === Event.Marriage) {
+  } else if (event === EventType.Marriage) {
     if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.MARRIAGE.REGISTRATION_TARGET
@@ -220,7 +220,7 @@ export function getServiceMessage(
 }
 
 export function isFreeOfCost(
-  event: Event,
+  event: EventType,
   eventDate: string,
   registeredDate: string,
   offlineData: IOfflineData
@@ -230,13 +230,13 @@ export function isFreeOfCost(
   return result === 0
 }
 
-export function getEventDate(data: IFormData, event: Event) {
+export function getEventDate(data: IFormData, event: EventType) {
   switch (event) {
-    case Event.Birth:
+    case EventType.Birth:
       return data.child.childBirthDate as string
-    case Event.Death:
+    case EventType.Death:
       return data.deathEvent.deathDate as string
-    case Event.Marriage:
+    case EventType.Marriage:
       return data.marriageEvent.marriageDate as string
   }
 }
@@ -253,11 +253,11 @@ export function getEvent(eventType: string | undefined) {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.Birth
+      return EventType.Birth
     case 'death':
-      return Event.Death
+      return EventType.Death
     case 'marriage':
-      return Event.Marriage
+      return EventType.Marriage
   }
 }
 

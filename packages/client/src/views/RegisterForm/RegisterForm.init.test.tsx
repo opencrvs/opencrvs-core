@@ -27,14 +27,14 @@ import {
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { vi } from 'vitest'
 
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { EventType, SystemRoleType, Status } from '@client/utils/gateway'
 import { storage } from '@client/storage'
 import { UserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
   // Some mock data
-  const draft1 = createDeclaration(Event.Birth)
-  const draft2 = createDeclaration(Event.Death)
-  const draft3 = createDeclaration(Event.Birth)
+  const draft1 = createDeclaration(EventType.Birth)
+  const draft2 = createDeclaration(EventType.Death)
+  const draft3 = createDeclaration(EventType.Birth)
 
   const currentUserData: IUserData = {
     userID: 'shakib75',
@@ -126,7 +126,7 @@ describe('when user logs in', () => {
     let draft: IDeclaration
 
     beforeAll(async () => {
-      draft = createDeclaration(Event.Death)
+      draft = createDeclaration(EventType.Death)
       vi.mock('lodash/debounce', () => vi.fn((fn) => fn))
       const { store } = await createTestStore()
       await writeDeclarationByUser(
@@ -188,8 +188,8 @@ describe('when user is in the register form before initial draft load', () => {
     const { store, history } = await createTestStore()
 
     const mock: any = vi.fn()
-    const draft = createDeclaration(Event.Birth)
-    const form = await getRegisterFormFromStore(store, Event.Birth)
+    const draft = createDeclaration(EventType.Birth)
+    const form = await getRegisterFormFromStore(store, EventType.Birth)
 
     try {
       await createTestComponent(

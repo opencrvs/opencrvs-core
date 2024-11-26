@@ -13,7 +13,7 @@ import { createRouterProps, createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { MockedProvider } from '@apollo/client/testing'
 import {
   mockRegistrationCountRequest,
@@ -47,7 +47,7 @@ describe('Performance home test', () => {
           {...createRouterProps('/performance', undefined, {
             search: {
               locationId: LOCATION_DHAKA_DIVISION.id,
-              event: Event.Birth,
+              event: EventType.Birth,
               timeEnd: new Date(1487076708000).toISOString(),
               timeStart: new Date(1455454308000).toISOString()
             }

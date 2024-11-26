@@ -57,7 +57,7 @@ import { ArrayElement } from '@client/SubmissionController'
 import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
 
 const FABContainer = styled.div`
@@ -275,10 +275,12 @@ class OfficeHomeView extends React.Component<
       storedDeclarations
     )
 
-    const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-      return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
-    })
+    const isOnePrintInAdvanceOn = Object.values(EventType).some(
+      (event: EventType) => {
+        const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
+        return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+      }
+    )
 
     return (
       <>
