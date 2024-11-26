@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 import { USER_MANAGEMENT_URL } from '@webhooks/constants'
 import fetch from 'node-fetch'
 import * as crypto from 'crypto'

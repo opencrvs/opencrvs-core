@@ -58,6 +58,8 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
+import { useState } from 'react'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -75,83 +77,53 @@ interface IBaseRejectTabProps {
   error?: boolean
 }
 
-interface IRejectTabState {
-  width: number
-  sortedCol: COLUMNS
-  sortOrder: SORT_ORDER
-}
-
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
-class RequiresUpdateComponent extends React.Component<
-  IRejectTabProps,
-  IRejectTabState
-> {
-  constructor(props: IRejectTabProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth,
-      sortedCol: COLUMNS.SENT_FOR_UPDATES,
-      sortOrder: SORT_ORDER.ASCENDING
-    }
-  }
+function RequiresUpdateComponent(props: IRejectTabProps) {
+  const { width } = useWindowSize()
+  const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES)
+  const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  onColumnClick = (columnName: string) => {
+  const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
+      sortedCol,
+      sortOrder
     )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
+    setSortedCol(newSortedCol)
+    setSortOrder(newSortOrder)
   }
 
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+  const getColumns = () => {
+    if (width > props.theme.grid.breakpoints.lg) {
       return [
         {
           width: 30,
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME,
-          isSorted: this.state.sortedCol === COLUMNS.NAME,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.NAME,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.event),
+          label: props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: props.intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(
-            constantsMessages.sentForUpdates
-          ),
+          label: props.intl.formatMessage(constantsMessages.sentForUpdates),
           width: 18,
           key: COLUMNS.SENT_FOR_UPDATES,
-          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_UPDATES,
-          sortFunction: this.onColumnClick
+          isSorted: sortedCol === COLUMNS.SENT_FOR_UPDATES,
+          sortFunction: onColumnClick
         },
         {
           width: 18,
@@ -163,7 +135,7 @@ class RequiresUpdateComponent extends React.Component<
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -177,8 +149,8 @@ class RequiresUpdateComponent extends React.Component<
     }
   }
 
-  transformRejectedContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = this.props
+  const transformRejectedContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = props
     if (!data || !data.results) {
       return []
     }
@@ -189,40 +161,34 @@ class RequiresUpdateComponent extends React.Component<
       SCOPES.RECORD_SUBMIT_FOR_UPDATES
     ] as Scope[]
 
-    const isReviewer = this.props.scope?.some((x) => validateScopes.includes(x))
+    const isReviewer = props.scope?.some((x) => validateScopes.includes(x))
 
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(data, props.intl)
     const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
-      const foundDeclaration = this.props.outboxDeclarations.find(
+      const foundDeclaration = props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
       const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (
-          this.state.width > this.props.theme.grid.breakpoints.lg &&
-          isReviewer
-        ) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
           actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.update),
+            label: props.intl.formatMessage(buttonMessages.update),
             handler: () => {},
             disabled: true
           })
         }
       } else {
-        if (
-          this.state.width > this.props.theme.grid.breakpoints.lg &&
-          isReviewer
-        ) {
+        if (width > props.theme.grid.breakpoints.lg && isReviewer) {
           actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.update),
+            label: props.intl.formatMessage(buttonMessages.update),
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
               e && e.stopPropagation()
-              this.props.goToPage(
+              props.goToPage(
                 REVIEW_EVENT_PARENT_FORM_PAGE,
                 reg.id,
                 'review',
@@ -266,18 +232,14 @@ class RequiresUpdateComponent extends React.Component<
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
-          }
+          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
-          }
+          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -306,11 +268,7 @@ class RequiresUpdateComponent extends React.Component<
         actions
       }
     })
-    const sortedItems = getSortedItems(
-      items,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
     return sortedItems.map((item) => {
       return {
         ...item,
@@ -322,40 +280,38 @@ class RequiresUpdateComponent extends React.Component<
     })
   }
 
-  render() {
-    const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
-    const { data } = queryData
-    const totalPages = this.props.queryData.data.totalItems
-      ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
-      : 0
-    const isShowPagination =
-      this.props.queryData.data.totalItems &&
-      this.props.queryData.data.totalItems > pageSize
-        ? true
-        : false
-    return (
-      <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.requiresUpdate)}
-        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
-        isShowPagination={isShowPagination}
-        paginationId={paginationId}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        loading={this.props.loading}
-        error={this.props.error}
-        noResultText={intl.formatMessage(wqMessages.noRecordsRequireUpdates)}
-        noContent={this.transformRejectedContent(data).length <= 0}
-      >
-        <Workqueue
-          content={this.transformRejectedContent(data)}
-          columns={this.getColumns()}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          hideLastBorder={!isShowPagination}
-        />
-      </WQContentWrapper>
-    )
-  }
+  const totalPages = props.queryData.data.totalItems
+    ? Math.ceil(props.queryData.data.totalItems / props.pageSize)
+    : 0
+  const isShowPagination =
+    props.queryData.data.totalItems &&
+    props.queryData.data.totalItems > props.pageSize
+      ? true
+      : false
+  return (
+    <WQContentWrapper
+      title={props.intl.formatMessage(navigationMessages.requiresUpdate)}
+      isMobileSize={width < props.theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      paginationId={props.paginationId}
+      totalPages={totalPages}
+      onPageChange={props.onPageChange}
+      loading={props.loading}
+      error={props.error}
+      noResultText={props.intl.formatMessage(
+        wqMessages.noRecordsRequireUpdates
+      )}
+      noContent={transformRejectedContent(props.queryData.data).length <= 0}
+    >
+      <Workqueue
+        content={transformRejectedContent(props.queryData.data)}
+        columns={getColumns()}
+        loading={props.loading}
+        sortOrder={sortOrder}
+        hideLastBorder={!isShowPagination}
+      />
+    </WQContentWrapper>
+  )
 }
 
 function mapStateToProps(state: IStoreState) {

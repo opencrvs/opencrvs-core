@@ -58,7 +58,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'

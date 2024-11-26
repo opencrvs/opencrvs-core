@@ -144,7 +144,7 @@ export const approveCorrectionRoute = createRoute({
       practitionerContacts,
       getAuthHeader(request),
       {
-        event: 'BIRTH',
+        event: getEventType(record),
         trackingId: getTrackingId(recordWithUpdatedValues)!,
         userFullName: requestingPractitioner.name
       }

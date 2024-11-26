@@ -3,10 +3,11 @@
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
-      "@gateway/*": ["./*"]
+      "@gateway/*": ["./*"],
+      "@events/*": ["../../events/src/*"]
     },
     "target": "es6",
-    "module": "commonjs",
+    "module": "node16",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node16",
@@ -19,7 +20,8 @@
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["fhir", "jest"],
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "typings"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]

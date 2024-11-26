@@ -18,7 +18,7 @@ import {
   useLocation,
   useParams,
   useRouteMatch
-} from 'react-router'
+} from 'react-router-dom'
 import { useRecord } from '@client/hooks/useRecord'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'

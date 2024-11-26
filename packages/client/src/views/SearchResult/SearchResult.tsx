@@ -47,7 +47,6 @@ import { Scope, SCOPES, SearchEventsQuery } from '@client/utils/gateway'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import styled, { withTheme } from 'styled-components'
-
 import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   ColumnContentAlignment,
@@ -55,11 +54,14 @@ import {
   IAction,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-
 import { Navigation } from '@client/components/interface/Navigation'
+import React from 'react'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect } from 'react-redux'
+import { RouteComponentProps } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { SearchCriteria } from '@client/utils/referenceApi'
 import {
   IconWithName,
   IconWithNameEvent,
@@ -68,11 +70,8 @@ import {
 } from '@client/views/OfficeHome/components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
-import ReactTooltip from 'react-tooltip'
+import { SearchCriteria } from '@client/utils/referenceApi'
+import { useWindowSize } from '@opencrvs/components/src/hooks'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -107,7 +106,6 @@ interface ISerachInputCustomProps {
   focusInput?: boolean
   buttonLabel: string
   onSearchTextChange?: (searchText: string) => void
-  onSubmit: (searchText: string) => any
 }
 
 export type ISearchInputProps = ISerachInputCustomProps &
@@ -136,58 +134,26 @@ type ISearchResultProps = IntlShapeProps &
   IBaseSearchResultProps &
   RouteComponentProps<IMatchParams>
 
-interface ISearchResultState {
-  width: number
-}
-
 type QueryData = SearchEventsQuery['searchEvents']
 
-class SearchResultView extends React.Component<
-  ISearchResultProps,
-  ISearchResultState
-> {
-  pageSize = 10
-  showPaginated = false
-  constructor(props: ISearchResultProps) {
-    super(props)
-    this.state = {
-      width: window.innerWidth
-    }
-  }
+function SearchResultView(props: ISearchResultProps) {
+  const { width } = useWindowSize()
 
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
-  }
-
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+  const getColumns = () => {
+    if (width > props.theme.grid.breakpoints.lg) {
       return [
         {
           width: 35,
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.event),
+          label: props.intl.formatMessage(constantsMessages.event),
           width: 20,
           key: COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          label: props.intl.formatMessage(constantsMessages.eventDate),
           width: 20,
           key: COLUMNS.DATE_OF_EVENT
         },
@@ -201,7 +167,7 @@ class SearchResultView extends React.Component<
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: props.intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
@@ -215,11 +181,11 @@ class SearchResultView extends React.Component<
     }
   }
 
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes(SCOPES.RECORD_REGISTER)
+  function userHasRegisterScope() {
+    return props.scope && props.scope.includes(SCOPES.RECORD_REGISTER)
   }
 
-  userHasValidateScope() {
+  function userHasValidateScope() {
     const validateScopes = [
       SCOPES.RECORD_REGISTER,
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
@@ -227,47 +193,42 @@ class SearchResultView extends React.Component<
     ] as Scope[]
 
     return (
-      this.props.scope &&
-      this.props.scope.some((scope) => validateScopes.includes(scope))
+      props.scope && props.scope.some((scope) => validateScopes.includes(scope))
     )
   }
 
-  hasIssueScope() {
-    return this.props.scope?.includes(
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
-    )
+  function hasIssueScope() {
+    return props.scope?.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
   }
 
-  hasPrintScope() {
-    return this.props.scope?.includes(
-      SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
-    )
+  function hasPrintScope() {
+    return props.scope?.includes(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)
   }
 
-  canSearchAnywhere() {
+  function canSearchAnywhere() {
     const searchScopes: Scope[] = [
       SCOPES.SEARCH_BIRTH,
       SCOPES.SEARCH_DEATH,
       SCOPES.SEARCH_MARRIAGE
     ]
-    return this.props.scope?.some((scope) => searchScopes.includes(scope))
+    return props.scope?.some((scope) => searchScopes.includes(scope))
   }
 
-  transformSearchContent = (data: QueryData) => {
+  const transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
       return []
     }
 
-    const transformedData = transformData(data, this.props.intl)
+    const transformedData = transformData(data, props.intl)
 
     const processingDeclarationIds = getProcessingDeclarationIds(
-      this.props.outboxDeclarations
+      props.outboxDeclarations
     )
 
     return transformedData
       .filter(({ id }) => !processingDeclarationIds.includes(id))
       .map((reg, index) => {
-        const foundDeclaration = this.props.outboxDeclarations.find(
+        const foundDeclaration = props.outboxDeclarations.find(
           (declaration) => declaration.id === reg.id
         )
         const actions: IAction[] = []
@@ -290,7 +251,7 @@ class SearchResultView extends React.Component<
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { intl, location, userDetails } = this.props
+        const { intl, location, userDetails } = props
         const search = location.search
         const params = new URLSearchParams(search)
         const [searchText, searchType] = [
@@ -308,31 +269,31 @@ class SearchResultView extends React.Component<
           isDeclared || declarationIsInProgress || declarationIsRejected
 
         const shouldShowReviewButton =
-          (this.userHasRegisterScope() && isDeclarationReviewableByRegistrar) ||
-          (this.userHasValidateScope() && isDeclarationReviewableByRegAgent)
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          (userHasRegisterScope() && isDeclarationReviewableByRegistrar) ||
+          (userHasValidateScope() && isDeclarationReviewableByRegAgent)
+        if (width > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            this.hasPrintScope()
+            hasPrintScope()
           ) {
             actions.push({
-              label: this.props.intl.formatMessage(buttonMessages.print),
+              label: props.intl.formatMessage(buttonMessages.print),
               handler: (
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                this.props.goToPrintCertificate(reg.id, reg.event)
+                props.goToPrintCertificate(reg.id, reg.event)
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && this.hasIssueScope()) {
+          } else if (declarationIsCertified && hasIssueScope()) {
             actions.push({
-              label: this.props.intl.formatMessage(buttonMessages.issue),
+              label: props.intl.formatMessage(buttonMessages.issue),
               handler: (
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                this.props.goToIssueCertificate(reg.id)
+                props.goToIssueCertificate(reg.id)
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -340,10 +301,10 @@ class SearchResultView extends React.Component<
             actions.push({
               label:
                 declarationIsRejected || declarationIsInProgress
-                  ? this.props.intl.formatMessage(constantsMessages.update)
-                  : this.props.intl.formatMessage(constantsMessages.review),
+                  ? props.intl.formatMessage(constantsMessages.update)
+                  : props.intl.formatMessage(constantsMessages.review),
               handler: () =>
-                this.props.goToPage(
+                props.goToPage(
                   reg.declarationStatus === 'CORRECTION_REQUESTED'
                     ? REVIEW_CORRECTION
                     : REVIEW_EVENT_PARENT_FORM_PAGE,
@@ -390,7 +351,7 @@ class SearchResultView extends React.Component<
                         name:
                           searchType === SearchCriteria.NAME ? searchText : '',
                         declarationLocationId:
-                          this.canSearchAnywhere() && userDetails
+                          !canSearchAnywhere() && userDetails
                             ? getUserLocation(userDetails).id
                             : ''
                       },
@@ -420,25 +381,21 @@ class SearchResultView extends React.Component<
           reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
         const isValidatedOnReview =
           reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-          this.userHasRegisterScope()
+          userHasRegisterScope()
             ? true
             : false
         const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
         const NameComponent = reg.name ? (
           <NameContainer
             id={`name_${index}`}
-            onClick={() =>
-              this.props.goToDeclarationRecordAudit('search', reg.id)
-            }
+            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
           >
             {reg.name}
           </NameContainer>
         ) : (
           <NoNameContainer
             id={`name_${index}`}
-            onClick={() =>
-              this.props.goToDeclarationRecordAudit('search', reg.id)
-            }
+            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
           >
             {intl.formatMessage(constantsMessages.noNameProvided)}
           </NoNameContainer>
@@ -472,115 +429,109 @@ class SearchResultView extends React.Component<
       })
   }
 
-  render() {
-    const { intl, location, userDetails } = this.props
-    const search = location.search
-    const params = new URLSearchParams(search)
-    const [searchText, searchType] = [
-      params.get('searchText'),
-      params.get('searchType')
-    ]
-    return (
-      <Frame
-        header={
-          <Header
-            searchText={searchText!}
-            selectedSearchType={searchType!}
-            mobileSearchBar={true}
-            enableMenuSelection={false}
-          />
-        }
-        navigation={<Navigation />}
-        skipToContentText={intl.formatMessage(
-          constantsMessages.skipToMainContent
-        )}
-      >
-        {searchText && searchType && (
-          <Query<SearchEventsQuery>
-            query={SEARCH_EVENTS}
-            variables={{
-              advancedSearchParameters: {
-                declarationLocationId:
-                  this.canSearchAnywhere() && userDetails
-                    ? getUserLocation(userDetails).id
-                    : '',
-                trackingId:
-                  searchType === SearchCriteria.TRACKING_ID ? searchText : '',
-                nationalId:
-                  searchType === SearchCriteria.NATIONAL_ID ? searchText : '',
-                registrationNumber:
-                  searchType === SearchCriteria.REGISTRATION_NUMBER
-                    ? searchText
-                    : '',
-                contactNumber:
-                  searchType === SearchCriteria.PHONE_NUMBER
-                    ? convertToMSISDN(searchText, window.config.COUNTRY)
-                    : '',
-                contactEmail:
-                  searchType === SearchCriteria.EMAIL ? searchText : '',
-                name: searchType === SearchCriteria.NAME ? searchText : ''
-              },
-              sort: SEARCH_RESULT_SORT
-            }}
-            fetchPolicy="cache-and-network"
-          >
-            {({ loading, error, data }) => {
-              const total = loading
-                ? -1
-                : data?.searchEvents?.results?.length || 0
-              return (
-                <WQContentWrapper
-                  title={intl.formatMessage(messages.searchResultFor, {
-                    param: searchText
-                  })}
-                  isMobileSize={
-                    this.state.width < this.props.theme.grid.breakpoints.lg
-                  }
-                  noResultText={intl.formatMessage(messages.noResultFor, {
-                    param: searchText
-                  })}
-                  noContent={total < 1 && !loading}
-                >
-                  {loading ? (
-                    <div id="search_loader">
-                      <LoadingIndicator loading={true} />
-                    </div>
-                  ) : error ? (
-                    <ErrorText id="search-result-error-text">
-                      {intl.formatMessage(errorMessages.queryError)}
-                    </ErrorText>
-                  ) : (
-                    data?.searchEvents &&
-                    total > 0 && (
-                      <>
-                        <ReactTooltip id="validateTooltip">
-                          <ToolTipContainer>
-                            {this.props.intl.formatMessage(
-                              registrarHomeMessages.validatedDeclarationTooltipForRegistrar
-                            )}
-                          </ToolTipContainer>
-                        </ReactTooltip>
-                        <Workqueue
-                          content={this.transformSearchContent(
-                            data.searchEvents
+  const { intl, location, userDetails } = props
+  const search = location.search
+  const params = new URLSearchParams(search)
+  const [searchText, searchType] = [
+    params.get('searchText'),
+    params.get('searchType')
+  ]
+  return (
+    <Frame
+      header={
+        <Header
+          searchText={searchText!}
+          selectedSearchType={searchType!}
+          mobileSearchBar={true}
+          enableMenuSelection={false}
+        />
+      }
+      navigation={<Navigation />}
+      skipToContentText={intl.formatMessage(
+        constantsMessages.skipToMainContent
+      )}
+    >
+      {searchText && searchType && (
+        <Query<SearchEventsQuery>
+          query={SEARCH_EVENTS}
+          variables={{
+            advancedSearchParameters: {
+              declarationLocationId:
+                !canSearchAnywhere() && userDetails
+                  ? getUserLocation(userDetails).id
+                  : '',
+              trackingId:
+                searchType === SearchCriteria.TRACKING_ID ? searchText : '',
+              nationalId:
+                searchType === SearchCriteria.NATIONAL_ID ? searchText : '',
+              registrationNumber:
+                searchType === SearchCriteria.REGISTRATION_NUMBER
+                  ? searchText
+                  : '',
+              contactNumber:
+                searchType === SearchCriteria.PHONE_NUMBER
+                  ? convertToMSISDN(searchText, window.config.COUNTRY)
+                  : '',
+              contactEmail:
+                searchType === SearchCriteria.EMAIL ? searchText : '',
+              name: searchType === SearchCriteria.NAME ? searchText : ''
+            },
+            sort: SEARCH_RESULT_SORT
+          }}
+          fetchPolicy="cache-and-network"
+        >
+          {({ loading, error, data }) => {
+            const total = loading
+              ? -1
+              : data?.searchEvents?.results?.length || 0
+            return (
+              <WQContentWrapper
+                title={intl.formatMessage(messages.searchResultFor, {
+                  param: searchText
+                })}
+                isMobileSize={width < props.theme.grid.breakpoints.lg}
+                noResultText={intl.formatMessage(messages.noResultFor, {
+                  param: searchText
+                })}
+                noContent={total < 1 && !loading}
+              >
+                {loading ? (
+                  <div id="search_loader">
+                    <LoadingIndicator loading={true} />
+                  </div>
+                ) : error ? (
+                  <ErrorText id="search-result-error-text">
+                    {intl.formatMessage(errorMessages.queryError)}
+                  </ErrorText>
+                ) : (
+                  data?.searchEvents &&
+                  total > 0 && (
+                    <>
+                      <ReactTooltip id="validateTooltip">
+                        <ToolTipContainer>
+                          {props.intl.formatMessage(
+                            registrarHomeMessages.validatedDeclarationTooltipForRegistrar
                           )}
-                          columns={this.getColumns()}
-                          noResultText={intl.formatMessage(
-                            constantsMessages.noResults
-                          )}
-                          hideLastBorder={true}
-                        />
-                      </>
-                    )
-                  )}
-                </WQContentWrapper>
-              )
-            }}
-          </Query>
-        )}
-      </Frame>
-    )
-  }
+                        </ToolTipContainer>
+                      </ReactTooltip>
+                      <Workqueue
+                        content={transformSearchContent(data.searchEvents)}
+                        columns={getColumns()}
+                        noResultText={intl.formatMessage(
+                          constantsMessages.noResults
+                        )}
+                        hideLastBorder={true}
+                      />
+                    </>
+                  )
+                )}
+              </WQContentWrapper>
+            )
+          }}
+        </Query>
+      )}
+    </Frame>
+  )
 }
 export const SearchResult = connect(
   (state: IStoreState) => ({

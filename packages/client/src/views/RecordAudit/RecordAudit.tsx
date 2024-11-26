@@ -20,7 +20,7 @@ import {
   Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps, Redirect, useParams } from 'react-router'
+import { RouteComponentProps, Redirect, useParams } from 'react-router-dom'
 import {
   goToHomeTab,
   goToPage,

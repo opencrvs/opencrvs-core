@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useHomePage } from '@client/hooks/useHomePage'
-import * as React from 'react'
+import React from 'react'
 import { Redirect } from 'react-router'
 
 export function Home() {

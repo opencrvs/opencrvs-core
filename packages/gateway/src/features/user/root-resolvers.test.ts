@@ -22,8 +22,19 @@ import {
   DEFAULT_ROLES_DEFINITION,
   SCOPES
 } from '@opencrvs/commons/authentication'
+import { fetchJSON } from '@opencrvs/commons'
 
 let container: StartedTestContainer
+
+jest.mock('@opencrvs/commons', () => {
+  const originalModule = jest.requireActual('@opencrvs/commons')
+  return {
+    ...originalModule,
+    fetchJSON: jest.fn()
+  }
+})
+
+const fetchJSONMock = fetchJSON as jest.MockedFunction<typeof fetchJSON>
 
 beforeAll(async () => {
   container = await startContainer()
@@ -1005,6 +1016,7 @@ describe('User root resolvers', () => {
     let authHeaderRegister: { Authorization: string }
     beforeEach(() => {
       fetch.resetMocks()
+      fetchJSONMock.mockReset()
       const sysAdminToken = jwt.sign(
         { scope: [SCOPES.USER_CREATE] },
         readFileSync('./test/cert.key'),
@@ -1044,9 +1056,9 @@ describe('User root resolvers', () => {
     }
 
     it('creates user for sysadmin', async () => {
-      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
-        status: 200
-      })
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -1066,9 +1078,9 @@ describe('User root resolvers', () => {
     })
 
     it('updates an user for sysadmin', async () => {
-      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
-        status: 200
-      })
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -1102,9 +1114,9 @@ describe('User root resolvers', () => {
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {
-      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
-        status: 200
-      })
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
       fetch.mockResponseOnce(
         JSON.stringify({
           statusCode: '201'
