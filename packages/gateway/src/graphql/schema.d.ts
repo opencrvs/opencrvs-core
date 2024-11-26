@@ -2436,7 +2436,6 @@ export interface QueryToSearchEventsArgs {
   sort?: string
   sortColumn?: string
   sortBy?: Array<GQLSortBy>
-  isWorkqueueData: boolean
 }
 export interface QueryToSearchEventsResolver<TParent = any, TResult = any> {
   (

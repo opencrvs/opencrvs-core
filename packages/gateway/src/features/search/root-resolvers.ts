@@ -85,8 +85,7 @@ export const resolvers: GQLResolver = {
         skip,
         sortColumn,
         sort = 'desc',
-        sortBy,
-        isWorkqueueData
+        sortBy
       },
       { headers: authHeader }
     ) {
@@ -95,14 +94,10 @@ export const resolvers: GQLResolver = {
         parameters: advancedSearchParameters
       }
       if (
-        !isWorkqueueData &&
         !inScope(authHeader, [
           SCOPES.SEARCH_BIRTH,
           SCOPES.SEARCH_DEATH,
-          SCOPES.SEARCH_MARRIAGE,
-          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+          SCOPES.SEARCH_MARRIAGE
         ])
       )
         return await Promise.reject(new Error('Not enough scope to search'))

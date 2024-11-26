@@ -375,7 +375,6 @@ async function getWorkqueueData(
 
   const result = await syncRegistrarWorkqueue(
     registrationLocationId,
-    true,
     reviewStatuses,
     pageSize,
     inProgressSkip,

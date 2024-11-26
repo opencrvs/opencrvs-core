@@ -17,7 +17,6 @@ export const SEARCH_EVENTS = gql`
     $count: Int
     $skip: Int
     $sortColumn: String
-    $isWorkqueueData: Boolean!
   ) {
     searchEvents(
       advancedSearchParameters: $advancedSearchParameters
@@ -25,7 +24,6 @@ export const SEARCH_EVENTS = gql`
       count: $count
       skip: $skip
       sortColumn: $sortColumn
-      isWorkqueueData: $isWorkqueueData
     ) {
       totalItems
       results {

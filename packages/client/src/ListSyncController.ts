@@ -13,7 +13,6 @@ import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 
 export async function syncRegistrarWorkqueue(
   locationId: string,
-  isWorkqueueData: boolean,
   reviewStatuses: string[],
   pageSize: number,
   inProgressSkip: number,
@@ -39,8 +38,7 @@ export async function syncRegistrarWorkqueue(
         approvalSkip: approvalSkip,
         externalValidationSkip: externalValidationSkip,
         printSkip: printSkip,
-        issueSkip: issueSkip,
-        isWorkqueueData: isWorkqueueData
+        issueSkip: issueSkip
       },
       fetchPolicy: 'no-cache'
     })

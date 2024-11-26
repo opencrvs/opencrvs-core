@@ -126,7 +126,6 @@ type Query {
     sort: String
     sortColumn: String
     sortBy: [SortBy!]
-    isWorkqueueData: Boolean!
   ): EventSearchResultSet
   getEventsWithProgress(
     declarationJurisdictionId: String
