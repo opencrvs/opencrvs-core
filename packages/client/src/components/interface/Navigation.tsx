@@ -285,8 +285,7 @@ const NavigationView = (props: IFullProps) => {
   } = props
   const tabId = deselectAllTabs
     ? ''
-    : // @todo actually provide match somehow
-    router?.match?.params?.tabId
+    : router?.match?.params?.tabId
     ? router.match.params.tabId
     : activeMenuItem
     ? activeMenuItem
@@ -839,7 +838,7 @@ const NavigationView = (props: IFullProps) => {
                           )}
                           onClick={() =>
                             router.navigate(routes.PERFORMANCE_DASHBOARD, {
-                              state: { isNavigatedInsideApp: true } //@todo: check
+                              state: { isNavigatedInsideApp: true }
                             })
                           }
                           id="navigation_dashboard"
@@ -857,7 +856,7 @@ const NavigationView = (props: IFullProps) => {
                           )}
                           onClick={() =>
                             router.navigate(routes.PERFORMANCE_STATISTICS, {
-                              state: { isNavigatedInsideApp: true } //@todo: check
+                              state: { isNavigatedInsideApp: true }
                             })
                           }
                           id="navigation_statistics"
@@ -875,7 +874,7 @@ const NavigationView = (props: IFullProps) => {
                           )}
                           onClick={() =>
                             router.navigate(routes.PERFORMANCE_LEADER_BOARDS, {
-                              state: { isNavigatedInsideApp: true } //@todo: check
+                              state: { isNavigatedInsideApp: true }
                             })
                           }
                           id="navigation_leaderboards"

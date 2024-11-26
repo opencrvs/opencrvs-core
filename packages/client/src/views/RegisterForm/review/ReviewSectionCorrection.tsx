@@ -33,7 +33,7 @@ import { IStoreState } from '@client/store'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { generateGoToHomeTabUrl } from '@client/navigation'
-import { RouteComponentProps } from '@client/components/withRouter'
+import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
 interface IChildrenProps {
   toggleRejectModal: () => void
@@ -242,12 +242,17 @@ class ReviewSectionCorrectionComp extends React.Component<FullProps, State> {
   }
 }
 
-export const ReviewSectionCorrection = connect<
-  IConnectProps,
-  DispatchProps,
-  {},
-  IStoreState
->((state) => ({ config: getOfflineData(state), user: getUserDetails(state) }), {
-  writeDeclaration,
-  modifyDeclaration
-})(injectIntl<'intl', FullProps>(ReviewSectionCorrectionComp))
+export const ReviewSectionCorrection = withRouter(
+  connect<
+    IConnectProps,
+    DispatchProps,
+    RouteComponentProps<IProps>,
+    IStoreState
+  >(
+    (state) => ({ config: getOfflineData(state), user: getUserDetails(state) }),
+    {
+      writeDeclaration,
+      modifyDeclaration
+    }
+  )(injectIntl<'intl', FullProps>(ReviewSectionCorrectionComp))
+)
