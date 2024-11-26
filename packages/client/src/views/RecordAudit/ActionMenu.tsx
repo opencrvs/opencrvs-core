@@ -341,7 +341,6 @@ const ReviewAction: React.FC<
 }) => {
   const navigate = useNavigate()
   const intl = useIntl()
-  const dispatch = useDispatch()
 
   const userHasReviewScope =
     scope &&
@@ -397,7 +396,6 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   isDownloaded
 }) => {
   const intl = useIntl()
-  const dispatch = useDispatch()
   const navigate = useNavigate()
 
   // @ToDo use: appropriate scope after configurable role pr is merged

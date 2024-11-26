@@ -2,21 +2,11 @@ import {
   useLocation,
   useNavigate,
   useParams,
-  RouterProps,
-  RouteProps,
   Location,
   NavigateFunction,
-  Params,
-  useMatch
+  Params
 } from 'react-router-dom'
 import * as React from 'react'
-
-/**
- * Custom withRouter component implemented using react-router-dom hooks
- * withRouter was deprecated in react-router-dom v6
- * @param Component
- * @returns
- */
 
 export type RouteComponentProps<T = {}> = {
   router: {
@@ -27,6 +17,11 @@ export type RouteComponentProps<T = {}> = {
   }
 } & T
 
+/**
+ * Custom withRouter component implemented using react-router-dom hooks
+ * withRouter was deprecated in react-router-dom v6
+ *
+ */
 export function withRouter<ComponentProps extends RouteComponentProps>(
   Component: React.ComponentType<ComponentProps>
 ) {
@@ -36,9 +31,6 @@ export function withRouter<ComponentProps extends RouteComponentProps>(
     const params = useParams()
 
     const match = { params }
-    // console.log('match', match)
-    // console.log('params', params)
-    console.log(props)
     return (
       <Component
         {...(props as ComponentProps)}

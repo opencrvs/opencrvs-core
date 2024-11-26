@@ -16,7 +16,11 @@ import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
-import { formatUrl, generateReviewCertificateUrl } from '@client/navigation'
+import {
+  formatUrl,
+  generateGoToHomeTabUrl,
+  generateReviewCertificateUrl
+} from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -93,6 +97,7 @@ const PaymentComponent = ({
     })
 
     if (!registrationId) {
+      // eslint-disable-next-line no-console
       console.error('No registrationId in URL')
       return
     }
@@ -144,7 +149,13 @@ const PaymentComponent = ({
         title={intl.formatMessage(messages.print)}
         goBack={() => navigate(-1)}
         hideBackground
-        goHome={() => goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+        goHome={() =>
+          navigate(
+            generateGoToHomeTabUrl({
+              tabId: WORKQUEUE_TABS.readyToPrint
+            })
+          )
+        }
       >
         <Content
           title={intl.formatMessage(messages.payment)}
@@ -222,10 +233,7 @@ function mapStatetoProps(
 }
 
 export const Payment = withRouter(
-  connect<ReturnType<typeof mapStatetoProps>, IDispatchProps, any, IStoreState>(
-    mapStatetoProps,
-    {
-      modifyDeclaration
-    }
-  )(injectIntl(withTheme(PaymentComponent)))
+  connect(mapStatetoProps, {
+    modifyDeclaration
+  })(injectIntl(withTheme(PaymentComponent)))
 )

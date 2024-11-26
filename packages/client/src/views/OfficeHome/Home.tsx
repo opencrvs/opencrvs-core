@@ -34,7 +34,6 @@ export function Home() {
     ].includes(role)
   const roleIsLocalSysAdmin = role && SYS_ADMIN_ROLES.includes(role)
 
-  console.log('woo hoo')
   if (isRoleAdmins) return <Navigate to={PERFORMANCE_HOME} />
   if (roleIsLocalSysAdmin)
     return (

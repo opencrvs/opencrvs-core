@@ -15,7 +15,6 @@ import { IntlShape, useIntl } from 'react-intl'
 import {
   Navigate,
   useLocation,
-  useMatch,
   useMatches,
   useNavigate,
   useParams

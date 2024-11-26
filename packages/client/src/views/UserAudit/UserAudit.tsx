@@ -28,7 +28,7 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { formatUrl } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -133,7 +133,7 @@ export const UserAudit = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { userId } = useParams()
-  const dispatch = useDispatch()
+
   const [showResendInviteSuccess, setShowResendInviteSuccess] =
     useState<boolean>(false)
   const [showResendInviteError, setShowResendInviteError] =

@@ -20,7 +20,6 @@ import {
   Spinner
 } from '@opencrvs/components'
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
@@ -46,7 +45,6 @@ const ReviewCertificateFrame = ({
   children: React.ReactNode
 }) => {
   const intl = useIntl()
-  const dispatch = useDispatch()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -136,7 +134,6 @@ export const ReviewCertificate = () => {
     isPrintInAdvance,
     canUserEditRecord,
     handleEdit
-    // @TODO: Can this be typed?
   } = usePrintableCertificate(registrationId!)
 
   const intl = useIntl()

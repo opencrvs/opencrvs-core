@@ -538,7 +538,7 @@ const SearchModifierComponent = () => {
 }
 
 export const AdvancedSearchResult = withRouter(
-  connect<{}, null, any, IStoreState>((state: IStoreState) => ({
+  connect((state: IStoreState) => ({
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),

@@ -20,7 +20,6 @@ import { DividerVertical } from '@opencrvs/components/lib/Divider'
 import PanControls from '@opencrvs/components/lib/DocumentViewer/components/PanControls'
 import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanViewer'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 const ViewerWrapper = styled.div`
   position: fixed;

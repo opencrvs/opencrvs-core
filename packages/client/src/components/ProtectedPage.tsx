@@ -65,11 +65,11 @@ interface IProtectPageState {
 
 type Props = OwnProps &
   DispatchProps &
-  RouteComponentProps<any> & {
+  RouteComponentProps<{
     authenticated: boolean
     userDetailsFetched: boolean
     userDetails: UserDetails | null
-  }
+  }>
 
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
   constructor(props: Props) {
@@ -273,7 +273,6 @@ const mapDispatchToProps = {
   redirectToAuthentication
 }
 
-export const ProtectedPage = connect<any, any, any>(
-  mapStateToProps as any,
-  mapDispatchToProps
-)(withRouter(ProtectedPageComponent as any))
+export const ProtectedPage = withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(ProtectedPageComponent)
+)

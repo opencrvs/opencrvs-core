@@ -220,7 +220,6 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
 }
 
 export const RejectRegistrationForm = withRouter(
-  // @TODO
   connect<StateProps, IDispatchProps, RouteComponentProps<IProps>, IStoreState>(
     (state: IStoreState) => ({
       form: rejectRegistration,

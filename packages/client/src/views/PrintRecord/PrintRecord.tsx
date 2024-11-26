@@ -14,7 +14,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useParams, Navigate, useNavigate } from 'react-router-dom'
 import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
@@ -55,7 +55,6 @@ const StyledAppBar = styled(AppBar)`
 
 export function PrintRecord() {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
   const offlineData = useSelector(getOfflineData)
   const cache = createIntlCache()

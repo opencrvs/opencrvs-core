@@ -157,19 +157,19 @@ export const ShowUpdateButton = ({
       declaration?.status as string
     )
   ) {
-    let PAGE_ROUTE: string, pageId: 'preview' | 'review'
+    let pageRoute: string, pageId: 'preview' | 'review'
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
       pageId = 'preview'
       if (type.toString() === 'birth') {
-        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+        pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (type.toString() === 'death') {
-        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+        pageRoute = DRAFT_DEATH_FORM_PAGE
       } else if (type.toString() === 'marriage') {
-        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
+        pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
     } else {
-      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
+      pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
       pageId = 'review'
     }
     if (!isDownloaded) {
@@ -192,7 +192,7 @@ export const ShowUpdateButton = ({
         onClick={() => {
           navigate(
             generateGoToPageUrl({
-              pageRoute: PAGE_ROUTE,
+              pageRoute,
               declarationId: id,
               pageId,
               event: type

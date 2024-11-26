@@ -11,7 +11,7 @@
 import React, { useEffect, ReactNode } from 'react'
 import { RouteComponentProps, withRouter } from './WithRouter'
 
-type ScrollToTopProps = RouteComponentProps<any> & { children?: ReactNode }
+type ScrollToTopProps = RouteComponentProps<{ children?: ReactNode }>
 
 const ScrollToTop = ({ children, router }: ScrollToTopProps) => {
   useEffect(() => {

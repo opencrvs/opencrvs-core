@@ -522,7 +522,7 @@ const mapStateToProps = (
   state: IStoreState,
   props: RouteComponentProps<IBaseProps>
 ) => {
-  const { registrationId, eventType, groupId } = props.router.match.params // @todo: implement match
+  const { registrationId, eventType, groupId } = props.router.match.params
   const event = getEvent(eventType)
   const userDetails = getUserDetails(state)
   const offlineCountryConfiguration = getOfflineData(state)
@@ -590,7 +590,7 @@ const mapStateToProps = (
     registerForm: getRegisterForm(state)[event],
     event,
     pageRoute: CERTIFICATE_COLLECTOR,
-    declarationId: registrationId as any, // @TODO
+    declarationId: registrationId,
     declaration,
     formSection: certFormSection,
     formGroup: {

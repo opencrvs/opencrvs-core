@@ -86,6 +86,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
 
     if (!this.props.router.match.params.registrationId) {
+      // eslint-disable-next-line no-console
       console.error('No registrationId in URL')
       return
     }
@@ -204,25 +205,12 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const { collector } = this.props.router.params // @todo: implement match
+    const { collector } = this.props.router.params
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl
       ? intl.formatMessage(issueMessages.issueCertificate)
       : intl.formatMessage(messages.certificateCollectionTitle)
-
-    if (!collector) {
-      console.error('No collector in URL')
-      // @TODO: check where to redirect
-      return (
-        <Navigate
-          to={formatUrl(REGISTRAR_HOME_TAB, {
-            tabId: WORKQUEUE_TABS.readyToPrint,
-            selectorId: ''
-          })}
-        />
-      )
-    }
 
     if (!this.props.declaration) {
       return (
@@ -262,7 +250,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         <IDVerifier
           id="idVerifier"
           title={intl.formatMessage(messages.idCheckTitle)}
-          collectorInformation={this.getGenericCollectorInfo(collector)}
+          collectorInformation={this.getGenericCollectorInfo(collector!)}
           actionProps={{
             positiveAction: {
               label: intl.formatMessage(messages.idCheckVerify),
@@ -283,7 +271,7 @@ const mapStateToProps = (
   state: IStoreState,
   ownProps: IOwnProps
 ): IStateProps => {
-  const { registrationId } = ownProps.router.match.params // @todo: implement match
+  const { registrationId } = ownProps.router.match.params
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === registrationId
@@ -315,7 +303,7 @@ const mapStateToProps = (
 }
 
 export const VerifyCollector = withRouter(
-  connect<IStateProps, IDispatchProps, any, IStoreState>(mapStateToProps, {
+  connect(mapStateToProps, {
     modifyDeclaration,
     writeDeclaration
   })(injectIntl(VerifyCollectorComponent))

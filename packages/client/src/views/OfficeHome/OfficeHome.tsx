@@ -533,12 +533,9 @@ function mapStateToProps(
 }
 
 export const OfficeHome = withRouter(
-  connect<IBaseOfficeHomeStateProps, IDispatchProps, any, IStoreState>(
-    mapStateToProps,
-    {
-      getOfflineData,
-      updateRegistrarWorkqueue,
-      updateWorkqueuePagination
-    }
-  )(injectIntl(OfficeHomeView))
+  connect(mapStateToProps, {
+    getOfflineData,
+    updateRegistrarWorkqueue,
+    updateWorkqueuePagination
+  })(injectIntl(OfficeHomeView))
 )

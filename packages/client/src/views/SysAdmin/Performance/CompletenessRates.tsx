@@ -31,8 +31,6 @@ import type { GQLMonthWiseEstimationMetric } from '@client/utils/gateway-depreca
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
-import { useDispatch } from 'react-redux'
-
 import {
   IPerformanceSelectOption,
   PerformanceSelect
@@ -48,7 +46,7 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'
 import { useQuery } from '@apollo/client'
-import { useLocation, useMatch, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -130,7 +128,6 @@ function Filter({
         locationId === NATIONAL_ADMINISTRATIVE_LEVEL ? '0' : locationId
     }
   })
-  const dispatch = useDispatch()
 
   if (
     data?.isLeafLevelLocation === true &&
@@ -241,7 +238,6 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     baseType: COMPLETENESS_RATE_REPORT_BASE.TIME
   })
 
-  const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
 

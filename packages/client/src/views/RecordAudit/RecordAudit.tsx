@@ -152,7 +152,6 @@ interface IDispatchProps {
 
 export type IRecordAuditTabs = keyof IQueryData | 'search'
 
-// @TOOD: Handle types?
 type RouteProps = RouteComponentProps<{
   tab?: IRecordAuditTabs
   declarationId?: string
@@ -490,7 +489,6 @@ const BodyContent = ({
   workqueueDeclaration,
   ...actionProps
 }: ValidatedProps) => {
-  const navigate = useNavigate()
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
   if (
     tab === 'search' ||

@@ -73,7 +73,8 @@ export const IssuePayment = () => {
 
   const readyToIssue = () => {
     if (draft === undefined) {
-      console.log('DRAFT UNDEFINED')
+      // eslint-disable-next-line no-console
+      console.error('draft is undefined')
       return
     }
     const registeredDate = getRegisteredDate(declaration.data)

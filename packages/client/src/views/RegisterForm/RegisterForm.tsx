@@ -763,12 +763,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
-      this.props.router.navigate(this.props.router.location.pathname, {
-        replace: true,
-        state: {
+      this.props.router.navigate(
+        {
+          pathname: this.props.router.location.pathname,
           hash: newHash + '-form-input'
+        },
+        {
+          replace: true
         }
-      })
+      )
     }
   }
 
@@ -1504,7 +1507,6 @@ export const RegisterForm = withRouter(
       writeDeclaration,
       modifyDeclaration,
       deleteDeclaration,
-
       toggleDraftSavedNotification
     }
   )(injectIntl(RegisterFormView))

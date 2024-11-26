@@ -69,7 +69,7 @@ import { Content } from '@opencrvs/components/lib/Content'
 import { getUserRoleIntlKey } from '@client/views/SysAdmin/Team/utils'
 import { Link } from '@opencrvs/components'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   CreateOrUpdateUserMutation,
   CreateOrUpdateUserMutationVariables

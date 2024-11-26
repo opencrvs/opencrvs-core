@@ -205,19 +205,6 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   render() {
     const { corrector } = this.props.router.params
 
-    if (!corrector) {
-      console.error('corrector missing from URL')
-
-      // @TODO: Check right redirect
-      return (
-        <Navigate
-          to={formatUrl(REGISTRAR_HOME_TAB, {
-            tabId: WORKQUEUE_TABS.readyForReview,
-            selectorId: ''
-          })}
-        />
-      )
-    }
     const { intl, declaration } = this.props
     if (!declaration) {
       return (
@@ -229,7 +216,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
         />
       )
     }
-    const correctorInfo = this.getGenericCorrectorInfo(corrector)
+    const correctorInfo = this.getGenericCorrectorInfo(corrector!)
     const hasNoInfo = Object.values(correctorInfo).every(
       (property) => property === undefined || property === ''
     )
@@ -295,7 +282,7 @@ const mapStateToProps = (
 }
 
 export const VerifyCorrector = withRouter(
-  connect<IStateProps, IDispatchProps, any, IStoreState>(mapStateToProps, {
+  connect(mapStateToProps, {
     modifyDeclaration,
     writeDeclaration
   })(injectIntl(VerifyCorrectorComponent))

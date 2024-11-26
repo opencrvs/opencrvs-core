@@ -138,7 +138,5 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const TeamSearch = withRouter(
-  connect<ReturnType<typeof mapStateToProps>, {}, any, IStoreState>(
-    mapStateToProps
-  )(injectIntl(withOnlineStatus(TeamSearchComponent)))
+  connect(mapStateToProps)(injectIntl(withOnlineStatus(TeamSearchComponent)))
 )

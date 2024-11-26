@@ -59,7 +59,6 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { RouteComponentProps } from '@client/components/WithRouter'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'

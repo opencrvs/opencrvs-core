@@ -26,7 +26,7 @@ import {
   Icon
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ILocation } from '@client/offline/reducer'
 import { useParams, useNavigate } from 'react-router-dom'
@@ -58,13 +58,10 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   margin-top: 20px;
 `
 
-// const con
-
 export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
   const getNewLevel =
     (currentlySelectedLocation: string) =>

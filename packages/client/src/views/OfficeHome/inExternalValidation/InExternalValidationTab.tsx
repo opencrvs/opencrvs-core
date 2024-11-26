@@ -24,7 +24,6 @@ import {
   constantsMessages,
   wqMessages
 } from '@client/i18n/messages'
-import { connect } from 'react-redux'
 import { formatUrl } from '@client/navigation'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
@@ -58,7 +57,7 @@ interface IBaseProps {
   error?: boolean
 }
 
-type IProps = IBaseProps & IntlShapeProps & IDispatchProps
+type IProps = IBaseProps & IntlShapeProps
 
 function InExternalValidationComponent(props: IProps) {
   const navigate = useNavigate()
