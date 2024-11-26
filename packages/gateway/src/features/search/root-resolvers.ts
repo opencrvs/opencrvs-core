@@ -102,10 +102,8 @@ export const resolvers: GQLResolver = {
           'recordsearch'
         ])
       ) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar, registration agent & field agent'
-          )
+        throw new Error(
+          'Advanced search is only allowed for registrar, registration agent & field agent'
         )
       }
 
@@ -146,7 +144,7 @@ export const resolvers: GQLResolver = {
 
         if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
-          return await Promise.reject(new Error(errMsg.message))
+          throw new Error(errMsg.message)
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
@@ -175,7 +173,7 @@ export const resolvers: GQLResolver = {
         )
 
         if (!hasAtLeastOneParam) {
-          return await Promise.reject(new Error('There is no param to search '))
+          throw new Error('There is no param to search ')
         }
 
         searchCriteria.parameters = { ...advancedSearchParameters }
@@ -201,10 +199,8 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'User does not have a sysadmin or register or validate scope'
-          )
+        throw new Error(
+          'User does not have a sysadmin or register or validate scope'
         )
       }
 
