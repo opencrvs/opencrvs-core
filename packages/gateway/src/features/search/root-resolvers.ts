@@ -94,7 +94,6 @@ export const resolvers: GQLResolver = {
         sort,
         parameters: advancedSearchParameters
       }
-      // Only registrar, registration agent & field agent should be able to search user
       if (
         !isWorkqueueData &&
         !inScope(authHeader, [
@@ -105,11 +104,8 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_DEATH_MY_JURISDICTION,
           SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
-      ) {
-        return await Promise.reject(
-          new Error('Advanced search is not allowed for this user')
-        )
-      }
+      )
+        return await Promise.reject(new Error('Not enough scope to search'))
 
       if (count) {
         searchCriteria.size = count
