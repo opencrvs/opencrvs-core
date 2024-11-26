@@ -8,19 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ErrorBoundary } from '@client/components/ErrorBoundary'
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
 import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
-import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
 import TransitionWrapper from '@client/components/TransitionWrapper'
-import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import * as routes from '@client/navigation/routes'
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
-import { useApolloClient } from '@client/utils/apolloClient'
+import styled from 'styled-components'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -36,21 +32,14 @@ import { CompletenessRates } from '@client/views/SysAdmin/Performance/Completene
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
-import { History, Location } from 'history'
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import {
   createBrowserRouter,
-  RouterProvider,
   Route,
   Routes,
-  useLocation,
-  Outlet
+  useLocation
 } from 'react-router-dom'
-import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
@@ -70,7 +59,6 @@ import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeL
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
 import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { Home } from '@client/views/OfficeHome/Home'
 import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
@@ -80,25 +68,9 @@ import { ReloadModal } from './views/Modals/ReloadModal'
 import { Workqueues } from './v2-events/workqueues'
 import { V2_ROOT_ROUTE } from './v2-events/routes'
 
-interface IAppProps {
-  client?: ApolloClient<NormalizedCacheObject>
-  store: AppStore
-  history: History
-}
-
 const MainSection = styled.section`
   flex-grow: 8;
   background: ${({ theme }) => theme.colors.background};
-`
-
-// Injecting global styles for the body tag - used only once
-// eslint-disable-line
-const GlobalStyle = createGlobalStyle`
-  body {
-    margin: 0;
-    padding: 0;
-    overflow-y: scroll;
-  }
 `
 
 export const router = createBrowserRouter([
@@ -109,7 +81,6 @@ export const router = createBrowserRouter([
 ])
 
 export function App() {
-  console.log('renders app?')
   const location = useLocation()
   return (
     <ScrollToTop>

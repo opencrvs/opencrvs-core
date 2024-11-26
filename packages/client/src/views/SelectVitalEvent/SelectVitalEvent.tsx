@@ -198,12 +198,7 @@ class SelectVitalEventView extends React.Component<
 }
 
 export const SelectVitalEvent = withRouter(
-  connect<
-    null,
-    DispatchProps,
-    RouteComponentProps<IntlShapeProps>,
-    IStoreState
-  >(null, {
+  connect(null, {
     storeDeclaration
   })(injectIntl(SelectVitalEventView))
 )

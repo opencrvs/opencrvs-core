@@ -123,15 +123,7 @@ interface IBaseSearchResultProps {
   outboxDeclarations: IDeclaration[]
 }
 
-interface IMatchParams {
-  searchText: string
-  searchType: string
-}
-
-type ISearchResultProps = IntlShapeProps &
-  ISearchInputProps &
-  IBaseSearchResultProps &
-  IMatchParams
+type ISearchResultProps = IntlShapeProps & IBaseSearchResultProps
 
 type QueryData = SearchEventsQuery['searchEvents']
 

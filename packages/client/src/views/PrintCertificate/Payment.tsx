@@ -58,7 +58,7 @@ interface IDispatchProps {
   modifyDeclaration: typeof modifyDeclaration
 }
 
-type IFullProps = IProps & IntlShapeProps & IDispatchProps
+type IFullProps = RouteComponentProps & IProps & IntlShapeProps & IDispatchProps
 
 const PaymentComponent = ({
   declaration,
@@ -212,10 +212,7 @@ const getEvent = (eventType: string | undefined) => {
   }
 }
 
-function mapStatetoProps(
-  state: IStoreState,
-  props: RouteComponentProps<{ registrationId: string; eventType: string }>
-) {
+function mapStatetoProps(state: IStoreState, props: RouteComponentProps) {
   const { registrationId, eventType } = props.router.params
   const event = getEvent(eventType)
   const declaration = state.declarationsState.declarations.find(

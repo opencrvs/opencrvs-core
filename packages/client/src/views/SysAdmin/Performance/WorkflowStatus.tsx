@@ -187,13 +187,8 @@ interface ISearchParams {
   status?: keyof IStatusMapping
   event?: Event
 }
-export interface IHistoryStateProps {
-  timeStart: Date | string
-  timeEnd: Date | string
-}
-interface WorkflowStatusProps
-  extends IHistoryStateProps,
-    WrappedComponentProps {}
+
+interface WorkflowStatusProps extends WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const navigate = useNavigate()
   const location = useLocation()

@@ -68,11 +68,6 @@ export interface ICertificateCorrectorDefinition {
   [corrector: string]: ICertificateCorrectorField
 }
 
-interface IMatchParams {
-  declarationId: string
-  corrector: string
-}
-
 interface IStateProps {
   declaration: IDeclaration
   form: ICertificateCorrectorDefinition
@@ -85,7 +80,7 @@ interface IDispatchProps {
   writeDeclaration: typeof writeDeclaration
 }
 
-type IOwnProps = RouteComponentProps<IMatchParams>
+type IOwnProps = RouteComponentProps
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps & IntlShapeProps
 
@@ -262,10 +257,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
   }
 }
 
-const mapStateToProps = (
-  state: IStoreState,
-  ownProps: IOwnProps
-): IStateProps => {
+const mapStateToProps = (state: IStoreState, ownProps: IOwnProps) => {
   const { declarationId } = ownProps.router.match.params
 
   const declaration = state.declarationsState.declarations.find(

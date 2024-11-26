@@ -481,14 +481,7 @@ class OfficeHomeView extends React.Component<
   }
 }
 
-function mapStateToProps(
-  state: IStoreState,
-  props: RouteComponentProps<{
-    tabId: string
-    selectorId?: string
-    pageId?: string
-  }>
-) {
+function mapStateToProps(state: IStoreState, props: RouteComponentProps<{}>) {
   const match = props.router.match
   const userDetails = getUserDetails(state)
   const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
@@ -533,7 +526,12 @@ function mapStateToProps(
 }
 
 export const OfficeHome = withRouter(
-  connect(mapStateToProps, {
+  connect<
+    IBaseOfficeHomeStateProps,
+    IDispatchProps,
+    RouteComponentProps<{}>,
+    IStoreState
+  >(mapStateToProps, {
     getOfflineData,
     updateRegistrarWorkqueue,
     updateWorkqueuePagination

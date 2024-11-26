@@ -40,13 +40,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { RouteComponentProps, withRouter } from '@client/components/WithRouter'
 
-interface IMatchParams {
-  userId?: string
-  locationId?: string
-  sectionId: string
-  groupId: string
-}
-
 type IUserProps = {
   userId?: string
   section: IFormSection
@@ -64,10 +57,7 @@ interface IDispatchProps {
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
-type Props = RouteComponentProps<IMatchParams> &
-  IUserProps &
-  IDispatchProps &
-  IntlShapeProps
+type Props = RouteComponentProps & IUserProps & IDispatchProps & IntlShapeProps
 
 const Container = styled.div`
   display: flex;
@@ -200,7 +190,7 @@ function getNextSectionIds(
   }
 }
 
-const mapStateToProps = (state: IStoreState, props: Props) => {
+const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
   const config = getOfflineData(state)
   const user = getUserDetails(state)
   const sectionId =

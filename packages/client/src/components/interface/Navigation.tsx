@@ -232,7 +232,7 @@ type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{ tabId: string } & { className?: string }>
+  RouteComponentProps<{ className?: string }>
 
 const getSettingsAndLogout = (props: IFullProps) => {
   const { intl, menuCollapse, activeMenuItem, redirectToAuthentication } = props

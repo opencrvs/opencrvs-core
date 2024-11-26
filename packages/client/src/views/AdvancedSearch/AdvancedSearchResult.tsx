@@ -70,7 +70,6 @@ import {
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
 import { isAdvancedSearchFormValid } from '@client/views/SearchResult/AdvancedSearch'
 import { getOfflineData } from '@client/offline/selectors'
 import {
@@ -110,14 +109,7 @@ interface IBaseSearchResultProps {
   outboxDeclarations: IDeclaration[]
 }
 
-interface IMatchParams {
-  searchText: string
-  searchType: string
-}
-
-type IFullProps = ISearchInputProps &
-  IBaseSearchResultProps &
-  RouteComponentProps<IMatchParams>
+type IFullProps = IBaseSearchResultProps & RouteComponentProps<{}>
 
 const AdvancedSearchResultComp = (props: IFullProps) => {
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NONE)

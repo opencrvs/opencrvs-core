@@ -61,7 +61,7 @@ interface ISearchParams {
   time: CompletenessRateTime
 }
 
-type ICompletenessRateProps = { eventType: string } & WrappedComponentProps
+type ICompletenessRateProps = WrappedComponentProps
 
 export interface IEstimationBase {
   baseType: COMPLETENESS_RATE_REPORT_BASE

@@ -178,10 +178,6 @@ const Text = styled.div`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-  timeStart: Date
-  timeEnd: Date
-  event: Event
-  selectedLocation: ISearchLocation
   currency: ICurrency
 }
 
@@ -714,8 +710,7 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const PerformanceHome = injectIntl(
-  connect(
-    mapStateToProps,
-    {}
-  )(withTheme(withOnlineStatus(PerformanceHomeComponent)))
+  connect(mapStateToProps)(
+    withTheme(withOnlineStatus(PerformanceHomeComponent))
+  )
 )

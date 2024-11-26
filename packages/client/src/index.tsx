@@ -21,7 +21,7 @@ import { ApolloProvider } from '@client/utils/ApolloProvider'
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { App, router } from '@client/App'
+import { router } from '@client/App'
 import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
@@ -91,9 +91,9 @@ export const Root = () => {
         <Provider store={store}>
           <I18nContainer>
             <ThemeProvider theme={getTheme()}>
-              {/* <StyledErrorBoundary> */}
-              <RouterProvider router={router} />
-              {/* </StyledErrorBoundary> */}
+              <StyledErrorBoundary>
+                <RouterProvider router={router} />
+              </StyledErrorBoundary>
             </ThemeProvider>
           </I18nContainer>
         </Provider>

@@ -14,7 +14,6 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -49,12 +48,6 @@ import { getEventRegisterForm } from '@client/forms/register/declaration-selecto
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
-interface IMatchParams {
-  registrationId: string
-  eventType: Event
-  collector: string
-}
-
 interface IStateProps {
   registerForm: IForm
   declaration?: IPrintableDeclaration
@@ -66,7 +59,7 @@ interface IDispatchProps {
   writeDeclaration: typeof writeDeclaration
 }
 
-type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
+type IOwnProps = RouteComponentProps<IntlShapeProps>
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
@@ -269,7 +262,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
 const mapStateToProps = (
   state: IStoreState,
-  ownProps: IOwnProps
+  ownProps: RouteComponentProps
 ): IStateProps => {
   const { registrationId } = ownProps.router.match.params
 
