@@ -15,7 +15,7 @@ import { z } from 'zod'
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  data: z.object({})
+  data: z.record(z.any())
 })
 
 const CreateActionInput = BaseActionInput.merge(

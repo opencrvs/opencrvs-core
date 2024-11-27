@@ -16,7 +16,7 @@ let client: elasticsearch.Client
 export const getOrCreateClient = () => {
   if (!client) {
     return new elasticsearch.Client({
-      node: `http://${env.ES_HOST}`
+      node: env.ES_HOST
     })
   }
 

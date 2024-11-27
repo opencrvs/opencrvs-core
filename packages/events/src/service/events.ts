@@ -84,6 +84,7 @@ export async function createEvent(
 
   const event = await getEventById(id)
   await indexEvent(event)
+
   return event
 }
 
