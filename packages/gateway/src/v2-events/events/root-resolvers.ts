@@ -31,8 +31,8 @@ const trpc = createTRPCClient<AppRouter>({
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getEvent(_, { eventId }, { headers: authHeader }) {
-      return trpc.event.get.query(eventId)
+    async getEvent(_, { eventId }, { headers }) {
+      return trpc.event.get.query(eventId, { context: { headers } })
     }
   },
   Mutation: {
@@ -40,7 +40,6 @@ export const resolvers: GQLResolver = {
       const createdEvent = await trpc.event.create.mutate(
         {
           type: event.type,
-          fields: [],
           transactionId: uuid.v4()
         },
         { context: { headers } }
@@ -51,23 +50,24 @@ export const resolvers: GQLResolver = {
       return trpc.event.actions.notify.mutate(
         {
           eventId: eventId,
-          type: 'NOTIFY',
-          fields: input.fields,
+          data: Object.fromEntries(input.data.map((d) => [d.id, d.value])),
+          createdAtLocation: '123',
           transactionId: uuid.v4()
         },
         { context: { headers } }
       )
     },
     async declareEvent(_, { eventId, input }, { headers }) {
-      return trpc.event.actions.declare.mutate(
+      const data = await trpc.event.actions.declare.mutate(
         {
           eventId: eventId,
-          type: 'DECLARE',
-          fields: input.fields,
+          data: Object.fromEntries(input.data.map((d) => [d.id, d.value])),
           transactionId: uuid.v4()
         },
         { context: { headers } }
       )
+
+      return data
     }
   }
 }

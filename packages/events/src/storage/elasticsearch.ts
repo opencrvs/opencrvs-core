@@ -8,10 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as elasticsearch from '@elastic/elasticsearch'
+import { env } from '@events/environment'
 
-import { cleanEnv, url } from 'envalid'
+let client: elasticsearch.Client
 
-export const env = cleanEnv(process.env, {
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
-  ES_HOST: url({ devDefault: 'http://localhost:9200' })
-})
+export const getOrCreateClient = () => {
+  if (!client) {
+    return new elasticsearch.Client({
+      node: env.ES_HOST
+    })
+  }
+
+  return client
+}
