@@ -32,7 +32,7 @@ const UnassignedAction = ActionBase.merge(
 
 const RegisterAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
+    type: z.literal(ActionType.REGISTER),
     identifiers: z.object({
       trackingId: z.string(),
       registrationNumber: z.string()
@@ -42,7 +42,7 @@ const RegisterAction = ActionBase.merge(
 
 const DeclareAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
+    type: z.literal(ActionType.DECLARE)
   })
 )
 

@@ -64,28 +64,18 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      notify: publicProcedure
-        .input(NotifyActionInput.omit({ type: true }))
-        .mutation((options) => {
-          return addAction(
-            { type: 'NOTIFY', ...options.input },
-            {
-              eventId: options.input.eventId,
-              createdBy: options.ctx.user.id
-            }
-          )
-        }),
-      declare: publicProcedure
-        .input(DeclareActionInput.omit({ type: true }))
-        .mutation((options) => {
-          return addAction(
-            { type: 'DECLARE', ...options.input },
-            {
-              eventId: options.input.eventId,
-              createdBy: options.ctx.user.id
-            }
-          )
+      notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
         })
+      }),
+      declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
+        })
+      })
     })
   })
 })
