@@ -19,19 +19,12 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
-import { ApolloError } from 'apollo-server-hapi'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { RateLimitError } from '@gateway/rate-limit'
 
 type ApiResponse<T> = {
   body: T
   statusCode: number
-}
-
-export class RateLimitError extends ApolloError {
-  constructor(message: string) {
-    super(message, 'DAILY_QUOTA_EXCEEDED')
-    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
-  }
 }
 
 // Complete definition of the Search response
@@ -101,9 +94,7 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_MARRIAGE
         ])
       ) {
-        return await Promise.reject(
-          new Error('Advanced search is not allowed for this user')
-        )
+        throw new Error('Advanced search is not allowed for this user')
       }
 
       if (count) {
@@ -143,7 +134,7 @@ export const resolvers: GQLResolver = {
 
         if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
-          return await Promise.reject(new Error(errMsg.message))
+          throw new Error(errMsg.message)
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
@@ -172,7 +163,7 @@ export const resolvers: GQLResolver = {
         )
 
         if (!hasAtLeastOneParam) {
-          return await Promise.reject(new Error('There is no param to search '))
+          throw new Error('There is no param to search ')
         }
 
         searchCriteria.parameters = { ...advancedSearchParameters }
@@ -198,9 +189,7 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (!inScope(authHeader, [SCOPES.PERFORMANCE_READ])) {
-        return await Promise.reject(
-          new Error('User does not have enough scope')
-        )
+        throw new Error('User does not have enough scope')
       }
 
       const searchCriteria: ISearchCriteria = {

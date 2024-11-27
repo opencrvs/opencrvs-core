@@ -27,7 +27,7 @@ import {
   storeDeclaration,
   IDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
@@ -35,7 +35,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 const declaration: IDeclaration = createDeclaration(
-  Event.Birth,
+  EventType.Birth,
   mockDeclarationData
 )
 declaration.data.registration = {
@@ -114,7 +114,7 @@ describe('Record audit summary for a draft death declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
     const deathDeclaration = createDeclaration(
-      Event.Death,
+      EventType.Death,
       mockDeathDeclarationData
     )
 
@@ -163,7 +163,7 @@ describe('Record audit summary for a draft marriage declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
     const marriageDeclaration = createDeclaration(
-      Event.Marriage,
+      EventType.Marriage,
       mockMarriageDeclarationData
     )
 
@@ -215,7 +215,7 @@ describe('Record audit summary for WorkQueue declarations', () => {
     store.getState().workqueueState.workqueue.data.inProgressTab.results = [
       {
         id: 'db097901-feba-4f71-a1ae-d3d46289d2d5',
-        type: Event.Birth,
+        type: EventType.Birth,
         registration: {
           status: 'DRAFT',
           contactNumber: '+8801622688231',

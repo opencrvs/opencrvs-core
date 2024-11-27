@@ -44,7 +44,7 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
 import { IFormData } from '@opencrvs/client/src/forms'
-import { Event, RegStatus, SCOPES } from '@client/utils/gateway'
+import { EventType, RegStatus, SCOPES } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
@@ -69,13 +69,13 @@ describe('when user is in the register form for birth event', () => {
       history = storeContext.history
       client = createClient(store)
 
-      const draft = createDeclaration(Event.Birth)
+      const draft = createDeclaration(EventType.Birth)
       store.dispatch(storeDeclaration(draft))
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(draft))
 
       const mock: any = vi.fn()
-      const form = await getRegisterFormFromStore(store, Event.Birth)
+      const form = await getRegisterFormFromStore(store, EventType.Birth)
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -144,10 +144,10 @@ describe('when user is in the register form for death event', () => {
     store = testStore.store
     history = testStore.history
 
-    draft = createDeclaration(Event.Death)
+    draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
-    form = await getRegisterFormFromStore(store, Event.Death)
+    form = await getRegisterFormFromStore(store, EventType.Death)
   })
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
@@ -203,10 +203,10 @@ describe('when user is in the register form for marriage event', () => {
     store = testStore.store
     history = testStore.history
 
-    draft = createDeclaration(Event.Marriage)
+    draft = createDeclaration(EventType.Marriage)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
-    form = await getRegisterFormFromStore(store, Event.Marriage)
+    form = await getRegisterFormFromStore(store, EventType.Marriage)
   })
 
   describe('when user is in marriage section', () => {
@@ -260,7 +260,7 @@ describe('when user is in the register form preview section and has the submit c
     store = storeContext.store
     history = storeContext.history
 
-    const draft = createDeclaration(Event.Birth)
+    const draft = createDeclaration(EventType.Birth)
     draft.data = {
       child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
       father: {
@@ -286,7 +286,7 @@ describe('when user is in the register form preview section and has the submit c
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
-    const form = await getRegisterFormFromStore(store, Event.Birth)
+    const form = await getRegisterFormFromStore(store, EventType.Birth)
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
@@ -328,14 +328,14 @@ describe('when user is in the register form preview section and has the submit c
       const nDeclaration = createReviewDeclaration(
         uuid(),
         mockDeclarationData,
-        Event.Birth
+        EventType.Birth
       )
       nDeclaration.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(nDeclaration))
 
-      const nform = getRegisterForm(store.getState())[Event.Birth]
+      const nform = getRegisterForm(store.getState())[EventType.Birth]
       const nTestComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -393,14 +393,14 @@ describe('when user is in the register form review section', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       mockDeclarationData,
-      Event.Birth
+      EventType.Birth
     )
     setScopes([SCOPES.RECORD_REGISTER, SCOPES.RECORD_SUBMIT_FOR_UPDATES], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
 
-    const form = await getReviewFormFromStore(store, Event.Birth)
+    const form = await getReviewFormFromStore(store, EventType.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -445,14 +445,14 @@ describe('when user is in the register form from review edit', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       mockDeclarationData,
-      Event.Birth
+      EventType.Birth
     )
     setScopes([SCOPES.RECORD_REGISTER], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
 
-    const form = await getReviewFormFromStore(store, Event.Birth)
+    const form = await getReviewFormFromStore(store, EventType.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -498,7 +498,7 @@ describe('when user is in the register form from sent for review edit', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       mockDeclarationData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Declared
     )
 
@@ -506,7 +506,7 @@ describe('when user is in the register form from sent for review edit', () => {
     store.dispatch(storeDeclaration(declaration))
     const mock: any = vi.fn()
 
-    const form = await getReviewFormFromStore(store, Event.Birth)
+    const form = await getReviewFormFromStore(store, EventType.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -590,7 +590,7 @@ describe('When user is in Preview section death event', () => {
     store = testStore.store
     history = testStore.history
 
-    const draft = createDeclaration(Event.Death)
+    const draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
     vi.clearAllMocks()
@@ -599,14 +599,14 @@ describe('When user is in Preview section death event', () => {
       uuid(),
       // @ts-ignore
       mockDeathDeclarationData,
-      Event.Death
+      EventType.Death
     )
     setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
 
-    deathForm = await getRegisterFormFromStore(store, Event.Death)
+    deathForm = await getRegisterFormFromStore(store, EventType.Death)
     const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
@@ -736,7 +736,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     history = testStore.history
     store = testStore.store
 
-    const draft = createDeclaration(Event.Death)
+    const draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
@@ -750,7 +750,7 @@ describe('When user is in Preview section death event in offline mode', () => {
       uuid(),
       // @ts-ignore
       mockDeathDeclarationData,
-      Event.Death
+      EventType.Death
     )
 
     setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
@@ -758,7 +758,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
 
-    deathForm = await getRegisterFormFromStore(store, Event.Death)
+    deathForm = await getRegisterFormFromStore(store, EventType.Death)
     const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
@@ -811,7 +811,7 @@ describe('When user is in Preview section marriage event', () => {
     store = testStore.store
     history = testStore.history
 
-    const draft = createDeclaration(Event.Death)
+    const draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
     vi.clearAllMocks()
@@ -820,7 +820,7 @@ describe('When user is in Preview section marriage event', () => {
       uuid(),
       // @ts-ignore
       mockDeathDeclarationData,
-      Event.Marriage
+      EventType.Marriage
     )
 
     setScopes([SCOPES.RECORD_SUBMIT_INCOMPLETE], store)
@@ -828,7 +828,8 @@ describe('When user is in Preview section marriage event', () => {
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(marriageDraft))
 
-    marriageForm = await getRegisterFormFromStore(store, Event.Marriage)
+    marriageForm = await getRegisterFormFromStore(store, EventType.Marriage)
+
     const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm

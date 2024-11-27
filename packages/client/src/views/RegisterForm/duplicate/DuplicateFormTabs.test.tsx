@@ -24,7 +24,7 @@ import {
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
-import { Event, SCOPES } from '@client/utils/gateway'
+import { EventType, SCOPES } from '@client/utils/gateway'
 import { vi } from 'vitest'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 
@@ -1157,7 +1157,7 @@ describe('when user is in the register form review section', () => {
           }
         ]
       },
-      Event.Birth
+      EventType.Birth
     )
     declaration.duplicates = [
       {
@@ -1170,7 +1170,7 @@ describe('when user is in the register form review section', () => {
     const mock: any = vi.fn()
     setScopes([SCOPES.RECORD_REGISTER], store)
 
-    const form = await getReviewFormFromStore(store, Event.Birth)
+    const form = await getReviewFormFromStore(store, EventType.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore

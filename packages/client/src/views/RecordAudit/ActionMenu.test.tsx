@@ -23,13 +23,13 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { ActionMenu } from './ActionMenu'
-import { Event, SCOPES } from '@client/utils/gateway'
+import { EventType, SCOPES } from '@client/utils/gateway'
 import { vi } from 'vitest'
 
 const defaultDeclaration = {
   id: '65c48a2b-68dd-4a7e-8868-d2bb1fd27844',
   name: 'Elissabe Sandrava',
-  type: Event.Birth,
+  type: EventType.Birth,
   status: SUBMISSION_STATUS.REGISTERED,
   assignment: {
     practitionerId: '73da21a1-4b8b-4174-83ca-122d829cb6ec',
@@ -48,7 +48,7 @@ const defaultDeclaration = {
 const draftBirthDownloaded = {
   id: '65c48a2b-68dd-4a7e-8868-d2bb1fd27844',
   data: {},
-  event: Event.Birth,
+  event: EventType.Birth,
   action: 'load declaration data for review',
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED
 } as unknown as IDeclaration
@@ -56,7 +56,7 @@ const draftBirthDownloaded = {
 const draftDeathDownloaded = {
   id: '65c48a2b-68dd-4a7e-8868-d2bb1fd27844',
   data: {},
-  event: Event.Death,
+  event: EventType.Death,
   action: 'load declaration data for review',
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED
 } as unknown as IDeclaration
@@ -64,7 +64,7 @@ const draftDeathDownloaded = {
 const draftBirthNotDownloaded = {
   id: '65c48a2b-68dd-4a7e-8868-d2bb1fd27844',
   data: {},
-  event: Event.Birth,
+  event: EventType.Birth,
   action: 'load declaration data for review',
   downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
 } as unknown as IDeclaration
@@ -72,7 +72,7 @@ const draftBirthNotDownloaded = {
 const draftDeathNotDownloaded = {
   id: '65c48a2b-68dd-4a7e-8868-d2bb1fd27844',
   data: {},
-  event: Event.Death,
+  event: EventType.Death,
   action: 'load declaration data for review',
   downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
 } as unknown as IDeclaration
@@ -133,14 +133,9 @@ describe('View action', () => {
       { store, history }
     )
 
-    const { status, node } = actionStatus(component, [ACTION.VIEW_DECLARATION])
-    expect(status).toBe(ACTION_STATUS.ENABLED)
+    const { status } = actionStatus(component, [ACTION.VIEW_DECLARATION])
 
-    node?.simulate('click')
-
-    expect(window.location.href).toContain(
-      defaultDeclaration.id + '/viewRecord'
-    )
+    expect(status).toBe(ACTION_STATUS.HIDDEN)
   })
 
   it('In progress', async () => {

@@ -34,7 +34,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { storage } from '@client/storage'
-import { Event, SCOPES } from '@client/utils/gateway'
+import { EventType, SCOPES } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
@@ -69,8 +69,8 @@ describe('when user has starts a new declaration', () => {
       history = testApp.history
       store = testApp.store
       setScopes([SCOPES.RECORD_DECLARE_BIRTH], store)
-      draft = createDeclaration(Event.Birth)
-      await store.dispatch(storeDeclaration(draft))
+      draft = createDeclaration(EventType.Birth)
+      store.dispatch(storeDeclaration(draft))
     })
 
     it('renders unlock screen', async () => {
@@ -110,7 +110,7 @@ describe('when user has starts a new declaration', () => {
             }
           }
         }
-        draft = createDeclaration(Event.Birth, data)
+        draft = createDeclaration(EventType.Birth, data)
 
         /*
          * Needs to be done before storeDeclaration(draft)

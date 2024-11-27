@@ -85,7 +85,7 @@ export const GET_USER_AUDIT_LOG = gql`
 `
 
 export const GET_USER = gql`
-  query getUser($userId: String) {
+  query getUser($userId: String!) {
     getUser(userId: $userId) {
       id
       name {

@@ -16,7 +16,7 @@ import {
   storeDeclaration
 } from '@opencrvs/client/src/declarations'
 import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
-import { Event, RegStatus, SCOPES } from '@client/utils/gateway'
+import { EventType, RegStatus, SCOPES } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
@@ -155,7 +155,7 @@ const birthDeclaration: IDeclaration = {
   },
   originalData: mockDeclarationData,
   review: true,
-  event: Event.Birth,
+  event: EventType.Birth,
   registrationStatus: RegStatus.Registered,
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644407705186,
@@ -223,7 +223,7 @@ const deathDeclaration: IDeclaration = {
   },
   originalData: mockDeathDeclarationData,
   review: true,
-  event: Event.Death,
+  event: EventType.Death,
   registrationStatus: RegStatus.Registered,
   downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644490181166,
@@ -268,7 +268,7 @@ describe('ReviewForm tests', () => {
     history = testStore.history
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 
-    form = await getReviewFormFromStore(store, Event.Birth)
+    form = await getReviewFormFromStore(store, EventType.Birth)
     getItem.mockReturnValue(registerScopeToken)
   })
 
@@ -411,7 +411,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.InProgress
     )
 
@@ -458,7 +458,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Declared
     )
 
@@ -506,7 +506,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Validated
     )
 
@@ -554,7 +554,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth,
+      EventType.Birth,
       RegStatus.Rejected
     )
 
@@ -602,7 +602,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth
+      EventType.Birth
     )
 
     const testComponent = await createTestComponent(
@@ -649,7 +649,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       birthDraftData,
-      Event.Birth
+      EventType.Birth
     )
     store.dispatch(
       getStorageDeclarationsSuccess(
@@ -702,7 +702,7 @@ describe('ReviewForm tests', () => {
           scope={scope}
           staticContext={mock}
           event={deathDeclaration.event}
-          registerForm={getReviewFormFromStore(store, Event.Death)}
+          registerForm={getReviewFormFromStore(store, EventType.Death)}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
@@ -741,7 +741,7 @@ describe('ReviewForm tests', () => {
       )
     })
     it('populates proper death event section', async () => {
-      const form = await getReviewFormFromStore(store, Event.Death)
+      const form = await getReviewFormFromStore(store, EventType.Death)
       const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}

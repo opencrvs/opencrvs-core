@@ -23,8 +23,7 @@ import { connect } from 'react-redux'
 import { getReviewForm } from '@opencrvs/client/src/forms/register/review-selectors'
 import { IDeclaration } from '@opencrvs/client/src/declarations'
 import { getScope } from '@client/profile/profileSelectors'
-import { Event, Scope, SCOPES } from '@client/utils/gateway'
-
+import { EventType, Scope, SCOPES } from '@client/utils/gateway'
 import {
   REGISTRAR_HOME_TAB,
   REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
@@ -36,7 +35,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 interface IReviewProps {
   theme: ITheme
   scope: Scope[] | null
-  event: Event
+  event: EventType
 }
 interface IDeclarationProp {
   declaration: IDeclaration | undefined
@@ -100,13 +99,13 @@ class ReviewFormView extends React.Component<IProps> {
 function getEvent(eventType: string) {
   switch (eventType && eventType.toLocaleLowerCase()) {
     case 'birth':
-      return Event.Birth
+      return EventType.Birth
     case 'death':
-      return Event.Death
+      return EventType.Death
     case 'marriage':
-      return Event.Marriage
+      return EventType.Marriage
     default:
-      return Event.Birth
+      return EventType.Birth
   }
 }
 

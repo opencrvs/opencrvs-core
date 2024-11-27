@@ -25,7 +25,7 @@ import { CollectorForm } from './CollectorForm'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { createLocation, History } from 'history'
 import { merge } from 'lodash'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
 import { vi } from 'vitest'
 
@@ -149,19 +149,19 @@ mockDeclarationData['history'] = declarationsHistory
 const birthDeclaration = {
   id: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
   data: mockDeclarationData,
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 const deathDeclaration = {
   id: '16ff35e1-3f92-4db3-b812-c402e609fb00',
   data: mockDeathDeclarationData,
-  event: Event.Death
+  event: EventType.Death
 }
 
 const marriageDeclaration = {
   id: '18ff35e1-3d92-4db3-b815-c4d2e609fb23',
   data: mockMarriageDeclarationData,
-  event: Event.Marriage
+  event: EventType.Marriage
 }
 
 beforeEach(() => {
