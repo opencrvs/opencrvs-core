@@ -14,7 +14,7 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
-  Event,
+  EventType,
   System,
   SystemStatus,
   SystemType,
@@ -86,10 +86,10 @@ export function SystemList() {
     selectedClient: null
   })
 
-  const [selectedTab, setSelectedTab] = React.useState(Event.Birth)
+  const [selectedTab, setSelectedTab] = React.useState(EventType.Birth)
 
-  const checkboxHandler = (permissions: string[], event: Event) => {
-    event === Event.Birth
+  const checkboxHandler = (permissions: string[], event: EventType) => {
+    event === EventType.Birth
       ? setBirthPermissions({ event, permissions })
       : setDeathPermissions({ event, permissions })
   }
@@ -184,10 +184,10 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.settings!.webhook!, Event.Birth)
+            populatePermissions(system.settings!.webhook!, EventType.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.settings!.webhook!, Event.Death)
+            populatePermissions(system.settings!.webhook!, EventType.Death)
           )
         },
         label: intl.formatMessage(buttonMessages.edit)
@@ -603,18 +603,18 @@ export function SystemList() {
                       <FormTabs
                         sections={[
                           {
-                            id: Event.Birth,
+                            id: EventType.Birth,
                             title: intl.formatMessage(integrationMessages.birth)
                           },
                           {
-                            id: Event.Death,
+                            id: EventType.Death,
                             title: intl.formatMessage(integrationMessages.death)
                           }
                         ]}
                         activeTabId={selectedTab}
-                        onTabClick={(tabId: Event) => setSelectedTab(tabId)}
+                        onTabClick={(tabId: EventType) => setSelectedTab(tabId)}
                       />
-                      {selectedTab === Event.Birth ? (
+                      {selectedTab === EventType.Birth ? (
                         <CheckboxGroup
                           id="birthCheckboxGroup"
                           options={[
@@ -652,7 +652,7 @@ export function SystemList() {
                           name="test-checkbox-group1"
                           value={birthPermissions.permissions ?? []}
                           onChange={(newValue) => {
-                            checkboxHandler(newValue, Event.Birth)
+                            checkboxHandler(newValue, EventType.Birth)
                           }}
                         />
                       ) : (
@@ -687,7 +687,7 @@ export function SystemList() {
                           name="test-checkbox-group1"
                           value={deathPermissions.permissions ?? []}
                           onChange={(newValue) => {
-                            checkboxHandler(newValue, Event.Death)
+                            checkboxHandler(newValue, EventType.Death)
                           }}
                         />
                       )}

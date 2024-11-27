@@ -15,6 +15,10 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   DeactivateSystemMutation,
   DeactivateSystemMutationVariables,
+  DeleteSystemMutation,
+  DeleteSystemMutationVariables,
+  EventType,
+  IntegratingSystemType,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
   RefreshSystemSecretMutation,
@@ -25,11 +29,7 @@ import {
   SystemType,
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
-  WebhookPermission,
-  Event,
-  DeleteSystemMutation,
-  DeleteSystemMutationVariables,
-  IntegratingSystemType
+  WebhookPermission
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'
@@ -124,11 +124,11 @@ export function useSystems() {
   } = useSystemsGlobalState()
 
   const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
-    initWebHook(Event.Birth)
+    initWebHook(EventType.Birth)
   )
 
   const [deathPermissions, setDeathPermissions] = useState<WebhookPermission>(
-    initWebHook(Event.Death)
+    initWebHook(EventType.Death)
   )
 
   const [systemToShowPermission, setSystemToShowPermission] = useState<System>()
@@ -315,8 +315,8 @@ export function useSystems() {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
-    setDeathPermissions(initWebHook(Event.Death))
-    setBirthPermissions(initWebHook(Event.Birth))
+    setDeathPermissions(initWebHook(EventType.Death))
+    setBirthPermissions(initWebHook(EventType.Birth))
     resetRefreshTokenData()
     updatePermissionsReset()
     systemToDeleteReset()
@@ -324,8 +324,8 @@ export function useSystems() {
 
   const closePermissionModal = () => {
     setSystemToShowPermission(undefined)
-    setDeathPermissions(initWebHook(Event.Death))
-    setBirthPermissions(initWebHook(Event.Birth))
+    setDeathPermissions(initWebHook(EventType.Death))
+    setBirthPermissions(initWebHook(EventType.Birth))
   }
 
   return {

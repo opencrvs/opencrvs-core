@@ -8,12 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
-import { Action, ActionType } from '@opencrvs/commons'
+import {
+  GQLCreateActionTypeResolver,
+  GQLResolver
+} from '@gateway/graphql/schema'
+import { ActionType } from '@opencrvs/commons'
+import { ActionDocument } from '@opencrvs/events/src/schema'
+
+const ActionResolver: GQLCreateActionTypeResolver = {
+  data: (list) =>
+    Object.entries(list.data).map(([id, value]) => ({ id, value }))
+}
 
 export const eventResolvers: GQLResolver = {
+  CreateAction: ActionResolver,
+  NotifyAction: ActionResolver,
+  DeclareAction: ActionResolver,
+  RegisterAction: ActionResolver,
   Action: {
-    __resolveType: (obj: Action) => {
+    __resolveType: (obj: ActionDocument) => {
       if (obj.type === ActionType.NOTIFY) {
         return 'NotifyAction'
       }

@@ -32,9 +32,9 @@ type Query {
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
   isLeafLevelLocation(locationId: String!): Boolean!
-  getUser(userId: String): User
-  getUserByMobile(mobile: String): User
-  getUserByEmail(email: String): User
+  getUser(userId: String!): User
+  getUserByMobile(mobile: String!): User
+  getUserByEmail(email: String!): User
   searchUsers(
     username: String
     mobile: String
@@ -821,47 +821,47 @@ input EventInput {
 }
 
 input NotifyActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input DeclareActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RegisterActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input CertifyActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input IssueActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RevokeActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input ReinstateActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RevokeCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RequestCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input ApproveCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RejectCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 scalar Map
@@ -1689,14 +1689,14 @@ type CreateAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
 }
 
 type RegisterAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
   identifiers: Identifiers!
 }
 
@@ -1704,14 +1704,14 @@ type NotifyAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
 }
 
 type DeclareAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
   identifiers: Identifiers!
 }
 

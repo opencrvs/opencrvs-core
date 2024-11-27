@@ -40,7 +40,8 @@ const server = createHTTPServer({
 
     return {
       user: {
-        id: userId
+        id: userId,
+        primaryOfficeId: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176'
       }
     }
   }

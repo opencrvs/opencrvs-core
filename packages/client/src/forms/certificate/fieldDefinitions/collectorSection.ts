@@ -33,7 +33,7 @@ import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityHelperTextMapper, identityNameMapper } from './messages'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 
@@ -808,11 +808,11 @@ export const collectMarriageCertificateFormSection: IFormSection = {
   ]
 }
 
-const otherCertCollectorFormGroup = (event: Event): IFormSectionGroup => {
+const otherCertCollectorFormGroup = (event: EventType): IFormSectionGroup => {
   const labelMap = {
-    [Event.Birth]: formMessages.informantsRelationWithChild,
-    [Event.Death]: formMessages.informantsRelationWithDeceased,
-    [Event.Marriage]: formMessages.relationshipToSpouses
+    [EventType.Birth]: formMessages.informantsRelationWithChild,
+    [EventType.Death]: formMessages.informantsRelationWithDeceased,
+    [EventType.Marriage]: formMessages.relationshipToSpouses
   }
 
   const fields: IFormField[] = [
@@ -1125,7 +1125,7 @@ export function getFilteredRadioOptions(
   birthForm: IRadioOption[],
   marriageForm?: IRadioOption[]
 ): IRadioOption[] {
-  if (declaration.event === Event.Birth) {
+  if (declaration.event === EventType.Birth) {
     options.splice(1, 0, ...birthForm)
 
     const rolesToCheck = ['MOTHER', 'FATHER']
@@ -1134,7 +1134,7 @@ export function getFilteredRadioOptions(
         options = options.filter((opt) => opt.value !== role)
       }
     }
-  } else if (declaration.event === Event.Marriage && marriageForm) {
+  } else if (declaration.event === EventType.Marriage && marriageForm) {
     options.splice(1, 0, ...marriageForm)
   }
 

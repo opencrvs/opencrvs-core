@@ -69,8 +69,9 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
-import { Workqueues } from './v2-events/workqueues'
-import { V2_ROOT_ROUTE } from './v2-events/routes'
+import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from './v2-events/routes/routes'
+import { Workqueues } from './v2-events/features/workqueues'
+import { PublishEvent } from './v2-events/features/events/PublishEvent'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -525,6 +526,11 @@ export function App(props: IAppProps) {
                                             exact
                                             path={V2_ROOT_ROUTE}
                                             component={Workqueues}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={V2_EVENT_ROUTE}
+                                            component={PublishEvent}
                                           />
                                         </Switch>
                                       </>
