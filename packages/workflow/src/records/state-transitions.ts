@@ -60,7 +60,8 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  upsertPatientIdentifierWithRN
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -550,6 +551,91 @@ export async function toRegistered(
     ),
     'REGISTERED'
   )
+}
+
+export async function toUpsertRegistrationIdentifier(
+  request: Hapi.Request,
+  record: InProgressRecord,
+  registrationNumber: EventRegistrationPayload['registrationNumber'],
+  token: string,
+  identifiers?: EventRegistrationPayload['identifiers']
+): Promise<RegisteredRecord> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const registeredTaskWithoutPractitionerExtensions =
+    createRegisterTask(previousTask)
+
+  // Add practitioner details (same logic as before)
+  const [registeredTask, practitionerResourcesBundle] =
+    await withPractitionerDetails(
+      registeredTaskWithoutPractitionerExtensions,
+      token
+    )
+
+  const event = getTaskEventType(registeredTask) as EVENT_TYPE
+  const composition = getComposition(record)
+
+  // Update patient identifiers (upsert logic here)
+  const patientsWithRegNumber = upsertPatientIdentifierWithRN(
+    record,
+    composition,
+    SECTION_CODE[event],
+    REG_NUMBER_SYSTEM[event],
+    registrationNumber
+  )
+
+  /* Upsert registration number here */
+  const system = `http://opencrvs.org/specs/id/${
+    event.toLowerCase() as Lowercase<typeof event>
+  }-registration-number` as const
+
+  registeredTask.identifier.push({
+    system,
+    value: registrationNumber as RegistrationNumber
+  })
+
+  if (event === EVENT_TYPE.BIRTH && identifiers) {
+    // Handle identifiers for children in birth events
+    identifiers.forEach((childIdentifier) => {
+      const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
+        ({ type }) => type?.coding?.[0].code === childIdentifier.type
+      )
+      if (!previousIdentifier) {
+        patientsWithRegNumber[0].identifier!.push({
+          type: {
+            coding: [
+              {
+                system: 'http://opencrvs.org/specs/identifier-type',
+                code: childIdentifier.type
+              }
+            ]
+          },
+          value: childIdentifier.value
+        })
+      } else {
+        previousIdentifier.value = childIdentifier.value
+      }
+    })
+  }
+
+  const patientIds = patientsWithRegNumber.map((p) => p.id)
+  const patientsEntriesWithRN = record.entry.filter((e) =>
+    patientIds.includes(e.resource.id)
+  )
+
+  // Bundle the updated resources
+  const unsavedChangedResources: Bundle = {
+    type: 'document',
+    resourceType: 'Bundle',
+    entry: [...patientsEntriesWithRN, { resource: registeredTask }]
+  }
+
+  const upsertedRecord = (await mergeChangedResourcesIntoRecord(
+    record,
+    unsavedChangedResources,
+    practitionerResourcesBundle
+  )) as RegisteredRecord
+
+  return upsertedRecord
 }
 
 export async function toArchived(

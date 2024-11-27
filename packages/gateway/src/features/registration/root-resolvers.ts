@@ -60,7 +60,8 @@ import {
   verifyRegistration,
   markNotADuplicate,
   rejectRegistration,
-  confirmRegistration
+  confirmRegistration,
+  upsertRegistrationIdentifier
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
@@ -612,7 +613,6 @@ export const resolvers: GQLResolver = {
 
       try {
         const taskEntry = await confirmRegistration(id, authHeader, {
-          error: details.error,
           registrationNumber: details.registrationNumber,
           identifiers: details.identifiers
         })
@@ -640,6 +640,26 @@ export const resolvers: GQLResolver = {
         return taskEntry.resource.id
       } catch (error) {
         throw new Error(`Error in rejectRegistration: ${error.message}`)
+      }
+    },
+    async upsertRegistrationIdentifier(
+      _,
+      { id, details },
+      { headers: authHeader }
+    ) {
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      try {
+        const taskEntry = await upsertRegistrationIdentifier(id, authHeader, {
+          registrationNumber: details.registrationNumber,
+          identifiers: details.identifiers
+        })
+
+        return taskEntry.resource.id
+      } catch (error) {
+        throw new Error(`Failed to confirm registration: ${error.message}`)
       }
     }
   }
