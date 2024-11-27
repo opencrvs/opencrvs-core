@@ -12,7 +12,7 @@
 import { tennisClubMembershipEvent } from './fixtures'
 import { useIntl } from 'react-intl'
 import { usePagination } from './usePagination'
-import { FieldConfig } from '@opencrvs/commons'
+import { FieldConfig } from '@opencrvs/commons/client'
 
 const eventTypes = { 'tennis-club-membership': tennisClubMembershipEvent }
 
