@@ -38,12 +38,12 @@ describe('user list without admin scope', () => {
 
   it('no add user button', async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store, history } = createStore())
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockUserResponse
     }
-    await store.dispatch(action)
+    store.dispatch(action)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
 
@@ -89,14 +89,14 @@ describe('User list tests', () => {
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store, history } = createStore())
     setScopes([SCOPES.USER_UPDATE, SCOPES.USER_CREATE], store)
 
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockLocalSysAdminUserResponse
     }
-    await store.dispatch(action)
+    store.dispatch(action)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -259,7 +259,9 @@ describe('User list tests', () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'REGISTRATION_AGENT',
                       label: {
@@ -280,7 +282,9 @@ describe('User list tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -301,7 +305,9 @@ describe('User list tests', () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'DISTRICT_REGISTRAR',
                       label: {
@@ -322,7 +328,9 @@ describe('User list tests', () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'STATE_REGISTRAR',
                       label: {
@@ -343,7 +351,9 @@ describe('User list tests', () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'FIELD_AGENT',
                       label: {

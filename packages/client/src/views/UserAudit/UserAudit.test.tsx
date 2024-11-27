@@ -42,6 +42,7 @@ const mockAuditedUserGqlResponse = {
     data: {
       getUser: {
         id: '5d08e102542c7a19fc55b790',
+        userMgntUserID: '5d08e102542c7a19fc55b790',
         name: [
           {
             use: 'bn',
