@@ -50,8 +50,7 @@ export const resolvers: GQLResolver = {
       return trpc.event.actions.notify.mutate(
         {
           eventId: eventId,
-          type: 'NOTIFY',
-          data: input.data,
+          data: Object.fromEntries(input.data.map((d) => [d.id, d.value])),
           createdAtLocation: '123',
           transactionId: uuid.v4()
         },
