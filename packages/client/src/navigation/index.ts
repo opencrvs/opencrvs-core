@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IWORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { CorrectionSection, UserSection } from '@client/forms'
 import {
   ADVANCED_SEARCH,

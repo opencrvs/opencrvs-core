@@ -14,7 +14,7 @@ import {
   ITouchedNestedFields,
   mapFieldsToValues
 } from '@client/components/form'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
 import { TimeMounted } from '@client/components/TimeMounted'
 import {

@@ -18,9 +18,7 @@ export const resolvers: GQLResolver = {
   Mutation: {
     async reactivateSystem(_, { clientId }, { headers: authHeader }) {
       if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        return Promise.reject(
-          new Error('Activate user is only allowed for this user')
-        )
+        throw new Error('Activate user is only allowed for this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}reactivateSystem`, {
         method: 'POST',
@@ -32,7 +30,7 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return new Error(
+        throw new Error(
           `Something went wrong on user management service. Couldn't activate system`
         )
       }
@@ -40,7 +38,7 @@ export const resolvers: GQLResolver = {
     },
     async deactivateSystem(_, { clientId }, { headers: authHeader }) {
       if (!hasScope(authHeader, SCOPES.CONFIG_UPDATE_ALL)) {
-        throw new Error('Deactivate user is not allowed for ohis user')
+        throw new Error('Deactivate user is not allowed for this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}deactivateSystem`, {
         method: 'POST',

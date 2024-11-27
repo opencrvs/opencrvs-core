@@ -72,11 +72,7 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-<<<<<<< HEAD
-import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
-=======
-import { EventType, RegStatus } from '@client/utils/gateway'
->>>>>>> develop
+import { EventType, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
