@@ -35,7 +35,7 @@ export async function resetServer() {
   })
 }
 
-/** @public */
+/** @knipignore */
 export function getOrCreateClient() {
   const host = server.getHost()
   const port = server.getMappedPort(9200)

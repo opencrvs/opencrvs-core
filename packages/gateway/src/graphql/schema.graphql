@@ -148,6 +148,7 @@ type Query {
   ): [SystemRole!]
   fetchSystem(clientId: ID!): System
   getEvent(eventId: ID!): Event!
+  getEventConfig: [EventConfig!]!
 }
 
 type Mutation {
@@ -642,6 +643,12 @@ type Event {
   createdAt: DateTime!
   updatedAt: DateTime!
   actions: [Action!]!
+}
+
+type EventConfig {
+  id: String!
+  label: Label!
+  actions: [EventConfigAction!]!
 }
 
 input CorrectionInput {
@@ -1204,6 +1211,18 @@ scalar DateTime
 
 union Action = CreateAction | RegisterAction | NotifyAction | DeclareAction
 
+type Label {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
+type EventConfigAction {
+  label: Label!
+  forms: [Form!]!
+  type: String!
+}
+
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -1716,6 +1735,13 @@ type DeclareAction {
   identifiers: Identifiers!
 }
 
+type Form {
+  label: Label!
+  version: FormVersion!
+  active: Boolean
+  pages: [Page!]!
+}
+
 enum AttachmentInputStatus {
   approved
   validated
@@ -1826,14 +1852,22 @@ type AdditionalIdWithCompositionId {
   trackingId: String!
 }
 
-type Field {
-  id: String!
-  value: FieldValue!
-}
+union Field = TextField | DateField | ParagraphField
 
 type Identifiers {
   trackingId: String!
   registrationNumber: String!
+}
+
+type FormVersion {
+  id: String!
+  label: Label!
+}
+
+type Page {
+  id: String!
+  title: Label!
+  fields: [Field!]!
 }
 
 enum TelecomSystem {
@@ -1882,4 +1916,42 @@ input PaymentInput {
   outcome: PaymentOutcomeType
   date: Date
   data: String
+}
+
+type TextField implements BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String!
+  options: TextFieldOptions
+}
+
+type DateField implements BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String!
+  options: DateFieldOptions
+}
+
+type ParagraphField implements BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String!
+}
+
+interface BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String!
+}
+
+type TextFieldOptions {
+  maxLength: Int
+}
+
+type DateFieldOptions {
+  notice: Label
 }

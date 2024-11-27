@@ -8,18 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { env } from '@events/environment'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { api } from '@gateway/v2-events/events/service'
 
-let client: elasticsearch.Client
-
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_HOST
-    })
-    return client
+export const resolvers: GQLResolver = {
+  Query: {
+    async getEventConfig(_, __, { headers }) {
+      return api.config.get.query(undefined, {
+        context: { headers }
+      })
+    }
   }
-
-  return client
 }

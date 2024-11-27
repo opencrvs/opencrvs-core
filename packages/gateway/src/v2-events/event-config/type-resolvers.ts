@@ -8,18 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { env } from '@events/environment'
+import { GQLResolver } from '@gateway/graphql/schema'
+import { FieldConfig } from '@opencrvs/commons'
 
-let client: elasticsearch.Client
+export const eventResolvers: GQLResolver = {
+  Field: {
+    __resolveType: (obj: FieldConfig) => {
+      if (obj.type === 'DATE') {
+        return 'DateField'
+      }
+      if (obj.type === 'PARAGRAPH') {
+        return 'ParagraphField'
+      }
 
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_HOST
-    })
-    return client
+      return 'TextField'
+    }
   }
-
-  return client
 }

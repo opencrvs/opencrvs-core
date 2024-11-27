@@ -1,0 +1,88 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+
+type EventConfig {
+  id: String!
+  label: Label!
+  actions: [EventConfigAction!]!
+}
+
+type Label {
+  id: String!
+  defaultMessage: String!
+  description: String!
+}
+
+type EventConfigAction {
+  label: Label!
+  forms: [Form!]!
+  type: String!
+}
+
+type Form {
+  label: Label!
+  version: FormVersion!
+  active: Boolean
+  pages: [Page!]!
+}
+
+type FormVersion {
+  id: String!
+  label: Label!
+}
+
+type Page {
+  id: String!
+  title: Label!
+  fields: [Field!]!
+}
+
+union Field = TextField | DateField | ParagraphField
+
+type TextField implements BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String! # "TEXT"
+  options: TextFieldOptions
+}
+
+type DateField implements BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String! # "DATE"
+  options: DateFieldOptions
+}
+
+type ParagraphField implements BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String! # "PARAGRAPH"
+}
+
+type TextFieldOptions {
+  maxLength: Int
+}
+
+type DateFieldOptions {
+  notice: Label
+}
+
+interface BaseField {
+  id: String!
+  required: Boolean!
+  label: Label!
+  type: String!
+}
+
+type Query {
+  getEventConfig: [EventConfig!]!
+}

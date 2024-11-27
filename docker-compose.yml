@@ -48,16 +48,6 @@ services:
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
 
-  events:
-    image: opencrvs/ocrvs-events:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/events/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
-
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64
@@ -87,6 +77,7 @@ services:
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
+
   events:
     image: opencrvs/ocrvs-events:${VERSION}
     #platform: linux/amd64
@@ -99,6 +90,7 @@ services:
     environment:
       - MONGO_URL=mongodb://mongo1/events
       - ES_HOST=elasticsearch:9200
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040/
 
   # User facing services
   workflow:
