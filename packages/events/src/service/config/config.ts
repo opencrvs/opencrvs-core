@@ -10,6 +10,7 @@
  */
 
 import { env } from '@events/environment'
+import fetch from 'node-fetch'
 
 export async function getEventsConfig(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
