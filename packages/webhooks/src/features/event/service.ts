@@ -12,33 +12,11 @@
 import * as crypto from 'crypto'
 import {
   RegisteredRecord,
-  MOTHER_CODE,
-  FATHER_CODE,
-  CHILD_CODE,
-  ATTACHMENT_DOCS_CODE,
-  INFORMANT_CODE,
-  DECEASED_CODE,
-  DEATH_ENCOUNTER_CODE,
   getComposition,
   CompositionSectionCode,
   resourceIdentifierToUUID,
   isTask
 } from '@opencrvs/commons/types'
-
-const NATIONAL_ID_BIRTH_PERMISSIONS = [
-  MOTHER_CODE,
-  FATHER_CODE,
-  CHILD_CODE,
-  ATTACHMENT_DOCS_CODE,
-  INFORMANT_CODE
-] as CompositionSectionCode[]
-
-const NATIONAL_ID_DEATH_PERMISSIONS = [
-  DECEASED_CODE,
-  ATTACHMENT_DOCS_CODE,
-  INFORMANT_CODE,
-  DEATH_ENCOUNTER_CODE
-] as CompositionSectionCode[]
 
 export function createRequestSignature(
   requestSigningVersion: string,
@@ -48,36 +26,6 @@ export function createRequestSignature(
   const hmac = crypto.createHmac(requestSigningVersion, signingSecret)
   hmac.update(`${requestSigningVersion}:${encodeURIComponent(rawBody)}`)
   return `${requestSigningVersion}=${hmac.digest('hex')}`
-}
-
-export function transformBirthBundle(
-  bundle: RegisteredRecord,
-  scope: string,
-  permissions: CompositionSectionCode[] = []
-) {
-  switch (scope) {
-    case 'nationalId':
-      return getPermissionsBundle(bundle, NATIONAL_ID_BIRTH_PERMISSIONS)
-    case 'webhook':
-      return getPermissionsBundle(bundle, permissions)
-    default:
-      return bundle
-  }
-}
-
-export function transformDeathBundle(
-  bundle: RegisteredRecord,
-  scope: string,
-  permissions: CompositionSectionCode[] = []
-) {
-  switch (scope) {
-    case 'nationalId':
-      return getPermissionsBundle(bundle, NATIONAL_ID_DEATH_PERMISSIONS)
-    case 'webhook':
-      return getPermissionsBundle(bundle, permissions)
-    default:
-      return bundle
-  }
 }
 
 export const getPermissionsBundle = (
