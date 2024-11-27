@@ -31,13 +31,9 @@ const TextField = BaseField.describe('Text input').merge(
 const DateField = BaseField.describe('A single date input (dd-mm-YYYY)').merge(
   z.object({
     type: z.literal('DATE'),
-    options: z
-      .object({
-        notice: TranslationConfig.describe(
-          'Text to display above the date input'
-        )
-      })
-      .optional()
+    options: z.object({
+      notice: TranslationConfig.describe('Text to display above the date input')
+    })
   })
 )
 
@@ -52,3 +48,5 @@ export const FieldConfig = z.discriminatedUnion('type', [
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>
+export type FieldType = FieldConfig['type']
+export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
