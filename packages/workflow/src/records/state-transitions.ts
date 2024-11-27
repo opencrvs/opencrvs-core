@@ -60,7 +60,8 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  upsertPatientIdentifierWithRN
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -554,7 +555,7 @@ export async function toRegistered(
 
 export async function toUpsertRegistrationIdentifier(
   request: Hapi.Request,
-  record: WaitingForValidationRecord,
+  record: InProgressRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
   identifiers?: EventRegistrationPayload['identifiers']
@@ -574,7 +575,7 @@ export async function toUpsertRegistrationIdentifier(
   const composition = getComposition(record)
 
   // Update patient identifiers (upsert logic here)
-  const patientsWithRegNumber = updatePatientIdentifierWithRN(
+  const patientsWithRegNumber = upsertPatientIdentifierWithRN(
     record,
     composition,
     SECTION_CODE[event],
@@ -587,21 +588,10 @@ export async function toUpsertRegistrationIdentifier(
     event.toLowerCase() as Lowercase<typeof event>
   }-registration-number` as const
 
-  // Find or create registration number identifier
-  let registrationIdentifier = registeredTask.identifier.find(
-    (identifier) => identifier.system === system
-  )
-
-  if (!registrationIdentifier) {
-    // If identifier doesn't exist, create it
-    registeredTask.identifier.push({
-      system,
-      value: registrationNumber as RegistrationNumber
-    })
-  } else {
-    // If identifier exists, update it
-    registrationIdentifier.value = registrationNumber as RegistrationNumber
-  }
+  registeredTask.identifier.push({
+    system,
+    value: registrationNumber as RegistrationNumber
+  })
 
   if (event === EVENT_TYPE.BIRTH && identifiers) {
     // Handle identifiers for children in birth events
@@ -639,101 +629,14 @@ export async function toUpsertRegistrationIdentifier(
     entry: [...patientsEntriesWithRN, { resource: registeredTask }]
   }
 
-  // Change the state to REGISTERED
-  return changeState(
-    await mergeChangedResourcesIntoRecord(
-      record,
-      unsavedChangedResources,
-      practitionerResourcesBundle
-    ),
-    'REGISTERED'
-  )
+  const upsertedRecord = (await mergeChangedResourcesIntoRecord(
+    record,
+    unsavedChangedResources,
+    practitionerResourcesBundle
+  )) as RegisteredRecord
+
+  return upsertedRecord
 }
-
-// export async function toUpsertRegistrationIdentifier(
-//   request: Hapi.Request,
-//   record: WaitingForValidationRecord,
-//   registrationNumber: EventRegistrationPayload['registrationNumber'],
-//   token: string,
-//   identifiers?: EventRegistrationPayload['identifiers']
-// ): Promise<RegisteredRecord> {
-//   const previousTask = getTaskFromSavedBundle(record)
-//   const registeredTaskWithoutPractitionerExtensions =
-//     createRegisterTask(previousTask)
-
-//   const [registeredTask, practitionerResourcesBundle] =
-//     await withPractitionerDetails(
-//       registeredTaskWithoutPractitionerExtensions,
-//       token
-//     )
-
-//   const event = getTaskEventType(registeredTask) as EVENT_TYPE
-//   const composition = getComposition(record)
-
-//   // for patient entries of child, deceased, bride, groom
-//   const patientsWithRegNumber = updatePatientIdentifierWithRN(
-//     record,
-//     composition,
-//     SECTION_CODE[event],
-//     REG_NUMBER_SYSTEM[event],
-//     registrationNumber
-//   )
-
-//   /* Setting registration number here */
-//   const system = `http://opencrvs.org/specs/id/${
-//     event.toLowerCase() as Lowercase<typeof event>
-//   }-registration-number` as const
-
-//   registeredTask.identifier.push({
-//     system,
-//     value: registrationNumber as RegistrationNumber
-//   })
-
-//   if (event === EVENT_TYPE.BIRTH && identifiers) {
-//     // For birth event patients[0] is child and it should
-//     // already be initialized with the RN identifier
-//     identifiers.forEach((childIdentifier) => {
-//       const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
-//         ({ type }) => type?.coding?.[0].code === childIdentifier.type
-//       )
-//       if (!previousIdentifier) {
-//         patientsWithRegNumber[0].identifier!.push({
-//           type: {
-//             coding: [
-//               {
-//                 system: 'http://opencrvs.org/specs/identifier-type',
-//                 code: childIdentifier.type
-//               }
-//             ]
-//           },
-//           value: childIdentifier.value
-//         })
-//       } else {
-//         previousIdentifier.value = childIdentifier.value
-//       }
-//     })
-//   }
-
-//   const patientIds = patientsWithRegNumber.map((p) => p.id)
-//   const patientsEntriesWithRN = record.entry.filter((e) =>
-//     patientIds.includes(e.resource.id)
-//   )
-
-//   const unsavedChangedResources: Bundle = {
-//     type: 'document',
-//     resourceType: 'Bundle',
-//     entry: [...patientsEntriesWithRN, { resource: registeredTask }]
-//   }
-
-//   return changeState(
-//     await mergeChangedResourcesIntoRecord(
-//       record,
-//       unsavedChangedResources,
-//       practitionerResourcesBundle
-//     ),
-//     'REGISTERED'
-//   )
-// }
 
 export async function toArchived(
   record: RegisteredRecord | ReadyForReviewRecord | ValidatedRecord,
