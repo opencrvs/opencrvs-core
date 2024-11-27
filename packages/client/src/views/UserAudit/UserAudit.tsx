@@ -34,7 +34,6 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  User,
   HumanName
 } from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
@@ -349,19 +348,21 @@ export const UserAudit = () => {
               />
             )}
           </>
-          <UserAuditActionModal
-            show={modalVisible}
-            user={data.getUser! as User}
-            onClose={() => toggleUserActivationModal()}
-            onConfirmRefetchQueries={[
-              {
-                query: GET_USER,
-                variables: {
-                  userId: userId
+          {data.getUser?.id ? (
+            <UserAuditActionModal
+              show={modalVisible}
+              userId={data.getUser?.id}
+              onClose={() => toggleUserActivationModal()}
+              onConfirmRefetchQueries={[
+                {
+                  query: GET_USER,
+                  variables: {
+                    userId: userId
+                  }
                 }
-              }
-            ]}
-          />
+              ]}
+            />
+          ) : null}
           <ResponsiveModal
             id="username-reminder-modal"
             show={toggleUsernameReminder}

@@ -50,7 +50,6 @@ import {
 } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { parse } from 'query-string'
-import * as React from 'react'
 import {
   injectIntl,
   useIntl,
@@ -63,13 +62,13 @@ import { userMutations } from '@client/user/mutations'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { ListUser } from '@opencrvs/components/lib/ListUser'
-import { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   withOnlineStatus,
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { LocationPicker } from '@client/components/LocationPicker'
-import { Query as QueryType, User } from '@client/utils/gateway'
+import { SearchUsersQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { Link } from '@opencrvs/components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
@@ -79,7 +78,9 @@ import { usePermissions } from '@client/hooks/useAuthorization'
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1
 
-const { useState } = React
+type User = NonNullable<
+  NonNullable<NonNullable<SearchUsersQuery['searchUsers']>['results']>[number]
+>
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -243,7 +244,7 @@ function UserListComponent(props: IProps) {
     offlineCountryConfig,
     location: { search }
   } = props
-  const { canEditUser, canAddOfficeUsers } = usePermissions()
+  const { canEditUser, canAddOfficeUsers, canAccessOffice } = usePermissions()
 
   const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
@@ -497,7 +498,7 @@ function UserListComponent(props: IProps) {
 
   const generateUserContents = useCallback(
     function generateUserContents(
-      data: QueryType,
+      data: SearchUsersQuery,
       locationId: string,
       userDetails: UserDetails | null
     ) {
@@ -505,53 +506,51 @@ function UserListComponent(props: IProps) {
         return []
       }
 
-      return data.searchUsers.results.map(
-        (user: User | null, index: number) => {
-          if (user !== null) {
-            const name =
-              (user &&
-                user.name &&
-                ((createNamesMap(user.name)[intl.locale] as string) ||
-                  (createNamesMap(user.name)[LANG_EN] as string))) ||
-              ''
-            const role = intl.formatMessage(user.role.label)
-            const avatar = user.avatar
+      return data.searchUsers.results.map((user, index) => {
+        if (user !== null) {
+          const name =
+            (user &&
+              user.name &&
+              ((createNamesMap(user.name)[intl.locale] as string) ||
+                (createNamesMap(user.name)[LANG_EN] as string))) ||
+            ''
+          const role = intl.formatMessage(user.role.label)
+          const avatar = user.avatar
 
-            return {
-              image: (
-                <AvatarSmall
-                  name={name}
-                  avatar={avatar || undefined}
-                  onClick={() => goToUserProfile(String(user.id))}
-                />
-              ),
-              label: (
-                <Link
-                  id="profile-link"
-                  onClick={() => goToUserProfile(String(user.id))}
-                >
-                  {name}
-                </Link>
-              ),
-              value: <Value>{role}</Value>,
-              actions: (
-                <StatusMenu
-                  userDetails={userDetails}
-                  locationId={locationId}
-                  user={user}
-                  index={index}
-                  status={user.status || undefined}
-                  underInvestigation={user.underInvestigation || false}
-                />
-              )
-            }
-          }
           return {
-            label: '',
-            value: <></>
+            image: (
+              <AvatarSmall
+                name={name}
+                avatar={avatar || undefined}
+                onClick={() => goToUserProfile(String(user.id))}
+              />
+            ),
+            label: (
+              <Link
+                id="profile-link"
+                onClick={() => goToUserProfile(String(user.id))}
+              >
+                {name}
+              </Link>
+            ),
+            value: <Value>{role}</Value>,
+            actions: (
+              <StatusMenu
+                userDetails={userDetails}
+                locationId={locationId}
+                user={user}
+                index={index}
+                status={user.status || undefined}
+                underInvestigation={user.underInvestigation || false}
+              />
+            )
           }
         }
-      )
+        return {
+          label: '',
+          value: <></>
+        }
+      })
     },
     [StatusMenu, intl, goToUserProfile]
   )
@@ -579,18 +578,20 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (locationId: string) => {
     const buttons: React.ReactElement[] = []
+    buttons.push(
+      <LocationPicker
+        key={`location-picker-${locationId}`}
+        selectedLocationId={locationId}
+        onChangeLocation={(locationId) => {
+          props.goToTeamUserList(locationId)
+          setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
+        }}
+        locationFilter={(location) =>
+          location.type === 'CRVS_OFFICE' && canAccessOffice(location)
+        }
+      />
+    )
     if (canAddOfficeUsers({ id: locationId })) {
-      buttons.push(
-        <LocationPicker
-          key={`location-picker-${locationId}`}
-          selectedLocationId={locationId}
-          onChangeLocation={(locationId) => {
-            props.goToTeamUserList(locationId)
-            setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
-          }}
-          locationFilter={(location) => location.type === 'CRVS_OFFICE'}
-        />
-      )
       buttons.push(
         <Button
           id="add-user"
@@ -612,7 +613,7 @@ function UserListComponent(props: IProps) {
       locationId,
       userDetails
     }: {
-      data: any
+      data: SearchUsersQuery
       locationId: string
       userDetails: UserDetails | null
     }) {
@@ -650,20 +651,22 @@ function UserListComponent(props: IProps) {
                 }
               />
             )}
-            <UserAuditActionModal
-              show={toggleActivation.modalVisible}
-              user={toggleActivation.selectedUser}
-              onClose={() => toggleUserActivationModal()}
-              onConfirmRefetchQueries={[
-                {
-                  query: SEARCH_USERS,
-                  variables: {
-                    primaryOfficeId: locationId,
-                    count: recordCount
+            {toggleActivation.selectedUser?.id ? (
+              <UserAuditActionModal
+                show={toggleActivation.modalVisible}
+                userId={toggleActivation.selectedUser.id}
+                onClose={() => toggleUserActivationModal()}
+                onConfirmRefetchQueries={[
+                  {
+                    query: SEARCH_USERS,
+                    variables: {
+                      primaryOfficeId: locationId,
+                      count: recordCount
+                    }
                   }
-                }
-              ]}
-            />
+                ]}
+              />
+            ) : null}
 
             <ResponsiveModal
               id="username-reminder-modal"
@@ -789,7 +792,7 @@ function UserListComponent(props: IProps) {
       hideBackground={true}
     >
       {isOnline ? (
-        <Query
+        <Query<SearchUsersQuery>
           query={SEARCH_USERS}
           variables={{
             primaryOfficeId: locationId,
@@ -824,7 +827,7 @@ function UserListComponent(props: IProps) {
                   <Loading>
                     <LoadingIndicator loading={true} />
                   </Loading>
-                ) : (
+                ) : data ? (
                   <>
                     <Header id="header">
                       {(searchedLocation &&
@@ -847,7 +850,7 @@ function UserListComponent(props: IProps) {
                       userDetails={userDetails}
                     />
                   </>
-                )}
+                ) : null}
               </Content>
             )
           }}

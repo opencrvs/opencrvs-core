@@ -2972,7 +2972,6 @@ export type SearchUsersQuery = {
     results?: Array<{
       __typename?: 'User'
       id: string
-      username?: string | null
       mobile?: string | null
       email?: string | null
       status: Status
@@ -2983,6 +2982,7 @@ export type SearchUsersQuery = {
         firstNames?: string | null
         familyName?: string | null
       }>
+      primaryOffice: { __typename?: 'Location'; id: string }
       role: {
         __typename?: 'UserRole'
         id: string
@@ -3046,6 +3046,7 @@ export type GetUserQuery = {
   getUser?: {
     __typename?: 'User'
     id: string
+    userMgntUserID: string
     username?: string | null
     mobile?: string | null
     email?: string | null
