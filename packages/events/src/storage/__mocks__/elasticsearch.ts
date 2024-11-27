@@ -35,6 +35,7 @@ export async function resetServer() {
   })
 }
 
+/** @internal */
 export function getOrCreateClient() {
   const host = server.getHost()
   const port = server.getMappedPort(9200)

@@ -43,7 +43,7 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
-export function eventToEventIndex(event: EventDocument): EventIndex {
+function eventToEventIndex(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === 'CREATE'
   ) as CreatedAction

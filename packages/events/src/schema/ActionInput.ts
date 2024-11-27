@@ -47,13 +47,13 @@ export const DeclareActionInput = BaseActionInput.merge(
     type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
   })
 )
-export const AssignActionInput = BaseActionInput.merge(
+const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
     assignedTo: z.string()
   })
 )
-export const UnassignActionInput = BaseActionInput.merge(
+const UnassignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.UNASSIGN).default(ActionType.UNASSIGN)
   })
