@@ -2153,7 +2153,7 @@ export interface QueryToIsLeafLevelLocationResolver<
 }
 
 export interface QueryToGetUserArgs {
-  userId?: string
+  userId: string
 }
 export interface QueryToGetUserResolver<TParent = any, TResult = any> {
   (
@@ -2165,7 +2165,7 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetUserByMobileArgs {
-  mobile?: string
+  mobile: string
 }
 export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
   (
@@ -2177,7 +2177,7 @@ export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetUserByEmailArgs {
-  email?: string
+  email: string
 }
 export interface QueryToGetUserByEmailResolver<TParent = any, TResult = any> {
   (

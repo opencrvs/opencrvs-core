@@ -8,32 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import styled from 'styled-components'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Button } from '@opencrvs/components/lib/Button'
 import { useDispatch, useSelector } from 'react-redux'
+import { InternalRefetchQueriesInclude, useApolloClient } from '@apollo/client'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   downloadDeclaration,
   DOWNLOAD_STATUS,
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { Action } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import { InternalRefetchQueriesInclude, useApolloClient } from '@apollo/client'
-import type { AssignmentData } from '@client/utils/gateway'
-import { IStoreState } from '@client/store'
-import { AvatarSmall } from '@client/components/Avatar'
-import { useIntl } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import { IStoreState } from '@client/store'
 import { useOnlineStatus } from '@client/utils'
+import type { AssignmentData } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
+import { Button } from '@opencrvs/components/lib/Button'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { Download } from '@opencrvs/components/lib/icons'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import React from 'react'
+import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { ResponsiveModal } from '@opencrvs/components'
+import styled from 'styled-components'
 
 interface IDownloadConfig {
   event: string
@@ -157,7 +157,7 @@ export function DownloadButton({
   const download = () =>
     dispatch(
       downloadDeclaration(
-        event.toLowerCase() as unknown as Event,
+        event.toLowerCase() as unknown as EventType,
         compositionId,
         action,
         client

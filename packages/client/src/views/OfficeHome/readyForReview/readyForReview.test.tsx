@@ -15,7 +15,7 @@ import {
   modifyDeclaration
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
@@ -69,7 +69,7 @@ const mockListSyncController = vi.fn()
 
 const mockSearchData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-  type: Event.Birth,
+  type: EventType.Birth,
   registration: {
     status: 'DECLARED',
     contactNumber: '01622688231',
@@ -150,7 +150,7 @@ const mockReviewTabData = {
   results: [
     {
       id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-      type: Event.Birth,
+      type: EventType.Birth,
       registration: {
         status: 'DECLARED',
         contactNumber: '01622688231',
@@ -198,7 +198,7 @@ const mockReviewTabData = {
     } as GQLBirthEventSearchSet,
     {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-      type: Event.Death,
+      type: EventType.Death,
       registration: {
         status: 'VALIDATED',
         trackingId: 'DW0UTHR',
@@ -348,7 +348,7 @@ describe('OfficeHome sent for review tab related tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: Event.Birth,
+                type: EventType.Birth,
                 registration: {
                   status: 'DECLARED',
                   contactNumber: '01622688231',
@@ -376,7 +376,7 @@ describe('OfficeHome sent for review tab related tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: Event.Death,
+                type: EventType.Death,
                 registration: {
                   status: 'VALIDATED',
                   trackingId: 'DW0UTHR',
@@ -524,7 +524,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     //TODO:: FAILED TEST
     it.skip('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.Death,
+        EventType.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         DownloadAction.LOAD_REVIEW_DECLARATION
       )
@@ -551,7 +551,7 @@ describe('OfficeHome sent for review tab related tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: Event.Birth,
+                type: EventType.Birth,
                 registration: {
                   status: 'VALIDATED',
                   contactNumber: '01622688231',
@@ -576,7 +576,7 @@ describe('OfficeHome sent for review tab related tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: Event.Death,
+                type: EventType.Death,
                 registration: {
                   status: 'DECLARED',
                   trackingId: 'DW0UTHR',
@@ -676,7 +676,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     it('shows review button when download is complete', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.Death,
+        EventType.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         DownloadAction.LOAD_REVIEW_DECLARATION
       )
@@ -700,7 +700,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.Death,
+        EventType.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         DownloadAction.LOAD_REVIEW_DECLARATION
       )
@@ -745,7 +745,7 @@ describe('Tablet tests', () => {
             results: [
               {
                 id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-                type: Event.Birth,
+                type: EventType.Birth,
                 registration: {
                   status: 'VALIDATED',
                   contactNumber: '01622688231',
@@ -773,7 +773,7 @@ describe('Tablet tests', () => {
               } as GQLBirthEventSearchSet,
               {
                 id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                type: Event.Death,
+                type: EventType.Death,
                 registration: {
                   status: 'DECLARED',
                   trackingId: 'DW0UTHR',

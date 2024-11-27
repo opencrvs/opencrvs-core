@@ -20,7 +20,7 @@ import {
   REGISTRATION_AGENT_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
 import { vi, Mock } from 'vitest'
@@ -45,7 +45,7 @@ describe('verify collector tests', () => {
         }
       ]
     },
-    event: Event.Birth
+    event: EventType.Birth
   }
 
   const deathDeclaration = {
@@ -60,7 +60,7 @@ describe('verify collector tests', () => {
         }
       ]
     },
-    event: Event.Death
+    event: EventType.Death
   }
 
   describe('in case of birth declaration', () => {
@@ -79,7 +79,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.Birth
+              eventType: EventType.Birth
             },
             isExact: true,
             path: '',
@@ -113,7 +113,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.Birth
+              eventType: EventType.Birth
             },
             isExact: true,
             path: '',
@@ -136,7 +136,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth',
-              eventType: Event.Birth
+              eventType: EventType.Birth
             },
             isExact: true,
             path: '',
@@ -168,7 +168,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockDeath1234',
-              eventType: Event.Death
+              eventType: EventType.Death
             },
             isExact: true,
             path: '',

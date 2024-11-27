@@ -8,43 +8,43 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IFormField, IRadioGroupFormField, ISelectOption } from '@client/forms'
-import { IOfflineData } from '@client/offline/reducer'
-import { get, has, PropertyPath } from 'lodash'
-import { IntlShape } from 'react-intl'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import {
-  generateLocationName,
-  generateFullLocation
-} from '@client/utils/locationUtils'
-import type {
-  GQLEventSearchSet,
-  GQLBirthEventSearchSet,
-  GQLDeathEventSearchSet,
-  GQLHumanName,
-  GQLMarriageEventSearchSet
-} from '@client/utils/gateway-deprecated-do-not-use'
-import { createNamesMap } from '@client/utils/data-formatting'
-import { IDynamicValues } from '@client/navigation'
+import { IFormField, IRadioGroupFormField, ISelectOption } from '@client/forms'
 import { countryMessages } from '@client/i18n/messages/constants'
 import {
   recordAuditMessages,
   regActionMessages,
   regStatusMessages
 } from '@client/i18n/messages/views/recordAudit'
+import { IDynamicValues } from '@client/navigation'
+import { IOfflineData } from '@client/offline/reducer'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
+import { createNamesMap } from '@client/utils/data-formatting'
+import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
-  Event,
+  EventType,
+  History,
+  HumanName,
   Maybe,
   RegAction,
   RegStatus,
   User,
-  History,
-  HumanName,
   AssignmentData
 } from '@client/utils/gateway'
+import type {
+  GQLBirthEventSearchSet,
+  GQLDeathEventSearchSet,
+  GQLEventSearchSet,
+  GQLHumanName,
+  GQLMarriageEventSearchSet
+} from '@client/utils/gateway-deprecated-do-not-use'
+import {
+  generateFullLocation,
+  generateLocationName
+} from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
-import { getDeclarationFullName } from '@client/utils/draftUtils'
+import { get, has, PropertyPath } from 'lodash'
+import { IntlShape } from 'react-intl'
 
 export interface IDeclarationData {
   id: string
@@ -141,7 +141,7 @@ const getLocation = (
   let internationalDistrict = EMPTY_STRING
   let internationalState = EMPTY_STRING
   let country = EMPTY_STRING
-  if (declaration.event === Event.Death) {
+  if (declaration.event === EventType.Death) {
     locationType =
       declaration.data?.deathEvent?.placeOfDeath?.toString() || EMPTY_STRING
 
@@ -165,7 +165,7 @@ const getLocation = (
     internationalState =
       declaration.data?.deathEvent?.internationalStatePlaceofdeath?.toString() ||
       EMPTY_STRING
-  } else if (declaration.event === Event.Birth) {
+  } else if (declaration.event === EventType.Birth) {
     locationType =
       declaration.data?.child?.placeOfBirth?.toString() || EMPTY_STRING
     locationId =
@@ -185,7 +185,7 @@ const getLocation = (
     internationalState =
       declaration.data?.child?.internationalStatePlaceofbirth?.toString() ||
       EMPTY_STRING
-  } else if (declaration.event === Event.Marriage) {
+  } else if (declaration.event === EventType.Marriage) {
     district =
       declaration.data?.marriageEvent?.districtPlaceofmarriage?.toString() ||
       EMPTY_STRING
@@ -305,19 +305,19 @@ export const removeUnderscore = (word: string): string => {
 const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
-  return (declaration && declaration.type === Event.Birth) || false
+  return (declaration && declaration.type === EventType.Birth) || false
 }
 
 const isDeathDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLDeathEventSearchSet => {
-  return (declaration && declaration.type === Event.Death) || false
+  return (declaration && declaration.type === EventType.Death) || false
 }
 
 const isMarriageDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLMarriageEventSearchSet => {
-  return (declaration && declaration.type === Event.Marriage) || false
+  return (declaration && declaration.type === EventType.Marriage) || false
 }
 
 export const getName = (names: (HumanName | null)[], language: string) => {

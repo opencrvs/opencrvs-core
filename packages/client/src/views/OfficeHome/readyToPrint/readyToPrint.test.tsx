@@ -14,7 +14,7 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
@@ -70,7 +70,7 @@ const nameObj = {
 
 const mockUserData = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-  type: Event.Birth,
+  type: EventType.Birth,
   registration: {
     status: 'REGISTERED',
     contactNumber: '01622688231',
@@ -152,7 +152,7 @@ const mockPrintTabData = {
   results: [
     {
       id: '956281c9-1f47-4c26-948a-970dd23c4094',
-      type: Event.Death,
+      type: EventType.Death,
       registration: {
         status: 'REGISTERED',
         contactNumber: undefined,
@@ -201,7 +201,7 @@ const mockPrintTabData = {
     } as GQLDeathEventSearchSet,
     {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-      type: Event.Death,
+      type: EventType.Death,
       registration: {
         status: 'REGISTERED',
         trackingId: 'DW0UTHR',
@@ -248,7 +248,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     const birthEventRegisteredDate = '2019-10-20T11:03:20.660Z'
     const birthEventSearchSet: GQLBirthEventSearchSet = {
       id: '956281c9-1f47-4c26-948a-970dd23c4094',
-      type: Event.Birth,
+      type: EventType.Birth,
       registration: {
         status: 'REGISTERED',
         contactNumber: '01622688231',
@@ -298,7 +298,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const deathEventSearchSet: GQLDeathEventSearchSet = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-      type: Event.Death,
+      type: EventType.Death,
       registration: {
         status: 'REGISTERED',
         trackingId: 'DW0UTHR',
@@ -739,7 +739,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.Death,
+        EventType.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         DownloadAction.LOAD_CERTIFICATE_DECLARATION
       )

@@ -32,9 +32,7 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
       ) {
-        return await Promise.reject(
-          new Error('Advanced search is not allowed for this user')
-        )
+        throw new Error('Advanced search is not allowed for this user')
       }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}searches`, {
@@ -47,10 +45,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 201) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user management service. Couldn't bookmark advanced search.`
-          )
+        throw new Error(
+          `Something went wrong on user management service. Couldn't bookmark advanced search.`
         )
       }
       const response = await res.json()
@@ -72,10 +68,8 @@ export const resolvers: GQLResolver = {
           SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
       ) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar or registration agent'
-          )
+        throw new Error(
+          'Advanced search is only allowed for registrar or registration agent'
         )
       }
 
@@ -94,10 +88,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user management service. Couldn't unbookmarked advanced search.`
-          )
+        throw new Error(
+          `Something went wrong on user management service. Couldn't unbookmarked advanced search.`
         )
       }
       const response = res.json()

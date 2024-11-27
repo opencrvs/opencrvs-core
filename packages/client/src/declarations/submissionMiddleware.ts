@@ -31,7 +31,7 @@ import {
   getChangedValues
 } from '@client/transformer'
 import { client } from '@client/utils/apolloClient'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   MARK_EVENT_AS_DUPLICATE,
   getBirthMutation
@@ -43,12 +43,13 @@ import { updateRegistrarWorkqueue } from '@client/workqueue'
 import { Action, Middleware, createAction } from '@reduxjs/toolkit'
 import { Dispatch } from 'redux'
 // eslint-disable-next-line no-restricted-imports
-import { captureException } from '@sentry/browser'
-import { getOfflineData } from '@client/offline/selectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import type { MutationToRequestRegistrationCorrectionArgs } from '@client/utils/gateway-deprecated-do-not-use'
 import { UserDetails } from '@client/utils/userUtils'
-import { getReviewForm } from '@client/forms/register/review-selectors'
+// eslint-disable-next-line no-restricted-imports
+import { captureException } from '@sentry/browser'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -218,9 +219,9 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     }
 
     const mutation =
-      event === Event.Birth
+      event === EventType.Birth
         ? getBirthMutation(submissionAction)
-        : event === Event.Death
+        : event === EventType.Death
         ? getDeathMutation(submissionAction)
         : getMarriageMutation(submissionAction)
 

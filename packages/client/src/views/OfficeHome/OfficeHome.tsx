@@ -27,7 +27,7 @@ import styled from 'styled-components'
 import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
+import { SYNC_WORKQUEUE_TIME } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -50,7 +50,7 @@ import { ArrayElement } from '@client/SubmissionController'
 import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { Event, SCOPES } from '@client/utils/gateway'
+import { EventType, SCOPES } from '@client/utils/gateway'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
 
@@ -143,7 +143,7 @@ class OfficeHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    setTimeout(() => this.updateWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
+    setTimeout(() => this.updateWorkqueue(), SYNC_WORKQUEUE_TIME)
     if (this.interval) {
       clearInterval(this.interval)
     }
@@ -253,10 +253,12 @@ class OfficeHomeView extends React.Component<
       storedDeclarations
     )
 
-    const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-      return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
-    })
+    const isOnePrintInAdvanceOn = Object.values(EventType).some(
+      (event: EventType) => {
+        const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
+        return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+      }
+    )
 
     return (
       <>
