@@ -20,7 +20,7 @@ import {
   mockUserResponse,
   validToken
 } from '@client/tests/util'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import * as React from 'react'
 import { Mock, vi } from 'vitest'
 import { IssuePayment } from './IssuePayment'
@@ -47,7 +47,7 @@ const birthDeclaration = {
       }
     ]
   },
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 const deathDeclaration = {
@@ -67,7 +67,7 @@ const deathDeclaration = {
       }
     ]
   },
-  event: Event.Death
+  event: EventType.Death
 }
 
 describe('verify collector tests for issuance', () => {
@@ -103,7 +103,7 @@ describe('verify collector tests for issuance', () => {
         match={{
           params: {
             registrationId: 'mockBirth',
-            eventType: Event.Birth
+            eventType: EventType.Birth
           },
           isExact: true,
           path: '',

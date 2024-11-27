@@ -20,9 +20,21 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
-import { ActionInput, EventInput } from '@opencrvs/commons'
+import {
+  ActionDeclareInput,
+  ActionNotifyInput,
+  EventInput
+} from '@events/schema'
 
-export const t = initTRPC.create({
+const ContextSchema = z.object({
+  user: z.object({
+    id: z.string()
+  })
+})
+
+type Context = z.infer<typeof ContextSchema>
+
+export const t = initTRPC.context<Context>().create({
   transformer: superjson
 })
 
@@ -36,16 +48,13 @@ export type AppRouter = typeof appRouter
 
 export const appRouter = router({
   event: router({
-    create: publicProcedure
-      .input(
-        z.object({
-          transactionId: z.string(),
-          event: EventInput
-        })
+    create: publicProcedure.input(EventInput).mutation(async (options) => {
+      return createEvent(
+        options.input,
+        options.ctx.user.id,
+        options.input.transactionId
       )
-      .mutation(async (options) => {
-        return createEvent(options.input.event, options.input.transactionId)
-      }),
+    }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
       return patchEvent(options.input)
     }),
@@ -53,16 +62,18 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      create: publicProcedure
-        .input(
-          z.object({
-            eventId: z.string(),
-            action: ActionInput
-          })
-        )
-        .mutation(async (options) => {
-          return addAction(options.input.eventId, options.input.action)
+      notify: publicProcedure.input(ActionNotifyInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
         })
+      }),
+      declare: publicProcedure.input(ActionDeclareInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
+        })
+      })
     })
   })
 })

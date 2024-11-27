@@ -11,8 +11,8 @@
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
   IPrintableDeclaration,
-  SUBMISSION_STATUS,
   modifyDeclaration,
+  SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
 import { useDeclaration } from '@client/declarations/selectors'
@@ -25,28 +25,28 @@ import {
   generateCertificateCorrectionUrl,
   generateGoToHomeTabUrl
 } from '@client/navigation'
+import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { printPDF } from '@client/pdfRenderer'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
   hasRegisterScope,
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { EventType } from '@client/utils/gateway'
+import { getLocationHierarchy } from '@client/utils/locationUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { cloneDeep } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
-  isCertificateForPrintInAdvance,
-  getRegisteredDate,
+  calculatePrice,
   getEventDate,
-  calculatePrice
+  getRegisteredDate,
+  isCertificateForPrintInAdvance
 } from './utils'
-import { Event } from '@client/utils/gateway'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { AdminStructure, IOfflineData } from '@client/offline/reducer'
-import { getLocationHierarchy } from '@client/utils/locationUtils'
-import { printPDF } from '@client/pdfRenderer'
 import { useNavigate } from 'react-router-dom'
 
 const withEnhancedTemplateVariables = (
@@ -122,7 +122,7 @@ export const usePrintableCertificate = (declarationId: string) => {
   const dispatch = useDispatch()
   const scope = useSelector(getScope)
   const canUserEditRecord =
-    declaration?.event !== Event.Marriage &&
+    declaration?.event !== EventType.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
   let svg = undefined

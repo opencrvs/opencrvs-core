@@ -42,7 +42,7 @@ import { messages } from '@client/i18n/messages/views/certificate'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { useDispatch, useSelector } from 'react-redux'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { Button } from '@opencrvs/components/src/Button'
 import { SubmissionAction } from '@client/forms'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
@@ -232,10 +232,10 @@ const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.Birth
+      return EventType.Birth
     case 'death':
-      return Event.Death
+      return EventType.Death
     case 'marriage':
-      return Event.Marriage
+      return EventType.Marriage
   }
 }

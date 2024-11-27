@@ -37,7 +37,7 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -307,10 +307,12 @@ const NavigationView = (props: IFullProps) => {
   )
   const runningVer = String(localStorage.getItem('running-version'))
 
-  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
-  })
+  const isOnePrintInAdvanceOn = Object.values(EventType).some(
+    (event: EventType) => {
+      const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
+      return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
+    }
+  )
   const showRegDashboard =
     !IS_PROD_ENVIRONMENT ||
     (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)

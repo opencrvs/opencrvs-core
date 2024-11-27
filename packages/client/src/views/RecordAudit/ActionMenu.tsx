@@ -37,21 +37,6 @@ import {
   SUBMISSION_STATUS,
   unassignDeclaration
 } from '@client/declarations'
-import { CorrectionSection } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  DRAFT_MARRIAGE_FORM_PAGE,
-  REVIEW_CORRECTION,
-  REVIEW_EVENT_PARENT_FORM_PAGE
-} from '@client/navigation/routes'
-import { messages } from '@client/i18n/messages/views/action'
-import { useModal } from '@client/hooks/useModal'
-import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
-import { client } from '@client/utils/apolloClient'
-import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   canBeCorrected,
   isArchivable,
@@ -63,7 +48,22 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { EVENT } from '@opencrvs/commons/client'
+import { CorrectionSection } from '@client/forms'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/action'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
+import { client } from '@client/utils/apolloClient'
+import { EventType } from '@client/utils/gateway'
+import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
+import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 
@@ -246,7 +246,7 @@ const CorrectRecordAction: React.FC<
   const intl = useIntl()
 
   const isBirthOrDeathEvent =
-    type && [EVENT.BIRTH, EVENT.DEATH].includes(type as EVENT)
+    type && [EventType.Birth, EventType.Death].includes(type as EventType)
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =

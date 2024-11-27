@@ -22,7 +22,7 @@ import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 
 import {
-  Event,
+  EventType,
   FetchViewRecordByCompositionQuery,
   RegStatus
 } from '@client/utils/gateway'
@@ -155,7 +155,7 @@ export const ViewRecord = () => {
   const eventData = data?.fetchRegistrationForViewing
   const eventType = ((data?.fetchRegistrationForViewing?.registration?.type &&
     data.fetchRegistrationForViewing.registration.type.toLowerCase()) ||
-    '') as Event
+    '') as EventType
 
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],

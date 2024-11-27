@@ -72,7 +72,7 @@ import {
   DIVIDER,
   HIDDEN
 } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
   getListOfLocations,
@@ -1521,7 +1521,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       return false
     }
     return (
-      event === Event.Birth &&
+      event === EventType.Birth &&
       ((section.id === 'mother' && !!data.mother?.detailsExist) ||
         (section.id === 'father' && !!data.father?.detailsExist))
     )
@@ -1530,7 +1530,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   isLastNameFirst = () => {
     const { form, draft: declaration } = this.props
     const fields = form.sections.find((section) =>
-      declaration.event === Event.Birth
+      declaration.event === EventType.Birth
         ? section.id === 'child'
         : section.id === 'deceased'
     )?.groups[0]?.fields

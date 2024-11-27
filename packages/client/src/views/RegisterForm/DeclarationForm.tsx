@@ -23,7 +23,7 @@ import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
 import { IForm } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { Navigate } from 'react-router-dom'
 import { RouteComponentProps, withRouter } from '@client/components/withRouter'
@@ -35,7 +35,7 @@ interface IFormProps {
   duplicate?: boolean
 }
 
-const pageRoute: { [key in Event]: string } = {
+const pageRoute: { [key in EventType]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   death: DRAFT_DEATH_FORM_PAGE_GROUP,
   marriage: DRAFT_MARRIAGE_FORM_PAGE_GROUP
@@ -56,7 +56,7 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
     ({ id }) => id === props.router.params.declarationId
   )
 
-  const event = declaration?.event || Event.Birth
+  const event = declaration?.event || EventType.Birth
   const registerForm = getRegisterForm(state)[event]
 
   return {

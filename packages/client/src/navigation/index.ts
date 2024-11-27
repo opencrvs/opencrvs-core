@@ -9,30 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
+  CERTIFICATE_CORRECTION,
   CREATE_USER_SECTION,
   EVENT_COMPLETENESS_RATES,
+  ISSUE_CERTIFICATE_PAYMENT,
+  ISSUE_COLLECTOR,
+  ISSUE_VERIFY_COLLECTOR,
   PERFORMANCE_HOME,
+  PERFORMANCE_REGISTRATIONS_LIST,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
+  REGISTRAR_HOME_TAB_PAGE,
   REVIEW_CERTIFICATE,
   REVIEW_USER_FORM,
   VERIFY_COLLECTOR,
-  CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  REGISTRAR_HOME_TAB_PAGE,
-  PERFORMANCE_REGISTRATIONS_LIST,
-  ISSUE_COLLECTOR,
-  ISSUE_VERIFY_COLLECTOR,
-  ISSUE_CERTIFICATE_PAYMENT,
   WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import {
-  NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES,
+  NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
@@ -40,11 +40,11 @@ import {
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
 import { stringify } from 'query-string'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { UserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
+import { EventType } from '@client/utils/gateway'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -91,7 +91,7 @@ export function generatePerformanceHomeUrl({
 }: {
   timeStart?: Date
   timeEnd?: Date
-  event?: Event
+  event?: EventType
   locationId?: string
 }) {
   return {
@@ -148,7 +148,7 @@ export const generateVerifyIssueCollectorUrl = ({
   collector
 }: {
   registrationId: string
-  event: Event
+  event: EventType
   collector: string
 }) =>
   formatUrl(ISSUE_VERIFY_COLLECTOR, {
@@ -186,7 +186,7 @@ export const generateReviewCertificateUrl = ({
   event
 }: {
   registrationId: string
-  event: Event
+  event: EventType
 }) =>
   formatUrl(REVIEW_CERTIFICATE, {
     registrationId: registrationId.toString(),
@@ -213,7 +213,7 @@ export const generatePrintCertificatePaymentUrl = ({
   event
 }: {
   registrationId: string
-  event: Event
+  event: EventType
 }) =>
   formatUrl(PRINT_CERTIFICATE_PAYMENT, {
     registrationId: registrationId.toString(),
@@ -225,7 +225,7 @@ export const generateIssueCertificatePaymentUrl = ({
   event
 }: {
   registrationId: string
-  event: Event
+  event: EventType
 }) =>
   formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
     registrationId: registrationId.toString(),
@@ -239,7 +239,7 @@ export const generateCompletenessRatesUrl = ({
   timeEnd,
   time = CompletenessRateTime.WithinTarget
 }: {
-  eventType: Event
+  eventType: EventType
   locationId?: string
   timeStart: Date
   timeEnd: Date
@@ -298,7 +298,7 @@ export const generateWorkflowStatusUrl = ({
   timeStart: Date
   timeEnd: Date
   status?: keyof IStatusMapping
-  event?: Event
+  event?: EventType
 }) => ({
   pathname: WORKFLOW_STATUS,
   search: stringify({

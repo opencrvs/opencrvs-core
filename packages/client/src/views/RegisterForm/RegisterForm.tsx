@@ -42,73 +42,74 @@ import {
   writeDeclaration,
   DOWNLOAD_STATUS
 } from '@client/declarations'
+import { Stack, ToggleMenu } from '@client/../../components/lib'
 import {
   FormFieldGenerator,
   ITouchedNestedFields,
   mapFieldsToValues
 } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
+import { TimeMounted } from '@client/components/TimeMounted'
 import {
+  CorrectionSection,
   IForm,
+  IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormData,
-  CorrectionSection,
   SubmissionAction
 } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import {
+  evalExpressionInFieldDefinition,
+  getNextSectionIds,
+  getSectionFields,
+  getVisibleGroupFields,
+  getVisibleSectionGroupsBasedOnConditions,
+  handleInitialValue,
+  hasFormError,
+  VIEW_TYPE
+} from '@client/forms/utils'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { messages } from '@client/i18n/messages/views/register'
 import {
   formatUrl,
   generateCertificateCorrectionUrl,
   generateGoToHomeTabUrl,
   generateGoToPageGroupUrl
 } from '@client/navigation'
-import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
+import { toggleDraftSavedNotification } from '@client/notification/actions'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from 'styled-components'
+import { client } from '@client/utils/apolloClient'
 import { Scope } from '@client/utils/authUtils'
-import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
-  getVisibleSectionGroupsBasedOnConditions,
-  getVisibleGroupFields,
-  hasFormError,
-  getSectionFields,
-  getNextSectionIds,
-  VIEW_TYPE,
-  handleInitialValue
-} from '@client/forms/utils'
-import { messages } from '@client/i18n/messages/views/register'
-import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
+  ACCUMULATED_FILE_SIZE,
   DECLARED,
   REJECTED,
-  VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  VALIDATED
 } from '@client/utils/constants'
-import { TimeMounted } from '@client/components/TimeMounted'
+import { EventType, RegStatus } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
-import { UserDetails } from '@client/utils/userUtils'
-import { client } from '@client/utils/apolloClient'
-import { Stack, ToggleMenu } from '@client/../../components/lib'
-import { useModal } from '@client/hooks/useModal'
+import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { Text } from '@opencrvs/components/lib/Text'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
 import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import * as routes from '@client/navigation/routes'
 import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -247,7 +248,8 @@ function FormAppBar({
   duplicate,
   modifyDeclarationMethod,
   deleteDeclarationMethod,
-  printDeclarationMethod
+  printDeclarationMethod,
+  canSaveAndExit
 }: {
   duplicate: boolean | undefined
   section: IFormSection
@@ -255,6 +257,7 @@ function FormAppBar({
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
   printDeclarationMethod: (declarationId: string) => void
+  canSaveAndExit: boolean
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
@@ -553,6 +556,7 @@ function FormAppBar({
                     id="save-exit-btn"
                     type="primary"
                     size="small"
+                    disabled={!canSaveAndExit}
                     onClick={handleSaveAndExit}
                   >
                     <Icon name="DownloadSimple" />
@@ -611,7 +615,12 @@ function FormAppBar({
             mobileRight={
               <>
                 {!isCorrection(declaration) && (
-                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                  <Button
+                    type="icon"
+                    size="small"
+                    disabled={!canSaveAndExit}
+                    onClick={handleSaveAndExit}
+                  >
                     <Icon name="DownloadSimple" />
                   </Button>
                 )}
@@ -864,13 +873,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const eventType = this.props.declaration.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
-        return Event.Birth
+        return EventType.Birth
       case 'death':
-        return Event.Death
+        return EventType.Death
       case 'marriage':
-        return Event.Marriage
+        return EventType.Marriage
       default:
-        return Event.Birth
+        return EventType.Birth
     }
   }
 
@@ -1027,7 +1036,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSection,
       activeSectionGroup,
       reviewSummaryHeader,
-      userDetails
+      userDetails,
+      config
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -1044,6 +1054,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
       this.props?.router.match?.params?.pageId === 'documents'
     const introSection =
       findFirstVisibleSection(registerForm.sections).id === activeSection.id
+    const canContinue =
+      'canContinue' in activeSection
+        ? evalExpressionInFieldDefinition(
+            activeSection.canContinue!,
+            declaration.data[activeSection.id],
+            config,
+            declaration.data,
+            userDetails
+          )
+        : true
+
     return (
       <>
         <TimeMounted
@@ -1066,6 +1087,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   })
                 )
               }
+              canSaveAndExit={canContinue}
             />
           }
           key={activeSection.id}
@@ -1171,7 +1193,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     declaration.event.toLowerCase()
                                   )
                                 }}
-                                disabled={this.state.isFileUploading}
+                                disabled={
+                                  !canContinue || this.state.isFileUploading
+                                }
                               >
                                 {intl.formatMessage(
                                   buttonMessages.continueButton

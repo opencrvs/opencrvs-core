@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { Context } from '@gateway/graphql/context'
+import { AugmentedRequest } from '@apollo/datasource-rest'
 import {
   Practitioner,
   isCompositionOrCompositionHistory,
@@ -19,27 +19,25 @@ import {
   isPractitionerRoleOrPractitionerRoleHistory,
   isSaved
 } from '@opencrvs/commons/types'
-import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+
 import { FHIR_URL } from '@gateway/constants'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
-export default class FHIRAPI extends RESTDataSource<Context> {
-  constructor() {
-    super()
-    this.baseURL = `${FHIR_URL}`
-  }
+export default class FHIRAPI extends OpenCRVSRESTDataSource {
+  override baseURL = FHIR_URL
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each as keyof typeof headers]!)
-    }
-    request.headers.set('Content-Type', 'application/fhir+json')
+  override willSendRequest(
+    _path: string,
+    request: AugmentedRequest
+  ): void | Promise<void> {
+    super.willSendRequest(_path, request)
+    request.headers['Content-Type'] = 'application/fhir+json'
   }
 
   async getPractitioner(practitionerId: string) {
-    if (this.context.record) {
-      const inBundle = this.context.record.entry
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
+    if (record) {
+      const inBundle = record.entry
         .map(({ resource }) => resource)
         .filter(isPractitioner)
         .find((resource) => resource.id === practitionerId)
@@ -49,11 +47,13 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       }
     }
 
-    return this.get<Practitioner>(`/Practitioner/${practitionerId}`)
+    const res = await this.get<Practitioner>(`Practitioner/${practitionerId}`)
+    return res
   }
   async getPractitionerRoleByPractitionerId(practitionerId: string) {
-    if (this.context.record) {
-      const inBundle = this.context.record.entry
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
+    if (record) {
+      const inBundle = record.entry
         .map(({ resource }) => resource)
         .filter(isPractitionerRole)
         .find(
@@ -67,24 +67,26 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       }
     }
 
-    return this.get(`/PractitionerRole?practitioner=${practitionerId}`)
+    return this.get(`PractitionerRole?practitioner=${practitionerId}`)
   }
 
   async getPractionerRoleHistory(id: string) {
-    if (!this.context.record) {
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
+    if (!record) {
       throw new Error('No record in context. This should never happen')
     }
-    return this.context.record.entry
+    return record.entry
       .map(({ resource }) => resource)
       .filter(isPractitionerRoleOrPractitionerRoleHistory)
       .filter((role) => role.id === id)
   }
 
   getCompositionHistory(id: string) {
-    if (!this.context.record) {
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
+    if (!record) {
       throw new Error('No record in context. This should never happen')
     }
-    return this.context.record.entry
+    return record.entry
       .map(({ resource }) => resource)
       .filter((composition) => composition.id === id)
       .filter(isCompositionOrCompositionHistory)
@@ -96,16 +98,17 @@ export default class FHIRAPI extends RESTDataSource<Context> {
       })
   }
   getDocumentReference(id: string) {
-    if (!this.context.record) {
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
+    if (!record) {
       throw new Error('No record in context. This should never happen')
     }
-    const reference = this.context.record.entry
+    const reference = record.entry
       .map(({ resource }) => resource)
       .filter(isDocumentReference)
       .find((documentReference) => documentReference.id === id)
     if (reference) {
       return reference
     }
-    return this.get(`/DocumentReference/${id}`)
+    return this.get(`DocumentReference/${id}`)
   }
 }

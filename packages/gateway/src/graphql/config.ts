@@ -8,18 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { mapSchema, getDirective, MapperKind } from '@graphql-tools/utils'
+import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils'
 import {
-  Kind,
-  GraphQLScalarType,
   defaultFieldResolver,
+  GraphQLError,
+  GraphQLScalarType,
   GraphQLSchema,
-  GraphQLError
+  Kind
 } from 'graphql'
 
+import { ApolloServerOptions } from '@apollo/server'
+import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
+import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
+import { resolvers as eventsV2Resolvers } from '@gateway/v2-events/events/root-resolvers'
+import { eventResolvers as eventsV2TypeResolvers } from '@gateway/v2-events/events/type-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
-import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { typeResolvers as metricsTypeResolvers } from '@gateway/features/metrics/type-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
 import { resolvers as registrationRootResolvers } from '@gateway/features/registration/root-resolvers'
@@ -28,35 +32,25 @@ import { resolvers as roleRootResolvers } from '@gateway/features/role/root-reso
 import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
+import { resolvers as integrationResolver } from '@gateway/features/systems/root-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
-import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
-import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import {
   ISystemModelData,
   IUserModelData,
   userTypeResolvers
 } from '@gateway/features/user/type-resolvers'
-import { getUser, getSystem } from '@gateway/features/user/utils'
+import { getSystem, getUser } from '@gateway/features/user/utils'
+import { Context } from '@gateway/graphql/context'
+import { AuthenticationError } from '@gateway/utils/graphql-errors'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 import { loadSchemaSync } from '@graphql-tools/load'
 import {
   addResolversToSchema,
   makeExecutableSchema
 } from '@graphql-tools/schema'
-import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { IResolvers } from 'graphql-tools'
 import { merge } from 'lodash'
-import LocationsAPI from '@gateway/features/fhir/locationsAPI'
-import DocumentsAPI from '@gateway/features/fhir/documentsAPI'
-import PaymentsAPI from '@gateway/features/fhir/paymentsAPI'
-import FHIRAPI from '@gateway/features/fhir/FHIRAPI'
-import { Context } from '@gateway/graphql/context'
-import PatientAPI from '@gateway/features/fhir/patientAPI'
-import MinioAPI from '@gateway/features/fhir/minioAPI'
-import { getAuthHeader } from '@opencrvs/commons/http'
-import { UsersAPI } from '@gateway/features/user/usersAPI'
-import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -67,6 +61,8 @@ interface IStringIndexSignatureInterface {
 type StringIndexed<T> = T & IStringIndexSignatureInterface
 
 export const resolvers: StringIndexed<IResolvers> = merge(
+  eventsV2Resolvers,
+  eventsV2TypeResolvers,
   notificationRootResolvers as IResolvers,
   registrationRootResolvers as IResolvers,
   locationRootResolvers as IResolvers,
@@ -241,23 +237,8 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
   })
 }
 
-export function getDataSources(): Context['dataSources'] {
-  return {
-    documentsAPI: new DocumentsAPI(),
-    paymentsAPI: new PaymentsAPI(),
-    locationsAPI: new LocationsAPI(),
-    usersAPI: new UsersAPI(),
-    fhirAPI: new FHIRAPI(),
-    patientAPI: new PatientAPI(),
-    minioAPI: new MinioAPI(),
-    metricsAPI: new MetricsAPI()
-  }
-}
-
-export const getApolloConfig = (): Config<Context> => {
-  const typeDefs = gql`
-    ${readFileSync(graphQLSchemaPath, 'utf8')}
-  `
+export const getApolloConfig = (): ApolloServerOptions<Context> => {
+  const typeDefs = readFileSync(graphQLSchemaPath, 'utf8')
   const schema = authSchemaTransformer(
     makeExecutableSchema({
       typeDefs,
@@ -267,15 +248,7 @@ export const getApolloConfig = (): Config<Context> => {
 
   return {
     schema,
-    introspection: true,
-    dataSources: getDataSources,
-    context: async ({ request }): Promise<Omit<Context, 'dataSources'>> => {
-      return {
-        request,
-        presignDocumentUrls: true,
-        headers: getAuthHeader(request)
-      }
-    }
+    introspection: true
   }
 }
 

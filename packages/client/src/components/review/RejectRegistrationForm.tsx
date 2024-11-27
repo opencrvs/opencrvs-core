@@ -10,17 +10,20 @@
  */
 import { FormFieldGenerator } from '@client/components/form'
 import {
+  archiveDeclaration,
   IDeclaration,
   IPayload,
-  SUBMISSION_STATUS,
-  archiveDeclaration
+  SUBMISSION_STATUS
 } from '@client/declarations'
 import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/reject'
-import styled from 'styled-components'
-import { Event } from '@client/utils/gateway'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { EventType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   IRejectRegistrationForm,
   rejectRegistration
@@ -28,16 +31,13 @@ import {
 import { IStoreState } from '@opencrvs/client/src/store'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { isEmpty } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { isEmpty } from 'lodash'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { UserDetails } from '@client/utils/userUtils'
 import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 import * as routes from '@client/navigation/routes'
+import styled from 'styled-components'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -50,7 +50,7 @@ interface IState {
 interface IProps {
   draftId: string
   declaration: IDeclaration
-  event: Event
+  event: EventType
   duplicate?: boolean
   onClose: () => void
   confirmRejectionEvent: (

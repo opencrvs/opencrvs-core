@@ -43,8 +43,7 @@ import {
   clearUserFormData,
   modifyUserFormData,
   submitFail,
-  submitSuccess,
-  TOAST_MESSAGES
+  submitSuccess
 } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { SuccessButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
@@ -75,7 +74,6 @@ import {
   CreateOrUpdateUserMutation,
   CreateOrUpdateUserMutationVariables
 } from '@client/utils/gateway'
-import { showSubmitFormSuccessToast } from '@client/notification/actions'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 

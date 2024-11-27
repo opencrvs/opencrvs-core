@@ -8,4 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const V2_ROOT_ROUTE = '/v2'
+import { z } from 'zod'
+
+export const TranslationConfig = z.object({
+  id: z
+    .string()
+    .describe(
+      'The identifier of the translation referred in translation CSV files'
+    ),
+  defaultMessage: z.string().describe('Default translation message'),
+  description: z
+    .string()
+    .describe(
+      'Describe the translation for a translator to be able to identify it.'
+    )
+})

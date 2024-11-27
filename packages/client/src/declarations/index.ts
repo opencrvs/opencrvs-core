@@ -21,7 +21,7 @@ import {
 } from '@client/forms'
 import {
   Attachment,
-  Event,
+  EventType,
   History,
   Query,
   RegStatus,
@@ -222,7 +222,7 @@ export interface IDeclaration {
   modifiedOn?: number
   eventType?: string
   review?: boolean
-  event: Event
+  event: EventType
   registrationStatus?: RegStatus
   submissionStatus?: string
   downloadStatus?: DOWNLOAD_STATUS
@@ -406,7 +406,7 @@ interface IDownloadDeclarationSuccess {
   payload: {
     queryData: any
     form: {
-      [key in Event]: IForm
+      [key in EventType]: IForm
     }
     client: ApolloClient<{}>
     offlineData?: IOfflineData
@@ -499,15 +499,15 @@ const initialState: IDeclarationsState = {
 
 /* Need to add mappings for events here */
 const QueryMapper = {
-  [Event.Birth]: getBirthQueryMappings,
-  [Event.Death]: getDeathQueryMappings,
-  [Event.Marriage]: getMarriageQueryMappings
+  [EventType.Birth]: getBirthQueryMappings,
+  [EventType.Death]: getDeathQueryMappings,
+  [EventType.Marriage]: getMarriageQueryMappings
 }
-const getQueryMapping = (event: Event, action: DeclarationAction) => {
+const getQueryMapping = (event: EventType, action: DeclarationAction) => {
   return QueryMapper[event] && QueryMapper[event](action)
 }
 
-export function createDeclaration(event: Event, initialData?: IFormData) {
+export function createDeclaration(event: EventType, initialData?: IFormData) {
   return {
     id: uuid(),
     data: initialData || {},
@@ -517,7 +517,7 @@ export function createDeclaration(event: Event, initialData?: IFormData) {
 }
 
 export function makeDeclarationReadyToDownload(
-  event: Event,
+  event: EventType,
   compositionId: string,
   action: DeclarationAction
 ): IDeclaration {
@@ -533,7 +533,7 @@ export function makeDeclarationReadyToDownload(
 export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
-  event: Event,
+  event: EventType,
   status?: RegStatus,
   duplicates?: IDuplicates[]
 ): IDeclaration {
@@ -1024,7 +1024,7 @@ export async function deleteDeclarationByUser(
 }
 
 export function downloadDeclaration(
-  event: Event,
+  event: EventType,
   compositionId: string,
   action: DeclarationAction,
   client: ApolloClient<{}>

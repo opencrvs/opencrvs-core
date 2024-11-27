@@ -29,7 +29,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
@@ -187,7 +187,7 @@ interface ISearchParams {
   GraphQL Queries in PerformanceHome.tsx also require BIRTH/DEATH.
   Due to that we had to use toUpperCase where it is required.
   */
-  event: Event
+  event: EventType
   locationId: string
   timeStart: string
   timeEnd: string
@@ -236,7 +236,7 @@ const PerformanceHomeComponent = (props: Props) => {
     timeEnd:
       (parsedSearch.timeEnd && new Date(parsedSearch.timeEnd)) ||
       new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
-    event: parsedSearch.event || Event.Birth
+    event: parsedSearch.event || EventType.Birth
   }
 
   const selectedLocation = !searchParams.locationId
@@ -349,7 +349,7 @@ const PerformanceHomeComponent = (props: Props) => {
               generatePerformanceHomeUrl({
                 timeStart: searchParams.timeStart,
                 timeEnd: searchParams.timeEnd,
-                event: option.value as Event,
+                event: option.value as EventType,
                 locationId
               })
             )
@@ -361,11 +361,11 @@ const PerformanceHomeComponent = (props: Props) => {
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
-              value: Event.Birth
+              value: EventType.Birth
             },
             {
               label: intl.formatMessage(messages.eventOptionForDeaths),
-              value: Event.Death
+              value: EventType.Death
             }
           ]}
         />

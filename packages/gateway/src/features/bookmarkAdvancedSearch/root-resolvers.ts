@@ -22,10 +22,8 @@ export const resolvers: GQLResolver = {
     ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar or registration agent'
-          )
+        throw new Error(
+          'Advanced search is only allowed for registrar or registration agent'
         )
       }
 
@@ -39,10 +37,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 201) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user management service. Couldn't bookmark advanced search.`
-          )
+        throw new Error(
+          `Something went wrong on user management service. Couldn't bookmark advanced search.`
         )
       }
       const response = await res.json()
@@ -55,10 +51,8 @@ export const resolvers: GQLResolver = {
     ) {
       // Only registrar or registration agent should be able to search user
       if (!inScope(authHeader, ['register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar or registration agent'
-          )
+        throw new Error(
+          'Advanced search is only allowed for registrar or registration agent'
         )
       }
 
@@ -77,10 +71,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user management service. Couldn't unbookmarked advanced search.`
-          )
+        throw new Error(
+          `Something went wrong on user management service. Couldn't unbookmarked advanced search.`
         )
       }
       const response = res.json()

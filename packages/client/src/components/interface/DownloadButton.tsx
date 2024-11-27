@@ -8,42 +8,42 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import styled from 'styled-components'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { IActionObject } from '@opencrvs/components/lib/Workqueue'
-import { Download } from '@opencrvs/components/lib/icons'
-import { Button } from '@opencrvs/components/lib/Button'
-import { connect } from 'react-redux'
-import {
-  downloadDeclaration,
-  DOWNLOAD_STATUS,
-  unassignDeclaration,
-  deleteDeclaration as deleteDeclarationAction
-} from '@client/declarations'
-import { Action } from '@client/forms'
-import { Event, SystemRoleType } from '@client/utils/gateway'
 import {
   ApolloClient,
   InternalRefetchQueriesInclude,
   useApolloClient
 } from '@apollo/client'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import type { AssignmentData } from '@client/utils/gateway'
-import { IStoreState } from '@client/store'
 import { AvatarSmall } from '@client/components/Avatar'
+import {
+  deleteDeclaration as deleteDeclarationAction,
+  DOWNLOAD_STATUS,
+  downloadDeclaration,
+  unassignDeclaration
+} from '@client/declarations'
+import { Action } from '@client/forms'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import { IStoreState } from '@client/store'
+import { useOnlineStatus } from '@client/utils'
 import {
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
-import { Dispatch } from 'redux'
-import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import type { AssignmentData } from '@client/utils/gateway'
+import { EventType, SystemRoleType } from '@client/utils/gateway'
+import { Button } from '@opencrvs/components/lib/Button'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { IActionObject } from '@opencrvs/components/lib/Workqueue'
+import { Download } from '@opencrvs/components/lib/icons'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
-import { useOnlineStatus } from '@client/utils'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import * as React from 'react'
+import { IntlShape, MessageDescriptor, useIntl } from 'react-intl'
+import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
+import { Dispatch } from 'redux'
+import styled from 'styled-components'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -229,7 +229,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   const download = useCallback(() => {
     const { event, compositionId, action } = downloadConfigs
     downloadDeclaration(
-      event.toLowerCase() as unknown as Event,
+      event.toLowerCase() as unknown as EventType,
       compositionId,
       action,
       client
@@ -388,7 +388,7 @@ const mapDispatchToProps = (
   ownProps: DownloadButtonProps
 ): IDispatchProps => ({
   downloadDeclaration: (
-    event: Event,
+    event: EventType,
     compositionId: string,
     action: Action,
     client: ApolloClient<any>

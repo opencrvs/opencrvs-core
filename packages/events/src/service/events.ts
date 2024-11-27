@@ -10,27 +10,20 @@
  */
 
 import { getClient } from '@events/storage/mongodb'
-import {
-  getUUID,
-  EventInput,
-  Event,
-  ActionInput,
-  ActionType
-} from '@opencrvs/commons'
+import { getUUID, ActionType } from '@opencrvs/commons'
+import { EventInput, ActionInput } from '@events/schema'
 import { z } from 'zod'
+import { EventDocument } from '@events/schema/EventDocument'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-const EventWithTransactionId = Event.extend({
-  transactionId: z.string()
-})
+export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const document = await collection.findOne({ transactionId })
 
@@ -45,7 +38,7 @@ class EventNotFoundError extends Error {
 export async function getEventById(id: string) {
   const db = await getClient()
 
-  const collection = db.collection<Event>('events')
+  const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
   if (!event) {
     throw new EventNotFoundError(id)
@@ -55,16 +48,17 @@ export async function getEventById(id: string) {
 
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
+  createdBy: string,
   transactionId: string
-): Promise<Event> {
+) {
   const existingEvent = await getEventByTransactionId(transactionId)
+
   if (existingEvent) {
     return existingEvent
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const now = new Date()
   const id = getUUID()
@@ -79,7 +73,7 @@ export async function createEvent(
       {
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy: '123-123-123',
+        createdBy,
         fields: []
       }
     ]
@@ -88,22 +82,23 @@ export async function createEvent(
   return getEventById(id)
 }
 
-export async function addAction(eventId: string, action: ActionInput) {
+export async function addAction(
+  input: ActionInput,
+  { eventId, createdBy }: { eventId: string; createdBy: string }
+) {
   const db = await getClient()
-  const collection = db.collection<Event>('events')
-
   const now = new Date()
 
-  await collection.updateOne(
+  await db.collection<EventDocument>('events').updateOne(
     {
       id: eventId
     },
     {
       $push: {
         actions: {
-          ...action,
-          createdAt: now,
-          createdBy: '123-123-123'
+          ...input,
+          createdBy,
+          createdAt: now
         }
       }
     }
@@ -112,9 +107,7 @@ export async function addAction(eventId: string, action: ActionInput) {
   return getEventById(eventId)
 }
 
-export async function patchEvent(
-  event: z.infer<typeof EventInputWithId>
-): Promise<Event> {
+export async function patchEvent(event: EventInputWithId) {
   const existingEvent = await getEventById(event.id)
 
   if (!existingEvent) {
@@ -122,8 +115,7 @@ export async function patchEvent(
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const now = new Date()
 

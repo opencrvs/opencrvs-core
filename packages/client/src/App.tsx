@@ -14,7 +14,6 @@ import { ProtectedPage } from '@client/components/ProtectedPage'
 import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
-import TransitionWrapper from '@client/components/TransitionWrapper'
 import * as routes from '@client/navigation/routes'
 import styled from 'styled-components'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
@@ -34,12 +33,7 @@ import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 
 import * as React from 'react'
-import {
-  createBrowserRouter,
-  Route,
-  Routes,
-  useLocation
-} from 'react-router-dom'
+import { createBrowserRouter, Route, Routes } from 'react-router-dom'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
@@ -65,8 +59,8 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
-import { Workqueues } from './v2-events/workqueues'
-import { V2_ROOT_ROUTE } from './v2-events/routes'
+import { V2_ROOT_ROUTE } from './v2-events/routes/routes'
+import { Workqueues } from './v2-events/features/workqueues'
 
 const MainSection = styled.section`
   flex-grow: 8;
@@ -86,8 +80,6 @@ export const router = createBrowserRouter([
 ])
 
 export function App() {
-  const location = useLocation()
-
   return (
     <ScrollToTop>
       <SessionExpireConfirmation />
@@ -98,350 +90,349 @@ export function App() {
               unprotectedRouteElements={['documents', 'affidavit']}
             >
               <ReloadModal />
-              <TransitionWrapper location={location}>
-                <Routes>
-                  <Route path={routes.HOME} Component={Home} />
-                  <Route
-                    path={routes.SELECT_VITAL_EVENT}
-                    Component={SelectVitalEvent}
-                  />
-                  <Route
-                    path={routes.SELECT_DEATH_INFORMANT}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.SELECT_MARRIAGE_INFORMANT}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_BIRTH_PARENT_FORM}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.VIEW_VERIFY_CERTIFICATE}
-                    Component={VerifyCertificatePage}
-                  />
-                  <Route
-                    path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_DEATH_FORM}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_DEATH_FORM_PAGE}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_MARRIAGE_FORM}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_DEATH_FORM_PAGE_GROUP}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_MARRIAGE_FORM_PAGE}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP}
-                    Component={DeclarationForm}
-                  />
-                  <Route
-                    path={routes.REVIEW_EVENT_PARENT_FORM_PAGE}
-                    Component={ReviewForm}
-                  />
-                  <Route
-                    path={routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP}
-                    Component={ReviewForm}
-                  />
-                  <Route
-                    path={routes.REVIEW_CORRECTION}
-                    Component={ReviewCorrection}
-                  />
-                  <Route path={routes.REGISTRAR_HOME} Component={OfficeHome} />
-                  <Route
-                    path={routes.REGISTRAR_HOME_TAB}
-                    Component={OfficeHome}
-                  />
-                  <Route
-                    path={routes.REGISTRAR_HOME_TAB_PAGE}
-                    Component={OfficeHome}
-                  />
 
-                  <Route
-                    path={routes.ALL_USER_EMAIL}
-                    element={
-                      <ProtectedRoute
-                        roles={[SystemRoleType.NationalSystemAdmin]}
-                      >
-                        <AllUserEmail />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path={routes.ADVANCED_SEARCH}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.LocalRegistrar,
-                          SystemRoleType.RegistrationAgent,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <AdvancedSearchConfig />
-                      </ProtectedRoute>
-                    }
-                  />
+              <Routes>
+                <Route path={routes.HOME} Component={Home} />
+                <Route
+                  path={routes.SELECT_VITAL_EVENT}
+                  Component={SelectVitalEvent}
+                />
+                <Route
+                  path={routes.SELECT_DEATH_INFORMANT}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.SELECT_MARRIAGE_INFORMANT}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_BIRTH_PARENT_FORM}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.VIEW_VERIFY_CERTIFICATE}
+                  Component={VerifyCertificatePage}
+                />
+                <Route
+                  path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_DEATH_FORM}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_DEATH_FORM_PAGE}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_MARRIAGE_FORM}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_DEATH_FORM_PAGE_GROUP}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_MARRIAGE_FORM_PAGE}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.DRAFT_MARRIAGE_FORM_PAGE_GROUP}
+                  Component={DeclarationForm}
+                />
+                <Route
+                  path={routes.REVIEW_EVENT_PARENT_FORM_PAGE}
+                  Component={ReviewForm}
+                />
+                <Route
+                  path={routes.REVIEW_EVENT_PARENT_FORM_PAGE_GROUP}
+                  Component={ReviewForm}
+                />
+                <Route
+                  path={routes.REVIEW_CORRECTION}
+                  Component={ReviewCorrection}
+                />
+                <Route path={routes.REGISTRAR_HOME} Component={OfficeHome} />
+                <Route
+                  path={routes.REGISTRAR_HOME_TAB}
+                  Component={OfficeHome}
+                />
+                <Route
+                  path={routes.REGISTRAR_HOME_TAB_PAGE}
+                  Component={OfficeHome}
+                />
 
-                  <Route
-                    path={routes.ADVANCED_SEARCH_RESULT}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.LocalRegistrar,
-                          SystemRoleType.RegistrationAgent,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <AdvancedSearchResult />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path={routes.DECLARATION_RECORD_AUDIT}
-                    Component={RecordAudit}
-                  />
-                  <Route path={routes.SEARCH} Component={SearchResult} />
-                  <Route path={routes.SEARCH_RESULT} Component={SearchResult} />
-                  <Route
-                    path={routes.CERTIFICATE_COLLECTOR}
-                    Component={CollectorForm}
-                  />
-                  <Route
-                    path={routes.VERIFY_COLLECTOR}
-                    Component={VerifyCollector}
-                  />
-                  <Route
-                    path={routes.VERIFY_CORRECTOR}
-                    Component={VerifyCorrector}
-                  />
-                  <Route
-                    path={routes.REVIEW_CERTIFICATE}
-                    Component={ReviewCertificate}
-                  />
-                  <Route
-                    path={routes.PRINT_CERTIFICATE_PAYMENT}
-                    Component={Payment}
-                  />
-                  <Route
-                    path={routes.CERTIFICATE_CORRECTION}
-                    Component={CorrectionForm}
-                  />
-                  <Route
-                    path={routes.CERTIFICATE_CORRECTION_REVIEW}
-                    Component={CorrectionReviewForm}
-                  />
-                  <Route path={routes.SETTINGS} Component={SettingsPage} />
+                <Route
+                  path={routes.ALL_USER_EMAIL}
+                  element={
+                    <ProtectedRoute
+                      roles={[SystemRoleType.NationalSystemAdmin]}
+                    >
+                      <AllUserEmail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={routes.ADVANCED_SEARCH}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.LocalRegistrar,
+                        SystemRoleType.RegistrationAgent,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <AdvancedSearchConfig />
+                    </ProtectedRoute>
+                  }
+                />
 
-                  <Route
-                    path={routes.TEAM_SEARCH}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.RegistrationAgent,
-                          SystemRoleType.LocalRegistrar,
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement
-                        ]}
-                      >
-                        <TeamSearch />
-                      </ProtectedRoute>
-                    }
-                  />
+                <Route
+                  path={routes.ADVANCED_SEARCH_RESULT}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.LocalRegistrar,
+                        SystemRoleType.RegistrationAgent,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <AdvancedSearchResult />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={routes.DECLARATION_RECORD_AUDIT}
+                  Component={RecordAudit}
+                />
+                <Route path={routes.SEARCH} Component={SearchResult} />
+                <Route path={routes.SEARCH_RESULT} Component={SearchResult} />
+                <Route
+                  path={routes.CERTIFICATE_COLLECTOR}
+                  Component={CollectorForm}
+                />
+                <Route
+                  path={routes.VERIFY_COLLECTOR}
+                  Component={VerifyCollector}
+                />
+                <Route
+                  path={routes.VERIFY_CORRECTOR}
+                  Component={VerifyCorrector}
+                />
+                <Route
+                  path={routes.REVIEW_CERTIFICATE}
+                  Component={ReviewCertificate}
+                />
+                <Route
+                  path={routes.PRINT_CERTIFICATE_PAYMENT}
+                  Component={Payment}
+                />
+                <Route
+                  path={routes.CERTIFICATE_CORRECTION}
+                  Component={CorrectionForm}
+                />
+                <Route
+                  path={routes.CERTIFICATE_CORRECTION_REVIEW}
+                  Component={CorrectionReviewForm}
+                />
+                <Route path={routes.SETTINGS} Component={SettingsPage} />
 
-                  <Route
-                    path={routes.TEAM_USER_LIST}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.RegistrationAgent,
-                          SystemRoleType.LocalRegistrar,
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalRegistrar,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement
-                        ]}
-                      >
-                        <UserList />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path={routes.SYSTEM_LIST}
-                    element={
-                      <ProtectedRoute
-                        roles={[SystemRoleType.NationalSystemAdmin]}
-                      >
-                        <SystemList />
-                      </ProtectedRoute>
-                    }
-                  />
+                <Route
+                  path={routes.TEAM_SEARCH}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.RegistrationAgent,
+                        SystemRoleType.LocalRegistrar,
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement
+                      ]}
+                    >
+                      <TeamSearch />
+                    </ProtectedRoute>
+                  }
+                />
 
-                  <Route path={routes.CREATE_USER} Component={CreateNewUser} />
-                  <Route
-                    path={routes.CREATE_USER_ON_LOCATION}
-                    Component={CreateNewUser}
-                  />
-                  <Route
-                    path={routes.CREATE_USER_SECTION}
-                    Component={CreateNewUser}
-                  />
-                  <Route
-                    path={routes.REVIEW_USER_FORM}
-                    Component={CreateNewUser}
-                  />
-                  <Route
-                    path={routes.REVIEW_USER_DETAILS}
-                    Component={CreateNewUser}
-                  />
-                  <Route
-                    path={routes.PERFORMANCE_HOME}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.RegistrationAgent,
-                          SystemRoleType.LocalRegistrar,
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <PerformanceHome />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path={routes.PERFORMANCE_STATISTICS}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <PerformanceStatistics />
-                      </ProtectedRoute>
-                    }
-                  />
+                <Route
+                  path={routes.TEAM_USER_LIST}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.RegistrationAgent,
+                        SystemRoleType.LocalRegistrar,
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalRegistrar,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement
+                      ]}
+                    >
+                      <UserList />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={routes.SYSTEM_LIST}
+                  element={
+                    <ProtectedRoute
+                      roles={[SystemRoleType.NationalSystemAdmin]}
+                    >
+                      <SystemList />
+                    </ProtectedRoute>
+                  }
+                />
 
-                  <Route
-                    path={routes.PERFORMANCE_LEADER_BOARDS}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <Leaderboards />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path={routes.PERFORMANCE_DASHBOARD}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <PerformanceDashboard />
-                      </ProtectedRoute>
-                    }
-                  />
+                <Route path={routes.CREATE_USER} Component={CreateNewUser} />
+                <Route
+                  path={routes.CREATE_USER_ON_LOCATION}
+                  Component={CreateNewUser}
+                />
+                <Route
+                  path={routes.CREATE_USER_SECTION}
+                  Component={CreateNewUser}
+                />
+                <Route
+                  path={routes.REVIEW_USER_FORM}
+                  Component={CreateNewUser}
+                />
+                <Route
+                  path={routes.REVIEW_USER_DETAILS}
+                  Component={CreateNewUser}
+                />
+                <Route
+                  path={routes.PERFORMANCE_HOME}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.RegistrationAgent,
+                        SystemRoleType.LocalRegistrar,
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <PerformanceHome />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={routes.PERFORMANCE_STATISTICS}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <PerformanceStatistics />
+                    </ProtectedRoute>
+                  }
+                />
 
-                  <Route
-                    path={routes.VS_EXPORTS}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <VSExport />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path={routes.EVENT_COMPLETENESS_RATES}
-                    Component={CompletenessRates}
-                  />
-                  <Route
-                    path={routes.WORKFLOW_STATUS}
-                    Component={WorkflowStatus}
-                  />
-                  <Route
-                    path={routes.PERFORMANCE_FIELD_AGENT_LIST}
-                    Component={FieldAgentList}
-                  />
-                  <Route path={routes.USER_PROFILE} Component={UserAudit} />
-                  <Route path={routes.VIEW_RECORD} Component={ViewRecord} />
-                  <Route
-                    path={routes.PERFORMANCE_REGISTRATIONS_LIST}
-                    Component={RegistrationList}
-                  />
+                <Route
+                  path={routes.PERFORMANCE_LEADER_BOARDS}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <Leaderboards />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={routes.PERFORMANCE_DASHBOARD}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <PerformanceDashboard />
+                    </ProtectedRoute>
+                  }
+                />
 
-                  <Route
-                    path={routes.ORGANISATIONS_INDEX}
-                    element={
-                      <ProtectedRoute
-                        roles={[
-                          SystemRoleType.RegistrationAgent,
-                          SystemRoleType.LocalRegistrar,
-                          SystemRoleType.LocalSystemAdmin,
-                          SystemRoleType.NationalSystemAdmin,
-                          SystemRoleType.PerformanceManagement,
-                          SystemRoleType.NationalRegistrar
-                        ]}
-                      >
-                        <AdministrativeLevels />
-                      </ProtectedRoute>
-                    }
-                  />
+                <Route
+                  path={routes.VS_EXPORTS}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <VSExport />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path={routes.EVENT_COMPLETENESS_RATES}
+                  Component={CompletenessRates}
+                />
+                <Route
+                  path={routes.WORKFLOW_STATUS}
+                  Component={WorkflowStatus}
+                />
+                <Route
+                  path={routes.PERFORMANCE_FIELD_AGENT_LIST}
+                  Component={FieldAgentList}
+                />
+                <Route path={routes.USER_PROFILE} Component={UserAudit} />
+                <Route path={routes.VIEW_RECORD} Component={ViewRecord} />
+                <Route
+                  path={routes.PERFORMANCE_REGISTRATIONS_LIST}
+                  Component={RegistrationList}
+                />
 
-                  <Route
-                    path={routes.ISSUE_COLLECTOR}
-                    Component={IssueCertificate}
-                  />
-                  <Route
-                    path={routes.ISSUE_VERIFY_COLLECTOR}
-                    Component={VerifyCollector}
-                  />
-                  <Route
-                    path={routes.ISSUE_CERTIFICATE_PAYMENT}
-                    Component={IssuePayment}
-                  />
-                  <Route path={routes.PRINT_RECORD} Component={PrintRecord} />
-                  <Route path={V2_ROOT_ROUTE} Component={Workqueues} />
-                </Routes>
-              </TransitionWrapper>
+                <Route
+                  path={routes.ORGANISATIONS_INDEX}
+                  element={
+                    <ProtectedRoute
+                      roles={[
+                        SystemRoleType.RegistrationAgent,
+                        SystemRoleType.LocalRegistrar,
+                        SystemRoleType.LocalSystemAdmin,
+                        SystemRoleType.NationalSystemAdmin,
+                        SystemRoleType.PerformanceManagement,
+                        SystemRoleType.NationalRegistrar
+                      ]}
+                    >
+                      <AdministrativeLevels />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path={routes.ISSUE_COLLECTOR}
+                  Component={IssueCertificate}
+                />
+                <Route
+                  path={routes.ISSUE_VERIFY_COLLECTOR}
+                  Component={VerifyCollector}
+                />
+                <Route
+                  path={routes.ISSUE_CERTIFICATE_PAYMENT}
+                  Component={IssuePayment}
+                />
+                <Route path={routes.PRINT_RECORD} Component={PrintRecord} />
+                <Route path={V2_ROOT_ROUTE} Component={Workqueues} />
+              </Routes>
             </ProtectedPage>
           </MainSection>
         </Page>

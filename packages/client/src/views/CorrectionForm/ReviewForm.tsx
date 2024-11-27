@@ -16,7 +16,7 @@ import { IStoreState } from '@client/store'
 import { CERTIFICATE_CORRECTION_REVIEW, HOME } from '@client/navigation/routes'
 import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { Navigate } from 'react-router-dom'
 import { RouteComponentProps, withRouter } from '@client/components/withRouter'
 
@@ -48,7 +48,7 @@ function mapStateToProps(
     (app) => app.id === declarationId
   )
 
-  const event = declaration?.event || Event.Birth
+  const event = declaration?.event || EventType.Birth
 
   const reviewForm = getEventReviewForm(state, event)
 

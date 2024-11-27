@@ -12,7 +12,7 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   constantsMessages,
   dynamicConstantsMessages,
@@ -185,7 +185,7 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 interface ISearchParams {
   locationId: string
   status?: keyof IStatusMapping
-  event?: Event
+  event?: EventType
 }
 
 interface WorkflowStatusProps extends WrappedComponentProps {}
@@ -725,7 +725,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                     timeStart: new Date(timeStart),
                     timeEnd: new Date(timeEnd),
                     status,
-                    event: value as Event
+                    event: value as EventType
                   })
                 )
               }}
