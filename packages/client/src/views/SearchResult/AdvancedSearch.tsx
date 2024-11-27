@@ -484,7 +484,9 @@ const DeathSection = () => {
 const AdvancedSearch = () => {
   const intl = useIntl()
   const { hasBirthSearchScopes, hasDeathSearchScopes } = usePermissions()
-  const activeTabId = hasBirthSearchScopes() ? TabId.BIRTH : TabId.DEATH
+  const [activeTabId, setActiveTabId] = useState(
+    hasBirthSearchScopes() ? TabId.BIRTH : TabId.DEATH
+  )
   const dispatch = useDispatch()
   const tabSections: IFormTabs<TabId>[] = [
     {
@@ -513,6 +515,7 @@ const AdvancedSearch = () => {
               sections={tabSections}
               activeTabId={activeTabId}
               onTabClick={(id: TabId) => {
+                setActiveTabId(id)
                 dispatch(
                   setAdvancedSearchParam({
                     ...advancedSearchInitialState,
