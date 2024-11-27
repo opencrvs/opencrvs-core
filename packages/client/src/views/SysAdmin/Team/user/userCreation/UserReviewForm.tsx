@@ -85,7 +85,6 @@ interface IUserReviewFormProps {
 }
 
 interface IDispatchProps {
-  submitForm: (variables: Record<string, any>) => void
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
   modify: (values: IFormSectionData) => void
@@ -127,7 +126,6 @@ const UserReviewFormComponent = ({
   formData,
   offlineCountryConfiguration,
   userId,
-  submitForm,
   section
 }: IFullProps & IDispatchProps) => {
   const navigate = useNavigate()
@@ -311,8 +309,6 @@ const UserReviewFormComponent = ({
     createOrUpdateUser({
       variables: variables as CreateOrUpdateUserMutationVariables
     })
-
-    submitForm(variables)
   }
 
   let title: string | undefined

@@ -154,7 +154,10 @@ export const UserAudit = () => {
   const { data, loading, error } = useQuery<
     GetUserQuery,
     GetUserQueryVariables
-  >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
+  >(GET_USER, {
+    variables: { userId: userId! },
+    fetchPolicy: 'cache-and-network'
+  })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
   const userRole =
     user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
