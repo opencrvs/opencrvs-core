@@ -26,7 +26,7 @@ import * as locationUtils from '@client/utils/locationUtils'
 import * as performanceUtils from '@client/views/SysAdmin/Performance/utils'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { StatusMapping } from '@client/views/SysAdmin/Performance/WorkflowStatus'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { History } from 'history'
 import { offlineDataReady } from '@client/offline/actions'
 import { vi, Mock } from 'vitest'
@@ -73,7 +73,7 @@ describe('Status wise registration count', () => {
       }
       component = await createTestComponent(
         <StatusWiseDeclarationCountView
-          selectedEvent={Event.Birth}
+          selectedEvent={EventType.Birth}
           data={data}
           isAccessibleOffice={true}
           statusMapping={StatusMapping}

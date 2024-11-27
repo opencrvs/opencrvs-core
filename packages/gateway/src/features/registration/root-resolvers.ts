@@ -34,14 +34,14 @@ import {
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
-import { UnassignError } from '@gateway/utils/unassignError'
+
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
   validateMarriageDeclarationAttachments
 } from '@gateway/utils/validators'
 import { checkUserAssignment } from '@gateway/authorisation'
-import { UserInputError } from 'apollo-server-hapi'
+
 import { setCollectorForPrintInAdvance } from '@gateway/features/registration/utils'
 import {
   archiveRegistration,
@@ -63,6 +63,7 @@ import {
   confirmRegistration
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
+import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
@@ -135,11 +136,12 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistrationForDownloading(
+        const record = await fetchRegistrationForDownloading(
           id,
           context.headers
         )
-        return context.record
+        context.dataSources.recordsAPI.setRecord(record)
+        return record
       } else {
         throw new Error('User does not have a register or validate scope')
       }
@@ -150,11 +152,12 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistrationForDownloading(
+        const record = await fetchRegistrationForDownloading(
           id,
           context.headers
         )
-        return context.record
+        context.dataSources.recordsAPI.setRecord(record)
+        return record
       } else {
         throw new Error('User does not have a register or validate scope')
       }
@@ -169,11 +172,12 @@ export const resolvers: GQLResolver = {
         hasScope(context.headers, 'validate') ||
         hasScope(context.headers, 'declare')
       ) {
-        context.record = await fetchRegistrationForDownloading(
+        const record = await fetchRegistrationForDownloading(
           id,
           context.headers
         )
-        return context.record
+        context.dataSources.recordsAPI.setRecord(record)
+        return record
       } else {
         throw new Error('User does not have a register or validate scope')
       }
@@ -207,17 +211,18 @@ export const resolvers: GQLResolver = {
       }
     },
     async fetchRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      context.record = await getRecordById(id, context.headers.Authorization)
-      return context.record
+      const record = await getRecordById(id, context.headers.Authorization)
+      context.dataSources.recordsAPI.setRecord(record)
+      return record
     },
     async fetchRegistrationForViewing(
       _,
       { id },
       context
     ): Promise<Saved<Bundle>> {
-      context.record = await viewDeclaration(id, context.headers)
-
-      return context.record
+      const record = await viewDeclaration(id, context.headers)
+      context.dataSources.recordsAPI.setRecord(record)
+      return record
     },
     async queryPersonByIdentifier(_, { identifier }, { headers: authHeader }) {
       if (
@@ -326,9 +331,9 @@ export const resolvers: GQLResolver = {
     async fetchRecordDetailsForVerification(_, { id }, context) {
       const token = await getAnonymousToken()
       context.headers.Authorization = `Bearer ${token}`
-      context.record = await verifyRegistration(id, context.headers)
-
-      return context.record
+      const record = await verifyRegistration(id, context.headers)
+      context.dataSources.recordsAPI.setRecord(record)
+      return record
     }
   },
 

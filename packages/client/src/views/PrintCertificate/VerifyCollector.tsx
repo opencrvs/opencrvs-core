@@ -14,7 +14,7 @@ import {
   modifyDeclaration,
   writeDeclaration
 } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
@@ -51,7 +51,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface IMatchParams {
   registrationId: string
-  eventType: Event
+  eventType: EventType
   collector: string
 }
 

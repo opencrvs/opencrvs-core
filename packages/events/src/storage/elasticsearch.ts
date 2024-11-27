@@ -8,12 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ApolloError } from 'apollo-server-errors'
+import * as elasticsearch from '@elastic/elasticsearch'
+import { env } from '@events/environment'
 
-export class UnassignError extends ApolloError {
-  constructor(message: string) {
-    super(message, 'UNASSIGNED')
+let client: elasticsearch.Client
 
-    Object.defineProperty(this, 'name', { value: 'UnassignError' })
+export const getOrCreateClient = () => {
+  if (!client) {
+    return new elasticsearch.Client({
+      node: env.ES_HOST
+    })
   }
+
+  return client
 }

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { ILanguageState } from '@client/i18n/reducer'
 import {
   AdminStructure,
   CRVSOffice,
@@ -15,21 +16,20 @@ import {
   ILocation,
   IOfflineData
 } from '@client/offline/reducer'
-import { ILanguageState } from '@client/i18n/reducer'
+import { System } from '@client/utils/gateway'
 import {
-  ILocationDataResponse,
-  IFacilitiesDataResponse,
-  IContentResponse,
-  IApplicationConfigResponse,
+  CertificateConfiguration,
   IApplicationConfig,
   IApplicationConfigAnonymous,
-  LoadFormsResponse,
-  LoadValidatorsResponse,
+  IApplicationConfigResponse,
+  IContentResponse,
+  IFacilitiesDataResponse,
+  ILocationDataResponse,
   LoadConditionalsResponse,
+  LoadFormsResponse,
   LoadHandlebarHelpersResponse,
-  CertificateConfiguration
+  LoadValidatorsResponse
 } from '@client/utils/referenceApi'
-import { System } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 
 const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig } from '@opencrvs/commons'
+import { EventConfig } from '@opencrvs/commons/client'
 
 export const tennisClubMembershipEvent = {
   id: 'TENNIS_CLUB_MEMBERSHIP',

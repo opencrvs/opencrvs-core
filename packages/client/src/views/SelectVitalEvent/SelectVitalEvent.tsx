@@ -19,7 +19,7 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
@@ -36,7 +36,7 @@ import {
   createDeclaration
 } from '@client/declarations'
 
-type GoToType = '' | Event
+type GoToType = '' | EventType
 
 const SelectVitalEventView = (
   props: IntlShapeProps & {
@@ -65,19 +65,19 @@ const SelectVitalEventView = (
       return setNoEventSelectedError(true)
     }
     let declaration: IDeclaration
-    switch (goTo as Event) {
-      case Event.Birth:
-        declaration = createDeclaration(Event.Birth)
+    switch (goTo as EventType) {
+      case EventType.Birth:
+        declaration = createDeclaration(EventType.Birth)
         storeDeclaration(declaration)
         goToBirthRegistrationAsParent(declaration.id)
         break
-      case Event.Death:
-        declaration = createDeclaration(Event.Death)
+      case EventType.Death:
+        declaration = createDeclaration(EventType.Death)
         storeDeclaration(declaration)
         goToDeathInformant(declaration.id)
         break
-      case Event.Marriage:
-        declaration = createDeclaration(Event.Marriage)
+      case EventType.Marriage:
+        declaration = createDeclaration(EventType.Marriage)
         storeDeclaration(declaration)
         goToMarriageInformant(declaration.id)
         break
@@ -148,11 +148,11 @@ const SelectVitalEventView = (
             key="birthevent"
             name="birthevent"
             label={intl.formatMessage(constantsMessages.birth)}
-            value={Event.Birth}
+            value={EventType.Birth}
             id="select_birth_event"
-            selected={goTo === Event.Birth ? Event.Birth : ''}
+            selected={goTo === EventType.Birth ? EventType.Birth : ''}
             onChange={() => {
-              setGoTo(Event.Birth)
+              setGoTo(EventType.Birth)
               setNoEventSelectedError(false)
             }}
           />
@@ -162,11 +162,11 @@ const SelectVitalEventView = (
               key="deathevent"
               name="deathevent"
               label={intl.formatMessage(constantsMessages.death)}
-              value={Event.Death}
+              value={EventType.Death}
               id="select_death_event"
-              selected={goTo === Event.Death ? Event.Death : ''}
+              selected={goTo === EventType.Death ? EventType.Death : ''}
               onChange={() => {
-                setGoTo(Event.Death)
+                setGoTo(EventType.Death)
                 setNoEventSelectedError(false)
               }}
             />
@@ -177,11 +177,11 @@ const SelectVitalEventView = (
               key="marriagevent"
               name="marriageevent"
               label={intl.formatMessage(constantsMessages.marriage)}
-              value={Event.Marriage}
+              value={EventType.Marriage}
               id="select_marriage_event"
-              selected={goTo === Event.Marriage ? Event.Marriage : ''}
+              selected={goTo === EventType.Marriage ? EventType.Marriage : ''}
               onChange={() => {
-                setGoTo(Event.Marriage)
+                setGoTo(EventType.Marriage)
                 setNoEventSelectedError(false)
               }}
             />
