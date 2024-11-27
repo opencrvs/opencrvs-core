@@ -13,6 +13,7 @@ import { ActionDocument, CreatedAction, EventDocument } from '@events/schema'
 import { EventIndex, Status } from '@events/schema/EventIndex'
 import { getClient } from '@events/storage'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
+import { type estypes } from '@elastic/elasticsearch'
 import { Transform } from 'stream'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
@@ -62,7 +63,12 @@ export function eventToEventIndex(event: EventDocument): EventIndex {
   }
 }
 
-export function createIndex(indexName: string) {
+/*
+ * This type ensures all properties of EventIndex are present in the mapping
+ */
+type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
+
+function createIndex(indexName: string) {
   const client = getOrCreateClient()
   return client.indices.create({
     index: indexName,
@@ -79,7 +85,7 @@ export function createIndex(indexName: string) {
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
           data: { type: 'object', enabled: true }
-        }
+        } satisfies EventIndexMapping
       }
     }
   })
