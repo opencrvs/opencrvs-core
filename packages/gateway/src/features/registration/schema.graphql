@@ -570,13 +570,17 @@ input IdentifierInput {
 
 input ConfirmRegistrationInput {
   registrationNumber: String!
-  error: String
   identifiers: [IdentifierInput!]
 }
 
 input RejectRegistrationInput {
   reason: String!
   comment: String
+}
+
+input UpsertRegistrationIdentifierInput {
+  registrationNumber: String!
+  identifiers: [IdentifierInput!]
 }
 
 type Mutation {
@@ -657,4 +661,8 @@ type Mutation {
   ): ID!
   confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
   rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
+  upsertRegistrationIdentifier(
+    id: ID!
+    details: UpsertRegistrationIdentifierInput!
+  ): ID!
 }
