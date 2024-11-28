@@ -18,6 +18,7 @@ import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
 import { GQLUserInput } from '@gateway/graphql/schema'
+import { SysAdminAccessMap } from '@gateway/features/role/utils'
 
 export interface ITokenPayload {
   sub: string
@@ -37,60 +38,6 @@ export type scopeType =
   | 'sysadmin'
   | 'performance'
 
-type RoleSearchPayload = {
-  title?: string
-  value?: MongoComparisonObject
-  role?: string
-  active?: boolean
-  sortBy?: string
-  sortOrder?: string
-}
-
-type MongoComparisonObject = {
-  $eq?: string
-  $gt?: string
-  $lt?: string
-  $gte?: string
-  $lte?: string
-  $in?: string[]
-  $ne?: string
-  $nin?: string[]
-}
-
-const SYSTEM_ROLE_TYPES = [
-  'FIELD_AGENT',
-  'LOCAL_REGISTRAR',
-  'LOCAL_SYSTEM_ADMIN',
-  'NATIONAL_REGISTRAR',
-  'NATIONAL_SYSTEM_ADMIN',
-  'PERFORMANCE_MANAGEMENT',
-  'REGISTRATION_AGENT'
-] as const
-
-// Derive the type from SYSTEM_ROLE_TYPES
-type SystemRoleType = (typeof SYSTEM_ROLE_TYPES)[number]
-
-export const SysAdminAccessMap: Partial<
-  Record<SystemRoleType, SystemRoleType[]>
-> = {
-  LOCAL_SYSTEM_ADMIN: [
-    'FIELD_AGENT',
-    'LOCAL_REGISTRAR',
-    'LOCAL_SYSTEM_ADMIN',
-    'PERFORMANCE_MANAGEMENT',
-    'REGISTRATION_AGENT'
-  ],
-  NATIONAL_SYSTEM_ADMIN: [
-    'FIELD_AGENT',
-    'LOCAL_REGISTRAR',
-    'LOCAL_SYSTEM_ADMIN',
-    'NATIONAL_REGISTRAR',
-    'NATIONAL_SYSTEM_ADMIN',
-    'PERFORMANCE_MANAGEMENT',
-    'REGISTRATION_AGENT'
-  ]
-}
-
 export async function getUser(
   body: { [key: string]: string | undefined },
   authHeader: IAuthHeader
@@ -105,6 +52,7 @@ export async function getUser(
   })
   return await res.json()
 }
+
 export function canAssignRole(
   loggedInUserScope: Scope[],
   userToSave: GQLUserInput
