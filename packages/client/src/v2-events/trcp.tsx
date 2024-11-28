@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React from 'react'
 import { createTRPCReact } from '@trpc/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { httpBatchLink } from '@trpc/client'
@@ -18,10 +18,12 @@ import { getToken } from '@client/utils/authUtils'
 
 export const trpc = createTRPCReact<AppRouter>()
 
-export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
-  const [trpcClient] = useState(() =>
-    trpc.createClient({
+let queryClient: QueryClient
+let trpcClient: ReturnType<typeof trpc.createClient>
+
+const getTrpcClient = () => {
+  if (!trpcClient) {
+    trpcClient = trpc.createClient({
       links: [
         httpBatchLink({
           url: '/api/events',
@@ -34,7 +36,22 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         })
       ]
     })
-  )
+  }
+
+  return trpcClient
+}
+
+const getQueryClient = () => {
+  if (!queryClient) {
+    queryClient = new QueryClient()
+  }
+
+  return queryClient
+}
+
+export function TRPCProvider({ children }: { children: React.ReactNode }) {
+  const trpcClient = getTrpcClient()
+  const queryClient = getQueryClient()
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
