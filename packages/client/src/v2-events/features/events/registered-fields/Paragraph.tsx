@@ -12,8 +12,8 @@ import { FieldProps } from '@opencrvs/commons'
 import React from 'react'
 import { useIntl } from 'react-intl'
 
-export const Paragraph = ({ id, label }: FieldProps<'PARAGRAPH'>) => {
+export const Paragraph = ({ label }: FieldProps<'PARAGRAPH'>) => {
   const intl = useIntl()
 
-  return <p id={id}>{intl.formatMessage(label)}</p>
+  return <p>{intl.formatMessage(label)}</p>
 }
