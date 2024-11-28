@@ -25,7 +25,7 @@ import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons/client'
 import { TextField, Paragraph, DateField } from './registered-fields'
 
-export function PublishEventIndex() {
+export function EventFormWizardIndex() {
   const { eventType } = useParams<{ eventType: string }>()
 
   const { event, isLoading } = useEvent(eventType)
@@ -38,11 +38,11 @@ export function PublishEventIndex() {
     throw new Error('Event not found')
   }
 
-  return <PublishEvent event={event} />
+  return <EventFormWizard event={event} />
 }
 
-export function PublishEvent({ event }: { event: EventConfig }) {
-  const { title, pages, exit, saveAndExit, previous, next, page } =
+export function EventFormWizard({ event }: { event: EventConfig }) {
+  const { title, pages, exit, saveAndExit, previous, next, currentPageIndex } =
     useEventForm(event)
 
   return (
@@ -80,7 +80,7 @@ export function PublishEvent({ event }: { event: EventConfig }) {
         <Frame.Section>
           <Content title={title}>
             <FormWizard
-              currentPage={page}
+              currentPage={currentPageIndex}
               pages={pages}
               components={{
                 TEXT: TextField,

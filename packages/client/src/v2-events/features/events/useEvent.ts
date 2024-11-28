@@ -22,8 +22,8 @@ export function useEvent(eventIdentifier: string) {
 
   const event = data?.find((event) => event.id === eventIdentifier)
 
-  console.log('data', data)
   const noMatchingEvent = !isFetching && !event
+
   return {
     // We hide the distinction between fetching (all calls) and loading (initial call) from the caller.
     isLoading: isFetching,

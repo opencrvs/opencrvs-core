@@ -11,11 +11,10 @@
 
 import { useIntl } from 'react-intl'
 import { usePagination } from './usePagination'
-
 import { EventConfig } from '@opencrvs/commons'
 
 /**
- * Creates form methods (e.g. pagination) for the event
+ * Creates form methods (e.g. pagination) based on the event configuration
  */
 export function useEventForm(event: EventConfig) {
   const intl = useIntl()
@@ -30,15 +29,13 @@ export function useEventForm(event: EventConfig) {
 
   return {
     title: intl.formatMessage(event.label),
-    type: event.id,
+    eventId: event.id,
     exit,
     saveAndExit,
     previous,
     next,
     finish,
-    form: pages,
-    fields: pages[page].fields,
     pages,
-    page
+    currentPageIndex: page
   }
 }
