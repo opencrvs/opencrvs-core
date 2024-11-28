@@ -91,7 +91,9 @@ export function usePermissions() {
     return false
   }
 
-  const canEditUser = (user: Pick<User, 'primaryOffice' | 'role'>) => {
+  const canEditUser = (
+    user: Pick<User, 'primaryOffice'> & { role: { id: string } }
+  ) => {
     if (!userPrimaryOffice?.id) {
       return false
     }

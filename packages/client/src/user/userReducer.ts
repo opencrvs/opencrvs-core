@@ -32,11 +32,12 @@ import {
 import * as offlineActions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { IStoreState } from '@client/store'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { GET_USER, SEARCH_USERS } from '@client/user/queries'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { UserRole } from '@client/utils/gateway'
+import { UserRole, SCOPES } from '@client/utils/gateway'
 
 import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
 import { Action } from 'redux'
@@ -167,14 +168,19 @@ function submitFail(errorData: ApolloError): ISubmitFailedAction {
 export interface IRoleLoadedAction {
   type: typeof ROLES_LOADED
   payload: {
+    loggedInUserScopes: string[]
     userRoles: UserRole[]
   }
 }
 
-export function rolesLoaded(userRoles: UserRole[]): IRoleLoadedAction {
+export function rolesLoaded(
+  loggedInUserScopes: string[],
+  userRoles: UserRole[]
+): IRoleLoadedAction {
   return {
     type: ROLES_LOADED,
     payload: {
+      loggedInUserScopes,
       userRoles
     }
   }
@@ -250,9 +256,9 @@ export interface IUserFormState {
   userAuditForm: IUserAuditForm
 }
 
-const fetchRoles = async () => {
+const fetchRoles = async (getState: () => IStoreState) => {
   const roles = await roleQueries.fetchRoles()
-  return roles.data.getUserRoles
+  return [getState().profile.tokenPayload?.scope, roles.data.getUserRoles]
 }
 
 export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
@@ -268,7 +274,9 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           loadingRoles: true
         },
         Cmd.run(fetchRoles, {
-          successActionCreator: rolesLoaded
+          successActionCreator: ([loggedInUserScopes, roles]) =>
+            rolesLoaded(loggedInUserScopes, roles),
+          args: [Cmd.getState]
         })
       )
 
@@ -376,7 +384,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case ROLES_LOADED:
-      const { userRoles } = action.payload
+      const { loggedInUserScopes, userRoles } = action.payload
+
+      const roleScopes = (role: string) =>
+        userRoles.find(({ id }) => id === role)?.scopes ?? []
 
       const form = deserializeForm(getCreateUserForm(), validators)
 
@@ -389,10 +400,19 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           if (field.type === 'SELECT_WITH_OPTIONS') {
             return {
               ...field,
-              options: userRoles.map((role) => ({
-                value: role.id,
-                label: role.label
-              }))
+              options: userRoles
+                .filter(
+                  ({ id }) =>
+                    loggedInUserScopes.includes(SCOPES.USER_CREATE) ||
+                    (loggedInUserScopes.includes(
+                      SCOPES.USER_CREATE_MY_JURISDICTION
+                    ) &&
+                      !roleScopes(id).includes(SCOPES.USER_CREATE))
+                )
+                .map((role) => ({
+                  value: role.id,
+                  label: role.label
+                }))
             }
           }
           return field
