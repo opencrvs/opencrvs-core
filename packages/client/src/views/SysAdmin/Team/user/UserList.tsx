@@ -269,6 +269,9 @@ function UserListComponent(props: IProps) {
   )
   const deliveryMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
+  const isMultipleOfficeUnderJurisdiction =
+    offlineOffices.filter(canAccessOffice).length > 1
+
   const getParentLocation = ({ partOf }: ILocation) => {
     const parentLocationId = partOf.split('/')[1]
     return offlineCountryConfig.locations[parentLocationId]
@@ -578,19 +581,21 @@ function UserListComponent(props: IProps) {
 
   const LocationButton = (locationId: string) => {
     const buttons: React.ReactElement[] = []
-    buttons.push(
-      <LocationPicker
-        key={`location-picker-${locationId}`}
-        selectedLocationId={locationId}
-        onChangeLocation={(locationId) => {
-          props.goToTeamUserList(locationId)
-          setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
-        }}
-        locationFilter={(location) =>
-          location.type === 'CRVS_OFFICE' && canAccessOffice(location)
-        }
-      />
-    )
+    if (isMultipleOfficeUnderJurisdiction) {
+      buttons.push(
+        <LocationPicker
+          key={`location-picker-${locationId}`}
+          selectedLocationId={locationId}
+          onChangeLocation={(locationId) => {
+            props.goToTeamUserList(locationId)
+            setCurrentPageNumber(DEFAULT_PAGE_NUMBER)
+          }}
+          locationFilter={(location) =>
+            location.type === 'CRVS_OFFICE' && canAccessOffice(location)
+          }
+        />
+      )
+    }
     if (canAddOfficeUsers({ id: locationId })) {
       buttons.push(
         <Button
