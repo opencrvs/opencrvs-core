@@ -77,7 +77,7 @@ export const SCOPES = {
   RECORD_REGISTRATION_REVOKE: 'record.registration-revoke', // v1.8
   RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
     'record.registration-request-reinstatement', // v1.8
-  RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
+  RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate', // v1.8
   RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
   RECORD_REJECT_REGISTRATION: 'record.reject-registration',
 
