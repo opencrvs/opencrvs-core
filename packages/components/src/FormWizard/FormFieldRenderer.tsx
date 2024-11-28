@@ -10,21 +10,30 @@
  */
 import React from 'react'
 
-type ComponentsMap = Record<string, React.ComponentType<any>>
+/**
+ * @example
+ * { 'TEXT': TextField, 'PARAGRAPH': Paragraph, 'DATE': DateField }
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ComponentsMap = Record<string, React.ComponentType<any>>
 
-export type Field<C extends ComponentsMap> = {
-  [K in keyof C]: {
-    type: K
-  } & React.ComponentProps<C[K]>
-}[keyof C]
+/** A JSON field in the form wizard that will be rendered. The type is the component to render the field. */
+export type Field<CM extends ComponentsMap> = {
+  /** A required unique id to ensure React can track the field with key={id} */
+  id: string
+  /** The type of the field (e.g. TEXT, PARAGRAPH, DATE) */
+  type: keyof CM
+} & React.ComponentProps<CM[keyof CM]>
 
-export const FormFieldRenderer = <C extends ComponentsMap>({
+type FormFieldRendererProps<CM extends ComponentsMap> = {
+  fields: Array<Field<CM>>
+  components: CM
+}
+
+export const FormFieldRenderer = <CM extends ComponentsMap>({
   fields,
   components
-}: {
-  fields: Field<C>[]
-  components: C
-}) => {
+}: FormFieldRendererProps<CM>) => {
   return (
     <>
       {fields.map((field) => {
