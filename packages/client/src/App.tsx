@@ -77,7 +77,7 @@ import {
 import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
 import { TRPCProvider } from './v2-events/trcp'
-import { Events } from './v2-events/features/workqueues/events'
+import { Events } from './v2-events/features/events/EventSelection'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>

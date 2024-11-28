@@ -28,12 +28,8 @@ import {
 } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
-import {
-  V2_EVENT_ROUTE,
-  V2_EVENTS_ROUTE
-} from '@client/v2-events/routes/routes'
+import { V2_EVENTS_ROUTE } from '@client/v2-events/routes/routes'
 import { useDispatch } from 'react-redux'
-import { formatUrl } from './utils'
 
 export const Workqueues = () => {
   const dispatch = useDispatch()

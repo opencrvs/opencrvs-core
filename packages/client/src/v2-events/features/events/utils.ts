@@ -1,4 +1,5 @@
 /**
+ * Copied over from core. Used until react-router-dom is updated to v6
  * @deprecated
  */
 export function formatUrl(url: string, props: { [key: string]: string }) {
