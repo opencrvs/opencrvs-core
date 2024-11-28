@@ -25,6 +25,7 @@ import {
 } from '@client/declarations/utils'
 import { isUnderJurisdiction } from '@client/utils/locationUtils'
 import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 
 export const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
@@ -54,6 +55,10 @@ export function usePermissions() {
   const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
   const locations = useSelector(getOfflineData).locations
   const offices = useSelector(getOfflineData).offices
+  const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
+
+  const roleScopes = (role: string) =>
+    roles.find(({ id }) => id === role)?.scopes ?? []
 
   const hasScopes = (neededScopes: Scope[]) =>
     neededScopes.every((scope) => userScopes?.includes(scope))
@@ -86,7 +91,7 @@ export function usePermissions() {
     return false
   }
 
-  const canEditUser = (user: Pick<User, 'primaryOffice'>) => {
+  const canEditUser = (user: Pick<User, 'primaryOffice' | 'role'>) => {
     if (!userPrimaryOffice?.id) {
       return false
     }
@@ -94,6 +99,9 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
+      if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
+        return false
+      }
       return isUnderJurisdiction(
         userPrimaryOffice.id,
         user.primaryOffice.id,
