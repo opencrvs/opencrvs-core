@@ -19,7 +19,8 @@ import {
   Content,
   ContentSize,
   FormWizard,
-  Values
+  Values,
+  Spinner
 } from '@opencrvs/components'
 import { V2_EVENT_ROUTE } from '@client/v2-events/routes/routes'
 
@@ -30,7 +31,7 @@ import { RadioGroup } from './registered-fields/RadioGroup'
 
 export const Events = () => {
   const history = useHistory()
-  const { data } = trpc.config.get.useQuery()
+  const { data, isLoading } = trpc.config.get.useQuery()
 
   const events = data ?? []
 
@@ -63,36 +64,40 @@ export const Events = () => {
       <Frame.Layout>
         <Frame.Section>
           <Content size={ContentSize.SMALL} title="Event type">
-            <FormWizard
-              currentPage={0}
-              pages={[
-                {
-                  fields: [
-                    {
-                      name: 'eventType',
-                      type: 'RADIO_GROUP',
-                      required: true,
-                      label: {
-                        defaultMessage: 'Select an event',
-                        description: 'Select an event',
-                        id: 'event.select.label'
-                      },
-                      options: events.map((event) => ({
-                        value: event.id,
-                        label: event.label.defaultMessage
-                      }))
-                    }
-                  ]
-                }
-              ]}
-              components={{
-                RADIO_GROUP: RadioGroup
-              }}
-              defaultValues={{
-                eventType: events[0]?.id
-              }}
-              onSubmit={onSubmit}
-            />
+            {isLoading ? (
+              <Spinner id="event-type-spinner" />
+            ) : (
+              <FormWizard
+                currentPage={0}
+                pages={[
+                  {
+                    fields: [
+                      {
+                        name: 'eventType',
+                        type: 'RADIO_GROUP',
+                        required: true,
+                        label: {
+                          defaultMessage: 'Select an event',
+                          description: 'Select an event',
+                          id: 'event.select.label'
+                        },
+                        options: events.map((event) => ({
+                          value: event.id,
+                          label: event.label.defaultMessage
+                        }))
+                      }
+                    ]
+                  }
+                ]}
+                components={{
+                  RADIO_GROUP: RadioGroup
+                }}
+                defaultValues={{
+                  eventType: events[0]?.id
+                }}
+                onSubmit={onSubmit}
+              />
+            )}
           </Content>
         </Frame.Section>
       </Frame.Layout>
