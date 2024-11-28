@@ -19,8 +19,6 @@ export type ComponentsMap = Record<string, React.ComponentType<any>>
 
 /** A JSON field in the form wizard that will be rendered. The type is the component to render the field. */
 export type Field<CM extends ComponentsMap> = {
-  /** A required unique id to ensure React can track the field with key={id} */
-  id: string
   /** The type of the field (e.g. TEXT, PARAGRAPH, DATE) */
   type: keyof CM
 } & React.ComponentProps<CM[keyof CM]>
@@ -36,9 +34,9 @@ export const FormFieldRenderer = <CM extends ComponentsMap>({
 }: FormFieldRendererProps<CM>) => {
   return (
     <>
-      {fields.map((field) => {
+      {fields.map((field, index) => {
         const FormFieldComponent = components[field.type]
-        return <FormFieldComponent key={field.id} {...field} />
+        return <FormFieldComponent key={field.id ?? index} {...field} />
       })}
     </>
   )
