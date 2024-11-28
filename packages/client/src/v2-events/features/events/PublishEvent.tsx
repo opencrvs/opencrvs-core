@@ -70,7 +70,6 @@ export function PublishEvent() {
                 PARAGRAPH: Paragraph,
                 DATE: DateField
               }}
-              defaultValues={{}}
               onNextPage={next}
               onSubmit={(values) => console.log(values)}
             />

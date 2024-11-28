@@ -34,7 +34,7 @@ export const FormWizard = <
 }: {
   currentPage: number
   pages: Page[]
-  defaultValues: Values
+  defaultValues?: Values
   components: Component
   onNextPage: (() => void) | undefined
   onSubmit: (data: Values) => void
