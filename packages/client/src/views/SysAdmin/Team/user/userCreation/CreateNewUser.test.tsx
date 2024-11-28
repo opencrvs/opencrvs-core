@@ -9,33 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { roleQueries } from '@client/forms/user/query/queries'
+import { REVIEW_USER_FORM } from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
-import { userQueries, GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
   loginAsFieldAgent,
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
-  mockOfflineData,
-  mockRoles,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  mockRoles
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { GET_USER, userQueries } from '@client/user/queries'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { ReactWrapper } from 'enzyme'
-import * as React from 'react'
-import {
-  REVIEW_USER_FORM,
-  REVIEW_USER_DETAILS
-} from '@client/navigation/routes'
-import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { Router } from '@sentry/react/types/types'
+import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { vi, Mock, describe, expect } from 'vitest'
+import * as React from 'react'
+import { Mock, describe, expect, vi } from 'vitest'
 
 const mockUsers = {
   data: {
@@ -194,28 +191,16 @@ describe('create new user tests', () => {
     ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
-    history = s.history
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <CreateNewUser
-          match={{
-            // @ts-ignore
-            params: {
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.userForms.sections[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      ;({ component: testComponent } = await createTestComponent(
+        <CreateNewUser />,
+        { store }
+      ))
 
       loginAsFieldAgent(store)
     })
@@ -263,21 +248,10 @@ describe('create new user tests', () => {
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
-              sectionId: mockOfflineData.userForms.sections[1].id,
-              groupId: mockOfflineData.userForms.sections[1].groups[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      ;({ component: testComponent } = await createTestComponent(
+        <CreateNewUser />,
+        { store }
+      ))
     })
 
     it('renders review header', () => {
@@ -308,8 +282,9 @@ describe('create new user tests', () => {
 })
 
 describe('edit user tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   let component: ReactWrapper<{}, {}>
+  let router: Router
   const submitMock: Mock = vi.fn()
 
   const graphqlMocks = [
@@ -384,24 +359,14 @@ describe('edit user tests', () => {
 
   describe('when user is in update form page', () => {
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
-              userId: '5e835e4d81fbf01e4dc554db',
-              sectionId: UserSection.User,
-              groupId: 'user-view-group'
-            },
-            isExact: true,
-            path: REVIEW_USER_FORM,
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMocks }
-      )
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CreateNewUser />, {
+          store,
+          graphqlMocks: graphqlMocks
+        })
 
       component = testComponent
+      router = testRouter
     })
 
     it('clicking on continue button takes user signature attachment page', async () => {
@@ -414,20 +379,14 @@ describe('edit user tests', () => {
       component.update()
       await flushPromises()
 
-      expect(history.location.pathname).toContain('signature-attachment')
+      expect(router.state.location.pathname).toContain('signature-attachment')
     })
   })
 
   describe('when user is in review page', () => {
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <CreateNewUser
-          location={{
-            pathname: REVIEW_USER_DETAILS,
-            state: {},
-            hash: '',
-            search: ''
-          }}
           // @ts-ignore
           submitForm={submitMock}
           match={{
@@ -441,7 +400,7 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        { store, history, graphqlMocks }
+        { store, graphqlMocks }
       )
 
       // wait for mocked data to load mockedProvider
@@ -464,7 +423,7 @@ describe('edit user tests', () => {
       )
       changeButtonOfType.hostNodes().first().simulate('click')
       await flushPromises()
-      expect(history.location.hash).toBe('#device')
+      expect(router.state.location.hash).toBe('#device')
     })
 
     it('clicking confirm button starts submitting the form', async () => {

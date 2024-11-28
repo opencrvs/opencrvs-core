@@ -151,7 +151,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = vi.fn(() => 1554055200000)
 
     const sentForApprovalDate = '2019-10-20T11:03:20.660Z'
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -265,7 +265,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -291,7 +291,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('should show pagination if items more than 10 in Approval Tab', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -322,7 +322,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('should show pagination and page number as per need ', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -348,7 +348,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -476,7 +476,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {

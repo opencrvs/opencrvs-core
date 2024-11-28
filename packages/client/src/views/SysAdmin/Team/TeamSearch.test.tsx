@@ -10,6 +10,8 @@
  */
 
 import { TEAM_SEARCH } from '@client/navigation/routes'
+import { checkAuth } from '@client/profile/profileActions'
+import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
 import {
   createTestApp,
@@ -19,35 +21,32 @@ import {
   mockUserResponse,
   registerScopeToken
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
+import { merge } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { TeamSearch } from './TeamSearch'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { checkAuth } from '@client/profile/profileActions'
+import { createMemoryRouter } from 'react-router-dom'
 import { Mock, vi } from 'vitest'
-import { merge } from 'lodash'
-import { queries } from '@client/profile/queries'
+import { TeamSearch } from './TeamSearch'
 
 describe('Team search test', () => {
   let store: AppStore
-  let history: History<any>
+  let router: ReturnType<typeof createMemoryRouter>
 
   beforeAll(async () => {
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   describe('Team search without location in props', () => {
     let app: ReactWrapper
 
     beforeAll(async () => {
-      app = await createTestComponent(<TeamSearch history={history} />, {
-        store,
-        history
-      })
+      ;({ component: app, router } = await createTestComponent(<TeamSearch />, {
+        store
+      }))
       app.update()
     })
 
@@ -84,10 +83,10 @@ describe('Team search test', () => {
       app.update()
       flushPromises()
 
-      expect(parse(history.location.search)).toEqual({
+      expect(parse(router.state.location.search)).toEqual({
         locationId: '0d8474da-0361-4d32-979e-af91f012340a'
       })
-      expect(history.location.pathname).toContain('/team/users')
+      expect(router.state.location.pathname).toContain('/team/users')
     })
   })
 
@@ -143,7 +142,6 @@ describe('Team search test', () => {
     beforeEach(async () => {
       const testApp = await createTestApp()
       app = testApp.app
-      history = testApp.history
 
       history.replace(TEAM_SEARCH, {
         selectedLocation: {

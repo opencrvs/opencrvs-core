@@ -60,7 +60,7 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -82,7 +82,7 @@ describe('verify collector tests', () => {
     })
 
     it('should takes user go back', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}
@@ -244,7 +244,7 @@ describe('verify collector tests', () => {
     })
 
     it('when informant is collector', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <VerifyCollector
           history={history}

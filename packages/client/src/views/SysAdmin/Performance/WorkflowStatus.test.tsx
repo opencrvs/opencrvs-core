@@ -8,20 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { formatUrl } from '@client/navigation'
+import { WORKFLOW_STATUS } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
 import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { EventType } from '@client/utils/gateway'
-import {
-  IHistoryStateProps,
-  WorkflowStatus
-} from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
-import { createBrowserHistory, createLocation, History } from 'history'
+import { History } from 'history'
 import { parse, stringify } from 'query-string'
 import * as React from 'react'
-import { match } from 'react-router-dom'
 import { vi } from 'vitest'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 
@@ -36,7 +34,6 @@ describe('Workflow status tests', () => {
   beforeAll(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
     Date.now = vi.fn(() => 1590220497869)
   })
 
@@ -229,27 +226,22 @@ describe('Workflow status tests', () => {
     ]
 
     beforeEach(async () => {
-      const path = '/performance/operations/workflowStatus'
-      const location = createLocation(path, {
-        timeStart,
-        timeEnd
-      })
-      const history = createBrowserHistory<IHistoryStateProps>()
-      history.location = location
-      location.search = stringify({
-        locationId,
-        event: 'BIRTH',
-        status: 'REGISTERED'
-      })
-      const match: match = {
-        isExact: false,
-        path,
-        url: path,
-        params: {}
-      }
-      const testComponent = await createTestComponent(
-        <WorkflowStatus match={match} history={history} location={location} />,
-        { store, history, graphqlMocks }
+      const { component: testComponent } = await createTestComponent(
+        <WorkflowStatus />,
+        {
+          store,
+          graphqlMocks,
+          path: WORKFLOW_STATUS,
+          initialEntries: [
+            formatUrl(WORKFLOW_STATUS, {}) +
+              '?' +
+              stringify({
+                locationId,
+                event: 'BIRTH',
+                status: 'REGISTERED'
+              })
+          ]
+        }
       )
 
       component = testComponent
@@ -341,27 +333,22 @@ describe('Workflow status tests', () => {
     ]
 
     beforeEach(async () => {
-      const path = '/performance/operations/workflowStatus'
-      const location = createLocation(path, {
-        timeStart,
-        timeEnd
-      })
-      const history = createBrowserHistory<IHistoryStateProps>()
-      history.location = location
-      location.search = stringify({
-        locationId,
-        event: 'BIRTH',
-        status: 'REGISTERED'
-      })
-      const match: match = {
-        isExact: false,
-        path,
-        url: path,
-        params: {}
-      }
-      const testComponent = await createTestComponent(
-        <WorkflowStatus match={match} history={history} location={location} />,
-        { store, history, graphqlMocks: graphqlMocksWithError }
+      const { component: testComponent } = await createTestComponent(
+        <WorkflowStatus />,
+        {
+          store,
+          path: WORKFLOW_STATUS,
+          initialEntries: [
+            formatUrl(WORKFLOW_STATUS, {}) +
+              '?' +
+              stringify({
+                locationId,
+                event: 'BIRTH',
+                status: 'REGISTERED'
+              })
+          ],
+          graphqlMocks: graphqlMocksWithError
+        }
       )
 
       component = testComponent

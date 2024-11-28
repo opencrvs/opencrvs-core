@@ -38,7 +38,7 @@ describe('Create PIN view', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <CreatePin onComplete={() => null} />,
       { store, history }
     )

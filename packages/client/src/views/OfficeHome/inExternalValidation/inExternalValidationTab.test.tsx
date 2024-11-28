@@ -81,7 +81,7 @@ describe('Registrar home external validation tab tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     testStore.dispatch(checkAuth())
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <InExternalValidationTab
         queryData={{ data: { totalItems: 1, results: [birthEventSearchSet] } }}

@@ -189,7 +189,7 @@ describe('Certificate issue collector test for a birth registration without fath
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <IssueCollectorForm
           location={location}
           history={history}
@@ -242,7 +242,7 @@ describe('Certificate issue collector test for a birth registration without fath
           }
         }
 
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <IssueCollectorForm
             location={location}
             history={history}
@@ -291,7 +291,7 @@ describe('Certificate issue collector test for a birth registration without fath
           }
         }
 
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <IssueCollectorForm
             location={location}
             history={history}
@@ -348,7 +348,7 @@ describe('Certificate issue collector test for a birth registration without fath
         }
       }
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <IssueCollectorFormForOthers
           location={location}
           history={history}
@@ -405,7 +405,7 @@ describe('Certificate issue collector test for a birth registration without fath
         }
       }
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <IssueCollectorFormForOthers
           location={location}
           history={history}

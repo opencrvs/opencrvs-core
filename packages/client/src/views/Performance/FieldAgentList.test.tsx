@@ -94,7 +94,7 @@ describe('Field agent list tests', () => {
         }
       }
     ]
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FieldAgentList history={history} location={location} match={match} />,
       { store, history, graphqlMocks: graphqlMock }
     )

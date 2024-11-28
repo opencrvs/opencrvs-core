@@ -59,7 +59,7 @@ describe('Change phone modal tests', () => {
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ChangePhoneModal
         show={true}
         onSuccess={onSuccessMock}

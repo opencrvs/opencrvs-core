@@ -41,8 +41,9 @@ describe('Performance home test', () => {
         displayLabel: 'Dhaka Division',
         id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
         searchableText: 'Dhaka'
-      }
-      app = await createTestComponent(
+      }M
+
+      ;({ component: app } = await createTestComponent(
         <PerformanceHome
           {...createRouterProps('/performance', undefined, {
             search: {
@@ -55,10 +56,9 @@ describe('Performance home test', () => {
         />,
         {
           store,
-          history,
           graphqlMocks
         }
-      )
+      ))
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)

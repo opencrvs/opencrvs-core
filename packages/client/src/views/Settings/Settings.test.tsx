@@ -68,7 +68,7 @@ describe('Settings page tests', () => {
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
       { store, history, graphqlMocks }

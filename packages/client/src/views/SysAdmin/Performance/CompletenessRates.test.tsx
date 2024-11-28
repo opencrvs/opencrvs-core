@@ -24,6 +24,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { stringify, parse } from 'query-string'
 import { GraphQLError } from 'graphql'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 const LOCATION_DHAKA_DIVISION = {
   displayLabel: 'Dhaka Division',
@@ -96,32 +97,33 @@ describe('Registraion Rates tests', () => {
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
-      <CompletenessRates
-        match={{
-          params: { eventType: 'birth' },
-          isExact: true,
-          path: EVENT_COMPLETENESS_RATES,
-          url: ''
-        }}
-        // @ts-ignore
-        location={{
-          search: stringify({
-            time: 'withinTarget',
-            locationId: LOCATION_DHAKA_DIVISION.id,
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1456868800000).toISOString()
-          })
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMocks }
+    const { component: testComponent } = await createTestComponent(
+      <CompletenessRates />,
+      {
+        store,
+        path: EVENT_COMPLETENESS_RATES,
+        initialEntries: [
+          formatUrl(EVENT_COMPLETENESS_RATES, {
+            eventType: 'birth'
+          }) +
+            '?' +
+            stringify({
+              time: 'withinTarget',
+              locationId: LOCATION_DHAKA_DIVISION.id,
+              timeEnd: new Date(1487076708000).toISOString(),
+              timeStart: new Date(1456868800000).toISOString()
+            })
+        ],
+        graphqlMocks: graphqlMocks
+      }
     )
+
+    component = testComponent
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
@@ -242,29 +244,29 @@ describe('Registraion Rates error state tests', () => {
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createTestStore())
+    ;({ store } = await createTestStore())
 
-    component = await createTestComponent(
-      <CompletenessRates
-        match={{
-          params: { eventType: 'birth' },
-          isExact: true,
-          path: EVENT_COMPLETENESS_RATES,
-          url: ''
-        }}
-        // @ts-ignore
-        location={{
-          search: stringify({
-            time: 'withinTarget',
-            locationId: LOCATION_DHAKA_DIVISION.id,
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMocks }
+    const { component: testComponent } = await createTestComponent(
+      <CompletenessRates />,
+      {
+        store,
+        path: EVENT_COMPLETENESS_RATES,
+        initialEntries: [
+          formatUrl(EVENT_COMPLETENESS_RATES, {
+            eventType: 'birth'
+          }) +
+            '?' +
+            stringify({
+              time: 'withinTarget',
+              locationId: LOCATION_DHAKA_DIVISION.id,
+              timeEnd: new Date(1487076708000).toISOString(),
+              timeStart: new Date(1455454308000).toISOString()
+            })
+        ],
+        graphqlMocks: graphqlMocks
+      }
     )
-
+    component = testComponent
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)

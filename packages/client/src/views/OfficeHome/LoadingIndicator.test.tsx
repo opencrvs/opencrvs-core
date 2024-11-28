@@ -18,7 +18,7 @@ describe('LoadingIndicator test cases', () => {
 
   it('Should display the Error', async () => {
     // @ts-ignore
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <LoadingIndicator
         loading={false}
         hasError={true}

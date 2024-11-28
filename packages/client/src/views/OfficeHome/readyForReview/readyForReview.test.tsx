@@ -250,7 +250,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('should show pagination bar if items more than 11 in ReviewTab', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -285,7 +285,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('renders all items returned from graphql query in ready for review', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: mockReviewTabData
@@ -319,7 +319,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -344,7 +344,7 @@ describe('OfficeHome sent for review tab related tests', () => {
   it('redirects to recordAudit page if row is clicked', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -547,7 +547,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {
@@ -742,7 +742,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyForReview
         queryData={{
           data: {

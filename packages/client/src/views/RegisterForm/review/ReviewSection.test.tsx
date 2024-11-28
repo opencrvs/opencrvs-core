@@ -119,7 +119,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -236,7 +236,7 @@ describe('when in device of large viewport', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -261,7 +261,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected death declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -286,7 +286,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected marriage declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -312,7 +312,7 @@ describe('when in device of large viewport', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -471,7 +471,7 @@ describe('when in device of large viewport', () => {
 
       const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -584,7 +584,7 @@ describe('when in device of large viewport', () => {
 
       const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -734,7 +734,7 @@ describe('when in device of large viewport', () => {
 
       const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -888,7 +888,7 @@ describe('when in device of small viewport', () => {
       DeclarationEvent.Birth
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewSection
         form={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}

@@ -53,26 +53,26 @@ describe('UserSetupPage tests', () => {
   let store: AppStore
   let history: History
   beforeEach(() => {
-    ;({ history, store } = createStore())
+    ;({ store } = createStore())
   })
   it('renders page successfully without type', async () => {
     await store.dispatch(
       getStorageUserDetailsSuccess(JSON.stringify(userDetails))
     )
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupPage />,
-      { store, history }
+      { store }
     )
 
     const app = testComponent
     expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
   })
   it('go to password page', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <ProtectedAccount />,
-      { store, history }
+      { store }
     )
     const app = testComponent
 
@@ -83,10 +83,10 @@ describe('UserSetupPage tests', () => {
   it('go to password page without userDetails', async () => {
     await store.dispatch(checkAuth())
     store.dispatch(getStorageUserDetailsSuccess('null'))
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupPage goToStep={() => {}} />,
-      { store, history }
+      { store }
     )
     const app = testComponent
 

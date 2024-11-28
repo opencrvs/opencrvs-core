@@ -75,7 +75,7 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders Payment component', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <Payment
           history={history}
           location={mockLocation}
@@ -109,7 +109,7 @@ describe('verify collector tests', () => {
 
     it('print payment receipt', async () => {
       const printMoneyReceiptSpy = vi.spyOn(PDFUtils, 'printMoneyReceipt')
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
@@ -164,7 +164,7 @@ describe('verify collector tests', () => {
     })
 
     it('when informant is collector', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}

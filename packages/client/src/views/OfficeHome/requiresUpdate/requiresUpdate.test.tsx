@@ -172,7 +172,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const birthEventRejectedDate = '2019-10-20T11:03:20.660Z'
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -301,7 +301,7 @@ describe('OfficeHome sent for update tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -501,7 +501,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{

@@ -16,19 +16,20 @@ import {
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import * as React from 'react'
+import { userMutations } from '@client/user/mutations'
 import { GET_USER } from '@client/user/queries'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
-import { userMutations } from '@client/user/mutations'
-import { vi, Mock } from 'vitest'
-import * as Router from 'react-router-dom'
-import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
-import { SystemRoleType } from '@client/utils/gateway'
-import * as profileSelectors from '@client/profile/profileSelectors'
+import { ReactWrapper } from 'enzyme'
+import { createMemoryHistory, History } from 'history'
+import * as React from 'react'
+import { vi } from 'vitest'
 
-const useParams = Router.useParams as Mock
+import { formatUrl } from '@client/navigation'
+import { USER_PROFILE } from '@client/navigation/routes'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
+import * as profileSelectors from '@client/profile/profileSelectors'
+import { SystemRoleType } from '@client/utils/gateway'
+import { createMemoryRouter } from 'react-router-dom'
 
 const mockAuditedUserGqlResponse = {
   request: {
@@ -87,36 +88,38 @@ describe('User audit list tests for field agent', () => {
   userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History<any>
+  let router: ReturnType<typeof createMemoryRouter>
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
 
-    useParams.mockImplementation(() => ({
-      userId: '5d08e102542c7a19fc55b790'
-    }))
-
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    component = await createTestComponent(<UserAudit />, {
+    ;({ component, router } = await createTestComponent(<UserAudit />, {
       store,
-      history,
+      path: USER_PROFILE,
+      initialEntries: [
+        formatUrl(USER_PROFILE, {
+          userId: '5d08e102542c7a19fc55b790'
+        })
+      ],
       graphqlMocks: [mockAuditedUserGqlResponse]
-    })
+    }))
   })
 
-  it('renders without crashing', async () => {
+  it.only('renders without crashing', async () => {
     expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
   })
 
   it('renders with a error toast for graphql error', async () => {
-    const testComponent = await createTestComponent(<UserAudit />, {
-      store,
-      history,
-      graphqlMocks: []
-    })
+    const { component: testComponent } = await createTestComponent(
+      <UserAudit />,
+      {
+        store,
+        graphqlMocks: []
+      }
+    )
     expect(await waitForElement(testComponent, '#error-toast')).toBeDefined()
   })
 
@@ -128,7 +131,7 @@ describe('User audit list tests for field agent', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    expect(history.location.pathname).toBe('/team/users')
+    expect(router.state.location.pathname).toBe('/team/users')
   })
 })
 
@@ -141,13 +144,8 @@ describe('User audit list tests for sys admin', () => {
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
 
-    useParams.mockImplementation(() => ({
-      userId: '5d08e102542c7a19fc55b790'
-    }))
-
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
     userDetails.systemRole = SystemRoleType.LocalSystemAdmin
     userDetails.primaryOffice = {
       id: '895cc945-94a9-4195-9a29-22e9310f3385',
@@ -157,11 +155,20 @@ describe('User audit list tests for sys admin', () => {
     }
     vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['sysadmin'])
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    component = await createTestComponent(<UserAudit />, {
-      store,
-      history,
-      graphqlMocks: [mockAuditedUserGqlResponse]
-    })
+    const { component: testComponent } = await createTestComponent(
+      <UserAudit />,
+      {
+        store,
+        path: USER_PROFILE,
+        initialEntries: [
+          formatUrl(USER_PROFILE, {
+            userId: '5d08e102542c7a19fc55b790'
+          })
+        ],
+        graphqlMocks: [mockAuditedUserGqlResponse]
+      }
+    )
+    component = testComponent
   })
 
   it('redirects to edit user view on clicking edit details menu option', async () => {

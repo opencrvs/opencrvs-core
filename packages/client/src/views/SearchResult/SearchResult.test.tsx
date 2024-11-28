@@ -60,7 +60,7 @@ describe('SearchResult tests', () => {
   })
 
   it('sets loading state while waiting for data', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -296,7 +296,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -336,7 +336,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -451,7 +451,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -550,7 +550,7 @@ describe('SearchResult tests', () => {
       configurable: true,
       value: 1100
     })
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -647,7 +647,7 @@ describe('SearchResult tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -754,7 +754,7 @@ describe('SearchResult downloadButton tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{
@@ -851,7 +851,7 @@ describe('SearchResult downloadButton tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <SearchResult
         // @ts-ignore
         location={{

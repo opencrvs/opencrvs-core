@@ -95,7 +95,7 @@ describe('In Progress tab', () => {
         data: {}
       }
     ]
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
@@ -164,7 +164,7 @@ describe('In Progress tab', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
@@ -266,7 +266,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -309,7 +309,7 @@ describe('In Progress tab', () => {
       for (let i = 0; i < 12; i++) {
         drafts.push(createDeclaration(EventType.Birth))
       }
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -416,7 +416,7 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       store.dispatch(storeDeclaration(drafts))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -464,7 +464,7 @@ describe('In Progress tab', () => {
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -557,7 +557,7 @@ describe('In Progress tab', () => {
       vi.clearAllMocks()
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -599,7 +599,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
       // @ts-ignore
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
@@ -740,7 +740,7 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = undefined
         store.dispatch(modifyDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
         )
@@ -757,7 +757,7 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
         store.dispatch(modifyDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
         )
@@ -774,7 +774,7 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
         )
@@ -809,7 +809,7 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
           { store, history }
         )
@@ -826,7 +826,7 @@ describe('In Progress tab', () => {
       const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
@@ -941,7 +941,7 @@ describe('In Progress tab', () => {
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
 
       // @ts-ignore
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}

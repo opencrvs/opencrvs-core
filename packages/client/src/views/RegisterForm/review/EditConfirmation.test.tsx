@@ -22,7 +22,7 @@ const mockHandleClose = vi.fn()
 describe('when user is in the review page', () => {
   let editComponent: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <EditConfirmation
         show={true}
         handleEdit={mockHandleEdit}

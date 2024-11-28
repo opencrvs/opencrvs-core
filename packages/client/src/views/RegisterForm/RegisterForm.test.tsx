@@ -76,7 +76,7 @@ describe('when user is in the register form for birth event', () => {
 
       const mock: any = vi.fn()
       const form = await getRegisterFormFromStore(store, EventType.Birth)
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -157,7 +157,7 @@ describe('when user is in the register form for death event', () => {
       // clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
       const mock: any = vi.fn()
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -215,7 +215,7 @@ describe('when user is in the register form for marriage event', () => {
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
       const mock: any = vi.fn()
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <RegisterForm
           location={mock}
@@ -286,7 +286,7 @@ describe('when user is in the register form preview section', () => {
     store.dispatch(storeDeclaration(draft))
 
     const form = await getRegisterFormFromStore(store, EventType.Birth)
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         history={history}
@@ -400,7 +400,7 @@ describe('when user is in the register form review section', () => {
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}
@@ -452,7 +452,7 @@ describe('when user is in the register form from review edit', () => {
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}
@@ -506,7 +506,7 @@ describe('when user is in the register form from sent for review edit', () => {
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RegisterForm
         location={mock}

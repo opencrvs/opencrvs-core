@@ -47,7 +47,7 @@ const deathDeclaration = {
 
 describe('when user wants to review death certificate', () => {
   it('displays the "Confirm & Print" button', async () => {
-    const { history, match } = createRouterProps(
+    const { match } = createRouterProps(
       '/',
       { isNavigatedInsideApp: false },
       {
@@ -63,9 +63,8 @@ describe('when user wants to review death certificate', () => {
 
     loginAsFieldAgent(store)
 
-    const component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
+    const { component } = await createTestComponent(<ReviewCertificate />, {
+      store
     })
 
     // @ts-ignore
@@ -124,9 +123,8 @@ describe('back button behavior tests of review certificate action', () => {
       // @ts-ignore
       storeDeclaration(birthDeclaration)
     )
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
+    const { component } = await createTestComponent(<ReviewCertificate />, {
+      store
     })
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
@@ -156,9 +154,8 @@ describe('back button behavior tests of review certificate action', () => {
         event: EventType.Birth
       } as IDeclaration)
     )
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
+    const { component } = await createTestComponent(<ReviewCertificate />, {
+      store
     })
 
     component.find('#action_page_back_button').hostNodes().simulate('click')
@@ -209,9 +206,8 @@ describe('when user wants to review birth certificate', () => {
       })
     )
 
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
+    const { component } = await createTestComponent(<ReviewCertificate />, {
+      store
     })
     await flushPromises()
     component.update()
@@ -285,9 +281,8 @@ describe('when user wants to review marriage certificate', () => {
       })
     )
 
-    component = await createTestComponent(<ReviewCertificate />, {
-      store,
-      history
+    const { component } = await createTestComponent(<ReviewCertificate />, {
+      store
     })
     await flushPromises()
     component.update()

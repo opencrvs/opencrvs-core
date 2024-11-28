@@ -33,7 +33,7 @@ describe('ForgotPIN tests', () => {
   userQueries.verifyPasswordById = vi.fn()
 
   beforeAll(async () => {
-    ;({ store, history } = await createStore())
+    ;({ store } = await createStore())
 
     store.dispatch(
       setUserDetails({
@@ -84,10 +84,11 @@ describe('ForgotPIN tests', () => {
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ForgotPIN goBack={goBackMock} onVerifyPassword={onVerifyPasswordMock} />,
-      { store, history }
+      { store }
     )
+    component = testComponent
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

@@ -45,7 +45,7 @@ describe('form component', () => {
     const draft = createDeclaration(EventType.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = vi.fn()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FormFieldGenerator
         id="mother"
         onChange={modifyDraft}
@@ -109,7 +109,7 @@ describe('form component', () => {
       }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
   describe('when user is in the moth​​er section', () => {
     it('renders the page', async () => {
@@ -152,7 +152,7 @@ describe('when field definition has location search input', () => {
 
   beforeEach(async () => {
     const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FormFieldGenerator
         id="locationForm"
         setAllFieldsDirty={false}
@@ -175,7 +175,7 @@ describe('when field definition has location search input', () => {
       { store }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders location search input without crashing', async () => {
@@ -222,7 +222,7 @@ describe('when user is in the register section', () => {
     const draft = createDeclaration(EventType.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = vi.fn()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -248,7 +248,7 @@ describe('when user is in the register section', () => {
       }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
   it('renders registration phone type as tel', () => {
     expect(
@@ -265,7 +265,7 @@ describe('when field definition has nested fields', () => {
     const draft = createDeclaration(EventType.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = vi.fn()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -339,7 +339,7 @@ describe('when field definition has nested fields', () => {
       }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   it('renders radio group with nested fields', () => {
@@ -442,7 +442,7 @@ describe('when field definition has date field', () => {
   describe('in case of static date field', () => {
     beforeEach(async () => {
       const { store } = createStore()
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <FormFieldGenerator
           id="locationForm"
           setAllFieldsDirty={false}
@@ -462,7 +462,7 @@ describe('when field definition has date field', () => {
         { store }
       )
 
-      component = testComponent.component
+      component = testComponent
     })
 
     it('shows validation errors for invalid date', async () => {
@@ -481,7 +481,7 @@ describe('when field definition has number field', () => {
 
   beforeEach(async () => {
     const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -503,7 +503,7 @@ describe('when field definition has number field', () => {
       }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   it('field does not take input of non numeric characters', async () => {
@@ -533,7 +533,7 @@ describe('when field definition has select field on mobile device', () => {
   beforeEach(async () => {
     window.HTMLElement.prototype.scrollIntoView = scrollMock
     const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -557,7 +557,7 @@ describe('when field definition has select field on mobile device', () => {
       { attachTo: document.body }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   it('triggers scroll up when focus so that soft keyboard does not block options', async () => {

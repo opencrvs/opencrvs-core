@@ -27,6 +27,11 @@ import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 import { vi, Mock } from 'vitest'
+import { formatUrl } from '@client/navigation'
+import {
+  DECLARATION_RECORD_AUDIT,
+  TEAM_USER_LIST
+} from '@client/navigation/routes'
 
 describe('user list without admin scope', () => {
   let store: AppStore
@@ -34,7 +39,7 @@ describe('user list without admin scope', () => {
 
   it('no add user button', async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store } = await createStore())
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockUserResponse
@@ -63,7 +68,7 @@ describe('user list without admin scope', () => {
       }
     ]
 
-    const component = await createTestComponent(
+    const { component } = await createTestComponent(
       <UserList
         // @ts-ignore
         location={{
@@ -72,8 +77,9 @@ describe('user list without admin scope', () => {
           })
         }}
       />,
-      { store, history, graphqlMocks: userListMock }
+      { store, graphqlMocks: userListMock }
     )
+
     component.update()
     expect(component.find('#add-user').length).toBe(0)
   })
@@ -85,7 +91,7 @@ describe('User list tests', () => {
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store } = await createStore())
 
     const action = {
       type: actions.SET_USER_DETAILS,
@@ -118,17 +124,17 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component } = await createTestComponent(<UserList />, {
+        store,
+        initialEntries: [
+          formatUrl(TEAM_USER_LIST, {}) +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
       const addUser = await waitForElement(component, '#add-user')
       addUser.hostNodes().simulate('click')
@@ -158,17 +164,17 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component } = await createTestComponent(<UserList />, {
+        store,
+        initialEntries: [
+          formatUrl(TEAM_USER_LIST, {}) +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
 
       const addUser = await waitForElement(component, '#add-user')
@@ -202,17 +208,19 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
+      const { component: testComponent } = await createTestComponent(
+        <UserList />,
+        {
+          store,
+          initialEntries: [
+            formatUrl(TEAM_USER_LIST, {}) +
+              '?' +
+              stringify({
+                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+              })
+          ],
+          graphqlMocks: userListMock
+        }
       )
 
       // wait for mocked data to load mockedProvider
@@ -333,16 +341,19 @@ describe('User list tests', () => {
           configurable: true,
           value: 1100
         })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-              })
-            }}
-          />,
-          { store, history, graphqlMocks: userListMock }
+        const { component: testComponent } = await createTestComponent(
+          <UserList />,
+          {
+            store,
+            initialEntries: [
+              formatUrl(TEAM_USER_LIST, {}) +
+                '?' +
+                stringify({
+                  locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+                })
+            ],
+            graphqlMocks: userListMock
+          }
         )
 
         // wait for mocked data to load mockedProvider
@@ -748,7 +759,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -940,7 +951,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -1362,7 +1373,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{

@@ -50,7 +50,7 @@ describe('Review Duplicates component', () => {
 
   it('should load the duplicate warning component correctly', async () => {
     const { store, history } = createStore()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <DuplicateWarning duplicateIds={duplicateIds} />,
       { store, history, graphqlMocks: graphqlMock }
     )

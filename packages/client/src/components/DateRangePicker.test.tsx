@@ -34,7 +34,7 @@ describe('date picker tests', () => {
     store = appStore.store
 
     onDatesChangeMock = vi.fn()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <DateRangePicker
         startDate={new Date(2020, 4, 16)}
         endDate={new Date(2020, 5, 16)}
@@ -43,7 +43,7 @@ describe('date picker tests', () => {
       { store }
     )
 
-    component = testComponent.component
+    component = testComponent
   })
 
   describe('on desktop', () => {

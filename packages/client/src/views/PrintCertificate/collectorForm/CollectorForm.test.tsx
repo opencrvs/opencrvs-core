@@ -167,7 +167,6 @@ const marriageDeclaration = {
 beforeEach(() => {
   const s = createStore()
   store = s.store
-  history = s.history
   location = createLocation('/')
   history.location = location
 })
@@ -177,24 +176,12 @@ describe('Certificate collector test for a birth registration without father det
     let component: ReactWrapper<{}, {}>
 
     beforeEach(async () => {
-      //@ts-ignore
       store.dispatch(storeDeclaration(birthDeclaration))
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { history, store }
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
+          store
+        }
       )
       component = testComponent
       await waitForElement(component, '#collector_form')
@@ -283,23 +270,13 @@ describe('Certificate collector test for a birth registration without father det
        * Who is collecting the certificate?
        */
       store.dispatch(storeDeclaration(birthDeclaration))
-      component = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
+          store
+        }
       )
+      component = testComponent
 
       const form = await waitForElement(component, '#collector_form')
 
@@ -492,7 +469,7 @@ describe('Certificate collector test for a birth registration without father det
 })
 
 describe('Certificate collector test for a birth registration with father details', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const mockLocation: any = vi.fn()
 
   describe('Test collector group', () => {
@@ -501,22 +478,11 @@ describe('Certificate collector test for a birth registration with father detail
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
 
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={mockLocation}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
+          store
+        }
       )
 
       component = testComponent
@@ -536,22 +502,11 @@ describe('Certificate collector test for a death registration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(deathDeclaration))
 
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '16ff35e1-3f92-4db3-b812-c402e609fb00',
-              eventType: 'death',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
+          store
+        }
       )
 
       component = testComponent
@@ -588,22 +543,11 @@ describe('Certificate collector test for a marriage registration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(marriageDeclaration))
 
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '18ff35e1-3d92-4db3-b815-c4d2e609fb23',
-              eventType: 'marriage',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
+          store
+        }
       )
 
       component = testComponent
@@ -646,22 +590,11 @@ describe('Certificate collector test for a birth registration without father and
       //@ts-ignore
       delete birthDeclaration['data']['father']
       store.dispatch(storeDeclaration(birthDeclaration))
-      const testComponent = await createTestComponent(
-        <CollectorForm
-          location={location}
-          history={history}
-          match={{
-            params: {
-              registrationId: '6a5fd35d-01ec-4c37-976e-e055107a74a1',
-              eventType: 'birth',
-              groupId: 'certCollector'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
+          store
+        }
       )
       component = testComponent
       await waitForElement(component, '#collector_form')

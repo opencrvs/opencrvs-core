@@ -44,7 +44,7 @@ describe('verify corrector tests', () => {
     })
 
     it('when mother is corrector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <VerifyCorrector
           history={history}
           location={history.location}
@@ -65,7 +65,7 @@ describe('verify corrector tests', () => {
     })
 
     it('when child is corrector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <VerifyCorrector
           history={history}
           location={history.location}
@@ -86,7 +86,7 @@ describe('verify corrector tests', () => {
     })
 
     it('should takes user go back', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <VerifyCorrector
           history={history}
           location={history.location}
@@ -268,7 +268,7 @@ describe('verify corrector tests', () => {
     })
 
     it('when informant is corrector renders idVerifier component', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <VerifyCorrector
           history={history}
           location={history.location}

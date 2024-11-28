@@ -271,7 +271,7 @@ describe('ReviewForm tests', () => {
   })
 
   it('Shared contact phone number should be set properly', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -308,7 +308,7 @@ describe('ReviewForm tests', () => {
     ).toBe('+8801711111111')
   })
   it('when registration has attachment', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -350,7 +350,7 @@ describe('ReviewForm tests', () => {
     ])
   })
   it('check registration', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -413,7 +413,7 @@ describe('ReviewForm tests', () => {
       RegStatus.InProgress
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -460,7 +460,7 @@ describe('ReviewForm tests', () => {
       RegStatus.Declared
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -508,7 +508,7 @@ describe('ReviewForm tests', () => {
       RegStatus.Validated
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -556,7 +556,7 @@ describe('ReviewForm tests', () => {
       RegStatus.Rejected
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -603,7 +603,7 @@ describe('ReviewForm tests', () => {
       EventType.Birth
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -658,7 +658,7 @@ describe('ReviewForm tests', () => {
         })
       )
     )
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewForm
         location={mock}
         history={history}
@@ -693,7 +693,7 @@ describe('ReviewForm tests', () => {
 
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}
@@ -740,7 +740,7 @@ describe('ReviewForm tests', () => {
     })
     it('populates proper death event section', async () => {
       const form = await getReviewFormFromStore(store, EventType.Death)
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}
@@ -788,7 +788,7 @@ describe('ReviewForm tests', () => {
 
     it('shows error message for user with declare scope', async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewForm
           location={mock}
           history={history}

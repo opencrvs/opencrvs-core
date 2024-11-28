@@ -83,10 +83,13 @@ describe('verify collector tests for issuance', () => {
   })
 
   it('when mother is collector renders issue payment component', async () => {
-    const testComponent = await createTestComponent(<IssuePayment />, {
-      store,
-      history
-    })
+    const { component: testComponent } = await createTestComponent(
+      <IssuePayment />,
+      {
+        store,
+        history
+      }
+    )
     expect(testComponent.find('#service').hostNodes().text()).toContain('Birth')
     expect(testComponent.find('#amountDue').hostNodes().text()).toContain('20')
     testComponent.find('#Continue').hostNodes().simulate('click')
@@ -135,10 +138,13 @@ describe('in case of death declaration renders issue payment component', () => {
   })
 
   it('when informant is collector', async () => {
-    const testComponent = await createTestComponent(<IssuePayment />, {
-      store,
-      history
-    })
+    const { component: testComponent } = await createTestComponent(
+      <IssuePayment />,
+      {
+        store,
+        history
+      }
+    )
     expect(testComponent.find('#service').hostNodes().text()).toContain('Death')
     expect(testComponent.find('#amountDue').hostNodes().text()).toContain('0.0')
     testComponent.find('#Continue').hostNodes().simulate('click')

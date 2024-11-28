@@ -172,7 +172,7 @@ describe('Registrations List test', () => {
         }
       }
     ]
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <RegistrationList history={history} location={location} match={match} />,
       { store, history, graphqlMocks: graphqlMock }
     )

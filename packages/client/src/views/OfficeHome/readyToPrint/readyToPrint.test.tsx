@@ -329,7 +329,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       ]
     }
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{
@@ -359,7 +359,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{
@@ -377,7 +377,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
   it('should show pagination bar if items are more than 11 in ready for print tab', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyToPrint
         queryData={{
           data: { totalItems: 24, results: [] }
@@ -406,7 +406,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   describe('When a row is clicked', () => {
     it('renders expanded area for ready to print', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         // @ts-ignore
         <ReadyToPrint
           queryData={{
@@ -785,7 +785,7 @@ describe('Tablet tests', () => {
   it('redirects to recordAudit page if item is clicked', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{

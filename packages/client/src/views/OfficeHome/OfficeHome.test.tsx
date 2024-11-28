@@ -172,7 +172,10 @@ describe('OfficeHome related tests', () => {
     it('shows no-record message in inProgress drafts tab', async () => {
       const { component: testComponent } = await createTestComponent(
         <OfficeHome />,
-        { store, apolloClient: client }
+        {
+          store,
+          apolloClient: client
+        }
       )
       await waitForElement(testComponent, '#no-record')
     })
@@ -209,21 +212,30 @@ describe('OfficeHome related tests', () => {
     it('shows no-record message in reject tab', async () => {
       const { component: testComponent } = await createTestComponent(
         <OfficeHome />,
-        { store, apolloClient: client }
+        {
+          store,
+          apolloClient: client
+        }
       )
       await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message in approval tab', async () => {
       const { component: testComponent } = await createTestComponent(
         <OfficeHome />,
-        { store, apolloClient: client }
+        {
+          store,
+          apolloClient: client
+        }
       )
       await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message in print tab', async () => {
       const { component: testComponent } = await createTestComponent(
         <OfficeHome />,
-        { store, apolloClient: client }
+        {
+          store,
+          apolloClient: client
+        }
       )
       await waitForElement(testComponent, '#no-record')
     })
@@ -231,7 +243,10 @@ describe('OfficeHome related tests', () => {
     it('shows no-record message in externalValidation tab', async () => {
       const { component: testComponent } = await createTestComponent(
         <OfficeHome />,
-        { store, apolloClient: client }
+        {
+          store,
+          apolloClient: client
+        }
       )
 
       await waitForElement(testComponent, '#no-record')
