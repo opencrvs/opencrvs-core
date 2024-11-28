@@ -29,11 +29,11 @@ interface ISystemRole {
 
 export interface ISystemRoleModel extends ISystemRole, Document {}
 
-const systemRoleSchema = new Schema({
+export const SystemRoleSchema = new Schema({
   value: { type: String, enum: SYSTEM_ROLE_TYPES },
   roles: [{ type: Schema.Types.ObjectId, ref: 'UserRole' }],
   active: { type: Boolean, default: true },
   creationDate: { type: Number, default: Date.now }
 })
 
-export default model<ISystemRoleModel>('SystemRole', systemRoleSchema)
+export default model<ISystemRoleModel>('SystemRole', SystemRoleSchema)
