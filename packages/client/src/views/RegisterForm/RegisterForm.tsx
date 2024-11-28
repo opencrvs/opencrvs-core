@@ -1103,7 +1103,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
                           this.props.declaration.id,
-                          CorrectionSection.SupportingDocuments
+                          config.config?.BIRTH?.CORRECTION_SUPPORTING_DOCUMENTS !== false
+                            ? CorrectionSection.SupportingDocuments
+                            : CorrectionSection.Reason
                         )
                       }}
                     />

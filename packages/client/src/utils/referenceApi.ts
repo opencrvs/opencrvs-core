@@ -104,6 +104,7 @@ export interface IApplicationConfig {
       DELAYED: number
     }
     PRINT_IN_ADVANCE: boolean
+    CORRECTION_SUPPORTING_DOCUMENTS: boolean
   }
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency

@@ -341,7 +341,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
-            <Table
+            {this.props.offlineResources.config?.BIRTH?.CORRECTION_SUPPORTING_DOCUMENTS !== false && <Table
               id="supportingDocuments"
               isLoading={false}
               content={[
@@ -360,7 +360,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></Table>
+            ></Table>}
             <FormFieldGenerator
               id={group.id}
               onChange={(values) => {

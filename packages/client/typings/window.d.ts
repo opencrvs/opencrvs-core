@@ -22,6 +22,7 @@ interface Window {
         DELAYED: number
       }
       PRINT_IN_ADVANCE: boolean
+      CORRECTION_SUPPORTING_DOCUMENTS: boolean
     }
     CONFIG_API_URL: string
     COUNTRY: string
