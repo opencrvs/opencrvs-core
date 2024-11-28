@@ -125,7 +125,7 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
-export interface IDispatchOptions {
+interface IDispatchOptions {
   action: string
   payloadKey: string
 }
@@ -934,7 +934,7 @@ export enum CorrectionSection {
   Summary = 'summary'
 }
 
-export enum PaymentSection {
+enum PaymentSection {
   Payment = 'payment'
 }
 
