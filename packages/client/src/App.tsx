@@ -72,6 +72,7 @@ import { ReloadModal } from './views/Modals/ReloadModal'
 import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from './v2-events/routes/routes'
 import { Workqueues } from './v2-events/features/workqueues'
 import { PublishEvent } from './v2-events/features/events/PublishEvent'
+import { TRPCProvider } from './v2-events/trcp'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -96,6 +97,7 @@ const GlobalStyle = createGlobalStyle`
 
 export function App(props: IAppProps) {
   const { client } = useApolloClient(props.store)
+
   return (
     <ErrorBoundary>
       <GlobalStyle />
@@ -522,16 +524,18 @@ export function App(props: IAppProps) {
                                             path={routes.PRINT_RECORD}
                                             component={PrintRecord}
                                           />
-                                          <ProtectedRoute
-                                            exact
-                                            path={V2_ROOT_ROUTE}
-                                            component={Workqueues}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={V2_EVENT_ROUTE}
-                                            component={PublishEvent}
-                                          />
+                                          <TRPCProvider>
+                                            <ProtectedRoute
+                                              exact
+                                              path={V2_ROOT_ROUTE}
+                                              component={Workqueues}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={V2_EVENT_ROUTE}
+                                              component={PublishEvent}
+                                            />
+                                          </TRPCProvider>
                                         </Switch>
                                       </>
                                     )

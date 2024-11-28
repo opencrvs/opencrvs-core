@@ -29,7 +29,8 @@ vi.mock('@events/storage/elasticsearch')
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
   const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' }
+    user: { id: '1', primaryOfficeId: '123' },
+    token: 'FAKE_TOKEN'
   })
   return caller
 }

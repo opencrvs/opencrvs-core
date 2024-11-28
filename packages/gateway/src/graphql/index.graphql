@@ -21,7 +21,6 @@
 # import Mutation from '../features/bookmarkAdvancedSearch/schema.graphql'
 # import Mutation.* from '../v2-events/events/schema.graphql'
 # import Query.* from '../v2-events/events/schema.graphql'
-# import Query.* from '../v2-events/event-config/schema.graphql'
 # import * from 'common.graphql'
 
 # TODO

@@ -26,6 +26,7 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
+import { EventConfig } from '@opencrvs/commons'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -51,7 +52,7 @@ export type AppRouter = typeof appRouter
 
 export const appRouter = router({
   config: router({
-    get: publicProcedure.query(async (options) => {
+    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
       return getEventsConfig(options.ctx.token)
     })
   }),

@@ -24,6 +24,7 @@ const server = createHTTPServer({
   router: appRouter,
   createContext: function createContext(opts) {
     const token = opts.req.headers.authorization
+
     if (!token) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'

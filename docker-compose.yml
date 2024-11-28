@@ -26,6 +26,7 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+      - GATEWAY_URL_INTERNAL=http://gateway:7070
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION}
     #platform: linux/amd64

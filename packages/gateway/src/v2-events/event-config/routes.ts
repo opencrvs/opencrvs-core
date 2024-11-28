@@ -8,20 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver } from '@gateway/graphql/schema'
-import { FieldConfig } from '@opencrvs/commons'
+import { env } from '@gateway/environment'
+import { ServerRoute } from '@hapi/hapi'
 
-export const eventResolvers: GQLResolver = {
-  Field: {
-    __resolveType: (obj: FieldConfig) => {
-      if (obj.type === 'DATE') {
-        return 'DateField'
+export const trpcProxy = [
+  {
+    method: '*',
+    path: '/events/{path*}',
+    handler: (req, h) => {
+      return h.proxy({
+        uri: new URL(req.params.path, env.EVENTS_URL).toString(),
+        passThrough: true
+      })
+    },
+    options: {
+      payload: {
+        output: 'data',
+        parse: false
       }
-      if (obj.type === 'PARAGRAPH') {
-        return 'ParagraphField'
-      }
-
-      return 'TextField'
     }
   }
-}
+] satisfies Array<ServerRoute>

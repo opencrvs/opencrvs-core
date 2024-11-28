@@ -20,8 +20,6 @@ import {
 import { ApolloServerOptions } from '@apollo/server'
 import { resolvers as eventsV2Resolvers } from '@gateway/v2-events/events/root-resolvers'
 import { eventResolvers as eventsV2TypeResolvers } from '@gateway/v2-events/events/type-resolvers'
-import { resolvers as eventsV2ConfigResolvers } from '@gateway/v2-events/event-config/root-resolvers'
-import { eventResolvers as eventsV2ConfigTypeResolvers } from '@gateway/v2-events/event-config/type-resolvers'
 import { resolvers as bookmarkAdvancedSearchResolvers } from '@gateway/features/bookmarkAdvancedSearch/root-resolvers'
 import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
@@ -65,8 +63,6 @@ type StringIndexed<T> = T & IStringIndexSignatureInterface
 export const resolvers: StringIndexed<IResolvers> = merge(
   eventsV2Resolvers,
   eventsV2TypeResolvers,
-  eventsV2ConfigResolvers,
-  eventsV2ConfigTypeResolvers,
   notificationRootResolvers as IResolvers,
   registrationRootResolvers as IResolvers,
   locationRootResolvers as IResolvers,

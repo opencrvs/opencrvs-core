@@ -9,22 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClubMembershipEvent } from './fixtures'
+import { FieldConfig } from '@opencrvs/commons/client'
 import { useIntl } from 'react-intl'
 import { usePagination } from './usePagination'
-import { FieldConfig } from '@opencrvs/commons/client'
 
-const eventTypes = { 'tennis-club-membership': tennisClubMembershipEvent }
+import { trpc } from '@client/v2-events/trcp'
+import { FormPage } from '@opencrvs/commons'
+import { useEffect, useState } from 'react'
+import { useRouteMatch } from 'react-router-dom'
+import { V2_EVENT_ROUTE } from '@client/v2-events/routes/routes'
 
 export function useEvent(anyEventType: string) {
   const intl = useIntl()
 
-  if (!eventTypes[anyEventType as keyof typeof eventTypes]) {
-    throw new Error(`Event type ${anyEventType} not found`)
-  }
+  const hook = trpc.config.get.useQuery()
+  const { isLoading, error, data } = hook
 
-  const type = anyEventType as keyof typeof eventTypes
-  const { pages, label } = eventTypes[type].actions[0].forms[0]
+  const [pages, setPages] = useState<FormPage[]>([])
+  const [title, setTitle] = useState<string>()
+  const [fields, setFields] = useState<FieldConfig[]>([])
+
+  const match = useRouteMatch<{ eventType: string }>(V2_EVENT_ROUTE)
 
   const { next, previous, page } = usePagination(pages.length)
 
@@ -32,10 +37,28 @@ export function useEvent(anyEventType: string) {
   const saveAndExit = () => alert('save and exit')
   const finish = () => alert('finish')
 
-  const title = intl.formatMessage(label)
+  useEffect(() => {
+    if (!data) {
+      return
+    }
+    if (error) {
+      return
+    }
+    const event = data.find((event) => event.id === match?.params.eventType)
+
+    if (!event) {
+      return
+    }
+
+    setTitle(intl.formatMessage(event.label))
+    const pages = event.actions[0].forms[0].pages
+    setPages(pages)
+    setFields(pages[page].fields)
+  }, [data, error, intl, match?.params.eventType, page])
 
   return {
-    type,
+    loading: isLoading,
+    type: match?.params.eventType,
     title,
     exit,
     saveAndExit,
@@ -43,6 +66,6 @@ export function useEvent(anyEventType: string) {
     next,
     finish,
     form: pages,
-    fields: pages[page].fields as FieldConfig[]
+    fields
   }
 }

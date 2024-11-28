@@ -51,7 +51,6 @@ export interface GQLQuery {
   getSystemRoles?: Array<GQLSystemRole>
   fetchSystem?: GQLSystem
   getEvent: GQLEvent
-  getEventConfig: Array<GQLEventConfig>
 }
 
 export interface GQLMutation {
@@ -510,12 +509,6 @@ export interface GQLEvent {
   createdAt: GQLDateTime
   updatedAt: GQLDateTime
   actions: Array<GQLAction>
-}
-
-export interface GQLEventConfig {
-  id: string
-  label: GQLLabel
-  actions: Array<GQLEventConfigAction>
 }
 
 export interface GQLCorrectionInput {
@@ -1121,18 +1114,6 @@ export interface GQLActionNameMap {
   DeclareAction: GQLDeclareAction
 }
 
-export interface GQLLabel {
-  id: string
-  defaultMessage: string
-  description: string
-}
-
-export interface GQLEventConfigAction {
-  label: GQLLabel
-  forms: Array<GQLForm>
-  type: string
-}
-
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
@@ -1646,13 +1627,6 @@ export interface GQLDeclareAction {
   identifiers: GQLIdentifiers
 }
 
-export interface GQLForm {
-  label: GQLLabel
-  version: GQLFormVersion
-  active?: boolean
-  pages: Array<GQLPage>
-}
-
 export const enum GQLAttachmentInputStatus {
   approved = 'approved',
   validated = 'validated',
@@ -1774,35 +1748,14 @@ export interface GQLAdditionalIdWithCompositionId {
   trackingId: string
 }
 
-export type GQLField = GQLTextField | GQLDateField | GQLParagraphField
-
-/** Use this to resolve union type Field */
-export type GQLPossibleFieldTypeNames =
-  | 'TextField'
-  | 'DateField'
-  | 'ParagraphField'
-
-export interface GQLFieldNameMap {
-  Field: GQLField
-  TextField: GQLTextField
-  DateField: GQLDateField
-  ParagraphField: GQLParagraphField
+export interface GQLField {
+  id: string
+  value: GQLFieldValue
 }
 
 export interface GQLIdentifiers {
   trackingId: string
   registrationNumber: string
-}
-
-export interface GQLFormVersion {
-  id: string
-  label: GQLLabel
-}
-
-export interface GQLPage {
-  id: string
-  title: GQLLabel
-  fields: Array<GQLField>
 }
 
 export const enum GQLTelecomSystem {
@@ -1851,57 +1804,6 @@ export interface GQLPaymentInput {
   outcome?: GQLPaymentOutcomeType
   date?: GQLDate
   data?: string
-}
-
-export interface GQLTextField extends GQLBaseField {
-  id: string
-  required: boolean
-  label: GQLLabel
-  type: string
-  options?: GQLTextFieldOptions
-}
-
-export interface GQLDateField extends GQLBaseField {
-  id: string
-  required: boolean
-  label: GQLLabel
-  type: string
-  options?: GQLDateFieldOptions
-}
-
-export interface GQLParagraphField extends GQLBaseField {
-  id: string
-  required: boolean
-  label: GQLLabel
-  type: string
-}
-
-export interface GQLBaseField {
-  id: string
-  required: boolean
-  label: GQLLabel
-  type: string
-}
-
-/** Use this to resolve interface type BaseField */
-export type GQLPossibleBaseFieldTypeNames =
-  | 'TextField'
-  | 'DateField'
-  | 'ParagraphField'
-
-export interface GQLBaseFieldNameMap {
-  BaseField: GQLBaseField
-  TextField: GQLTextField
-  DateField: GQLDateField
-  ParagraphField: GQLParagraphField
-}
-
-export interface GQLTextFieldOptions {
-  maxLength?: number
-}
-
-export interface GQLDateFieldOptions {
-  notice?: GQLLabel
 }
 
 /*********************************
@@ -1957,7 +1859,6 @@ export interface GQLResolver {
   SystemRole?: GQLSystemRoleTypeResolver
   System?: GQLSystemTypeResolver
   Event?: GQLEventTypeResolver
-  EventConfig?: GQLEventConfigTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -2006,8 +1907,6 @@ export interface GQLResolver {
     __resolveType: GQLActionTypeResolver
   }
 
-  Label?: GQLLabelTypeResolver
-  EventConfigAction?: GQLEventConfigActionTypeResolver
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -2035,29 +1934,14 @@ export interface GQLResolver {
   RegisterAction?: GQLRegisterActionTypeResolver
   NotifyAction?: GQLNotifyActionTypeResolver
   DeclareAction?: GQLDeclareActionTypeResolver
-  Form?: GQLFormTypeResolver
   FieldValue?: GraphQLScalarType
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
 
   AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
-  Field?: {
-    __resolveType: GQLFieldTypeResolver
-  }
-
+  Field?: GQLFieldTypeResolver
   Identifiers?: GQLIdentifiersTypeResolver
-  FormVersion?: GQLFormVersionTypeResolver
-  Page?: GQLPageTypeResolver
-  TextField?: GQLTextFieldTypeResolver
-  DateField?: GQLDateFieldTypeResolver
-  ParagraphField?: GQLParagraphFieldTypeResolver
-  BaseField?: {
-    __resolveType: GQLBaseFieldTypeResolver
-  }
-
-  TextFieldOptions?: GQLTextFieldOptionsTypeResolver
-  DateFieldOptions?: GQLDateFieldOptionsTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   sendNotificationToAllUsers?: QueryToSendNotificationToAllUsersResolver<TParent>
@@ -2098,7 +1982,6 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
   getEvent?: QueryToGetEventResolver<TParent>
-  getEventConfig?: QueryToGetEventConfigResolver<TParent>
 }
 
 export interface QueryToSendNotificationToAllUsersArgs {
@@ -2707,15 +2590,6 @@ export interface QueryToGetEventResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetEventArgs,
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface QueryToGetEventConfigResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -5806,39 +5680,6 @@ export interface EventToActionsResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface GQLEventConfigTypeResolver<TParent = any> {
-  id?: EventConfigToIdResolver<TParent>
-  label?: EventConfigToLabelResolver<TParent>
-  actions?: EventConfigToActionsResolver<TParent>
-}
-
-export interface EventConfigToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EventConfigToLabelResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EventConfigToActionsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -8349,78 +8190,6 @@ export interface GQLActionTypeResolver<TParent = any> {
         'CreateAction' | 'RegisterAction' | 'NotifyAction' | 'DeclareAction'
       >
 }
-export interface GQLLabelTypeResolver<TParent = any> {
-  id?: LabelToIdResolver<TParent>
-  defaultMessage?: LabelToDefaultMessageResolver<TParent>
-  description?: LabelToDescriptionResolver<TParent>
-}
-
-export interface LabelToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LabelToDefaultMessageResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface LabelToDescriptionResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLEventConfigActionTypeResolver<TParent = any> {
-  label?: EventConfigActionToLabelResolver<TParent>
-  forms?: EventConfigActionToFormsResolver<TParent>
-  type?: EventConfigActionToTypeResolver<TParent>
-}
-
-export interface EventConfigActionToLabelResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EventConfigActionToFormsResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface EventConfigActionToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLAssignmentDataTypeResolver<TParent = any> {
   practitionerId?: AssignmentDataToPractitionerIdResolver<TParent>
   firstName?: AssignmentDataToFirstNameResolver<TParent>
@@ -11071,49 +10840,6 @@ export interface DeclareActionToIdentifiersResolver<
   ): TResult
 }
 
-export interface GQLFormTypeResolver<TParent = any> {
-  label?: FormToLabelResolver<TParent>
-  version?: FormToVersionResolver<TParent>
-  active?: FormToActiveResolver<TParent>
-  pages?: FormToPagesResolver<TParent>
-}
-
-export interface FormToLabelResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FormToVersionResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FormToActiveResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FormToPagesResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
 export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
   (parent: TParent, context: Context, info: GraphQLResolveInfo):
     | 'UserAuditLogItemWithComposition'
@@ -11150,12 +10876,28 @@ export interface AdditionalIdWithCompositionIdToTrackingIdResolver<
 }
 
 export interface GQLFieldTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
-    | 'TextField'
-    | 'DateField'
-    | 'ParagraphField'
-    | Promise<'TextField' | 'DateField' | 'ParagraphField'>
+  id?: FieldToIdResolver<TParent>
+  value?: FieldToValueResolver<TParent>
 }
+
+export interface FieldToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface FieldToValueResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLIdentifiersTypeResolver<TParent = any> {
   trackingId?: IdentifiersToTrackingIdResolver<TParent>
   registrationNumber?: IdentifiersToRegistrationNumberResolver<TParent>
@@ -11171,253 +10913,6 @@ export interface IdentifiersToTrackingIdResolver<TParent = any, TResult = any> {
 }
 
 export interface IdentifiersToRegistrationNumberResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLFormVersionTypeResolver<TParent = any> {
-  id?: FormVersionToIdResolver<TParent>
-  label?: FormVersionToLabelResolver<TParent>
-}
-
-export interface FormVersionToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface FormVersionToLabelResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLPageTypeResolver<TParent = any> {
-  id?: PageToIdResolver<TParent>
-  title?: PageToTitleResolver<TParent>
-  fields?: PageToFieldsResolver<TParent>
-}
-
-export interface PageToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PageToTitleResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface PageToFieldsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLTextFieldTypeResolver<TParent = any> {
-  id?: TextFieldToIdResolver<TParent>
-  required?: TextFieldToRequiredResolver<TParent>
-  label?: TextFieldToLabelResolver<TParent>
-  type?: TextFieldToTypeResolver<TParent>
-  options?: TextFieldToOptionsResolver<TParent>
-}
-
-export interface TextFieldToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface TextFieldToRequiredResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface TextFieldToLabelResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface TextFieldToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface TextFieldToOptionsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLDateFieldTypeResolver<TParent = any> {
-  id?: DateFieldToIdResolver<TParent>
-  required?: DateFieldToRequiredResolver<TParent>
-  label?: DateFieldToLabelResolver<TParent>
-  type?: DateFieldToTypeResolver<TParent>
-  options?: DateFieldToOptionsResolver<TParent>
-}
-
-export interface DateFieldToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DateFieldToRequiredResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DateFieldToLabelResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DateFieldToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface DateFieldToOptionsResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLParagraphFieldTypeResolver<TParent = any> {
-  id?: ParagraphFieldToIdResolver<TParent>
-  required?: ParagraphFieldToRequiredResolver<TParent>
-  label?: ParagraphFieldToLabelResolver<TParent>
-  type?: ParagraphFieldToTypeResolver<TParent>
-}
-
-export interface ParagraphFieldToIdResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ParagraphFieldToRequiredResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ParagraphFieldToLabelResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface ParagraphFieldToTypeResolver<TParent = any, TResult = any> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLBaseFieldTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
-    | 'TextField'
-    | 'DateField'
-    | 'ParagraphField'
-    | Promise<'TextField' | 'DateField' | 'ParagraphField'>
-}
-export interface GQLTextFieldOptionsTypeResolver<TParent = any> {
-  maxLength?: TextFieldOptionsToMaxLengthResolver<TParent>
-}
-
-export interface TextFieldOptionsToMaxLengthResolver<
-  TParent = any,
-  TResult = any
-> {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface GQLDateFieldOptionsTypeResolver<TParent = any> {
-  notice?: DateFieldOptionsToNoticeResolver<TParent>
-}
-
-export interface DateFieldOptionsToNoticeResolver<
   TParent = any,
   TResult = any
 > {

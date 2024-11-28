@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { AppRouter } from './router'
 import { env } from '@gateway/environment'
-import type { AppRouter } from '@opencrvs/events/src/router'
+
 import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 
 import superjson from 'superjson'
