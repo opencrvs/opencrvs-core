@@ -11,11 +11,6 @@
 import * as Hapi from '@hapi/hapi'
 import { ITokenPayload } from '@user-mgnt/utils/token'
 import decode from 'jwt-decode'
-import SystemRole, {
-  ISystemRoleModel,
-  sysAdminAccessMap
-} from '@user-mgnt/model/systemRole'
-import { SortOrder, ObjectId } from 'mongoose'
 
 export const statuses = {
   PENDING: 'pending',
@@ -61,36 +56,4 @@ export const getUserId = (authHeader: IAuthHeader): string => {
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   return tokenPayload.sub
-}
-
-export async function getValidRoles(
-  criteria = {},
-  sortOrder: SortOrder = 'asc',
-  sortBy: string,
-  token: string,
-  systemRole?: string
-): Promise<Omit<ISystemRoleModel & { _id: ObjectId }, never>[] | null> {
-  const scope = getTokenPayload(token).scope
-  const allRoles = await SystemRole.find(criteria)
-    .populate('roles')
-    .sort({
-      [sortBy]: sortOrder
-    })
-  let roleFilter = ''
-  if (scope.includes('natlsysadmin')) {
-    roleFilter = 'NATIONAL_SYSTEM_ADMIN'
-  } else if (scope.includes('sysadmin')) {
-    roleFilter = 'LOCAL_SYSTEM_ADMIN'
-  } else {
-    return null
-  }
-  const accessibleRoleValues = sysAdminAccessMap.get(roleFilter) || []
-  if (
-    (systemRole && accessibleRoleValues.includes(systemRole)) ||
-    !systemRole
-  ) {
-    return allRoles.filter((role) => accessibleRoleValues.includes(role.value))
-  } else {
-    return null
-  }
 }
