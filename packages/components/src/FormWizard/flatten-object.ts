@@ -8,9 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/**
+ * Flattens an object with nested objects into a single level object.
+ *
+ * @example
+ * flatten({ foo: { bar: { baz: 'value' } } })
+ * // { "foo.bar.baz": "value" }
+ */
 export const flatten = <T extends Record<string, unknown>>(
+  // eslint-disable-next-line @typescript-eslint/ban-types
   data: object,
-  prefix: string = ''
+  prefix = ''
 ) => {
   const result: { [key: string]: string | number | null } = {}
 
