@@ -22,7 +22,7 @@ import {
   Values,
   Spinner
 } from '@opencrvs/components'
-import { V2_EVENT_ROUTE } from '@client/v2-events/routes/routes'
+import { V2_EVENT_ROUTE } from '@client/v2-events/routes'
 
 import { trpc } from '@client/v2-events/trcp'
 import { formatUrl } from './utils'

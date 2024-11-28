@@ -73,7 +73,7 @@ import {
   V2_EVENT_ROUTE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE
-} from './v2-events/routes/routes'
+} from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
 import { TRPCProvider } from './v2-events/trcp'
