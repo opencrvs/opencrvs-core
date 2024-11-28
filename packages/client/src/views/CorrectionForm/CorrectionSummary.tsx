@@ -83,7 +83,7 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { UserDetails } from '@client/utils/userUtils'
 import { ROLE_REGISTRATION_AGENT } from '@client/utils/constants'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { SystemRoleType } from '@client/utils/gateway'
+import { EventType, SystemRoleType } from '@client/utils/gateway'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -175,6 +175,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     const noIdCheck =
       relationShip !== CorrectorRelationship.REGISTRAR &&
       relationShip !== CorrectorRelationship.ANOTHER_AGENT
+
+    /** 
+     * only hidden when CORRECTION_SUPPORTING_DOCUMENTS is set and false
+     * @todo add other event types
+     * */
+    const hideSupportingDocuments = (this.props.declaration.event === EventType.Birth && this.props.offlineResources.config?.BIRTH?.CORRECTION_SUPPORTING_DOCUMENTS === false)
 
     const backToReviewButton = (
       <SecondaryButton
@@ -341,7 +347,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
             ></Table>
-            {this.props.offlineResources.config?.BIRTH?.CORRECTION_SUPPORTING_DOCUMENTS !== false && <Table
+            {!hideSupportingDocuments && <Table
               id="supportingDocuments"
               isLoading={false}
               content={[

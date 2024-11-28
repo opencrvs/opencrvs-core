@@ -1039,6 +1039,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
           )
         : true
 
+    /**
+     * only skipped when CORRECTION_SUPPORTING_DOCUMENTS is set and false
+     * @todo add other event types
+     * */
+    const skipSupportingDocuments = (this.props.declaration.event === EventType.Birth && config.config?.BIRTH?.CORRECTION_SUPPORTING_DOCUMENTS === false)
+
     return (
       <>
         <TimeMounted
@@ -1103,7 +1109,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       onContinue={() => {
                         this.props.goToCertificateCorrection(
                           this.props.declaration.id,
-                          config.config?.BIRTH?.CORRECTION_SUPPORTING_DOCUMENTS !== false
+                          !skipSupportingDocuments
                             ? CorrectionSection.SupportingDocuments
                             : CorrectionSection.Reason
                         )
