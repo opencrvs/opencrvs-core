@@ -18,7 +18,7 @@ import { Button } from '../Button'
  * @example
  * { "informant.name": "John Doe", "informant.address": "123 Main St" }
  */
-type Values = Record<string, string>
+export type Values = Record<string, string>
 
 /**
  * Definition of a page of the form wizard
@@ -34,7 +34,7 @@ type FormWizardProps<CM extends ComponentsMap> = {
   pages: Page<CM>[]
   defaultValues?: Values
   /** Callback when the user clicks the "Continue" button */
-  onNextPage: (() => void) | undefined
+  onNextPage?: () => void
   /** Callback when the user submits the form wizard */
   onSubmit: (data: Values) => void
 }

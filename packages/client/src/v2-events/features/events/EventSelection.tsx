@@ -18,43 +18,28 @@ import {
   Icon,
   Content,
   ContentSize,
-  RadioGroup,
-  RadioSize,
-  Stack,
-  ErrorText
+  FormWizard,
+  Values
 } from '@opencrvs/components'
-import { useDispatch } from 'react-redux'
-import { push } from 'connected-react-router'
-import { Controller, useForm } from 'react-hook-form'
 import { V2_EVENT_ROUTE } from '@client/v2-events/routes/routes'
 
 import { trpc } from '@client/v2-events/trcp'
 import { formatUrl } from './utils'
-
-type SelectEventForm = {
-  eventType: string
-}
+import { useHistory } from 'react-router-dom'
+import { RadioGroup } from './registered-fields/RadioGroup'
 
 export const Events = () => {
-  const dispatch = useDispatch()
-  const { data, isFetching } = trpc.config.get.useQuery()
+  const history = useHistory()
+  const { data } = trpc.config.get.useQuery()
 
   const events = data ?? []
 
-  const { handleSubmit, control, formState } = useForm<SelectEventForm>()
-
-  const errorMessage = formState.errors.eventType
-    ? 'Please select an event'
-    : ''
-
-  const onSubmit = ({ eventType }: SelectEventForm) => {
+  const onSubmit = ({ eventType }: Values) => {
     if (eventType) {
-      dispatch(
-        push(
-          formatUrl(V2_EVENT_ROUTE, {
-            eventType
-          })
-        )
+      history.push(
+        formatUrl(V2_EVENT_ROUTE, {
+          eventType
+        })
       )
     }
   }
@@ -78,29 +63,36 @@ export const Events = () => {
       <Frame.Layout>
         <Frame.Section>
           <Content size={ContentSize.SMALL} title="Event type">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              {!!errorMessage && <ErrorText>{errorMessage}</ErrorText>}
-              <Stack direction="column" gap={24}>
-                <Controller
-                  name="eventType"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <RadioGroup
-                      size={RadioSize.LARGE}
-                      options={events.map((event) => ({
+            <FormWizard
+              currentPage={0}
+              pages={[
+                {
+                  fields: [
+                    {
+                      name: 'eventType',
+                      type: 'RADIO_GROUP',
+                      required: true,
+                      label: {
+                        defaultMessage: 'Select an event',
+                        description: 'Select an event',
+                        id: 'event.select.label'
+                      },
+                      options: events.map((event) => ({
                         value: event.id,
                         label: event.label.defaultMessage
-                      }))}
-                      {...field}
-                    />
-                  )}
-                />
-                <Button fullWidth type="primary" disabled={isFetching}>
-                  Continue
-                </Button>
-              </Stack>
-            </form>
+                      }))
+                    }
+                  ]
+                }
+              ]}
+              components={{
+                RADIO_GROUP: RadioGroup
+              }}
+              defaultValues={{
+                eventType: events[0]?.id
+              }}
+              onSubmit={onSubmit}
+            />
           </Content>
         </Frame.Section>
       </Frame.Layout>
