@@ -10,26 +10,15 @@
  */
 // eslint-disable-next-line import/no-relative-parent-imports
 import { METRICS_URL } from '@gateway/constants'
-import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
 export interface ITimeLoggedResponse {
   status?: string
   timeSpentEditing: number
 }
 
-export default class MetricsAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = `${METRICS_URL}`
-  }
-
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
-  }
+export default class MetricsAPI extends OpenCRVSRESTDataSource {
+  override baseURL = `${METRICS_URL}`
 
   getTimeLogged(recordId: string) {
     return this.get(`/timeLogged?compositionId=${recordId}`)

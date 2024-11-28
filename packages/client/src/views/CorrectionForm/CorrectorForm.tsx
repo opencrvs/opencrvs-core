@@ -27,7 +27,7 @@ import {
   goToHomeTab
 } from '@client/navigation'
 import { IFormSection, IFormSectionData, ReviewSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { FormFieldGenerator } from '@client/components/form'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -159,7 +159,7 @@ function CorrectorFormComponent(props: IFullProps) {
           size={ContentSize.SMALL}
           title={group.title && intl.formatMessage(group.title)}
           subtitle={
-            declaration.event === Event.Birth
+            declaration.event === EventType.Birth
               ? intl.formatMessage(messages.birthCorrectionNote)
               : undefined
           }

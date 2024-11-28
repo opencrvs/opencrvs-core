@@ -21,7 +21,7 @@ import {
 } from '@opencrvs/components'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -110,13 +110,16 @@ const ReviewCertificateFrame = ({
 }
 
 export const ReviewCertificate = () => {
+  const { registrationId } = useParams<{
+    registrationId: string
+  }>()
   const {
     svgCode,
     handleCertify,
     isPrintInAdvance,
     canUserEditRecord,
     handleEdit
-  } = usePrintableCertificate()
+  } = usePrintableCertificate(registrationId)
   const intl = useIntl()
   const [modal, openModal] = useModal()
 

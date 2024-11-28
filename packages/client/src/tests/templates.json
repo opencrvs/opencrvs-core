@@ -24,6 +24,7 @@
       },
       "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/birth-certificate.svg",
+      "svg": "<svg></svg>",
       "fonts": {
         "Noto Sans": {
           "normal": "/api/countryconfig/fonts/NotoSans-Regular.ttf",
@@ -49,6 +50,7 @@
       },
       "isDefault": false,
       "svgUrl": "/api/countryconfig/certificates/birth-certificate-certified-copy.svg",
+      "svg": "<svg></svg>",
       "fonts": {
         "Noto Sans": {
           "normal": "/api/countryconfig/fonts/NotoSans-Regular.ttf",
@@ -74,6 +76,7 @@
       },
       "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/death-certificate.svg",
+      "svg": "<svg></svg>",
       "fonts": {
         "Noto Sans": {
           "normal": "/api/countryconfig/fonts/NotoSans-Regular.ttf",
@@ -99,6 +102,7 @@
       },
       "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/marriage-certificate.svg",
+      "svg": "<svg></svg>",
       "fonts": {
         "Noto Sans": {
           "normal": "/api/countryconfig/fonts/NotoSans-Regular.ttf",

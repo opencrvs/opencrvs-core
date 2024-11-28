@@ -10,6 +10,7 @@
  */
 import { ISerializedForm } from '@client/forms'
 import { Conditional } from '@client/forms/conditionals'
+import { Validator } from '@client/forms/validators'
 import { ILanguage } from '@client/i18n/reducer'
 import {
   AdminStructure,
@@ -18,8 +19,7 @@ import {
   ILocation
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { Event, System } from '@client/utils/gateway'
-import { Validator } from '@client/forms/validators'
+import { EventType, System } from '@client/utils/gateway'
 import { IntlShape } from 'react-intl'
 
 export interface ILocationDataResponse {
@@ -79,7 +79,7 @@ interface ILoginBackground {
 }
 export interface ICertificateConfigData {
   id: string
-  event: Event
+  event: EventType
   label: {
     id: string
     defaultMessage: string

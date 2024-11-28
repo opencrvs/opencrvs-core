@@ -47,11 +47,11 @@ import { IForm } from '@client/forms'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 
 interface IMatchParams {
   registrationId: string
-  eventType: Event
+  eventType: EventType
   collector: string
 }
 

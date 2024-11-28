@@ -414,8 +414,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+      const record = context.dataSources.recordsAPI.getRecord()
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        record,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return (person && person.name) || null
@@ -424,8 +425,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+      const record = context.dataSources.recordsAPI.getRecord()
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        record,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
@@ -438,8 +440,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+      const record = context.dataSources.recordsAPI.getRecord()
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        record,
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const marriageExtension = findExtension(
@@ -458,8 +461,9 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
+
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return (person && person.birthDate) || null
@@ -469,7 +473,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return (person && person.identifier) || null
@@ -479,7 +483,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person && person.maritalStatus && person.maritalStatus.text
@@ -489,7 +493,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const occupationExtension = findExtension(
@@ -507,7 +511,7 @@ export const typeResolvers: GQLResolver = {
         return
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const reasonNotApplyingExtension = findExtension(
@@ -529,7 +533,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const ageOfIndividualInYearsExtension = findExtension(
@@ -551,7 +555,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const exactDateOfBirthUnknownExtension = findExtension(
@@ -569,7 +573,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person?.active
@@ -579,7 +583,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person?.multipleBirthInteger
@@ -589,7 +593,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person
@@ -599,7 +603,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
 
@@ -638,7 +642,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       const educationalAttainmentExtension = findExtension(
@@ -656,7 +660,7 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       const person = getResourceFromBundleById<Patient>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
       )
       return person?.address
@@ -738,7 +742,9 @@ export const typeResolvers: GQLResolver = {
         )
       }
 
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const docSection = findCompositionSection(
         ATTACHMENT_DOCS_CODE,
         composition
@@ -751,7 +757,7 @@ export const typeResolvers: GQLResolver = {
       )
       return docRefReferences.map(async (docRefReference) =>
         getResourceFromBundleById(
-          context.record!,
+          context.dataSources.recordsAPI.getRecord(),
           resourceIdentifierToUUID(docRefReference)
         )
       )
@@ -760,14 +766,16 @@ export const typeResolvers: GQLResolver = {
       if (!task.focus) {
         return null
       }
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
 
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(patientSection.entry[0].reference)
       )
 
@@ -786,13 +794,15 @@ export const typeResolvers: GQLResolver = {
       if (!task.focus) {
         return null
       }
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const patientSection = findCompositionSection(INFORMANT_CODE, composition)
       if (!patientSection || !patientSection.entry) {
         return null
       }
       const relatedPerson = getResourceFromBundleById<RelatedPerson>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(patientSection.entry[0].reference)
       )
 
@@ -979,8 +989,9 @@ export const typeResolvers: GQLResolver = {
       return (foundIdentifier && foundIdentifier.value) || null
     },
     status: async (task: Saved<Task>, _, context) => {
-      return context.record?.entry
-        .map(({ resource }) => resource)
+      return context.dataSources.recordsAPI
+        .fetchRecord()
+        ?.entry.map(({ resource }) => resource)
         .filter(isTaskOrTaskHistory)
         .sort(sortDescending)
     },
@@ -999,7 +1010,9 @@ export const typeResolvers: GQLResolver = {
         )
       }
 
-      const composition = getComposition(context.record!)
+      const composition = getComposition(
+        context.dataSources.recordsAPI.getRecord()
+      )
       const duplicateCompositionIds =
         composition.relatesTo &&
         composition.relatesTo.map((duplicate) => {
@@ -1042,10 +1055,10 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         task.extension
       )
-      const office =
-        context.record && findLastOfficeFromSavedBundle(context.record)
+      const record = context.dataSources.recordsAPI.fetchRecord()
+      const office = record && findLastOfficeFromSavedBundle(record)
 
-      if (assignmentExtension && context.record) {
+      if (assignmentExtension && record) {
         const regLastUserExtension = findExtension(
           `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
           task.extension
@@ -1056,7 +1069,7 @@ export const typeResolvers: GQLResolver = {
         )
 
         const user = findResourceFromBundleById<Practitioner>(
-          context.record,
+          record,
           practitionerId
         )!
 
@@ -1090,7 +1103,8 @@ export const typeResolvers: GQLResolver = {
     reason: (task: Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
     comments: (task) => task.note,
-    location: async (task, _, { dataSources, record }) => {
+    location: async (task, _, context) => {
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const taskLocation = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension as Extension[]
@@ -1201,7 +1215,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       return getResourceFromBundleById<RelatedPerson>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(
           relatedPersonRef.valueReference.reference as ResourceIdentifier
         )
@@ -1268,7 +1282,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       const practitioner = getResourceFromBundleById<Practitioner>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(
           encounterParticipant.individual.reference as ResourceIdentifier
         )
@@ -1292,7 +1306,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       const practitioner = getResourceFromBundleById<Practitioner>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(encounterParticipant.individual.reference)
       )
       return (
@@ -1333,9 +1347,9 @@ export const typeResolvers: GQLResolver = {
       if (!encounter) {
         return []
       }
-
-      return context
-        .record!.entry.map((entry) => entry.resource)
+      const record = context.dataSources.recordsAPI.getRecord()
+      return record.entry
+        .map((entry) => entry.resource)
         .filter(isDocumentReference)
         .filter((x) => x.subject?.reference === encounter)
     },
@@ -1355,7 +1369,7 @@ export const typeResolvers: GQLResolver = {
       const paymentId = paymentReference.split('/')[1]
       const paymentReconciliation =
         getResourceFromBundleById<PaymentReconciliation>(
-          context.record!,
+          context.dataSources.recordsAPI.getRecord(),
           paymentId
         )
 
@@ -1364,9 +1378,9 @@ export const typeResolvers: GQLResolver = {
           'PaymentReconciliation resource not found even when task has payment extension. This should never happen'
         )
       }
-
-      const documentReference = context
-        .record!.entry.map((entry) => entry.resource)
+      const record = context.dataSources.recordsAPI.getRecord()
+      const documentReference = record.entry
+        .map((entry) => entry.resource)
         .filter(isDocumentReference)
         .filter(
           (x) => x.subject?.reference === `PaymentReconciliation/${paymentId}`
@@ -1522,7 +1536,8 @@ export const typeResolvers: GQLResolver = {
       }
       return JSON.parse(systemIdentifier.value)
     },
-    location: async (task: Task, _: any, { record }) => {
+    location: async (task: Task, _: any, context) => {
+      const record = context.dataSources.recordsAPI.fetchRecord()
       const officeExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
         task.extension
@@ -1587,7 +1602,7 @@ export const typeResolvers: GQLResolver = {
         user.valueReference.reference
       )
       const practitioner = getResourceFromBundleById<Practitioner>(
-        context.record!,
+        context.dataSources.recordsAPI.getRecord(),
         practitionerId
       )
 

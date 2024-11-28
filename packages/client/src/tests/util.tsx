@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { App } from '@client/App'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { EventType, SystemRoleType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -839,7 +839,7 @@ export const mockDeathRegistrationSectionData = {
 const mockFetchCertificatesTemplatesDefinition = [
   {
     id: 'birth-certificate',
-    event: 'birth' as Event,
+    event: 'birth' as EventType,
     label: {
       id: 'certificates.birth.certificate',
       defaultMessage: 'Birth Certificate',
@@ -852,6 +852,7 @@ const mockFetchCertificatesTemplatesDefinition = [
     },
     isDefault: true,
     svgUrl: '/api/countryconfig/certificates/birth-certificate.svg',
+    svg: '<svg></svg>',
     fonts: {
       'Noto Sans': {
         normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
@@ -863,7 +864,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: 'birth-certificate-copy',
-    event: 'birth' as Event,
+    event: 'birth' as EventType,
     label: {
       id: 'certificates.birth-certificate-copy',
       defaultMessage: 'Birth Certificate certified copy',
@@ -876,6 +877,7 @@ const mockFetchCertificatesTemplatesDefinition = [
     },
     isDefault: false,
     svgUrl: '/api/countryconfig/certificates/birth-certificate-copy.svg',
+    svg: '<svg></svg>',
     fonts: {
       'Noto Sans': {
         normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
@@ -887,7 +889,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: 'death-certificate',
-    event: 'death' as Event,
+    event: 'death' as EventType,
     label: {
       id: 'certificates.death.certificate',
       defaultMessage: 'Death Certificate',
@@ -900,6 +902,7 @@ const mockFetchCertificatesTemplatesDefinition = [
     },
     isDefault: true,
     svgUrl: '/api/countryconfig/certificates/death-certificate.svg',
+    svg: '<svg></svg>',
     fonts: {
       'Noto Sans': {
         normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
@@ -911,7 +914,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: 'marriage-certificate',
-    event: 'marriage' as Event,
+    event: 'marriage' as EventType,
     label: {
       id: 'certificates.marriage.certificate',
       defaultMessage: 'Marriage Certificate',
@@ -924,6 +927,7 @@ const mockFetchCertificatesTemplatesDefinition = [
     },
     isDefault: true,
     svgUrl: '/api/countryconfig/certificates/marriage-certificate.svg',
+    svg: '<svg></svg>',
     fonts: {
       'Noto Sans': {
         normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
@@ -1073,7 +1077,7 @@ export async function goToMotherSection(component: ReactWrapper) {
 
 export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
-  event: Event
+  event: EventType
 ) {
   await store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
@@ -1082,7 +1086,7 @@ export async function getRegisterFormFromStore(
 
 export async function getReviewFormFromStore(
   store: Store<IStoreState, AnyAction>,
-  event: Event
+  event: EventType
 ) {
   await store.dispatch(setOfflineData(userDetails))
   const state = store.getState()

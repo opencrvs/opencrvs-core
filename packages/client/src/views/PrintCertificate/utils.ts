@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormData, IFormSectionGroup, ISelectOption } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, EventType } from '@client/utils/gateway'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
@@ -65,7 +65,7 @@ function getDayRanges(
     (x) => x.id === certificate.certificateTemplateId
   )
   switch (templateConfig?.event) {
-    case Event.Birth: {
+    case EventType.Birth: {
       const BIRTH_REGISTRATION_TARGET =
         offlineData.config.BIRTH.REGISTRATION_TARGET
       const BIRTH_LATE_REGISTRATION_TARGET =
@@ -85,7 +85,7 @@ function getDayRanges(
       return birthRanges
     }
 
-    case Event.Death: {
+    case EventType.Death: {
       const DEATH_REGISTRATION_TARGET =
         offlineData.config.DEATH.REGISTRATION_TARGET
       const DEATH_ON_TIME_FEE = templateConfig?.fee.onTime
@@ -97,7 +97,7 @@ function getDayRanges(
       ]
       return deathRanges
     }
-    case Event.Marriage: {
+    case EventType.Marriage: {
       const MARRIAGE_REGISTRATION_TARGET =
         offlineData.config.MARRIAGE.REGISTRATION_TARGET
       const MARRIAGE_ON_TIME_FEE = templateConfig?.fee.onTime
@@ -166,7 +166,7 @@ export function timeElapsed(days: number) {
 }
 
 export function calculatePrice(
-  event: Event,
+  event: EventType,
   eventDate: string,
   registeredDate: string,
   offlineData: IOfflineData,
@@ -180,14 +180,14 @@ export function calculatePrice(
 
 export function getServiceMessage(
   intl: IntlShape,
-  event: Event,
+  event: EventType,
   eventDate: string,
   registeredDate: string,
   offlineData: IOfflineData
 ) {
   const days = calculateDays(eventDate, registeredDate)
 
-  if (event === Event.Birth) {
+  if (event === EventType.Birth) {
     if (days <= offlineData.config.BIRTH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.BIRTH.REGISTRATION_TARGET
@@ -205,7 +205,7 @@ export function getServiceMessage(
         target: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       })
     }
-  } else if (event === Event.Death) {
+  } else if (event === EventType.Death) {
     if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.DEATH.REGISTRATION_TARGET
@@ -215,7 +215,7 @@ export function getServiceMessage(
         target: offlineData.config.DEATH.REGISTRATION_TARGET
       })
     }
-  } else if (event === Event.Marriage) {
+  } else if (event === EventType.Marriage) {
     if (days <= offlineData.config.DEATH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.MARRIAGE.REGISTRATION_TARGET
@@ -239,13 +239,13 @@ export function isFreeOfCost(
   return result === 0
 }
 
-export function getEventDate(data: IFormData, event: Event) {
+export function getEventDate(data: IFormData, event: EventType) {
   switch (event) {
-    case Event.Birth:
+    case EventType.Birth:
       return data.child.childBirthDate as string
-    case Event.Death:
+    case EventType.Death:
       return data.deathEvent.deathDate as string
-    case Event.Marriage:
+    case EventType.Marriage:
       return data.marriageEvent.marriageDate as string
   }
 }
@@ -262,11 +262,11 @@ export function getEvent(eventType: string | undefined) {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.Birth
+      return EventType.Birth
     case 'death':
-      return Event.Death
+      return EventType.Death
     case 'marriage':
-      return Event.Marriage
+      return EventType.Marriage
   }
 }
 

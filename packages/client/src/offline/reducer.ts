@@ -39,12 +39,12 @@ import { merge } from 'lodash'
 import { isNavigatorOnline } from '@client/utils'
 import { ISerializedForm } from '@client/forms'
 import { initConditionals } from '@client/forms/conditionals'
+import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { initValidators } from '@client/forms/validators'
 import {
   Action as NotificationAction,
   configurationErrorNotification
 } from '@client/notification/actions'
-import { initHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { getToken } from '@client/utils/authUtils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'

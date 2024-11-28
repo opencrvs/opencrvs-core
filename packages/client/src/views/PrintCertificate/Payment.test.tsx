@@ -19,7 +19,7 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
 import { checkAuth } from '@client/profile/profileActions'
@@ -46,7 +46,7 @@ const birthDeclaration = {
       }
     ] as unknown as IFormSectionData
   },
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 const deathDeclaration = {
@@ -61,7 +61,7 @@ const deathDeclaration = {
       }
     ] as unknown as IFormSectionData
   },
-  event: Event.Death
+  event: EventType.Death
 }
 
 // Helper function to set up test

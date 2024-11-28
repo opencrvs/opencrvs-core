@@ -18,7 +18,7 @@ import {
 } from '@client/tests/util'
 import { VerifyCollector } from './VerifyCollector'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 
 // Common mock data
@@ -34,7 +34,7 @@ const birthDeclaration = {
       }
     ]
   },
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 const deathDeclaration = {
@@ -55,7 +55,7 @@ const deathDeclaration = {
       }
     ]
   },
-  event: Event.Death
+  event: EventType.Death
 }
 
 // Helper function for setting up tests
@@ -84,7 +84,7 @@ async function setupTest({
       match={{
         params: {
           registrationId,
-          eventType: event as Event,
+          eventType: event as EventType,
           collector
         },
         isExact: true,

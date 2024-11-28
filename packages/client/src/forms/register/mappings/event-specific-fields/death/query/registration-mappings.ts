@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
+import { EventType } from '@client/utils/gateway'
+import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 
 export function getDeathRegistrationSectionTransformer(
   transformedData: IFormData,
@@ -35,7 +35,7 @@ export function getDeathRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].type && queryData[sectionId].type === 'DEATH') {
-    transformedData[sectionId].type = Event.Death
+    transformedData[sectionId].type = EventType.Death
   }
 
   if (queryData[sectionId].status) {

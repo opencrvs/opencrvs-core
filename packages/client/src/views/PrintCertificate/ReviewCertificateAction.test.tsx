@@ -24,7 +24,7 @@ import {
 import { ReviewCertificate } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
 import { IFormSectionData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
@@ -43,7 +43,7 @@ const birthDeclaration = {
       }
     ] as unknown as IFormSectionData
   },
-  event: Event.Birth
+  event: EventType.Birth
 }
 
 const deathDeclaration = {
@@ -58,7 +58,7 @@ const deathDeclaration = {
       }
     ] as unknown as IFormSectionData
   },
-  event: Event.Death
+  event: EventType.Death
 }
 
 const marriageDeclaration = {
@@ -73,7 +73,7 @@ const marriageDeclaration = {
       }
     ] as unknown as IFormSectionData
   },
-  event: Event.Marriage
+  event: EventType.Marriage
 }
 
 async function setupTest({
@@ -224,7 +224,7 @@ describe('Back button behavior tests of review certificate action', () => {
       {
         matchParams: {
           registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.Birth
+          eventType: EventType.Birth
         }
       }
     )
@@ -253,7 +253,7 @@ describe('Back button behavior tests of review certificate action', () => {
       {
         matchParams: {
           registrationId: 'mockBirth1234',
-          eventType: Event.Birth
+          eventType: EventType.Birth
         }
       }
     )

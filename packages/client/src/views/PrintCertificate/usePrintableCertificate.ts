@@ -11,8 +11,8 @@
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import {
   IPrintableDeclaration,
-  SUBMISSION_STATUS,
   modifyDeclaration,
+  SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
 import { useDeclaration } from '@client/declarations/selectors'
@@ -22,28 +22,28 @@ import {
   SubmissionAction
 } from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
+import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { printPDF } from '@client/pdfRenderer'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import {
   hasRegisterScope,
   hasRegistrationClerkScope
 } from '@client/utils/authUtils'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { EventType } from '@client/utils/gateway'
+import { getLocationHierarchy } from '@client/utils/locationUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { cloneDeep } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
-  isCertificateForPrintInAdvance,
-  getRegisteredDate,
+  calculatePrice,
   getEventDate,
-  calculatePrice
+  getRegisteredDate,
+  isCertificateForPrintInAdvance
 } from './utils'
-import { Event } from '@client/utils/gateway'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { AdminStructure, IOfflineData } from '@client/offline/reducer'
-import { getLocationHierarchy } from '@client/utils/locationUtils'
-import { printPDF } from '@client/pdfRenderer'
 import { useParams } from 'react-router'
 import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
@@ -130,10 +130,7 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = () => {
-  const { registrationId } = useParams<{
-    registrationId: string
-  }>()
+export const usePrintableCertificate = (registrationId: string) => {
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
   >(registrationId)
@@ -150,7 +147,7 @@ export const usePrintableCertificate = () => {
   const dispatch = useDispatch()
   const scope = useSelector(getScope)
   const canUserEditRecord =
-    declaration?.event !== Event.Marriage &&
+    declaration?.event !== EventType.Marriage &&
     (hasRegisterScope(scope) || hasRegistrationClerkScope(scope))
 
   const certificateTemplateConfig: ICertificateData | undefined =
