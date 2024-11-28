@@ -71,7 +71,7 @@ import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEm
 import { ReloadModal } from './views/Modals/ReloadModal'
 import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from './v2-events/routes/routes'
 import { Workqueues } from './v2-events/features/workqueues'
-import { PublishEvent } from './v2-events/features/events/PublishEvent'
+import { PublishEventIndex } from './v2-events/features/events/PublishEvent'
 import { TRPCProvider } from './v2-events/trcp'
 
 interface IAppProps {
@@ -533,7 +533,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={V2_EVENT_ROUTE}
-                                              component={PublishEvent}
+                                              component={PublishEventIndex}
                                             />
                                           </TRPCProvider>
                                         </Switch>

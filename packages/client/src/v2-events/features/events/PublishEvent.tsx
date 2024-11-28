@@ -20,11 +20,28 @@ import {
 import React from 'react'
 import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
+import { useEventForm } from './useEventForm'
+import { EventConfig } from '@opencrvs/commons/client'
 
-export function PublishEvent() {
+export function PublishEventIndex() {
   const { eventType } = useParams<{ eventType: string }>()
+
+  const { event, isLoading } = useEvent(eventType)
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!event) {
+    throw new Error('Event not found')
+  }
+
+  return <PublishEvent event={event} />
+}
+
+export function PublishEvent({ event }: { event: EventConfig }) {
   const { title, exit, saveAndExit, previous, next, finish } =
-    useEvent(eventType)
+    useEventForm(event)
 
   return (
     <Frame

@@ -9,63 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConfig } from '@opencrvs/commons/client'
-import { useIntl } from 'react-intl'
-import { usePagination } from './usePagination'
-
 import { trpc } from '@client/v2-events/trcp'
-import { FormPage } from '@opencrvs/commons'
-import { useEffect, useState } from 'react'
-import { useRouteMatch } from 'react-router-dom'
-import { V2_EVENT_ROUTE } from '@client/v2-events/routes/routes'
 
-export function useEvent(anyEventType: string) {
-  const intl = useIntl()
-
+/**
+ * Fetches configures events and finds a matching event
+ * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
+ * @returns event configuration
+ */
+export function useEvent(eventIdentifier: string) {
   const hook = trpc.config.get.useQuery()
-  const { isLoading, error, data } = hook
+  const { error, data, isFetching } = hook
 
-  const [pages, setPages] = useState<FormPage[]>([])
-  const [title, setTitle] = useState<string>()
-  const [fields, setFields] = useState<FieldConfig[]>([])
+  const event = data?.find((event) => event.id === eventIdentifier)
 
-  const match = useRouteMatch<{ eventType: string }>(V2_EVENT_ROUTE)
-
-  const { next, previous, page } = usePagination(pages.length)
-
-  const exit = () => alert('exit')
-  const saveAndExit = () => alert('save and exit')
-  const finish = () => alert('finish')
-
-  useEffect(() => {
-    if (!data) {
-      return
-    }
-    if (error) {
-      return
-    }
-    const event = data.find((event) => event.id === match?.params.eventType)
-
-    if (!event) {
-      return
-    }
-
-    setTitle(intl.formatMessage(event.label))
-    const pages = event.actions[0].forms[0].pages
-    setPages(pages)
-    setFields(pages[page].fields)
-  }, [data, error, intl, match?.params.eventType, page])
-
+  const noMatchingEvent = !isFetching && !event
   return {
-    loading: isLoading,
-    type: match?.params.eventType,
-    title,
-    exit,
-    saveAndExit,
-    previous,
-    next,
-    finish,
-    form: pages,
-    fields
+    // We hide the distinction between fetching (all calls) and loading (initial call) from the caller.
+    isLoading: isFetching,
+    error: noMatchingEvent ? 'Event not found' : error?.message,
+    event: event
   }
 }
