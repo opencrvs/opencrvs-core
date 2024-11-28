@@ -244,7 +244,8 @@ function UserListComponent(props: IProps) {
     offlineCountryConfig,
     location: { search }
   } = props
-  const { canEditUser, canAddOfficeUsers, canAccessOffice } = usePermissions()
+  const { canReadUser, canEditUser, canAddOfficeUsers, canAccessOffice } =
+    usePermissions()
 
   const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleUsernameReminder, setToggleUsernameReminder] =
@@ -532,6 +533,7 @@ function UserListComponent(props: IProps) {
               <Link
                 id="profile-link"
                 onClick={() => goToUserProfile(String(user.id))}
+                disabled={!canReadUser(user)}
               >
                 {name}
               </Link>
@@ -555,7 +557,7 @@ function UserListComponent(props: IProps) {
         }
       })
     },
-    [StatusMenu, intl, goToUserProfile]
+    [StatusMenu, intl, goToUserProfile, canReadUser]
   )
 
   const onClickAddUser = useCallback(
