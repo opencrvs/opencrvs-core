@@ -12,7 +12,7 @@ import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
 
-export const getSortedItems = <T = any>(
+export const getSortedItems = <T>(
   items: T[],
   sortedCol: COLUMNS,
   sortOrder: SORT_ORDER
