@@ -85,7 +85,7 @@ export const secondary = css`
   }
 `
 
-export const secondary_negative = css`
+export const secondaryNegative = css`
   border: 2px solid ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.negative};
 

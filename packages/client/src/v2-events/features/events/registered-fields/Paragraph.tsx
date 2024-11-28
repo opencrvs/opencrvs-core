@@ -8,10 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { FieldProps } from '@opencrvs/commons'
+import React from 'react'
+import { useIntl } from 'react-intl'
 
-import { cleanEnv, url } from 'envalid'
+export const Paragraph = ({ label }: FieldProps<'PARAGRAPH'>) => {
+  const intl = useIntl()
 
-export const env = cleanEnv(process.env, {
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
-  ES_HOST: url({ devDefault: 'http://localhost:9200' })
-})
+  return <p>{intl.formatMessage(label)}</p>
+}
