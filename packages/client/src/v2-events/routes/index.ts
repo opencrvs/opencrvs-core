@@ -8,5 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const V2_ROOT_ROUTE = '/v2'
-export const V2_EVENT_ROUTE = `${V2_ROOT_ROUTE}/event/:eventType`
+
+// import { route, string } from 'react-router-typesafe-routes/native'
+
+// export const V2_ROUTES = {
+//   V2: route(
+//     'v2',
+//     {},
+//     {
+//       EVENT: route('event/:eventType', {
+//         params: {
+//           eventType: string().defined()
+//         }
+//       })
+//     }
+//   )
+// }
+
+export {}
