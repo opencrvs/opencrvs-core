@@ -70,7 +70,7 @@ const nameObjNatlSysAdmin = {
 storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
-let { store, history } = createStore()
+let { store } = createStore()
 let client = createClient(store)
 
 describe('Navigation for national system admin related tests', () => {
@@ -80,28 +80,30 @@ describe('Navigation for national system admin related tests', () => {
     merge(mockUserResponse, nameObjNatlSysAdmin)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
     getItem.mockReturnValue(natlSysAdminToken)
     await store.dispatch(checkAuth())
     await flushPromises()
 
-    testComponent = await createTestComponent(
+    const { component, router } = await createTestComponent(
       <OfficeHome
-        match={{
-          params: {
-            tabId: WORKQUEUE_TABS.inProgress
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
+      // match={{
+      //   params: {
+      //     tabId: WORKQUEUE_TABS.inProgress
+      //   },
+      //   isExact: true,
+      //   path: '',
+      //   url: ''
+      // }}
+
+      // history={history}
+      // location={history.location}
       />,
-      { store, history }
+      { store }
     )
+
+    testComponent = component
   })
 
   it('Tabs loaded successfully including config tab', async () => {
@@ -128,47 +130,49 @@ describe('Navigation for Registration agent related tests', () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
     await flushPromises()
 
-    testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <OfficeHome
-        match={{
-          params: {
-            tabId: WORKQUEUE_TABS.inProgress
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
+      // match={{
+      //   params: {
+      //     tabId: WORKQUEUE_TABS.inProgress
+      //   },
+      //   isExact: true,
+      //   path: '',
+      //   url: ''
+      // }}
+      // staticContext={undefined}
+      // history={history}
+      // location={history.location}
       />,
-      { store, history }
+      { store }
     )
+
+    testComponent = component
   })
   it('renders page with team and performance tab for registration agent', async () => {
-    const testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <OfficeHome
-        match={{
-          params: { tabId: WORKQUEUE_TABS.inProgress },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
+      // match={{
+      //   params: { tabId: WORKQUEUE_TABS.inProgress },
+      //   isExact: true,
+      //   path: '',
+      //   url: ''
+      // }}
+      // staticContext={undefined}
+      // history={history}
+      // location={history.location}
       />,
-      { store, history, apolloClient: client }
+      { store, apolloClient: client }
     )
-    expect(testComponent.exists('#navigation_team')).toBeTruthy()
-    expect(testComponent.exists('#navigation_performance')).toBeTruthy()
-    expect(testComponent.exists('#navigation_config_main')).toBeFalsy()
+    expect(component.exists('#navigation_team')).toBeTruthy()
+    expect(component.exists('#navigation_performance')).toBeTruthy()
+    expect(component.exists('#navigation_config_main')).toBeFalsy()
   })
 
   it('5 application tabs exists for registration agent', async () => {
@@ -209,16 +213,18 @@ describe('Navigation for District Registrar related tests', () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
     await flushPromises()
 
-    testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <Navigation menuCollapse={() => {}} />,
-      { store, history }
+      { store }
     )
+
+    testComponent = component
   })
   it('settings and logout exists on navigation mobile view', async () => {
     expect(testComponent.exists('#navigation_settings')).toBeTruthy()

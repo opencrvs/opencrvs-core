@@ -49,7 +49,6 @@ import { setUserDetails } from '@client/profile/profileActions'
 import { createLocation, createMemoryHistory, History } from 'history'
 import { stringify } from 'query-string'
 
-import { ConnectedRouter } from 'connected-react-router'
 import { mockOfflineData } from './mock-offline-data'
 import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
@@ -59,6 +58,8 @@ import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutation
 import { draftToGqlTransformer } from '@client/transformer'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { Root } from '@client/Root'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -144,17 +145,30 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilOfflineCountryConfigLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true },
+  initialEntries?: string[]
 ) {
-  const { store, history } = await createTestStore()
-  const app = mount(
-    <App store={store} history={history} client={createGraphQLClient()} />
+  const { store } = await createTestStore()
+  const router = createMemoryRouter(
+    [
+      {
+        path: '*',
+        Component: App
+      }
+    ],
+    { initialEntries }
   )
+
+  const app = mount(
+    <Root store={store} router={router} client={createGraphQLClient()} />
+  )
+
+  app.debug()
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
-  return { history, app, store }
+  return { app, store }
 }
 
 interface ITestView {
@@ -847,24 +861,24 @@ export const mockOfflineDataDispatch = {
 }
 
 export async function createTestStore() {
-  const { store, history } = createStore()
+  const { store } = createStore()
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
-  return { store, history }
+  return { store }
 }
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {
     store,
-    history,
     graphqlMocks,
-    apolloClient
+    apolloClient,
+    initialEntries
   }: {
     store: AppStore
-    history: History
     graphqlMocks?: MockedProvider['props']['mocks']
     apolloClient?: ApolloClient<any>
+    initialEntries?: string[]
   },
   options?: MountRendererProps
 ) {
@@ -889,22 +903,29 @@ export async function createTestComponent(
       </MockedProvider>
     )
   }
+  const router = createMemoryRouter(
+    [
+      {
+        path: '*',
+        element: <node.type {...node.props} />
+      }
+    ],
+    { initialEntries }
+  )
 
-  function PropProxy(props: Record<string, any>) {
+  function PropProxy() {
     return withGraphQL(
       <Provider store={store}>
-        <ConnectedRouter noInitialPop={true} history={history}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
-              <node.type {...node.props} {...props} />
-            </ThemeProvider>
-          </I18nContainer>
-        </ConnectedRouter>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </I18nContainer>
       </Provider>
     )
   }
 
-  return mount(<PropProxy {...node.props} />, options)
+  return { component: mount(<PropProxy />, options), router }
 }
 
 export const getFileFromBase64String = (
@@ -1065,7 +1086,7 @@ export function createRouterProps<
   if (search) {
     location.search = stringify(search)
   }
-  const match: Params = {
+  const match = {
     isExact: false,
     path,
     url: path,

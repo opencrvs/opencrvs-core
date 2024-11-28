@@ -22,11 +22,15 @@ import {
   setInitialDeclarations
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
+import {
+  REVIEW_EVENT_PARENT_FORM_PAGE,
+  REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
+} from '@opencrvs/client/src/navigation/routes'
 import { EventType } from '@client/utils/gateway'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { vi } from 'vitest'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
+import { formatUrl } from '@client/navigation'
 
 const viewRecordMock = {
   data: {
@@ -1141,9 +1145,11 @@ describe('when user is in the register form review section', () => {
   const mockViewRecordFunction = vi.fn()
   mockViewRecordFunction.mockReturnValue(viewRecordMock)
   ViewRecordQueries.fetchDeclarationForViewing = mockViewRecordFunction
-  let component: ReactWrapper<{}, {}>
+
+  let testComponent: ReactWrapper<{}, {}>
+
   beforeEach(async () => {
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
     const declaration = createReviewDeclaration(
       uuid(),
       {
@@ -1167,40 +1173,38 @@ describe('when user is in the register form review section', () => {
     ]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
+
     vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
+    // @TODO
+    const foo = formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE_GROUP, {
+      declarationId: declaration.id,
+      event: EventType.Birth,
+      groupId: 'review-view-group',
+      pageId: 'review'
+    })
+
+    const { component } = await createTestComponent(
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={form}
         declaration={declaration}
         duplicate={true}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'review',
-            groupId: 'review-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
+        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE_GROUP}
       />,
-      { store, history }
+      {
+        store,
+        initialEntries: [foo]
+      }
     )
-    component = testComponent
+
+    testComponent = component
   })
 
   it('should show the duplicate tracking id in tab', async () => {
     expect(
-      component
+      testComponent
         .find('#tab_4090df15-f4e5-4f16-ae7e-bb518129d493')
         .hostNodes()
         .text()
@@ -1208,13 +1212,13 @@ describe('when user is in the register form review section', () => {
   })
 
   it('should show comparison when click on duplicate trackingId from tab', async () => {
-    component
+    testComponent
       .find('#tab_4090df15-f4e5-4f16-ae7e-bb518129d493')
       .hostNodes()
       .simulate('click')
-    component.update()
+    testComponent.update()
 
-    expect(component.find('#content-name').hostNodes().text()).toBe(
+    expect(testComponent.find('#content-name').hostNodes().text()).toBe(
       'Is Edgar Samo (BPJM787) a duplicate?'
     )
   })

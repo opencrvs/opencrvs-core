@@ -8,20 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ErrorBoundary } from '@client/components/ErrorBoundary'
-import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
-import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { createGlobalStyle, ThemeProvider } from 'styled-components'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { useApolloClient } from '@client/utils/apolloClient'
-import { Provider } from 'react-redux'
-import { RouterProvider } from 'react-router-dom'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
 // eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { router } from '@client/App'
 import { createStore } from '@client/store'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
@@ -31,6 +21,8 @@ import { SubmissionController } from '@client/SubmissionController'
 import WebFont from 'webfontloader'
 import { BrowserTracing } from '@sentry/tracing'
 import { APPLICATION_VERSION } from './utils/constants'
+import { Root } from './Root'
+import { router } from './App'
 
 WebFont.load({
   google: {
@@ -71,42 +63,6 @@ window.addEventListener('online', userReconnectedToast)
 const container = document.getElementById('root')
 const root = createRoot(container!)
 
-// Injecting global styles for the body tag - used only once
-// eslint-disable-line
-const GlobalStyle = createGlobalStyle`
-  body {
-    margin: 0;
-    padding: 0;
-    overflow-y: scroll;
-  }
-`
-
-/**
- * Starting from react-router v6, routes need to be renderd 'on-the-side' of the application.
- * This changes the order of how provider components are rendered.
- * Root component is the entry point of the application, and renders all the providers before application components, which are rendered by the RouterProvider.
- */
-export const Root = () => {
-  const { client } = useApolloClient(store)
-
-  return (
-    <ErrorBoundary>
-      <GlobalStyle />
-      <ApolloProvider client={client}>
-        <Provider store={store}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
-              <StyledErrorBoundary>
-                <RouterProvider router={router} />
-              </StyledErrorBoundary>
-            </ThemeProvider>
-          </I18nContainer>
-        </Provider>
-      </ApolloProvider>
-    </ErrorBoundary>
-  )
-}
-
-root.render(<Root />)
+root.render(<Root router={router} store={store} />)
 
 new SubmissionController(store).start()
