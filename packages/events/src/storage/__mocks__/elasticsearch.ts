@@ -16,6 +16,10 @@ import * as elasticsearch from '@elastic/elasticsearch'
 let server: StartedElasticsearchContainer
 
 export async function setupServer() {
+  if (server) {
+    return
+  }
+
   server = await new ElasticsearchContainer('elasticsearch:8.14.3')
     .withExposedPorts(9200)
     .withStartupTimeout(120_000)
@@ -39,6 +43,7 @@ export async function resetServer() {
 export function getOrCreateClient() {
   const host = server.getHost()
   const port = server.getMappedPort(9200)
+
   return new elasticsearch.Client({
     node: `http://${host}:${port}`
   })
