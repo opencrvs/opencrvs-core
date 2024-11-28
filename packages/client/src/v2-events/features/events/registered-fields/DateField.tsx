@@ -27,7 +27,7 @@ export const DateField = ({ id, options }: FieldProps<'DATE'>) => {
       <DateFieldComponent
         id={id}
         notice={intl.formatMessage(options.notice)}
-        onChange={(val: string) => setValue(id, val)}
+        onChange={(val) => setValue(id, val)}
         value={value}
       />
     </InputField>
