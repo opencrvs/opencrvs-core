@@ -29,6 +29,7 @@ import {
 } from '@client/components/interface/Navigation'
 import { ReactWrapper } from 'enzyme'
 import { Mock, vi } from 'vitest'
+import { Router } from '@sentry/react/types/types'
 
 const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
@@ -125,7 +126,7 @@ describe('Navigation for national system admin related tests', () => {
 
 describe('Navigation for Registration agent related tests', () => {
   let testComponent: ReactWrapper<{}, {}>
-
+  let router: Router
   beforeEach(async () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
@@ -136,40 +137,18 @@ describe('Navigation for Registration agent related tests', () => {
     await store.dispatch(checkAuth())
     await flushPromises()
 
-    const { component } = await createTestComponent(
-      <OfficeHome
-      // match={{
-      //   params: {
-      //     tabId: WORKQUEUE_TABS.inProgress
-      //   },
-      //   isExact: true,
-      //   path: '',
-      //   url: ''
-      // }}
-      // staticContext={undefined}
-      // history={history}
-      // location={history.location}
-      />,
+    const { component, router: testRouter } = await createTestComponent(
+      <OfficeHome />,
       { store }
     )
-
+    router = testRouter
     testComponent = component
   })
   it('renders page with team and performance tab for registration agent', async () => {
-    const { component } = await createTestComponent(
-      <OfficeHome
-      // match={{
-      //   params: { tabId: WORKQUEUE_TABS.inProgress },
-      //   isExact: true,
-      //   path: '',
-      //   url: ''
-      // }}
-      // staticContext={undefined}
-      // history={history}
-      // location={history.location}
-      />,
-      { store, apolloClient: client }
-    )
+    const { component } = await createTestComponent(<OfficeHome />, {
+      store,
+      apolloClient: client
+    })
     expect(component.exists('#navigation_team')).toBeTruthy()
     expect(component.exists('#navigation_performance')).toBeTruthy()
     expect(component.exists('#navigation_config_main')).toBeFalsy()
@@ -191,18 +170,19 @@ describe('Navigation for Registration agent related tests', () => {
       .hostNodes()
       .simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('readyForReview')
+
+    expect(router.state.location.pathname).toContain('readyForReview')
 
     testComponent
       .find('#navigation_requiresUpdate')
       .hostNodes()
       .simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('requiresUpdate')
+    expect(router.state.location.pathname).toContain('requiresUpdate')
 
     testComponent.find('#navigation_approvals').hostNodes().simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('approvals')
+    expect(router.state.location.pathname).toContain('approvals')
   })
 })
 

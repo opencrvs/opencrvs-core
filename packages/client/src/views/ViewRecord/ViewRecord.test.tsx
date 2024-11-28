@@ -22,7 +22,7 @@ describe('View Record for loading and success state', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
     const mocks = [
       {
@@ -1202,11 +1202,14 @@ describe('View Record for loading and success state', () => {
         }
       }
     ]
-    component = await createTestComponent(<ViewRecord />, {
-      store,
-      history,
-      graphqlMocks: mocks
-    })
+    let { component: testComponent } = await createTestComponent(
+      <ViewRecord />,
+      {
+        store,
+        graphqlMocks: mocks
+      }
+    )
+    component = testComponent
     ;(useParams as Mock).mockImplementation(() => ({
       declarationId: '4090df15-f4e5-4f16-ae7e-bb518129d493'
     }))
@@ -1229,11 +1232,15 @@ describe('View Record error state', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
-    component = await createTestComponent(<ViewRecord />, {
-      store,
-      history
-    })
+    const { store } = createStore()
+    const { component: testComponent } = await createTestComponent(
+      <ViewRecord />,
+      {
+        store
+      }
+    )
+
+    component = testComponent
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })

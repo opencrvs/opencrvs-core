@@ -489,6 +489,7 @@ function mapStateToProps(state: IStoreState, props: RouteComponentProps) {
     (match.params.pageId && Number.parseInt(match.params.pageId)) ||
     (match.params.selectorId && Number.parseInt(match.params.selectorId)) ||
     1
+
   return {
     offlineResources: getOfflineData(state),
     declarations: state.declarationsState.declarations,

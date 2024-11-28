@@ -873,12 +873,14 @@ export async function createTestComponent(
     store,
     graphqlMocks,
     apolloClient,
-    initialEntries
+    initialEntries,
+    path = '*'
   }: {
     store: AppStore
     graphqlMocks?: MockedProvider['props']['mocks']
     apolloClient?: ApolloClient<any>
     initialEntries?: string[]
+    path?: string
   },
   options?: MountRendererProps
 ) {
@@ -906,8 +908,8 @@ export async function createTestComponent(
   const router = createMemoryRouter(
     [
       {
-        path: '*',
-        element: <node.type {...node.props} />
+        path,
+        element: node
       }
     ],
     { initialEntries }
