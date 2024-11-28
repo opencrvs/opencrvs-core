@@ -52,7 +52,8 @@ export const RECORD_ALLOWED_SCOPES = {
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
-  const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
+  const currentUser = useSelector(getUserDetails)
+  const userPrimaryOffice = currentUser?.primaryOffice
   const locations = useSelector(getOfflineData).locations
   const offices = useSelector(getOfflineData).offices
   const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
@@ -69,7 +70,7 @@ export function usePermissions() {
 
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
 
-  const canReadUser = (user: Pick<User, 'primaryOffice'>) => {
+  const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
     if (!userPrimaryOffice?.id) {
       return false
     }
@@ -86,6 +87,9 @@ export function usePermissions() {
         locations,
         offices
       )
+    }
+    if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+      return user.id === currentUser?.id
     }
 
     return false
