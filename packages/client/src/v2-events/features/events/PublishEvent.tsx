@@ -15,13 +15,15 @@ import {
   Stack,
   Button,
   Icon,
-  Content
+  Content,
+  FormWizard
 } from '@opencrvs/components'
 import React from 'react'
 import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
 import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons/client'
+import { TextField, Paragraph, DateField } from './registered-fields'
 
 export function PublishEventIndex() {
   const { eventType } = useParams<{ eventType: string }>()
@@ -40,7 +42,7 @@ export function PublishEventIndex() {
 }
 
 export function PublishEvent({ event }: { event: EventConfig }) {
-  const { title, exit, saveAndExit, previous, next, finish } =
+  const { title, pages, exit, saveAndExit, previous, next, page } =
     useEventForm(event)
 
   return (
@@ -76,21 +78,18 @@ export function PublishEvent({ event }: { event: EventConfig }) {
         </Frame.SectionFormBackAction>
 
         <Frame.Section>
-          <Content
-            title={title}
-            bottomActionButtons={[
-              <Button
-                key="continue"
-                fullWidth
-                type="primary"
-                size="large"
-                onClick={next ?? finish}
-              >
-                Continue
-              </Button>
-            ]}
-          >
-            <b>This is where the form will be rendered</b>
+          <Content title={title}>
+            <FormWizard
+              currentPage={page}
+              pages={pages}
+              components={{
+                TEXT: TextField,
+                PARAGRAPH: Paragraph,
+                DATE: DateField
+              }}
+              onNextPage={next}
+              onSubmit={(values) => console.log(values)}
+            />
           </Content>
         </Frame.Section>
       </Frame.LayoutForm>

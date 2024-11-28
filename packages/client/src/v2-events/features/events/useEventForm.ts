@@ -37,6 +37,8 @@ export function useEventForm(event: EventConfig) {
     next,
     finish,
     form: pages,
-    fields: pages[page].fields
+    fields: pages[page].fields,
+    pages,
+    page
   }
 }
