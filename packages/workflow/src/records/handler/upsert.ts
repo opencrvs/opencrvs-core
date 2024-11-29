@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
@@ -23,10 +22,10 @@ import {
 import { invokeWebhooks } from '@workflow/records/webhooks'
 import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 
-export interface UpsertRegistrationPayload {
+export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
-  error?: string
+  error: string
   identifiers?: {
     type: SupportedPatientIdentifierCode
     value: string
@@ -40,16 +39,27 @@ export async function upsertRegistrationHandler(
   const token = getToken(request)
   const compositionId = request.params.id
   const { registrationNumber, error, identifiers } =
-    request.payload as UpsertRegistrationPayload
+    request.payload as EventRegistrationPayload
 
   if (error) {
-    throw new Error(`Upsert operation failed with error: ${error}`)
+    throw new Error(`Callback triggered with an error: ${error}`)
   }
 
   const savedRecord = await getRecordById(
     compositionId,
     request.headers.authorization,
-    ['IN_PROGRESS'],
+    [
+      'ARCHIVED',
+      'CERTIFIED',
+      'CORRECTION_REQUESTED',
+      'IN_PROGRESS',
+      'READY_FOR_REVIEW',
+      'ISSUED',
+      'REGISTERED',
+      'REJECTED',
+      'VALIDATED',
+      'WAITING_VALIDATION'
+    ],
     true
   )
   if (!savedRecord) {
@@ -63,23 +73,16 @@ export async function upsertRegistrationHandler(
     token,
     identifiers
   )
-
   const event = getEventType(bundle)
 
-  // Index the updated bundle
   await indexBundle(bundle, token)
-
-  // Audit the event
   await auditEvent('registered', bundle, token)
 
-  // Send notifications if enabled
   if (await isNotificationEnabled('registered', event, token)) {
     await sendNotification('registered', bundle, token)
   }
 
-  // Invoke webhooks for the updated bundle
   await invokeWebhooks({ bundle, token, event })
 
-  // Return the updated bundle
   return h.response(bundle).code(200)
 }

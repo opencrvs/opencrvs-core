@@ -21,7 +21,8 @@ import {
   ReadyForReviewRecord,
   WaitingForValidationRecord,
   RejectedRecord,
-  ArchivedRecord
+  ArchivedRecord,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { getRecordById } from './records'
 
@@ -38,6 +39,7 @@ type WaitForExternalValidation = Nominal<{}, 'WaitForExternalValidation'>
 type Archive = Nominal<{}, 'Archive'>
 type Reject = Nominal<{}, 'Reject'>
 type Reinstate = Nominal<{}, 'Reinstate'>
+type Upsert = Nominal<{}, 'Upsert'>
 
 type ActionIdentifiers = {
   REQUEST_CORRECTION: RequestCorrection
@@ -53,6 +55,7 @@ type ActionIdentifiers = {
   WAITING_VALIDATION: WaitForExternalValidation
   ARCHIVE: Archive
   REINSTATE: Reinstate
+  UPSERT: Upsert
 }
 
 /*
@@ -108,6 +111,8 @@ type StateTree =
       Reject,
       RejectedRecord
     >
+  // Upsert declaration
+  | Transition<ValidRecord, Upsert, RegisteredRecord>
 
 /*
  * Internals
