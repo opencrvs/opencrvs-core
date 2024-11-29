@@ -40,7 +40,8 @@ export async function upsertRegistrationHandler(
 ) {
   const token = getToken(request)
   const compositionId = request.params.id
-  const { error } = request.payload as EventRegistrationPayload
+  const { registrationNumber, error, identifiers } =
+    request.payload as EventRegistrationPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
@@ -67,7 +68,13 @@ export async function upsertRegistrationHandler(
     throw new Error('Could not find record in elastic search!')
   }
 
-  const bundle = savedRecord as RegisteredRecord
+  const bundle = await toUpsertRegistrationIdentifier(
+    request,
+    savedRecord,
+    registrationNumber,
+    token,
+    identifiers
+  )
   const event = getEventType(bundle)
 
   await indexBundle(bundle, token)

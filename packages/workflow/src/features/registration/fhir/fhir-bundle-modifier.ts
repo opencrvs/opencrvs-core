@@ -24,7 +24,7 @@ import {
   getResourceFromBundleById,
   resourceIdentifierToUUID,
   SupportedPatientIdentifierCode,
-  InProgressRecord
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -207,7 +207,7 @@ export function updatePatientIdentifierWithRN(
 }
 
 export function upsertPatientIdentifierWithRN(
-  record: InProgressRecord,
+  record: ValidRecord,
   composition: Composition,
   sectionCodes: string[],
   identifierType: SupportedPatientIdentifierCode,

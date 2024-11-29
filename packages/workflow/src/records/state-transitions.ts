@@ -555,7 +555,7 @@ export async function toRegistered(
 
 export async function toUpsertRegistrationIdentifier(
   request: Hapi.Request,
-  record: InProgressRecord,
+  record: ValidRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
   identifiers?: EventRegistrationPayload['identifiers']
