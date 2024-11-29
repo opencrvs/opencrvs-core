@@ -12,19 +12,14 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 
 import SystemRole from '@user-mgnt/model/systemRole'
-import { ObjectId, SortOrder } from 'mongoose'
-import { UserRole } from '@user-mgnt/model/user'
+import { SortOrder } from 'mongoose'
 
-type VerifyPayload = {
+interface IVerifyPayload {
   value?: string
   role?: string
   active?: boolean
   sortBy?: string
   sortOrder?: SortOrder
-}
-
-type UserRoleSchema = {
-  labels: { label: string }[]
 }
 
 export default async function getSystemRoles(
@@ -37,46 +32,37 @@ export default async function getSystemRoles(
     active,
     sortBy = 'creationDate',
     sortOrder = 'asc'
-  } = request.payload as VerifyPayload
-
-  // Define criteria with types: roles is an array of ObjectId
-  let criteria: {
-    value?: string
-    roles?: { $in: ObjectId[] }
-    active?: boolean
-  } = {}
+  } = request.payload as IVerifyPayload
+  let criteria = {}
 
   if (value) {
     criteria = { ...criteria, value }
   }
-
-  // This part is for querying the 'roles' field by resolving the labels inside UserRole
   if (role) {
-    const roleIds = await UserRole.find<UserRoleSchema>({
-      'labels.label': role
-    }).distinct('_id') // Get only the _id of UserRoles matching the role
-
-    criteria = {
-      ...criteria,
-      roles: {
-        $in: roleIds // Filter the roles by UserRole _ids
-      }
-    }
+    criteria = { ...criteria, 'roles.labels.label': role }
   }
-
   if (active !== undefined) {
     criteria = { ...criteria, active }
   }
 
   return await SystemRole.find(criteria)
-    .populate({ path: 'roles', select: 'labels' })
+    .populate('roles')
     .sort({
       [sortBy]: sortOrder
     })
 }
 
 export const searchRoleSchema = Joi.object({
-  value: Joi.string().optional(),
+  value: Joi.object({
+    $eq: Joi.string().optional(),
+    $gt: Joi.string().optional(),
+    $lt: Joi.string().optional(),
+    $gte: Joi.string().optional(),
+    $lte: Joi.string().optional(),
+    $ne: Joi.string().optional(),
+    $in: Joi.array().items(Joi.string()).optional(),
+    $nin: Joi.array().items(Joi.string()).optional()
+  }).optional(),
   role: Joi.string().optional(),
   active: Joi.boolean().optional(),
   sortBy: Joi.string().optional(),
