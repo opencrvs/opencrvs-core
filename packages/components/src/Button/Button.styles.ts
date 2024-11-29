@@ -124,7 +124,6 @@ export const tertiary = css`
 
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
-    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:active {
