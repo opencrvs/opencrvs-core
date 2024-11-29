@@ -32,7 +32,7 @@ const Container = styled.div<{
 
   display: flex;
   border-radius: 4px;
-  border: 2px solid var(--color);
+  border: 1.5px solid var(--color);
   border-left-width: 0px;
   background: linear-gradient(
     to right,
