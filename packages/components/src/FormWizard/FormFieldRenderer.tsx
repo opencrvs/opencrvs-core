@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useMemo } from 'react'
+import { Controller, FieldValues, useFormContext } from 'react-hook-form'
+import * as _ from 'lodash'
+import { Stack } from '../Stack'
+import { ErrorText } from '../ErrorText'
 
 /**
  * @example
@@ -24,20 +28,48 @@ export type Field<CM extends ComponentsMap> = {
 } & React.ComponentProps<CM[keyof CM]>
 
 type FormFieldRendererProps<CM extends ComponentsMap> = {
-  fields: Array<Field<CM>>
+  field: Field<CM>
   components: CM
 }
 
 export const FormFieldRenderer = <CM extends ComponentsMap>({
-  fields,
+  field,
   components
 }: FormFieldRendererProps<CM>) => {
+  const context = useFormContext<FieldValues>()
+  const FormFieldComponent = useMemo(
+    () => components[field.type],
+    [components, field.type]
+  )
+
+  // NOTE: values are in dotted format. e.g. { 'applicant.surname': 'Doe' }
+  // NOTE2: We do not seem to have lodash here actually
+  // NOTE3: Since paragraph does not have id, it will break at this stage
+
+  console.log(context.formState)
+
+  const error = field?.id
+    ? _.get(context.formState.errors, field.id)
+    : undefined
+
+  console.log('error', error)
+
   return (
-    <>
-      {fields.map((field, index) => {
-        const FormFieldComponent = components[field.type]
-        return <FormFieldComponent key={field.id ?? index} {...field} />
-      })}
-    </>
+    <Stack direction="column" gap={8} alignItems="stretch">
+      <Controller
+        name={field.id}
+        control={context.control}
+        rules={{ required: field.required }}
+        render={({ field: formField }) => (
+          <FormFieldComponent key={field.id} {...field} {...formField} />
+        )}
+      />
+
+      {!!error && (
+        <ErrorText id={field.id}>
+          {(error.message as string) || 'required'}
+        </ErrorText>
+      )}
+    </Stack>
   )
 }

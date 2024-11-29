@@ -47,7 +47,8 @@ export const FormWizard = <CM extends ComponentsMap>({
   onNextPage,
   onSubmit
 }: FormWizardProps<CM>) => {
-  const methods = useForm({ defaultValues })
+  const form = useForm<Values>({ defaultValues })
+
   const page = pages[currentPage]
 
   if (!page) {
@@ -61,9 +62,21 @@ export const FormWizard = <CM extends ComponentsMap>({
   const flatOnSubmit = (data: Values) => onSubmit(flatten<Values>(data))
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(flatOnSubmit)}>
-        <FormFieldRenderer fields={page.fields} components={components} />
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(flatOnSubmit)}>
+        {/* NOTE: This was brought up to the same level as the Form.
+        Otherwise react do not notice the difference between pages and sets applicant's name as recommender's.
+        We might need to have index for all, since the index fallback is not unique across pages.
+        */}
+        {page.fields.map((field, index) => {
+          return (
+            <FormFieldRenderer
+              key={field.id}
+              field={field}
+              components={components}
+            />
+          )
+        })}
 
         {onNextPage ? (
           <Button type="primary" onClick={onNextPage}>
@@ -71,7 +84,7 @@ export const FormWizard = <CM extends ComponentsMap>({
           </Button>
         ) : (
           // Initial simple submit for testing
-          <input type="submit" value="Submit" />
+          <Button type="primary">Submit</Button>
         )}
       </form>
     </FormProvider>

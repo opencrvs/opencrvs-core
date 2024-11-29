@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventType } from '@client/utils/gateway'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -22,10 +21,8 @@ import React, { useState } from 'react'
 import {
   WrappedComponentProps as IntlShapeProps,
   defineMessages,
-  injectIntl,
   useIntl
 } from 'react-intl'
-import { connect } from 'react-redux'
 import { useEventConfigurations } from './useEventConfiguration'
 import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'

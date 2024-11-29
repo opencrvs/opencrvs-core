@@ -48,7 +48,7 @@ const Paragraph = z
 const RadioGroup = z
   .object({
     type: z.literal('RADIO_GROUP'),
-    name: z.string(),
+    id: z.string(),
     required: z.boolean(),
     label: TranslationConfig,
     options: z.array(
