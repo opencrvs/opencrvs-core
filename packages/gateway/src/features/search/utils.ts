@@ -10,9 +10,17 @@
  */
 
 import { SEARCH_URL } from '@gateway/constants'
-import { GQLAdvancedSearchParametersInput } from '@gateway/graphql/schema'
+import {
+  GQLAdvancedSearchParametersInput,
+  GQLEventType
+} from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
+import {
+  getTokenPayload,
+  Scope,
+  SCOPES
+} from '@opencrvs/commons/authentication'
 
 export interface ISearchCriteria {
   parameters: GQLAdvancedSearchParametersInput
@@ -43,4 +51,61 @@ export const postAdvancedSearch = async (
       new Error(`Search request failed: ${error.message}`)
     )
   }
+}
+
+const addEventParamForScope = (
+  requiredScopes: Scope[],
+  event: GQLEventType,
+  tokenScopes: Scope[],
+  filteredParams: Omit<GQLAdvancedSearchParametersInput, 'event'> & {
+    event?: GQLEventType[]
+  },
+  searchParamEvent: GQLEventType | undefined
+) => {
+  if (!tokenScopes.some((scope) => requiredScopes.includes(scope))) return
+
+  if (!searchParamEvent) {
+    filteredParams.event ??= []
+    filteredParams.event.push(event)
+  }
+}
+
+export const filterSearchParamsWithScope = (
+  token: string,
+  advancedSearchParameters: GQLAdvancedSearchParametersInput
+): Omit<
+  GQLAdvancedSearchParametersInput,
+  'event' & {
+    event: GQLEventType[]
+  }
+> => {
+  const { event: searchParamEvent, ...filteredParams } =
+    advancedSearchParameters
+  const currentUserScopes = getTokenPayload(token).scope
+
+  addEventParamForScope(
+    [SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION],
+    GQLEventType.birth,
+    currentUserScopes,
+    filteredParams,
+    searchParamEvent
+  )
+
+  addEventParamForScope(
+    [SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION],
+    GQLEventType.death,
+    currentUserScopes,
+    filteredParams,
+    searchParamEvent
+  )
+
+  addEventParamForScope(
+    [SCOPES.SEARCH_MARRIAGE, SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION],
+    GQLEventType.marriage,
+    currentUserScopes,
+    filteredParams,
+    searchParamEvent
+  )
+
+  return filteredParams
 }

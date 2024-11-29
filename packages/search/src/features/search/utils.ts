@@ -29,10 +29,10 @@ export async function advancedQueryBuilder(
 
   const must: any[] = []
 
-  if (params.event) {
+  if (params.event && params.event.length > 0) {
     must.push({
-      match: {
-        event: params.event
+      terms: {
+        'event.keyword': params.event
       }
     })
   }

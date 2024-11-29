@@ -17,7 +17,11 @@ import {
 } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
-import { ISearchCriteria, postAdvancedSearch } from './utils'
+import {
+  filterSearchParamsWithScope,
+  ISearchCriteria,
+  postAdvancedSearch
+} from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
 import { ApolloError } from 'apollo-server-hapi'
 import { SCOPES } from '@opencrvs/commons/authentication'
@@ -89,10 +93,6 @@ export const resolvers: GQLResolver = {
       },
       { headers: authHeader }
     ) {
-      const searchCriteria: ISearchCriteria = {
-        sort,
-        parameters: advancedSearchParameters
-      }
       if (
         !inScope(authHeader, [
           SCOPES.SEARCH_BIRTH,
@@ -107,6 +107,16 @@ export const resolvers: GQLResolver = {
           totalItems: 0,
           results: []
         }
+
+      const filteredSearchParamsWithScopes = filterSearchParamsWithScope(
+        authHeader.Authorization,
+        advancedSearchParameters
+      )
+
+      const searchCriteria: ISearchCriteria = {
+        sort,
+        parameters: filteredSearchParamsWithScopes
+      }
 
       if (count) {
         searchCriteria.size = count
@@ -177,7 +187,7 @@ export const resolvers: GQLResolver = {
           return await Promise.reject(new Error('There is no param to search '))
         }
 
-        searchCriteria.parameters = { ...advancedSearchParameters }
+        searchCriteria.parameters = { ...filteredSearchParamsWithScopes }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)

@@ -14,7 +14,7 @@ export enum SortOrder {
   DESC = 'desc'
 }
 export interface IAdvancedSearchParam {
-  event?: string
+  event?: string[]
   name?: string
   registrationStatuses?: string[]
   dateOfEvent?: string
