@@ -11,7 +11,6 @@
 import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
-import { toUpsertRegistrationIdentifier } from '@workflow/records/state-transitions'
 import { getEventType } from './utils'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
@@ -20,7 +19,10 @@ import {
   sendNotification
 } from '@workflow/records/notification'
 import { invokeWebhooks } from '@workflow/records/webhooks'
-import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
+import {
+  SupportedPatientIdentifierCode,
+  RegisteredRecord
+} from '@opencrvs/commons/types'
 
 export interface EventRegistrationPayload {
   trackingId: string
@@ -38,8 +40,7 @@ export async function upsertRegistrationHandler(
 ) {
   const token = getToken(request)
   const compositionId = request.params.id
-  const { registrationNumber, error, identifiers } =
-    request.payload as EventRegistrationPayload
+  const { error } = request.payload as EventRegistrationPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
@@ -66,13 +67,7 @@ export async function upsertRegistrationHandler(
     throw new Error('Could not find record in elastic search!')
   }
 
-  const bundle = await toUpsertRegistrationIdentifier(
-    request,
-    savedRecord,
-    registrationNumber,
-    token,
-    identifiers
-  )
+  const bundle = savedRecord as RegisteredRecord
   const event = getEventType(bundle)
 
   await indexBundle(bundle, token)
