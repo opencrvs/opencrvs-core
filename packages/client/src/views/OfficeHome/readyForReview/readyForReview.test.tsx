@@ -473,22 +473,10 @@ describe('OfficeHome sent for review tab related tests', () => {
         })
       apolloClient.query = mockListSyncController
 
-      createdTestComponent = await createTestComponent(
-        <OfficeHome
-        // {...createRouterProps(
-        //   formatUrl(REGISTRAR_HOME, {
-        //     tabId: WORKQUEUE_TABS.readyForReview
-        //   }),
-        //   { isNavigatedInsideApp: false },
-        //   {
-        //     matchParams: {
-        //       tabId: WORKQUEUE_TABS.readyForReview
-        //     }
-        //   }
-        // )}
-        />,
-        { store, apolloClient }
-      )
+      createdTestComponent = await createTestComponent(<OfficeHome />, {
+        store,
+        apolloClient
+      })
 
       testComponent = createdTestComponent
     })
