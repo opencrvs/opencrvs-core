@@ -566,7 +566,8 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       ])
     }
 
-    if (tabs.sections.length === 0) return undefined
+    if (tabs.sections.length === 0 || tabs.sections.length === 1)
+      return undefined
 
     return (
       <FormTabs
