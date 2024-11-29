@@ -21,14 +21,15 @@ import {
   patchEvent
 } from './service/events'
 import {
-  ActionDeclareInput,
-  ActionNotifyInput,
+  DeclareActionInput,
+  NotifyActionInput,
   EventInput
 } from '@events/schema'
 
 const ContextSchema = z.object({
   user: z.object({
-    id: z.string()
+    id: z.string(),
+    primaryOfficeId: z.string()
   })
 })
 
@@ -52,6 +53,7 @@ export const appRouter = router({
       return createEvent(
         options.input,
         options.ctx.user.id,
+        options.ctx.user.primaryOfficeId,
         options.input.transactionId
       )
     }),
@@ -62,13 +64,13 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      notify: publicProcedure.input(ActionNotifyInput).mutation((options) => {
+      notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id
         })
       }),
-      declare: publicProcedure.input(ActionDeclareInput).mutation((options) => {
+      declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id
