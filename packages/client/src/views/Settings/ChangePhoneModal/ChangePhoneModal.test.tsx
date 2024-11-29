@@ -67,7 +67,6 @@ describe('Change phone modal tests', () => {
       />,
       {
         store,
-        history,
         graphqlMocks
       }
     )

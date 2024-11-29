@@ -246,6 +246,7 @@ export const generateCompletenessRatesUrl = ({
   time?: CompletenessRateTime
 }) =>
   formatUrl(EVENT_COMPLETENESS_RATES, { eventType }) +
+  '?' +
   stringify(
     locationId
       ? {

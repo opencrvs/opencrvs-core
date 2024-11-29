@@ -10,7 +10,10 @@
  */
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { formatUrl } from '@client/navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import {
+  ISSUE_CERTIFICATE_PAYMENT,
+  REGISTRAR_HOME_TAB
+} from '@client/navigation/routes'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
@@ -22,10 +25,9 @@ import {
 } from '@client/tests/util'
 import { EventType } from '@client/utils/gateway'
 import * as React from 'react'
-import { Mock, vi } from 'vitest'
+import { Mock } from 'vitest'
 import { IssuePayment } from './IssuePayment'
 import { storeDeclaration } from '@client/declarations'
-import { useParams } from 'react-router-dom'
 
 const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
@@ -71,13 +73,10 @@ const deathDeclaration = {
 }
 
 describe('verify collector tests for issuance', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    ;(useParams as Mock).mockImplementation(() => ({
-      registrationId: 'mockBirth1234',
-      eventType: 'birth'
-    }))
+
     // @ts-ignore
     store.dispatch(storeDeclaration(birthDeclaration))
   })
@@ -86,8 +85,14 @@ describe('verify collector tests for issuance', () => {
     const { component: testComponent } = await createTestComponent(
       <IssuePayment />,
       {
-        store,
-        history
+        path: ISSUE_CERTIFICATE_PAYMENT,
+        initialEntries: [
+          formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
+            registrationId: 'mockBirth1234',
+            eventType: 'birth'
+          })
+        ],
+        store
       }
     )
     expect(testComponent.find('#service').hostNodes().text()).toContain('Birth')
@@ -96,27 +101,20 @@ describe('verify collector tests for issuance', () => {
   })
 
   it('invalid declaration id for issue certificate', async () => {
-    const { store, history } = createStore()
-    const mockLocation: any = vi.fn()
-    await createTestComponent(
-      <IssuePayment
-        //@ts-ignore
-        location={mockLocation}
-        history={history}
-        match={{
-          params: {
-            registrationId: 'mockBirth',
-            eventType: EventType.Birth
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
-    )
+    const { store } = createStore()
 
-    expect(history.location.pathname).toEqual(
+    const { router } = await createTestComponent(<IssuePayment />, {
+      store,
+      path: ISSUE_CERTIFICATE_PAYMENT,
+      initialEntries: [
+        formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
+          registrationId: 'mockBirth',
+          eventType: EventType.Birth
+        })
+      ]
+    })
+
+    expect(router.state.location.pathname).toEqual(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.readyToIssue,
         selectorId: ''
@@ -126,13 +124,10 @@ describe('verify collector tests for issuance', () => {
 })
 
 describe('in case of death declaration renders issue payment component', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    ;(useParams as Mock).mockImplementation(() => ({
-      registrationId: 'mockDeath1234',
-      eventType: 'death'
-    }))
+
     //@ts-ignore
     store.dispatch(storeDeclaration(deathDeclaration))
   })
@@ -142,7 +137,13 @@ describe('in case of death declaration renders issue payment component', () => {
       <IssuePayment />,
       {
         store,
-        history
+        path: ISSUE_CERTIFICATE_PAYMENT,
+        initialEntries: [
+          formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
+            registrationId: 'mockDeath1234',
+            eventType: 'death'
+          })
+        ]
       }
     )
     expect(testComponent.find('#service').hostNodes().text()).toContain('Death')

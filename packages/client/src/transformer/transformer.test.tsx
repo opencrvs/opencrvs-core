@@ -59,7 +59,7 @@ describe('when draft data is transformed to graphql', () => {
     app = testApp.app
     await flushPromises()
     app.update()
-    history = testApp.history
+
     store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
 

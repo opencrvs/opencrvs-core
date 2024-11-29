@@ -63,7 +63,7 @@ const graphqlMocks = [
 ]
 
 describe('Settings page tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -71,7 +71,7 @@ describe('Settings page tests', () => {
     const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
-      { store, history, graphqlMocks }
+      { store, graphqlMocks }
     )
     component = testComponent
   })

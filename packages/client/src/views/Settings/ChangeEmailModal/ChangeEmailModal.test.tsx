@@ -67,7 +67,6 @@ describe('Change email modal tests', () => {
       />,
       {
         store,
-        history,
         graphqlMocks
       }
     )

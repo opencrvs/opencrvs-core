@@ -22,16 +22,18 @@ import {
 
 let testComponent: ReactWrapper
 beforeEach(async () => {
-  const { store, history } = createStore()
-  testComponent = await createTestComponent(
-    // @ts-ignore
-    <AdvancedSearchConfig
-      {...createRouterProps(formatUrl(ADVANCED_SEARCH, {}), {
-        isNavigatedInsideApp: false
-      })}
-    ></AdvancedSearchConfig>,
-    { store, history }
-  )
+  const { store } = createStore()
+  testComponent = (
+    await createTestComponent(
+      // @ts-ignore
+      <AdvancedSearchConfig
+        {...createRouterProps(formatUrl(ADVANCED_SEARCH, {}), {
+          isNavigatedInsideApp: false
+        })}
+      ></AdvancedSearchConfig>,
+      { store }
+    )
+  )?.component
   testComponent.update()
 })
 
@@ -58,7 +60,7 @@ describe('when advancedSearchPage renders with no active params in store', () =>
 describe('when advancedSearchPage renders with 2 or more active params in store', () => {
   let testComponent: ReactWrapper
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     store.dispatch(
       setAdvancedSearchParam({
         event: 'birth',
@@ -66,10 +68,11 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
         registrationStatuses: ['IN_PROGRESS']
       })
     )
-    testComponent = await createTestComponent(
-      <AdvancedSearchConfig></AdvancedSearchConfig>,
-      { store, history }
-    )
+    testComponent = (
+      await createTestComponent(<AdvancedSearchConfig></AdvancedSearchConfig>, {
+        store
+      })
+    )?.component
     testComponent.update()
   })
 

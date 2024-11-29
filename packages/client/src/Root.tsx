@@ -15,10 +15,12 @@ import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { useApolloClient } from '@client/utils/apolloClient'
 import { Provider } from 'react-redux'
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider, RouterProviderProps } from 'react-router-dom'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 
 import * as React from 'react'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import { AppStore } from './store'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -40,16 +42,16 @@ export const Root = ({
   store,
   router
 }: {
-  store: any
-  router: any
-  client: any
+  store: AppStore
+  router: RouterProviderProps['router']
+  client?: ApolloClient<NormalizedCacheObject>
 }) => {
-  const { client: foo } = useApolloClient(store)
+  const { client: apolloClient } = useApolloClient(store)
 
   return (
     <ErrorBoundary>
       <GlobalStyle />
-      <ApolloProvider client={foo ?? client}>
+      <ApolloProvider client={client ?? apolloClient}>
         <Provider store={store}>
           <I18nContainer>
             <ThemeProvider theme={getTheme()}>

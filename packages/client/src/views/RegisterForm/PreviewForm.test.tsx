@@ -54,7 +54,7 @@ describe('when user is previewing the form data', () => {
   beforeEach(async () => {
     const testApp = await createTestApp()
     app = testApp.app
-    history = testApp.history
+
     store = testApp.store
     await waitForReady(app)
   })

@@ -263,7 +263,6 @@ describe('ReviewForm tests', () => {
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
 
     form = await getReviewFormFromStore(store, EventType.Birth)
     getItem.mockReturnValue(registerScopeToken)
@@ -292,7 +291,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={birthDeclaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(storeDeclaration(birthDeclaration))
@@ -329,7 +328,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={birthDeclaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(storeDeclaration(birthDeclaration))
@@ -371,7 +370,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={birthDeclaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(storeDeclaration(birthDeclaration))
@@ -434,7 +433,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={declaration.id}
       />,
-      { store, history }
+      { store }
     )
     store.dispatch(
       getStorageDeclarationsSuccess(
@@ -481,7 +480,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={declaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(
@@ -529,7 +528,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={declaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(
@@ -577,7 +576,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={declaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(
@@ -624,7 +623,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={declaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(
@@ -679,7 +678,7 @@ describe('ReviewForm tests', () => {
         }}
         declarationId={declaration.id}
       />,
-      { store, history }
+      { store }
     )
 
     store.dispatch(storeDeclaration(declaration))
@@ -714,7 +713,7 @@ describe('ReviewForm tests', () => {
           }}
           declarationId={deathDeclaration.id}
         />,
-        { store, history }
+        { store }
       )
 
       store.dispatch(storeDeclaration(deathDeclaration))
@@ -761,7 +760,7 @@ describe('ReviewForm tests', () => {
           }}
           declarationId={deathDeclaration.id}
         />,
-        { store, history }
+        { store }
       )
 
       store.dispatch(storeDeclaration(deathDeclaration))
@@ -809,7 +808,7 @@ describe('ReviewForm tests', () => {
           }}
           declarationId={birthDeclaration.id}
         />,
-        { store, history }
+        { store }
       )
       testComponent.update()
 

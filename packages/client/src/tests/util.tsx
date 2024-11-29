@@ -57,7 +57,11 @@ import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { Root } from '@client/Root'
 import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import {
+  createMemoryRouter,
+  RouterProvider,
+  RouterProviderProps
+} from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData } from './mock-offline-data'
 
@@ -168,7 +172,7 @@ export async function createTestApp(
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
-  return { app, store }
+  return { app, store, router }
 }
 
 interface ITestView {
@@ -928,6 +932,15 @@ export async function createTestComponent(
   }
 
   return { component: mount(<PropProxy />, options), router }
+}
+
+/**
+ * Create a test component with the given node and store.
+ * Returns component route
+ */
+export type TestComponentWithRouteMock = {
+  component: ReactWrapper<{}, {}>
+  router: Awaited<ReturnType<typeof createTestComponent>>['router']
 }
 
 export const getFileFromBase64String = (

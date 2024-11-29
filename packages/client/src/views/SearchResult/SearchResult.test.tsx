@@ -18,7 +18,7 @@ import { SEARCH_EVENTS } from '@client/search/queries'
 import { createStore } from '@client/store'
 import { createTestComponent, mockUserResponse } from '@client/tests/util'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
-import { goToSearch } from '@client/navigation'
+
 import { waitForElement } from '@client/tests/wait-for-element'
 import { EventType } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
@@ -52,9 +52,9 @@ queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', () => {
   let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
+
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
   })
@@ -62,12 +62,12 @@ describe('SearchResult tests', () => {
   it('sets loading state while waiting for data', async () => {
     const { component: testComponent } = await createTestComponent(
       <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
-        }}
+      // @ts-ignore
+      // location={{
+      //   search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
+      // }}
       />,
-      { store, history }
+      { store, initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID'] }
     )
 
     // @ts-ignore
@@ -298,12 +298,16 @@ describe('SearchResult tests', () => {
 
     const { component: testComponent } = await createTestComponent(
       <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=01622688232&searchType=PHONE_NUMBER'
-        }}
+      // @ts-ignore
+      // location={{
+      //   search: '?searchText=01622688232&searchType=PHONE_NUMBER'
+      // }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=01622688232&searchType=PHONE_NUMBER']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -343,7 +347,11 @@ describe('SearchResult tests', () => {
           search: '?searchText=+8801622688232&searchType=PHONE_NUMBER'
         }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=+8801622688232&searchType=PHONE_NUMBER']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -359,8 +367,8 @@ describe('SearchResult tests', () => {
   it('renders empty search page with a header in small devices', async () => {
     const testSearchResultComponent = await createTestComponent(
       //@ts-ignore
-      <SearchResult location={{}} />,
-      { store, history }
+      <SearchResult />,
+      { store, initialEntries: ['/search?location='] }
     )
 
     Object.defineProperty(window, 'innerWidth', {
@@ -368,9 +376,9 @@ describe('SearchResult tests', () => {
       configurable: true,
       value: 200
     })
-    store.dispatch(goToSearch())
+    // store.dispatch(goToSearch())
 
-    const searchTextInput = testSearchResultComponent
+    const searchTextInput = testSearchResultComponent.component
       .find('#searchText')
       .hostNodes()
 
@@ -378,12 +386,12 @@ describe('SearchResult tests', () => {
 
     searchTextInput.simulate('change', { target: { value: 'DW0UTHR' } })
 
-    testSearchResultComponent
+    testSearchResultComponent.component
       .find('#searchIconButton')
       .hostNodes()
       .simulate('click')
 
-    expect(window.location.search).toBe(
+    expect(testSearchResultComponent.router.state.location.search).toBe(
       '?searchText=DW0UTHR&searchType=TRACKING_ID'
     )
   })
@@ -453,12 +461,16 @@ describe('SearchResult tests', () => {
 
     const { component: testComponent } = await createTestComponent(
       <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
-        }}
+      // @ts-ignore
+      // location={{
+      //   search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
+      // }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -551,13 +563,12 @@ describe('SearchResult tests', () => {
       value: 1100
     })
     const { component: testComponent } = await createTestComponent(
-      <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      <SearchResult />,
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -649,12 +660,16 @@ describe('SearchResult tests', () => {
 
     const { component: testComponent } = await createTestComponent(
       <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
-        }}
+      // @ts-ignore
+      // location={{
+      //   search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
+      // }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -675,9 +690,9 @@ describe('SearchResult tests', () => {
 
 describe('SearchResult downloadButton tests', () => {
   let store: ReturnType<typeof createStore>['store']
-  let history: ReturnType<typeof createStore>['history']
+
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
   })
@@ -756,12 +771,16 @@ describe('SearchResult downloadButton tests', () => {
 
     const { component: testComponent } = await createTestComponent(
       <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
-        }}
+      // @ts-ignore
+      // location={{
+      //   search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
+      // }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider
@@ -853,12 +872,16 @@ describe('SearchResult downloadButton tests', () => {
 
     const { component: testComponent } = await createTestComponent(
       <SearchResult
-        // @ts-ignore
-        location={{
-          search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
-        }}
+      // @ts-ignore
+      // location={{
+      //   search: '?searchText=DW0UTHR&searchType=TRACKING_ID'
+      // }}
       />,
-      { store, history, graphqlMocks: graphqlMock as any }
+      {
+        store,
+        graphqlMocks: graphqlMock as any,
+        initialEntries: ['/?searchText=DW0UTHR&searchType=TRACKING_ID']
+      }
     )
 
     // wait for mocked data to load mockedProvider

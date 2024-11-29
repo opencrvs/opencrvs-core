@@ -139,9 +139,9 @@ const getItem = window.localStorage.getItem as Mock
 
 describe('RegistrationHome sent for approval tab related tests', () => {
   let store: AppStore
-  let history: History
+
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     getItem.mockReturnValue(validateScopeToken)
     await store.dispatch(checkAuth())
   })
@@ -243,7 +243,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -279,7 +279,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const data = (await waitForElement(testComponent, Workqueue)).prop(
@@ -305,7 +305,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     expect(
@@ -336,7 +336,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     expect(
@@ -348,7 +348,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const { component: testComponent } = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -440,7 +440,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -452,14 +452,14 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/approvalTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
 })
 
 describe('Tablet tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
     getItem.mockReturnValue(validateScopeToken)
@@ -476,7 +476,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const { component: testComponent } = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <SentForReview
         queryData={{
           data: {
@@ -547,7 +547,7 @@ describe('Tablet tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -559,7 +559,7 @@ describe('Tablet tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/approvalTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })

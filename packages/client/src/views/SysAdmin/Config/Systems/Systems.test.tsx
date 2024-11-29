@@ -19,8 +19,8 @@ import {
   selectOption
 } from '@client/tests/util'
 import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
-import { useParams } from 'react-router-dom'
-import { describe, Mock } from 'vitest'
+
+import { describe } from 'vitest'
 import {
   activateSystem,
   deactivateSystem,
@@ -43,7 +43,6 @@ describe('render system integration', () => {
       }
     )
     component = testComponent
-    ;(useParams as Mock).mockImplementation(() => ({}))
   })
 
   it('Render system integrations properly ', async () => {

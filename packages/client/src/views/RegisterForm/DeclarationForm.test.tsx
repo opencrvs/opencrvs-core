@@ -63,7 +63,7 @@ describe('when user has starts a new declaration', () => {
       )
       const testApp = await createTestApp()
       app = testApp.app
-      history = testApp.history
+
       store = testApp.store
 
       draft = createDeclaration(EventType.Birth)
@@ -86,7 +86,7 @@ describe('when user has starts a new declaration', () => {
     beforeEach(async () => {
       const testApp = await createTestApp()
       app = testApp.app
-      history = testApp.history
+
       store = testApp.store
     })
 

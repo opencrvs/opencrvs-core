@@ -22,7 +22,8 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  resizeWindow,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
@@ -38,6 +39,7 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { vi, Mock } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -237,7 +239,7 @@ storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
 describe('RegistrarHome ready to print tab related tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const client = createClient(store)
 
   beforeAll(async () => {
@@ -339,7 +341,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const element = await waitForElement(testComponent, Workqueue)
@@ -366,7 +368,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           data: { totalItems: 0, results: [] }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -388,7 +390,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const element = await waitForElement(testComponent, '#pagination_container')
@@ -406,14 +408,14 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   describe('When a row is clicked', () => {
     it('renders expanded area for ready to print', async () => {
-      const { component: testComponent } = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         // @ts-ignore
         <ReadyToPrint
           queryData={{
             data: mockPrintTabData
           }}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -426,15 +428,15 @@ describe('RegistrarHome ready to print tab related tests', () => {
       await waitForElement(testComponent, '#name_0')
       testComponent.update()
 
-      expect(window.location.href).toContain(
+      expect(router.state.location.pathname).toContain(
         '/record-audit/printTab/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
   })
 
   describe('handles download status', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: ReactWrapper<{}, {}>
+    let testComponent: TestComponentWithRouteMock
+    let createdTestComponent: TestComponentWithRouteMock
     beforeEach(async () => {
       Date.now = vi.fn(() => 1554055200000)
       mockListSyncController
@@ -704,38 +706,42 @@ describe('RegistrarHome ready to print tab related tests', () => {
         })
       client.query = mockListSyncController
 
-      createdTestComponent = await createTestComponent(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'print' } }} />,
-        { store, history, apolloClient: client }
-      )
+      createdTestComponent = await createTestComponent(<OfficeHome />, {
+        store,
+        apolloClient: client,
+        initialEntries: [formatUrl('/', { tabId: 'print' })]
+      })
       testComponent = createdTestComponent
     })
 
     it('downloads declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
-
-      testComponent.find('#assign').hostNodes().simulate('click')
       expect(
-        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+        testComponent.component.find('#assignment').hostNodes()
+      ).toHaveLength(1)
+
+      testComponent.component.find('#assign').hostNodes().simulate('click')
+      expect(
+        testComponent.component
+          .find('#action-loading-ListItemAction-0')
+          .hostNodes()
       ).toHaveLength(1)
 
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
+      testComponent.component.update()
 
       const action = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-Print'
       )
       action.hostNodes().simulate('click')
@@ -743,8 +749,8 @@ describe('RegistrarHome ready to print tab related tests', () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
-      expect(history.location.pathname).toBe(
+      testComponent.component.update()
+      expect(testComponent.router.state.location.pathname).toBe(
         '/cert/collector/956281c9-1f47-4c26-948a-970dd23c4094/death/certCollector'
       )
     })
@@ -758,10 +764,10 @@ describe('RegistrarHome ready to print tab related tests', () => {
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
 
-      testComponent.update()
+      testComponent.component.update()
 
       const errorIcon = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-1-icon-failed'
       )
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -770,7 +776,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 })
 
 describe('Tablet tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
@@ -785,14 +791,14 @@ describe('Tablet tests', () => {
   it('redirects to recordAudit page if item is clicked', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const { component: testComponent } = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{
           data: mockPrintTabData
         }}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -804,7 +810,7 @@ describe('Tablet tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/printTab/956281c9-1f47-4c26-948a-970dd23c4094'
     )
   })

@@ -14,7 +14,7 @@ import { createTestComponent } from '@client/tests/util'
 import { createStore } from '@client/store'
 
 describe('LoadingIndicator test cases', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   it('Should display the Error', async () => {
     // @ts-ignore
@@ -24,7 +24,7 @@ describe('LoadingIndicator test cases', () => {
         hasError={true}
         noDeclaration={false}
       />,
-      { store, history }
+      { store }
     )
     const isShowingLoadingText = testComponent.find(
       'div#search-result-error-text-count'
