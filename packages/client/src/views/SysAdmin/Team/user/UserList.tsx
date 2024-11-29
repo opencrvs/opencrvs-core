@@ -39,7 +39,8 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import {
   getAddressName,
   getUserRoleIntlKey,
-  UserStatus
+  UserStatus,
+  canDeactivateUser
 } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -396,7 +397,7 @@ function UserListComponent(props: IProps) {
   )
 
   const getMenuItems = useCallback(
-    function getMenuItems(user: User) {
+    function getMenuItems(user: User, userDetails: UserDetails | null) {
       const menuItems = [
         {
           label: intl.formatMessage(messages.editUserDetailsTitle),
@@ -432,7 +433,11 @@ function UserListComponent(props: IProps) {
         })
       }
 
-      if (user.status === 'active') {
+      if (
+        userDetails &&
+        user.status === 'active' &&
+        canDeactivateUser(user.id, userDetails)
+      ) {
         menuItems.push({
           label: intl.formatMessage(messages.deactivate),
           handler: () => toggleUserActivationModal(user)
@@ -530,7 +535,7 @@ function UserListComponent(props: IProps) {
               toggleButton={
                 <Icon name="DotsThreeVertical" color="primary" size="large" />
               }
-              menuItems={getMenuItems(user)}
+              menuItems={getMenuItems(user, userDetails)}
             />
           )}
         </Stack>
