@@ -3,8 +3,8 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-COPY --chown=node:node packages/gateway /app/packages/gateway
-COPY --chown=node:node packages/events /app/packages/events
+COPY --chown=node:node gateway /app/packages/gateway
+COPY --chown=node:node events /app/packages/events
 
 WORKDIR /app/packages/components
 COPY --chown=node:node components /app/packages/components

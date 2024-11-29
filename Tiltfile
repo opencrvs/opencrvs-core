@@ -15,14 +15,15 @@ allow_k8s_contexts('docker-desktop')
 docker_build("opencrvs/ocrvs-base", ".", dockerfile="packages/Dockerfile.base", only=["packages/commons","package.json","yarn.lock"], network="host")
 
 # Build services
-docker_build("opencrvs/ocrvs-client:local", "packages", dockerfile="packages/client/Dockerfile", only=["components","client"], network="host")
+docker_build("opencrvs/ocrvs-client:local", "packages", dockerfile="packages/client/Dockerfile", only=["components","client","events","gateway"], network="host")
 docker_build("opencrvs/ocrvs-login:local", "packages", dockerfile="packages/login/Dockerfile", only=["components","login"], network="host")
+docker_build("opencrvs/ocrvs-gateway:local", "packages", dockerfile="packages/gateway/Dockerfile", only=["components","gateway", "events"], network="host")
 
 apps = ['auth', 
               'config',
               'dashboards', 
               'documents', 
-              'gateway',  
+              'events',
               'metrics', 
               'migration', 
               'notification', 

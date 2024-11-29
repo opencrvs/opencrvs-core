@@ -50,6 +50,7 @@ export interface GQLQuery {
   getEventsWithProgress?: GQLEventProgressResultSet
   getSystemRoles?: Array<GQLSystemRole>
   fetchSystem?: GQLSystem
+  getEvent: GQLEvent
 }
 
 export interface GQLMutation {
@@ -86,6 +87,7 @@ export interface GQLMutation {
   markMarriageAsIssued: string
   markEventAsDuplicate: string
   confirmRegistration: string
+  rejectRegistration: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -105,6 +107,18 @@ export interface GQLMutation {
   deleteSystem?: GQLSystem
   bookmarkAdvancedSearch?: GQLBookMarkedSearches
   removeBookmarkedAdvancedSearch?: GQLBookMarkedSearches
+  createEvent: GQLEvent
+  notifyEvent: GQLEvent
+  declareEvent: GQLEvent
+  registerEvent: GQLEvent
+  certifyEvent: GQLEvent
+  issueEvent: GQLEvent
+  revokeEvent: GQLEvent
+  reinstateEvent: GQLEvent
+  revokeCorrectionEvent: GQLEvent
+  requestCorrectionEvent: GQLEvent
+  approveCorrectionEvent: GQLEvent
+  rejectCorrectionEvent: GQLEvent
 }
 
 export interface GQLDummy {
@@ -403,7 +417,7 @@ export interface GQLEventSearchResultSet {
 }
 
 export interface GQLAdvancedSearchParametersInput {
-  event?: GQLEvent
+  event?: GQLEventType
   name?: string
   registrationStatuses?: Array<string | null>
   dateOfEvent?: string
@@ -513,6 +527,14 @@ export interface GQLSystem {
   type: GQLSystemType
   integratingSystemType?: GQLIntegratingSystemType
   settings?: GQLSystemSettings
+}
+
+export interface GQLEvent {
+  type: string
+  id: string
+  createdAt: GQLDateTime
+  updatedAt: GQLDateTime
+  actions: Array<GQLAction>
 }
 
 export interface GQLCorrectionInput {
@@ -693,6 +715,54 @@ export interface GQLRemoveBookmarkedSeachInput {
   searchId: string
 }
 
+export interface GQLEventInput {
+  type: string
+}
+
+export interface GQLNotifyActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLDeclareActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLRegisterActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLCertifyActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLIssueActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLRevokeActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLReinstateActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLRevokeCorrectionActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLRequestCorrectionActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLApproveCorrectionActionInput {
+  data: Array<GQLFieldInput>
+}
+
+export interface GQLRejectCorrectionActionInput {
+  data: Array<GQLFieldInput>
+}
+
 export type GQLMap = any
 
 export interface GQLRegistration {
@@ -700,7 +770,6 @@ export interface GQLRegistration {
   _fhirID?: string
   draftId?: string
   trackingId?: string
-  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -1017,7 +1086,7 @@ export interface GQLEventSearchSetNameMap {
   MarriageEventSearchSet: GQLMarriageEventSearchSet
 }
 
-export const enum GQLEvent {
+export const enum GQLEventType {
   birth = 'birth',
   death = 'death',
   marriage = 'marriage'
@@ -1063,6 +1132,29 @@ export interface GQLSystemSettings {
   openIdProviderClientId?: string
   openIdProviderBaseUrl?: string
   openIdProviderClaims?: string
+}
+
+export type GQLDateTime = any
+
+export type GQLAction =
+  | GQLCreateAction
+  | GQLRegisterAction
+  | GQLNotifyAction
+  | GQLDeclareAction
+
+/** Use this to resolve union type Action */
+export type GQLPossibleActionTypeNames =
+  | 'CreateAction'
+  | 'RegisterAction'
+  | 'NotifyAction'
+  | 'DeclareAction'
+
+export interface GQLActionNameMap {
+  Action: GQLAction
+  CreateAction: GQLCreateAction
+  RegisterAction: GQLRegisterAction
+  NotifyAction: GQLNotifyAction
+  DeclareAction: GQLDeclareAction
 }
 
 export interface GQLAttachmentInput {
@@ -1124,7 +1216,6 @@ export interface GQLRegistrationInput {
   _fhirID?: string
   draftId?: string
   trackingId?: string
-  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -1354,7 +1445,7 @@ export interface GQLRoleLabel {
 }
 
 export interface GQLAdvancedSeachParameters {
-  event?: GQLEvent
+  event?: GQLEventType
   name?: string
   registrationStatuses?: Array<string | null>
   dateOfEvent?: string
@@ -1542,6 +1633,36 @@ export interface GQLEventProgressData {
 export interface GQLWebhookPermission {
   event: string
   permissions: Array<string>
+}
+
+export interface GQLCreateAction {
+  type: string
+  createdAt: GQLDateTime
+  createdBy: string
+  data: Array<GQLField>
+}
+
+export interface GQLRegisterAction {
+  type: string
+  createdAt: GQLDateTime
+  createdBy: string
+  data: Array<GQLField>
+  identifiers: GQLIdentifiers
+}
+
+export interface GQLNotifyAction {
+  type: string
+  createdAt: GQLDateTime
+  createdBy: string
+  data: Array<GQLField>
+}
+
+export interface GQLDeclareAction {
+  type: string
+  createdAt: GQLDateTime
+  createdBy: string
+  data: Array<GQLField>
+  identifiers: GQLIdentifiers
 }
 
 export const enum GQLAttachmentInputStatus {
@@ -1765,6 +1886,7 @@ export interface GQLResolver {
   EventProgressResultSet?: GQLEventProgressResultSetTypeResolver
   SystemRole?: GQLSystemRoleTypeResolver
   System?: GQLSystemTypeResolver
+  Event?: GQLEventTypeResolver
   CreatedIds?: GQLCreatedIdsTypeResolver
   Reinstated?: GQLReinstatedTypeResolver
   Avatar?: GQLAvatarTypeResolver
@@ -1808,6 +1930,11 @@ export interface GQLResolver {
 
   EventProgressSet?: GQLEventProgressSetTypeResolver
   SystemSettings?: GQLSystemSettingsTypeResolver
+  DateTime?: GraphQLScalarType
+  Action?: {
+    __resolveType: GQLActionTypeResolver
+  }
+
   AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
@@ -1831,12 +1958,18 @@ export interface GQLResolver {
   MarriageEventSearchSet?: GQLMarriageEventSearchSetTypeResolver
   EventProgressData?: GQLEventProgressDataTypeResolver
   WebhookPermission?: GQLWebhookPermissionTypeResolver
+  CreateAction?: GQLCreateActionTypeResolver
+  RegisterAction?: GQLRegisterActionTypeResolver
+  NotifyAction?: GQLNotifyActionTypeResolver
+  DeclareAction?: GQLDeclareActionTypeResolver
   FieldValue?: GraphQLScalarType
   AuditLogItemBase?: {
     __resolveType: GQLAuditLogItemBaseTypeResolver
   }
 
   AdditionalIdWithCompositionId?: GQLAdditionalIdWithCompositionIdTypeResolver
+  Field?: GQLFieldTypeResolver
+  Identifiers?: GQLIdentifiersTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   sendNotificationToAllUsers?: QueryToSendNotificationToAllUsersResolver<TParent>
@@ -1876,6 +2009,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getEventsWithProgress?: QueryToGetEventsWithProgressResolver<TParent>
   getSystemRoles?: QueryToGetSystemRolesResolver<TParent>
   fetchSystem?: QueryToFetchSystemResolver<TParent>
+  getEvent?: QueryToGetEventResolver<TParent>
 }
 
 export interface QueryToSendNotificationToAllUsersArgs {
@@ -2134,7 +2268,7 @@ export interface QueryToIsLeafLevelLocationResolver<
 }
 
 export interface QueryToGetUserArgs {
-  userId?: string
+  userId: string
 }
 export interface QueryToGetUserResolver<TParent = any, TResult = any> {
   (
@@ -2146,7 +2280,7 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetUserByMobileArgs {
-  mobile?: string
+  mobile: string
 }
 export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
   (
@@ -2158,7 +2292,7 @@ export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
 }
 
 export interface QueryToGetUserByEmailArgs {
-  email?: string
+  email: string
 }
 export interface QueryToGetUserByEmailResolver<TParent = any, TResult = any> {
   (
@@ -2477,6 +2611,18 @@ export interface QueryToFetchSystemResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface QueryToGetEventArgs {
+  eventId: string
+}
+export interface QueryToGetEventResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetEventArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLMutationTypeResolver<TParent = any> {
   requestRegistrationCorrection?: MutationToRequestRegistrationCorrectionResolver<TParent>
   rejectRegistrationCorrection?: MutationToRejectRegistrationCorrectionResolver<TParent>
@@ -2511,6 +2657,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markMarriageAsIssued?: MutationToMarkMarriageAsIssuedResolver<TParent>
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
+  rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2530,6 +2677,18 @@ export interface GQLMutationTypeResolver<TParent = any> {
   deleteSystem?: MutationToDeleteSystemResolver<TParent>
   bookmarkAdvancedSearch?: MutationToBookmarkAdvancedSearchResolver<TParent>
   removeBookmarkedAdvancedSearch?: MutationToRemoveBookmarkedAdvancedSearchResolver<TParent>
+  createEvent?: MutationToCreateEventResolver<TParent>
+  notifyEvent?: MutationToNotifyEventResolver<TParent>
+  declareEvent?: MutationToDeclareEventResolver<TParent>
+  registerEvent?: MutationToRegisterEventResolver<TParent>
+  certifyEvent?: MutationToCertifyEventResolver<TParent>
+  issueEvent?: MutationToIssueEventResolver<TParent>
+  revokeEvent?: MutationToRevokeEventResolver<TParent>
+  reinstateEvent?: MutationToReinstateEventResolver<TParent>
+  revokeCorrectionEvent?: MutationToRevokeCorrectionEventResolver<TParent>
+  requestCorrectionEvent?: MutationToRequestCorrectionEventResolver<TParent>
+  approveCorrectionEvent?: MutationToApproveCorrectionEventResolver<TParent>
+  rejectCorrectionEvent?: MutationToRejectCorrectionEventResolver<TParent>
 }
 
 export interface MutationToRequestRegistrationCorrectionArgs {
@@ -5610,6 +5769,59 @@ export interface SystemToSettingsResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
+export interface GQLEventTypeResolver<TParent = any> {
+  type?: EventToTypeResolver<TParent>
+  id?: EventToIdResolver<TParent>
+  createdAt?: EventToCreatedAtResolver<TParent>
+  updatedAt?: EventToUpdatedAtResolver<TParent>
+  actions?: EventToActionsResolver<TParent>
+}
+
+export interface EventToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface EventToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface EventToCreatedAtResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface EventToUpdatedAtResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface EventToActionsResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface GQLCreatedIdsTypeResolver<TParent = any> {
   compositionId?: CreatedIdsToCompositionIdResolver<TParent>
   trackingId?: CreatedIdsToTrackingIdResolver<TParent>
@@ -5761,7 +5973,6 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
   draftId?: RegistrationToDraftIdResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
-  mosipAid?: RegistrationToMosipAidResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
@@ -5817,15 +6028,6 @@ export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {
-  (
-    parent: TParent,
-    args: {},
-    context: Context,
-    info: GraphQLResolveInfo
-  ): TResult
-}
-
-export interface RegistrationToMosipAidResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -8201,6 +8403,16 @@ export interface SystemSettingsToOpenIdProviderClaimsResolver<
   ): TResult
 }
 
+export interface GQLActionTypeResolver<TParent = any> {
+  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+    | 'CreateAction'
+    | 'RegisterAction'
+    | 'NotifyAction'
+    | 'DeclareAction'
+    | Promise<
+        'CreateAction' | 'RegisterAction' | 'NotifyAction' | 'DeclareAction'
+      >
+}
 export interface GQLAssignmentDataTypeResolver<TParent = any> {
   practitionerId?: AssignmentDataToPractitionerIdResolver<TParent>
   firstName?: AssignmentDataToFirstNameResolver<TParent>
@@ -10630,6 +10842,216 @@ export interface WebhookPermissionToEventResolver<
 }
 
 export interface WebhookPermissionToPermissionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLCreateActionTypeResolver<TParent = any> {
+  type?: CreateActionToTypeResolver<TParent>
+  createdAt?: CreateActionToCreatedAtResolver<TParent>
+  createdBy?: CreateActionToCreatedByResolver<TParent>
+  data?: CreateActionToDataResolver<TParent>
+}
+
+export interface CreateActionToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface CreateActionToCreatedAtResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface CreateActionToCreatedByResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface CreateActionToDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLRegisterActionTypeResolver<TParent = any> {
+  type?: RegisterActionToTypeResolver<TParent>
+  createdAt?: RegisterActionToCreatedAtResolver<TParent>
+  createdBy?: RegisterActionToCreatedByResolver<TParent>
+  data?: RegisterActionToDataResolver<TParent>
+  identifiers?: RegisterActionToIdentifiersResolver<TParent>
+}
+
+export interface RegisterActionToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegisterActionToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegisterActionToCreatedByResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegisterActionToDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface RegisterActionToIdentifiersResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLNotifyActionTypeResolver<TParent = any> {
+  type?: NotifyActionToTypeResolver<TParent>
+  createdAt?: NotifyActionToCreatedAtResolver<TParent>
+  createdBy?: NotifyActionToCreatedByResolver<TParent>
+  data?: NotifyActionToDataResolver<TParent>
+}
+
+export interface NotifyActionToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface NotifyActionToCreatedAtResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface NotifyActionToCreatedByResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface NotifyActionToDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface GQLDeclareActionTypeResolver<TParent = any> {
+  type?: DeclareActionToTypeResolver<TParent>
+  createdAt?: DeclareActionToCreatedAtResolver<TParent>
+  createdBy?: DeclareActionToCreatedByResolver<TParent>
+  data?: DeclareActionToDataResolver<TParent>
+  identifiers?: DeclareActionToIdentifiersResolver<TParent>
+}
+
+export interface DeclareActionToTypeResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface DeclareActionToCreatedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface DeclareActionToCreatedByResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface DeclareActionToDataResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface DeclareActionToIdentifiersResolver<
   TParent = any,
   TResult = any
 > {

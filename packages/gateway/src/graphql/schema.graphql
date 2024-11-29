@@ -32,9 +32,9 @@ type Query {
   fetchMarriageRegistration(id: ID!): MarriageRegistration
   fetchRecordDetailsForVerification(id: String!): RecordDetails
   isLeafLevelLocation(locationId: String!): Boolean!
-  getUser(userId: String): User
-  getUserByMobile(mobile: String): User
-  getUserByEmail(email: String): User
+  getUser(userId: String!): User
+  getUserByMobile(mobile: String!): User
+  getUserByEmail(email: String!): User
   searchUsers(
     username: String
     mobile: String
@@ -147,6 +147,7 @@ type Query {
     sortOrder: String
   ): [SystemRole!]
   fetchSystem(clientId: ID!): System
+  getEvent(eventId: ID!): Event!
 }
 
 type Mutation {
@@ -216,7 +217,8 @@ type Mutation {
     comment: String
     duplicateTrackingId: String
   ): ID!
-  confirmRegistration(id: ID!): ID!
+  confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
+  rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -263,6 +265,30 @@ type Mutation {
   removeBookmarkedAdvancedSearch(
     removeBookmarkedSearchInput: RemoveBookmarkedSeachInput!
   ): BookMarkedSearches
+  createEvent(event: EventInput!): Event!
+  notifyEvent(eventId: ID!, input: NotifyActionInput!): Event!
+  declareEvent(eventId: ID!, input: DeclareActionInput!): Event!
+  registerEvent(eventId: ID!, input: RegisterActionInput!): Event!
+  certifyEvent(eventId: ID!, input: CertifyActionInput!): Event!
+  issueEvent(eventId: ID!, input: IssueActionInput!): Event!
+  revokeEvent(eventId: ID!, input: RevokeActionInput!): Event!
+  reinstateEvent(eventId: ID!, input: ReinstateActionInput!): Event!
+  revokeCorrectionEvent(
+    eventId: ID!
+    input: RevokeCorrectionActionInput!
+  ): Event!
+  requestCorrectionEvent(
+    eventId: ID!
+    input: RequestCorrectionActionInput!
+  ): Event!
+  approveCorrectionEvent(
+    eventId: ID!
+    input: ApproveCorrectionActionInput!
+  ): Event!
+  rejectCorrectionEvent(
+    eventId: ID!
+    input: RejectCorrectionActionInput!
+  ): Event!
 }
 
 type Dummy {
@@ -498,7 +524,7 @@ type EventSearchResultSet {
 }
 
 input AdvancedSearchParametersInput {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -610,6 +636,14 @@ type System {
   settings: SystemSettings
 }
 
+type Event {
+  type: String!
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  actions: [Action!]!
+}
+
 input CorrectionInput {
   requester: String!
   requesterOther: String
@@ -697,6 +731,17 @@ type Reinstated {
   registrationStatus: RegStatus
 }
 
+input ConfirmRegistrationInput {
+  registrationNumber: String!
+  error: String
+  identifiers: [IdentifierInput!]
+}
+
+input RejectRegistrationInput {
+  reason: String!
+  comment: String
+}
+
 input UserInput {
   id: ID
   name: [HumanNameInput!]!
@@ -771,6 +816,54 @@ input RemoveBookmarkedSeachInput {
   searchId: String!
 }
 
+input EventInput {
+  type: String!
+}
+
+input NotifyActionInput {
+  data: [FieldInput!]!
+}
+
+input DeclareActionInput {
+  data: [FieldInput!]!
+}
+
+input RegisterActionInput {
+  data: [FieldInput!]!
+}
+
+input CertifyActionInput {
+  data: [FieldInput!]!
+}
+
+input IssueActionInput {
+  data: [FieldInput!]!
+}
+
+input RevokeActionInput {
+  data: [FieldInput!]!
+}
+
+input ReinstateActionInput {
+  data: [FieldInput!]!
+}
+
+input RevokeCorrectionActionInput {
+  data: [FieldInput!]!
+}
+
+input RequestCorrectionActionInput {
+  data: [FieldInput!]!
+}
+
+input ApproveCorrectionActionInput {
+  data: [FieldInput!]!
+}
+
+input RejectCorrectionActionInput {
+  data: [FieldInput!]!
+}
+
 scalar Map
 
 type Registration {
@@ -778,7 +871,6 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
-  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1065,7 +1157,7 @@ interface EventSearchSet {
   operationHistories: [OperationHistorySearchSet]
 }
 
-enum Event {
+enum EventType {
   birth
   death
   marriage
@@ -1107,6 +1199,10 @@ type SystemSettings {
   openIdProviderBaseUrl: String
   openIdProviderClaims: String
 }
+
+scalar DateTime
+
+union Action = CreateAction | RegisterAction | NotifyAction | DeclareAction
 
 input AttachmentInput {
   _fhirID: ID
@@ -1167,7 +1263,6 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
-  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1266,6 +1361,11 @@ enum RegStatus {
   ISSUED
 }
 
+input IdentifierInput {
+  type: String!
+  value: String!
+}
+
 input HumanNameInput {
   use: String
   firstNames: String
@@ -1298,6 +1398,11 @@ input SystemSettingsInput {
 input WebhookInput {
   event: String!
   permissions: [String]!
+}
+
+input FieldInput {
+  id: String!
+  value: FieldValue!
 }
 
 type AssignmentData {
@@ -1392,7 +1497,7 @@ type RoleLabel {
 }
 
 type AdvancedSeachParameters {
-  event: Event
+  event: EventType
   name: String
   registrationStatuses: [String]
   dateOfEvent: String
@@ -1581,6 +1686,36 @@ type WebhookPermission {
   permissions: [String!]!
 }
 
+type CreateAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  data: [Field!]!
+}
+
+type RegisterAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  data: [Field!]!
+  identifiers: Identifiers!
+}
+
+type NotifyAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  data: [Field!]!
+}
+
+type DeclareAction {
+  type: String!
+  createdAt: DateTime!
+  createdBy: String!
+  data: [Field!]!
+  identifiers: Identifiers!
+}
+
 enum AttachmentInputStatus {
   approved
   validated
@@ -1689,6 +1824,16 @@ interface AuditLogItemBase {
 type AdditionalIdWithCompositionId {
   compositionId: String!
   trackingId: String!
+}
+
+type Field {
+  id: String!
+  value: FieldValue!
+}
+
+type Identifiers {
+  trackingId: String!
+  registrationNumber: String!
 }
 
 enum TelecomSystem {
