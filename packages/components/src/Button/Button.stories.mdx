@@ -11,34 +11,40 @@ import { Activity } from '../icons'
 export const Template = (args) => <Button {...args}>Click here</Button>
 
 export const Sizes = () => (
-  <Stack>
-    <Button type="primary" size="large">
-      Large
-    </Button>
-    <Button type="primary" size="medium">
-      Default
-    </Button>
-    <Button type="primary" size="small">
-      Small
-    </Button>
-    <Button type="secondary" size="large">
-      Large
-    </Button>
-    <Button type="secondary" size="medium">
-      Default
-    </Button>
-    <Button type="secondary" size="small">
-      Small
-    </Button>
-    <Button type="tertiary" size="large">
-      Large
-    </Button>
-    <Button type="tertiary" size="medium">
-      Default
-    </Button>
-    <Button type="tertiary" size="small">
-      Small
-    </Button>
+  <Stack direction="column" alignItems="left">
+    <Stack>
+      <Button type="primary" size="large">
+        Large
+      </Button>
+      <Button type="primary" size="medium">
+        Default
+      </Button>
+      <Button type="primary" size="small">
+        Small
+      </Button>
+    </Stack>
+    <Stack>
+      <Button type="secondary" size="large">
+        Large
+      </Button>
+      <Button type="secondary" size="medium">
+        Default
+      </Button>
+      <Button type="secondary" size="small">
+        Small
+      </Button>
+    </Stack>
+    <Stack>
+      <Button type="tertiary" size="large">
+        Large
+      </Button>
+      <Button type="tertiary" size="medium">
+        Default
+      </Button>
+      <Button type="tertiary" size="small">
+        Small
+      </Button>
+    </Stack>
   </Stack>
 )
 
@@ -60,25 +66,41 @@ export const WithIcon = () => (
 )
 
 export const Icons = () => (
-  <Stack>
-    <Button type="icon" size="large" aria-label="View performance data">
-      <Icon name="Target" size="large" />
-    </Button>
-    <Button type="icon" size="medium" aria-label="View performance data">
-      <Icon name="Target" size="medium" />
-    </Button>
-    <Button type="icon" size="small" aria-label="View performance data">
-      <Icon name="Target" size="medium" />
-    </Button>
-    <Button type="iconPrimary" size="large" aria-label="View performance data">
-      <Icon name="Target" size="large" />
-    </Button>
-    <Button type="iconPrimary" size="medium" aria-label="View performance data">
-      <Icon name="Target" size="medium" />
-    </Button>
-    <Button type="iconPrimary" size="small" aria-label="View performance data">
-      <Icon name="Target" size="medium" />
-    </Button>
+  <Stack direction="column" alignItems="left">
+    <Stack>
+      <Button
+        type="iconPrimary"
+        size="large"
+        aria-label="View performance data"
+      >
+        <Icon name="Target" size="large" />
+      </Button>
+      <Button
+        type="iconPrimary"
+        size="medium"
+        aria-label="View performance data"
+      >
+        <Icon name="Target" size="medium" />
+      </Button>
+      <Button
+        type="iconPrimary"
+        size="small"
+        aria-label="View performance data"
+      >
+        <Icon name="Target" size="medium" />
+      </Button>
+    </Stack>
+    <Stack>
+      <Button type="icon" size="large" aria-label="View performance data">
+        <Icon name="Target" size="large" />
+      </Button>
+      <Button type="icon" size="medium" aria-label="View performance data">
+        <Icon name="Target" size="medium" />
+      </Button>
+      <Button type="icon" size="small" aria-label="View performance data">
+        <Icon name="Target" size="medium" />
+      </Button>
+    </Stack>
   </Stack>
 )
 
