@@ -11,39 +11,35 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 
-const BaseField = z.object({
-  id: z.string(),
-  required: z.boolean(),
-  label: TranslationConfig
-})
-
-const TextField = BaseField.describe('Text input').merge(
-  z.object({
+const TextField = z
+  .object({
     type: z.literal('TEXT'),
+    id: z.string(),
+    required: z.boolean(),
+    label: TranslationConfig,
     options: z
       .object({
         maxLength: z.number().describe('Maximum length of the text')
       })
       .optional()
   })
-)
+  .describe('Text input')
 
-const DateField = BaseField.describe('A single date input (dd-mm-YYYY)').merge(
-  z.object({
+const DateField = z
+  .object({
     type: z.literal('DATE'),
-    options: z
-      .object({
-        notice: TranslationConfig.describe(
-          'Text to display above the date input'
-        )
-      })
-      .optional()
+    id: z.string(),
+    required: z.boolean(),
+    label: TranslationConfig,
+    options: z.object({
+      notice: TranslationConfig.describe('Text to display above the date input')
+    })
   })
-)
+  .describe('A single date input (dd-mm-YYYY)')
 
-const Paragraph = BaseField.describe('A read-only HTML <p> paragraph').merge(
-  z.object({ type: z.literal('PARAGRAPH') })
-)
+const Paragraph = z
+  .object({ type: z.literal('PARAGRAPH'), label: TranslationConfig })
+  .describe('A read-only HTML <p> paragraph')
 
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
@@ -52,3 +48,5 @@ export const FieldConfig = z.discriminatedUnion('type', [
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>
+export type FieldType = FieldConfig['type']
+export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
