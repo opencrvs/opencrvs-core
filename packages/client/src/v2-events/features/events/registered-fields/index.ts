@@ -11,3 +11,4 @@
 export * from './TextField'
 export * from './DateField'
 export * from './Paragraph'
+export * from './RadioGroup'

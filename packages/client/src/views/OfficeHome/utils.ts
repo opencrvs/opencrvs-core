@@ -12,7 +12,8 @@ import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
 
-export const getSortedItems = <T>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getSortedItems = <T = any>(
   items: T[],
   sortedCol: COLUMNS,
   sortOrder: SORT_ORDER

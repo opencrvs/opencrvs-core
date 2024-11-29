@@ -23,7 +23,12 @@ import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
 import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons/client'
-import { TextField, Paragraph, DateField } from './registered-fields'
+import {
+  TextField,
+  Paragraph,
+  DateField,
+  RadioGroup
+} from './registered-fields'
 
 export function EventFormWizardIndex() {
   const { eventType } = useParams<{ eventType: string }>()
@@ -85,10 +90,11 @@ export function EventFormWizard({ event }: { event: EventConfig }) {
               components={{
                 TEXT: TextField,
                 PARAGRAPH: Paragraph,
-                DATE: DateField
+                DATE: DateField,
+                RADIO_GROUP: RadioGroup
               }}
               onNextPage={next}
-              onSubmit={(values) => console.log(values)}
+              onSubmit={() => {}}
             />
           </Content>
         </Frame.Section>

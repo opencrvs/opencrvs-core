@@ -934,7 +934,7 @@ export enum CorrectionSection {
   Summary = 'summary'
 }
 
-enum PaymentSection {
+export enum PaymentSection {
   Payment = 'payment'
 }
 

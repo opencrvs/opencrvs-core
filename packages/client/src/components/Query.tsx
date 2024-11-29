@@ -23,6 +23,6 @@ import {
   QueryComponentOptions
 } from '@apollo/client/react/components'
 
-export function Query<T>(props: QueryComponentOptions<T>) {
+export function Query<T = any>(props: QueryComponentOptions<T>) {
   return <ApolloQuery<T> {...props} />
 }

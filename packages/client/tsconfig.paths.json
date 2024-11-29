@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "@client/*": ["./*"],
-      "@gateway/*": ["../../gateway/src/*"]
+      "@gateway/*": ["../../gateway/src/*"],
+      "@events/*": ["../../events/src/*"]
     }
   },
   "exclude": ["**/*.test.tsx"]

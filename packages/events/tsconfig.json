@@ -3,7 +3,7 @@
     "baseUrl": "./src",
     "strict": true,
     "paths": { "@events/*": ["./*"] },
-    "target": "ESNext",
+    "target": "es6",
     "module": "node16",
     "outDir": "build/dist",
     "sourceMap": true,
