@@ -62,12 +62,14 @@ import {
   isCertificateForPrintInAdvance,
   filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { flatten } from 'lodash'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  MessageDescriptor,
+  injectIntl
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router-dom'
-import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
@@ -162,26 +164,13 @@ const getErrorsOnFieldsBySection = (
     user
   )
 
-  return {
-    [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] = (
-        errors[field.name as keyof typeof errors] as IFieldErrors
-      ).errors
-
-      const value = draft.data[sectionId]
-        ? draft.data[sectionId][field.name]
-        : null
-
-      const informationMissing =
-        validationErrors.length > 0 || value === null ? validationErrors : []
-
-      return { ...fields, [field.name]: informationMissing }
-    }, {})
-  }
+  return Object.values(errors)
+    .map((field) => field.errors[0]?.message)
+    .filter(Boolean)
 }
 
 interface IState {
-  showError: boolean
+  errorMessages: Array<MessageDescriptor>
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
 }
@@ -190,7 +179,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      showError: false,
+      errorMessages: [],
       showModalForNoSignedAffidavit: false,
       isFileUploading: false
     }
@@ -246,10 +235,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.offlineCountryConfiguration,
       this.props.userDetails
     )
-    const errorValues = Object.values(errors).map(Object.values)
-    const errLength = flatten(errorValues).filter(
-      (errs) => errs.length > 0
-    ).length
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -257,9 +242,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
-    if (errLength > 0) {
+    if (errors.length > 0) {
       this.setState({
-        showError: true
+        errorMessages: errors
       })
 
       return
@@ -282,7 +267,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
         )
       ) {
         this.setState({
-          showError: true
+          errorMessages: []
         })
 
         return
@@ -295,7 +280,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
 
     this.setState({
-      showError: false,
+      errorMessages: [],
       showModalForNoSignedAffidavit: false
     })
     if (!nextGroup) {
@@ -349,7 +334,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { showError, showModalForNoSignedAffidavit } = this.state
+    const { errorMessages, showModalForNoSignedAffidavit } = this.state
     const props = this.props
     const { declaration } = props
 
@@ -411,12 +396,13 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               </Button>
             ]}
           >
-            {showError && (
+            {errorMessages.length > 0 && (
               <ErrorWrapper>
-                <ErrorText id="form_error">
-                  {(formGroup.error && intl.formatMessage(formGroup.error)) ||
-                    ''}
-                </ErrorText>
+                {errorMessages.map((err, key) => (
+                  <ErrorText key={key} id="form_error">
+                    {intl.formatMessage(err)}
+                  </ErrorText>
+                ))}
               </ErrorWrapper>
             )}
             <FormFieldGenerator
@@ -425,7 +411,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               onChange={(values) => {
                 if (values && values.affidavitFile) {
                   this.setState({
-                    showError: false
+                    errorMessages: []
                   })
                 }
                 this.modifyDeclaration(values, declarationToBeCertified)

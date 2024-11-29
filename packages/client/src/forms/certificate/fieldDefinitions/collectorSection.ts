@@ -14,6 +14,7 @@ import {
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   identityTypeMapper,
   IFormField,
+  IFormFieldValue,
   IFormSection,
   IFormSectionGroup,
   IRadioGroupFormField,
@@ -1051,15 +1052,21 @@ function getCertCollectorGroupForEvent(
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
-    error: certificateMessages.certificateCollectorError,
     fields: [
       {
         name: 'certificateTemplateId',
         type: 'SELECT_WITH_OPTIONS',
         label: certificateMessages.certificateTemplateSelectLabel,
         required: true,
-        initialValue: certTemplateDefaultValue,
-        validator: [],
+        validator: [
+          (value: IFormFieldValue) => {
+            return !value
+              ? {
+                  message: certificateMessages.certificateCollectorTemplateError
+                }
+              : undefined
+          }
+        ],
         options: certificateTemplateOptions
       },
       {
@@ -1070,7 +1077,15 @@ function getCertCollectorGroupForEvent(
         hideHeader: true,
         required: true,
         initialValue: '',
-        validator: [],
+        validator: [
+          (value: IFormFieldValue) => {
+            return !value
+              ? {
+                  message: certificateMessages.certificateCollectorError
+                }
+              : undefined
+          }
+        ],
         options: finalOptions
       }
     ]

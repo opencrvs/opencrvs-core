@@ -74,6 +74,7 @@ interface ICertificateMessages
   toastMessage: MessageDescriptor
   otherCollectorFormTitle: MessageDescriptor
   certificateCollectorError: MessageDescriptor
+  certificateCollectorTemplateError: MessageDescriptor
   certificateOtherCollectorInfoError: MessageDescriptor
   certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
   certificateOtherCollectorAffidavitError: MessageDescriptor
@@ -415,6 +416,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Please select who is collecting the certificate',
     description: 'Form level error for collector form',
     id: 'print.certificate.collector.form.error'
+  },
+  certificateCollectorTemplateError: {
+    defaultMessage: 'Please select certificate type',
+    description: 'Form level error for collector certificate template',
+    id: 'print.certificate.collector.form.error.template'
   },
   certificateOtherCollectorInfoError: {
     defaultMessage: 'Complete all the mandatory fields',
