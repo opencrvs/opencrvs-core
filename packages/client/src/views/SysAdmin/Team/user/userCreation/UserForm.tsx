@@ -122,6 +122,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       this.props.section,
       this.props.formData
     ).reduce((memo, { name }) => ({ ...memo, [name]: true }), {})
+
     this.setAllFormFieldsTouched(touched)
   }
 

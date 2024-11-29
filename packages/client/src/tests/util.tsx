@@ -38,7 +38,7 @@ import {
 } from 'enzyme'
 import { readFileSync } from 'fs'
 import { graphql, print } from 'graphql'
-import { createLocation, createMemoryHistory } from 'history'
+import { createLocation, createMemoryHistory, History } from 'history'
 import * as jwt from 'jsonwebtoken'
 import { join } from 'path'
 import { stringify } from 'query-string'
@@ -57,9 +57,10 @@ import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { Root } from '@client/Root'
 import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { createMemoryRouter, RouterProvider, useParams } from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData } from './mock-offline-data'
+import { formatUrl } from '@client/navigation'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -867,6 +868,89 @@ export async function createTestStore() {
   return { store }
 }
 
+export async function createTestComponentB(
+  node: React.ReactElement<ITestView>,
+  {
+    store,
+    graphqlMocks,
+    apolloClient,
+    initialEntries,
+    history,
+    path = '*'
+  }: {
+    store: AppStore
+    graphqlMocks?: MockedProvider['props']['mocks']
+    apolloClient?: ApolloClient<any>
+    initialEntries?: string[]
+    path?: string
+    history: History
+  },
+  options?: MountRendererProps
+) {
+  store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+  await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
+
+  const withGraphQL = (node: JSX.Element) => {
+    if (apolloClient) {
+      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
+    }
+
+    return (
+      <MockedProvider
+        mocks={graphqlMocks}
+        addTypename={false}
+        defaultOptions={{
+          watchQuery: { fetchPolicy: 'no-cache' },
+          query: { fetchPolicy: 'no-cache' }
+        }}
+      >
+        {node}
+      </MockedProvider>
+    )
+  }
+  const props = node.props as any
+
+  const locationProps = props?.match.path
+    ? {
+        initialEntries: [
+          props.location
+            ? props.location
+            : formatUrl(props.match.path, props.match.params)
+        ],
+        path: props.match.path
+      }
+    : { path, initialEntries: initialEntries || [] }
+
+  ;(useParams as any).mockReturnValue(props.match.params)
+
+  const router = createMemoryRouter(
+    [
+      {
+        path: locationProps.path,
+        element: node
+      }
+    ],
+    { ...locationProps }
+  )
+
+  router.subscribe(() => {
+    history.push(router.state.location)
+  })
+
+  function PropProxy() {
+    return withGraphQL(
+      <Provider store={store}>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </I18nContainer>
+      </Provider>
+    )
+  }
+
+  return mount(<PropProxy />, options)
+}
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {

@@ -296,6 +296,7 @@ const UserReviewFormComponent = ({
       userDetails,
       offlineCountryConfiguration
     )
+
     if (variables.user._fhirID) {
       variables.user.id = variables.user._fhirID
       delete variables.user._fhirID

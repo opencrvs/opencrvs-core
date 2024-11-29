@@ -8,34 +8,35 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import {
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  storeDeclaration
+} from '@client/declarations'
+import { CorrectionSection } from '@client/forms'
+import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { formatUrl } from '@client/navigation'
+import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
+import { getOfflineDataSuccess } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
-  createTestComponent,
-  mockDeclarationData,
   createRouterProps,
+  createTestComponentB,
   flushPromises,
-  mockDeathDeclarationData,
   getRegisterFormFromStore,
+  mockDeathDeclarationData,
+  mockDeclarationData,
   mockOfflineData,
   userDetails
 } from '@client/tests/util'
+import { draftToGqlTransformer } from '@client/transformer'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { CorrectionSection } from '@client/forms'
-import { EventType, RegStatus } from '@client/utils/gateway'
-import {
-  IDeclaration,
-  storeDeclaration,
-  DOWNLOAD_STATUS
-} from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
-import { formatUrl } from '@client/navigation'
-import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
-import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
-import { draftToGqlTransformer } from '@client/transformer'
-import { getOfflineDataSuccess } from '@client/offline/actions'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { Router } from '@sentry/react/types/types'
+
+let wrapper: ReactWrapper<{}, {}>
 
 const deathDeclaration: IDeclaration = {
   id: '85bccf72-6117-4cab-827d-47728becb0c1',
@@ -164,10 +165,7 @@ const birthDeclaration: IDeclaration = {
   timeLoggedMS: 990618
 }
 
-const { store } = createStore()
-
-let wrapper: ReactWrapper<{}, {}>
-let router: Router
+const { store, history } = createStore()
 
 describe('Correction summary', () => {
   describe('for a birth declaration', () => {
@@ -176,17 +174,25 @@ describe('Correction summary', () => {
       await flushPromises()
       store.dispatch(storeDeclaration(birthDeclaration))
       const form = await getRegisterFormFromStore(store, EventType.Birth)
-      const { component, router: testRouter } = await createTestComponent(
-        <CorrectionForm />,
-        {
-          store,
-          path: CERTIFICATE_CORRECTION,
-          initialEntries: [
+      wrapper = await createTestComponentB(
+        <CorrectionForm
+          {...createRouterProps(
             formatUrl(CERTIFICATE_CORRECTION, {
               declarationId: birthDeclaration.id,
               pageId: CorrectionSection.Summary
-            })
-          ],
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                declarationId: birthDeclaration.id,
+                pageId: CorrectionSection.Summary
+              }
+            }
+          )}
+        />,
+        {
+          store,
+          history,
           graphqlMocks: [
             {
               request: {
@@ -208,8 +214,6 @@ describe('Correction summary', () => {
           ]
         }
       )
-      router = testRouter
-      wrapper = component
     })
     it('should disable the mark correction button if fees no is selected', () => {
       expect(
@@ -376,7 +380,7 @@ describe('Correction summary', () => {
       await flushPromises()
       wrapper.update()
 
-      expect(router.state.location.pathname).toContain('/review-view-group')
+      expect(history.location.pathname).toContain('/review-view-group')
     })
 
     it('should cancel the correction when the cross button is pressed', () => {
@@ -384,39 +388,48 @@ describe('Correction summary', () => {
 
       wrapper.update()
 
-      expect(router.state.location.pathname).toContain(
-        WORKQUEUE_TABS.readyForReview
-      )
+      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
     })
 
-    it('after successful correction request redirects to reg home review tab', () => {
+    it('after successful correction request redirects to  reg home review tab', () => {
       wrapper
         .find('#correctionFees_NOT_REQUIRED')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
       wrapper.update()
       wrapper.find('#make_correction').hostNodes().simulate('click')
-      wrapper.find('#send').hostNodes().simulate('click')
       wrapper.update()
-      expect(router.state.location.pathname).toContain(
+      expect(history.location.pathname).toContain(
         `registration-home/${WORKQUEUE_TABS.readyForReview}`
       )
     })
   })
   describe('for a death declaration', () => {
     beforeEach(async () => {
+      // ;(deathDeclaration.data.corrector.relationship as any).value = 'INFORMANT'
+
       store.dispatch(storeDeclaration(deathDeclaration))
-      const { component } = await createTestComponent(<CorrectionForm />, {
-        store,
-        path: CERTIFICATE_CORRECTION,
-        initialEntries: [
-          formatUrl(CERTIFICATE_CORRECTION, {
-            declarationId: deathDeclaration.id,
-            pageId: CorrectionSection.Summary
-          })
-        ]
-      })
-      wrapper = component
+      wrapper = await createTestComponentB(
+        <CorrectionForm
+          {...createRouterProps(
+            formatUrl(CERTIFICATE_CORRECTION, {
+              declarationId: deathDeclaration.id,
+              pageId: CorrectionSection.Summary
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                declarationId: deathDeclaration.id,
+                pageId: CorrectionSection.Summary
+              }
+            }
+          )}
+        />,
+        {
+          store,
+          history
+        }
+      )
     })
     it('should return corrector informat', () => {
       const instance = wrapper

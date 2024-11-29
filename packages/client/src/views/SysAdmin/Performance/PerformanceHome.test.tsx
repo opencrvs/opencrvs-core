@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createStore } from '@client/store'
-import { createRouterProps, createTestComponent } from '@client/tests/util'
+import {
+  createRouterProps,
+  createTestComponent,
+  createTestComponentB
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
@@ -41,9 +45,8 @@ describe('Performance home test', () => {
         displayLabel: 'Dhaka Division',
         id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
         searchableText: 'Dhaka'
-      }M
-
-      ;({ component: app } = await createTestComponent(
+      }
+      app = await createTestComponentB(
         <PerformanceHome
           {...createRouterProps('/performance', undefined, {
             search: {
@@ -56,9 +59,10 @@ describe('Performance home test', () => {
         />,
         {
           store,
+          history,
           graphqlMocks
         }
-      ))
+      )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)

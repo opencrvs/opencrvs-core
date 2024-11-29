@@ -72,7 +72,7 @@ const config = { DONT_LOG_ERRORS_ON_HANDLED_FAILURES: true }
 
 export const createStore = <T>(
   existingHistory?: History<T>
-): { store: AppStore } => {
+): { store: AppStore; history: any } => {
   const reducers = combineReducers<IStoreState>({
     profile: profileReducer,
     i18n: intlReducer,
@@ -103,5 +103,5 @@ export const createStore = <T>(
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
-  return { store }
+  return { store, history: existingHistory || createBrowserHistory() }
 }

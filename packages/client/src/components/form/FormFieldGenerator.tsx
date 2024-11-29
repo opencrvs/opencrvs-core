@@ -241,6 +241,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       touched: Boolean(touched),
       placeholder: fieldDefinition.placeholder
     }
+
     if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
       return (
         <InputField {...inputFieldProps}>
