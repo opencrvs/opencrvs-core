@@ -15,15 +15,17 @@ import {
   Stack,
   Button,
   Icon,
-  Content
+  Content,
+  FormWizard
 } from '@opencrvs/components'
 import React from 'react'
 import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
+import { TextField, Paragraph, DateField } from './registered-fields'
 
 export function PublishEvent() {
   const { eventType } = useParams<{ eventType: string }>()
-  const { title, exit, saveAndExit, previous, next, finish } =
+  const { title, event, exit, saveAndExit, previous, next, page } =
     useEvent(eventType)
 
   return (
@@ -59,21 +61,18 @@ export function PublishEvent() {
         </Frame.SectionFormBackAction>
 
         <Frame.Section>
-          <Content
-            title={title}
-            bottomActionButtons={[
-              <Button
-                key="continue"
-                fullWidth
-                type="primary"
-                size="large"
-                onClick={next ?? finish}
-              >
-                Continue
-              </Button>
-            ]}
-          >
-            <b>This is where the form will be rendered</b>
+          <Content title={title}>
+            <FormWizard
+              currentPage={page}
+              pages={event.actions[0].forms[0].pages}
+              components={{
+                TEXT: TextField,
+                PARAGRAPH: Paragraph,
+                DATE: DateField
+              }}
+              onNextPage={next}
+              onSubmit={(values) => console.log(values)}
+            />
           </Content>
         </Frame.Section>
       </Frame.LayoutForm>

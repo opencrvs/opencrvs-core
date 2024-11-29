@@ -688,47 +688,47 @@ export interface GQLEventInput {
 }
 
 export interface GQLNotifyActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLDeclareActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLRegisterActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLCertifyActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLIssueActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLRevokeActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLReinstateActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLRevokeCorrectionActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLRequestCorrectionActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLApproveCorrectionActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export interface GQLRejectCorrectionActionInput {
-  fields: Array<GQLFieldInput>
+  data: Array<GQLFieldInput>
 }
 
 export type GQLMap = any
@@ -1601,14 +1601,14 @@ export interface GQLCreateAction {
   type: string
   createdAt: GQLDateTime
   createdBy: string
-  fields: Array<GQLField>
+  data: Array<GQLField>
 }
 
 export interface GQLRegisterAction {
   type: string
   createdAt: GQLDateTime
   createdBy: string
-  fields: Array<GQLField>
+  data: Array<GQLField>
   identifiers: GQLIdentifiers
 }
 
@@ -1616,14 +1616,14 @@ export interface GQLNotifyAction {
   type: string
   createdAt: GQLDateTime
   createdBy: string
-  fields: Array<GQLField>
+  data: Array<GQLField>
 }
 
 export interface GQLDeclareAction {
   type: string
   createdAt: GQLDateTime
   createdBy: string
-  fields: Array<GQLField>
+  data: Array<GQLField>
   identifiers: GQLIdentifiers
 }
 
@@ -10634,7 +10634,7 @@ export interface GQLCreateActionTypeResolver<TParent = any> {
   type?: CreateActionToTypeResolver<TParent>
   createdAt?: CreateActionToCreatedAtResolver<TParent>
   createdBy?: CreateActionToCreatedByResolver<TParent>
-  fields?: CreateActionToFieldsResolver<TParent>
+  data?: CreateActionToDataResolver<TParent>
 }
 
 export interface CreateActionToTypeResolver<TParent = any, TResult = any> {
@@ -10664,7 +10664,7 @@ export interface CreateActionToCreatedByResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface CreateActionToFieldsResolver<TParent = any, TResult = any> {
+export interface CreateActionToDataResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -10677,7 +10677,7 @@ export interface GQLRegisterActionTypeResolver<TParent = any> {
   type?: RegisterActionToTypeResolver<TParent>
   createdAt?: RegisterActionToCreatedAtResolver<TParent>
   createdBy?: RegisterActionToCreatedByResolver<TParent>
-  fields?: RegisterActionToFieldsResolver<TParent>
+  data?: RegisterActionToDataResolver<TParent>
   identifiers?: RegisterActionToIdentifiersResolver<TParent>
 }
 
@@ -10714,7 +10714,7 @@ export interface RegisterActionToCreatedByResolver<
   ): TResult
 }
 
-export interface RegisterActionToFieldsResolver<TParent = any, TResult = any> {
+export interface RegisterActionToDataResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -10739,7 +10739,7 @@ export interface GQLNotifyActionTypeResolver<TParent = any> {
   type?: NotifyActionToTypeResolver<TParent>
   createdAt?: NotifyActionToCreatedAtResolver<TParent>
   createdBy?: NotifyActionToCreatedByResolver<TParent>
-  fields?: NotifyActionToFieldsResolver<TParent>
+  data?: NotifyActionToDataResolver<TParent>
 }
 
 export interface NotifyActionToTypeResolver<TParent = any, TResult = any> {
@@ -10769,7 +10769,7 @@ export interface NotifyActionToCreatedByResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface NotifyActionToFieldsResolver<TParent = any, TResult = any> {
+export interface NotifyActionToDataResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
@@ -10782,7 +10782,7 @@ export interface GQLDeclareActionTypeResolver<TParent = any> {
   type?: DeclareActionToTypeResolver<TParent>
   createdAt?: DeclareActionToCreatedAtResolver<TParent>
   createdBy?: DeclareActionToCreatedByResolver<TParent>
-  fields?: DeclareActionToFieldsResolver<TParent>
+  data?: DeclareActionToDataResolver<TParent>
   identifiers?: DeclareActionToIdentifiersResolver<TParent>
 }
 
@@ -10819,7 +10819,7 @@ export interface DeclareActionToCreatedByResolver<
   ): TResult
 }
 
-export interface DeclareActionToFieldsResolver<TParent = any, TResult = any> {
+export interface DeclareActionToDataResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},

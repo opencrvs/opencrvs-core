@@ -12,9 +12,11 @@
 import { tennisClubMembershipEvent } from './fixtures'
 import { useIntl } from 'react-intl'
 import { usePagination } from './usePagination'
-import { FieldConfig } from '@opencrvs/commons'
+import { FieldConfig } from '@opencrvs/commons/client'
 
-const eventTypes = { 'tennis-club-membership': tennisClubMembershipEvent }
+const eventTypes = {
+  'tennis-club-membership': tennisClubMembershipEvent
+}
 
 export function useEvent(anyEventType: string) {
   const intl = useIntl()
@@ -24,6 +26,7 @@ export function useEvent(anyEventType: string) {
   }
 
   const type = anyEventType as keyof typeof eventTypes
+  const event = eventTypes[type]
   const { pages, label } = eventTypes[type].actions[0].forms[0]
 
   const { next, previous, page } = usePagination(pages.length)
@@ -42,7 +45,8 @@ export function useEvent(anyEventType: string) {
     previous,
     next,
     finish,
+    page,
     form: pages,
-    fields: pages[page].fields as FieldConfig[]
+    event
   }
 }

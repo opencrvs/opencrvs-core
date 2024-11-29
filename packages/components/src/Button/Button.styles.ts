@@ -91,7 +91,6 @@ export const secondary = css`
     color: ${({ theme }) => theme.colors.grey600};
   }
 `
-
 export const secondaryNegative = css`
   border: 1.5px solid ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.copy};
