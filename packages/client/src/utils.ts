@@ -46,7 +46,6 @@ export function useOnlineStatus() {
       setOnline(isNavigatorOnline())
     }
 
-    handleConnectionChange()
     window.addEventListener(ONLINE, handleConnectionChange)
     window.addEventListener(OFFLINE, handleConnectionChange)
 
