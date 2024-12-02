@@ -905,7 +905,15 @@ export async function createTestComponent(
       </MockedProvider>
     )
   }
-  const router = createMemoryRouter(routesConfig, { initialEntries })
+  const router = createMemoryRouter(
+    [
+      {
+        path,
+        element: node
+      }
+    ],
+    { initialEntries }
+  )
 
   function PropProxy() {
     return withGraphQL(
