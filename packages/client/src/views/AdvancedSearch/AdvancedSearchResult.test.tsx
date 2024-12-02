@@ -147,19 +147,8 @@ describe('AdvancedSearchResult Bookmark', () => {
   beforeEach(async () => {
     const s = createStore()
     store = s.store
-    const { component: testComponent } = await createTestComponent(
-      <AdvancedSearchResult />,
-      {
-        store,
-        initialEntries: [formatUrl(ADVANCED_SEARCH_RESULT, {})],
-        path: ADVANCED_SEARCH_RESULT,
-        graphqlMocks: graphqlMock as any
-      }
-    )
-    component = testComponent
-
     await flushPromises()
-    component.update()
+
     store.dispatch(
       setAdvancedSearchParam({
         ...advancedSearchInitialState,
@@ -168,9 +157,20 @@ describe('AdvancedSearchResult Bookmark', () => {
         registrationStatuses: ['IN_PROGRESS']
       })
     )
-    component.update()
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    component.update()
+
+    const { component: testComponent } = await createTestComponent(
+      <AdvancedSearchResult />,
+      {
+        store,
+
+        initialEntries: [ADVANCED_SEARCH_RESULT],
+        path: ADVANCED_SEARCH_RESULT,
+        graphqlMocks: graphqlMock as any
+      }
+    )
+    component = testComponent
+
     await waitForElement(component, 'AdvancedSearchResultComp')
   })
 
