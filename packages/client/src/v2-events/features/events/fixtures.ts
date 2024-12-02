@@ -10,6 +10,7 @@
  */
 import { EventConfig } from '@opencrvs/commons/client'
 
+/** @knipignore */
 export const tennisClubMembershipEvent = {
   id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {

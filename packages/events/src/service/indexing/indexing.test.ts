@@ -13,12 +13,13 @@ import { appRouter, t } from '@events/router'
 const { createCallerFactory } = t
 import { vi } from 'vitest'
 import { indexAllEvents } from './indexing'
-import { getOrCreateClient } from '@events/storage/elasticsearch'
+
 import {
   setupServer as setupMongoServer,
   resetServer as resetMongoServer
 } from '@events/storage/__mocks__/mongodb'
 import {
+  getOrCreateClient,
   resetServer as resetESServer,
   setupServer as setupESServer
 } from '@events/storage/__mocks__/elasticsearch'
@@ -29,12 +30,14 @@ vi.mock('@events/storage/elasticsearch')
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
   const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' }
+    user: { id: '1', primaryOfficeId: '123' },
+    token: 'FAKE_TOKEN'
   })
+
   return caller
 }
 
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
+beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 200000)
 afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
 
 const client = createClient()
