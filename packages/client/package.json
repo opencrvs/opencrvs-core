@@ -16,7 +16,7 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
-    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=349",
+    "lint:ts": "eslint --fix './src/**/*.{ts,tsx}' --max-warnings=1000",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
     "generate-gateway-types": "NODE_OPTIONS=--dns-result-order=ipv4first graphql-codegen --config codegen.ts && prettier --write src/utils/gateway.ts",

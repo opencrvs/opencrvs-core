@@ -883,7 +883,12 @@ export async function createTestComponent(
     store: AppStore
     graphqlMocks?: MockedProvider['props']['mocks']
     apolloClient?: ApolloClient<any>
-    initialEntries?: string[]
+    initialEntries?:
+      | string[]
+      | {
+          pathname: string
+          state: Record<string, string | Record<string, string>>
+        }[]
     path?: string
   },
   options?: MountRendererProps
