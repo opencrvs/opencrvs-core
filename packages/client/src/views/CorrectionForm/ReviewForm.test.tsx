@@ -73,14 +73,14 @@ describe('Review form for an declaration', () => {
 
     store.dispatch(storeDeclaration(declaration))
 
-    // @todo: consider setting initialEntries
-    // history.replace(
-    //   formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
-    //     declarationId: declaration.id,
-    //     pageId: ReviewSection.Review,
-    //     groupId: 'review-view-group'
-    //   })
-    // )
+    router.navigate(
+      formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
+        declarationId: declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group'
+      }),
+      { replace: true }
+    )
 
     await waitForElement(wrapper, 'CorrectionReviewFormComponent')
   })
