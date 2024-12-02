@@ -17,6 +17,8 @@ import {
 import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
+import { GQLUserInput } from '@gateway/graphql/schema'
+import { SysAdminAccessMap } from '@gateway/features/role/utils'
 
 export interface ITokenPayload {
   sub: string
@@ -49,6 +51,22 @@ export async function getUser(
     }
   })
   return await res.json()
+}
+
+export function canAssignRole(
+  loggedInUserScope: Scope[],
+  userToSave: GQLUserInput
+) {
+  let roleFilter: keyof typeof SysAdminAccessMap
+  if (loggedInUserScope.includes('natlsysadmin')) {
+    roleFilter = 'NATIONAL_SYSTEM_ADMIN'
+  } else if (loggedInUserScope.includes('sysadmin')) {
+    roleFilter = 'LOCAL_SYSTEM_ADMIN'
+  } else {
+    throw Error('Create user is only allowed for sysadmin/natlsysadmin')
+  }
+
+  return SysAdminAccessMap[roleFilter]?.includes(userToSave.systemRole)
 }
 
 export async function getSystem(

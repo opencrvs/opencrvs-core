@@ -12,8 +12,13 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from '@gateway/fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { IRoleSearchPayload } from '@gateway/features/role/type-resolvers'
-import { transformMongoComparisonObject } from '@gateway/features/role/utils'
+import {
+  getAccessibleRolesForScope,
+  SystemRole,
+  transformMongoComparisonObject
+} from '@gateway/features/role/utils'
 import { hasScope } from '@gateway/features/user/utils'
+import { getTokenPayload } from '@opencrvs/commons/authentication'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -59,7 +64,12 @@ export const resolvers: GQLResolver = {
           ...authHeader
         }
       })
-      return await res.json()
+      const { scope } = getTokenPayload(authHeader.Authorization.split(' ')[1])
+      const accessibleSysAdminRoles = getAccessibleRolesForScope(scope)
+      const allSysAdminRoles = (await res.json()) as SystemRole[]
+      return allSysAdminRoles.filter((sysAdminRole) =>
+        accessibleSysAdminRoles?.includes(sysAdminRole.value)
+      )
     }
   },
   Mutation: {
