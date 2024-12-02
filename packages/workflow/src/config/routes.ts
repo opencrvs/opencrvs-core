@@ -29,7 +29,7 @@ import { approveCorrectionRoute } from '@workflow/records/handler/correction/app
 import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
 import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
 import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
-import { upsertRegistrationHandler } from '@workflow/features/registration/upsert'
+import { upsertRegistrationHandler } from '@workflow/records/handler/upsert'
 
 export const getRoutes = () => {
   const routes = [

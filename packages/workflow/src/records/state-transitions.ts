@@ -60,8 +60,7 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN,
-  upsertPatientIdentifierWithRN
+  updatePatientIdentifierWithRN
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
