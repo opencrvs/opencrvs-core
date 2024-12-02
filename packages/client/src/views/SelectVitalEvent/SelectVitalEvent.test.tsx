@@ -8,26 +8,27 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
+import { createTestApp, flushPromises, waitForReady } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { ReactWrapper } from 'enzyme'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('when user is selecting the vital event', () => {
   let app: ReactWrapper
-  let history: History
+  let router: ReturnType<typeof createMemoryRouter>
 
   beforeEach(async () => {
     const testApp = await createTestApp()
     app = testApp.app
+    router = testApp.router
 
     await waitForReady(app)
   })
 
   describe('when user is in vital event selection view', () => {
     beforeEach(async () => {
-      history.replace(SELECT_VITAL_EVENT)
+      router.navigate(SELECT_VITAL_EVENT, { replace: true })
       await waitForElement(app, '#select_vital_event_view')
     })
     it('lists the options', () => {
@@ -51,8 +52,8 @@ describe('when user is selecting the vital event', () => {
         app.find('#select_death_event').hostNodes().simulate('change')
         app.find('#continue').hostNodes().simulate('click')
       })
-      it('takses user to the death registration form', () => {
-        expect(history.location.pathname).toContain('events/death')
+      it('takes user to the death registration form', () => {
+        expect(router.state.location.pathname).toContain('events/death')
       })
     })
 
