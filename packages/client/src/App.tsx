@@ -15,8 +15,8 @@ import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { Provider } from 'react-redux'
-import { RouterProvider } from 'react-router-dom'
-import { createGlobalStyle, ThemeProvider } from 'styled-components'
+import { RouterProvider, createBrowserRouter, Outlet } from 'react-router-dom'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 
 import * as React from 'react'
 
@@ -42,7 +42,6 @@ import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceH
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import styled from 'styled-components'
 
 import { SystemRoleType } from '@client/utils/gateway'
 import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
@@ -58,7 +57,6 @@ import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCer
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
-import { createBrowserRouter, Outlet } from 'react-router-dom'
 import { AppStore } from './store'
 import { Workqueues } from './v2-events/features/workqueues'
 import { V2_ROOT_ROUTE } from './v2-events/routes/routes'
