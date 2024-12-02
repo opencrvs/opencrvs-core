@@ -78,15 +78,13 @@ export function AdministrativeLevels() {
         [key: string]: ILocation
       }
 
-      let childLocations = Object.values(locations).filter(
-        (s) => s.partOf === `Location/${location}`
-      )
-
-      if (!childLocations.length) {
-        childLocations = Object.values(offices).filter(
-          (s) => s.partOf === `Location/${location}`
+      const childLocations = Object.values(locations)
+        .filter((s) => s.partOf === `Location/${location}`)
+        .concat(
+          Object.values(offices).filter(
+            (s) => s.partOf === `Location/${location}`
+          )
         )
-      }
 
       let dataOfBreadCrumb: IBreadCrumbData[] = [
         {
