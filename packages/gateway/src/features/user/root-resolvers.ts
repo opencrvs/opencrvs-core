@@ -347,6 +347,12 @@ export const resolvers: GQLResolver = {
       { userId, password, securityQNAs },
       { headers: authHeader }
     ) {
+      if (
+        !isTokenOwner(authHeader, userId) &&
+        hasScope(authHeader, SCOPES.USER_UPDATE)
+      )
+        throw new Error('User can not be activated')
+
       const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
         method: 'POST',
         body: JSON.stringify({ userId, password, securityQNAs }),
