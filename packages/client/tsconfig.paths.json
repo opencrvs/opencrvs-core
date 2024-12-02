@@ -5,6 +5,5 @@
       "@gateway/*": ["../../gateway/src/*"],
       "@events/*": ["../../events/src/*"]
     }
-  },
-  "exclude": ["**/*.test.tsx"]
+  }
 }
