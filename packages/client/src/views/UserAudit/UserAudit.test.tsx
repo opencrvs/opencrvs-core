@@ -20,7 +20,6 @@ import { userMutations } from '@client/user/mutations'
 import { GET_USER } from '@client/user/queries'
 import { UserAudit } from '@client/views/UserAudit/UserAudit'
 import { ReactWrapper } from 'enzyme'
-import { createMemoryHistory, History } from 'history'
 import * as React from 'react'
 import { vi } from 'vitest'
 
@@ -108,7 +107,7 @@ describe('User audit list tests for field agent', () => {
     }))
   })
 
-  it.only('renders without crashing', async () => {
+  it('renders without crashing', async () => {
     expect(await waitForElement(component, '#user-audit-list')).toBeDefined()
   })
 
@@ -138,8 +137,8 @@ describe('User audit list tests for field agent', () => {
 describe('User audit list tests for sys admin', () => {
   userMutations.resendInvite = vi.fn()
   let component: ReactWrapper<{}, {}>
+  let router: ReturnType<typeof createMemoryRouter>
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
@@ -155,9 +154,8 @@ describe('User audit list tests for sys admin', () => {
     }
     vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['sysadmin'])
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const { component: testComponent } = await createTestComponent(
-      <UserAudit />,
-      {
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(<UserAudit />, {
         store,
         path: USER_PROFILE,
         initialEntries: [
@@ -166,9 +164,9 @@ describe('User audit list tests for sys admin', () => {
           })
         ],
         graphqlMocks: [mockAuditedUserGqlResponse]
-      }
-    )
+      })
     component = testComponent
+    router = testRouter
   })
 
   it('redirects to edit user view on clicking edit details menu option', async () => {
@@ -193,7 +191,7 @@ describe('User audit list tests for sys admin', () => {
     // wait for mocked data to load mockedProvider
     await flushPromises()
 
-    expect(history.location.pathname).toBe(
+    expect(router.state.location.pathname).toBe(
       '/user/5d08e102542c7a19fc55b790/preview/'
     )
   })

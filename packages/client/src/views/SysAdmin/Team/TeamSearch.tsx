@@ -66,7 +66,7 @@ const Text = styled.div`
 class TeamSearchComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    const historyState = props.router.location.state // @TODO: Check if this is true
+    const historyState = props.router.location.state
     this.state = {
       selectedLocation:
         (historyState && historyState?.selectedLocation) || undefined

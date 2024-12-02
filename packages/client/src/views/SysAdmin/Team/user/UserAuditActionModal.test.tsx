@@ -16,7 +16,6 @@ import { AppStore, createStore } from '@client/store'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
-import { History } from 'history'
 import { vi, Mock } from 'vitest'
 import { SystemRoleType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -179,7 +178,6 @@ const graphqlMocksOfReactivate = [
 describe('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
   let onCloseMock: Mock
 
   beforeEach(async () => {

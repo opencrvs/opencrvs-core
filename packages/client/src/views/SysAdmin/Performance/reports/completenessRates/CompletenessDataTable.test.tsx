@@ -16,8 +16,6 @@ import { createTestComponent } from '@client/tests/util'
 import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { EventType } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
-
-import { History } from 'history'
 import { COMPLETENESS_RATE_REPORT_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 

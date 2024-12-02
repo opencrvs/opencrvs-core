@@ -19,11 +19,11 @@ import {
   createTestStore,
   flushPromises,
   mockUserResponse,
-  registerScopeToken
+  registerScopeToken,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { merge } from 'lodash'
 import { parse } from 'query-string'
 import * as React from 'react'
@@ -91,8 +91,7 @@ describe('Team search test', () => {
   })
 
   describe('Team search with location in props', () => {
-    let app: ReactWrapper
-    let history: History
+    let testComponent: ReactWrapper<{}, {}>
     const getItem = window.localStorage.getItem as Mock
     const mockFetchUserDetails = vi.fn()
     const nameObj = {
@@ -125,9 +124,6 @@ describe('Team search test', () => {
       }
     }
 
-    // storage.getItem = vi.fn()
-    // storage.setItem = vi.fn()
-
     beforeAll(async () => {
       merge(mockUserResponse, nameObj)
       mockFetchUserDetails.mockReturnValue(mockUserResponse)
@@ -140,22 +136,29 @@ describe('Team search test', () => {
     })
 
     beforeEach(async () => {
-      const testApp = await createTestApp()
-      app = testApp.app
-
-      history.replace(TEAM_SEARCH, {
-        selectedLocation: {
-          id: '',
-          searchableText: '',
-          displayLabel: 'Alokbali Union Parishad'
-        }
-      })
+      const testComponent = (
+        await createTestComponent(<TeamSearch />, {
+          store,
+          initialEntries: [
+            {
+              pathname: TEAM_SEARCH,
+              state: {
+                selectedLocation: {
+                  id: '',
+                  searchableText: '',
+                  displayLabel: 'Alokbali Union Parishad'
+                }
+              }
+            }
+          ]
+        })
+      )?.component
     })
 
     it('loads the location in the search input box', async () => {
-      await waitForElement(app, '#locationSearchInput')
+      await waitForElement(testComponent, '#locationSearchInput')
       expect(
-        app.find('#locationSearchInput').hostNodes().props().value
+        testComponent.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Alokbali Union Parishad')
     })
   })
