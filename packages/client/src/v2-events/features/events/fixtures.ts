@@ -138,3 +138,17 @@ export const tennisClubMembershipEvent = {
     }
   ]
 } satisfies EventConfig
+
+export const tennisClubMemberDeclaration = {
+  action: 'DECLARE',
+  applicant: {
+    firstname: 'Roger',
+    surname: 'Federer',
+    dob: 'Aug 8, 1981'
+  },
+  recommender: {
+    firstname: 'Rafael',
+    surname: 'Nadal',
+    id: '787898'
+  }
+}
