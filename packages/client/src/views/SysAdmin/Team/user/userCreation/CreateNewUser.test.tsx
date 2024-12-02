@@ -21,7 +21,8 @@ import {
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockRoles,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  setScopes
 } from '@client/tests/util'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -36,7 +37,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import { GetUserQuery, Status } from '@client/utils/gateway'
+import { GetUserQuery, SCOPES, Status } from '@client/utils/gateway'
 
 describe('create new user tests', () => {
   let store: AppStore
@@ -44,10 +45,11 @@ describe('create new user tests', () => {
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     const s = createStore()
     store = s.store
     history = s.history
+    setScopes([SCOPES.USER_CREATE], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -225,6 +227,7 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(async () => {
+    setScopes([SCOPES.USER_CREATE], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
