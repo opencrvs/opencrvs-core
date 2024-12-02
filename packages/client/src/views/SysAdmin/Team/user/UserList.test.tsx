@@ -134,8 +134,10 @@ describe('User list tests', () => {
       ]
       const { component, router } = await createTestComponent(<UserList />, {
         store,
+        path: TEAM_USER_LIST,
         initialEntries: [
-          formatUrl(TEAM_USER_LIST, {}) +
+          '/',
+          TEAM_USER_LIST +
             '?' +
             stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
@@ -174,8 +176,9 @@ describe('User list tests', () => {
       ]
       const { component, router } = await createTestComponent(<UserList />, {
         store,
+        path: TEAM_USER_LIST,
         initialEntries: [
-          formatUrl(TEAM_USER_LIST, {}) +
+          TEAM_USER_LIST +
             '?' +
             stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
@@ -221,7 +224,7 @@ describe('User list tests', () => {
         {
           store,
           initialEntries: [
-            formatUrl(TEAM_USER_LIST, {}) +
+            TEAM_USER_LIST +
               '?' +
               stringify({
                 locationId: '0d8474da-0361-4d32-979e-af91f012340a'
@@ -353,9 +356,10 @@ describe('User list tests', () => {
         const { component: testComponent, router: testRouter } =
           await createTestComponent(<UserList />, {
             store,
+            path: TEAM_USER_LIST,
             initialEntries: [
               '/',
-              formatUrl(TEAM_USER_LIST, {}) +
+              TEAM_USER_LIST +
                 '?' +
                 stringify({
                   locationId: '0d8474da-0361-4d32-979e-af91f012340a'
