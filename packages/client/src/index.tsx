@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-unassigned-import
+import * as actions from '@client/notification/actions'
+import { storage } from '@client/storage'
+import { createStore } from '@client/store'
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-import { createStore } from '@client/store'
-import * as actions from '@client/notification/actions'
-import { storage } from '@client/storage'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/react'
 import { SubmissionController } from '@client/SubmissionController'
-import WebFont from 'webfontloader'
+import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
+import { createBrowserRouter } from 'react-router-dom'
+import WebFont from 'webfontloader'
+import { App, routesConfig } from './App'
 import { APPLICATION_VERSION } from './utils/constants'
-import { Root } from './Root'
-import { router } from './App'
 
 WebFont.load({
   google: {
@@ -63,6 +63,8 @@ window.addEventListener('online', userReconnectedToast)
 const container = document.getElementById('root')
 const root = createRoot(container!)
 
-root.render(<Root router={router} store={store} />)
+const router = createBrowserRouter(routesConfig)
+
+root.render(<App router={router} store={store} />)
 
 new SubmissionController(store).start()

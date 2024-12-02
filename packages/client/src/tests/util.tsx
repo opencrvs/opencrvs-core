@@ -17,7 +17,7 @@ import {
   Observable
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
-import { App } from '@client/App'
+import { App, routesConfig } from '@client/App'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
@@ -54,7 +54,6 @@ import { Section, SubmissionAction } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { getSystemRolesQuery } from '@client/forms/user/query/queries'
-import { Root } from '@client/Root'
 import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
@@ -149,21 +148,11 @@ export async function createTestApp(
   initialEntries?: string[]
 ) {
   const { store } = await createTestStore()
-  const router = createMemoryRouter(
-    [
-      {
-        path: '*',
-        Component: App
-      }
-    ],
-    { initialEntries }
-  )
+  const router = createMemoryRouter(routesConfig, { initialEntries })
 
   const app = mount(
-    <Root store={store} router={router} client={createGraphQLClient()} />
+    <App store={store} router={router} client={createGraphQLClient()} />
   )
-
-  app.debug()
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
@@ -916,15 +905,7 @@ export async function createTestComponent(
       </MockedProvider>
     )
   }
-  const router = createMemoryRouter(
-    [
-      {
-        path,
-        element: node
-      }
-    ],
-    { initialEntries }
-  )
+  const router = createMemoryRouter(routesConfig, { initialEntries })
 
   function PropProxy() {
     return withGraphQL(
