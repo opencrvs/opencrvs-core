@@ -33,14 +33,13 @@ export type RouteComponentProps<T = {}> = {
  * withRouter was deprecated in react-router-dom v6.
  * This implementation introduces the similar functionality using react-router-dom hooks.
  */
-
 export function withRouter<ComponentProps extends RouteComponentProps>(
   Component: React.ComponentType<ComponentProps>
 ) {
   function ComponentWithRouterProp(props: Omit<ComponentProps, 'router'>) {
-    const params = useParams()
     const location = useLocation()
     const navigate = useNavigate()
+    const params = useParams()
 
     /**
      * For backwards compatibility, match is added to the router prop.

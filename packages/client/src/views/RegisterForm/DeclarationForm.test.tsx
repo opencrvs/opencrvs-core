@@ -21,6 +21,7 @@ import {
   createTestApp,
   flushPromises,
   getFileFromBase64String,
+  goToChildSection,
   goToDocumentsSection,
   goToFatherSection,
   goToMotherSection,
@@ -125,20 +126,11 @@ describe('when user has starts a new declaration', () => {
           })
         )
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        app.update()
-
-        await waitForElement(app, '#content-name')
-
-        app.find('#next_section').hostNodes().simulate('click')
-        app.find('#next_section').hostNodes().simulate('click')
-        await waitForElement(app, '#form_section_id_child-view-group')
+        await goToChildSection(app)
       })
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
-          // await waitForElement(app, '#informant_parent_view')
           app
             .find('#firstNamesEng')
             .hostNodes()
@@ -149,7 +141,7 @@ describe('when user has starts a new declaration', () => {
           app.find('#next_section').hostNodes().simulate('click')
           await flushPromises()
         })
-        it.only('redirect to home when pressed save and exit button', async () => {
+        it('redirect to home when pressed save and exit button', async () => {
           app.find('#save-exit-btn').hostNodes().simulate('click')
           await flushPromises()
           app.update()
@@ -213,18 +205,7 @@ describe('when user has starts a new declaration', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
+            await goToDocumentsSection(app)
           })
           it('renders list of document upload field', async () => {
             const fileInputs = app
@@ -336,7 +317,7 @@ describe('when user has starts a new declaration', () => {
       describe('when user clicks the "mother" page', () => {
         beforeEach(() => goToMotherSection(app))
         it('changes to the mother details section', () => {
-          expect(window.location.href).toContain('mother')
+          expect(router.state.location.pathname).toContain('mother')
         })
         it('hides everything with pinpad if is page loses focus', async () => {
           setPageVisibility(false)
@@ -346,7 +327,7 @@ describe('when user has starts a new declaration', () => {
       describe('when user clicks the "father" page', () => {
         beforeEach(() => goToFatherSection(app))
         it('changes to the father details section', () => {
-          expect(window.location.href).toContain('father')
+          expect(router.state.location.pathname).toContain('father')
         })
       })
       describe('when user is in document page', () => {

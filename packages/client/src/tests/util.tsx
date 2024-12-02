@@ -985,6 +985,11 @@ export async function goToMotherSection(component: ReactWrapper) {
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 
+export async function goToChildSection(component: ReactWrapper) {
+  await goToSection(component, 1)
+  await waitForElement(component, '#form_section_id_child-view-group')
+}
+
 export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
