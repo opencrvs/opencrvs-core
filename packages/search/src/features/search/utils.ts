@@ -13,7 +13,8 @@ import {
   Patient,
   SUPPORTED_PATIENT_IDENTIFIER_CODES,
   CERTIFIED_STATUS,
-  REGISTERED_STATUS
+  REGISTERED_STATUS,
+  ISSUED_STATUS
 } from '@opencrvs/commons/types'
 import { IAdvancedSearchParam } from '@search/features/search/types'
 import { transformDeprecatedParamsToSupported } from './deprecation-support'
@@ -75,7 +76,7 @@ export async function advancedQueryBuilder(
       query_string: {
         default_field: 'type',
         query: isExternalSearch
-          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS})`
+          ? `(${REGISTERED_STATUS}) OR (${CERTIFIED_STATUS}) OR (${ISSUED_STATUS})`
           : `(${params.registrationStatuses!.join(') OR (')})`
       }
     })
