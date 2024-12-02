@@ -12,7 +12,12 @@ import { FormFieldGenerator } from '@client/components/form'
 import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { formatUrl } from '@client/navigation'
-import { REVIEW_USER_FORM } from '@client/navigation/routes'
+import {
+  CREATE_USER_ON_LOCATION,
+  CREATE_USER_SECTION,
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM
+} from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
 import {
@@ -21,6 +26,7 @@ import {
   loginAsFieldAgent,
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
+  mockOfflineData,
   mockOfflineDataDispatch,
   mockRoles,
   TestComponentWithRouteMock
@@ -200,9 +206,13 @@ describe('create new user tests', () => {
     beforeEach(async () => {
       const component = await createTestComponent(<CreateNewUser />, {
         store,
-        // @TODO
-        path: REVIEW_USER_FORM,
-        initialEntries: [formatUrl(REVIEW_USER_FORM, {})]
+        path: CREATE_USER_ON_LOCATION,
+        initialEntries: [
+          formatUrl(CREATE_USER_ON_LOCATION, {
+            locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+            sectionId: mockOfflineData.userForms.sections[0].id
+          })
+        ]
       })
 
       testComponent = component.component
@@ -254,10 +264,17 @@ describe('create new user tests', () => {
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      ;({ component: testComponent } = await createTestComponent(
-        <CreateNewUser />,
-        { store }
-      ))
+      ;({ component: testComponent, router: testRouter } =
+        await createTestComponent(<CreateNewUser />, {
+          store,
+          path: CREATE_USER_SECTION,
+          initialEntries: [
+            formatUrl(CREATE_USER_SECTION, {
+              sectionId: mockOfflineData.userForms.sections[1].id,
+              groupId: mockOfflineData.userForms.sections[1].groups[0].id
+            })
+          ]
+        }))
     })
 
     it('renders review header', () => {
@@ -370,7 +387,15 @@ describe('edit user tests', () => {
       const { component: testComponent, router: testRouter } =
         await createTestComponent(<CreateNewUser />, {
           store,
-          graphqlMocks: graphqlMocks
+          graphqlMocks: graphqlMocks,
+          path: REVIEW_USER_FORM,
+          initialEntries: [
+            formatUrl(REVIEW_USER_FORM, {
+              userId: '5e835e4d81fbf01e4dc554db',
+              sectionId: UserSection.User,
+              groupId: 'user-view-group'
+            })
+          ]
         })
 
       component = testComponent
@@ -393,7 +418,7 @@ describe('edit user tests', () => {
 
   describe('when user is in review page', () => {
     beforeEach(async () => {
-      const { component: testComponent } = await createTestComponent(
+      ;({ component, router } = await createTestComponent(
         <CreateNewUser
           // @ts-ignore
           submitForm={submitMock}
@@ -401,21 +426,16 @@ describe('edit user tests', () => {
         {
           store,
           graphqlMocks,
-          path: REVIEW_USER_FORM,
+          path: REVIEW_USER_DETAILS,
           initialEntries: [
-            formatUrl(REVIEW_USER_FORM, {
+            formatUrl(REVIEW_USER_DETAILS, {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.Preview
             })
           ]
         }
-      )
+      ))
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
       component.update()
     })
 
