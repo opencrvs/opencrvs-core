@@ -14,13 +14,11 @@ import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
 import {
-  createTestApp,
   createTestComponent,
   createTestStore,
   flushPromises,
   mockUserResponse,
-  registerScopeToken,
-  TestComponentWithRouteMock
+  registerScopeToken
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ReactWrapper } from 'enzyme'
@@ -136,7 +134,7 @@ describe('Team search test', () => {
     })
 
     beforeEach(async () => {
-      const testComponent = (
+      testComponent = (
         await createTestComponent(<TeamSearch />, {
           store,
           initialEntries: [

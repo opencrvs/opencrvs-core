@@ -29,7 +29,6 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { ReadyToPrint } from './ReadyToPrint'
@@ -437,7 +436,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   describe('handles download status', () => {
     let testComponent: TestComponentWithRouteMock
-    let createdTestComponent: TestComponentWithRouteMock
+
     beforeEach(async () => {
       Date.now = vi.fn(() => 1554055200000)
       mockListSyncController
@@ -707,13 +706,12 @@ describe('RegistrarHome ready to print tab related tests', () => {
         })
       client.query = mockListSyncController
 
-      createdTestComponent = await createTestComponent(<OfficeHome />, {
+      testComponent = await createTestComponent(<OfficeHome />, {
         store,
         apolloClient: client,
         path: REGISTRAR_HOME_TAB,
         initialEntries: [formatUrl(REGISTRAR_HOME_TAB, { tabId: 'print' })]
       })
-      testComponent = createdTestComponent
     })
 
     it('downloads declaration after clicking download button', async () => {

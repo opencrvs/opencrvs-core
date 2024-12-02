@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-unassigned-import
+import 'focus-visible/dist/focus-visible.js'
 import * as actions from '@client/notification/actions'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
-import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 // eslint-disable-next-line no-restricted-imports

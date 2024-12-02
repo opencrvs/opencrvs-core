@@ -8,18 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createRouterProps, createTestComponent } from '@client/tests/util'
-import { AdvancedSearchConfig } from './AdvancedSearch'
-import { createStore } from '@client/store'
+import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
-import { formatUrl } from '@client/navigation'
-import {
-  ADVANCED_SEARCH,
-  ADVANCED_SEARCH_RESULT
-} from '@client/navigation/routes'
+import { createStore } from '@client/store'
+import { createTestComponent } from '@client/tests/util'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
 import { createMemoryRouter } from 'react-router-dom'
+import { AdvancedSearchConfig } from './AdvancedSearch'
 
 let testComponent: ReactWrapper
 beforeEach(async () => {
