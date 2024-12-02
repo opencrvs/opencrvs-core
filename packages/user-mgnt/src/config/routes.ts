@@ -335,9 +335,6 @@ export const getRoutes = () => {
       options: {
         tags: ['api'],
         description: 'Activate an existing pending user',
-        auth: {
-          scope: [SCOPES.USER_UPDATE]
-        },
         validate: {
           payload: activateUserRequestSchema
         }

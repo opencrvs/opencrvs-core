@@ -28,7 +28,7 @@ import {
   getDeathSection,
   getRegisterForm
 } from '@client/forms/register/declaration-selectors'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { isArray } from 'lodash'
 import { ZeroDocument } from '@client/views/RegisterForm/review/ReviewSection'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadField/DocumentListPreview'
@@ -55,7 +55,7 @@ export const SupportingDocumentsView = (props: IProps) => {
   const eventsRegisterForm = useSelector(getRegisterForm)
   const eventType = String(
     declaration.data.registration.type
-  ).toLowerCase() as Event
+  ).toLowerCase() as EventType
   const documentsSection = useSelector((state: IStoreState) =>
     eventType.toLowerCase() === 'birth'
       ? getBirthSection(state, 'documents')

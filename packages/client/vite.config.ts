@@ -78,7 +78,7 @@ export default defineConfig(({ mode }) => {
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
     optimizeDeps: {
-      include: ['@opencrvs/commons/client']
+      include: ['@opencrvs/commons/client', '@opencrvs/commons/events']
     },
     // This changes the output dir from dist to build
     build: {

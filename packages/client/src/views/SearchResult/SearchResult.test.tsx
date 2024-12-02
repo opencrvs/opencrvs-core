@@ -25,7 +25,7 @@ import {
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
 import { vi } from 'vitest'
 
@@ -108,7 +108,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -139,7 +139,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: 'c7e83060-4db9-4057-8b14-71841243b05f',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -174,7 +174,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9be037dec2f',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -205,7 +205,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-brbe037dec2f',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -236,7 +236,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: '150dd4ca-6822-4f94-ad92-b9beee7dec2f',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -267,7 +267,7 @@ describe('SearchResult tests', () => {
                 },
                 {
                   id: 'fd60a75e-314e-4231-aab7-e6b71fb1106a',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -422,7 +422,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -484,7 +484,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REGISTERED'
     }
@@ -516,7 +516,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -586,7 +586,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'VALIDATED'
     }
@@ -618,7 +618,7 @@ describe('SearchResult tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -692,7 +692,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'DECLARED'
     }
@@ -724,7 +724,7 @@ describe('SearchResult downloadButton tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',
@@ -789,7 +789,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.Birth,
+      event: EventType.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REJECTED'
     }
@@ -821,7 +821,7 @@ describe('SearchResult downloadButton tests', () => {
               results: [
                 {
                   id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: Event.Death,
+                  type: EventType.Death,
                   __typename: 'X',
                   registration: {
                     __typename: 'X',

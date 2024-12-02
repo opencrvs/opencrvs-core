@@ -14,22 +14,19 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import {
-  // BirthSection,
-  ViewType,
-  // DeathSection,
-  LOCATION_SEARCH_INPUT,
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION,
   IForm,
-  TEXT
+  // DeathSection,
+  LOCATION_SEARCH_INPUT,
+  TEXT,
   // MarriageSection
+  // BirthSection,
+  ViewType
 } from '@client/forms'
-import {
-  Event as DeclarationEvent,
-  RegStatus,
-  SCOPES
-} from '@client/utils/gateway'
+import { formMessages } from '@client/i18n/messages'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
@@ -41,24 +38,28 @@ import {
   setScopes,
   userDetails
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { isMobileDevice } from '@client/utils/commonUtils'
+import {
+  EventType as DeclarationEvent,
+  EventType,
+  RegStatus,
+  SCOPES
+} from '@client/utils/gateway'
 import {
   renderSelectDynamicLabel,
   ReviewSection
 } from '@client/views/RegisterForm/review/ReviewSection'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { v4 as uuid } from 'uuid'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
-import { formMessages } from '@client/i18n/messages'
-import { vi, Mock, SpyInstance } from 'vitest'
-import { offlineDataReady } from '@client/offline/actions'
+import { v4 as uuid } from 'uuid'
+import { Mock, SpyInstance, vi } from 'vitest'
 
 const { store, history } = createStore()
 const mockHandler = vi.fn()
 
-const draft = createDeclaration(DeclarationEvent.Birth)
+const draft = createDeclaration(EventType.Birth)
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: {
@@ -78,18 +79,18 @@ draft.data = {
 const declaredBirthDeclaration = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.Birth
+  EventType.Birth
 )
 const rejectedDraftBirth = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.Birth,
+  EventType.Birth,
   RegStatus.Rejected
 )
 const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.Death,
+  EventType.Death,
   RegStatus.Rejected
 )
 const rejectedDraftMarriage = createReviewDeclaration(
@@ -106,7 +107,7 @@ describe('when in device of large viewport', () => {
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
-    form = await getRegisterFormFromStore(store, DeclarationEvent.Birth)
+    form = await getRegisterFormFromStore(store, EventType.Birth)
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     Object.assign(window, { outerWidth: 1034 })
 
@@ -472,11 +473,7 @@ describe('when in device of large viewport', () => {
         documents: {}
       }
 
-      const simpleDraft = createReviewDeclaration(
-        uuid(),
-        data,
-        DeclarationEvent.Birth
-      )
+      const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
       const testComponent = await createTestComponent(
         <ReviewSection
@@ -589,11 +586,7 @@ describe('when in device of large viewport', () => {
         documents: {}
       }
 
-      const simpleDraft = createReviewDeclaration(
-        uuid(),
-        data,
-        DeclarationEvent.Birth
-      )
+      const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
       const testComponent = await createTestComponent(
         <ReviewSection
@@ -743,11 +736,7 @@ describe('when in device of large viewport', () => {
         documents: {}
       }
 
-      const simpleDraft = createReviewDeclaration(
-        uuid(),
-        data,
-        DeclarationEvent.Birth
-      )
+      const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
       const testComponent = await createTestComponent(
         <ReviewSection

@@ -8,58 +8,48 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { FormikTouched, FormikValues } from 'formik'
-import {
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps,
-  injectIntl,
-  useIntl
-} from 'react-intl'
-import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
-import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
-import debounce from 'lodash/debounce'
-import {
-  PrimaryButton,
-  TertiaryButton,
-  DangerButton
-} from '@opencrvs/components/lib/buttons'
-import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
-import { Alert } from '@opencrvs/components/lib/Alert'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Frame } from '@opencrvs/components/lib/Frame'
-import { AppBar } from '@opencrvs/components/lib/AppBar'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Button } from '@opencrvs/components/lib/Button'
-import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  deleteDeclaration,
-  IDeclaration,
-  IPayload,
-  modifyDeclaration,
-  SUBMISSION_STATUS,
-  writeDeclaration,
-  DOWNLOAD_STATUS
-} from '@client/declarations'
+import { Stack, ToggleMenu } from '@opencrvs/components/lib'
 import {
   FormFieldGenerator,
   ITouchedNestedFields,
   mapFieldsToValues
 } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
+import { TimeMounted } from '@client/components/TimeMounted'
 import {
+  deleteDeclaration,
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  IPayload,
+  modifyDeclaration,
+  SUBMISSION_STATUS,
+  writeDeclaration
+} from '@client/declarations'
+import {
+  CorrectionSection,
   IForm,
+  IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormData,
-  CorrectionSection,
   SubmissionAction
 } from '@client/forms'
-import { Event, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
+import {
+  evalExpressionInFieldDefinition,
+  getNextSectionIds,
+  getSectionFields,
+  getVisibleGroupFields,
+  getVisibleSectionGroupsBasedOnConditions,
+  handleInitialValue,
+  hasFormError,
+  VIEW_TYPE
+} from '@client/forms/utils'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { messages } from '@client/i18n/messages/views/register'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -68,47 +58,57 @@ import {
   goToPageGroup as goToPageGroupAction,
   goToPrintRecordView
 } from '@client/navigation'
-import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
+import { toggleDraftSavedNotification } from '@client/notification/actions'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from 'styled-components'
-import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
+import { client } from '@client/utils/apolloClient'
 import {
-  getVisibleSectionGroupsBasedOnConditions,
-  getVisibleGroupFields,
-  hasFormError,
-  getSectionFields,
-  getNextSectionIds,
-  VIEW_TYPE,
-  handleInitialValue,
-  evalExpressionInFieldDefinition
-} from '@client/forms/utils'
-import { messages } from '@client/i18n/messages/views/register'
-import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
+  ACCUMULATED_FILE_SIZE,
   DECLARED,
   REJECTED,
-  VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  VALIDATED
 } from '@client/utils/constants'
-import { TimeMounted } from '@client/components/TimeMounted'
+import { EventType, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
-import { UserDetails } from '@client/utils/userUtils'
-import { client } from '@client/utils/apolloClient'
-import { Stack, ToggleMenu } from '@client/../../components/lib'
-import { useModal } from '@client/hooks/useModal'
+import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
+import { Alert } from '@opencrvs/components/lib/Alert'
+import { AppBar } from '@opencrvs/components/lib/AppBar'
+import { Button } from '@opencrvs/components/lib/Button'
+import {
+  DangerButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { Icon } from '@opencrvs/components/lib/Icon'
+import { DeclarationIcon, Duplicate } from '@opencrvs/components/lib/icons'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Text } from '@opencrvs/components/lib/Text'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
+import { FormikTouched, FormikValues } from 'formik'
+import { flatten, get, isEqual, isNull, isUndefined, merge } from 'lodash'
+import debounce from 'lodash/debounce'
+import * as React from 'react'
+import {
+  injectIntl,
+  IntlShape,
+  WrappedComponentProps as IntlShapeProps,
+  useIntl
+} from 'react-intl'
+import { connect, useDispatch } from 'react-redux'
+import { RouteComponentProps } from 'react-router-dom'
+import styled from 'styled-components'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -259,7 +259,8 @@ function FormAppBar({
   duplicate,
   modifyDeclarationMethod,
   deleteDeclarationMethod,
-  printDeclarationMethod
+  printDeclarationMethod,
+  canSaveAndExit
 }: {
   duplicate: boolean | undefined
   section: IFormSection
@@ -267,6 +268,7 @@ function FormAppBar({
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
   printDeclarationMethod: (declarationId: string) => void
+  canSaveAndExit: boolean
 }) {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -550,6 +552,7 @@ function FormAppBar({
                     id="save-exit-btn"
                     type="primary"
                     size="small"
+                    disabled={!canSaveAndExit}
                     onClick={handleSaveAndExit}
                   >
                     <Icon name="DownloadSimple" />
@@ -608,7 +611,12 @@ function FormAppBar({
             mobileRight={
               <>
                 {!isCorrection(declaration) && (
-                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                  <Button
+                    type="icon"
+                    size="small"
+                    disabled={!canSaveAndExit}
+                    onClick={handleSaveAndExit}
+                  >
                     <Icon name="DownloadSimple" />
                   </Button>
                 )}
@@ -864,13 +872,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const eventType = this.props.declaration.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
-        return Event.Birth
+        return EventType.Birth
       case 'death':
-        return Event.Death
+        return EventType.Death
       case 'marriage':
-        return Event.Marriage
+        return EventType.Marriage
       default:
-        return Event.Birth
+        return EventType.Birth
     }
   }
 
@@ -1055,6 +1063,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
               printDeclarationMethod={this.props.goToPrintRecord}
+              canSaveAndExit={canContinue}
             />
           }
           key={activeSection.id}

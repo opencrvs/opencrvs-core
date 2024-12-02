@@ -37,21 +37,21 @@ type CreateAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
 }
 
 type NotifyAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
 }
 
 type DeclareAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
   identifiers: Identifiers!
 }
 
@@ -59,52 +59,52 @@ type RegisterAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
   identifiers: Identifiers!
 }
 
 input NotifyActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input DeclareActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RegisterActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input CertifyActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input IssueActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RevokeActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input ReinstateActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RevokeCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RequestCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input ApproveCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RejectCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 type Identifiers {

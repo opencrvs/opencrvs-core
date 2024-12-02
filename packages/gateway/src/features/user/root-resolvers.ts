@@ -35,13 +35,14 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
-import { UserInputError } from 'apollo-server-hapi'
+
 import fetch from '@gateway/fetch'
 import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -62,18 +63,17 @@ export const resolvers: GQLResolver = {
         return user
       }
     ),
-
     getUserByMobile: rateLimitedResolver(
       { requestsPerMinute: 20 },
       async (_, { mobile }, { dataSources }) => {
-        return dataSources.usersAPI.getUserByMobile(mobile!)
+        return dataSources.usersAPI.getUserByMobile(mobile)
       }
     ),
 
     getUserByEmail: rateLimitedResolver(
       { requestsPerMinute: 20 },
       (_, { email }, { dataSources }) => {
-        return dataSources.usersAPI.getUserByEmail(email!)
+        return dataSources.usersAPI.getUserByEmail(email)
       }
     ),
 
@@ -102,9 +102,7 @@ export const resolvers: GQLResolver = {
             SCOPES.USER_DATA_SEEDING
           ])
         ) {
-          return await Promise.reject(
-            new Error('Searching other users is not allowed for this user')
-          )
+          throw new Error('Searching other users is not allowed for this user')
         }
 
         let payload: IUserSearchPayload = {
@@ -135,7 +133,7 @@ export const resolvers: GQLResolver = {
             ...authHeader
           }
         })
-        return await res.json()
+        return res.json()
       }
     ),
 
@@ -164,9 +162,7 @@ export const resolvers: GQLResolver = {
             SCOPES.USER_READ_MY_JURISDICTION
           ])
         ) {
-          return await Promise.reject(
-            new Error('Search field agents is not allowed for this user')
-          )
+          throw new Error('Search field agents is not allowed for this user')
         }
 
         if (!locationId && !primaryOfficeId) {
@@ -275,9 +271,7 @@ export const resolvers: GQLResolver = {
         })
 
         if (res.status !== 200) {
-          return await Promise.reject(
-            new Error('Unauthorized to verify password')
-          )
+          throw new Error('Unauthorized to verify password')
         }
 
         return await res.json()
@@ -294,9 +288,7 @@ export const resolvers: GQLResolver = {
           SCOPES.USER_UPDATE
         ])
       ) {
-        return await Promise.reject(
-          new Error('Create or update user is not allowed for this user')
-        )
+        throw new Error('Create or update user is not allowed for this user')
       }
 
       try {
@@ -344,10 +336,8 @@ export const resolvers: GQLResolver = {
             ]
         })
       } else if (res.status !== 201) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user-mgnt service. Couldn't perform ${action}`
-          )
+        throw new Error(
+          `Something went wrong on user-mgnt service. Couldn't perform ${action}`
         )
       }
       return await res.json()
@@ -357,6 +347,12 @@ export const resolvers: GQLResolver = {
       { userId, password, securityQNAs },
       { headers: authHeader }
     ) {
+      if (
+        !isTokenOwner(authHeader, userId) &&
+        !hasScope(authHeader, SCOPES.USER_UPDATE)
+      )
+        throw new Error('User can not be activated')
+
       const res = await fetch(`${USER_MANAGEMENT_URL}activateUser`, {
         method: 'POST',
         body: JSON.stringify({ userId, password, securityQNAs }),
@@ -369,10 +365,8 @@ export const resolvers: GQLResolver = {
       const response = await res.json()
 
       if (res.status !== 201) {
-        return await Promise.reject(
-          new Error(
-            "Something went wrong on user-mgnt service. Couldn't activate given user"
-          )
+        throw new Error(
+          "Something went wrong on user-mgnt service. Couldn't activate given user"
         )
       }
       return response.userId
@@ -387,10 +381,8 @@ export const resolvers: GQLResolver = {
         !hasScope(authHeader, SCOPES.USER_UPDATE) &&
         !isTokenOwner(authHeader, userId)
       ) {
-        return await Promise.reject(
-          new Error(
-            `Change password is not allowed. ${userId} is not the owner of the token`
-          )
+        throw new Error(
+          `Change password is not allowed. ${userId} is not the owner of the token`
         )
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPassword`, {
@@ -403,10 +395,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            "Something went wrong on user-mgnt service. Couldn't change user password"
-          )
+        throw new Error(
+          "Something went wrong on user-mgnt service. Couldn't change user password"
         )
       }
       return true
@@ -417,19 +407,15 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (!isTokenOwner(authHeader, userId)) {
-        return await Promise.reject(
-          new Error(
-            `Change phone is not allowed. ${userId} is not the owner of the token`
-          )
+        throw new Error(
+          `Change phone is not allowed. ${userId} is not the owner of the token`
         )
       }
       try {
         await checkVerificationCode(nonce, verifyCode)
       } catch (err) {
         logger.error(err)
-        return await Promise.reject(
-          new Error(`Change phone is not allowed. Error: ${err}`)
-        )
+        throw new Error(`Change phone is not allowed. Error: ${err}`)
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPhone`, {
         method: 'POST',
@@ -441,10 +427,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            "Something went wrong on user-mgnt service. Couldn't change user phone number"
-          )
+        throw new Error(
+          "Something went wrong on user-mgnt service. Couldn't change user phone number"
         )
       }
       return true
@@ -455,19 +439,15 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (!isTokenOwner(authHeader, userId)) {
-        return await Promise.reject(
-          new Error(
-            `Change email is not allowed. ${userId} is not the owner of the token`
-          )
+        throw new Error(
+          `Change email is not allowed. ${userId} is not the owner of the token`
         )
       }
       try {
         await checkVerificationCode(nonce, verifyCode)
       } catch (err) {
         logger.error(err)
-        return await Promise.reject(
-          new Error(`Change email is not allowed. Error: ${err}`)
-        )
+        throw new Error(`Change email is not allowed. Error: ${err}`)
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}changeUserEmail`, {
         method: 'POST',
@@ -479,10 +459,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            "Something went wrong on user-mgnt service. Couldn't change user email"
-          )
+        throw new Error(
+          "Something went wrong on user-mgnt service. Couldn't change user email"
         )
       }
       return true
@@ -496,10 +474,8 @@ export const resolvers: GQLResolver = {
 
       // Only token owner should be able to change their avatar
       if (!isTokenOwner(authHeader, userId)) {
-        return await Promise.reject(
-          new Error(
-            `Changing avatar is not allowed. ${userId} is not the owner of the token`
-          )
+        throw new Error(
+          `Changing avatar is not allowed. ${userId} is not the owner of the token`
         )
       }
 
@@ -521,10 +497,8 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            "Something went wrong on user-mgnt service. Couldn't change user avatar"
-          )
+        throw new Error(
+          "Something went wrong on user-mgnt service. Couldn't change user avatar"
         )
       }
       return avatar
@@ -537,10 +511,8 @@ export const resolvers: GQLResolver = {
       if (
         !inScope(authHeader, [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING])
       ) {
-        return await Promise.reject(
-          new Error(
-            `User ${userId} is not allowed to audit for not having the sys admin scope`
-          )
+        throw new Error(
+          `User ${userId} is not allowed to audit for not having the sys admin scope`
         )
       }
 
@@ -562,20 +534,15 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user-mgnt service. Couldn't audit user ${userId}`
-          )
+        throw new Error(
+          `Something went wrong on user-mgnt service. Couldn't audit user ${userId}`
         )
       }
-
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
-        return await Promise.reject(
-          new Error('SMS invite can not be resent by this user')
-        )
+        throw new Error('SMS invite can not be resent by this user')
       }
 
       const res = await fetch(`${USER_MANAGEMENT_URL}resendInvite`, {
@@ -590,20 +557,15 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
-          )
+        throw new Error(
+          `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
         )
       }
-
       return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
-        return await Promise.reject(
-          new Error('Username reminder can not be resent by this user')
-        )
+        throw new Error('Username reminder can not be resent by this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}usernameReminder`, {
         method: 'POST',
@@ -617,20 +579,15 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
-          )
+        throw new Error(
+          `Something went wrong on user-mgnt service. Couldn't send sms to ${userId}`
         )
       }
-
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
       if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
-        return await Promise.reject(
-          new Error('Reset password can not be sent by this user')
-        )
+        throw new Error('Reset password can not be sent by this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordInvite`, {
         method: 'POST',
@@ -644,13 +601,10 @@ export const resolvers: GQLResolver = {
       })
 
       if (res.status !== 200) {
-        return await Promise.reject(
-          new Error(
-            `Something went wrong on user-mgnt service. Couldn't reset password and send sms to ${userId}`
-          )
+        throw new Error(
+          `Something went wrong on user-mgnt service. Couldn't reset password and send sms to ${userId}`
         )
       }
-
       return true
     }
   }

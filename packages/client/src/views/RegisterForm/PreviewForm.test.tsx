@@ -32,7 +32,7 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
-import { Event, SCOPES } from '@client/utils/gateway'
+import { EventType, SCOPES } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 // eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from '@apollo/client/react'
@@ -71,7 +71,7 @@ describe('when user is previewing the form data', () => {
       await flushPromises()
       const data = deathReviewDraftData
 
-      customDraft = { id: uuid(), data, review: true, event: Event.Death }
+      customDraft = { id: uuid(), data, review: true, event: EventType.Death }
 
       store.dispatch(storeDeclaration(customDraft))
 
@@ -124,7 +124,7 @@ describe('when user is previewing the form data', () => {
       customDraft = {
         id: uuid(),
         data,
-        event: Event.Birth,
+        event: EventType.Birth,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
       setScopes(
@@ -186,7 +186,7 @@ describe('when user is previewing the form data', () => {
       await flushPromises()
       const data = birthReviewDraftData
 
-      customDraft = { id: uuid(), data, review: true, event: Event.Birth }
+      customDraft = { id: uuid(), data, review: true, event: EventType.Birth }
       store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
@@ -231,7 +231,12 @@ describe('when user is previewing the form data', () => {
       await flushPromises()
       const data = marriageReviewDraftData
 
-      customDraft = { id: uuid(), data, review: true, event: Event.Marriage }
+      customDraft = {
+        id: uuid(),
+        data,
+        review: true,
+        event: EventType.Marriage
+      }
       store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
@@ -274,7 +279,7 @@ describe('when user is previewing the form data', () => {
         ...mockDeclarationData
       }
 
-      const customDraft = createReviewDeclaration(uuid(), data, Event.Birth)
+      const customDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
       customDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
 
       store.dispatch(storeDeclaration(customDraft))

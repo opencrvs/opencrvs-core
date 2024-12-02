@@ -47,9 +47,7 @@ export const postAdvancedSearch = async (
     })
     return await response.json()
   } catch (error) {
-    return await Promise.reject(
-      new Error(`Search request failed: ${error.message}`)
-    )
+    throw new Error(`Search request failed: ${error.message}`)
   }
 }
 

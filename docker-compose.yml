@@ -98,6 +98,7 @@ services:
       - base
     environment:
       - MONGO_URL=mongodb://mongo1/events
+      - ES_HOST=elasticsearch:9200
 
   # User facing services
   workflow:

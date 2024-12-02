@@ -18,7 +18,7 @@ import {
 import { IAuthHeader } from '@opencrvs/commons'
 
 import { checkUserAssignment } from '@gateway/authorisation'
-import { UnassignError } from '@gateway/utils/unassignError'
+
 import {
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments,
@@ -30,8 +30,8 @@ import {
   rejectRegistrationCorrection,
   requestRegistrationCorrection
 } from '@gateway/workflow'
-import { UserInputError } from 'apollo-server-hapi'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Mutation: {

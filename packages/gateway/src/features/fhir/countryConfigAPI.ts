@@ -8,25 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// eslint-disable-next-line import/no-relative-parent-imports
-
-import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { Roles } from '@opencrvs/commons'
 
-export default class CountryConfigAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = COUNTRY_CONFIG_URL
-  }
-
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
-  }
+export default class CountryConfigAPI extends OpenCRVSRESTDataSource {
+  override baseURL = COUNTRY_CONFIG_URL
 
   getRoles(): Promise<Roles> {
     return this.get(`/roles`)

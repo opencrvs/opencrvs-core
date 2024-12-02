@@ -20,7 +20,6 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import format from '@client/utils/date-formatting'
-import { Avatar, Event } from '@client/utils/gateway'
 import type { GQLSearchFieldAgentResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
@@ -40,6 +39,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { Avatar, EventType } from '@client/utils/gateway'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -159,7 +159,7 @@ function FieldAgentListComponent(props: IProps) {
     offlineOffices
   } = props
   const {
-    event = Event.Birth,
+    event = EventType.Birth,
     locationId,
     timeStart,
     timeEnd
@@ -425,11 +425,11 @@ function FieldAgentListComponent(props: IProps) {
               options={[
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
-                  value: Event.Birth
+                  value: EventType.Birth
                 },
                 {
                   label: intl.formatMessage(messages.eventOptionForDeaths),
-                  value: Event.Death
+                  value: EventType.Death
                 }
               ]}
             />

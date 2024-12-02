@@ -18,7 +18,7 @@ import {
 } from '@client/tests/util'
 import { VerifyCorrector } from './VerifyCorrector'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
@@ -29,13 +29,13 @@ describe('verify corrector tests', () => {
   const birthDeclaration = {
     id: 'mockBirth1234',
     data: mockDeclarationData,
-    event: Event.Birth
+    event: EventType.Birth
   }
 
   const deathDeclaration = {
     id: 'mockDeath1234',
     data: mockDeathDeclarationData,
-    event: Event.Death
+    event: EventType.Death
   }
 
   describe('in case of birth declaration', () => {

@@ -11,8 +11,8 @@
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   IPrintableDeclaration,
-  SUBMISSION_STATUS,
   modifyDeclaration,
+  SUBMISSION_STATUS,
   writeDeclaration
 } from '@client/declarations'
 import { useDeclaration } from '@client/declarations/selectors'
@@ -22,24 +22,24 @@ import {
   SubmissionAction
 } from '@client/forms'
 import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
+import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { printPDF } from '@client/pdfRenderer'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
+import { formatLongDate } from '@client/utils/date-formatting'
+import { EventType, SCOPES } from '@client/utils/gateway'
+import { getLocationHierarchy } from '@client/utils/locationUtils'
+import { getUserName, UserDetails } from '@client/utils/userUtils'
 import { cloneDeep } from 'lodash'
 import { useDispatch, useSelector } from 'react-redux'
 import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './PDFUtils'
 import {
-  isCertificateForPrintInAdvance,
-  getRegisteredDate,
+  calculatePrice,
   getEventDate,
-  calculatePrice
+  getRegisteredDate,
+  isCertificateForPrintInAdvance
 } from './utils'
-import { Event, SCOPES } from '@client/utils/gateway'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { AdminStructure, IOfflineData } from '@client/offline/reducer'
-import { getLocationHierarchy } from '@client/utils/locationUtils'
-import { printPDF } from '@client/pdfRenderer'
 import { usePermissions } from '@client/hooks/useAuthorization'
 
 const withEnhancedTemplateVariables = (
@@ -114,7 +114,7 @@ export const usePrintableCertificate = (declarationId: string) => {
   const dispatch = useDispatch()
   const { hasAnyScope } = usePermissions()
   const canUserCorrectRecord =
-    declaration?.event !== Event.Marriage &&
+    declaration?.event !== EventType.Marriage &&
     hasAnyScope([
       SCOPES.RECORD_REGISTRATION_CORRECT,
       SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
@@ -169,7 +169,7 @@ export const usePrintableCertificate = (declarationId: string) => {
       }
     }
 
-    const svg = await compileSvg(
+    const svg = compileSvg(
       offlineData.templates.certificates[draft.event].definition,
       { ...draft.data.template, preview: false },
       state

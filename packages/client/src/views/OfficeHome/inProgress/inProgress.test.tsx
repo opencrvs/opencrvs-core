@@ -18,7 +18,7 @@ import {
   DOWNLOAD_STATUS
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import {
   REGISTRAR_HOME_TAB,
@@ -84,12 +84,12 @@ describe('In Progress tab', () => {
     const localDrafts = [
       {
         id: '1',
-        event: Event.Birth,
+        event: EventType.Birth,
         data: {}
       },
       {
         id: '2',
-        event: Event.Birth,
+        event: EventType.Birth,
         data: {}
       }
     ]
@@ -151,12 +151,12 @@ describe('In Progress tab', () => {
     const localDrafts = [
       {
         id: '1',
-        event: Event.Birth,
+        event: EventType.Birth,
         data: {}
       },
       {
         id: '2',
-        event: Event.Birth,
+        event: EventType.Birth,
         data: {}
       }
     ]
@@ -213,13 +213,13 @@ describe('In Progress tab', () => {
               familyNameEng: 'Hoque'
             }
           },
-          event: Event.Birth,
+          event: EventType.Birth,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP
         },
         {
           id: 'e6605607-92e0-4625-87d8-c168205bdde7',
-          event: Event.Birth,
+          event: EventType.Birth,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -243,7 +243,7 @@ describe('In Progress tab', () => {
               familyNameEng: 'Hoque'
             }
           },
-          event: Event.Death,
+          event: EventType.Death,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP
         },
@@ -256,7 +256,7 @@ describe('In Progress tab', () => {
               familyNameEng: 'Hoque'
             }
           },
-          event: Event.Death,
+          event: EventType.Death,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP
         }
@@ -302,7 +302,7 @@ describe('In Progress tab', () => {
       vi.clearAllMocks()
       const drafts: IDeclaration[] = []
       for (let i = 0; i < 12; i++) {
-        drafts.push(createDeclaration(Event.Birth))
+        drafts.push(createDeclaration(EventType.Birth))
       }
       const testComponent = await createTestComponent(
         <InProgress
@@ -344,7 +344,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = [
         {
           id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-          event: Event.Birth,
+          event: EventType.Birth,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -366,7 +366,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
-          event: Event.Birth,
+          event: EventType.Birth,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP,
           data: {
@@ -377,7 +377,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-          event: Event.Death,
+          event: EventType.Death,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -389,7 +389,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f2',
-          event: Event.Death,
+          event: EventType.Death,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -400,7 +400,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
-          event: Event.Death,
+          event: EventType.Death,
           modifiedOn: TIME_STAMP + 1,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -456,7 +456,7 @@ describe('In Progress tab', () => {
     it('renders all items returned from graphql query in inProgress tab', async () => {
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.Birth))
+      drafts.push(createDeclaration(EventType.Birth))
       const testComponent = await createTestComponent(
         <InProgress
           drafts={drafts}
@@ -467,7 +467,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-                  type: Event.Death,
+                  type: EventType.Death,
                   registration: {
                     status: 'IN_PROGRESS',
                     contactNumber: undefined,
@@ -548,7 +548,7 @@ describe('In Progress tab', () => {
     it('Should render pagination in progress tab if data is more than 10', async () => {
       vi.clearAllMocks()
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.Birth))
+      drafts.push(createDeclaration(EventType.Birth))
       const testComponent = await createTestComponent(
         <InProgress
           drafts={drafts}
@@ -588,7 +588,7 @@ describe('In Progress tab', () => {
       vi.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.Birth))
+      drafts.push(createDeclaration(EventType.Birth))
       // @ts-ignore
       const testComponent = await createTestComponent(
         <InProgress
@@ -601,7 +601,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-                  type: Event.Death,
+                  type: EventType.Death,
                   registration: {
                     status: 'IN_PROGRESS',
                     contactNumber: undefined,
@@ -698,7 +698,7 @@ describe('In Progress tab', () => {
             results: [
               {
                 id: declarationId,
-                type: Event.Birth,
+                type: EventType.Birth,
                 registration: {
                   trackingId: 'BQ2IDOP',
                   modifiedAt: TIME_STAMP,
@@ -734,7 +734,7 @@ describe('In Progress tab', () => {
 
       it('renders download button when not downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.Birth,
+          EventType.Birth,
           declarationId,
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
@@ -751,7 +751,7 @@ describe('In Progress tab', () => {
       })
       it('renders loading indicator when declaration is being downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.Birth,
+          EventType.Birth,
           declarationId,
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
@@ -768,7 +768,7 @@ describe('In Progress tab', () => {
       })
       it('renders update button when download succeeds', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.Birth,
+          EventType.Birth,
           declarationId,
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
@@ -797,13 +797,13 @@ describe('In Progress tab', () => {
           formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId,
             pageId: 'review',
-            event: Event.Birth
+            event: EventType.Birth
           })
         )
       })
       it('renders error when download fails', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.Birth,
+          EventType.Birth,
           declarationId,
           DownloadAction.LOAD_REVIEW_DECLARATION
         )
@@ -825,7 +825,7 @@ describe('In Progress tab', () => {
       const TIME_STAMP = '1562912635549'
       const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.Birth))
+      drafts.push(createDeclaration(EventType.Birth))
       const testComponent = await createTestComponent(
         <InProgress
           drafts={drafts}
@@ -836,7 +836,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: 'f0a1ca2c-6a14-4b9e-a627-c3e2e110587e',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   registration: {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP
@@ -872,7 +872,7 @@ describe('In Progress tab', () => {
                 } as GQLBirthEventSearchSet,
                 {
                   id: '2f7828fd-24ac-49fd-a1fd-53cda4777aa0',
-                  type: Event.Death,
+                  type: EventType.Death,
                   registration: {
                     trackingId: 'DZECJZC',
                     modifiedAt: TIME_STAMP
@@ -935,7 +935,7 @@ describe('In Progress tab', () => {
       vi.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.Birth))
+      drafts.push(createDeclaration(EventType.Birth))
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
 
       // @ts-ignore
@@ -949,7 +949,7 @@ describe('In Progress tab', () => {
               results: [
                 {
                   id: declarationId,
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   registration: {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP
