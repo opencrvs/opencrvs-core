@@ -274,11 +274,10 @@ export const resolvers: GQLResolver = {
         )
       }
 
-      // const roles = await getRoles(authHeader)
       const { scope: loggedInUserScope } = getTokenPayload(
         authHeader.Authorization.split(' ')[1]
       )
-      debugger
+
       if (!canAssignRole(loggedInUserScope, user)) {
         throw Error('Create user is only allowed for sysadmin/natlsysadmin')
       }

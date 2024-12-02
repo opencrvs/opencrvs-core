@@ -1,5 +1,3 @@
-import { Scope } from '@opencrvs/commons/authentication'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +8,8 @@ import { Scope } from '@opencrvs/commons/authentication'
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+import { Scope } from '@opencrvs/commons/authentication'
 
 export const SYSTEM_ROLE_KEYS = [
   'FIELD_AGENT',
