@@ -145,9 +145,7 @@ describe('AdvancedSearchResult Bookmark', () => {
   let store: AppStore
 
   beforeEach(async () => {
-    const s = createStore()
-    store = s.store
-    await flushPromises()
+    ;({ store } = createStore())
 
     store.dispatch(
       setAdvancedSearchParam({
@@ -157,19 +155,14 @@ describe('AdvancedSearchResult Bookmark', () => {
         registrationStatuses: ['IN_PROGRESS']
       })
     )
+
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-
-    const { component: testComponent } = await createTestComponent(
-      <AdvancedSearchResult />,
-      {
-        store,
-
-        initialEntries: [ADVANCED_SEARCH_RESULT],
-        path: ADVANCED_SEARCH_RESULT,
-        graphqlMocks: graphqlMock as any
-      }
-    )
-    component = testComponent
+    ;({ component } = await createTestComponent(<AdvancedSearchResult />, {
+      store,
+      initialEntries: [formatUrl(ADVANCED_SEARCH_RESULT, {})],
+      path: ADVANCED_SEARCH_RESULT,
+      graphqlMocks: graphqlMock as any
+    }))
 
     await waitForElement(component, 'AdvancedSearchResultComp')
   })
@@ -237,10 +230,7 @@ describe('AdvancedSearchResult Bookmark', () => {
       .find('#bookmark_advanced_search_result')
       .hostNodes()
       .simulate('click')
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+
     await flushPromises()
     component.update()
     expect(
@@ -266,10 +256,7 @@ describe('AdvancedSearchResult Bookmark', () => {
       .find('#remove_advanced_search_bookmark')
       .hostNodes()
       .simulate('click')
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+
     await flushPromises()
     component.update()
     expect(
