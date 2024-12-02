@@ -25,7 +25,6 @@ import {
 } from '@client/profile/profileActions'
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
-import { History } from 'history'
 import { Mock } from 'vitest'
 
 const nameObj = {
@@ -51,7 +50,7 @@ merge(mockUserResponse, nameObj)
 
 describe('UserSetupPage tests', () => {
   let store: AppStore
-  let history: History
+
   beforeEach(() => {
     ;({ store } = createStore())
   })
@@ -70,7 +69,6 @@ describe('UserSetupPage tests', () => {
   })
   it('go to password page', async () => {
     const { component: testComponent } = await createTestComponent(
-      // @ts-ignore
       <ProtectedAccount />,
       { store }
     )

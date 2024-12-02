@@ -49,7 +49,6 @@ const ReviewCertificateFrame = ({
   const navigate = useNavigate()
 
   const back = () => {
-    // @TODO: CHECK if this needs to be changed
     const historyState = location.state
     const navigatedFromInsideApp = Boolean(
       historyState && historyState.isNavigatedInsideApp

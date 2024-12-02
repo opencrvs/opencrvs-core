@@ -17,21 +17,19 @@ import {
   inValidImageB64String,
   mockDeclarationData,
   mockDeathDeclarationData,
-  mockMarriageDeclarationData
+  mockMarriageDeclarationData,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { createLocation, History } from 'history'
 import { merge } from 'lodash'
 import { EventType } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
 import { vi } from 'vitest'
 
 let store: AppStore
-let history: History
-let location = createLocation('/')
 
 const declarationsHistory = [
   {
@@ -167,23 +165,22 @@ const marriageDeclaration = {
 beforeEach(() => {
   const s = createStore()
   store = s.store
-  location = createLocation('/')
-  history.location = location
 })
 
 describe('Certificate collector test for a birth registration without father details', () => {
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
+    let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
-      const { component: testComponent } = await createTestComponent(
-        <CollectorForm />,
-        {
-          store
-        }
-      )
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CollectorForm />, {
+          store,
+          initialEntries: ['/']
+        })
       component = testComponent
+      router = testRouter
       await waitForElement(component, '#collector_form')
     })
 
@@ -215,7 +212,7 @@ describe('Certificate collector test for a birth registration without father det
         setTimeout(resolve, 500)
       })
       component.update()
-      expect(history.location.pathname).toBe(
+      expect(router.state.location.pathname).toBe(
         '/print/check/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/father'
       )
     })
@@ -256,7 +253,7 @@ describe('Certificate collector test for a birth registration without father det
         setTimeout(resolve, 500)
       })
       component.update()
-      expect(history.location.pathname).toBe(
+      expect(router.state.location.pathname).toBe(
         '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/otherCertCollector'
       )
     })
@@ -264,19 +261,19 @@ describe('Certificate collector test for a birth registration without father det
 
   describe('Test other collector group', () => {
     let component: ReactWrapper<{}, {}>
+    let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
       /*
        * Who is collecting the certificate?
        */
       store.dispatch(storeDeclaration(birthDeclaration))
-      const { component: testComponent } = await createTestComponent(
-        <CollectorForm />,
-        {
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CollectorForm />, {
           store
-        }
-      )
+        })
       component = testComponent
+      router = testRouter
 
       const form = await waitForElement(component, '#collector_form')
 
@@ -362,8 +359,9 @@ describe('Certificate collector test for a birth registration without father det
           'input[name="affidavitFile"][type="file"]'
         )
       })
+
       it('takes the user to affedavit view', async () => {
-        expect(history.location.pathname).toBe(
+        expect(router.state.location.pathname).toBe(
           '/cert/collector/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth/affidavit'
         )
       })
@@ -415,7 +413,7 @@ describe('Certificate collector test for a birth registration without father det
 
         component.find('#submit_confirm').hostNodes().simulate('click')
 
-        expect(history.location.pathname).toBe(
+        expect(router.state.location.pathname).toBe(
           '/print/payment/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
@@ -440,7 +438,7 @@ describe('Certificate collector test for a birth registration without father det
           component.find('#noAffidavitAgreementConfirmationModal').hostNodes()
         ).toHaveLength(1)
         component.find('#submit_confirm').hostNodes().simulate('click')
-        expect(history.location.pathname).toBe(
+        expect(router.state.location.pathname).toBe(
           '/review/6a5fd35d-01ec-4c37-976e-e055107a74a1/birth'
         )
       })
@@ -470,22 +468,21 @@ describe('Certificate collector test for a birth registration without father det
 
 describe('Certificate collector test for a birth registration with father details', () => {
   const { store } = createStore()
-  const mockLocation: any = vi.fn()
 
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
+    let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
 
-      const { component: testComponent } = await createTestComponent(
-        <CollectorForm />,
-        {
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CollectorForm />, {
           store
-        }
-      )
+        })
 
       component = testComponent
+      router = testRouter
     })
 
     it('father option will be available', async () => {
@@ -498,6 +495,7 @@ describe('Certificate collector test for a birth registration with father detail
 describe('Certificate collector test for a death registration', () => {
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
+    let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
       store.dispatch(storeDeclaration(deathDeclaration))
@@ -529,7 +527,7 @@ describe('Certificate collector test for a death registration', () => {
       const $confirm = await waitForElement(component, '#confirm_form')
       $confirm.hostNodes().simulate('click')
 
-      expect(history.location.pathname).toBe(
+      expect(router.state.location.pathname).toBe(
         '/review/16ff35e1-3f92-4db3-b812-c402e609fb00/death'
       )
     })
@@ -539,18 +537,18 @@ describe('Certificate collector test for a death registration', () => {
 describe('Certificate collector test for a marriage registration', () => {
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
+    let router: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
       store.dispatch(storeDeclaration(marriageDeclaration))
 
-      const { component: testComponent } = await createTestComponent(
-        <CollectorForm />,
-        {
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CollectorForm />, {
           store
-        }
-      )
+        })
 
       component = testComponent
+      router = testRouter
     })
 
     it('informant will be grrom', async () => {
@@ -575,7 +573,7 @@ describe('Certificate collector test for a marriage registration', () => {
       const $confirm = await waitForElement(component, '#confirm_form')
       $confirm.hostNodes().simulate('click')
 
-      expect(history.location.pathname).toBe(
+      expect(router.state.location.pathname).toBe(
         '/review/18ff35e1-3d92-4db3-b815-c4d2e609fb23/marriage'
       )
     })
@@ -585,7 +583,7 @@ describe('Certificate collector test for a marriage registration', () => {
 describe('Certificate collector test for a birth registration without father and mother details', () => {
   describe('Test collector group', () => {
     let component: ReactWrapper<{}, {}>
-
+    let router: TestComponentWithRouteMock['router']
     beforeEach(async () => {
       //@ts-ignore
       delete birthDeclaration['data']['father']

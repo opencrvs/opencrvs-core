@@ -30,7 +30,6 @@ import {
   createReviewDeclaration
 } from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { Store } from 'redux'
 import { EventType } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
@@ -45,14 +44,23 @@ import {
   marriageReviewDraftData
 } from '@client/tests/mock-drafts'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 describe('when user is previewing the form data', () => {
   let app: ReactWrapper
-  let history: History
+  let history: any
   let store: Store
 
   beforeEach(async () => {
-    const testApp = await createTestApp()
+    const testApp = await createTestApp(
+      { waitUntilOfflineCountryConfigLoaded: true },
+      [
+        formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+          event: 'death',
+          pageId: 'review'
+        })
+      ]
+    )
     app = testApp.app
 
     store = testApp.store

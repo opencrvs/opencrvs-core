@@ -57,11 +57,7 @@ import { getSystemRolesQuery } from '@client/forms/user/query/queries'
 import { Root } from '@client/Root'
 import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
-import {
-  createMemoryRouter,
-  RouterProvider,
-  RouterProviderProps
-} from 'react-router-dom'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { vi } from 'vitest'
 import { mockOfflineData } from './mock-offline-data'
 
@@ -887,7 +883,13 @@ export async function createTestComponent(
       | string[]
       | {
           pathname: string
-          state: Record<string, string | Record<string, string>>
+          state: Record<
+            string,
+            | string
+            | boolean
+            | number
+            | Record<string, string | boolean | number>
+          >
         }[]
     path?: string
   },

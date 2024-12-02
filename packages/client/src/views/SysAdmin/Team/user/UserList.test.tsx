@@ -14,12 +14,12 @@ import {
   createTestComponent,
   flushPromises,
   mockOfflineDataDispatch,
-  mockUserResponse
+  mockUserResponse,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
@@ -35,7 +35,6 @@ import {
 
 describe('user list without admin scope', () => {
   let store: AppStore
-  let history: History<any>
 
   it('no add user button', async () => {
     Date.now = vi.fn(() => 1487076708000)
@@ -77,7 +76,17 @@ describe('user list without admin scope', () => {
           })
         }}
       />,
-      { store, graphqlMocks: userListMock }
+      {
+        store,
+        graphqlMocks: userListMock,
+        initialEntries: [
+          '/' +
+            '?' +
+            stringify({
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+            })
+        ]
+      }
     )
 
     component.update()
@@ -87,7 +96,6 @@ describe('user list without admin scope', () => {
 
 describe('User list tests', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
@@ -124,7 +132,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const { component } = await createTestComponent(<UserList />, {
+      const { component, router } = await createTestComponent(<UserList />, {
         store,
         initialEntries: [
           formatUrl(TEAM_USER_LIST, {}) +
@@ -141,7 +149,7 @@ describe('User list tests', () => {
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUserInLocation')
+      expect(router.state.location.pathname).toContain('/createUserInLocation')
     })
     it('add user button redirects to office selection form for invalid location id', async () => {
       const userListMock = [
@@ -164,7 +172,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const { component } = await createTestComponent(<UserList />, {
+      const { component, router } = await createTestComponent(<UserList />, {
         store,
         initialEntries: [
           formatUrl(TEAM_USER_LIST, {}) +
@@ -182,7 +190,7 @@ describe('User list tests', () => {
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUser')
+      expect(router.state.location.pathname).toContain('/createUser')
     })
   })
 
@@ -238,6 +246,7 @@ describe('User list tests', () => {
       userMutations.usernameReminderSend = vi.fn()
       userMutations.sendResetPasswordInvite = vi.fn()
       let component: ReactWrapper<{}, {}>
+      let router: TestComponentWithRouteMock['router']
       const userListMock = [
         {
           request: {
@@ -341,11 +350,11 @@ describe('User list tests', () => {
           configurable: true,
           value: 1100
         })
-        const { component: testComponent } = await createTestComponent(
-          <UserList />,
-          {
+        const { component: testComponent, router: testRouter } =
+          await createTestComponent(<UserList />, {
             store,
             initialEntries: [
+              '/',
               formatUrl(TEAM_USER_LIST, {}) +
                 '?' +
                 stringify({
@@ -353,8 +362,7 @@ describe('User list tests', () => {
                 })
             ],
             graphqlMocks: userListMock
-          }
-        )
+          })
 
         // wait for mocked data to load mockedProvider
         await new Promise((resolve) => {
@@ -363,6 +371,7 @@ describe('User list tests', () => {
 
         testComponent.update()
         component = testComponent
+        router = testRouter
       })
 
       it('renders list of users', () => {
@@ -400,7 +409,9 @@ describe('User list tests', () => {
           .at(0)
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
-        expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
+        expect(router.state.location.pathname).toMatch(
+          /.user\/(\w)+\/preview\/*/
+        )
       })
 
       it('clicking on menu options Resend invite sends invite', async () => {

@@ -28,19 +28,18 @@ import {
   IUserData
 } from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { Store } from 'redux'
 import { storage } from '@client/storage'
 import { EventType } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { vi, Mock } from 'vitest'
 import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
+import { formatUrl } from '@client/navigation'
 
 describe('when user has starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {
     let draft: IDeclaration
     let app: ReactWrapper
-    let history: History
     let store: Store
 
     beforeEach(async () => {
@@ -61,7 +60,14 @@ describe('when user has starts a new declaration', () => {
       ;(storage.getItem as Mock).mockImplementation(
         (param: keyof typeof indexedDB) => Promise.resolve(indexedDB[param])
       )
-      const testApp = await createTestApp()
+      const testApp = await createTestApp(
+        { waitUntilOfflineCountryConfigLoaded: true },
+        [
+          formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+            declarationId: draft.id.toString()
+          })
+        ]
+      )
       app = testApp.app
 
       store = testApp.store
@@ -71,16 +77,13 @@ describe('when user has starts a new declaration', () => {
     })
 
     it('renders unlock screen', async () => {
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
-      )
       await waitForElement(app, '#unlockPage')
     })
   })
 
   describe('when secured', () => {
     let app: ReactWrapper
-    let history: History
+
     let store: Store
 
     beforeEach(async () => {
@@ -113,9 +116,9 @@ describe('when user has starts a new declaration', () => {
          */
         store.dispatch(storeDeclaration(draft))
         // TODO: SELECT_BIRTH_INFORMANT has been removed
-        history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
-        )
+        // history.replace(
+        //   DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
+        // )
         await waitForElement(app, '#content-name')
 
         app.find('#next_section').hostNodes().simulate('click')

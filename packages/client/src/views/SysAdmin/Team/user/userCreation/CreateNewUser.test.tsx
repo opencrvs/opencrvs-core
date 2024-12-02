@@ -11,6 +11,7 @@
 import { FormFieldGenerator } from '@client/components/form'
 import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { roleQueries } from '@client/forms/user/query/queries'
+import { formatUrl } from '@client/navigation'
 import { REVIEW_USER_FORM } from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
@@ -21,7 +22,8 @@ import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockOfflineDataDispatch,
-  mockRoles
+  mockRoles,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { GET_USER, userQueries } from '@client/user/queries'
@@ -30,7 +32,6 @@ import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/Cre
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Router } from '@sentry/react/types/types'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import * as React from 'react'
 import { Mock, describe, expect, vi } from 'vitest'
 
@@ -183,8 +184,8 @@ const mockUsers = {
 
 describe('create new user tests', () => {
   let store: AppStore
-  let history: History
   let testComponent: ReactWrapper
+  let testRouter: TestComponentWithRouteMock['router']
 
   beforeEach(async () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
@@ -197,10 +198,15 @@ describe('create new user tests', () => {
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      ;({ component: testComponent } = await createTestComponent(
-        <CreateNewUser />,
-        { store }
-      ))
+      const component = await createTestComponent(<CreateNewUser />, {
+        store,
+        // @TODO
+        path: REVIEW_USER_FORM,
+        initialEntries: [formatUrl(REVIEW_USER_FORM, {})]
+      })
+
+      testComponent = component.component
+      testRouter = component.router
 
       loginAsFieldAgent(store)
     })
@@ -226,7 +232,7 @@ describe('create new user tests', () => {
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toContain(
+      expect(testRouter.state.location.pathname).toContain(
         'preview/preview-registration-office'
       )
     })
@@ -237,7 +243,7 @@ describe('create new user tests', () => {
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
-      expect(history.location.pathname).toContain(
+      expect(testRouter.state.location.pathname).toContain(
         '/createUser/user/signature-attachment'
       )
     })
@@ -267,8 +273,10 @@ describe('create new user tests', () => {
         .first()
         .simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstName')
+      expect(testRouter.state.location.pathname).toBe(
+        '/createUser/user/user-view-group'
+      )
+      expect(testRouter.state.location.hash).toBe('#firstName')
     })
 
     it('clicking submit button submits the form data', async () => {
@@ -389,18 +397,18 @@ describe('edit user tests', () => {
         <CreateNewUser
           // @ts-ignore
           submitForm={submitMock}
-          match={{
-            // @ts-ignore
-            params: {
+        />,
+        {
+          store,
+          graphqlMocks,
+          path: REVIEW_USER_FORM,
+          initialEntries: [
+            formatUrl(REVIEW_USER_FORM, {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.Preview
-            },
-            isExact: true,
-            path: REVIEW_USER_FORM,
-            url: ''
-          }}
-        />,
-        { store, graphqlMocks }
+            })
+          ]
+        }
       )
 
       // wait for mocked data to load mockedProvider

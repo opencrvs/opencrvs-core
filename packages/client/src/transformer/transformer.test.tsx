@@ -36,13 +36,13 @@ import { clone } from 'lodash'
 import { birthDraftData } from '@client/tests/mock-drafts'
 import createFetchMock from 'vitest-fetch-mock'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
 
 describe('when draft data is transformed to graphql', () => {
   let app: ReactWrapper
-  let history: History
   let store: Store
   let customDraft: IDeclaration
   let form: IForm
@@ -55,13 +55,6 @@ describe('when draft data is transformed to graphql', () => {
       [JSON.stringify({ data: mockOfflineData.locations }), { status: 200 }],
       [JSON.stringify({ data: mockOfflineData.facilities }), { status: 200 }]
     )
-    const testApp = await createTestApp()
-    app = testApp.app
-    await flushPromises()
-    app.update()
-
-    store = testApp.store
-    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
 
     customDraft = {
       id: uuid(),
@@ -69,14 +62,25 @@ describe('when draft data is transformed to graphql', () => {
       event: EventType.Birth,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
+
+    const testApp = await createTestApp(
+      { waitUntilOfflineCountryConfigLoaded: true },
+      [
+        formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+          declarationId: customDraft.id.toString()
+        })
+      ]
+    )
+
+    app = testApp.app
+    await flushPromises()
+    app.update()
+
+    store = testApp.store
+    store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
+
     store.dispatch(storeDeclaration(customDraft))
     form = getRegisterForm(store.getState())[EventType.Birth]
-    history.replace(
-      DRAFT_BIRTH_PARENT_FORM.replace(
-        ':declarationId',
-        customDraft.id.toString()
-      )
-    )
 
     app.update()
   })
