@@ -15,7 +15,8 @@ import {
   flushPromises,
   mockRoles,
   setScopes,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  fetchUserMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -28,10 +29,9 @@ import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 import { roleQueries } from '@client/forms/user/query/queries'
-
 import { vi, Mock } from 'vitest'
 import { SCOPES } from '@opencrvs/commons/client'
-import { FetchUserQuery, SearchUsersQuery, Status } from '@client/utils/gateway'
+import { SearchUsersQuery, Status } from '@client/utils/gateway'
 import { NetworkStatus } from '@apollo/client'
 
 const searchUserResultsMock = (
@@ -58,32 +58,6 @@ const searchUserResultsMock = (
   }
 ]
 
-const fetchUserMock = (officeId: string): FetchUserQuery => ({
-  getUser: {
-    id: '123',
-    userMgntUserID: '123',
-    primaryOffice: {
-      id: officeId
-    },
-    name: [
-      {
-        use: 'en',
-        firstNames: 'Mohammad',
-        familyName: 'Ashraful'
-      }
-    ],
-    status: Status.Active,
-    practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
-    creationDate: '1701241360173',
-    role: {
-      label: {
-        id: 'userRoles.localSystemAdmin',
-        defaultMessage: 'Local System Admin',
-        description: 'Label for local system admin'
-      }
-    }
-  }
-})
 const mockRegistrationAgent = (officeId: string) => ({
   id: '5d08e102542c7a19fc55b790',
   name: [
