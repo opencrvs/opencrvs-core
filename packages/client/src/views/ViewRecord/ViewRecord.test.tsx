@@ -15,8 +15,8 @@ import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { FETCH_VIEW_RECORD_BY_COMPOSITION } from '@client/views/ViewRecord/query'
 import { ViewRecord } from './ViewRecord'
-import { useParams } from 'react-router-dom'
-import { Mock } from 'vitest'
+import { VIEW_RECORD } from '@client/navigation/routes'
+import { formatUrl } from '@client/navigation'
 
 describe('View Record for loading and success state', () => {
   let component: ReactWrapper<{}, {}>
@@ -1205,10 +1205,13 @@ describe('View Record for loading and success state', () => {
 
     ;({ component } = await createTestComponent(<ViewRecord />, {
       store,
+      path: VIEW_RECORD,
+      initialEntries: [
+        formatUrl(VIEW_RECORD, {
+          declarationId: '4090df15-f4e5-4f16-ae7e-bb518129d493'
+        })
+      ],
       graphqlMocks: mocks
-    }))
-    ;(useParams as Mock).mockImplementation(() => ({
-      declarationId: '4090df15-f4e5-4f16-ae7e-bb518129d493'
     }))
   })
 
@@ -1230,17 +1233,22 @@ describe('View Record error state', () => {
 
   beforeEach(async () => {
     const { store } = createStore()
-    const { component } = await createTestComponent(<ViewRecord />, {
-      store
-    })
+    const { component: testComponent } = await createTestComponent(
+      <ViewRecord />,
+      {
+        store
+      }
+    )
 
     await new Promise((resolve) => {
       setTimeout(resolve, 0)
     })
-    component.update()
+
+    testComponent.update()
+    component = testComponent
   })
 
-  it('Render error state properly ', async () => {
+  it('Render error state properly', async () => {
     expect(component.exists('GenericErrorToast')).toBeTruthy()
   })
 })
