@@ -19,21 +19,28 @@ import {
   ADVANCED_SEARCH,
   ADVANCED_SEARCH_RESULT
 } from '@client/navigation/routes'
+import { createMemoryRouter } from 'react-router-dom'
 
 let testComponent: ReactWrapper
+let testRouter: ReturnType<typeof createMemoryRouter>
 beforeEach(async () => {
   const { store } = createStore()
-  testComponent = (
-    await createTestComponent(
-      // @ts-ignore
-      <AdvancedSearchConfig
-        {...createRouterProps(formatUrl(ADVANCED_SEARCH, {}), {
-          isNavigatedInsideApp: false
-        })}
-      ></AdvancedSearchConfig>,
-      { store }
-    )
-  )?.component
+  const component = await createTestComponent(
+    // @ts-ignore
+    <AdvancedSearchConfig
+      {...createRouterProps(formatUrl(ADVANCED_SEARCH, {}), {
+        isNavigatedInsideApp: false
+      })}
+    ></AdvancedSearchConfig>,
+    {
+      store,
+      initialEntries: [
+        { pathname: ADVANCED_SEARCH, state: { isNavigatedInsideApp: false } }
+      ]
+    }
+  )
+  testComponent = component.component
+  testRouter = component.router
   testComponent.update()
 })
 
@@ -59,6 +66,7 @@ describe('when advancedSearchPage renders with no active params in store', () =>
 
 describe('when advancedSearchPage renders with 2 or more active params in store', () => {
   let testComponent: ReactWrapper
+  let testRouter: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
     const { store } = createStore()
     store.dispatch(
@@ -68,11 +76,16 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
         registrationStatuses: ['IN_PROGRESS']
       })
     )
-    testComponent = (
-      await createTestComponent(<AdvancedSearchConfig></AdvancedSearchConfig>, {
+    const component = await createTestComponent(
+      <AdvancedSearchConfig></AdvancedSearchConfig>,
+      {
         store
-      })
-    )?.component
+      }
+    )
+
+    testComponent = component.component
+    testRouter = component.router
+
     testComponent.update()
   })
 
@@ -90,6 +103,8 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
 
   it('goes to advancedSearch Result page if search button is clicked', async () => {
     testComponent.find('#search').hostNodes().simulate('click')
-    expect(window.location.href).toContain(`${ADVANCED_SEARCH_RESULT}`)
+    expect(testRouter.state.location.pathname).toContain(
+      `${ADVANCED_SEARCH_RESULT}`
+    )
   })
 })

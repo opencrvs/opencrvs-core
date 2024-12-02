@@ -55,6 +55,7 @@ import { vi } from 'vitest'
 import { createClient } from '@client/utils/apolloClient'
 import { ApolloClient } from '@apollo/client'
 import { formatUrl } from '@client/navigation'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('when user is in the register form for birth event', () => {
   let component: TestComponentWithRouteMock
@@ -429,6 +430,7 @@ describe('when user is in the register form review section', () => {
 
 describe('when user is in the register form from review edit', () => {
   let component: ReactWrapper<{}, {}>
+  let router: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
     const { store } = await createTestStore()
     // @ts-ignore
@@ -444,26 +446,28 @@ describe('when user is in the register form from review edit', () => {
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const { component: testComponent } = await createTestComponent(
-      <RegisterForm
-        registerForm={form}
-        declaration={declaration}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-      />,
-      {
-        store,
-        path: REVIEW_EVENT_PARENT_FORM_PAGE,
-        initialEntries: [
-          '/',
-          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
-            declarationId: declaration.id,
-            pageId: 'mother',
-            groupId: 'mother-view-group'
-          })
-        ]
-      }
-    )
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <RegisterForm
+          registerForm={form}
+          declaration={declaration}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            '/',
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'mother',
+              groupId: 'mother-view-group'
+            })
+          ]
+        }
+      )
     component = testComponent
+    router = testRouter
   })
 
   it('should redirect to review page when back button is clicked', async () => {
@@ -471,7 +475,7 @@ describe('when user is in the register form from review edit', () => {
     backButton.hostNodes().simulate('click')
     component.update()
     await flushPromises()
-    expect(window.location.href).toContain('/review')
+    expect(router.state.location.pathname).toContain('/review')
   })
 })
 
