@@ -12,7 +12,8 @@ import * as React from 'react'
 import {
   createTestComponent,
   getReviewFormFromStore,
-  createTestStore
+  createTestStore,
+  flushPromises
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -22,10 +23,7 @@ import {
   setInitialDeclarations
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
-import {
-  REVIEW_EVENT_PARENT_FORM_PAGE,
-  REVIEW_EVENT_PARENT_FORM_PAGE_GROUP
-} from '@opencrvs/client/src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@opencrvs/client/src/navigation/routes'
 import { EventType } from '@client/utils/gateway'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { vi } from 'vitest'
@@ -1150,6 +1148,8 @@ describe('when user is in the register form review section', () => {
 
   beforeEach(async () => {
     const { store } = await createTestStore()
+
+    await flushPromises()
     const declaration = createReviewDeclaration(
       uuid(),
       {
@@ -1178,14 +1178,6 @@ describe('when user is in the register form review section', () => {
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    // @TODO
-    const foo = formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE_GROUP, {
-      declarationId: declaration.id,
-      event: EventType.Birth,
-      groupId: 'review-view-group',
-      pageId: 'review'
-    })
-
     const { component } = await createTestComponent(
       <RegisterForm
         registerForm={form}
@@ -1195,7 +1187,15 @@ describe('when user is in the register form review section', () => {
       />,
       {
         store,
-        initialEntries: [foo]
+        path: REVIEW_EVENT_PARENT_FORM_PAGE_GROUP,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE_GROUP, {
+            declarationId: declaration.id,
+            event: EventType.Birth,
+            groupId: 'review-view-group',
+            pageId: 'review'
+          })
+        ]
       }
     )
 
