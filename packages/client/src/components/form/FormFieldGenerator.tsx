@@ -615,6 +615,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           to={fieldDefinition.options.url}
           form={values}
           draft={draftData}
+          label={fieldDefinition.label}
+          callback={fieldDefinition.options.callback}
         />
       )
     }

@@ -12,30 +12,45 @@ import { IFormData, IFormSectionData } from '@client/forms'
 import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { Redirect } from 'react-router-dom'
+import { Link } from '@opencrvs/components'
 
 export const RedirectField = ({
   to,
   form,
-  draft
+  draft,
+  label,
+  callback
 }: {
   to: string
   form: IFormSectionData
   draft: IFormData
+  label: string
+  callback?: {
+    trigger: string
+    params: Record<string, string>
+  }
 }) => {
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
+  const evalPath = evalExpressionInFieldDefinition(
+    '`' + to + '`',
+    form,
+    config,
+    draft,
+    user
+  )
+
+  useEffect(() => {
+    if (callback?.params) {
+      // TODO: look for params in the url
+    }
+  }, [callback])
+
   return (
-    <Redirect
-      to={evalExpressionInFieldDefinition(
-        '`' + to + '`',
-        form,
-        config,
-        draft,
-        user
-      )}
-    />
+    <Link element="a" href={evalPath}>
+      {label}
+    </Link>
   )
 }
