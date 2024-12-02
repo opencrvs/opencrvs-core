@@ -8,18 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { env } from '@events/environment'
+import { AppRouter } from './router'
+import { env } from '@gateway/environment'
 
-let client: elasticsearch.Client
+import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_HOST
+import superjson from 'superjson'
+
+export const api = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson,
+      headers({ opList }) {
+        const headers = opList[0].context?.headers
+        return headers as HTTPHeaders
+      }
     })
-    return client
-  }
-
-  return client
-}
+  ]
+})

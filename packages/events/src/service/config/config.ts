@@ -8,18 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
+
 import { env } from '@events/environment'
+import fetch from 'node-fetch'
 
-let client: elasticsearch.Client
+export async function getEventsConfig(token: string) {
+  const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
 
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_HOST
-    })
-    return client
+  if (!res.ok) {
+    throw new Error('Failed to fetch events config')
   }
 
-  return client
+  return res.json()
 }

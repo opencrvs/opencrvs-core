@@ -12,6 +12,12 @@ import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
 
+const FormPage = z.object({
+  id: z.string().describe('Unique identifier for the page'),
+  title: TranslationConfig.describe('Header title of the page'),
+  fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
+})
+
 export const FormConfig = z.object({
   label: TranslationConfig.describe('Human readable description of the form'),
   version: z.object({
@@ -25,13 +31,8 @@ export const FormConfig = z.object({
     )
   }),
   active: z.boolean().default(false).describe('Whether the form is active'),
-  pages: z.array(
-    z.object({
-      id: z.string().describe('Unique identifier for the page'),
-      title: TranslationConfig.describe('Header title of the page'),
-      fields: z.array(FieldConfig).describe('Fields to be rendered on the page')
-    })
-  )
+  pages: z.array(FormPage)
 })
 
+export type FormPage = z.infer<typeof FormPage>
 export type FormConfig = z.infer<typeof FormConfig>

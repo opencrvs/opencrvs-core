@@ -8,18 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { env } from '@events/environment'
+import { env } from '@gateway/environment'
+import { ServerRoute } from '@hapi/hapi'
 
-let client: elasticsearch.Client
-
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_HOST
-    })
-    return client
+export const trpcProxy = [
+  {
+    method: '*',
+    path: '/events/{path*}',
+    handler: (req, h) => {
+      return h.proxy({
+        uri: new URL(req.params.path, env.EVENTS_URL).toString(),
+        passThrough: true
+      })
+    },
+    options: {
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
   }
-
-  return client
-}
+] satisfies Array<ServerRoute>

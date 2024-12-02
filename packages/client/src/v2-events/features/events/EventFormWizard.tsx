@@ -21,12 +21,34 @@ import {
 import React from 'react'
 import { useEvent } from './useEvent'
 import { useParams } from 'react-router-dom'
-import { TextField, Paragraph, DateField } from './registered-fields'
+import { useEventForm } from './useEventForm'
+import { EventConfig } from '@opencrvs/commons/client'
+import {
+  TextField,
+  Paragraph,
+  DateField,
+  RadioGroup
+} from './registered-fields'
 
-export function PublishEvent() {
+export function EventFormWizardIndex() {
   const { eventType } = useParams<{ eventType: string }>()
-  const { title, event, exit, saveAndExit, previous, next, page } =
-    useEvent(eventType)
+
+  const { event, isLoading } = useEvent(eventType)
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!event) {
+    throw new Error('Event not found')
+  }
+
+  return <EventFormWizard event={event} />
+}
+
+export function EventFormWizard({ event }: { event: EventConfig }) {
+  const { title, pages, exit, saveAndExit, previous, next, currentPageIndex } =
+    useEventForm(event)
 
   return (
     <Frame
@@ -63,15 +85,16 @@ export function PublishEvent() {
         <Frame.Section>
           <Content title={title}>
             <FormWizard
-              currentPage={page}
-              pages={event.actions[0].forms[0].pages}
+              currentPage={currentPageIndex}
+              pages={pages}
               components={{
                 TEXT: TextField,
                 PARAGRAPH: Paragraph,
-                DATE: DateField
+                DATE: DateField,
+                RADIO_GROUP: RadioGroup
               }}
               onNextPage={next}
-              onSubmit={(values) => console.log(values)}
+              onSubmit={() => {}}
             />
           </Content>
         </Frame.Section>
