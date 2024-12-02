@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { formatUrl } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import {
   BOOKMARK_ADVANCED_SEARCH_RESULT_MUTATION,

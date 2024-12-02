@@ -27,11 +27,7 @@ import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 import { vi, Mock } from 'vitest'
-import { formatUrl } from '@client/navigation'
-import {
-  DECLARATION_RECORD_AUDIT,
-  TEAM_USER_LIST
-} from '@client/navigation/routes'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
 
 describe('user list without admin scope', () => {
   let store: AppStore
