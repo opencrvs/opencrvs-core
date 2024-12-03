@@ -407,7 +407,7 @@ export type AdvancedSearchParametersInput = {
 }
 
 export type ApproveCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type AssignmentData = {
@@ -585,7 +585,7 @@ export type CertificationMetric = {
 }
 
 export type CertifyActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Comment = {
@@ -666,7 +666,7 @@ export type CreateAction = {
   __typename?: 'CreateAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   type: Scalars['String']
 }
 
@@ -757,13 +757,13 @@ export type DeclareAction = {
   __typename?: 'DeclareAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   identifiers: Identifiers
   type: Scalars['String']
 }
 
 export type DeclareActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Dummy = {
@@ -1024,7 +1024,7 @@ export enum IntegratingSystemType {
 }
 
 export type IssueActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type LocalRegistrar = {
@@ -1560,12 +1560,12 @@ export type NotifyAction = {
   __typename?: 'NotifyAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   type: Scalars['String']
 }
 
 export type NotifyActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type ObservationFhirids = {
@@ -1999,13 +1999,13 @@ export type RegisterAction = {
   __typename?: 'RegisterAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   identifiers: Identifiers
   type: Scalars['String']
 }
 
 export type RegisterActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Registration = {
@@ -2097,7 +2097,7 @@ export enum RegistrationType {
 }
 
 export type ReinstateActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Reinstated = {
@@ -2107,7 +2107,7 @@ export type Reinstated = {
 }
 
 export type RejectCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type RejectRegistrationInput = {
@@ -2178,15 +2178,15 @@ export type RemoveBookmarkedSeachInput = {
 }
 
 export type RequestCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type RevokeActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type RevokeCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type SearchFieldAgentResponse = {

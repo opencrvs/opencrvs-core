@@ -13,7 +13,12 @@ module.exports = {
     'no-restricted-imports': [
       'error',
       {
-        patterns: ['@client/*', '!@client/v2-events', '!@client/components']
+        patterns: [
+          '@client/*',
+          '!@client/v2-events',
+          '!@client/components',
+          '!@client/utils'
+        ]
       }
     ]
   }

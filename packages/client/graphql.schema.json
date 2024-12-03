@@ -2101,7 +2101,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -3818,7 +3818,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -4598,7 +4598,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -5514,7 +5514,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -5582,7 +5582,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -7943,7 +7943,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -12383,7 +12383,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -12435,7 +12435,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -16190,7 +16190,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -16258,7 +16258,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -17226,7 +17226,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -17300,7 +17300,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -18103,7 +18103,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -18138,7 +18138,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -18173,7 +18173,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",

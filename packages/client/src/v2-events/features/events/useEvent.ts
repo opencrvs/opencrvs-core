@@ -8,45 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { trpc } from '@client/v2-events/trcp'
 
-import { tennisClubMembershipEvent } from './fixtures'
-import { useIntl } from 'react-intl'
-import { usePagination } from './usePagination'
-import { FieldConfig } from '@opencrvs/commons/client'
+/**
+ * Fetches configures events and finds a matching event
+ * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
+ * @returns event configuration
+ */
+export function useEvent(eventIdentifier: string) {
+  const hook = trpc.config.get.useQuery()
+  const { error, data, isFetching } = hook
 
-const eventTypes = {
-  'tennis-club-membership': tennisClubMembershipEvent
-}
+  const event = data?.find((event) => event.id === eventIdentifier)
 
-export function useEvent(anyEventType: string) {
-  const intl = useIntl()
-
-  if (!eventTypes[anyEventType as keyof typeof eventTypes]) {
-    throw new Error(`Event type ${anyEventType} not found`)
-  }
-
-  const type = anyEventType as keyof typeof eventTypes
-  const event = eventTypes[type]
-  const { pages, label } = eventTypes[type].actions[0].forms[0]
-
-  const { next, previous, page } = usePagination(pages.length)
-
-  const exit = () => alert('exit')
-  const saveAndExit = () => alert('save and exit')
-  const finish = () => alert('finish')
-
-  const title = intl.formatMessage(label)
+  const noMatchingEvent = !isFetching && !event
 
   return {
-    type,
-    title,
-    exit,
-    saveAndExit,
-    previous,
-    next,
-    finish,
-    page,
-    form: pages,
-    event
+    // We hide the distinction between fetching (all calls) and loading (initial call) from the caller.
+    isLoading: isFetching,
+    error: noMatchingEvent ? 'Event not found' : error?.message,
+    event: event
   }
 }

@@ -69,9 +69,15 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import { SCOPES } from './utils/gateway'
-import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from './v2-events/routes/routes'
+import {
+  V2_EVENT_ROUTE,
+  V2_EVENTS_ROUTE,
+  V2_ROOT_ROUTE
+} from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
-import { PublishEvent } from './v2-events/features/events/PublishEvent'
+import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
+import { TRPCProvider } from './v2-events/trcp'
+import { Events } from './v2-events/features/events/EventSelection'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -96,6 +102,7 @@ const GlobalStyle = createGlobalStyle`
 
 export function App(props: IAppProps) {
   const { client } = useApolloClient(props.store)
+
   return (
     <ErrorBoundary>
       <GlobalStyle />
@@ -604,16 +611,23 @@ export function App(props: IAppProps) {
                                             path={routes.PRINT_RECORD}
                                             component={PrintRecord}
                                           />
-                                          <ProtectedRoute
-                                            exact
-                                            path={V2_ROOT_ROUTE}
-                                            component={Workqueues}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={V2_EVENT_ROUTE}
-                                            component={PublishEvent}
-                                          />
+                                          <TRPCProvider>
+                                            <ProtectedRoute
+                                              exact
+                                              path={V2_ROOT_ROUTE}
+                                              component={Workqueues}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={V2_EVENTS_ROUTE}
+                                              component={Events}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={V2_EVENT_ROUTE}
+                                              component={EventFormWizardIndex}
+                                            />
+                                          </TRPCProvider>
                                         </Switch>
                                       </>
                                     )

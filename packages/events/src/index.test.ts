@@ -34,7 +34,8 @@ afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
   const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' }
+    user: { id: '1', primaryOfficeId: '123' },
+    token: 'NOT_A_REAL_TOKEN'
   })
   return caller
 }
