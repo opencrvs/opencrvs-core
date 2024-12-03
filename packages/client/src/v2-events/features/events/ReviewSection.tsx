@@ -20,7 +20,9 @@ import {
   Icon,
   Link,
   ListReview,
-  Stack
+  ResponsiveModal,
+  Stack,
+  Text
 } from '@opencrvs/components'
 import { ReviewHeader } from '../../../views/RegisterForm/review/ReviewHeader'
 import { useSelector } from 'react-redux'
@@ -29,6 +31,7 @@ import { useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons'
+import { useModal } from '@client/hooks/useModal'
 // @ToDO: Fix import
 
 const Row = styled.div<{
@@ -108,8 +111,20 @@ const getValueFromFieldId = (declaration: any, fieldId: any) =>
   fieldId.split('.').reduce((acc: any, part: any) => acc?.[part], declaration)
 
 const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
+  const [modal, openModal] = useModal()
+
   const { title, pages, exit, saveAndExit } = useEventForm(event)
   const offlineCountryConfig = useSelector(getOfflineData)
+
+  const handleRegister = async () => {
+    const confirmedRegister = await openModal<boolean | null>((close) => (
+      <RegisterModal close={close}></RegisterModal>
+    ))
+    if (confirmedRegister) {
+      alert('Registered new member')
+    }
+    return
+  }
 
   const goBackToForm = (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
@@ -198,10 +213,11 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
               </ReviewContainter>
             </FormData>
           </Card>
-          <ReviewActionComponent />
+          <ReviewActionComponent onRegister={handleRegister} />
         </LeftColumn>
         <RightColumn></RightColumn>
       </Row>
+      {modal}
     </Frame>
   )
 }
@@ -274,7 +290,7 @@ const ActionContainer = styled.div`
   }
 `
 
-const ReviewActionComponent = () => {
+const ReviewActionComponent = ({ onRegister }: { onRegister: () => {} }) => {
   return (
     <Container>
       <UnderLayBackground background="success">
@@ -289,7 +305,7 @@ const ReviewActionComponent = () => {
               type="positive"
               size="large"
               id="validateDeclarationBtn"
-              onClick={() => alert('Regstered')}
+              onClick={onRegister}
             >
               <Icon name="Check" />
               Register
@@ -309,3 +325,43 @@ const ReviewActionComponent = () => {
     </Container>
   )
 }
+
+const RegisterModal: React.FC<{
+  close: (result: boolean | null) => void
+}> = ({ close }) => (
+  <ResponsiveModal
+    autoHeight
+    responsive={false}
+    title="Register the death?"
+    actions={[
+      <Button
+        type="tertiary"
+        id="cancel_register"
+        key="cancel_register"
+        onClick={() => {
+          close(null)
+        }}
+      >
+        Cancel
+      </Button>,
+      <Button
+        type="negative"
+        key="confirm_register"
+        id="confirm_register"
+        onClick={() => {
+          close(true)
+        }}
+      >
+        Register
+      </Button>
+    ]}
+    show={true}
+    handleClose={() => close(null)}
+  >
+    <Stack>
+      <Text variant="reg16" element="p" color="grey500">
+        The action will be recorded.
+      </Text>
+    </Stack>
+  </ResponsiveModal>
+)
