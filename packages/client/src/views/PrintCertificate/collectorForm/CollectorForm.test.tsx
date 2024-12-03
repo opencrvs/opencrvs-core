@@ -28,7 +28,10 @@ import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { merge } from 'lodash'
 import { EventType } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
-import { CERTIFICATE_COLLECTOR } from '@client/navigation/routes'
+import {
+  CERTIFICATE_COLLECTOR,
+  VERIFY_COLLECTOR
+} from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { vi } from 'vitest'
 
@@ -182,9 +185,10 @@ describe('Certificate collector test for a birth registration without father det
       const { component: testComponent, router: testRouter } =
         await createTestComponent(<CollectorForm />, {
           store,
-          path: CERTIFICATE_COLLECTOR,
+          path: VERIFY_COLLECTOR,
           initialEntries: [
-            formatUrl(CERTIFICATE_COLLECTOR, {
+            '/',
+            formatUrl(VERIFY_COLLECTOR, {
               groupId: 'user-view-group',
               registrationId: birthDeclaration.id,
               eventType: birthDeclaration.event
@@ -232,20 +236,16 @@ describe('Certificate collector test for a birth registration without father det
       )
     })
 
-    // @TODO: Check redirecting and mock parents?
-    it.skip('should redirects back to certificate collector option selection with father already selected', async () => {
+    it('should redirect back to certificate collector option selection with father already selected', async () => {
+      await flushPromises()
       component
         .find('#type_FATHER')
         .hostNodes()
         .simulate('change', { target: { value: 'FATHER' } })
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
+
       component.update()
       component.find('#confirm_form').hostNodes().simulate('click')
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500)
-      })
+
       component.update()
 
       component.find('#action_page_back_button').hostNodes().simulate('click')

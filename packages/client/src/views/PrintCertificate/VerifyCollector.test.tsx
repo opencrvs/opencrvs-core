@@ -80,7 +80,7 @@ describe('verify collector tests', () => {
       expect(testComponent.find('#idVerifier').hostNodes()).toHaveLength(1)
     })
 
-    it('should takes user go back', async () => {
+    it('should take user go back', async () => {
       const { component: testComponent, router } = await createTestComponent(
         <VerifyCollector />,
         {
