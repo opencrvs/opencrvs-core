@@ -10,8 +10,8 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate, useNavigationType } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   FIELD_AGENT_ROLES,
@@ -37,6 +37,8 @@ export function HistoryNavigator({
   const pathname = location.pathname
   const navigate = useNavigate()
 
+  const navigationType = useNavigationType()
+
   const isLandingPage = () => {
     if (
       (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(pathname)) ||
@@ -58,10 +60,10 @@ export function HistoryNavigator({
         id="header-go-back-button"
         type="icon"
         size="medium"
-        // disabled={
-        //   (history.action === 'POP' || history.action === 'REPLACE') &&
-        //   isLandingPage()
-        // }
+        disabled={
+          (navigationType === 'POP' || navigationType === 'REPLACE') &&
+          isLandingPage()
+        }
         onClick={() => navigate(-1)}
       >
         <Icon name="ArrowLeft" />
@@ -70,7 +72,7 @@ export function HistoryNavigator({
         <Button
           type="icon"
           size="medium"
-          // disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
+          disabled={navigationType === 'PUSH' || navigationType === 'REPLACE'}
           onClick={() => navigate(1)}
         >
           <Icon name="ArrowRight" />
