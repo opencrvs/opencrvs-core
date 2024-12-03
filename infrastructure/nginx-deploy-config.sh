@@ -10,5 +10,7 @@ set -e
 
 sed -i s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g /etc/nginx/conf.d/default.conf
 sed -i s~{{COUNTRY_CONFIG_URL_INTERNAL}}~$COUNTRY_CONFIG_URL_INTERNAL~g /usr/share/nginx/html/index.html
+sed -i s~{{GATEWAY_URL_INTERNAL}}~$GATEWAY_URL_INTERNAL~g /etc/nginx/conf.d/default.conf
+sed -i s~{{GATEWAY_URL_INTERNAL}}~$GATEWAY_URL_INTERNAL~g /usr/share/nginx/html/index.html
 sed -i s~{{CONTENT_SECURITY_POLICY_WILDCARD}}~$CONTENT_SECURITY_POLICY_WILDCARD~g /etc/nginx/conf.d/default.conf
 nginx -g 'daemon off;'

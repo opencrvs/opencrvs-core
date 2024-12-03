@@ -8,18 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { env } from '@events/environment'
 
-let client: elasticsearch.Client
-
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_HOST
-    })
-    return client
-  }
-
-  return client
-}
+export const V2_ROOT_ROUTE = '/v2'
+export const V2_EVENTS_ROUTE = `${V2_ROOT_ROUTE}/event`
+export const V2_EVENT_ROUTE = `${V2_EVENTS_ROUTE}/:eventType`
