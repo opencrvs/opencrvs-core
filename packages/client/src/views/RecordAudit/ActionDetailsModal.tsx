@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { goToUserProfile, IDynamicValues } from '@client/navigation'
+import { IDynamicValues } from '@client/navigation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
@@ -45,6 +45,8 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
+import { useSelector } from 'react-redux'
+import { getScope } from '@client/profile/profileSelectors'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -648,7 +650,6 @@ export const ActionDetailsModal = ({
   toggleActionDetails,
   intl,
   userDetails,
-  goToUser,
   registerForm,
   reviewForm,
   offlineData,
@@ -660,12 +661,12 @@ export const ActionDetailsModal = ({
   toggleActionDetails: (param: History | null) => void
   intl: IntlShape
   userDetails: UserDetails | null
-  goToUser: typeof goToUserProfile
   registerForm: IForm
   reviewForm: IReviewFormState
   offlineData: Partial<IOfflineData>
   draft: IDeclaration | null
 }) => {
+  const scopes = useSelector(getScope)
   if (isEmpty(actionDetailsData)) return <></>
 
   const title = getStatusLabel(
@@ -673,7 +674,8 @@ export const ActionDetailsModal = ({
     actionDetailsData.regStatus,
     intl,
     actionDetailsData.user,
-    userDetails
+    userDetails,
+    scopes
   )
 
   let userName = ''

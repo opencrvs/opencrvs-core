@@ -46,6 +46,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 type IStateProps = {
   scopes: Scope[] | null
@@ -140,21 +141,7 @@ const HeaderComponent = (props: IFullProps) => {
     changeTeamLocation
   } = props
 
-  function hasSearch() {
-    // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
-    return scopes?.some((scope) =>
-      (
-        [
-          SCOPES.SEARCH_BIRTH,
-          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-          SCOPES.SEARCH_DEATH,
-          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-          SCOPES.SEARCH_MARRIAGE,
-          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-        ] as Scope[]
-      ).includes(scope)
-    )
-  }
+  const { canSearchRecords } = usePermissions()
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = new URLSearchParams(location.search).get('locationId')
@@ -236,7 +223,7 @@ const HeaderComponent = (props: IFullProps) => {
           ]
         }
       }
-    } else if (!hasSearch()) {
+    } else if (!canSearchRecords()) {
       return {
         mobileLeft: [
           {
@@ -386,7 +373,7 @@ const HeaderComponent = (props: IFullProps) => {
     {
       element: (
         <>
-          {hasSearch() && (
+          {canSearchRecords() && (
             <HeaderCenter>
               <Button
                 type="iconPrimary"
@@ -413,7 +400,7 @@ const HeaderComponent = (props: IFullProps) => {
     }
   ]
 
-  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !hasSearch()) {
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !canSearchRecords()) {
     rightMenu = [
       {
         element: <HistoryNavigator />

@@ -346,7 +346,6 @@ function RecordAuditBody({
     toggleActionDetails,
     intl,
     userDetails,
-    goToUser: goToUserProfile,
     registerForm: regForm,
     offlineData,
     draft,

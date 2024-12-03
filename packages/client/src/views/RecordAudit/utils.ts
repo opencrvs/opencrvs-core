@@ -29,7 +29,9 @@ import {
   RegAction,
   RegStatus,
   User,
-  AssignmentData
+  AssignmentData,
+  Scope,
+  SCOPES
 } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
@@ -462,7 +464,8 @@ export function getStatusLabel(
   regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
   performedBy: Maybe<User> | undefined,
-  loggedInUser: UserDetails | null
+  loggedInUser: UserDetails | null,
+  scopes: Scope[] | null
 ) {
   if (action) {
     return intl.formatMessage(regActionMessages[action], {
@@ -471,10 +474,8 @@ export function getStatusLabel(
   }
   if (
     regStatus === RegStatus.Declared &&
-    performedBy?.id === loggedInUser?.userMgntUserID
-    // @TODO: How do we handle this specific case with scopes?
-    // && loggedInUser?.systemRole &&
-    // FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
+    performedBy?.id === loggedInUser?.userMgntUserID &&
+    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }
