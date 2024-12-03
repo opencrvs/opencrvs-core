@@ -26,7 +26,7 @@ import {
   useIntl
 } from 'react-intl'
 import { connect } from 'react-redux'
-import { useEventConfigurations } from './useEvent'
+import { useEventConfigurations } from './useEventConfiguration'
 import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'

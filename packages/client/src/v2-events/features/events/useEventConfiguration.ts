@@ -30,7 +30,7 @@ export function useEventConfigurations() {
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
  * @returns event configuration
  */
-export function useEvent(eventIdentifier: string) {
+export function useEventConfiguration(eventIdentifier: string) {
   const hook = useEventConfigurations()
   const { error, data, isFetching } = hook
 
