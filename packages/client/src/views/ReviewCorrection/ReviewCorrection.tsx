@@ -12,13 +12,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import { IntlShape, useIntl } from 'react-intl'
-import {
-  Navigate,
-  useLocation,
-  useMatches,
-  useNavigate,
-  useParams
-} from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useRecord } from '@client/hooks/useRecord'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
@@ -695,10 +689,6 @@ function applyCorrectionToData(record: IDeclaration) {
 
 export function ReviewCorrection() {
   const { declarationId } = useParams<URLParams>()
-  const match = useMatches() // @TODO: useMatch() instead
-
-  const location = useLocation()
-  const navigate = useNavigate()
 
   const records = useRecord()
   const record = declarationId ? records.findById(declarationId) : undefined
@@ -723,23 +713,10 @@ export function ReviewCorrection() {
   return (
     <>
       <RegisterForm
-        // @ts-ignore
-        match={
-          {
-            ...(match[0] ?? {}),
-            params: {
-              declarationId: record.id,
-              pageId: 'review',
-              groupId: 'review-view-group'
-            }
-          } as any
-        }
         reviewSummaryHeader={
           <ReviewSummarySection declaration={recordWithProposedChanges} />
         }
         pageRoute={''}
-        location={location}
-        navigate={navigate}
         registerForm={registerForm!}
         declaration={recordWithProposedChanges}
       />
