@@ -26,7 +26,7 @@ interface IProps {
  * Higher order component that wraps a route and checks if the user has access to it.
  * If the user does not have access, they are redirected to the home page.
  */
-export const ProtectedRouteWrapper = (
+const ProtectedRouteWrapper = (
   props: IProps & ReturnType<typeof mapStateToProps> & RouteProps
 ) => {
   const { children, userDetails, roles } = props

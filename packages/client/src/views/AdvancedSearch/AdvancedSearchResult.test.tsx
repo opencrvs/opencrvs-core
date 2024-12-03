@@ -29,7 +29,6 @@ import { EventType } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { AdvancedSearchResult } from './AdvancedSearchResult'
-import { formatUrl } from '@client/navigation'
 
 const graphqlMock = [
   {

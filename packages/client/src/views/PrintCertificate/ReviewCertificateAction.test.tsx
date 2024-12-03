@@ -17,8 +17,7 @@ import {
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
   flushPromises,
-  loginAsFieldAgent,
-  TestComponentWithRouteMock
+  loginAsFieldAgent
 } from '@client/tests/util'
 import { ReviewCertificate } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'

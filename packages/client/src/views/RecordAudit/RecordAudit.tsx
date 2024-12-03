@@ -153,7 +153,7 @@ interface IDispatchProps {
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
 }
 
-export type IRecordAuditTabs = keyof IQueryData | 'search'
+type IRecordAuditTabs = keyof IQueryData | 'search'
 
 type RouteProps = RouteComponentProps<{
   tab?: IRecordAuditTabs
