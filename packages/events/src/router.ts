@@ -14,22 +14,26 @@ import superjson from 'superjson'
 import { z } from 'zod'
 
 import {
+  DeclareActionInput,
+  EventInput,
+  NotifyActionInput
+} from '@events/schema'
+import { getEventsConfig } from './service/config/config'
+import {
   addAction,
   createEvent,
   EventInputWithId,
   getEventById,
   patchEvent
 } from './service/events'
-import {
-  ActionDeclareInput,
-  ActionNotifyInput,
-  EventInput
-} from '@events/schema'
+import { EventConfig } from '@opencrvs/commons'
 
 const ContextSchema = z.object({
   user: z.object({
-    id: z.string()
-  })
+    id: z.string(),
+    primaryOfficeId: z.string()
+  }),
+  token: z.string()
 })
 
 type Context = z.infer<typeof ContextSchema>
@@ -47,11 +51,17 @@ const publicProcedure = t.procedure
 export type AppRouter = typeof appRouter
 
 export const appRouter = router({
+  config: router({
+    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
+      return getEventsConfig(options.ctx.token)
+    })
+  }),
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
       return createEvent(
         options.input,
         options.ctx.user.id,
+        options.ctx.user.primaryOfficeId,
         options.input.transactionId
       )
     }),
@@ -62,13 +72,13 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      notify: publicProcedure.input(ActionNotifyInput).mutation((options) => {
+      notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id
         })
       }),
-      declare: publicProcedure.input(ActionDeclareInput).mutation((options) => {
+      declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id

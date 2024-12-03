@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
-    "paths": { "@client/*": ["./*"] }
+    "paths": {
+      "@client/*": ["./*"],
+      "@gateway/*": ["../../gateway/src/*"],
+      "@events/*": ["../../events/src/*"]
+    }
   }
 }

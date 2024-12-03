@@ -15,16 +15,40 @@ import {
   Stack,
   Button,
   Icon,
-  Content
+  Content,
+  FormWizard
 } from '@opencrvs/components'
 import React from 'react'
-import { useEvent } from './useEvent'
+import { useEventConfiguration } from './useEventConfiguration'
 import { useParams } from 'react-router-dom'
+import { useEventForm } from './useEventForm'
+import { EventConfig } from '@opencrvs/commons/client'
+import {
+  TextField,
+  Paragraph,
+  DateField,
+  RadioGroup
+} from './registered-fields'
 
-export function PublishEvent() {
+export function EventFormWizardIndex() {
   const { eventType } = useParams<{ eventType: string }>()
-  const { title, exit, saveAndExit, previous, next, finish } =
-    useEvent(eventType)
+
+  const { event, isLoading } = useEventConfiguration(eventType)
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!event) {
+    throw new Error('Event not found')
+  }
+
+  return <EventFormWizard event={event} />
+}
+
+export function EventFormWizard({ event }: { event: EventConfig }) {
+  const { title, pages, exit, saveAndExit, previous, next, currentPageIndex } =
+    useEventForm(event)
 
   return (
     <Frame
@@ -59,21 +83,19 @@ export function PublishEvent() {
         </Frame.SectionFormBackAction>
 
         <Frame.Section>
-          <Content
-            title={title}
-            bottomActionButtons={[
-              <Button
-                key="continue"
-                fullWidth
-                type="primary"
-                size="large"
-                onClick={next ?? finish}
-              >
-                Continue
-              </Button>
-            ]}
-          >
-            <b>This is where the form will be rendered</b>
+          <Content title={title}>
+            <FormWizard
+              currentPage={currentPageIndex}
+              pages={pages}
+              components={{
+                TEXT: TextField,
+                PARAGRAPH: Paragraph,
+                DATE: DateField,
+                RADIO_GROUP: RadioGroup
+              }}
+              onNextPage={next}
+              onSubmit={() => {}}
+            />
           </Content>
         </Frame.Section>
       </Frame.LayoutForm>
