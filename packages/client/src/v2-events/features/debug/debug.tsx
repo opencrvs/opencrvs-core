@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* stylelint-disable */
 import React from 'react'
 
 import { useEvents } from '@client/v2-events/features/events/useEvents'

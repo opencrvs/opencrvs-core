@@ -10,22 +10,26 @@
  */
 
 import { appRouter, t } from '@events/router'
-const { createCallerFactory } = t
 import { vi } from 'vitest'
 import { indexAllEvents } from './indexing'
+const { createCallerFactory } = t
 
-import {
-  setupServer as setupMongoServer,
-  resetServer as resetMongoServer
-} from '@events/storage/__mocks__/mongodb'
 import {
   getOrCreateClient,
   resetServer as resetESServer,
   setupServer as setupESServer
 } from '@events/storage/__mocks__/elasticsearch'
+import {
+  resetServer as resetMongoServer,
+  setupServer as setupMongoServer
+} from '@events/storage/__mocks__/mongodb'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
+vi.mock('@events/service/config/config', () => ({
+  getEventsConfig: () => Promise.all([tennisClubMembershipEvent])
+}))
 
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
@@ -45,7 +49,7 @@ const client = createClient()
 test('indexes all records from MongoDB with one function call', async () => {
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
   await resetESServer()
 
@@ -68,7 +72,7 @@ test('indexes all records from MongoDB with one function call', async () => {
 test('records are automatically indexed', async () => {
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   const esClient = getOrCreateClient()

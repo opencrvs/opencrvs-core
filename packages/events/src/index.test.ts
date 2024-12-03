@@ -10,6 +10,7 @@
  */
 import { vi } from 'vitest'
 import { appRouter, t } from './router'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   getClient,
   resetServer as resetMongoServer,
@@ -27,6 +28,9 @@ const { createCallerFactory } = t
 
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
+vi.mock('@events/service/config/config', () => ({
+  getEventsConfig: () => Promise.all([tennisClubMembershipEvent])
+}))
 
 beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
 afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
@@ -41,10 +45,11 @@ function createClient() {
 }
 
 const client = createClient()
+
 test('event can be created and fetched', async () => {
   const event = await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   const fetchedEvent = await client.event.get(event.id)
@@ -57,12 +62,12 @@ test('creating an event is an idempotent operation', async () => {
 
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   expect(await db.collection('events').find().toArray()).toHaveLength(1)
@@ -71,7 +76,7 @@ test('creating an event is an idempotent operation', async () => {
 test('stored events can be modified', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   const event = await client.event.patch({
@@ -87,7 +92,7 @@ test('stored events can be modified', async () => {
 test('actions can be added to created events', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   const event = await client.event.actions.declare({
