@@ -68,7 +68,7 @@ export const FormWizard = <CM extends ComponentsMap>({
         Otherwise react do not notice the difference between pages and sets applicant's name as recommender's.
         We might need to have index for all, since the index fallback is not unique across pages.
         */}
-        {page.fields.map((field, index) => {
+        {page.fields.map((field) => {
           return (
             <FormFieldRenderer
               key={field.id}

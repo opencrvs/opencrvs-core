@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useMemo } from 'react'
-import { Controller, FieldValues, useFormContext } from 'react-hook-form'
+import { Controller, FieldValues, useFormContext, get } from 'react-hook-form'
 import * as _ from 'lodash'
 import { Stack } from '../Stack'
 import { ErrorText } from '../ErrorText'
@@ -43,16 +43,7 @@ export const FormFieldRenderer = <CM extends ComponentsMap>({
   )
 
   // NOTE: values are in dotted format. e.g. { 'applicant.surname': 'Doe' }
-  // NOTE2: We do not seem to have lodash here actually
-  // NOTE3: Since paragraph does not have id, it will break at this stage
-
-  console.log(context.formState)
-
-  const error = field?.id
-    ? _.get(context.formState.errors, field.id)
-    : undefined
-
-  console.log('error', error)
+  const error = get(context.formState.errors, field.id)
 
   return (
     <Stack direction="column" gap={8} alignItems="stretch">

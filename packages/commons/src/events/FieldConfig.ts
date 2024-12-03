@@ -42,7 +42,11 @@ const DateField = z
   .describe('A single date input (dd-mm-YYYY)')
 
 const Paragraph = z
-  .object({ type: z.literal('PARAGRAPH'), label: TranslationConfig })
+  .object({
+    id: z.string(),
+    type: z.literal('PARAGRAPH'),
+    label: TranslationConfig
+  })
   .describe('A read-only HTML <p> paragraph')
 
 const RadioGroup = z
