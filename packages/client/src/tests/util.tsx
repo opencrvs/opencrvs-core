@@ -148,7 +148,10 @@ export async function createTestApp(
   initialEntries?: string[]
 ) {
   const { store } = await createTestStore()
-  const router = createMemoryRouter(routesConfig, { initialEntries })
+
+  const router = createMemoryRouter(routesConfig, {
+    initialEntries
+  })
 
   const app = mount(
     <App store={store} router={router} client={createGraphQLClient()} />

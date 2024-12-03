@@ -9,22 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClubMembershipEvent } from './fixtures'
 import { useIntl } from 'react-intl'
 import { usePagination } from './usePagination'
-import { FieldConfig } from '@opencrvs/commons'
+import { EventConfig } from '@opencrvs/commons'
 
-const eventTypes = { 'tennis-club-membership': tennisClubMembershipEvent }
-
-export function useEvent(anyEventType: string) {
+/**
+ * Creates form methods (e.g. pagination) based on the event configuration
+ */
+export function useEventForm(event: EventConfig) {
   const intl = useIntl()
 
-  if (!eventTypes[anyEventType as keyof typeof eventTypes]) {
-    throw new Error(`Event type ${anyEventType} not found`)
-  }
-
-  const type = anyEventType as keyof typeof eventTypes
-  const { pages, label } = eventTypes[type].actions[0].forms[0]
+  const pages = event.actions[0].forms[0].pages
 
   const { next, previous, page } = usePagination(pages.length)
 
@@ -32,17 +27,15 @@ export function useEvent(anyEventType: string) {
   const saveAndExit = () => alert('save and exit')
   const finish = () => alert('finish')
 
-  const title = intl.formatMessage(label)
-
   return {
-    type,
-    title,
+    title: intl.formatMessage(event.label),
+    eventId: event.id,
     exit,
     saveAndExit,
     previous,
     next,
     finish,
-    form: pages,
-    fields: pages[page].fields as FieldConfig[]
+    pages,
+    currentPageIndex: page
   }
 }
