@@ -10,11 +10,7 @@
  */
 
 import { AppStore } from '@client/store'
-import {
-  createRouterProps,
-  createTestComponent,
-  createTestStore
-} from '@client/tests/util'
+import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Activity } from '@opencrvs/components/lib/icons'
 import { ReactWrapper } from 'enzyme'
@@ -31,10 +27,6 @@ describe('Leaderboards component', () => {
     ;({ store } = await createTestStore())
   })
   beforeEach(async () => {
-    const { history } = createRouterProps('/performance/dashboard', {
-      isNavigatedInsideApp: false
-    })
-
     const { component: testComponent } = await createTestComponent(
       <DashboardEmbedView title="Dashboard" icon={<Activity />} />,
       {

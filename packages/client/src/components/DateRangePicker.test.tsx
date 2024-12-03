@@ -18,7 +18,6 @@ import {
 import { AppStore } from '@client/store'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
 import { Mock, vi } from 'vitest'
 import startOfMonth from 'date-fns/startOfMonth'
 

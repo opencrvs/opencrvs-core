@@ -75,9 +75,6 @@ describe('when user wants to review death certificate', () => {
 })
 
 describe('back button behavior tests of review certificate action', () => {
-  let component: ReactWrapper
-  let router: TestComponentWithRouteMock['router']
-
   const mockBirthDeclarationData = {
     ...cloneDeep(mockDeclarationData),
     history: [
@@ -138,17 +135,6 @@ describe('back button behavior tests of review certificate action', () => {
   })
 
   it('takes user to registration home when navigated from external link', async () => {
-    // const { match } = createRouterProps(
-    //   '/previous-route',
-    //   { isNavigatedInsideApp: false },
-    //   {
-    //     matchParams: {
-    //       registrationId: 'asdhdqe2472487jsdfsdf',
-    //       eventType: EventType.Birth
-    //     }
-    //   }
-    // )
-    // ;(useParams as Mock).mockImplementation(() => match.params)
     const { store } = createStore()
 
     loginAsFieldAgent(store)

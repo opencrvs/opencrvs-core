@@ -23,10 +23,7 @@ import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { merge } from 'lodash'
 import * as React from 'react'
-import {
-  WORKQUEUE_TABS,
-  Navigation
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
 import { ReactWrapper } from 'enzyme'
 import { Mock, vi } from 'vitest'
 import { Router } from '@sentry/react/types/types'
@@ -87,22 +84,7 @@ describe('Navigation for national system admin related tests', () => {
     await store.dispatch(checkAuth())
     await flushPromises()
 
-    const { component, router } = await createTestComponent(
-      <OfficeHome
-      // match={{
-      //   params: {
-      //     tabId: WORKQUEUE_TABS.inProgress
-      //   },
-      //   isExact: true,
-      //   path: '',
-      //   url: ''
-      // }}
-
-      // history={history}
-      // location={history.location}
-      />,
-      { store }
-    )
+    const { component } = await createTestComponent(<OfficeHome />, { store })
 
     testComponent = component
   })

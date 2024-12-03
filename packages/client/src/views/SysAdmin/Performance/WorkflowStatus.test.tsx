@@ -21,7 +21,6 @@ import { EventType } from '@client/utils/gateway'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
-import { History } from 'history'
 import { parse, stringify } from 'query-string'
 import * as React from 'react'
 import { vi } from 'vitest'
@@ -31,8 +30,6 @@ describe('Workflow status tests', () => {
   let store: AppStore
   let component: ReactWrapper<{}, {}>
   let router: TestComponentWithRouteMock['router']
-  const timeStart = new Date(2019, 11, 6)
-  const timeEnd = new Date(2019, 11, 13)
   const locationId = 'bfe8306c-0910-48fe-8bf5-0db906cf3155'
 
   beforeAll(async () => {

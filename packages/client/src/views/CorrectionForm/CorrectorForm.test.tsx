@@ -13,7 +13,6 @@ import {
   createTestComponent,
   mockDeclarationData,
   mockDeathDeclarationData,
-  createRouterProps,
   TestComponentWithRouteMock
 } from '@client/tests/util'
 
@@ -48,20 +47,7 @@ describe('Corrector form', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
 
-      const { location } = createRouterProps(
-        formatUrl(CERTIFICATE_CORRECTION, {
-          declarationId: birthDeclaration.id,
-          pageId: CorrectionSection.Corrector
-        }),
-        { isNavigatedInsideApp: false },
-        {
-          matchParams: {
-            declarationId: birthDeclaration.id,
-            pageId: CorrectionSection.Corrector
-          }
-        }
-      )
-      // @TODO: NOTE this is different component than **CorrectorForm**
+      //  NOTE this is different component than **CorrectorForm**
       wrapper = await createTestComponent(<CorrectionForm />, {
         store,
         path: CERTIFICATE_CORRECTION,
@@ -158,33 +144,16 @@ describe('Corrector form', () => {
   describe('for a death registration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(deathDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-        // {...createRouterProps(
-        // formatUrl(CERTIFICATE_CORRECTION, {
-        //   declarationId: deathDeclaration.id,
-        //   pageId: CorrectionSection.Corrector
-        // }),
-        //   { isNavigatedInsideApp: false },
-        //   {
-        //     matchParams: {
-        //       declarationId: deathDeclaration.id,
-        //       pageId: CorrectionSection.Corrector
-        //     }
-        //   }
-        // )}
-        />,
-        {
-          store,
-          path: CERTIFICATE_CORRECTION,
-          initialEntries: [
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: deathDeclaration.id,
-              pageId: CorrectionSection.Corrector
-            })
-          ]
-        }
-      )
+      wrapper = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: deathDeclaration.id,
+            pageId: CorrectionSection.Corrector
+          })
+        ]
+      })
     })
 
     it('should disable the continue button if no option is selected', () => {
@@ -208,33 +177,16 @@ describe('Corrector form', () => {
   describe('for an declaration', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
-      wrapper = await createTestComponent(
-        <CorrectionForm
-        // {...createRouterProps(
-        //   formatUrl(CERTIFICATE_CORRECTION, {
-        //     declarationId: birthDeclaration.id,
-        //     pageId: CorrectionSection.Corrector
-        //   }),
-        //   { isNavigatedInsideApp: false },
-        //   {
-        //     matchParams: {
-        //       declarationId: birthDeclaration.id,
-        //       pageId: CorrectionSection.Corrector
-        //     }
-        //   }
-        // )}
-        />,
-        {
-          store,
-          path: CERTIFICATE_CORRECTION,
-          initialEntries: [
-            formatUrl(CERTIFICATE_CORRECTION, {
-              declarationId: birthDeclaration.id,
-              pageId: CorrectionSection.Corrector
-            })
-          ]
-        }
-      )
+      wrapper = await createTestComponent(<CorrectionForm />, {
+        store,
+        path: CERTIFICATE_CORRECTION,
+        initialEntries: [
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: birthDeclaration.id,
+            pageId: CorrectionSection.Corrector
+          })
+        ]
+      })
     })
 
     it('should disable the continue button if others option is selected without specifying the relationship', () => {

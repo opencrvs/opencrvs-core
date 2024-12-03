@@ -646,8 +646,9 @@ describe('Certificate collector test for a birth registration without father and
       await flushPromises()
       store.dispatch(storeDeclaration(marriageDeclaration))
 
-      const { component: testComponent, router: testRouter } =
-        await createTestComponent(<CollectorForm />, {
+      const { component: testComponent } = await createTestComponent(
+        <CollectorForm />,
+        {
           store,
           path: CERTIFICATE_COLLECTOR,
           initialEntries: [
@@ -657,7 +658,8 @@ describe('Certificate collector test for a birth registration without father and
               eventType: birthDeclaration.event
             })
           ]
-        })
+        }
+      )
 
       component = testComponent
 

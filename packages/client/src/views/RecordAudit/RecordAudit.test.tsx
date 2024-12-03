@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockDeclarationData,
-  createRouterProps,
   flushPromises,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,

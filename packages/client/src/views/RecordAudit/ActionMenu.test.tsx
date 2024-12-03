@@ -379,7 +379,7 @@ describe('Review action', () => {
   const REVIEW_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -402,7 +402,7 @@ describe('Review action', () => {
 
   it('In progress', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -454,7 +454,7 @@ describe('Review action', () => {
 
   it('In review - Not downloaded - Has Scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -473,7 +473,7 @@ describe('Review action', () => {
 
   it('In review - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -492,7 +492,7 @@ describe('Review action', () => {
 
   it('Potential duplicate - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -514,7 +514,7 @@ describe('Review action', () => {
 
   it('Potential duplicate - Not downloaded - Has Scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -566,7 +566,7 @@ describe('Review action', () => {
 
   it('Requires update', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -614,7 +614,7 @@ describe('Review action', () => {
 
   it('Validated - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -633,7 +633,7 @@ describe('Review action', () => {
 
   it('Validated - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -652,7 +652,7 @@ describe('Review action', () => {
 
   it('Archived', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -675,7 +675,7 @@ describe('Review action', () => {
 
   it('Registered', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -698,7 +698,7 @@ describe('Review action', () => {
 
   it('Registered + Printed in advance', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -749,7 +749,7 @@ describe('Review action', () => {
 
   it('Pending correction - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -770,7 +770,7 @@ describe('Review action', () => {
 
   it('Pending correction - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -850,7 +850,7 @@ describe('Update action', () => {
 
   it('In progress - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -869,7 +869,7 @@ describe('Update action', () => {
 
   it('In progress - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -888,7 +888,7 @@ describe('Update action', () => {
 
   it('In review', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -907,7 +907,7 @@ describe('Update action', () => {
 
   it('Potential duplicate', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -956,7 +956,7 @@ describe('Update action', () => {
 
   it('Requires update - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -975,7 +975,7 @@ describe('Update action', () => {
 
   it('Requires update - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -994,7 +994,7 @@ describe('Update action', () => {
 
   it('Validated', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1013,7 +1013,7 @@ describe('Update action', () => {
 
   it('Archived', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1032,7 +1032,7 @@ describe('Update action', () => {
 
   it('Registered', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1051,7 +1051,7 @@ describe('Update action', () => {
 
   it('Registered + Printed in advance', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1070,7 +1070,7 @@ describe('Update action', () => {
 
   it('Pending correction - Downloaded', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1092,7 +1092,7 @@ describe('Archive action', () => {
   const ARCHIVE_SCOPES = ['validate', 'register'] as any as Scope
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1112,7 +1112,7 @@ describe('Archive action', () => {
   it('In progress - Downloaded', async () => {
     const { store } = createStore()
     const toggleDisplayDialogMock = vi.fn()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1134,7 +1134,7 @@ describe('Archive action', () => {
 
   it('In progress - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1153,7 +1153,7 @@ describe('Archive action', () => {
 
   it('In progress - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1173,7 +1173,7 @@ describe('Archive action', () => {
   it('In review - Downloaded', async () => {
     const { store } = createStore()
     const toggleDisplayDialogMock = vi.fn()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1195,7 +1195,7 @@ describe('Archive action', () => {
 
   it('In review - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1214,7 +1214,7 @@ describe('Archive action', () => {
 
   it('In review - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1234,7 +1234,7 @@ describe('Archive action', () => {
   it('Requires update - Downloaded', async () => {
     const { store } = createStore()
     const toggleDisplayDialogMock = vi.fn()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1256,7 +1256,7 @@ describe('Archive action', () => {
 
   it('Requires update - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1275,7 +1275,7 @@ describe('Archive action', () => {
 
   it('Requires update - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1295,7 +1295,7 @@ describe('Archive action', () => {
   it('Validated - Downloaded', async () => {
     const { store } = createStore()
     const toggleDisplayDialogMock = vi.fn()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1317,7 +1317,7 @@ describe('Archive action', () => {
 
   it('Validated - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1336,7 +1336,7 @@ describe('Archive action', () => {
 
   it('Validated - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1355,7 +1355,7 @@ describe('Archive action', () => {
 
   it('Archived', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1374,7 +1374,7 @@ describe('Archive action', () => {
 
   it('Registered', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1393,7 +1393,7 @@ describe('Archive action', () => {
 
   it('Registered + Printed in advance', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1412,7 +1412,7 @@ describe('Archive action', () => {
 
   it('Pending correction', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1434,7 +1434,7 @@ describe('Reinstate action', () => {
   const REINSTATE_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1454,7 +1454,7 @@ describe('Reinstate action', () => {
   it('Archived - Downloaded', async () => {
     const { store } = createStore()
     const toggleDisplayDialogMock = vi.fn()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1475,7 +1475,7 @@ describe('Reinstate action', () => {
 
   it('Archived - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1494,7 +1494,7 @@ describe('Reinstate action', () => {
 
   it('Archived - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1513,7 +1513,7 @@ describe('Reinstate action', () => {
 
   it('Registered', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1535,7 +1535,7 @@ describe('Print action', () => {
   const PRINT_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1554,7 +1554,7 @@ describe('Print action', () => {
 
   it('In progress', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1573,7 +1573,7 @@ describe('Print action', () => {
 
   it('In review', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1592,7 +1592,7 @@ describe('Print action', () => {
 
   it('Potential duplicate', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1612,7 +1612,7 @@ describe('Print action', () => {
 
   it('Requires update', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1631,7 +1631,7 @@ describe('Print action', () => {
 
   it('Validated', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1650,7 +1650,7 @@ describe('Print action', () => {
 
   it('Archived', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1695,7 +1695,7 @@ describe('Print action', () => {
 
   it('Registered - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1714,7 +1714,7 @@ describe('Print action', () => {
 
   it('Registered - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1733,7 +1733,7 @@ describe('Print action', () => {
 
   it('Registered + Printed in advance', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1752,7 +1752,7 @@ describe('Print action', () => {
 
   it('Pending correction', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1774,7 +1774,7 @@ describe('Issue action', () => {
   const ISSUE_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1793,7 +1793,7 @@ describe('Issue action', () => {
 
   it('In progress', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1812,7 +1812,7 @@ describe('Issue action', () => {
 
   it('In review', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1831,7 +1831,7 @@ describe('Issue action', () => {
 
   it('Potential duplicate', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1851,7 +1851,7 @@ describe('Issue action', () => {
 
   it('Requires update', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1870,7 +1870,7 @@ describe('Issue action', () => {
 
   it('Validated', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1889,7 +1889,7 @@ describe('Issue action', () => {
 
   it('Archived', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1908,7 +1908,7 @@ describe('Issue action', () => {
 
   it('Registered', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -1992,7 +1992,7 @@ describe('Issue action', () => {
 
   it('Pending correction', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2014,7 +2014,7 @@ describe('Correct action', () => {
   const CORRECTION_SCOPES = SCOPES.RA
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2052,7 +2052,7 @@ describe('Correct action', () => {
 
   it('In review', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2110,7 +2110,7 @@ describe('Correct action', () => {
 
   it('Validated', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2174,7 +2174,7 @@ describe('Correct action', () => {
 
   it('Registered - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2193,7 +2193,7 @@ describe('Correct action', () => {
 
   it('Registered - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2212,7 +2212,7 @@ describe('Correct action', () => {
 
   it('Registered + Printed in advance - Does not have scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2231,7 +2231,7 @@ describe('Correct action', () => {
 
   it('Registered + Printed in advance - Not downloaded - Has scope', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2276,7 +2276,7 @@ describe('Correct action', () => {
 
   it('Pending correction', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2297,7 +2297,7 @@ describe('Correct action', () => {
 describe('Delete declaration action', () => {
   it('Draft', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2321,7 +2321,7 @@ describe('Delete declaration action', () => {
 
   it('In progress', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2340,7 +2340,7 @@ describe('Delete declaration action', () => {
 
   it('In review', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2363,7 +2363,7 @@ describe('Unassign action', () => {
   const Assignment = 'Assigned to Kennedy Mweene at Ibombo District Office'
   it('Has scope - assigned to someone else', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2388,7 +2388,7 @@ describe('Unassign action', () => {
 
   it('Does not have scope - assigned to someone else', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2410,7 +2410,7 @@ describe('Unassign action', () => {
 
   it('Assigned to self', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -2435,7 +2435,7 @@ describe('Unassign action', () => {
 
   it('Not assigned', async () => {
     const { store } = createStore()
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,

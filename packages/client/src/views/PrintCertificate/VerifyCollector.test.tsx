@@ -19,7 +19,6 @@ import {
 import { VerifyCollector } from './VerifyCollector'
 import { storeDeclaration } from '@client/declarations'
 import { EventType } from '@client/utils/gateway'
-import { ReactWrapper } from 'enzyme'
 import { formatUrl } from '@client/navigation'
 import { VERIFY_COLLECTOR } from '@client/navigation/routes'
 

@@ -12,7 +12,6 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockDeclarationData,
-  createRouterProps,
   flushPromises,
   mockDeathDeclarationData,
   getRegisterFormFromStore,

@@ -24,7 +24,6 @@ import { checkAuth } from '@client/profile/profileActions'
 import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { History } from 'history'
 import { vi, Mock } from 'vitest'
 import { EventType } from '@client/utils/gateway'
 

@@ -20,7 +20,6 @@ import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
 import {
-  createRouterProps,
   createTestComponent,
   mockUserResponse,
   resizeWindow,
@@ -33,7 +32,6 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { EVENT_STATUS } from '@client/workqueue'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ApolloClient } from '@apollo/client'
-import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { ReadyForReview } from './ReadyForReview'
@@ -42,9 +40,6 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { REGISTRAR_HOME } from '@client/navigation/routes'
-import { formatUrl } from '@client/navigation'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
 import { vi, Mock } from 'vitest'
 

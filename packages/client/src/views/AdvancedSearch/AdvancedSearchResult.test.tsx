@@ -158,7 +158,7 @@ describe('AdvancedSearchResult Bookmark', () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
     ;({ component } = await createTestComponent(<AdvancedSearchResult />, {
       store,
-      initialEntries: [formatUrl(ADVANCED_SEARCH_RESULT, {})],
+      initialEntries: [ADVANCED_SEARCH_RESULT],
       path: ADVANCED_SEARCH_RESULT,
       graphqlMocks: graphqlMock as any
     }))
