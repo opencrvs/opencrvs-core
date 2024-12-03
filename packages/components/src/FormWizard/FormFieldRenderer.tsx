@@ -9,10 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useMemo } from 'react'
-import { Controller, FieldValues, useFormContext, get } from 'react-hook-form'
-import * as _ from 'lodash'
-import { Stack } from '../Stack'
-import { ErrorText } from '../ErrorText'
 
 /**
  * @example
@@ -36,31 +32,10 @@ export const FormFieldRenderer = <CM extends ComponentsMap>({
   field,
   components
 }: FormFieldRendererProps<CM>) => {
-  const context = useFormContext<FieldValues>()
   const FormFieldComponent = useMemo(
     () => components[field.type],
     [components, field.type]
   )
 
-  // NOTE: values are in dotted format. e.g. { 'applicant.surname': 'Doe' }
-  const error = get(context.formState.errors, field.id)
-
-  return (
-    <Stack direction="column" gap={8} alignItems="stretch">
-      <Controller
-        name={field.id}
-        control={context.control}
-        rules={{ required: field.required }}
-        render={({ field: formField }) => (
-          <FormFieldComponent key={field.id} {...field} {...formField} />
-        )}
-      />
-
-      {!!error && (
-        <ErrorText id={field.id}>
-          {(error.message as string) || 'required'}
-        </ErrorText>
-      )}
-    </Stack>
-  )
+  return <FormFieldComponent key={field.id} {...field} />
 }

@@ -11,24 +11,40 @@
 import React from 'react'
 import {
   InputField,
-  useFormContext,
   DateField as DateFieldComponent
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
 import { useIntl } from 'react-intl'
+import { useController } from 'react-hook-form'
 
-export const DateField = ({ id, label, options = {} }: FieldProps<'DATE'>) => {
+export const DateField = ({
+  id,
+  label,
+  options = {},
+  required
+}: FieldProps<'DATE'>) => {
   const intl = useIntl()
-  const { setValue, watch } = useFormContext()
-  const value = watch(id)
+  const {
+    field,
+    fieldState: { isTouched, error }
+  } = useController({
+    name: id,
+    rules: { required: '[not i18n yet..]: This field is required' }
+  })
 
   return (
-    <InputField id={id} touched={false} label={intl.formatMessage(label)}>
+    <InputField
+      id={id}
+      touched={isTouched}
+      label={intl.formatMessage(label)}
+      error={error?.message}
+    >
       <DateFieldComponent
         id={id}
         notice={options.notice && intl.formatMessage(options.notice)}
-        onChange={(val) => setValue(id, val)}
-        value={value}
+        onChange={(val) => field.onChange(val)}
+        value={field.value}
+        onBlur={field.onBlur}
       />
     </InputField>
   )

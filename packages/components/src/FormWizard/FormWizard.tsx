@@ -13,6 +13,7 @@ import { Field, ComponentsMap, FormFieldRenderer } from './FormFieldRenderer'
 import { FieldValues, FormProvider, useForm } from 'react-hook-form'
 import { flatten } from './flatten-object'
 import { Button } from '../Button'
+import { Stack } from '@opencrvs/components'
 
 /**
  * Definition of a page of the form wizard
@@ -45,7 +46,7 @@ export const FormWizard = <CM extends ComponentsMap>({
   onNextPage,
   onSubmit
 }: FormWizardProps<CM>) => {
-  const form = useForm({ defaultValues })
+  const form = useForm({ defaultValues, mode: 'onBlur' })
 
   const page = pages[currentPage]
 
@@ -63,28 +64,24 @@ export const FormWizard = <CM extends ComponentsMap>({
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(flatOnSubmit)}>
-        {/* NOTE: This was brought up to the same level as the Form.
-        Otherwise react do not notice the difference between pages and sets applicant's name as recommender's.
-        We might need to have index for all, since the index fallback is not unique across pages.
-        */}
-        {page.fields.map((field) => {
-          return (
+        <Stack direction="column" gap={16} alignItems="stretch">
+          {page.fields.map((field) => (
             <FormFieldRenderer
               key={field.id}
               field={field}
               components={components}
             />
-          )
-        })}
+          ))}
 
-        {onNextPage ? (
-          <Button type="primary" onClick={onNextPage}>
-            Continue
-          </Button>
-        ) : (
-          // Initial simple submit for testing
-          <Button type="primary">Submit</Button>
-        )}
+          {onNextPage ? (
+            <Button type="primary" onClick={onNextPage}>
+              Continue
+            </Button>
+          ) : (
+            // Initial simple submit for testing
+            <Button type="primary">Submit</Button>
+          )}
+        </Stack>
       </form>
     </FormProvider>
   )
