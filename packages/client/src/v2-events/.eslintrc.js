@@ -17,7 +17,8 @@ module.exports = {
           '@client/*',
           '!@client/v2-events',
           '!@client/components',
-          '!@client/utils'
+          '!@client/utils',
+          '!@client/navigation'
         ]
       }
     ]

@@ -79,13 +79,6 @@ export const tennisClubMembershipEvent = defineConfig({
                     defaultMessage: "Applicant's date of birth",
                     description: 'This is the label for the field',
                     id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
-                  },
-                  options: {
-                    notice: {
-                      id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.notice',
-                      defaultMessage: 'This is the notice for the field',
-                      description: 'This is the description for the notice'
-                    }
                   }
                 }
               ]

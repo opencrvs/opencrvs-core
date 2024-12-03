@@ -19,7 +19,7 @@ import {
   FormWizard
 } from '@opencrvs/components'
 import React from 'react'
-import { useEvent } from './useEvent'
+import { useEventConfiguration } from './useEventConfiguration'
 import { useParams } from 'react-router-dom'
 import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons/client'
@@ -33,7 +33,7 @@ import {
 export function EventFormWizardIndex() {
   const { eventType } = useParams<{ eventType: string }>()
 
-  const { event, isLoading } = useEvent(eventType)
+  const { event, isLoading } = useEventConfiguration(eventType)
 
   if (isLoading) {
     return <div>Loading...</div>

@@ -11,12 +11,27 @@
 import { trpc } from '@client/v2-events/trcp'
 
 /**
- * Fetches configures events and finds a matching event
+ * Fetches configured events and finds a matching event
+ * @returns a list of event configurations
+ */
+export function useEventConfigurations() {
+  const res = trpc.config.get.useQuery()
+  const { failureReason } = res
+  if (failureReason) {
+    // eslint-disable-next-line no-console
+    console.error(failureReason?.data?.stack)
+  }
+
+  return res
+}
+
+/**
+ * Fetches configured events and finds a matching event
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
  * @returns event configuration
  */
-export function useEvent(eventIdentifier: string) {
-  const hook = trpc.config.get.useQuery()
+export function useEventConfiguration(eventIdentifier: string) {
+  const hook = useEventConfigurations()
   const { error, data, isFetching } = hook
 
   const event = data?.find((event) => event.id === eventIdentifier)
