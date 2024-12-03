@@ -19,6 +19,7 @@ import {
 import { IAdvancedSearchParam } from '@search/features/search/types'
 import { transformDeprecatedParamsToSupported } from './deprecation-support'
 import { resolveLocationChildren } from './location'
+import { UUID } from '@opencrvs/commons'
 
 export async function advancedQueryBuilder(
   params: IAdvancedSearchParam,
@@ -28,14 +29,6 @@ export async function advancedQueryBuilder(
   params = transformDeprecatedParamsToSupported(params)
 
   const must: any[] = []
-
-  if (params.event && params.event.length > 0) {
-    must.push({
-      terms: {
-        'event.keyword': params.event
-      }
-    })
-  }
 
   if (params.name) {
     must.push({
@@ -64,6 +57,114 @@ export async function advancedQueryBuilder(
           'witnessTwoFamilyName'
         ],
         fuzziness: 'AUTO'
+      }
+    })
+  }
+
+  if (
+    params.birthJurisdictionId ||
+    params.deathJurisdictionId ||
+    params.marriageJurisdictionId
+  ) {
+    let leafLevelJurisdictionIds: UUID[] = []
+
+    if (
+      params.birthJurisdictionId ||
+      params.deathJurisdictionId ||
+      params.marriageJurisdictionId
+    ) {
+      const jurisdictionId: UUID | null =
+        params.birthJurisdictionId ??
+        params.deathJurisdictionId ??
+        params.marriageJurisdictionId ??
+        null
+
+      if (jurisdictionId) {
+        leafLevelJurisdictionIds = await resolveLocationChildren(jurisdictionId)
+      }
+    }
+
+    const shouldConditions: any[] = []
+
+    if (params.birthJurisdictionId) {
+      shouldConditions.push({
+        bool: {
+          must: [
+            {
+              terms: {
+                'event.keyword': ['birth']
+              }
+            },
+            {
+              terms: {
+                'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
+              }
+            }
+          ]
+        }
+      })
+    } else if (params.event?.includes('birth')) {
+      shouldConditions.push({
+        terms: {
+          'event.keyword': ['birth']
+        }
+      })
+    }
+
+    if (params.deathJurisdictionId) {
+      shouldConditions.push({
+        bool: {
+          must: [
+            {
+              terms: {
+                'event.keyword': ['death']
+              }
+            },
+            {
+              terms: {
+                'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
+              }
+            }
+          ]
+        }
+      })
+    } else if (params.event?.includes('death')) {
+      shouldConditions.push({
+        terms: {
+          'event.keyword': ['death']
+        }
+      })
+    }
+
+    if (params.marriageJurisdictionId) {
+      shouldConditions.push({
+        bool: {
+          must: [
+            {
+              terms: {
+                'event.keyword': ['marriage']
+              }
+            },
+            {
+              terms: {
+                'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
+              }
+            }
+          ]
+        }
+      })
+    } else if (params.event?.includes('marriage')) {
+      shouldConditions.push({
+        terms: {
+          'event.keyword': ['marriage']
+        }
+      })
+    }
+
+    must.push({
+      bool: {
+        should: shouldConditions,
+        minimum_should_match: 1
       }
     })
   }

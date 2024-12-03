@@ -21,6 +21,7 @@ import {
   Scope,
   SCOPES
 } from '@opencrvs/commons/authentication'
+import { IUserModelData } from '@gateway/features/user/type-resolvers'
 
 export interface ISearchCriteria {
   parameters: GQLAdvancedSearchParametersInput
@@ -51,12 +52,43 @@ export const postAdvancedSearch = async (
   }
 }
 
-const addEventParamForScope = (
+const addJurisdictionIdParamWithScopes = (
+  currentScopes: Scope[],
+  searchParams: Omit<GQLAdvancedSearchParametersInput, 'event'> & {
+    event?: GQLEventType[]
+    birthJurisdictionId?: string
+    deathJurisdictionId?: string
+    marriageJurisdictionId?: string
+  },
+  user: IUserModelData
+) => {
+  if (
+    searchParams.event &&
+    (searchParams.declarationJurisdictionId ||
+      searchParams.declarationLocationId)
+  ) {
+  }
+
+  if (currentScopes.includes(SCOPES.SEARCH_BIRTH_MY_JURISDICTION)) {
+    searchParams.birthJurisdictionId = user.primaryOfficeId
+  }
+  if (currentScopes.includes(SCOPES.SEARCH_DEATH_MY_JURISDICTION)) {
+    searchParams.deathJurisdictionId = user.primaryOfficeId
+  }
+  if (currentScopes.includes(SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION)) {
+    searchParams.marriageJurisdictionId = user.primaryOfficeId
+  }
+}
+
+const addSearchParamForScope = (
   requiredScopes: Scope[],
   event: GQLEventType,
   tokenScopes: Scope[],
   filteredParams: Omit<GQLAdvancedSearchParametersInput, 'event'> & {
     event?: GQLEventType[]
+    birthJurisdictionId?: string
+    deathJurisdictionId?: string
+    marriageJurisdictionId?: string
   },
   searchParamEvent: GQLEventType | undefined
 ) => {
@@ -70,7 +102,8 @@ const addEventParamForScope = (
 
 export const filterSearchParamsWithScope = (
   token: string,
-  advancedSearchParameters: GQLAdvancedSearchParametersInput
+  advancedSearchParameters: GQLAdvancedSearchParametersInput,
+  user: IUserModelData
 ): Omit<
   GQLAdvancedSearchParametersInput,
   'event' & {
@@ -81,7 +114,7 @@ export const filterSearchParamsWithScope = (
     advancedSearchParameters
   const currentUserScopes = getTokenPayload(token).scope
 
-  addEventParamForScope(
+  addSearchParamForScope(
     [SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION],
     GQLEventType.birth,
     currentUserScopes,
@@ -89,7 +122,7 @@ export const filterSearchParamsWithScope = (
     searchParamEvent
   )
 
-  addEventParamForScope(
+  addSearchParamForScope(
     [SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION],
     GQLEventType.death,
     currentUserScopes,
@@ -97,13 +130,15 @@ export const filterSearchParamsWithScope = (
     searchParamEvent
   )
 
-  addEventParamForScope(
+  addSearchParamForScope(
     [SCOPES.SEARCH_MARRIAGE, SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION],
     GQLEventType.marriage,
     currentUserScopes,
     filteredParams,
     searchParamEvent
   )
+
+  addJurisdictionIdParamWithScopes(currentUserScopes, filteredParams, user)
 
   return filteredParams
 }

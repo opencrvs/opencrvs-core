@@ -84,7 +84,7 @@ export const resolvers: GQLResolver = {
         sort = 'desc',
         sortBy
       },
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) {
       if (
         !inScope(authHeader, [
@@ -101,9 +101,13 @@ export const resolvers: GQLResolver = {
           results: []
         }
 
+      const userIdentifier = getTokenPayload(authHeader.Authorization).sub
+      const user = await dataSources.usersAPI.getUserById(userIdentifier!)
+
       const filteredSearchParamsWithScopes = filterSearchParamsWithScope(
         authHeader.Authorization,
-        advancedSearchParameters
+        advancedSearchParameters,
+        user
       )
 
       const searchCriteria: ISearchCriteria = {

@@ -92,6 +92,9 @@ export interface IAdvancedSearchParam {
   brideDoBEnd?: string
   brideIdentifier?: string
   dateOfMarriage?: string
+  birthJurisdictionId?: UUID
+  deathJurisdictionId?: UUID
+  marriageJurisdictionId?: UUID
 }
 
 export interface ISearchCriteria {

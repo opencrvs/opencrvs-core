@@ -23,7 +23,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
-import { getUserLocation, UserDetails } from '@client/utils/userUtils'
+import { UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import type {
   GQLEventSearchResultSet,
@@ -348,10 +348,7 @@ async function getWorkqueueData(
   userDetails: UserDetails,
   workqueuePaginationParams: IWorkqueuePaginationParams
 ) {
-  const registrationLocationId =
-    (userDetails && getUserLocation(userDetails).id) || ''
-
-  const scope = getScope(state)
+  const scope = getScope(state)!
   const reviewStatuses =
     scope && scope.includes(SCOPES.RECORD_REGISTER)
       ? [
@@ -374,7 +371,6 @@ async function getWorkqueueData(
   } = workqueuePaginationParams
 
   const result = await syncRegistrarWorkqueue(
-    registrationLocationId,
     reviewStatuses,
     pageSize,
     inProgressSkip,
