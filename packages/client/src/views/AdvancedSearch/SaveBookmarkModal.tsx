@@ -59,13 +59,11 @@ export function BookmarkAdvancedSearchModal({
   const { searchId, bookmarkName, ...advancedSearchParams } = useSelector(
     getAdvancedSearchParamsState
   )
-  delete advancedSearchParams.bookmarkName
   //remove null and empty properties
   const filteredAdvancedSearchParams = omitBy(
     advancedSearchParams,
     (properties) => properties === null || properties === EMPTY_STRING
   ) as AdvancedSearchParametersInput
-
   const [queryName, setQueryName] = React.useState('')
   const onChangeQueryName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
