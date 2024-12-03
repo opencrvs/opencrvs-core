@@ -35,7 +35,7 @@ const DateField = z
       .object({
         notice: TranslationConfig.describe(
           'Text to display above the date input'
-        )
+        ).optional()
       })
       .optional()
   })
