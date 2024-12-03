@@ -9,4 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export function noop() {}
+export type Noop = () => void
+
+export const noop: Noop = () => {}

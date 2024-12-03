@@ -8,6 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export type Noop = () => void
+import { useState } from 'react'
 
-export const noop: Noop = () => {}
+// TODO: Paginate with react-router-dom
+export const usePagination = (
+  /** Amount of pages to iterate through */
+  pages: number
+) => {
+  const [page, setPage] = useState(0)
+
+  const next = page < pages - 1 ? () => setPage(page + 1) : undefined
+  const previous = page > 0 ? () => setPage(page - 1) : undefined
+
+  return {
+    /** Page number between 0 and pages - 1 */
+    page,
+    next,
+    previous
+  }
+}

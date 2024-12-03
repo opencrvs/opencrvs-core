@@ -8,4 +8,4 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const V2_ROOT_ROUTE = '/v2'
+export * from '@opencrvs/commons/events'

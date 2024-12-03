@@ -76,7 +76,7 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { messages as reviewMessages } from '@client/i18n/messages/views/review'
 import { Checkbox, Stack } from '@opencrvs/components/lib'
 import { printRecordMessages } from '@client/i18n/messages/views/printRecord'
-import { Event, History, RegStatus } from '@client/utils/gateway'
+import { EventType, History, RegStatus } from '@client/utils/gateway'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -828,7 +828,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     offlineCountryConfiguration
   ).filter((sec) => sec.items.length > 0)
   function renderSignatureBox() {
-    if (props.declaration.event === Event.Marriage) {
+    if (props.declaration.event === EventType.Marriage) {
       return (
         <StyledStack>
           <StyledStack direction="column">
@@ -950,7 +950,7 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
           .filter(({ id }) => id === 'informant')
           .map((section, idx) => {
             const items =
-              props.declaration.event === Event.Marriage
+              props.declaration.event === EventType.Marriage
                 ? [
                     ...section.items.map((item) => ({
                       data: [

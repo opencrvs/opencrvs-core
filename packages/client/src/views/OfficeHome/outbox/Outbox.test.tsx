@@ -23,7 +23,7 @@ import {
   createTestStore,
   mockDeclarationData
 } from '@client/tests/util'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Outbox } from './Outbox'
@@ -32,7 +32,7 @@ function storeOutboxDeclaration(
   store: AppStore,
   submissionStatus: SUBMISSION_STATUS
 ) {
-  const declaration = createDeclaration(Event.Birth, mockDeclarationData)
+  const declaration = createDeclaration(EventType.Birth, mockDeclarationData)
   declaration.submissionStatus = submissionStatus
   store.dispatch(storeDeclaration(declaration))
 }

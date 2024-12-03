@@ -8,4 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-declare module 'rc-menu'
+export * from './ActionConfig'
+export * from './EventConfig'
+export * from './FieldConfig'
+export * from './FormConfig'

@@ -12,17 +12,33 @@
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
+
 import {
-  ActionInput,
+  DeclareActionInput,
+  EventInput,
+  NotifyActionInput
+} from '@events/schema'
+import { getEventsConfig } from './service/config/config'
+import {
   addAction,
   createEvent,
-  EventInput,
   EventInputWithId,
   getEventById,
   patchEvent
 } from './service/events'
+import { EventConfig } from '@opencrvs/commons'
 
-export const t = initTRPC.create({
+const ContextSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    primaryOfficeId: z.string()
+  }),
+  token: z.string()
+})
+
+type Context = z.infer<typeof ContextSchema>
+
+export const t = initTRPC.context<Context>().create({
   transformer: superjson
 })
 
@@ -35,17 +51,20 @@ const publicProcedure = t.procedure
 export type AppRouter = typeof appRouter
 
 export const appRouter = router({
+  config: router({
+    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
+      return getEventsConfig(options.ctx.token)
+    })
+  }),
   event: router({
-    create: publicProcedure
-      .input(
-        z.object({
-          transactionId: z.string(),
-          event: EventInput
-        })
+    create: publicProcedure.input(EventInput).mutation(async (options) => {
+      return createEvent(
+        options.input,
+        options.ctx.user.id,
+        options.ctx.user.primaryOfficeId,
+        options.input.transactionId
       )
-      .mutation(async (options) => {
-        return createEvent(options.input.event, options.input.transactionId)
-      }),
+    }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
       return patchEvent(options.input)
     }),
@@ -53,16 +72,18 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      create: publicProcedure
-        .input(
-          z.object({
-            eventId: z.string(),
-            action: ActionInput
-          })
-        )
-        .mutation(async (options) => {
-          return addAction(options.input.eventId, options.input.action)
+      notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
         })
+      }),
+      declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
+        })
+      })
     })
   })
 })
