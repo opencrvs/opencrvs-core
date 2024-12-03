@@ -24,7 +24,7 @@ import {
   useIntl
 } from 'react-intl'
 import { useEventConfigurations } from './useEventConfiguration'
-import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from '@client/v2-events/routes'
+import { V2_ROOT_ROUTE, V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 
@@ -82,7 +82,7 @@ export const EventSelection = (props: IntlShapeProps) => {
     }
 
     history.push(
-      formatUrl(V2_EVENT_ROUTE, {
+      formatUrl(V2_CREATE_EVENT_ROUTE, {
         eventType
       })
     )
@@ -121,18 +121,6 @@ export const EventSelection = (props: IntlShapeProps) => {
       <Content
         size={ContentSize.SMALL}
         title={intl.formatMessage(messages.registerNewEventHeading)}
-        bottomActionButtons={[
-          <Button
-            key="select-vital-event-continue"
-            id="continue"
-            type="primary"
-            size="large"
-            fullWidth
-            onClick={handleContinue}
-          >
-            {intl.formatMessage(messages.continueButton)}
-          </Button>
-        ]}
       >
         {noEventSelectedError && (
           <ErrorText id="require-error">
@@ -143,7 +131,6 @@ export const EventSelection = (props: IntlShapeProps) => {
           id="select_vital_event_view"
           direction="column"
           alignItems="left"
-          gap={0}
         >
           {events.data?.map((event) => (
             <RadioButton
@@ -160,6 +147,17 @@ export const EventSelection = (props: IntlShapeProps) => {
               }}
             />
           ))}
+
+          <Button
+            key="select-vital-event-continue"
+            id="continue"
+            type="primary"
+            size="large"
+            fullWidth
+            onClick={handleContinue}
+          >
+            {intl.formatMessage(messages.continueButton)}
+          </Button>
         </Stack>
       </Content>
     </Frame>
