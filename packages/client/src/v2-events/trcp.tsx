@@ -17,49 +17,41 @@ import {
   type PersistedClient,
   type Persister
 } from '@tanstack/react-query-persist-client'
-import { httpBatchLink, loggerLink } from '@trpc/client'
-import { createTRPCReact } from '@trpc/react-query'
-import React from 'react'
+import { httpLink, loggerLink } from '@trpc/client'
+import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
+import React, { useEffect } from 'react'
 import superjson from 'superjson'
+import { preloadData } from './features/events/useEvents'
 
-let queryClient: QueryClient
-let trpcClient: ReturnType<typeof api.createClient>
+export const api = createTRPCReact<AppRouter>()
 
 const getTrpcClient = () => {
-  if (!trpcClient) {
-    trpcClient = api.createClient({
-      links: [
-        loggerLink({
-          enabled: (op) =>
-            process.env.NODE_ENV === 'development' ||
-            (op.direction === 'down' && op.result instanceof Error)
-        }),
-        httpBatchLink({
-          url: '/api/events',
-          transformer: superjson,
-          async headers() {
-            return {
-              authorization: `Bearer ${getToken()}`
-            }
+  return api.createClient({
+    links: [
+      httpLink({
+        url: '/api/events',
+        transformer: superjson,
+        async headers() {
+          return {
+            authorization: `Bearer ${getToken()}`
           }
-        })
-      ]
-    })
-  }
-
-  return trpcClient
+        }
+      }),
+      loggerLink({
+        enabled: (op) =>
+          process.env.NODE_ENV === 'development' ||
+          (op.direction === 'down' && op.result instanceof Error)
+      })
+    ]
+  })
 }
 
 const getQueryClient = () => {
-  if (!queryClient) {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {}
-      }
-    })
-  }
-
-  return queryClient
+  return new QueryClient({
+    defaultOptions: {
+      queries: {}
+    }
+  })
 }
 
 function createIDBPersister(idbValidKey = 'reactQuery') {
@@ -76,12 +68,18 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
   } satisfies Persister
 }
 
-export const api = createTRPCReact<AppRouter>()
+const trpcClient = getTrpcClient()
+const queryClient = getQueryClient()
+
+export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
+
 const persister = createIDBPersister()
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const trpcClient = getTrpcClient()
-  const queryClient = getQueryClient()
+  useEffect(() => {
+    preloadData()
+  }, [])
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
