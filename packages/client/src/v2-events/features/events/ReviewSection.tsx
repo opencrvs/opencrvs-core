@@ -31,15 +31,6 @@ import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons'
 // @ToDO: Fix import
 
-export const RequiredField = styled.span`
-  color: ${({ theme }) => theme.colors.negative};
-  display: inline-block;
-  text-transform: lowercase;
-
-  &::first-letter {
-    text-transform: uppercase;
-  }
-`
 const Row = styled.div<{
   position?: 'left' | 'center'
   background?: 'white' | 'background'
@@ -56,6 +47,13 @@ const Row = styled.div<{
   padding: 24px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
+  }
+`
+const RightColumn = styled.div`
+  width: 40%;
+  border-radius: 4px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
   }
 `
 const LeftColumn = styled.div`
@@ -110,8 +108,7 @@ const getValueFromFieldId = (declaration: any, fieldId: any) =>
   fieldId.split('.').reduce((acc: any, part: any) => acc?.[part], declaration)
 
 const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
-  const { title, pages, exit, saveAndExit, previous, next, currentPageIndex } =
-    useEventForm(event)
+  const { title, pages, exit, saveAndExit } = useEventForm(event)
   const offlineCountryConfig = useSelector(getOfflineData)
 
   const goBackToForm = (
@@ -201,7 +198,9 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
               </ReviewContainter>
             </FormData>
           </Card>
+          <ReviewActionComponent />
         </LeftColumn>
+        <RightColumn></RightColumn>
       </Row>
     </Frame>
   )
@@ -214,4 +213,99 @@ export const ReviewSection = () => {
   if (isLoading) return <div>Loading...</div>
   if (!event) return <div>Failed to get event</div>
   return <ReviewSectionComponent event={event}></ReviewSectionComponent>
+}
+
+const Container = styled.div`
+  position: relative;
+  margin-top: 48px;
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    max-width: 100vw;
+  }
+`
+const Content = styled.div`
+  z-index: 1;
+  padding: 32px;
+  position: relative;
+  white-space: pre-wrap;
+  color: ${({ theme }) => theme.colors.copy};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px;
+    padding-bottom: 32px;
+  }
+`
+const UnderLayBackground = styled.div<{ background: string }>`
+  background-color: ${({ background, theme }) =>
+    background === 'success'
+      ? theme.colors.greenLighter
+      : background === 'error'
+      ? theme.colors.redLighter
+      : theme.colors.greenLighter};
+  /* position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; */
+`
+
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.h2}
+  margin-bottom: 12px;
+`
+const Description = styled.div`
+  ${({ theme }) => theme.fonts.reg18};
+  margin-bottom: 32px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.reg16}
+  }
+`
+
+const ActionContainer = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+
+  button:first-child {
+    margin-right: 16px;
+  }
+
+  & > button {
+    margin-bottom: 8px;
+  }
+`
+
+const ReviewActionComponent = () => {
+  return (
+    <Container>
+      <UnderLayBackground background="success">
+        <Content>
+          <Title>Register member</Title>
+          <Description>
+            By clicking register, you confirm that the information entered is
+            correct and the member can be registered.
+          </Description>
+          <ActionContainer>
+            <Button
+              type="positive"
+              size="large"
+              id="validateDeclarationBtn"
+              onClick={() => alert('Regstered')}
+            >
+              <Icon name="Check" />
+              Register
+            </Button>
+            <Button
+              type="negative"
+              size="large"
+              id="rejectDeclarationBtn"
+              onClick={() => alert('Rejected')}
+            >
+              <Icon name="X" />
+              Reject
+            </Button>
+          </ActionContainer>
+        </Content>
+      </UnderLayBackground>
+    </Container>
+  )
 }
