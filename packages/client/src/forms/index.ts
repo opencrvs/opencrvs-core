@@ -731,7 +731,7 @@ export interface IRedirectFormField extends IFormFieldBase {
   type: typeof REDIRECT
   options: {
     url: string
-    callback?: {
+    callback: {
       trigger: string
       params: Record<string, string>
     }
@@ -1242,11 +1242,11 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
+export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   type: typeof REDIRECT
   options: {
     url: string
-    callback?: {
+    callback: {
       trigger: string
       params: Record<string, string>
     }
