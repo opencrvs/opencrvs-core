@@ -18,11 +18,7 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
-import {
-  WrappedComponentProps as IntlShapeProps,
-  defineMessages,
-  useIntl
-} from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useEventConfigurations } from './useEventConfiguration'
 import { V2_ROOT_ROUTE, V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'
