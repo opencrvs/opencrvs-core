@@ -105,16 +105,6 @@ export function generatePerformanceHomeUrl({
   }
 }
 
-// @TODO: Check if format url does anything
-// export function goToAdvancedSearchResult(mobile?: boolean) {
-//   return push(formatUrl(ADVANCED_SEARCH_RESULT, {}))
-// }
-
-// @TODO: Delete after test
-// export function goToSearch() {
-//   return push(SEARCH)
-// }
-
 export const generatePrintCertificateUrl = ({
   registrationId,
   event,
@@ -246,6 +236,7 @@ export const generateCompletenessRatesUrl = ({
   time?: CompletenessRateTime
 }) =>
   formatUrl(EVENT_COMPLETENESS_RATES, { eventType }) +
+  '?' +
   stringify(
     locationId
       ? {

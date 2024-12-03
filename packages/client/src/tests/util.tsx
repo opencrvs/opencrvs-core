@@ -8,57 +8,57 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { App } from '@client/App'
-import { EventType, SystemRoleType, Status } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getReviewForm } from '@client/forms/register/review-selectors'
-import { offlineDataReady, setOfflineData } from '@client/offline/actions'
-import { AppStore, createStore, IStoreState } from '@client/store'
-import { ThemeProvider } from 'styled-components'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { join } from 'path'
 import {
-  configure,
-  mount,
-  ReactWrapper,
-  shallow,
-  MountRendererProps
-} from 'enzyme'
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-import { readFileSync } from 'fs'
-import { graphql, print } from 'graphql'
-import * as jwt from 'jsonwebtoken'
-import * as React from 'react'
-import {
-  ApolloProvider,
-  NetworkStatus,
   ApolloClient,
-  InMemoryCache,
   ApolloLink,
+  ApolloProvider,
+  InMemoryCache,
+  NetworkStatus,
   Observable
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
+import { App, routesConfig } from '@client/App'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
+import { offlineDataReady, setOfflineData } from '@client/offline/actions'
+import { setUserDetails } from '@client/profile/profileActions'
+import { AppStore, createStore, IStoreState } from '@client/store'
+import { getSchema } from '@client/tests/graphql-schema-mock'
+import { EventType, Status, SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import {
+  configure,
+  mount,
+  MountRendererProps,
+  ReactWrapper,
+  shallow
+} from 'enzyme'
+import { readFileSync } from 'fs'
+import { graphql, print } from 'graphql'
+import { createLocation, createMemoryHistory } from 'history'
+import * as jwt from 'jsonwebtoken'
+import { join } from 'path'
+import { stringify } from 'query-string'
+import * as React from 'react'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
+import { ThemeProvider } from 'styled-components'
 import { waitForElement } from './wait-for-element'
-import { setUserDetails } from '@client/profile/profileActions'
-import { createLocation, createMemoryHistory, History } from 'history'
-import { stringify } from 'query-string'
 
-import { ConnectedRouter } from 'connected-react-router'
-import { mockOfflineData } from './mock-offline-data'
-import { Section, SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '@client/declarations'
-import { vi } from 'vitest'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { draftToGqlTransformer } from '@client/transformer'
+import { Section, SubmissionAction } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+import { getSystemRolesQuery } from '@client/forms/user/query/queries'
+import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { vi } from 'vitest'
+import { mockOfflineData } from './mock-offline-data'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -144,17 +144,20 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilOfflineCountryConfigLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true },
+  initialEntries?: string[]
 ) {
-  const { store, history } = await createTestStore()
+  const { store } = await createTestStore()
+  const router = createMemoryRouter(routesConfig, { initialEntries })
+
   const app = mount(
-    <App store={store} history={history} client={createGraphQLClient()} />
+    <App store={store} router={router} client={createGraphQLClient()} />
   )
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
-  return { history, app, store }
+  return { app, store, router }
 }
 
 interface ITestView {
@@ -847,24 +850,37 @@ export const mockOfflineDataDispatch = {
 }
 
 export async function createTestStore() {
-  const { store, history } = createStore()
+  const { store } = createStore()
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
-  return { store, history }
+  return { store }
 }
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {
     store,
-    history,
     graphqlMocks,
-    apolloClient
+    apolloClient,
+    initialEntries,
+    path = '*'
   }: {
     store: AppStore
-    history: History
     graphqlMocks?: MockedProvider['props']['mocks']
     apolloClient?: ApolloClient<any>
+    initialEntries?:
+      | string[]
+      | {
+          pathname: string
+          state: Record<
+            string,
+            | string
+            | boolean
+            | number
+            | Record<string, string | boolean | number>
+          >
+        }[]
+    path?: string
   },
   options?: MountRendererProps
 ) {
@@ -889,22 +905,38 @@ export async function createTestComponent(
       </MockedProvider>
     )
   }
+  const router = createMemoryRouter(
+    [
+      {
+        path,
+        element: node
+      }
+    ],
+    { initialEntries }
+  )
 
-  function PropProxy(props: Record<string, any>) {
+  function PropProxy() {
     return withGraphQL(
       <Provider store={store}>
-        <ConnectedRouter noInitialPop={true} history={history}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
-              <node.type {...node.props} {...props} />
-            </ThemeProvider>
-          </I18nContainer>
-        </ConnectedRouter>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </I18nContainer>
       </Provider>
     )
   }
 
-  return mount(<PropProxy {...node.props} />, options)
+  return { component: mount(<PropProxy />, options), router }
+}
+
+/**
+ * Create a test component with the given node and store.
+ * Returns component route
+ */
+export type TestComponentWithRouteMock = {
+  component: ReactWrapper<{}, {}>
+  router: Awaited<ReturnType<typeof createTestComponent>>['router']
 }
 
 export const getFileFromBase64String = (
@@ -959,6 +991,11 @@ export async function goToFatherSection(component: ReactWrapper) {
 export async function goToMotherSection(component: ReactWrapper) {
   await goToSection(component, 2)
   await waitForElement(component, '#form_section_id_mother-view-group')
+}
+
+export async function goToChildSection(component: ReactWrapper) {
+  await goToSection(component, 1)
+  await waitForElement(component, '#form_section_id_child-view-group')
 }
 
 export async function getRegisterFormFromStore(
@@ -1065,7 +1102,7 @@ export function createRouterProps<
   if (search) {
     location.search = stringify(search)
   }
-  const match: Params = {
+  const match = {
     isExact: false,
     path,
     url: path,

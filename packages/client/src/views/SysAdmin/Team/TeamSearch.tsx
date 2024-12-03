@@ -28,7 +28,10 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 
@@ -66,7 +69,7 @@ const Text = styled.div`
 class TeamSearchComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    const historyState = props.router.location.state // @TODO: Check if this is true
+    const historyState = props.router.location.state
     this.state = {
       selectedLocation:
         (historyState && historyState?.selectedLocation) || undefined

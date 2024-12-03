@@ -33,7 +33,10 @@ import { IStoreState } from '@client/store'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { generateGoToHomeTabUrl } from '@client/navigation'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 interface IChildrenProps {
   toggleRejectModal: () => void

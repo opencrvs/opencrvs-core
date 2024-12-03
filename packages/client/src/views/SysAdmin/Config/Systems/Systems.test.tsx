@@ -19,8 +19,8 @@ import {
   selectOption
 } from '@client/tests/util'
 import { SystemList } from '@client/views/SysAdmin/Config/Systems/Systems'
-import { useParams } from 'react-router-dom'
-import { describe, Mock } from 'vitest'
+
+import { describe } from 'vitest'
 import {
   activateSystem,
   deactivateSystem,
@@ -34,13 +34,15 @@ describe('render system integration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
-    component = await createTestComponent(<SystemList />, {
-      store,
-      history
-    })
-    ;(useParams as Mock).mockImplementation(() => ({}))
+    const { component: testComponent } = await createTestComponent(
+      <SystemList />,
+      {
+        store
+      }
+    )
+    component = testComponent
   })
 
   it('Render system integrations properly ', async () => {
@@ -78,13 +80,16 @@ describe('render create system integrations', () => {
   ]
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
-    component = await createTestComponent(<SystemList />, {
-      store,
-      history,
-      graphqlMocks: mocks
-    })
+    const { component: testComponent } = await createTestComponent(
+      <SystemList />,
+      {
+        store,
+        graphqlMocks: mocks
+      }
+    )
+    component = testComponent
   })
 
   it('should show the system creation modal after click the create button', async () => {
@@ -164,13 +169,16 @@ describe('render create webhook system integrations', () => {
   ]
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
-    component = await createTestComponent(<SystemList />, {
-      store,
-      history,
-      graphqlMocks: mocks
-    })
+    const { component: testComponent } = await createTestComponent(
+      <SystemList />,
+      {
+        store,
+        graphqlMocks: mocks
+      }
+    )
+    component = testComponent
   })
 
   it('should show the system creation modal after click the create button', async () => {
@@ -234,7 +242,7 @@ describe('render toggle settings', () => {
 
   describe('delete system integration', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
 
@@ -258,11 +266,14 @@ describe('render toggle settings', () => {
         }
       ]
 
-      component = await createTestComponent(<SystemList />, {
-        store,
-        history,
-        graphqlMocks: mocks
-      })
+      const { component: testComponent } = await createTestComponent(
+        <SystemList />,
+        {
+          store,
+          graphqlMocks: mocks
+        }
+      )
+      component = testComponent
     })
 
     it('should delete system successfully', async () => {
@@ -288,7 +299,7 @@ describe('render toggle settings', () => {
 
   describe('deactivate system integration', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
 
@@ -312,11 +323,14 @@ describe('render toggle settings', () => {
         }
       ]
 
-      component = await createTestComponent(<SystemList />, {
-        store,
-        history,
-        graphqlMocks: mocks
-      })
+      const { component: testComponent } = await createTestComponent(
+        <SystemList />,
+        {
+          store,
+          graphqlMocks: mocks
+        }
+      )
+      component = testComponent
     })
 
     it('should deactivated system successfully', async () => {
@@ -344,7 +358,7 @@ describe('render toggle settings', () => {
 
   describe('active system integration', () => {
     beforeEach(async () => {
-      const { store, history } = createStore()
+      const { store } = createStore()
       store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
 
@@ -367,11 +381,14 @@ describe('render toggle settings', () => {
         }
       ]
 
-      component = await createTestComponent(<SystemList />, {
-        store,
-        history,
-        graphqlMocks: mocks
-      })
+      const { component: testComponent } = await createTestComponent(
+        <SystemList />,
+        {
+          store,
+          graphqlMocks: mocks
+        }
+      )
+      component = testComponent
     })
 
     it('should active system successfully', async () => {

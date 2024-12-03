@@ -29,7 +29,10 @@ import {
   createDeclaration
 } from '@client/declarations'
 
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 
 type DispatchProps = {

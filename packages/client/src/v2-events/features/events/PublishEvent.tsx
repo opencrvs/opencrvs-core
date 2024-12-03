@@ -23,8 +23,9 @@ import { useParams } from 'react-router-dom'
 
 export function PublishEvent() {
   const { eventType } = useParams<{ eventType: string }>()
-  const { title, exit, saveAndExit, previous, next, finish } =
-    useEvent(eventType)
+  const { title, exit, saveAndExit, previous, next, finish } = useEvent(
+    eventType!
+  )
 
   return (
     <Frame

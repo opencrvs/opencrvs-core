@@ -105,6 +105,7 @@ interface IUserFormDataSubmitAction {
     variables: { [key: string]: any }
     isUpdate: boolean
     officeLocationId: string
+    onSuccess: () => void
   }
 }
 
@@ -113,7 +114,8 @@ export function submitUserFormData(
   mutation: any,
   variables: { [key: string]: any },
   officeLocationId: string,
-  isUpdate = false
+  isUpdate = false,
+  onSuccess: () => void
 ): IUserFormDataSubmitAction {
   return {
     type: SUBMIT_USER_FORM_DATA,
@@ -122,7 +124,8 @@ export function submitUserFormData(
       mutation,
       variables,
       officeLocationId,
-      isUpdate
+      isUpdate,
+      onSuccess
     }
   }
 }
@@ -137,14 +140,19 @@ interface ISubmitSuccessAction {
   type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
   payload: {
     isUpdate: boolean
+    onSuccess: () => void
   }
 }
 
-export function submitSuccess(isUpdate = false): ISubmitSuccessAction {
+export function submitSuccess(
+  isUpdate: boolean,
+  onSuccess: () => void
+): ISubmitSuccessAction {
   return {
     type: SUBMIT_USER_FORM_DATA_SUCCESS,
     payload: {
-      isUpdate
+      isUpdate: !!isUpdate,
+      onSuccess
     }
   }
 }
@@ -356,7 +364,8 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               ]
             }),
           {
-            successActionCreator: () => submitSuccess(isUpdate),
+            successActionCreator: () =>
+              submitSuccess(isUpdate, action.payload.onSuccess),
             failActionCreator: submitFail
           }
         )
@@ -372,14 +381,18 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       )
 
     case SUBMIT_USER_FORM_DATA_SUCCESS:
-      const list = Cmd.list<ReturnType<typeof showSubmitFormSuccessToast>>([
+      const list = Cmd.list<
+        | ReturnType<typeof clearUserFormData>
+        | ReturnType<typeof showSubmitFormSuccessToast>
+      >([
         Cmd.action(
           showSubmitFormSuccessToast(
             action.payload.isUpdate
               ? TOAST_MESSAGES.UPDATE_SUCCESS
               : TOAST_MESSAGES.SUCCESS
           )
-        )
+        ),
+        Cmd.action(clearUserFormData())
       ])
 
       return loop({ ...state, submitting: false, submissionError: false }, list)

@@ -47,7 +47,10 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 

@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import {
-  RegisterForm,
-  RouteProps
-} from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
@@ -26,7 +23,10 @@ import { IForm } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 interface IFormProps {
   declaration?: IDeclaration
@@ -51,7 +51,7 @@ const DeclarationFormView = (props: RouteComponentProps<IFormProps>) => {
   return <RegisterForm declaration={declaration} {...rest} />
 }
 
-function mapStatetoProps(state: IStoreState, props: RouteProps) {
+function mapStatetoProps(state: IStoreState, props: RouteComponentProps) {
   const declaration = state.declarationsState.declarations.find(
     ({ id }) => id === props.router.params.declarationId
   )

@@ -106,7 +106,10 @@ import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { Text } from '@opencrvs/components/lib/Text'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'

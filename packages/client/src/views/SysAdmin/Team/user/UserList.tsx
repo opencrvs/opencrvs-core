@@ -615,17 +615,19 @@ function UserListComponent(props: IProps) {
   )
 
   function onChangeLocation() {
-    navigate(routes.TEAM_SEARCH, {
-      state: searchedLocation
-        ? {
-            selectedLocation: {
-              id: searchedLocation.id,
-              searchableText: searchedLocation?.name,
-              displayLabel: searchedLocation?.name
-            }
+    if (searchedLocation) {
+      navigate(routes.TEAM_SEARCH, {
+        state: {
+          selectedLocation: {
+            id: searchedLocation.id,
+            searchableText: searchedLocation?.name,
+            displayLabel: searchedLocation?.name
           }
-        : undefined
-    })
+        }
+      })
+    } else {
+      navigate(routes.TEAM_SEARCH)
+    }
   }
 
   const LocationButton = (

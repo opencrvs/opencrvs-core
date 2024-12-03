@@ -10,7 +10,10 @@
  */
 import * as React from 'react'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -90,6 +93,7 @@ class ReviewFormView extends React.Component<IProps> {
     }
   }
 }
+
 function getEvent(eventType: string) {
   switch (eventType && eventType.toLocaleLowerCase()) {
     case 'birth':
@@ -121,6 +125,7 @@ function mapStatetoProps(
   if (!match?.params?.event) {
     throw new Error('Event is not provided as path param')
   }
+
   const reviewFormState: IReviewFormState = getReviewForm(
     state
   ) as IReviewFormState
@@ -140,6 +145,8 @@ function mapStatetoProps(
   }
 }
 
-export const ReviewForm = connect<any, {}, any, IStoreState>(mapStatetoProps)(
-  injectIntl(withTheme(ReviewFormView))
+export const ReviewForm = withRouter(
+  connect<any, {}, any, IStoreState>(mapStatetoProps)(
+    injectIntl(withTheme(ReviewFormView))
+  )
 )

@@ -98,7 +98,10 @@ import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { ActionMenu } from './ActionMenu'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

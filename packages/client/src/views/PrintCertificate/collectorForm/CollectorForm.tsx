@@ -76,7 +76,10 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 import { UserDetails } from '@client/utils/userUtils'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;

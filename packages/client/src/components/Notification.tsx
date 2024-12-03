@@ -36,7 +36,7 @@ import {
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import * as routes from '@client/navigation/routes'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { RouteComponentProps, withRouter } from './withRouter'
+import { RouteComponentProps, withRouter } from './WithRouterProps'
 import { formatUrl } from '@client/navigation'
 
 type NotificationProps = ReturnType<typeof mapStateToProps> & {
