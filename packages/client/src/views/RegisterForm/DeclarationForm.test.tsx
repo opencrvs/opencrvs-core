@@ -38,13 +38,14 @@ import { createMemoryRouter } from 'react-router-dom'
 import { Store } from 'redux'
 import { Mock, vi } from 'vitest'
 
-describe('when user has starts a new declaration', () => {
+describe('when user starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {
     let draft: IDeclaration
     let app: ReactWrapper
     let store: Store
 
     beforeEach(async () => {
+      await flushPromises()
       const userData: IUserData[] = [
         {
           userID: userDetails.userMgntUserID,
@@ -100,6 +101,7 @@ describe('when user has starts a new declaration', () => {
     describe('when user is in birth registration by parent informant view', () => {
       let draft: IDeclaration
       beforeEach(async () => {
+        await flushPromises()
         const data = {
           registration: {
             informantType: {
@@ -326,6 +328,7 @@ describe('when user has starts a new declaration', () => {
       })
       describe('when user clicks the "father" page', () => {
         beforeEach(() => goToFatherSection(app))
+
         it('changes to the father details section', () => {
           expect(router.state.location.pathname).toContain('father')
         })

@@ -29,6 +29,7 @@ import { EventType } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { AdvancedSearchResult } from './AdvancedSearchResult'
+import { formatUrl } from '@client/navigation'
 
 const graphqlMock = [
   {
@@ -238,6 +239,8 @@ describe('AdvancedSearchResult Bookmark', () => {
   })
 
   it('should remove bookmark advanced search & show notification if click on confirm button', async () => {
+    await flushPromises()
+
     store.dispatch(
       setAdvancedSearchParam({
         ...advancedSearchInitialState,
