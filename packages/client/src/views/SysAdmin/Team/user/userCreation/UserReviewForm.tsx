@@ -40,20 +40,18 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { draftToGqlTransformer } from '@client/transformer'
 import {
-  clearUserFormData,
   modifyUserFormData,
-  submitFail,
-  submitSuccess
+  submitUserFormData
 } from '@client/user/userReducer'
 import { Action } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { SuccessButton, ICON_ALIGNMENT } from '@opencrvs/components/lib/buttons'
 import { Button } from '@opencrvs/components/lib/Button'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { ApolloClient, useMutation } from '@apollo/client'
+import { ApolloClient } from '@apollo/client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect, useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
@@ -72,11 +70,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
-import { useNavigate, useParams } from 'react-router-dom'
-import {
-  CreateOrUpdateUserMutation,
-  CreateOrUpdateUserMutationVariables
-} from '@client/utils/gateway'
+import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 
@@ -91,6 +85,7 @@ interface IDispatchProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
   modify: (values: IFormSectionData) => void
+  submitForm: (variables: Record<string, any>) => void
   userDetails: UserDetails | null
 }
 
@@ -129,34 +124,12 @@ const UserReviewFormComponent = ({
   formData,
   offlineCountryConfiguration,
   userId,
-  section
+  section,
+  submitForm
 }: IFullProps & IDispatchProps) => {
   const navigate = useNavigate()
 
-  const params = useParams()
-  const dispatch = useDispatch()
   const locationId = formData['registrationOffice']
-
-  const [createOrUpdateUser] = useMutation<
-    CreateOrUpdateUserMutation,
-    CreateOrUpdateUserMutationVariables
-  >(createOrUpdateUserMutation, {
-    onError(error, clientOptions) {
-      dispatch(submitFail(error))
-    },
-    onCompleted() {
-      dispatch(clearUserFormData)
-
-      navigate({
-        pathname: routes.TEAM_USER_LIST,
-        search: stringify({
-          locationId
-        })
-      })
-
-      dispatch(submitSuccess(Boolean(params.userId)))
-    }
-  })
 
   const getValue = (field: IFormField) => {
     if (field.type === LOCATION_SEARCH_INPUT) {
@@ -309,9 +282,7 @@ const UserReviewFormComponent = ({
       delete variables.user.signature.__typename //to fix updating registrar bug
     }
 
-    createOrUpdateUser({
-      variables: variables as CreateOrUpdateUserMutationVariables
-    })
+    submitForm(variables)
   }
 
   let title: string | undefined
@@ -412,8 +383,28 @@ const UserReviewFormComponent = ({
 }
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
+  const navigateToUserList = () =>
+    props.router.navigate({
+      pathname: routes.TEAM_USER_LIST,
+      search: stringify({
+        locationId: props.formData.registrationOffice as string
+      })
+    })
+
   return {
-    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values))
+    modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
+    submitForm: (variables: Record<string, any>) => {
+      dispatch(
+        submitUserFormData(
+          props.client,
+          createOrUpdateUserMutation,
+          variables,
+          props.formData.registrationOffice as string,
+          Boolean(props.router.match.params.userId), // to detect if update or create,
+          navigateToUserList
+        )
+      )
+    }
   }
 }
 export const UserReviewForm = withRouter(

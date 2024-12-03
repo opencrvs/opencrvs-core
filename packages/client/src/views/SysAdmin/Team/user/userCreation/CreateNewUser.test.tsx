@@ -261,9 +261,12 @@ describe('create new user tests', () => {
 
   describe('when user in review page', () => {
     beforeEach(async () => {
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
+
+      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       store.dispatch(modifyUserFormData(mockCompleteFormData))
+
+      await flushPromises()
       ;({ component: testComponent, router: testRouter } =
         await createTestComponent(<CreateNewUser />, {
           store,
@@ -454,16 +457,14 @@ describe('edit user tests', () => {
       expect(router.state.location.hash).toBe('#device')
     })
 
-    // @TODO: TAKE TEST BACK TO USE BEFORE MERGING
-    it.skip('clicking confirm button starts submitting the form', async () => {
-      await waitForElement(component, '#submit-edit-user-form')
-      component.update()
-
+    it('clicking confirm button starts submitting the form', async () => {
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
+
       submitButton.hostNodes().simulate('click')
+
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })

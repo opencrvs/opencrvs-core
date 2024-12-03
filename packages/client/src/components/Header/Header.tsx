@@ -50,7 +50,7 @@ import {
   withRouter
 } from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
+import { parse, stringify } from 'query-string'
 
 type IStateProps = {
   userDetails: UserDetails | null
@@ -140,9 +140,8 @@ const HeaderComponent = (props: IFullProps) => {
   } = props
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
-    const locationId = new URLSearchParams(router.location.search).get(
-      'locationId'
-    )
+    const locationId = parse(router.location.search).locationId as string
+
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [

@@ -133,6 +133,7 @@ describe('signature upload tests', () => {
 
   describe('when user in review page', () => {
     beforeEach(async () => {
+      await flushPromises()
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
       store.dispatch(rolesMessageAddData())
       ;({ component: testComponent } = await createTestComponent(
@@ -161,8 +162,7 @@ describe('signature upload tests', () => {
       )
     })
 
-    // @TODO: TAKE TEST BACK TO USE BEFORE MERGING
-    it.skip('clicking submit button submits the form data', async () => {
+    it('clicking submit button submits the form data', async () => {
       testComponent.update()
       testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
