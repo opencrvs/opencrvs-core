@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { EventConfig } from '@opencrvs/commons/client'
+
+/** @knipignore */
 export const tennisClubMembershipEvent = {
   id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {
@@ -126,4 +129,4 @@ export const tennisClubMembershipEvent = {
       ]
     }
   ]
-}
+} satisfies EventConfig

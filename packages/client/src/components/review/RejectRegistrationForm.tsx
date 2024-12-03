@@ -173,7 +173,7 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
               key="submit_archive"
               id="submit_archive"
               size="medium"
-              type="secondary_negative"
+              type="secondaryNegative"
               onClick={() => {
                 this.props.archiveDeclaration(
                   payload.id,
