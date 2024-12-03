@@ -144,7 +144,7 @@ interface ISubmitSuccessAction {
   }
 }
 
-export function submitSuccess(
+function submitSuccess(
   isUpdate: boolean,
   onSuccess: () => void
 ): ISubmitSuccessAction {
@@ -164,7 +164,7 @@ interface ISubmitFailedAction {
   }
 }
 
-export function submitFail(errorData: ApolloError): ISubmitFailedAction {
+function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
     type: SUBMIT_USER_FORM_DATA_FAIL,
     payload: {
@@ -392,6 +392,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               : TOAST_MESSAGES.SUCCESS
           )
         ),
+        Cmd.run(action.payload.onSuccess),
         Cmd.action(clearUserFormData())
       ])
 
