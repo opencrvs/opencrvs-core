@@ -54,7 +54,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { EventType } from '@client/utils/gateway'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const FABContainer = styled.div`
   position: fixed;

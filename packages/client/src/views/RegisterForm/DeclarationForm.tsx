@@ -23,7 +23,10 @@ import { IForm } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 interface IFormProps {
   declaration?: IDeclaration

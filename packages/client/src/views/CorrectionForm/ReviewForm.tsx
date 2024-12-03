@@ -18,7 +18,10 @@ import { connect } from 'react-redux'
 import { getEventReviewForm } from '@client/forms/register/review-selectors'
 import { EventType } from '@client/utils/gateway'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 type IStateProps = {
   declaration: IDeclaration | undefined

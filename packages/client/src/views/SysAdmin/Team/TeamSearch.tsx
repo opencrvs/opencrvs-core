@@ -28,7 +28,10 @@ import { NoWifi } from '@opencrvs/components/lib/icons'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 

@@ -10,7 +10,10 @@
  */
 import * as React from 'react'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'

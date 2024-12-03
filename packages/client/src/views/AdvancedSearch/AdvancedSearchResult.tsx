@@ -42,7 +42,10 @@ import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { ErrorText, Link, Pill } from '@client/../../components/lib'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import {

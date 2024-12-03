@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useEffect, ReactNode } from 'react'
-import { RouteComponentProps, withRouter } from './withRouter'
+import { RouteComponentProps, withRouter } from './WithRouterProps'
 
 type ScrollToTopProps = RouteComponentProps<{ children?: ReactNode }>
 

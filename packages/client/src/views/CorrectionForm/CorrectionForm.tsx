@@ -12,7 +12,10 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { Navigate } from 'react-router-dom'
-import { RouteComponentProps, withRouter } from '@client/components/withRouter'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
