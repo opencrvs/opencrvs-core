@@ -9,10 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { api } from '@client/v2-events/trcp'
+import { api, utils } from '@client/v2-events/trcp'
+
+export function preloadData() {
+  utils.config.get.ensureData()
+}
 
 export function useEvents() {
-  const createEvent = api.event.create
+  const createEvent = api.event.create.useMutation
 
   return {
     createEvent,
