@@ -305,6 +305,7 @@ export const routesConfig = [
         )
       },
       { path: routes.ISSUE_COLLECTOR, element: <IssueCertificate /> },
+      { path: routes.ISSUE_VERIFY_COLLECTOR, element: <VerifyCollector /> },
       { path: routes.ISSUE_CERTIFICATE_PAYMENT, element: <IssuePayment /> },
       { path: routes.PRINT_RECORD, element: <PrintRecord /> },
       {
@@ -354,6 +355,22 @@ export const routesConfig = [
       },
       {
         path: routes.CREATE_USER,
+        element: <CreateNewUser />
+      },
+      {
+        path: routes.CREATE_USER_ON_LOCATION,
+        element: <CreateNewUser />
+      },
+      {
+        path: routes.CREATE_USER_SECTION,
+        element: <CreateNewUser />
+      },
+      {
+        path: routes.REVIEW_USER_FORM,
+        element: <CreateNewUser />
+      },
+      {
+        path: routes.REVIEW_USER_DETAILS,
         element: <CreateNewUser />
       },
       { path: V2_ROOT_ROUTE, element: <Workqueues /> }
