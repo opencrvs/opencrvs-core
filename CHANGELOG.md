@@ -31,7 +31,7 @@
 
 ### Deprecated
 
-- `validator-api` & `age-verification-api` are deprecated and unused. Corresponding roles are removed from the `systemScopes` and also removed from the audience when creating the token [#7904](https://github.com/opencrvs/opencrvs-core/issues/7904)
+- `validator-api` & `age-verification-api` scopes are deprecated and unused. Corresponding scopes are removed from the `systemScopes` and also removed from the audience when creating the token [#7904](https://github.com/opencrvs/opencrvs-core/issues/7904)
 
 ## Bug fixes
 
