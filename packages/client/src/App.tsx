@@ -79,7 +79,7 @@ import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
 import { TRPCProvider } from './v2-events/trcp'
 import { EventSelection } from './v2-events/features/events/EventSelection'
-import ReviewSection from './v2-events/features/events/ReviewSection'
+import { ReviewSection } from './v2-events/features/events/ReviewSection'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>

@@ -10,15 +10,25 @@
  */
 
 import React from 'react'
-import {
-  tennisClubMemberDeclaration as declaration,
-  tennisClubMembershipEvent as event
-} from './fixtures'
+import { tennisClubMemberDeclaration as declaration } from './fixtures'
 import styled from 'styled-components'
-import { Accordion, Link, ListReview } from '@opencrvs/components'
+import {
+  Accordion,
+  AppBar,
+  Button,
+  Frame,
+  Icon,
+  Link,
+  ListReview,
+  Stack
+} from '@opencrvs/components'
 import { ReviewHeader } from '../../../views/RegisterForm/review/ReviewHeader'
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
+import { useParams } from 'react-router-dom'
+import { useEventConfiguration } from './useEventConfiguration'
+import { useEventForm } from './useEventForm'
+import { EventConfig } from '@opencrvs/commons'
 // @ToDO: Fix import
 
 export const RequiredField = styled.span`
@@ -48,8 +58,6 @@ const Row = styled.div<{
     padding: 0;
   }
 `
-const Wrapper = styled.div``
-
 const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
@@ -101,15 +109,41 @@ const DeclarationDataContainer = styled.div``
 const getValueFromFieldId = (declaration: any, fieldId: any) =>
   fieldId.split('.').reduce((acc: any, part: any) => acc?.[part], declaration)
 
-const ReviewSection = () => {
-  const { action } = declaration
+const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
+  const { title, pages, exit, saveAndExit, previous, next, currentPageIndex } =
+    useEventForm(event)
   const offlineCountryConfig = useSelector(getOfflineData)
-  const forms = event.actions.filter(
-    (formAction) => formAction.type === action
-  )[0].forms
+
+  const goBackToForm = (
+    e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
+    fieldId: string
+  ) => {
+    e.stopPropagation()
+    alert('Going back to ' + fieldId)
+  }
 
   return (
-    <Wrapper>
+    <Frame
+      skipToContentText="Skip to form"
+      header={
+        <AppBar
+          mobileLeft={title}
+          desktopLeft={title}
+          desktopRight={
+            <Stack direction="row">
+              <Button type="primary" onClick={saveAndExit}>
+                <Icon name="DownloadSimple" />
+                Save and exit
+              </Button>
+              <Button type="secondary" onClick={exit}>
+                <Icon name="X" />
+                Exit
+              </Button>
+            </Stack>
+          }
+        />
+      }
+    >
       <Row>
         <LeftColumn>
           <Card>
@@ -125,51 +159,59 @@ const ReviewSection = () => {
               }
             />
             <FormData>
-              {forms.map((form) => {
-                return (
-                  <ReviewContainter key={form.label.defaultMessage}>
-                    {form.pages.map((page) => {
-                      return (
-                        <DeclarationDataContainer
-                          key={'Section_' + page.title.defaultMessage}
-                        >
-                          <Accordion
-                            name={page.title.defaultMessage}
-                            label={page.title.defaultMessage}
-                            labelForHideAction="Hide"
-                            labelForShowAction="Show"
-                            action={<Link>Change</Link>}
-                            expand={true}
-                          >
-                            <ListReview
-                              id={'Section_' + page.title.defaultMessage}
-                            >
-                              {page.fields.map((field, id) => (
-                                <ListReview.Row
-                                  id={id.toString()}
-                                  key={id}
-                                  label={field.label.defaultMessage}
-                                  value={getValueFromFieldId(
-                                    declaration,
-                                    field.id
-                                  )}
-                                  actions={<Link>Change</Link>}
-                                />
-                              ))}
-                            </ListReview>
-                          </Accordion>
-                        </DeclarationDataContainer>
-                      )
-                    })}
-                  </ReviewContainter>
-                )
-              })}
+              <ReviewContainter>
+                {pages.map((page) => {
+                  return (
+                    <DeclarationDataContainer
+                      key={'Section_' + page.title.defaultMessage}
+                    >
+                      <Accordion
+                        name={page.title.defaultMessage}
+                        label={page.title.defaultMessage}
+                        labelForHideAction="Hide"
+                        labelForShowAction="Show"
+                        action={
+                          <Link onClick={(e) => goBackToForm(e, page.id)}>
+                            Change
+                          </Link>
+                        }
+                        expand={true}
+                      >
+                        <ListReview id={'Section_' + page.title.defaultMessage}>
+                          {page.fields.map((field, id) => (
+                            <ListReview.Row
+                              id={id.toString()}
+                              key={id}
+                              label={field.label.defaultMessage}
+                              value={getValueFromFieldId(declaration, field.id)}
+                              actions={
+                                <Link
+                                  onClick={(e) => goBackToForm(e, field.id)}
+                                >
+                                  Change
+                                </Link>
+                              }
+                            />
+                          ))}
+                        </ListReview>
+                      </Accordion>
+                    </DeclarationDataContainer>
+                  )
+                })}
+              </ReviewContainter>
             </FormData>
           </Card>
         </LeftColumn>
       </Row>
-    </Wrapper>
+    </Frame>
   )
 }
 
-export default ReviewSection
+export const ReviewSection = () => {
+  const { eventType } = useParams<{ eventType: string }>()
+
+  const { event, isLoading } = useEventConfiguration(eventType)
+  if (isLoading) return <div>Loading...</div>
+  if (!event) return <div>Failed to get event</div>
+  return <ReviewSectionComponent event={event}></ReviewSectionComponent>
+}
