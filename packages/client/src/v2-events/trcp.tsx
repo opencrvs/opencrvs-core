@@ -8,23 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { createTRPCReact } from '@trpc/react-query'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { httpBatchLink } from '@trpc/client'
-import superjson from 'superjson'
-import type { AppRouter } from '@gateway/v2-events/events/router'
+import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
-
-export const trpc = createTRPCReact<AppRouter>()
+import type { AppRouter } from '@gateway/v2-events/events/router'
+import { QueryClient } from '@tanstack/react-query'
+import {
+  PersistQueryClientProvider,
+  type PersistedClient,
+  type Persister
+} from '@tanstack/react-query-persist-client'
+import { httpBatchLink, loggerLink } from '@trpc/client'
+import { createTRPCReact } from '@trpc/react-query'
+import React from 'react'
+import superjson from 'superjson'
 
 let queryClient: QueryClient
-let trpcClient: ReturnType<typeof trpc.createClient>
+let trpcClient: ReturnType<typeof api.createClient>
 
 const getTrpcClient = () => {
   if (!trpcClient) {
-    trpcClient = trpc.createClient({
+    trpcClient = api.createClient({
       links: [
+        loggerLink({
+          enabled: (op) =>
+            process.env.NODE_ENV === 'development' ||
+            (op.direction === 'down' && op.result instanceof Error)
+        }),
         httpBatchLink({
           url: '/api/events',
           transformer: superjson,
@@ -43,18 +52,48 @@ const getTrpcClient = () => {
 
 const getQueryClient = () => {
   if (!queryClient) {
-    queryClient = new QueryClient()
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {}
+      }
+    })
   }
 
   return queryClient
 }
 
+function createIDBPersister(idbValidKey = 'reactQuery') {
+  return {
+    persistClient: async (client: PersistedClient) => {
+      await storage.setItem(idbValidKey, client)
+    },
+    restoreClient: async () => {
+      return (await storage.getItem<PersistedClient>(idbValidKey)) || undefined
+    },
+    removeClient: async () => {
+      await storage.removeItem(idbValidKey)
+    }
+  } satisfies Persister
+}
+
+export const api = createTRPCReact<AppRouter>()
+const persister = createIDBPersister()
+
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const trpcClient = getTrpcClient()
   const queryClient = getQueryClient()
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </trpc.Provider>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        maxAge: 1000 * 60 * 60 * 4,
+        buster: 'persisted-indexed-db'
+      }}
+    >
+      <api.Provider client={trpcClient} queryClient={queryClient}>
+        {children}
+      </api.Provider>
+    </PersistQueryClientProvider>
   )
 }

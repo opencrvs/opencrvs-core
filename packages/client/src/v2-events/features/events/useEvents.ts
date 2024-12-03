@@ -8,20 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-module.exports = {
-  rules: {
-    'no-restricted-imports': [
-      'error',
-      {
-        patterns: [
-          '@client/*',
-          '!@client/v2-events',
-          '!@client/components',
-          '!@client/utils',
-          '!@client/navigation',
-          '!@client/storage'
-        ]
-      }
-    ]
+
+import { api } from '@client/v2-events/trcp'
+
+export function useEvents() {
+  const createEvent = api.event.create
+
+  return {
+    createEvent,
+    actions: {
+      declare: api.event.actions.declare
+    }
   }
 }

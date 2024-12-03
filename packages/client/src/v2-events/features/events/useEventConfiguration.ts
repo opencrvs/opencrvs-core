@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { trpc } from '@client/v2-events/trcp'
+import { api } from '@client/v2-events/trcp'
 
 /**
  * Fetches configured events and finds a matching event
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
-  const res = trpc.config.get.useQuery()
+  const res = api.config.get.useQuery()
   const { failureReason } = res
   if (failureReason) {
     // eslint-disable-next-line no-console
