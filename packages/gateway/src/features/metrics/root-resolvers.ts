@@ -67,7 +67,9 @@ export const resolvers: GQLResolver = {
           results
         }
       } else {
-        throw new Error('User does not have the scope required for this resource')
+        throw new Error(
+          'User does not have the scope required for this resource'
+        )
       }
     },
     async getTotalPayments(
