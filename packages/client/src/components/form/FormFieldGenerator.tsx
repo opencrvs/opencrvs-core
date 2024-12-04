@@ -617,6 +617,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           fieldDefinition={fieldDefinition}
           fields={fields}
           setFieldValue={setFieldValue}
+          isDisabled={disabled}
         />
       )
     }

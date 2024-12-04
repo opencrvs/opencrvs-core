@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  FieldValueMap,
   IFormData,
   IFormField,
   IFormFieldValue,
@@ -30,13 +29,15 @@ export const RedirectField = ({
   form,
   draft,
   fieldDefinition,
-  setFieldValue
+  setFieldValue,
+  isDisabled
 }: {
   fields: IFormField[]
   form: IFormSectionData
   draft: IFormData
   fieldDefinition: Ii18nRedirectFormField
   setFieldValue: (name: string, value: IFormFieldValue) => void
+  isDisabled?: boolean
 }) => {
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
@@ -69,9 +70,7 @@ export const RedirectField = ({
   )
 
   useEffect(() => {
-    const hasRequestBeenMade = Boolean(
-      (form[trigger.name] as FieldValueMap)?.['data']
-    )
+    const hasRequestBeenMade = Boolean(form[trigger.name])
     function checkParamsPresentInURL() {
       const urlParams = new URLSearchParams(window.location.search)
       for (const [key, value] of Object.entries(params)) {
@@ -87,8 +86,8 @@ export const RedirectField = ({
   }, [call, params, form, trigger])
 
   return (
-    <Link element="a" href={evalPath}>
-      {fieldDefinition.label}
+    <Link disabled={isDisabled}>
+      <a href={evalPath}>{fieldDefinition.label}</a>
     </Link>
   )
 }
