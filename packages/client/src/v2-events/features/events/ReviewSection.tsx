@@ -373,7 +373,7 @@ const RegisterModal: React.FC<{
   <ResponsiveModal
     autoHeight
     responsive={false}
-    title="Register the death?"
+    title="Register the member?"
     actions={[
       <Button
         type="tertiary"
