@@ -24,6 +24,7 @@ const server = createHTTPServer({
   router: appRouter,
   createContext: function createContext(opts) {
     const token = opts.req.headers.authorization
+
     if (!token) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
@@ -40,8 +41,10 @@ const server = createHTTPServer({
 
     return {
       user: {
-        id: userId
-      }
+        id: userId,
+        primaryOfficeId: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176'
+      },
+      token
     }
   }
 })

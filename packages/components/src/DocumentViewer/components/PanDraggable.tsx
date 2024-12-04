@@ -22,7 +22,7 @@ export interface IDragData {
   dy: number
 }
 
-export interface IReactPanZoomStateType {
+interface IReactPanZoomStateType {
   dragging: boolean
   mouseDown: boolean
   comesFromDragging: boolean
