@@ -31,9 +31,13 @@ const DateField = z
     id: z.string(),
     required: z.boolean(),
     label: TranslationConfig,
-    options: z.object({
-      notice: TranslationConfig.describe('Text to display above the date input')
-    })
+    options: z
+      .object({
+        notice: TranslationConfig.describe(
+          'Text to display above the date input'
+        ).optional()
+      })
+      .optional()
   })
   .describe('A single date input (dd-mm-YYYY)')
 

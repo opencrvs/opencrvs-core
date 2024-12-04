@@ -77,7 +77,7 @@ import {
 import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
 import { TRPCProvider } from './v2-events/trcp'
-import { Events } from './v2-events/features/events/EventSelection'
+import { EventSelection } from './v2-events/features/events/EventSelection'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -538,7 +538,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={V2_EVENTS_ROUTE}
-                                              component={Events}
+                                              component={EventSelection}
                                             />
                                             <ProtectedRoute
                                               exact
