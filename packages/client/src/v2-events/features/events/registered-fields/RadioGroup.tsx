@@ -12,22 +12,20 @@ import React from 'react'
 import {
   InputField,
   useFormContext,
-  DateField as DateFieldComponent
+  RadioGroup as RadioGroupComponent
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
-import { useIntl } from 'react-intl'
 
-export const DateField = ({ id, options = {} }: FieldProps<'DATE'>) => {
-  const intl = useIntl()
+export const RadioGroup = ({ name, options }: FieldProps<'RADIO_GROUP'>) => {
   const { setValue, watch } = useFormContext()
-  const value = watch(id)
+  const value = watch(name)
 
   return (
-    <InputField id={id} touched={false}>
-      <DateFieldComponent
-        id={id}
-        notice={options.notice && intl.formatMessage(options.notice)}
-        onChange={(val) => setValue(id, val)}
+    <InputField id={name} touched={false}>
+      <RadioGroupComponent
+        options={options}
+        name={name}
+        onChange={(val) => setValue(name, val)}
         value={value}
       />
     </InputField>

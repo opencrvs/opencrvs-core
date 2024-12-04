@@ -12,10 +12,15 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import { MongoClient } from 'mongodb'
 
 let server: MongoMemoryServer
+let client: MongoClient
 let databaseName = 'events_' + Date.now()
 
 export async function setupServer() {
-  server = await MongoMemoryServer.create()
+  if (!server) {
+    server = await MongoMemoryServer.create()
+  }
+
+  return server
 }
 
 export async function resetServer() {
@@ -24,7 +29,10 @@ export async function resetServer() {
 
 export async function getClient() {
   const uri = server.getUri()
-  const client = new MongoClient(uri)
+  if (!client) {
+    client = new MongoClient(uri)
+  }
+
   await client.connect()
 
   return client.db(databaseName)

@@ -8,5 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const V2_ROOT_ROUTE = '/v2'
-export const V2_EVENT_ROUTE = `${V2_ROOT_ROUTE}/event/:eventType`
+import { AppRouter } from './router'
+import { env } from '@gateway/environment'
+
+import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
+
+import superjson from 'superjson'
+
+export const api = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson,
+      headers({ opList }) {
+        const headers = opList[0].context?.headers
+        return headers as HTTPHeaders
+      }
+    })
+  ]
+})
