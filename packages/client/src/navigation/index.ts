@@ -9,21 +9,37 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { UserSection, CorrectionSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { CorrectionSection, UserSection } from '@client/forms'
 import {
+  ADVANCED_SEARCH,
+  ADVANCED_SEARCH_RESULT,
+  ALL_USER_EMAIL,
   CERTIFICATE_COLLECTOR,
+  CERTIFICATE_CORRECTION,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
+  DECLARATION_RECORD_AUDIT,
+  DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
+  DRAFT_MARRIAGE_FORM,
   EVENT_COMPLETENESS_RATES,
   HOME,
+  ISSUE_CERTIFICATE_PAYMENT,
+  ISSUE_COLLECTOR,
+  ISSUE_VERIFY_COLLECTOR,
+  ORGANISATIONS_INDEX,
+  PERFORMANCE_DASHBOARD,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
-  ADVANCED_SEARCH,
+  PERFORMANCE_LEADER_BOARDS,
+  PERFORMANCE_REGISTRATIONS_LIST,
+  PERFORMANCE_STATISTICS,
   PRINT_CERTIFICATE_PAYMENT,
+  PRINT_RECORD,
   REGISTRAR_HOME_TAB,
+  REGISTRAR_HOME_TAB_PAGE,
   REVIEW_CERTIFICATE,
   REVIEW_USER_DETAILS,
   REVIEW_USER_FORM,
@@ -31,55 +47,39 @@ import {
   SEARCH_RESULT,
   SELECT_VITAL_EVENT,
   SETTINGS,
+  SYSTEM_LIST,
   TEAM_SEARCH,
-  VERIFY_COLLECTOR,
-  WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CERTIFICATE_CORRECTION,
+  VERIFY_COLLECTOR,
   VERIFY_CORRECTOR,
-  DECLARATION_RECORD_AUDIT,
-  REGISTRAR_HOME_TAB_PAGE,
-  SYSTEM_LIST,
-  VS_EXPORTS,
   VIEW_RECORD,
-  ADVANCED_SEARCH_RESULT,
-  PERFORMANCE_REGISTRATIONS_LIST,
-  PERFORMANCE_LEADER_BOARDS,
-  PERFORMANCE_STATISTICS,
-  PERFORMANCE_DASHBOARD,
-  ORGANISATIONS_INDEX,
-  ISSUE_COLLECTOR,
-  ISSUE_VERIFY_COLLECTOR,
-  ISSUE_CERTIFICATE_PAYMENT,
-  DRAFT_BIRTH_PARENT_FORM,
-  DRAFT_MARRIAGE_FORM,
-  ALL_USER_EMAIL,
-  PRINT_RECORD
+  VS_EXPORTS,
+  WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import {
-  NATL_ADMIN_ROLES,
   NATIONAL_REGISTRAR_ROLES,
+  NATL_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES
 } from '@client/utils/constants'
+import { EventType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import {
   goBack as back,
+  goForward as forward,
   push,
-  replace,
-  goForward as forward
+  replace
 } from 'connected-react-router'
-import { stringify } from 'query-string'
-import { Cmd, loop } from 'redux-loop'
-import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { UserDetails } from '@client/utils/userUtils'
+import { stringify } from 'query-string'
+import { Cmd, loop } from 'redux-loop'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -215,7 +215,7 @@ export function goToPerformanceHome(
     startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
   ),
   timeEnd: Date = new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
-  event?: Event,
+  event?: EventType,
   locationId?: string
 ) {
   return push({
@@ -360,7 +360,10 @@ export function goToVerifyCorrector(declarationId: string, corrector: string) {
   )
 }
 
-export function goToReviewCertificate(registrationId: string, event: Event) {
+export function goToReviewCertificate(
+  registrationId: string,
+  event: EventType
+) {
   return push(
     formatUrl(REVIEW_CERTIFICATE, {
       registrationId: registrationId.toString(),
@@ -386,7 +389,7 @@ export function goToVerifyCollector(
 
 export function goToPrintCertificatePayment(
   registrationId: string,
-  event: Event
+  event: EventType
 ) {
   return push(
     formatUrl(PRINT_CERTIFICATE_PAYMENT, {
@@ -398,7 +401,7 @@ export function goToPrintCertificatePayment(
 
 export function goToIssueCertificatePayment(
   registrationId: string,
-  event: Event
+  event: EventType
 ) {
   return push(
     formatUrl(ISSUE_CERTIFICATE_PAYMENT, {
@@ -421,7 +424,7 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
 }
 
 export function goToCompletenessRates(
-  eventType: Event,
+  eventType: EventType,
   locationId: string | undefined,
   timeStart: Date,
   timeEnd: Date,
@@ -489,7 +492,7 @@ export function goToWorkflowStatus(
   timeStart: Date,
   timeEnd: Date,
   status?: keyof IStatusMapping,
-  event?: Event
+  event?: EventType
 ) {
   return push({
     pathname: WORKFLOW_STATUS,

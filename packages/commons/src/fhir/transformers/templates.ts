@@ -23,7 +23,6 @@ import {
   QuestionnaireResponse,
   RelatedPerson,
   Section,
-  EVENT_TYPE,
   Task
 } from '..'
 import {
@@ -31,7 +30,9 @@ import {
   CompositionSectionTitle,
   CompositionSectionTitleByCode,
   DEATH_CORRECTION_ENCOUNTER_CODE,
-  PartialBy
+  EVENT_TYPE,
+  PartialBy,
+  ReferenceTypeByCode
 } from '../../types'
 import { UUID } from '../../uuid'
 
@@ -126,7 +127,7 @@ export function createEncounterSection<
     },
     entry: [
       {
-        reference: `urn:uuid:${refUuid}` as const
+        reference: `urn:uuid:${refUuid}` as ReferenceTypeByCode<T>['reference']
       }
     ]
   }

@@ -17,7 +17,9 @@ export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
+  FHIR_URL: url({
+    devDefault: 'http://localhost:3447/fhir'
+  }),
   CERT_PUBLIC_KEY_PATH: str({
     devDefault: '../../.secrets/public-key.pem'
   }),
@@ -29,6 +31,7 @@ export const env = cleanEnv(process.env, {
   APPLICATION_CONFIG_URL: url({ devDefault: 'http://localhost:2021/' }),
   NOTIFICATION_URL: url({ devDefault: 'http://localhost:2020/' }),
   WORKFLOW_URL: url({ devDefault: 'http://localhost:5050/' }),
+  EVENTS_URL: url({ devDefault: 'http://localhost:5555/' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   DISABLE_RATE_LIMIT: bool({

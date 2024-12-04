@@ -15,7 +15,7 @@ import { formatUrl, goBack } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams, Redirect } from 'react-router'
+import { useParams, Redirect } from 'react-router-dom'
 import { IDeclaration } from '@client/declarations'
 import styled from 'styled-components'
 import {

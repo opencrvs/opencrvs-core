@@ -30,7 +30,7 @@ import {
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   getValidationErrorsForForm,
@@ -66,7 +66,7 @@ import { flatten } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router-dom'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
@@ -85,7 +85,7 @@ const ErrorWrapper = styled.div`
 
 type PropsWhenDeclarationIsFound = {
   registerForm: IForm
-  event: Event
+  event: EventType
   pageRoute: string
   declarationId: string
   declaration: IPrintableDeclaration
@@ -232,7 +232,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     declarationId: string,
     currentGroup: string,
     nextGroup: string | undefined,
-    event: Event,
+    event: EventType,
     sectionId: keyof IPrintableDeclaration['data'],
     fields: IFormField[],
     draft: IPrintableDeclaration | undefined
@@ -318,7 +318,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   goToNextFormForSomeoneElse = (
     declarationId: string,
     declaration: IPrintableDeclaration,
-    event: Event
+    event: EventType
   ) => {
     const { offlineCountryConfiguration } = this
       .props as PropsWhenDeclarationIsFound
@@ -510,9 +510,9 @@ const mapStateToProps = (
   const certFormSection = getCertificateCollectorFormSection(declaration)
 
   const isAllowPrintInAdvance =
-    event === Event.Birth
+    event === EventType.Birth
       ? getOfflineData(state).config.BIRTH.PRINT_IN_ADVANCE
-      : event === Event.Death
+      : event === EventType.Death
       ? getOfflineData(state).config.DEATH.PRINT_IN_ADVANCE
       : getOfflineData(state).config.MARRIAGE.PRINT_IN_ADVANCE
 

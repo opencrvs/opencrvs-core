@@ -31,10 +31,10 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ApolloClient } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
-import * as React from 'react'
+import React, { useEffect } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
@@ -92,75 +92,79 @@ const SpinnerWrapper = styled.div`
   align-items: center;
 `
 
-class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
-  async componentDidMount() {
-    const { userId, client } = this.props
-    if (
-      this.props.match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])
-    ) {
-      this.props.clearUserFormData()
-    }
-    if (userId) {
-      this.props.fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
-        userId
-      })
-    }
-  }
+const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
+  const {
+    userId,
+    match,
+    intl,
+    goBack,
+    submitting,
+    clearUserFormData,
+    fetchAndStoreUserData,
+    client,
+    section,
+    userDetailsStored,
+    loadingRoles
+  } = props
 
-  async componentWillUnmount() {
-    this.props.clearUserFormData()
-  }
-
-  renderLoadingPage = () => {
-    const { intl, userId } = this.props
-    return (
-      <ActionPageLight
-        title={
+  useEffect(() => {
+    const initialize = async () => {
+      if (match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])) {
+        clearUserFormData()
+      }
+      if (userId) {
+        fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
           userId
-            ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-            : intl.formatMessage(formMessages.userFormTitle)
-        }
-        goBack={this.props.goBack}
-        hideBackground={true}
-      >
-        <Container>
-          {this.props.submitting ? (
-            <SpinnerWrapper>
-              <Spinner id="user-form-submitting-spinner" size={25} />
-              <p>
-                {this.props.userId
-                  ? intl.formatMessage(userFormMessages.updatingUser)
-                  : intl.formatMessage(userFormMessages.creatingNewUser)}
-              </p>
-            </SpinnerWrapper>
-          ) : (
+        })
+      }
+    }
+
+    initialize()
+
+    return () => {
+      clearUserFormData()
+    }
+  }, [userId, match.path, clearUserFormData, fetchAndStoreUserData, client])
+
+  const renderLoadingPage = () => (
+    <ActionPageLight
+      title={
+        userId
+          ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+          : intl.formatMessage(formMessages.userFormTitle)
+      }
+      goBack={goBack}
+      hideBackground={true}
+    >
+      <Container>
+        {submitting ? (
+          <SpinnerWrapper>
             <Spinner id="user-form-submitting-spinner" size={25} />
-          )}
-        </Container>
-      </ActionPageLight>
-    )
+            <p>
+              {userId
+                ? intl.formatMessage(userFormMessages.updatingUser)
+                : intl.formatMessage(userFormMessages.creatingNewUser)}
+            </p>
+          </SpinnerWrapper>
+        ) : (
+          <Spinner id="user-form-submitting-spinner" size={25} />
+        )}
+      </Container>
+    </ActionPageLight>
+  )
+
+  if (submitting || loadingRoles || (userId && !userDetailsStored)) {
+    return renderLoadingPage()
   }
 
-  render() {
-    const { section, submitting, userDetailsStored, loadingRoles, userId } =
-      this.props
-    if (submitting || loadingRoles || (userId && !userDetailsStored)) {
-      return this.renderLoadingPage()
-    }
-
-    if (section.viewType === 'form') {
-      return <UserForm {...this.props} />
-    }
-
-    if (section.viewType === 'preview') {
-      return (
-        <UserReviewForm
-          client={this.props.client as ApolloClient<any>}
-          {...this.props}
-        />
-      )
-    }
+  if (section.viewType === 'form') {
+    return <UserForm {...props} />
   }
+
+  if (section.viewType === 'preview') {
+    return <UserReviewForm client={client as ApolloClient<any>} {...props} />
+  }
+  return null
 }
 
 function getNextSectionIds(

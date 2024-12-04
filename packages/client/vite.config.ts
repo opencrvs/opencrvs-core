@@ -77,6 +77,9 @@ export default defineConfig(({ mode }) => {
       'process.env': {},
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
+    optimizeDeps: {
+      include: ['@opencrvs/commons/client', '@opencrvs/commons/events']
+    },
     // This changes the output dir from dist to build
     build: {
       outDir: 'build',
@@ -136,6 +139,11 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
+        },
+        '/api/': {
+          target: 'http://localhost:7070',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
         }
       }
     }

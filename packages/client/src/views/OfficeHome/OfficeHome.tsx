@@ -32,15 +32,12 @@ import styled from 'styled-components'
 import { getUserLocation } from '@client/utils/userUtils'
 import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
-import {
-  PAGE_TRANSITIONS_ENTER_TIME,
-  FIELD_AGENT_ROLES
-} from '@client/utils/constants'
+import { SYNC_WORKQUEUE_TIME, FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
@@ -60,7 +57,8 @@ import { ArrayElement } from '@client/SubmissionController'
 import { ReadyToIssue } from './readyToIssue/ReadyToIssue'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
+import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -159,7 +157,7 @@ class OfficeHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    setTimeout(() => this.updateWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
+    setTimeout(() => this.updateWorkqueue(), SYNC_WORKQUEUE_TIME)
     if (this.interval) {
       clearInterval(this.interval)
     }
@@ -277,10 +275,12 @@ class OfficeHomeView extends React.Component<
       storedDeclarations
     )
 
-    const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-      const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-      return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
-    })
+    const isOnePrintInAdvanceOn = Object.values(EventType).some(
+      (event: EventType) => {
+        const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
+        return offlineResources.config[upperCaseEvent].PRINT_IN_ADVANCE
+      }
+    )
 
     return (
       <>
@@ -456,11 +456,12 @@ class OfficeHomeView extends React.Component<
         )}
 
         <FABContainer>
-          <FloatingActionButton
-            id="new_event_declaration"
-            onClick={this.props.goToEvents}
-            icon={() => <PlusTransparentWhite />}
-          />
+          <Link to={SELECT_VITAL_EVENT}>
+            <FloatingActionButton
+              id="new_event_declaration"
+              icon={() => <PlusTransparentWhite />}
+            />
+          </Link>
         </FABContainer>
 
         {this.state.showCertificateToast && (

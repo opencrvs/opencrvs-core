@@ -34,6 +34,7 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, sendNotification } from './utils'
+import { getEventType } from '@workflow/features/registration/utils'
 
 export const rejectCorrectionRoute = createRoute({
   method: 'POST',
@@ -116,7 +117,7 @@ export const rejectCorrectionRoute = createRoute({
       practitionerContacts,
       getAuthHeader(request),
       {
-        event: 'BIRTH',
+        event: getEventType(record),
         trackingId: getTrackingId(recordWithCorrectionRejectedTask)!,
         userFullName: requestingPractitioner.name,
         reason: rejectionDetails.reason

@@ -22,14 +22,14 @@ import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subMonths from 'date-fns/subMonths'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { Query } from '@client/components/Query'
@@ -180,7 +180,7 @@ interface IConnectProps {
   offices: { [key: string]: ILocation }
   timeStart: Date
   timeEnd: Date
-  event: Event
+  event: EventType
   selectedLocation: ISearchLocation
   currency: ICurrency
 }
@@ -191,7 +191,7 @@ interface ISearchParams {
   GraphQL Queries in PerformanceHome.tsx also require BIRTH/DEATH.
   Due to that we had to use toUpperCase where it is required.
   */
-  event: Event
+  event: EventType
   locationId: string
   timeStart: string
   timeEnd: string
@@ -336,7 +336,7 @@ const PerformanceHomeComponent = (props: Props) => {
             goToPerformanceHome(
               timeStart,
               timeEnd,
-              option.value as Event,
+              option.value as EventType,
               locationId
             )
           }}
@@ -347,11 +347,11 @@ const PerformanceHomeComponent = (props: Props) => {
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
-              value: Event.Birth
+              value: EventType.Birth
             },
             {
               label: intl.formatMessage(messages.eventOptionForDeaths),
-              value: Event.Death
+              value: EventType.Death
             }
           ]}
         />
@@ -696,7 +696,7 @@ function mapStateToProps(
     timeEnd:
       (timeEnd && new Date(timeEnd)) ||
       new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
-    event: event || Event.Birth,
+    event: event || EventType.Birth,
     selectedLocation,
     offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state),

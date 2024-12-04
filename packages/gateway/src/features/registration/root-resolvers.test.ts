@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { resolvers as appResolvers } from '@gateway/features/registration/root-resolvers'
+import { UserInputError } from '@gateway/utils/graphql-errors'
 import { mockTaskBundle } from '@gateway/utils/testUtils'
 import { DOWNLOADED_EXTENSION_URL } from '@opencrvs/commons/types'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
-import * as jwt from 'jsonwebtoken'
-
-import { UserInputError } from 'apollo-server-hapi'
+import { sign } from 'jsonwebtoken'
+import RecordsAPI from '@gateway/features/fhir/recordsAPI'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = appResolvers as any
-const registerCertifyToken = jwt.sign(
+const registerCertifyToken = sign(
   { scope: ['register', 'certify'] },
   readFileSync('./test/cert.key'),
   {
@@ -30,7 +30,7 @@ const registerCertifyToken = jwt.sign(
   }
 )
 
-const validateToken = jwt.sign(
+const validateToken = sign(
   { scope: ['validate'] },
   readFileSync('./test/cert.key'),
   {
@@ -41,7 +41,7 @@ const validateToken = jwt.sign(
   }
 )
 
-const declareToken = jwt.sign(
+const declareToken = sign(
   { scope: ['declare'] },
   readFileSync('./test/cert.key'),
   {
@@ -52,7 +52,7 @@ const declareToken = jwt.sign(
   }
 )
 
-const certifyToken = jwt.sign(
+const certifyToken = sign(
   { scope: ['certify'] },
   readFileSync('./test/cert.key'),
   {
@@ -62,7 +62,7 @@ const certifyToken = jwt.sign(
   }
 )
 
-const sysAdminToken = jwt.sign(
+const sysAdminToken = sign(
   { scope: ['sysadmin'] },
   readFileSync('./test/cert.key'),
   {
@@ -168,7 +168,8 @@ const mockContext = {
   headers: authHeaderRegCert,
   dataSources: {
     locationsAPI: { getLocation: () => mockLocation },
-    usersAPI: { getUserById: () => mockUserDetails }
+    usersAPI: { getUserById: () => mockUserDetails },
+    recordsAPI: new RecordsAPI()
   }
 }
 

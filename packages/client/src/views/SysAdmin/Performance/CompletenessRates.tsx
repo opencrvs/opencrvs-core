@@ -14,7 +14,7 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import {
-  Event,
+  EventType,
   IsLeafLevelLocationQuery,
   QueryIsLeafLevelLocationArgs
 } from '@client/utils/gateway'
@@ -32,7 +32,7 @@ import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, useIntl, WrappedComponentProps } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 import {
   IPerformanceSelectOption,
   PerformanceSelect
@@ -115,7 +115,7 @@ function Filter({
   onBaseChange
 }: {
   locationId: string
-  event: Event
+  event: EventType
   dateStart: Date
   dateEnd: Date
   base: COMPLETENESS_RATE_REPORT_BASE
@@ -216,7 +216,7 @@ function Filter({
               messages.performanceWithinTargetDaysLabel,
               {
                 target:
-                  window.config[event.toUpperCase() as Uppercase<Event>]
+                  window.config[event.toUpperCase() as Uppercase<EventType>]
                     .REGISTRATION_TARGET,
                 withPrefix: false
               }
@@ -271,7 +271,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             locationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
             base={base.baseType}
             time={time}
-            event={eventType as Event}
+            event={eventType as EventType}
             dateStart={dateStart}
             dateEnd={dateEnd}
             onBaseChange={(base) => setBase({ baseType: base })}
@@ -320,7 +320,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                         time
                       )}
                       completenessRateTime={time}
-                      eventType={eventType as Event}
+                      eventType={eventType as EventType}
                     />
                   )}
                   <CompletenessDataTable
@@ -332,7 +332,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                         ? data.fetchMonthWiseEventMetrics
                         : data.fetchLocationWiseEventMetrics)
                     }
-                    eventType={eventType as Event}
+                    eventType={eventType as EventType}
                     completenessRateTime={time}
                   />
                 </>

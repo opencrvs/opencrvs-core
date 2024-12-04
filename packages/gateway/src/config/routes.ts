@@ -60,6 +60,7 @@ import sendUserNameHandler, {
 } from '@gateway/routes/sendUserName/handler'
 import tokenHandler from '@gateway/routes/token/handler'
 import { rateLimitedRoute } from '@gateway/rate-limit'
+import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -346,8 +347,8 @@ export const getRoutes = () => {
 
     catchAllProxy.location,
     catchAllProxy.locationId,
-
-    rateLimitedAuthProxy.authenticateSuperUser
+    rateLimitedAuthProxy.authenticateSuperUser,
+    ...trpcProxy
   ]
 
   return routes
