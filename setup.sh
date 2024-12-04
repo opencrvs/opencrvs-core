@@ -154,6 +154,7 @@ elif [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
   echo
   OS="MAC"
+  export NODE_OPTIONS="--dns-result-order=ipv4first"
 else
   echo "Sorry your operating system is not supported."
   echo "YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04"
@@ -367,6 +368,28 @@ fi
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
+function create_elastic_index {
+  local body=$1
+  local index_name=$2
+
+  local -i result=1
+  local output
+
+  output=$(curl -s -D- -m15 -w "%{http_code}" -X PUT "http://localhost:9200/$index_name" -H 'Content-Type: application/json' -d "$body")
+
+  echo "${output}"
+
+  if [[ "${output: -3}" -eq 200 ]]; then
+    result=0
+  fi
+
+  if ((result)); then
+    echo -e "\n${output::-3}\n"
+  fi
+
+  return $result
+}
+create_elastic_index "{\"settings\":{\"number_of_replicas\":0}}" "ocrvs"
 echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
@@ -379,6 +402,9 @@ set -- $(stty size) #$1=rows, $2=columns
 #start a new session in dettached mode with resizable panes
 tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
+if [ "$(uname)" == "Darwin" ]; then
+  tmux set-environment NODE_OPTIONS "--dns-result-order=ipv4first"
+fi
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
 tmux split-window -h -l '30%'
