@@ -43,7 +43,8 @@ import {
   IFormData,
   IPreviewGroup,
   REVIEW_OVERRIDE_POSITION,
-  SubmissionAction
+  SubmissionAction,
+  IFormFieldValue
 } from '@client/forms'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Table } from '@opencrvs/components/lib/Table'
@@ -66,7 +67,8 @@ import {
   isVisibleField,
   renderValue,
   sectionHasError,
-  updateDeclarationRegistrationWithCorrection
+  updateDeclarationRegistrationWithCorrection,
+  RenderableFieldType
 } from './utils'
 import { IStoreState } from '@client/store'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -118,6 +120,7 @@ type IDispatchProps = {
 }
 
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
+type NestedItemType = RenderableFieldType | undefined | IFormFieldValue
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
@@ -668,9 +671,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       language
     } = this.props
     const visitedTags: string[] = []
-    const nestedItems: any[] = []
+    const nestedItems: NestedItemType[] = []
     // parent field
-    let item: any
+    let item: NestedItemType
     item = this.getSinglePreviewField(section, group, field, true)
 
     item && nestedItems.push(item)
