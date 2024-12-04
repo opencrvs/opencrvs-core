@@ -79,6 +79,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { FormikTouched, FormikValues } from 'formik'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -170,7 +171,6 @@ const getErrorsOnFieldsBySection = (
 }
 
 interface IState {
-  errorMessages: Array<MessageDescriptor>
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
 }
@@ -179,11 +179,11 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      errorMessages: [],
       showModalForNoSignedAffidavit: false,
       isFileUploading: false
     }
   }
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
@@ -243,10 +243,14 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     ] as IFormSectionData
 
     if (errors.length > 0) {
-      this.setState({
-        errorMessages: errors
-      })
+      const formGroup = (
+        this.props as PropsWhenDeclarationIsFound
+      ).formGroup.fields.reduce(
+        (acc, { name }) => ({ ...acc, [name]: true }),
+        {}
+      )
 
+      this.setAllFormFieldsTouched(formGroup)
       return
     }
 
@@ -266,10 +270,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           (collector.noAffidavitAgreement as string[]).length > 0
         )
       ) {
-        this.setState({
-          errorMessages: []
-        })
-
         return
       }
 
@@ -280,7 +280,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
 
     this.setState({
-      errorMessages: [],
       showModalForNoSignedAffidavit: false
     })
     if (!nextGroup) {
@@ -334,7 +333,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { errorMessages, showModalForNoSignedAffidavit } = this.state
+    const { showModalForNoSignedAffidavit } = this.state
     const props = this.props
     const { declaration } = props
 
@@ -396,30 +395,19 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               </Button>
             ]}
           >
-            {errorMessages.length > 0 && (
-              <ErrorWrapper>
-                {errorMessages.map((err, key) => (
-                  <ErrorText key={key} id="form_error">
-                    {intl.formatMessage(err)}
-                  </ErrorText>
-                ))}
-              </ErrorWrapper>
-            )}
             <FormFieldGenerator
               id={formGroup.id}
               key={formGroup.id}
               onChange={(values) => {
-                if (values && values.affidavitFile) {
-                  this.setState({
-                    errorMessages: []
-                  })
-                }
                 this.modifyDeclaration(values, declarationToBeCertified)
               }}
               setAllFieldsDirty={false}
               fields={formGroup.fields}
               draftData={declarationToBeCertified.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
+              onSetTouched={(setTouchedFunc) =>
+                (this.setAllFormFieldsTouched = setTouchedFunc)
+              }
             />
           </Content>
         </ActionPageLight>

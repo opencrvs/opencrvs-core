@@ -13,9 +13,11 @@ import {
   CHECKBOX_GROUP,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   identityTypeMapper,
+  IFormData,
   IFormField,
   IFormFieldValue,
   IFormSection,
+  IFormSectionData,
   IFormSectionGroup,
   IRadioGroupFormField,
   IRadioOption,
@@ -38,6 +40,7 @@ import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { ICertificateData } from '@client/utils/referenceApi'
+import { IOfflineData } from '@client/offline/reducer'
 
 interface INameField {
   firstNamesField: string
@@ -976,7 +979,24 @@ const affidavitCertCollectorGroup: IFormSectionGroup = {
       label: certificateMessages.noLabel,
       required: false,
       initialValue: [],
-      validator: [],
+      validator: [
+        (
+          value: IFormFieldValue,
+          drafts?: IFormData,
+          offlineCountryConfig?: IOfflineData,
+          form?: IFormSectionData
+        ) =>
+          form &&
+          !(
+            (form['noAffidavitAgreement'] as Array<string>)?.length ||
+            form['affidavitFile']
+          )
+            ? {
+                message:
+                  certificateMessages.certificateOtherCollectorAffidavitError
+              }
+            : undefined
+      ],
       options: [
         {
           value: 'AFFIDAVIT',
@@ -1046,9 +1066,6 @@ function getCertCollectorGroupForEvent(
     certificates
       .filter((x) => x.event === declaration.event)
       .map((x) => ({ label: x.label, value: x.id })) || []
-  const certTemplateDefaultValue = certificates.find(
-    (x) => x.isDefault && x.event === declaration.event
-  )?.id
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
