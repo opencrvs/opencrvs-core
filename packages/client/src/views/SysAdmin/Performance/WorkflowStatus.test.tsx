@@ -8,22 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
-import { createTestComponent, createTestStore } from '@client/tests/util'
-import {
-  WorkflowStatus,
-  IHistoryStateProps
-} from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { AppStore } from '@client/store'
-import { createBrowserHistory, createLocation, History } from 'history'
-import { ReactWrapper } from 'enzyme'
-import { stringify, parse } from 'query-string'
+import { createTestComponent, createTestStore } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
+import { EventType } from '@client/utils/gateway'
+import {
+  IHistoryStateProps,
+  WorkflowStatus
+} from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
+import { createBrowserHistory, createLocation, History } from 'history'
+import { parse, stringify } from 'query-string'
+import * as React from 'react'
 import { match } from 'react-router-dom'
 import { vi } from 'vitest'
-import { Event } from '@client/utils/gateway'
+import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 
 describe('Workflow status tests', () => {
   let store: AppStore
@@ -115,7 +115,7 @@ describe('Workflow status tests', () => {
                 },
                 {
                   id: 'd78d29a1-8521-4582-9f4e-902907ca369a',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   name: [
                     {
                       use: 'en',
@@ -169,7 +169,7 @@ describe('Workflow status tests', () => {
                 },
                 {
                   id: '8a1d92b8-18a6-4074-83fb-cc57134e6dbf',
-                  type: Event.Birth,
+                  type: EventType.Birth,
                   name: [
                     {
                       use: 'en',

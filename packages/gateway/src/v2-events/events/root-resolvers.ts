@@ -8,38 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { env } from '@gateway/environment'
 import { GQLResolver } from '@gateway/graphql/schema'
-import type { AppRouter } from '@opencrvs/events/src/router'
-import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 
-import superjson from 'superjson'
 import uuid from 'uuid'
-
-const trpc = createTRPCClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: env.EVENTS_URL,
-      transformer: superjson,
-      headers({ opList }) {
-        const headers = opList[0].context?.headers
-        return headers as HTTPHeaders
-      }
-    })
-  ]
-})
+import { api } from './service'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getEvent(_, { eventId }, { headers: authHeader }) {
-      return trpc.event.get.query(eventId)
+    async getEvent(_, { eventId }, { headers }) {
+      return api.event.get.query(eventId, { context: { headers } })
     }
   },
   Mutation: {
     async createEvent(_, { event }, { headers }) {
-      const createdEvent = await trpc.event.create.mutate(
+      const createdEvent = await api.event.create.mutate(
         {
-          event: event,
+          type: event.type,
           transactionId: uuid.v4()
         },
         { context: { headers } }
@@ -47,24 +31,27 @@ export const resolvers: GQLResolver = {
       return createdEvent
     },
     async notifyEvent(_, { eventId, input }, { headers }) {
-      return trpc.event.actions.notify.mutate(
+      return api.event.actions.notify.mutate(
         {
           eventId: eventId,
-          transactionId: uuid.v4(),
-          action: input
+          data: Object.fromEntries(input.data.map((d) => [d.id, d.value])),
+          createdAtLocation: '123',
+          transactionId: uuid.v4()
         },
         { context: { headers } }
       )
     },
     async declareEvent(_, { eventId, input }, { headers }) {
-      return trpc.event.actions.declare.mutate(
+      const data = await api.event.actions.declare.mutate(
         {
           eventId: eventId,
-          transactionId: uuid.v4(),
-          action: input
+          data: Object.fromEntries(input.data.map((d) => [d.id, d.value])),
+          transactionId: uuid.v4()
         },
         { context: { headers } }
       )
+
+      return data
     }
   }
 }

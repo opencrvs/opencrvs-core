@@ -17,7 +17,9 @@ export const env = cleanEnv(process.env, {
   DOMAIN: str({ devDefault: '*' }),
   LOGIN_URL: url({ devDefault: 'http://localhost:3020/' }),
   CLIENT_APP_URL: url({ devDefault: 'http://localhost:3000/' }),
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
+  FHIR_URL: url({
+    devDefault: 'http://localhost:3447/fhir'
+  }),
   CERT_PUBLIC_KEY_PATH: str({
     devDefault: '../../.secrets/public-key.pem'
   }),

@@ -23,6 +23,6 @@ export const Heading2 = styled.h2`
 export const Heading3 = styled.h3`
   ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.grey600};
-  padding: 8px 0px;
+  padding: 18px 0px 8px 0px;
   border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `

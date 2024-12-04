@@ -8,30 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi } from 'vitest'
 import { appRouter, t } from './router'
-import {
-  getClient,
-  resetServer,
-  setupServer
-} from './storage/__mocks__/mongodb'
+import { getClient } from './storage/__mocks__/mongodb'
+
+import { getUUID } from '@opencrvs/commons'
 
 const { createCallerFactory } = t
-
-vi.mock('@events/storage/mongodb')
-
-beforeAll(async () => {
-  await setupServer()
-})
-
-afterEach(async () => {
-  resetServer()
-})
 
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
   const caller = createCaller({
-    user: { id: '1' }
+    user: { id: '1', primaryOfficeId: '123' },
+    token: 'NOT_A_REAL_TOKEN'
   })
   return caller
 }
@@ -40,7 +28,7 @@ const client = createClient()
 test('event can be created and fetched', async () => {
   const event = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    type: 'birth'
   })
 
   const fetchedEvent = await client.event.get(event.id)
@@ -53,12 +41,12 @@ test('creating an event is an idempotent operation', async () => {
 
   await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    type: 'birth'
   })
 
   await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    type: 'birth'
   })
 
   expect(await db.collection('events').find().toArray()).toHaveLength(1)
@@ -67,12 +55,13 @@ test('creating an event is an idempotent operation', async () => {
 test('stored events can be modified', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    type: 'birth'
   })
 
   const event = await client.event.patch({
     id: originalEvent.id,
-    type: 'death'
+    type: 'death',
+    transactionId: getUUID()
   })
 
   expect(event.updatedAt).not.toBe(originalEvent.updatedAt)
@@ -82,15 +71,13 @@ test('stored events can be modified', async () => {
 test('actions can be added to created events', async () => {
   const originalEvent = await client.event.create({
     transactionId: '1',
-    event: { type: 'birth' }
+    type: 'birth'
   })
 
   const event = await client.event.actions.declare({
     eventId: originalEvent.id,
     transactionId: '2',
-    action: {
-      fields: []
-    }
+    data: {}
   })
 
   expect(event.actions).toEqual([

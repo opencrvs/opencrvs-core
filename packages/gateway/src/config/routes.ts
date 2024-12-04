@@ -20,6 +20,7 @@ import sendVerifyCodeHandler, {
   requestSchema,
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
+import { trpcProxy } from '@gateway/v2-events/event-config/routes'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -87,7 +88,8 @@ export const getRoutes = () => {
     authProxy.token,
     rateLimitedAuthProxy.authenticate,
     rateLimitedAuthProxy.authenticateSuperUser,
-    rateLimitedAuthProxy.verifyUser
+    rateLimitedAuthProxy.verifyUser,
+    ...trpcProxy
   ]
 
   return routes
