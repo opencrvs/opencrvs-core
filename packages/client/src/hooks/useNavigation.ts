@@ -12,7 +12,7 @@ import {
   TAB_GROUPS,
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
-import { Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { usePermissions } from './useAuthorization'
 
 // TODO: Move useHomePage hook into this hook and figure out how to return the home for each role

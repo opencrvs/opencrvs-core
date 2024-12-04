@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { CodegenConfig } from '@graphql-codegen/cli'
-import { scopes, SCOPES } from '@opencrvs/commons/authentication'
 
 const config: CodegenConfig = {
   schema: [
@@ -50,10 +49,6 @@ const config: CodegenConfig = {
             /* eslint-disable */
             import { PlainDate } from '@client/utils/date-formatting'
 
-            export const scopes = ${JSON.stringify(scopes)} as const
-            export type Scope = (typeof scopes)[number]
-
-            export const SCOPES = ${JSON.stringify(SCOPES)} as const
             `
           }
         }

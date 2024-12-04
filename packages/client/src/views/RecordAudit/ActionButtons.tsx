@@ -31,7 +31,7 @@ import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 
 export type CMethodParams = {
   declaration: IDeclarationData

@@ -15,7 +15,7 @@ import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { HOME } from '@client/navigation/routes'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { Scope } from '@client/utils/gateway'
+import { Scope } from '@opencrvs/commons/client'
 
 interface IProps extends RouteProps {
   scopes?: Scope[]

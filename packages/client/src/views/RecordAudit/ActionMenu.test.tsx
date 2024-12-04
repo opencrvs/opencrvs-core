@@ -23,7 +23,8 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { ActionMenu } from './ActionMenu'
-import { EventType, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
 import { vi } from 'vitest'
 
 const defaultDeclaration = {

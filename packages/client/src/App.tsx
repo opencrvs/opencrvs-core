@@ -68,7 +68,7 @@ import { PrintRecord } from './views/PrintRecord/PrintRecord'
 import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
-import { SCOPES } from './utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
   V2_EVENT_ROUTE,
   V2_EVENTS_ROUTE,

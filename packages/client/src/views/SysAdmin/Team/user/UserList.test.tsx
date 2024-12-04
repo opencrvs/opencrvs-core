@@ -29,7 +29,8 @@ import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 
 import { vi, Mock } from 'vitest'
-import { SCOPES, SearchUsersQuery, Status } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { SearchUsersQuery, Status } from '@client/utils/gateway'
 
 describe('user list without admin scope', () => {
   let store: AppStore

@@ -44,7 +44,8 @@ import {
   DRAFT_MARRIAGE_FORM_PAGE
 } from '@opencrvs/client/src/navigation/routes'
 import { IFormData } from '@opencrvs/client/src/forms'
-import { EventType, RegStatus, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'

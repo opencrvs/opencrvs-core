@@ -40,11 +40,11 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
   EventType as DeclarationEvent,
   EventType,
-  RegStatus,
-  SCOPES
+  RegStatus
 } from '@client/utils/gateway'
 import {
   renderSelectDynamicLabel,

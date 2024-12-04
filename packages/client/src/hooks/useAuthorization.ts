@@ -11,7 +11,8 @@
 
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope, User, Location, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { User, Location } from '@client/utils/gateway'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import {
   canBeCorrected,
