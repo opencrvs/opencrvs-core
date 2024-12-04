@@ -250,7 +250,7 @@ describe('Rate limit', () => {
     for (let i = 1; i <= 10; i++) {
       const res = await server.app.inject({
         method: 'POST',
-        url: '/auth/authenticate',
+        url: '/api/auth/authenticate',
         payload: {
           username: 'test.user',
           password: 'test'
@@ -263,7 +263,7 @@ describe('Rate limit', () => {
     // should return 402 Forbidden
     const res = await server.app.inject({
       method: 'POST',
-      url: '/auth/authenticate',
+      url: '/api/auth/authenticate',
       payload: {
         username: 'test.user',
         password: 'test'
@@ -275,7 +275,7 @@ describe('Rate limit', () => {
     for (let i = 1; i <= 10; i++) {
       const res = await server.app.inject({
         method: 'POST',
-        url: '/auth/authenticate',
+        url: '/api/auth/authenticate',
         payload: {
           username: 'test.user2',
           password: 'test'
@@ -287,7 +287,7 @@ describe('Rate limit', () => {
     // should return 402 Forbidden
     const res2 = await server.app.inject({
       method: 'POST',
-      url: '/auth/authenticate',
+      url: '/api/auth/authenticate',
       payload: {
         username: 'test.user2',
         password: 'test'
