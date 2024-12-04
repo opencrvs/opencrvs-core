@@ -62,7 +62,7 @@ const constantsMessages = defineMessages({
   }
 })
 
-export const EventSelector = () => {
+const EventSelector = () => {
   const intl = useIntl()
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
