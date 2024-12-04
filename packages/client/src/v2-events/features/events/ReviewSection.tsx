@@ -9,20 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { tennisClubMemberDeclaration as declaration } from './fixtures'
 import styled from 'styled-components'
 import {
   Accordion,
   AppBar,
   Button,
+  Checkbox,
   Frame,
   Icon,
   Link,
   ListReview,
   ResponsiveModal,
   Stack,
-  Text
+  Text,
+  TextInput
 } from '@opencrvs/components'
 import { ReviewHeader } from '../../../views/RegisterForm/review/ReviewHeader'
 import { useSelector } from 'react-redux'
@@ -110,6 +112,17 @@ const DeclarationDataContainer = styled.div``
 const getValueFromFieldId = (declaration: any, fieldId: any) =>
   fieldId.split('.').reduce((acc: any, part: any) => acc?.[part], declaration)
 
+enum REJECT_ACTIONS {
+  ARCHIVE,
+  SEND_FOR_UPDATE
+}
+
+interface RejectionState {
+  rejectAction: REJECT_ACTIONS
+  details: string
+  isDuplicate: boolean
+}
+
 const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
   const [modal, openModal] = useModal()
 
@@ -122,6 +135,26 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
     ))
     if (confirmedRegister) {
       alert('Registered new member')
+    }
+    return
+  }
+
+  const handleReject = async () => {
+    const confirmedReject = await openModal<RejectionState | null>((close) => (
+      <RejectModal close={close}></RejectModal>
+    ))
+    if (confirmedReject) {
+      const { rejectAction, ...rest } = confirmedReject
+      switch (rejectAction) {
+        case REJECT_ACTIONS.ARCHIVE:
+          alert('Archived the registration ' + JSON.stringify(rest))
+          break
+        case REJECT_ACTIONS.SEND_FOR_UPDATE:
+          alert('Sent the registration for update ' + JSON.stringify(rest))
+          break
+        default:
+          break
+      }
     }
     return
   }
@@ -217,7 +250,10 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
               </ReviewContainter>
             </FormData>
           </Card>
-          <ReviewActionComponent onRegister={handleRegister} />
+          <ReviewActionComponent
+            onRegister={handleRegister}
+            onReject={handleReject}
+          />
         </LeftColumn>
         <RightColumn></RightColumn>
       </Row>
@@ -261,11 +297,6 @@ const UnderLayBackground = styled.div<{ background: string }>`
       : background === 'error'
       ? theme.colors.redLighter
       : theme.colors.greenLighter};
-  /* position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%; */
 `
 
 const Title = styled.div`
@@ -294,7 +325,13 @@ const ActionContainer = styled.div`
   }
 `
 
-const ReviewActionComponent = ({ onRegister }: { onRegister: () => {} }) => {
+const ReviewActionComponent = ({
+  onRegister,
+  onReject
+}: {
+  onRegister: () => {}
+  onReject: () => {}
+}) => {
   return (
     <Container>
       <UnderLayBackground background="success">
@@ -318,7 +355,7 @@ const ReviewActionComponent = ({ onRegister }: { onRegister: () => {} }) => {
               type="negative"
               size="large"
               id="rejectDeclarationBtn"
-              onClick={() => alert('Rejected')}
+              onClick={onReject}
             >
               <Icon name="X" />
               Reject
@@ -369,6 +406,87 @@ const RegisterModal: React.FC<{
     </Stack>
   </ResponsiveModal>
 )
+
+const RejectModal: React.FC<{
+  close: (result: RejectionState | null) => void
+}> = ({ close }) => {
+  const [state, setState] = useState<RejectionState>({
+    rejectAction: REJECT_ACTIONS.ARCHIVE,
+    details: '',
+    isDuplicate: false
+  })
+
+  return (
+    <ResponsiveModal
+      autoHeight
+      responsive={false}
+      title="Reason for rejection?"
+      actions={[
+        <Button
+          type="tertiary"
+          id="cancel_reject"
+          key="cancel_reject"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          Cancel
+        </Button>,
+        <Button
+          type="secondaryNegative"
+          key="confirm_reject_with_archive"
+          id="confirm_reject_with_archive"
+          onClick={() => {
+            close({
+              ...state,
+              rejectAction: REJECT_ACTIONS.ARCHIVE
+            })
+          }}
+        >
+          Archive
+        </Button>,
+        <Button
+          type="negative"
+          key="confirm_reject_with_update"
+          id="confirm_reject_with_update"
+          onClick={() => {
+            close({
+              ...state,
+              rejectAction: REJECT_ACTIONS.SEND_FOR_UPDATE
+            })
+          }}
+        >
+          Send for updates
+        </Button>
+      ]}
+      show={true}
+      handleClose={() => close(null)}
+    >
+      <Stack direction="column" alignItems="left">
+        <Text variant="reg16" element="p" color="grey500">
+          Please describe the updates required to this record for follow up
+          action.
+        </Text>
+        <TextInput
+          required={true}
+          value={state.details}
+          onChange={(e) =>
+            setState((prev) => ({ ...prev, details: e.target.value }))
+          }
+        />
+        <Checkbox
+          name={'markDUplicate'}
+          label={'Mark as a duplicate'}
+          value={''}
+          selected={state.isDuplicate}
+          onChange={() =>
+            setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
+          }
+        />
+      </Stack>
+    </ResponsiveModal>
+  )
+}
 
 const EditFieldModal: React.FC<{
   close: (result: boolean | null) => void
