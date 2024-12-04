@@ -45,7 +45,7 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -62,7 +62,7 @@ import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
 
 const SCREEN_LOCK = 'screenLock'
@@ -337,10 +337,12 @@ const NavigationView = (props: IFullProps) => {
   )
   const runningVer = String(localStorage.getItem('running-version'))
 
-  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
-  })
+  const isOnePrintInAdvanceOn = Object.values(EventType).some(
+    (event: EventType) => {
+      const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
+      return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
+    }
+  )
   const showRegDashboard =
     !IS_PROD_ENVIRONMENT ||
     (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)

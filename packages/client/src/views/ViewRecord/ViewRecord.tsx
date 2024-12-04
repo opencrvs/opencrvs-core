@@ -17,12 +17,12 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
 import { goBack } from '@client/navigation'
 import {
-  Event,
+  EventType,
   FetchViewRecordByCompositionQuery,
   RegStatus
 } from '@client/utils/gateway'
@@ -153,7 +153,7 @@ export const ViewRecord = () => {
   const eventData = data?.fetchRegistrationForViewing
   const eventType = ((data?.fetchRegistrationForViewing?.registration?.type &&
     data.fetchRegistrationForViewing.registration.type.toLowerCase()) ||
-    '') as Event
+    '') as EventType
 
   const transData: IFormData = gqlToDraftTransformer(
     form[eventType],

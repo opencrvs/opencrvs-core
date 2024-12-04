@@ -22,7 +22,7 @@ import {
   Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps, Redirect, useParams } from 'react-router'
+import { RouteComponentProps, Redirect, useParams } from 'react-router-dom'
 import {
   goToHomeTab,
   goToPage,
@@ -73,7 +73,7 @@ import { getLanguage } from '@client/i18n/selectors'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
-  Event,
+  EventType,
   History
 } from '@client/utils/gateway'
 import { get } from 'lodash'
@@ -212,7 +212,7 @@ function ReinstateButton({
       MarkEventAsReinstatedMutationVariables
     >
       mutation={
-        declaration.event === Event.Birth
+        declaration.event === EventType.Birth
           ? REINSTATE_BIRTH_DECLARATION
           : REINSTATE_DEATH_DECLARATION
       }
@@ -338,7 +338,7 @@ function RecordAuditBody({
   const eventType = declaration.type
   if (eventType in registerForm.registerForm)
     regForm = get(registerForm.registerForm, eventType)
-  else regForm = registerForm.registerForm[Event.Birth]
+  else regForm = registerForm.registerForm[EventType.Birth]
 
   const actionDetailsModalProps = {
     show: showActionDetails,

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -23,27 +23,8 @@ interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
-  eventType?: Event
+  eventType?: EventType
   completenessRateTime?: CompletenessRateTime
-}
-
-interface IActiveState {
-  value: number
-  stroke: string
-}
-interface IState {
-  legendMarginTop: number
-  legendMarginLeft: number
-  chartTop: number
-  chartRight: number
-  chartBottom: number
-  chartLeft: number
-  maximizeXAxisInterval?: boolean
-  legendLayout: LegendProps['layout']
-  activeLabel: string
-  activeRegisteredInTargetDays: IActiveState
-  activeTotalRegistered: IActiveState
-  activeTotalEstimate: IActiveState
 }
 
 const CustomLegendContainer = styled.div<{
@@ -123,6 +104,26 @@ interface ILineDataPoint {
   registrationPercentage: string
 }
 
+interface IActiveState {
+  value: number
+  stroke: string
+}
+
+interface IState {
+  legendMarginTop: number
+  legendMarginLeft: number
+  chartTop: number
+  chartRight: number
+  chartBottom: number
+  chartLeft: number
+  maximizeXAxisInterval?: boolean
+  legendLayout: LegendProps['layout']
+  activeLabel: string
+  activeRegisteredInTargetDays: IActiveState
+  activeTotalRegistered: IActiveState
+  activeTotalEstimate: IActiveState
+}
+
 function LegendDot(props: React.HTMLAttributes<SVGElement>) {
   return (
     <svg width={10} height={10} viewBox="0 0 10 10" fill="none" {...props}>
@@ -146,6 +147,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
       legendLayout: 'horizontal' as const
     }
   }
+
   const getStatePropertiesForLargeWindowChart = () => {
     return {
       legendMarginTop: -16,
@@ -275,7 +277,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
                     messages.performanceWithinTargetDaysLabel,
                     {
                       target:
-                        eventType === Event.Birth
+                        eventType === EventType.Birth
                           ? window.config.BIRTH.REGISTRATION_TARGET
                           : window.config.DEATH.REGISTRATION_TARGET,
                       withPrefix: false
@@ -292,6 +294,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const customizedTooltip = (dataPoint: any) => {
     const wrapperPayload = dataPoint.payload[0]
 
@@ -304,6 +307,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mouseMoveHandler = (data: any) => {
     if (data && data.activePayload) {
       setState({
@@ -466,6 +470,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
       />
     )
   }
+
   return getLoadingIndicator()
 }
 

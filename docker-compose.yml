@@ -26,6 +26,7 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+      - GATEWAY_URL_INTERNAL=http://gateway:7070
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION}
     #platform: linux/amd64
@@ -47,6 +48,7 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64
@@ -62,6 +64,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
+      - EVENTS_URL=http://events:5555/
       - FHIR_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
@@ -75,6 +78,21 @@ services:
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
+
+  events:
+    image: opencrvs/ocrvs-events:${VERSION}
+    #platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./packages/events/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - base
+    environment:
+      - MONGO_URL=mongodb://mongo1/events
+      - ES_HOST=elasticsearch:9200
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040/
+
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION}
