@@ -2,6 +2,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { AUTH_URL } from '@gateway/constants'
 import { unauthorized } from '@hapi/boom'
+import fetch from 'node-fetch'
 
 export default async function tokenHandler(
   request: Hapi.Request,

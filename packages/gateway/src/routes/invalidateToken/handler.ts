@@ -2,6 +2,7 @@ import * as Joi from 'joi'
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { AUTH_URL } from '@gateway/constants'
+import fetch from 'node-fetch'
 
 interface IInvalidateTokenPayload {
   token: string

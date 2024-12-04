@@ -3,6 +3,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { AUTH_URL } from '@gateway/constants'
 import { unauthorized } from '@hapi/boom'
+import fetch from 'node-fetch'
 
 interface IPayload {
   nonce: string

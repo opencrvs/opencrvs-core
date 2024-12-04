@@ -1,5 +1,6 @@
 import { AUTH_URL } from '@gateway/constants'
 import { logger } from '@opencrvs/commons'
+import fetch from 'node-fetch'
 
 export default async function getPublicKey(): Promise<string> {
   const authUrl = new URL('/.well-known', AUTH_URL)

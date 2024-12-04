@@ -3,6 +3,7 @@ import * as Hapi from '@hapi/hapi'
 import { logger } from '@opencrvs/commons'
 import { AUTH_URL } from '@gateway/constants'
 import { badRequest, unauthorized } from '@hapi/boom'
+import fetch from 'node-fetch'
 
 export enum NotificationEvent {
   TWO_FACTOR_AUTHENTICATION = 'TWO_FACTOR_AUTHENTICATION',
