@@ -52,93 +52,99 @@ export const postAdvancedSearch = async (
   }
 }
 
-const addJurisdictionIdParamWithScopes = (
-  currentScopes: Scope[],
-  searchParams: Omit<GQLAdvancedSearchParametersInput, 'event'> & {
-    event?: GQLEventType[]
-    birthJurisdictionId?: string
-    deathJurisdictionId?: string
-    marriageJurisdictionId?: string
-  },
-  user: IUserModelData
-) => {
-  if (
-    searchParams.event &&
-    (searchParams.declarationJurisdictionId ||
-      searchParams.declarationLocationId)
-  ) {
-  }
-
-  if (currentScopes.includes(SCOPES.SEARCH_BIRTH_MY_JURISDICTION)) {
-    searchParams.birthJurisdictionId = user.primaryOfficeId
-  }
-  if (currentScopes.includes(SCOPES.SEARCH_DEATH_MY_JURISDICTION)) {
-    searchParams.deathJurisdictionId = user.primaryOfficeId
-  }
-  if (currentScopes.includes(SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION)) {
-    searchParams.marriageJurisdictionId = user.primaryOfficeId
-  }
-}
-
 const addSearchParamForScope = (
   requiredScopes: Scope[],
-  event: GQLEventType,
   tokenScopes: Scope[],
-  filteredParams: Omit<GQLAdvancedSearchParametersInput, 'event'> & {
-    event?: GQLEventType[]
+  advancedSearchParameters: GQLAdvancedSearchParametersInput & {
     birthJurisdictionId?: string
     deathJurisdictionId?: string
     marriageJurisdictionId?: string
   },
-  searchParamEvent: GQLEventType | undefined
+  user: IUserModelData,
+  event?: GQLEventType
 ) => {
+  const { declarationJurisdictionId, declarationLocationId } =
+    advancedSearchParameters
   if (!tokenScopes.some((scope) => requiredScopes.includes(scope))) return
 
-  if (!searchParamEvent) {
-    filteredParams.event ??= []
-    filteredParams.event.push(event)
+  const scopeMappings = {
+    [GQLEventType.birth]: {
+      jurisdictionScope: SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+      generalScope: SCOPES.SEARCH_BIRTH,
+      jurisdictionIdField: 'birthJurisdictionId' as const
+    },
+    [GQLEventType.death]: {
+      jurisdictionScope: SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+      generalScope: SCOPES.SEARCH_DEATH,
+      jurisdictionIdField: 'deathJurisdictionId' as const
+    },
+    [GQLEventType.marriage]: {
+      jurisdictionScope: SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
+      generalScope: SCOPES.SEARCH_MARRIAGE,
+      jurisdictionIdField: 'marriageJurisdictionId' as const
+    }
+  }
+
+  if (
+    advancedSearchParameters.declarationLocationId ||
+    advancedSearchParameters.declarationJurisdictionId
+  ) {
+    if (
+      user.primaryOfficeId !== declarationLocationId &&
+      user.primaryOfficeId !== declarationJurisdictionId
+    ) {
+      throw new Error('Can not search this location')
+    }
+  }
+
+  if (event) {
+    const { jurisdictionScope, generalScope, jurisdictionIdField } =
+      scopeMappings[event]
+
+    if (tokenScopes.includes(jurisdictionScope)) {
+      advancedSearchParameters[jurisdictionIdField] = user.primaryOfficeId
+    } else if (tokenScopes.includes(generalScope)) {
+      advancedSearchParameters.event = event
+    }
   }
 }
 
 export const filterSearchParamsWithScope = (
   token: string,
   advancedSearchParameters: GQLAdvancedSearchParametersInput,
-  user: IUserModelData
+  user: IUserModelData,
+  eventType?: GQLEventType
 ): Omit<
   GQLAdvancedSearchParametersInput,
   'event' & {
     event: GQLEventType[]
   }
 > => {
-  const { event: searchParamEvent, ...filteredParams } =
-    advancedSearchParameters
   const currentUserScopes = getTokenPayload(token).scope
 
   addSearchParamForScope(
     [SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION],
-    GQLEventType.birth,
     currentUserScopes,
-    filteredParams,
-    searchParamEvent
+    advancedSearchParameters,
+    user,
+    eventType
   )
 
   addSearchParamForScope(
     [SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION],
-    GQLEventType.death,
     currentUserScopes,
-    filteredParams,
-    searchParamEvent
+    advancedSearchParameters,
+    user,
+    eventType
   )
 
   addSearchParamForScope(
     [SCOPES.SEARCH_MARRIAGE, SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION],
-    GQLEventType.marriage,
     currentUserScopes,
-    filteredParams,
-    searchParamEvent
+    advancedSearchParameters,
+    user,
+    eventType
   )
 
-  addJurisdictionIdParamWithScopes(currentUserScopes, filteredParams, user)
-
-  return filteredParams
+  return advancedSearchParameters
 }

@@ -64,24 +64,19 @@ export async function advancedQueryBuilder(
   if (
     params.birthJurisdictionId ||
     params.deathJurisdictionId ||
-    params.marriageJurisdictionId
+    params.marriageJurisdictionId ||
+    params.event
   ) {
     let leafLevelJurisdictionIds: UUID[] = []
 
-    if (
-      params.birthJurisdictionId ||
-      params.deathJurisdictionId ||
-      params.marriageJurisdictionId
-    ) {
-      const jurisdictionId: UUID | null =
-        params.birthJurisdictionId ??
-        params.deathJurisdictionId ??
-        params.marriageJurisdictionId ??
-        null
+    const jurisdictionId: UUID | null =
+      params.birthJurisdictionId ??
+      params.deathJurisdictionId ??
+      params.marriageJurisdictionId ??
+      null
 
-      if (jurisdictionId) {
-        leafLevelJurisdictionIds = await resolveLocationChildren(jurisdictionId)
-      }
+    if (jurisdictionId) {
+      leafLevelJurisdictionIds = await resolveLocationChildren(jurisdictionId)
     }
 
     const shouldConditions: any[] = []
@@ -103,7 +98,7 @@ export async function advancedQueryBuilder(
           ]
         }
       })
-    } else if (params.event?.includes('birth')) {
+    } else if (params.event === 'birth') {
       shouldConditions.push({
         terms: {
           'event.keyword': ['birth']
@@ -128,7 +123,7 @@ export async function advancedQueryBuilder(
           ]
         }
       })
-    } else if (params.event?.includes('death')) {
+    } else if (params.event === 'death') {
       shouldConditions.push({
         terms: {
           'event.keyword': ['death']
@@ -153,7 +148,7 @@ export async function advancedQueryBuilder(
           ]
         }
       })
-    } else if (params.event?.includes('marriage')) {
+    } else if (params.event === 'marriage') {
       shouldConditions.push({
         terms: {
           'event.keyword': ['marriage']
