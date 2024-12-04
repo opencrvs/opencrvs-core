@@ -111,7 +111,7 @@ import {
   withRouter
 } from '@client/components/WithRouterProps'
 import * as routes from '@client/navigation/routes'
-import { useNavigate } from 'react-router-dom'
+import { Params, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 const Notice = styled.div`
@@ -158,6 +158,10 @@ type IFormProps = RouteComponentProps<{
   pageRoute: string
   duplicate?: boolean
   reviewSummaryHeader?: React.ReactNode
+  /**
+   * In Review Correction, the component gives in additional props to override router props.
+   */
+  match?: { params: Params<string> }
 }>
 
 type DispatchProps = {
@@ -1471,12 +1475,17 @@ function findFirstVisibleSection(sections: IFormSection[]) {
 
 function mapStateToProps(state: IStoreState, props: IFormProps) {
   const { router, registerForm, declaration } = props
-  const match = router.match
+  const params = {
+    ...(router.match?.params ?? {}),
+    // ReviewCorrection depends on additional params passed in as props.
+    ...(props?.match?.params ?? {})
+  }
+
   const sectionId =
-    match.params.pageId || findFirstVisibleSection(registerForm.sections).id
+    params.pageId || findFirstVisibleSection(registerForm.sections).id
   const user = getUserDetails(state)
   const config = getOfflineData(state)
-  const groupId = match.params.groupId
+  const groupId = params.groupId
   const { activeSection, activeSectionGroup } = getValidSectionGroup(
     registerForm.sections,
     declaration,
@@ -1486,9 +1495,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps) {
   )
 
   if (!activeSectionGroup) {
-    throw new Error(
-      `Configuration for group "${match.params.groupId}" missing!`
-    )
+    throw new Error(`Configuration for group "${params.groupId}" missing!`)
   }
 
   const setAllFieldsDirty =

@@ -716,6 +716,13 @@ export function ReviewCorrection() {
         reviewSummaryHeader={
           <ReviewSummarySection declaration={recordWithProposedChanges} />
         }
+        match={{
+          params: {
+            declarationId: record.id,
+            pageId: 'review',
+            groupId: 'review-view-group'
+          }
+        }}
         pageRoute={''}
         registerForm={registerForm!}
         declaration={recordWithProposedChanges}
