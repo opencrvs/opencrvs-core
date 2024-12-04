@@ -368,28 +368,6 @@ fi
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
-function create_elastic_index {
-  local body=$1
-  local index_name=$2
-
-  local -i result=1
-  local output
-
-  output=$(curl -s -D- -m15 -w "%{http_code}" -X PUT "http://localhost:9200/$index_name" -H 'Content-Type: application/json' -d "$body")
-
-  echo "${output}"
-
-  if [[ "${output: -3}" -eq 200 ]]; then
-    result=0
-  fi
-
-  if ((result)); then
-    echo -e "\n${output::-3}\n"
-  fi
-
-  return $result
-}
-create_elastic_index "{\"settings\":{\"number_of_replicas\":0}}" "ocrvs"
 echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
