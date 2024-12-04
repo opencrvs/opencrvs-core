@@ -20,17 +20,34 @@ import { CertifyInput, IssueInput } from './records/validations'
 
 export async function uploadFileToMinio(
   fileData: string,
-  authHeader: IAuthHeader,
-  svg?: boolean
+  authHeader: IAuthHeader
 ): Promise<string> {
-  const suffix = svg ? '/upload-svg' : '/upload'
+  const suffix = '/upload'
   const request = {
     method: 'POST',
     headers: {
       ...authHeader,
-      'Content-Type': svg ? 'image/svg+xml' : 'application/json'
+      'Content-Type': 'application/json'
     },
-    body: svg ? fileData : JSON.stringify({ fileData: fileData })
+    body: JSON.stringify({ fileData: fileData })
+  }
+  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, request)
+  const res = await result.json()
+  return res.refUrl
+}
+
+export async function uploadSVGToMinio(
+  fileData: string,
+  authHeader: IAuthHeader
+): Promise<string> {
+  const suffix = '/upload-svg'
+  const request = {
+    method: 'POST',
+    headers: {
+      ...authHeader,
+      'Content-Type': 'image/svg+xml'
+    },
+    body: fileData
   }
   const result = await fetch(`${DOCUMENTS_URL}${suffix}`, request)
   const res = await result.json()
@@ -45,14 +62,13 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
     certificateDetails.collector.affidavit
   ) {
     for (const affidavit of certificateDetails.collector.affidavit) {
-      affidavit.data = await uploadFileToMinio(affidavit.data, authHeader, true)
+      affidavit.data = await uploadSVGToMinio(affidavit.data, authHeader)
     }
   }
   if ('data' in certificateDetails) {
-    certificateDetails.data = await uploadFileToMinio(
+    certificateDetails.data = await uploadSVGToMinio(
       certificateDetails.data,
-      authHeader,
-      true
+      authHeader
     )
   }
   return certificateDetails
