@@ -20,8 +20,7 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useEventConfigurations } from './useEventConfiguration'
-import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from '@client/v2-events/routes'
-import { formatUrl } from '@client/navigation'
+import { ROUTES } from '@client/v2-events/routes'
 import { useNavigate } from 'react-router-dom'
 
 const messages = defineMessages({
@@ -69,7 +68,7 @@ export const EventSelection = () => {
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
 
   const goToHome = () => {
-    navigate(V2_ROOT_ROUTE)
+    navigate(ROUTES.V2.path)
   }
 
   const handleContinue = () => {
@@ -78,7 +77,7 @@ export const EventSelection = () => {
     }
 
     navigate(
-      formatUrl(V2_EVENT_ROUTE, {
+      ROUTES.V2.EVENTS.CREATE.EVENT.buildPath({
         eventType
       })
     )

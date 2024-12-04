@@ -12,7 +12,7 @@ import { ActionType } from '@opencrvs/commons'
 import { z } from 'zod'
 
 const ActionBase = z.object({
-  createdAt: z.date(),
+  createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.object({})
 })

@@ -20,7 +20,6 @@ import {
 } from '@opencrvs/components'
 import React from 'react'
 import { useEventConfiguration } from './useEventConfiguration'
-import { useParams } from 'react-router-dom'
 import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons/client'
 import {
@@ -29,13 +28,11 @@ import {
   DateField,
   RadioGroup
 } from './registered-fields'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { ROUTES } from '@client/v2-events/routes'
 
 export function EventFormWizardIndex() {
-  const { eventType } = useParams<{ eventType: string }>()
-
-  if (!eventType) {
-    throw new Error('Event type not found')
-  }
+  const { eventType } = useTypedParams(ROUTES.V2.EVENTS.CREATE.EVENT)
 
   const { event, isLoading } = useEventConfiguration(eventType)
 

@@ -17,9 +17,11 @@ export function preloadData() {
 
 export function useEvents() {
   const createEvent = api.event.create.useMutation
+  const getEvents = api.events.get
 
   return {
     createEvent,
+    getEvents,
     actions: {
       declare: api.event.actions.declare
     }
