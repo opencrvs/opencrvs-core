@@ -126,12 +126,18 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
     return
   }
 
-  const goBackToForm = (
+  const handleEdit = async (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
     fieldId: string
   ) => {
     e.stopPropagation()
-    alert('Going back to ' + fieldId)
+    const confirmedEdit = await openModal<boolean | null>((close) => (
+      <EditFieldModal close={close}></EditFieldModal>
+    ))
+    if (confirmedEdit) {
+      alert('Editing field: ' + fieldId)
+    }
+    return
   }
 
   return (
@@ -183,7 +189,7 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
                         labelForHideAction="Hide"
                         labelForShowAction="Show"
                         action={
-                          <Link onClick={(e) => goBackToForm(e, page.id)}>
+                          <Link onClick={(e) => handleEdit(e, page.id)}>
                             Change
                           </Link>
                         }
@@ -197,9 +203,7 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
                               label={field.label.defaultMessage}
                               value={getValueFromFieldId(declaration, field.id)}
                               actions={
-                                <Link
-                                  onClick={(e) => goBackToForm(e, field.id)}
-                                >
+                                <Link onClick={(e) => handleEdit(e, field.id)}>
                                   Change
                                 </Link>
                               }
@@ -345,7 +349,7 @@ const RegisterModal: React.FC<{
         Cancel
       </Button>,
       <Button
-        type="negative"
+        type="primary"
         key="confirm_register"
         id="confirm_register"
         onClick={() => {
@@ -361,6 +365,46 @@ const RegisterModal: React.FC<{
     <Stack>
       <Text variant="reg16" element="p" color="grey500">
         The action will be recorded.
+      </Text>
+    </Stack>
+  </ResponsiveModal>
+)
+
+const EditFieldModal: React.FC<{
+  close: (result: boolean | null) => void
+}> = ({ close }) => (
+  <ResponsiveModal
+    autoHeight
+    responsive={false}
+    title="Edit declaration?"
+    actions={[
+      <Button
+        type="tertiary"
+        id="cancel_edit"
+        key="cancel_edit"
+        onClick={() => {
+          close(null)
+        }}
+      >
+        Cancel
+      </Button>,
+      <Button
+        type="primary"
+        key="confirm_edit"
+        id="confirm_edit"
+        onClick={() => {
+          close(true)
+        }}
+      >
+        Continue
+      </Button>
+    ]}
+    show={true}
+    handleClose={() => close(null)}
+  >
+    <Stack>
+      <Text variant="reg16" element="p" color="grey500">
+        A record will be created of any changes you make
       </Text>
     </Stack>
   </ResponsiveModal>
