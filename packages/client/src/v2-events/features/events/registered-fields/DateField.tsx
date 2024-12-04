@@ -17,7 +17,7 @@ import {
 import { FieldProps } from '@opencrvs/commons'
 import { useIntl } from 'react-intl'
 
-export const DateField = ({ id, options }: FieldProps<'DATE'>) => {
+export const DateField = ({ id, options = {} }: FieldProps<'DATE'>) => {
   const intl = useIntl()
   const { setValue, watch } = useFormContext()
   const value = watch(id)
@@ -26,7 +26,7 @@ export const DateField = ({ id, options }: FieldProps<'DATE'>) => {
     <InputField id={id} touched={false}>
       <DateFieldComponent
         id={id}
-        notice={intl.formatMessage(options.notice)}
+        notice={options.notice && intl.formatMessage(options.notice)}
         onChange={(val) => setValue(id, val)}
         value={value}
       />
