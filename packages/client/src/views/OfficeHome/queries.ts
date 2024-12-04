@@ -76,6 +76,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
 export const REGISTRATION_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query registrationHome(
+    $declarationLocationId: String!
     $pageSize: Int
     $inProgressSkip: Int
     $healthSystemSkip: Int
@@ -89,6 +90,7 @@ export const REGISTRATION_HOME_QUERY = gql`
   ) {
     inProgressTab: searchEvents(
       advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
         compositionType: [
           "birth-declaration"
@@ -106,6 +108,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     }
     notificationTab: searchEvents(
       advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
         registrationStatuses: ["IN_PROGRESS"]
         compositionType: [
           "birth-notification"
@@ -122,7 +125,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     reviewTab: searchEvents(
-      advancedSearchParameters: { registrationStatuses: $reviewStatuses }
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: $reviewStatuses
+      }
       count: $pageSize
       skip: $reviewSkip
     ) {
@@ -132,7 +138,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     rejectTab: searchEvents(
-      advancedSearchParameters: { registrationStatuses: ["REJECTED"] }
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["REJECTED"]
+      }
       count: $pageSize
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
@@ -145,6 +154,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     }
     approvalTab: searchEvents(
       advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
         registrationStatuses: ["VALIDATED", "CORRECTION_REQUESTED"]
       }
       count: $pageSize
@@ -156,7 +166,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     externalValidationTab: searchEvents(
-      advancedSearchParameters: { registrationStatuses: ["WAITING_VALIDATION"] }
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["WAITING_VALIDATION"]
+      }
       count: $pageSize
       skip: $externalValidationSkip
     ) {
@@ -166,7 +179,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     printTab: searchEvents(
-      advancedSearchParameters: { registrationStatuses: ["REGISTERED"] }
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["REGISTERED"]
+      }
       count: $pageSize
       skip: $printSkip
     ) {
@@ -176,7 +192,10 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     issueTab: searchEvents(
-      advancedSearchParameters: { registrationStatuses: ["CERTIFIED"] }
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: ["CERTIFIED"]
+      }
       count: $pageSize
       skip: $issueSkip
     ) {
