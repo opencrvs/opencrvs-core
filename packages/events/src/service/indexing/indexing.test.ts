@@ -10,26 +10,13 @@
  */
 
 import { appRouter, t } from '@events/router'
-import { vi } from 'vitest'
 import { indexAllEvents } from './indexing'
 const { createCallerFactory } = t
 
 import {
   getOrCreateClient,
-  resetServer as resetESServer,
-  setupServer as setupESServer
+  resetServer as resetESServer
 } from '@events/storage/__mocks__/elasticsearch'
-import {
-  resetServer as resetMongoServer,
-  setupServer as setupMongoServer
-} from '@events/storage/__mocks__/mongodb'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-
-vi.mock('@events/storage/mongodb')
-vi.mock('@events/storage/elasticsearch')
-vi.mock('@events/service/config/config', () => ({
-  getEventsConfig: () => Promise.all([tennisClubMembershipEvent])
-}))
 
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
@@ -40,9 +27,6 @@ function createClient() {
 
   return caller
 }
-
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 200000)
-afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
 
 const client = createClient()
 
