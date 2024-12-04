@@ -1115,6 +1115,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             type="tertiary"
                             size="small"
                             onClick={this.props.goBack}
+                            disabled={!canContinue}
                           >
                             <Icon name="ArrowLeft" size="medium" />
                             {intl.formatMessage(buttonMessages.back)}
