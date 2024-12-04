@@ -69,7 +69,6 @@ const systemScopes = {
 export const systemRoleScopes = {
   HEALTH: [systemScopes.declare, systemScopes.notificationApi],
   NATIONAL_ID: [systemScopes.nationalId],
-  AGE_CHECK: [systemScopes.declare],
   RECORD_SEARCH: [systemScopes.recordsearch],
   WEBHOOK: [systemScopes.webhook]
 }
