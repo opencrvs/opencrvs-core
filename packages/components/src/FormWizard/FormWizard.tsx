@@ -13,7 +13,7 @@ import { Field, ComponentsMap, FormFieldRenderer } from './FormFieldRenderer'
 import { FieldValues, FormProvider, useForm } from 'react-hook-form'
 import { flatten } from './flatten-object'
 import { Button } from '../Button'
-import { Stack } from '@opencrvs/components'
+import { Stack } from '../Stack'
 
 /**
  * Definition of a page of the form wizard
