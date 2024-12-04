@@ -9,15 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { api, utils } from '@client/v2-events/trcp'
+import { api, utils } from '@client/v2-events/trpc'
 
 export function preloadData() {
   utils.config.get.ensureData()
 }
 
-export function useEvents() {
-  const createEvent = api.event.create.useMutation
+utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
+  mutationFn: canonicalMutationFn
+}))
 
+export function useEvents() {
+  const createEvent = () =>
+    api.event.create.useMutation({
+      retry: 3,
+      retryDelay: 5000
+    })
   return {
     createEvent,
     actions: {

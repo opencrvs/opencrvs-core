@@ -13,6 +13,9 @@ import React from 'react'
 
 import { useEvents } from '@client/v2-events/features/events/useEvents'
 import styled from 'styled-components'
+import { Text } from '@opencrvs/components'
+import { useOnlineStatus } from '@client/utils'
+import { useQueryClient } from '@tanstack/react-query'
 
 const Container = styled.div`
   background: #fff;
@@ -29,7 +32,8 @@ const Container = styled.div`
 
 export const Debug = () => {
   const events = useEvents()
-
+  const online = useOnlineStatus()
+  const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
   const createEvents = () => {
@@ -51,11 +55,33 @@ export const Debug = () => {
     )
   }
 
+  const mutations = queryClient.getMutationCache().getAll()
   return (
     <Container>
       <ul>
         <li>
+          <Text variant="reg12" element="span">
+            {online ? 'Online' : 'Offline'}
+          </Text>
+        </li>
+        <li>
           <button onClick={createEvents}>Create event</button>
+        </li>
+        <li>
+          <Text variant="reg12" element="span">
+            Failed requests in cache{' '}
+            {mutations
+              .filter((mutation) => mutation.state.isPaused)
+              .length.toString()}
+          </Text>
+        </li>
+        <li>
+          <Text variant="reg12" element="span">
+            Paused requests in cache{' '}
+            {mutations
+              .filter((mutation) => mutation.state.error)
+              .length.toString()}
+          </Text>
         </li>
       </ul>
     </Container>

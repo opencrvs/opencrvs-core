@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { api } from '@client/v2-events/trcp'
+import { api } from '@client/v2-events/trpc'
 
 /**
  * Fetches configured events and finds a matching event

@@ -28,6 +28,11 @@ export const api = createTRPCReact<AppRouter>()
 const getTrpcClient = () => {
   return api.createClient({
     links: [
+      loggerLink({
+        enabled: (op) =>
+          process.env.NODE_ENV === 'development' ||
+          (op.direction === 'down' && op.result instanceof Error)
+      }),
       httpLink({
         url: '/api/events',
         transformer: superjson,
@@ -36,11 +41,6 @@ const getTrpcClient = () => {
             authorization: `Bearer ${getToken()}`
           }
         }
-      }),
-      loggerLink({
-        enabled: (op) =>
-          process.env.NODE_ENV === 'development' ||
-          (op.direction === 'down' && op.result instanceof Error)
       })
     ]
   })
@@ -49,7 +49,14 @@ const getTrpcClient = () => {
 const getQueryClient = () => {
   return new QueryClient({
     defaultOptions: {
-      queries: {}
+      queries: {
+        gcTime: Infinity,
+        retry: 1
+      },
+      mutations: {
+        gcTime: Infinity,
+        retry: 1
+      }
     }
   })
 }
@@ -60,7 +67,8 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
       await storage.setItem(idbValidKey, client)
     },
     restoreClient: async () => {
-      return (await storage.getItem<PersistedClient>(idbValidKey)) || undefined
+      const client = await storage.getItem<PersistedClient>(idbValidKey)
+      return client || undefined
     },
     removeClient: async () => {
       await storage.removeItem(idbValidKey)
@@ -70,10 +78,9 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
 
 const trpcClient = getTrpcClient()
 const queryClient = getQueryClient()
+const persister = createIDBPersister()
 
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
-
-const persister = createIDBPersister()
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -83,10 +90,23 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
+      onSuccess={async (...args) => {
+        queryClient.resumePausedMutations()
+
+        queryClient
+          .getMutationCache()
+          .getAll()
+          .map((m) => m.continue())
+      }}
       persistOptions={{
         persister,
         maxAge: 1000 * 60 * 60 * 4,
-        buster: 'persisted-indexed-db'
+        buster: 'persisted-indexed-db',
+        dehydrateOptions: {
+          shouldDehydrateMutation: () => {
+            return true
+          }
+        }
       }}
     >
       <api.Provider client={trpcClient} queryClient={queryClient}>
