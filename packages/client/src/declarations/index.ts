@@ -19,13 +19,13 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
   Attachment,
   EventType,
   History,
   Query,
-  RegStatus,
-  SCOPES
+  RegStatus
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {

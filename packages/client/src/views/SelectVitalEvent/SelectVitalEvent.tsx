@@ -19,7 +19,8 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { EventType, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,

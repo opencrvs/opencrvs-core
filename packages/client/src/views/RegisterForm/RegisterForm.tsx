@@ -71,7 +71,8 @@ import {
   REJECTED,
   VALIDATED
 } from '@client/utils/constants'
-import { EventType, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import {
   bytesToSize,

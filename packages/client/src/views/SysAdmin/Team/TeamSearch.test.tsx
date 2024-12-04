@@ -29,7 +29,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { vi } from 'vitest'
 import { merge } from 'lodash'
 import { queries } from '@client/profile/queries'
-import { SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 
 describe('Team search test', () => {
   let store: AppStore

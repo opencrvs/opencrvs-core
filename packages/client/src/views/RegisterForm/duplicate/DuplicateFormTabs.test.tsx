@@ -24,7 +24,8 @@ import {
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
-import { EventType, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
 import { vi } from 'vitest'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 

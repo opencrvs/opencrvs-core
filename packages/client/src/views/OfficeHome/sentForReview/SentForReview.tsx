@@ -56,7 +56,8 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
-import { RegStatus, Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { RegStatus } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 

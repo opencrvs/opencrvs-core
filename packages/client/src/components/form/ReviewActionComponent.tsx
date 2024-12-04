@@ -21,7 +21,7 @@ import React, { useState } from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import ProtectedComponent from '@client/components/ProtectedComponent'
-import { SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 import { usePermissions } from '@client/hooks/useAuthorization'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {

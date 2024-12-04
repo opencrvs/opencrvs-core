@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { App } from '@client/App'
-import { EventType, Status, Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { EventType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
