@@ -8,23 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { required, IValidationResult } from '@client/utils/validate'
+import { httpErrorResponseValidator } from '@client/components/form/http'
 import {
+  IDynamicFormField,
   IFormField,
   IFormSectionData,
-  IDynamicFormField,
-  IFormData,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
+import { IValidationResult, required } from '@client/utils/validate'
 import {
   getConditionalActionsForField,
   getFieldValidation,
   isFieldButton
 } from '@opencrvs/client/src/forms/utils'
-import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
-import { httpErrorResponseValidator } from '@client/components/form/http'
-import { UserDetails } from '@client/utils/userUtils'
 
 export interface IFieldErrors {
   errors: IValidationResult[]
@@ -41,9 +38,6 @@ const getValidationErrors = {
   forField: function (
     field: IFormField,
     values: IFormSectionData,
-    offlineCountryConfig: IOfflineData,
-    drafts: IFormData,
-    user: UserDetails | null,
     requiredErrorMessage?: MessageDescriptor,
     checkValidationErrorsOnly?: boolean
   ) {
@@ -51,13 +45,9 @@ const getValidationErrors = {
       field.nestedFields && values[field.name]
         ? (values[field.name] as IFormSectionData).value
         : values[field.name]
-    const conditionalActions = getConditionalActionsForField(
-      field,
-      values,
-      offlineCountryConfig,
-      drafts,
-      user
-    )
+    const conditionalActions = getConditionalActionsForField(field, {
+      $form: values
+    })
     if (
       conditionalActions.includes('hide') ||
       (conditionalActions.includes('disable') && !isFieldButton(field))
@@ -83,29 +73,17 @@ const getValidationErrors = {
     }
 
     const validationResults = validators
-      .map((validator) =>
-        validator(value, drafts, offlineCountryConfig, values)
-      )
+      .map((validator) => validator(value, { $form: values }))
       .filter((error) => error !== undefined) as IValidationResult[]
 
     return {
       errors: validationResults,
-      nestedFields: this.forNestedField(
-        field,
-        values,
-        offlineCountryConfig,
-        drafts,
-        user,
-        requiredErrorMessage
-      )
+      nestedFields: this.forNestedField(field, values, requiredErrorMessage)
     }
   },
   forNestedField: function (
     field: IFormField,
     values: IFormSectionData,
-    resource: IOfflineData,
-    drafts: IFormData,
-    user: UserDetails | null,
     requiredErrorMessage?: MessageDescriptor
   ): {
     [fieldName: string]: IValidationResult[]
@@ -119,11 +97,7 @@ const getValidationErrors = {
         const errors = this.forField(
           nestedField,
           (values[field.name] as IFormSectionData)
-            .nestedFields as IFormSectionData,
-          resource,
-          drafts,
-          user,
-          requiredErrorMessage
+            .nestedFields as IFormSectionData
         ).errors
 
         return {
@@ -139,9 +113,6 @@ const getValidationErrors = {
 export function getValidationErrorsForForm(
   fields: IFormField[],
   values: IFormSectionData,
-  resource: IOfflineData,
-  drafts: IFormData,
-  user: UserDetails | null,
   requiredErrorMessage?: MessageDescriptor,
   checkValidationErrorsOnly?: boolean
 ) {
@@ -155,9 +126,6 @@ export function getValidationErrorsForForm(
             [field.name]: getValidationErrors.forField(
               field,
               values,
-              resource,
-              drafts,
-              user,
               requiredErrorMessage,
               checkValidationErrorsOnly
             )

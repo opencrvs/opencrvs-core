@@ -8,81 +8,67 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { Field, ComponentsMap, FormFieldRenderer } from './FormFieldRenderer'
-import { FieldValues, FormProvider, useForm } from 'react-hook-form'
-import { flatten } from './flatten-object'
+import React, { PropsWithChildren } from 'react'
+import { FieldValues } from 'react-hook-form'
 import { Button } from '../Button'
 import { Stack } from '../Stack'
+import { Frame } from '../Frame'
+import { Content } from '../Content'
+import { Icon } from '../Icon'
 
-/**
- * Definition of a page of the form wizard
- */
-type Page<CM extends ComponentsMap> = {
-  fields: Array<Field<CM>>
-}
-
-type FormWizardProps<CM extends ComponentsMap> = {
-  /** The field type to component map the form wizard will use to render the fields */
-  components: CM
+type FormWizardProps = PropsWithChildren<{
   currentPage: number
-  pages: Page<CM>[]
-  defaultValues?: FieldValues
+  totalPages: number
   /** Callback when the user clicks the "Continue" button */
   onNextPage?: () => void
+  onPreviousPage?: () => void
+
   /** Callback when the user submits the form wizard */
-  onSubmit: (data: FieldValues) => void
-}
+  onSubmit: () => void
+  pageTitle: string
+}>
 
-/**
- * Form Wizard acts as a JSON input to component output mapper.
- * It defines a concept of pages, which are collections of fields.
- */
-export const FormWizard = <CM extends ComponentsMap>({
+export const FormWizard = ({
+  children,
   currentPage,
-  pages,
-  defaultValues,
-  components,
+  totalPages,
+  onSubmit,
+  pageTitle,
   onNextPage,
-  onSubmit
-}: FormWizardProps<CM>) => {
-  const form = useForm({ defaultValues, mode: 'onBlur' })
-
-  const page = pages[currentPage]
-
-  if (!page) {
-    throw new Error(`Page #${currentPage} not found!`)
+  onPreviousPage
+}: FormWizardProps) => {
+  const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    onSubmit()
   }
 
-  /**
-   * By default, react-hook-form extracts `foo.bar.baz` as a deep object,
-   * but we wanna flatten it to `{ "foo.bar.baz": "value" }`.
-   */
-  const flatOnSubmit = (data: FieldValues) =>
-    onSubmit(flatten<FieldValues>(data))
-
   return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(flatOnSubmit)}>
-        <Stack direction="column" gap={16} alignItems="stretch">
-          {page.fields.map((field) => (
-            <FormFieldRenderer
-              key={field.id}
-              field={field}
-              components={components}
-            />
-          ))}
+    <Frame.LayoutForm>
+      <Frame.SectionFormBackAction>
+        {currentPage > 0 && (
+          <Button type="tertiary" size="small" onClick={onPreviousPage}>
+            <Icon name="ArrowLeft" size="medium" />
+            Back
+          </Button>
+        )}
+      </Frame.SectionFormBackAction>
+      <Frame.Section>
+        <Content title={pageTitle}>
+          <form onSubmit={onFormSubmit}>
+            <Stack direction="column" gap={16} alignItems="stretch">
+              {children}
 
-          {onNextPage ? (
-            <Button type="primary" onClick={onNextPage}>
-              Continue
-            </Button>
-          ) : (
-            // Initial simple submit for testing
-            <Button type="primary">Submit</Button>
-          )}
-        </Stack>
-      </form>
-    </FormProvider>
+              {currentPage + 1 < totalPages ? (
+                <Button type="primary" onClick={onNextPage}>
+                  Continue
+                </Button>
+              ) : (
+                <Button type="primary">Submit</Button>
+              )}
+            </Stack>
+          </form>
+        </Content>
+      </Frame.Section>
+    </Frame.LayoutForm>
   )
 }

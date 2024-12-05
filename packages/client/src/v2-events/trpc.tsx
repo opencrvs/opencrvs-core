@@ -103,8 +103,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         maxAge: 1000 * 60 * 60 * 4,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
-          shouldDehydrateMutation: () => {
-            return true
+          shouldDehydrateMutation: (mut) => {
+            return mut.state.status !== 'success'
           }
         }
       }}

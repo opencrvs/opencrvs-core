@@ -56,6 +56,7 @@ export const Debug = () => {
   }
 
   const mutations = queryClient.getMutationCache().getAll()
+  const storedEvents = events.useStoredEvents()
   return (
     <Container>
       <ul>
@@ -81,6 +82,14 @@ export const Debug = () => {
             {mutations
               .filter((mutation) => mutation.state.error)
               .length.toString()}
+          </Text>
+        </li>
+        <li>
+          <button onClick={() => queryClient.clear()}>Clear</button>
+        </li>
+        <li>
+          <Text variant="reg12" element="span">
+            IndexedDB stores: {storedEvents.data?.length} events
           </Text>
         </li>
       </ul>

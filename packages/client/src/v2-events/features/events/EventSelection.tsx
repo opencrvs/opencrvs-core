@@ -24,6 +24,8 @@ import { V2_ROOT_ROUTE, V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import { Spinner } from '@opencrvs/components'
+import { useEvents } from './useEvents'
+import { Debug } from '../debug/debug'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -66,17 +68,26 @@ const EventSelector = () => {
   const intl = useIntl()
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
-  const events = useEventConfigurations()
+  const eventConfigurations = useEventConfigurations()
+  const events = useEvents()
   const history = useHistory()
 
-  const handleContinue = () => {
+  const createEvent = events.createEvent()
+
+  const handleContinue = async () => {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
+    const transactionId = Math.random().toString()
+
+    createEvent.mutate({
+      type: eventType,
+      transactionId
+    })
 
     history.push(
       formatUrl(V2_CREATE_EVENT_ROUTE, {
-        eventType
+        eventId: transactionId
       })
     )
   }
@@ -94,7 +105,7 @@ const EventSelector = () => {
         alignItems="left"
         gap={16}
       >
-        {events.map((event) => (
+        {eventConfigurations.map((event) => (
           <RadioButton
             size="large"
             key={`${event.id}event`}
@@ -171,6 +182,7 @@ export const EventSelection = () => {
           <EventSelector />
         </React.Suspense>
       </Content>
+      <Debug />
     </Frame>
   )
 }
