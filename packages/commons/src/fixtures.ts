@@ -9,6 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/*
+ * @public
+ */
 export * from './fixtures/birth-bundle'
 export * from './fixtures/death-bundle'
 export * from './fixtures/marriage-bundle'

@@ -10,9 +10,6 @@
  */
 import { defineConfig } from '../events'
 
-/*
- * @public
- */
 export const tennisClubMembershipEvent = defineConfig({
   id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {
