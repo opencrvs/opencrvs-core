@@ -153,7 +153,7 @@ export const WorkqueueIndex = ({ loading, error }: IReviewTabProps) => {
     >
       <ReactTooltip id="validateTooltip">
         <ToolTipContainer>
-          {intl.formatMessage(messages.validatedDeclarationTooltipForRegistrar)}
+          {intl.formatMessage(messages.empty)}
         </ToolTipContainer>
       </ReactTooltip>
       <Workqueue

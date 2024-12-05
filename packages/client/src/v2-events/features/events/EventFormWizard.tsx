@@ -50,7 +50,7 @@ export function EventFormWizardIndex() {
   )
 }
 
-export function EventFormWizard({ event }: { event: EventConfig }) {
+function EventFormWizard({ event }: { event: EventConfig }) {
   const intl = useIntl()
   const { page, next, previous } = usePagination(
     event.actions[0].forms[0].pages.length

@@ -10,30 +10,29 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface INavigationMessages
+interface IWorkQueueMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   CREATED: MessageDescriptor
   DECLARED: MessageDescriptor
   REGISTERED: MessageDescriptor
 }
 
-const messagesToDefine: INavigationMessages = {
+const messagesToDefine: IWorkQueueMessages = {
   CREATED: {
-    defaultMessage: 'In progress',
-    description: 'In progress label in navigation',
-    id: 'navigation.CREATED'
+    id: 'wq.noRecords.CREATED',
+    defaultMessage: 'No records in progress',
+    description: 'No records messages for empty draft tab'
   },
   DECLARED: {
-    defaultMessage: 'Ready for review',
-    description: 'Ready for review label in navigation',
-    id: 'navigation.DECLARED'
+    id: 'wq.noRecords.DECLARED',
+    defaultMessage: 'No records ready for review',
+    description: 'No records messages for ready for review tab'
   },
   REGISTERED: {
-    defaultMessage: 'Ready to print',
-    description: 'Ready to print label in navigation',
-    id: 'navigation.REGISTERED'
+    id: 'wq.noRecords.REGISTERED',
+    defaultMessage: 'No records ready to print',
+    description: 'No records messages for ready to print tab'
   }
 }
 
-export const navigationMessages: INavigationMessages =
-  defineMessages(messagesToDefine)
+export const wqMessages: IWorkQueueMessages = defineMessages(messagesToDefine)

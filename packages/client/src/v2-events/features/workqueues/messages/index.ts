@@ -1,5 +1,5 @@
 export * from './constants'
 export * from './registrarHome'
-export * from './workflow'
+export * from './workqueue'
 export * from './navigation'
 export * from './errors'
