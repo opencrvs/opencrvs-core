@@ -82,16 +82,6 @@ export const getRoutes = () => {
     },
     {
       method: 'POST',
-      path: '/records/{id}/upsert',
-      handler: upsertRegistrationHandler,
-      config: {
-        tags: ['api'],
-        description:
-          'Upsert Register event based on tracking id and registration number.'
-      }
-    },
-    {
-      method: 'POST',
       path: '/create-record',
       handler: createRecordHandler,
       config: {

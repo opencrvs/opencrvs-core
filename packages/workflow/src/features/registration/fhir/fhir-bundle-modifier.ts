@@ -23,7 +23,8 @@ import {
   findExtension,
   getResourceFromBundleById,
   resourceIdentifierToUUID,
-  SupportedPatientIdentifierCode
+  SupportedPatientIdentifierCode,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -167,6 +168,46 @@ async function checkForDuplicateStatusUpdate(taskResource: Task) {
 
 export function updatePatientIdentifierWithRN(
   record: WaitingForValidationRecord,
+  composition: Composition,
+  sectionCodes: string[],
+  identifierType: SupportedPatientIdentifierCode,
+  registrationNumber: string
+): Saved<Patient>[] {
+  return sectionCodes.map((sectionCode) => {
+    const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
+    const patientId = resourceIdentifierToUUID(
+      sectionEntry.reference as ResourceIdentifier
+    )
+    const patient = getResourceFromBundleById<Patient>(record, patientId)
+
+    if (!patient.identifier) {
+      patient.identifier = []
+    }
+    const rnIdentifier = patient.identifier.find(
+      (identifier: fhir3.Identifier) =>
+        identifier.type?.coding?.[0].code === identifierType
+    )
+    if (rnIdentifier) {
+      rnIdentifier.value = registrationNumber
+    } else {
+      patient.identifier.push({
+        type: {
+          coding: [
+            {
+              system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+              code: identifierType
+            }
+          ]
+        },
+        value: registrationNumber
+      })
+    }
+    return patient
+  })
+}
+
+export function upsertPatientIdentifierWithRN(
+  record: ValidRecord,
   composition: Composition,
   sectionCodes: string[],
   identifierType: SupportedPatientIdentifierCode,

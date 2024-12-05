@@ -11,7 +11,7 @@
 import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
-import { getEventType } from './utils'
+import { getEventType } from '@workflow/features/registration/utils'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import {
