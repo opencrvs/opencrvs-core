@@ -31,17 +31,8 @@ export function useEventConfigurations() {
  * @returns event configuration
  */
 export function useEventConfiguration(eventIdentifier: string) {
-  const hook = useEventConfigurations()
-  const { error, data, isFetching } = hook
+  const [config] = api.config.get.useSuspenseQuery()
+  const event = config?.find((event) => event.id === eventIdentifier)
 
-  const event = data?.find((event) => event.id === eventIdentifier)
-
-  const noMatchingEvent = !isFetching && !event
-
-  return {
-    // We hide the distinction between fetching (all calls) and loading (initial call) from the caller.
-    isLoading: isFetching,
-    error: noMatchingEvent ? 'Event not found' : error?.message,
-    event: event
-  }
+  return { event }
 }

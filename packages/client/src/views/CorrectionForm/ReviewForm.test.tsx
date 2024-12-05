@@ -59,6 +59,8 @@ declaration.data.registration = {
 
 describe('Review form for an declaration', () => {
   beforeEach(async () => {
+    await flushPromises()
+
     const appBundle = await createTestApp(undefined, [
       formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
         declarationId: declaration.id,
@@ -73,6 +75,7 @@ describe('Review form for an declaration', () => {
 
     store.dispatch(storeDeclaration(declaration))
 
+    await flushPromises()
     router.navigate(
       formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
         declarationId: declaration.id,

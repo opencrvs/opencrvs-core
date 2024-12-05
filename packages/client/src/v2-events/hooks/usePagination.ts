@@ -10,7 +10,7 @@
  */
 import { useState } from 'react'
 
-// TODO: Paginate with react-router-dom
+// TODO: Paginate with react-router-dom v6 using ?page=1... etc.
 export const usePagination = (
   /** Amount of pages to iterate through */
   pages: number
@@ -21,7 +21,6 @@ export const usePagination = (
   const previous = page > 0 ? () => setPage(page - 1) : undefined
 
   return {
-    /** Page number between 0 and pages - 1 */
     page,
     next,
     previous

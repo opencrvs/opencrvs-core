@@ -16,11 +16,12 @@ import {
   Button,
   Icon,
   Content,
-  FormWizard
+  FormWizard,
+  Spinner
 } from '@opencrvs/components'
 import React from 'react'
 import { useEventConfiguration } from './useEventConfiguration'
-import { useEventForm } from './useEventForm'
+
 import { EventConfig } from '@opencrvs/commons/client'
 import {
   TextField,
@@ -30,37 +31,46 @@ import {
 } from './registered-fields'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { ROUTES } from '@client/v2-events/routes'
+import { usePagination } from '@client/v2-events/hooks/usePagination'
+import { useEventFormNavigation } from './useEventFormNavigation'
+import { useIntl } from 'react-intl'
 
 export function EventFormWizardIndex() {
   const { eventType } = useTypedParams(ROUTES.V2.EVENTS.CREATE.EVENT)
 
-  const { event, isLoading } = useEventConfiguration(eventType)
-
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
+  const { event } = useEventConfiguration(eventType)
 
   if (!event) {
     throw new Error('Event not found')
   }
 
-  return <EventFormWizard event={event} />
+  return (
+    <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+      <EventFormWizard event={event} />
+    </React.Suspense>
+  )
 }
 
 export function EventFormWizard({ event }: { event: EventConfig }) {
-  const { title, pages, exit, saveAndExit, previous, next, currentPageIndex } =
-    useEventForm(event)
+  const intl = useIntl()
+  const { page, next, previous } = usePagination(
+    event.actions[0].forms[0].pages.length
+  )
+  const { modal, exit } = useEventFormNavigation()
 
   return (
     <Frame
       skipToContentText="Skip to form"
       header={
         <AppBar
-          mobileLeft={title}
-          desktopLeft={title}
+          mobileLeft={intl.formatMessage(event.label)}
+          desktopLeft={intl.formatMessage(event.label)}
           desktopRight={
             <Stack direction="row">
-              <Button type="primary" onClick={saveAndExit}>
+              <Button
+                type="primary"
+                onClick={() => alert('Whoops... Not implemented.')}
+              >
                 <Icon name="DownloadSimple" />
                 Save and exit
               </Button>
@@ -73,6 +83,8 @@ export function EventFormWizard({ event }: { event: EventConfig }) {
         />
       }
     >
+      {modal}
+
       <Frame.LayoutForm>
         <Frame.SectionFormBackAction>
           {previous && (
@@ -84,10 +96,10 @@ export function EventFormWizard({ event }: { event: EventConfig }) {
         </Frame.SectionFormBackAction>
 
         <Frame.Section>
-          <Content title={title}>
+          <Content title={intl.formatMessage(event.label)}>
             <FormWizard
-              currentPage={currentPageIndex}
-              pages={pages}
+              currentPage={page}
+              pages={event.actions[0].forms[0].pages}
               components={{
                 TEXT: TextField,
                 PARAGRAPH: Paragraph,
