@@ -21,6 +21,7 @@
     "@opencrvs/commons": "^1.7.0",
     "app-module-path": "^2.2.0",
     "date-fns": "^2.28.0",
+    "envalid": "^8.0.0",
     "file-type": "^16.5.3",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-pino": "^9.0.0",

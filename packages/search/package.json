@@ -23,6 +23,7 @@
     "app-module-path": "^2.2.0",
     "country-data": "^0.0.31",
     "date-fns": "^2.29.3",
+    "envalid": "^8.0.0",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-pino": "^9.0.0",
     "hapi-sentry": "^3.1.0",
