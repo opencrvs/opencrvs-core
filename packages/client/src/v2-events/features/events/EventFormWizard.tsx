@@ -30,9 +30,13 @@ import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents'
 import { formatUrl } from '@client/navigation'
 import { V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
+import { EventDocument } from '@events/schema'
 
 export function EventFormWizardIndex() {
-  const { eventId } = useParams<{ eventId: string }>()
+  const { eventId, actionType } = useParams<{
+    actionType: string
+    eventId: string
+  }>()
   const events = useEvents()
 
   const event = events.getEvent(eventId)
@@ -44,19 +48,21 @@ export function EventFormWizardIndex() {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
   const history = useHistory()
+
   useEffect(() => {
-    if (eventId !== event.id && event.id !== '__EMPTY__') {
+    if (eventId !== event.id && event.id !== event.transactionId) {
       history.push(
         formatUrl(V2_CREATE_EVENT_ROUTE, {
-          eventId: event.id
+          eventId: event.id,
+          actionType
         })
       )
     }
-  }, [event.id, eventId, history])
+  }, [actionType, event.id, event.transactionId, eventId, history])
 
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
-      <EventFormWizard event={eventConfiguration} />
+      <EventFormWizard event={event} configuration={eventConfiguration} />
     </React.Suspense>
   )
 }
@@ -103,18 +109,27 @@ const messages = defineMessages({
   }
 })
 
-function EventFormWizard({ event }: { event: EventConfig }) {
+function EventFormWizard({
+  configuration,
+  event
+}: {
+  event: EventDocument
+  configuration: EventConfig
+}) {
   const intl = useIntl()
   const [formValues, setFormValues] = React.useState<any>({})
-  const { modal, exit } = useEventFormNavigation()
+  const { modal, exit, goToHome } = useEventFormNavigation()
+  const events = useEvents()
 
-  const pages = event.actions[0].forms[0].pages
+  const pages = configuration.actions[0].forms[0].pages
   const {
     page: currentPage,
     next,
     previous,
     total
   } = usePagination(pages.length)
+
+  const declareMutation = events.actions.declare()
 
   const TODO = () => {}
   const IS_TODO = Math.random() > 0.5
@@ -138,7 +153,7 @@ function EventFormWizard({ event }: { event: EventConfig }) {
         <AppBar
           desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
           desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-            event: intl.formatMessage(event.label)
+            event: intl.formatMessage(configuration.label)
           })}
           desktopRight={
             <>
@@ -163,7 +178,7 @@ function EventFormWizard({ event }: { event: EventConfig }) {
           }
           mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
           mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-            event: intl.formatMessage(event.label)
+            event: intl.formatMessage(configuration.label)
           })}
           mobileRight={
             <>
@@ -189,7 +204,14 @@ function EventFormWizard({ event }: { event: EventConfig }) {
       <FormWizard
         currentPage={currentPage}
         totalPages={total}
-        onSubmit={() => console.log(formValues)}
+        onSubmit={() => {
+          declareMutation.mutate({
+            eventId: event.id,
+            data: formValues,
+            transactionId: Math.random().toString()
+          })
+          goToHome()
+        }}
         pageTitle={intl.formatMessage(page.title)}
         onNextPage={next}
         onPreviousPage={previous}

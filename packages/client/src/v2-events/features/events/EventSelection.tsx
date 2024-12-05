@@ -87,7 +87,8 @@ const EventSelector = () => {
 
     history.push(
       formatUrl(V2_CREATE_EVENT_ROUTE, {
-        eventId: transactionId
+        eventId: transactionId,
+        actionType: 'declare'
       })
     )
   }

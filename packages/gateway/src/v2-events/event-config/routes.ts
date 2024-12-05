@@ -18,9 +18,7 @@ export const trpcProxy = [
     path: '/events/{path*}',
     handler: (req, h) => {
       logger.info(`Proxying request to ${req.params.path}`)
-      // if (req.params.path === 'event.create') {
-      //   throw new Error('Not implemented')
-      // }
+
       return h.proxy({
         uri: new URL(req.params.path, env.EVENTS_URL).toString(),
         passThrough: true

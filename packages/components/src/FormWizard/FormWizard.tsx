@@ -37,11 +37,6 @@ export const FormWizard = ({
   onNextPage,
   onPreviousPage
 }: FormWizardProps) => {
-  const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    onSubmit()
-  }
-
   return (
     <Frame.LayoutForm>
       <Frame.SectionFormBackAction>
@@ -54,19 +49,19 @@ export const FormWizard = ({
       </Frame.SectionFormBackAction>
       <Frame.Section>
         <Content title={pageTitle}>
-          <form onSubmit={onFormSubmit}>
-            <Stack direction="column" gap={16} alignItems="stretch">
-              {children}
+          <Stack direction="column" gap={16} alignItems="stretch">
+            {children}
 
-              {currentPage + 1 < totalPages ? (
-                <Button type="primary" onClick={onNextPage}>
-                  Continue
-                </Button>
-              ) : (
-                <Button type="primary">Submit</Button>
-              )}
-            </Stack>
-          </form>
+            {currentPage + 1 < totalPages ? (
+              <Button type="primary" role="button" onClick={onNextPage}>
+                Continue
+              </Button>
+            ) : (
+              <Button type="primary" onClick={onSubmit}>
+                Submit
+              </Button>
+            )}
+          </Stack>
         </Content>
       </Frame.Section>
     </Frame.LayoutForm>
