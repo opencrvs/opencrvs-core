@@ -18,9 +18,13 @@ import {
   resetServer as resetESServer,
   setupServer as setupESServer
 } from './storage/__mocks__/elasticsearch'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
+vi.mock('@events/service/config/config', () => ({
+  getEventsConfig: () => Promise.all([tennisClubMembershipEvent])
+}))
 
 beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
 afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
