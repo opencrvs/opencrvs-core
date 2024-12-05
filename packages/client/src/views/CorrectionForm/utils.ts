@@ -412,9 +412,13 @@ const getFormFieldValue = (
   let tempField: IFormField
   for (const key in sectionDraftData) {
     tempField = sectionDraftData[key] as IFormField
-    return (tempField &&
+    if (
+      tempField &&
       tempField.nestedFields &&
-      tempField.nestedFields[field.name]) as IFormFieldValue
+      field.name in tempField.nestedFields
+    ) {
+      return tempField.nestedFields[field.name] as IFormFieldValue
+    }
   }
   return ''
 }
