@@ -15,11 +15,12 @@ export function preloadData() {
   utils.config.get.ensureData()
 }
 
-utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn
-}))
+// utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
+//   mutationFn: canonicalMutationFn
+// }))
 
 export function useEvents() {
+  const getEvents = api.events.get
   const createEvent = () =>
     api.event.create.useMutation({
       retry: 3,
@@ -27,6 +28,7 @@ export function useEvents() {
     })
   return {
     createEvent,
+    getEvents,
     actions: {
       declare: api.event.actions.declare
     }

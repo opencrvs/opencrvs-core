@@ -1,0 +1,48 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import { EventStatus } from '@events/schema/EventIndex'
+import { route, string } from 'react-router-typesafe-routes/dom'
+import { zod } from 'react-router-typesafe-routes/zod'
+import { z } from 'zod'
+
+export const ROUTES = {
+  V2: route(
+    'v2',
+    {},
+    {
+      EVENTS: route(
+        'events',
+        {},
+        {
+          VIEW: route('view', {
+            searchParams: {
+              status: zod(z.nativeEnum(EventStatus)).default(
+                EventStatus.CREATED
+              ),
+              limit: zod(z.number().min(1).max(100)).default(10),
+              offset: zod(z.number().min(0)).default(0)
+            }
+          }),
+          CREATE: route(
+            'create',
+            {},
+            {
+              EVENT: route(':eventType', {
+                params: { eventType: string().defined() }
+              })
+            }
+          )
+        }
+      )
+    }
+  )
+}

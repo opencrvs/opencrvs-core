@@ -20,8 +20,8 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useEventConfigurations } from './useEventConfiguration'
+import { ROUTES } from '@client/v2-events/routes'
 import { useNavigate } from 'react-router-dom'
-import { V2_ROOT_ROUTE, V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
 import { Spinner } from '@opencrvs/components'
 import { formatUrl } from '@client/navigation'
 
@@ -75,7 +75,7 @@ const EventSelector = () => {
     }
 
     navigate(
-      formatUrl(V2_CREATE_EVENT_ROUTE, {
+      ROUTES.V2.EVENTS.CREATE.EVENT.buildPath({
         eventType
       })
     )
@@ -130,8 +130,9 @@ export const EventSelection = () => {
   const navigate = useNavigate()
 
   const goToHome = () => {
-    navigate(V2_ROOT_ROUTE)
+    navigate(ROUTES.V2.path)
   }
+
   return (
     <Frame
       header={

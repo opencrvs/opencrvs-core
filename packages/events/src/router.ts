@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { initTRPC, TRPCError } from '@trpc/server'
+import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
 
@@ -27,6 +27,8 @@ import {
   patchEvent
 } from './service/events'
 import { EventConfig } from '@opencrvs/commons'
+import { getIndexedEvents } from './service/indexing/indexing'
+import { EventIndices } from './schema/EventIndex'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -58,19 +60,6 @@ export const appRouter = router({
   }),
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
-      const config = await getEventsConfig(options.ctx.token)
-
-      const eventIds = config.map((c) => c.id)
-
-      if (!eventIds.includes(options.input.type)) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `Invalid event type ${
-            options.input.type
-          }. Valid event types are: ${eventIds.join(', ')}`
-        })
-      }
-
       return createEvent(
         options.input,
         options.ctx.user.id,
@@ -97,6 +86,11 @@ export const appRouter = router({
           createdBy: options.ctx.user.id
         })
       })
+    })
+  }),
+  events: router({
+    get: publicProcedure.output(EventIndices).query(async () => {
+      return getIndexedEvents()
     })
   })
 })

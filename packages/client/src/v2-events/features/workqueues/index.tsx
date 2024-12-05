@@ -12,27 +12,39 @@
 import React from 'react'
 
 import { Debug } from '@client/v2-events/features/debug/debug'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
 import {
-  AppBar,
-  Button,
-  Content,
-  ContentSize,
   Frame,
+  AppBar,
+  Stack,
+  Button,
   Icon,
   LeftNavigation,
   NavigationGroup,
   NavigationItem,
-  SearchTool,
-  Stack,
-  Text
+  SearchTool
 } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
-import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@client/v2-events/routes'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useEvents } from '@client/v2-events/features/events/useEvents'
+import groupBy from 'lodash-es/groupBy'
+import { EventStatus } from '@events/schema/EventIndex'
 
-export const Workqueues = () => {
+export const Workqueues = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
+  const { getEvents } = useEvents()
+  const events = getEvents.useQuery()
+
+  const createQueueUrl = (status: EventStatus) =>
+    ROUTES.V2.EVENTS.VIEW.buildPath(
+      {},
+      {
+        status
+      }
+    )
+
+  const eventsByStatus = groupBy(events.data, (event) => event.status)
 
   return (
     <Frame
@@ -41,27 +53,39 @@ export const Workqueues = () => {
           applicationName="OpenCRVS-TS (Tennis club)"
           applicationVersion="0.1-alpha"
         >
+          {/* @TODO: Consider mapping through these once we know the mapping.
+            Currently it seems we would need to give that through configuration.
+          */}
           <NavigationGroup>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              label="In progress"
-            />
+            <NavLink to={createQueueUrl(EventStatus.CREATED)}>
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'purple'} />}
+                label="In progress"
+                count={eventsByStatus[EventStatus.CREATED]?.length}
+              />
+            </NavLink>
+            <NavLink to={createQueueUrl(EventStatus.DECLARED)}>
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'teal'} />}
+                label="Ready for review"
+                count={eventsByStatus[EventStatus.DECLARED]?.length}
+              />
+            </NavLink>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'orange'} />}
-              label="Ready for review"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
               label="Requires updates"
             />
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'grey'} />}
               label="Sent for approval"
             />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'green'} />}
-              label="Ready to print"
-            />
+            <NavLink to={createQueueUrl(EventStatus.REGISTERED)}>
+              <NavigationItem
+                icon={() => <DeclarationIconSmall color={'green'} />}
+                label="Ready to print"
+                count={eventsByStatus[EventStatus.REGISTERED]?.length}
+              />
+            </NavLink>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'blue'} />}
               label="Ready to issue"
@@ -91,7 +115,7 @@ export const Workqueues = () => {
               <Button
                 type="iconPrimary"
                 onClick={() => {
-                  navigate(V2_EVENTS_ROUTE)
+                  navigate(ROUTES.V2.EVENTS.CREATE.path)
                 }}
               >
                 <Plus />
@@ -114,11 +138,7 @@ export const Workqueues = () => {
         />
       }
     >
-      <Content size={ContentSize.LARGE} title="Welcome">
-        <Text variant="h2" element="p">
-          🚧🚧🚧🚧🚧🚧🚧🚧👷‍♂️👷👷🏻👷🏻‍♀️👷‍♂️👷‍♂️🚧🚧🚧🚧🚧🚧🚧🚧
-        </Text>
-      </Content>
+      {children}
       <Debug />
     </Frame>
   )

@@ -28,17 +28,14 @@ import {
   DateField,
   RadioGroup
 } from './registered-fields'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { ROUTES } from '@client/v2-events/routes'
+import { useIntl } from 'react-intl'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { useEventFormNavigation } from './useEventFormNavigation'
-import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
 
 export function EventFormWizardIndex() {
-  const { eventType } = useParams<{ eventType: string }>()
-
-  if (!eventType) {
-    throw new Error('Event type not found')
-  }
+  const { eventType } = useTypedParams(ROUTES.V2.EVENTS.CREATE.EVENT)
 
   const { event } = useEventConfiguration(eventType)
 

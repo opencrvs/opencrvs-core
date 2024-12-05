@@ -58,12 +58,6 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
-import { Workqueues } from './v2-events/features/workqueues'
-import {
-  V2_CREATE_EVENT_ROUTE,
-  V2_EVENTS_ROUTE,
-  V2_ROOT_ROUTE
-} from './v2-events/routes'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReloadModal } from './views/Modals/ReloadModal'
@@ -77,9 +71,7 @@ import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
-import { EventSelection } from './v2-events/features/events/EventSelection'
-import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
-import { TRPCProvider } from './v2-events/trpc'
+import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -380,30 +372,7 @@ export const routesConfig = [
         path: routes.REVIEW_USER_DETAILS,
         element: <CreateNewUser />
       },
-      {
-        path: V2_ROOT_ROUTE,
-        element: (
-          <TRPCProvider>
-            <Workqueues />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: V2_EVENTS_ROUTE,
-        element: (
-          <TRPCProvider>
-            <EventSelection />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: V2_CREATE_EVENT_ROUTE,
-        element: (
-          <TRPCProvider>
-            <EventFormWizardIndex />
-          </TRPCProvider>
-        )
-      }
+      v2RoutesConfig
     ]
   }
 ]

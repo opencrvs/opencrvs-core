@@ -11,26 +11,33 @@
 
 import { z } from 'zod'
 
-const Status = z.enum([
-  'CREATED',
-  'NOTIFIED',
-  'DECLARED',
-  'REGISTERED',
-  'CERTIFIED'
-])
+/**
+ * Event statuses recognized by the system
+ */
+export const EventStatus = {
+  CREATED: 'CREATED',
+  NOTIFIED: 'NOTIFIED',
+  DECLARED: 'DECLARED',
+  REGISTERED: 'REGISTERED',
+  CERTIFIED: 'CERTIFIED'
+} as const
+export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
-export type Status = z.infer<typeof Status>
+export const eventStatuses = Object.values(EventStatus)
+export const EventStatuses = z.nativeEnum(EventStatus)
+
 export const EventIndex = z.object({
   id: z.string(),
   type: z.string(),
-  status: Status,
-  createdAt: z.date(),
+  status: EventStatuses,
+  createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdAtLocation: z.string(),
-  modifiedAt: z.date(),
+  modifiedAt: z.string().datetime(),
   assignedTo: z.string().nullable(),
   updatedBy: z.string(),
   data: z.object({})
 })
 
 export type EventIndex = z.infer<typeof EventIndex>
+export const EventIndices = z.array(EventIndex)
