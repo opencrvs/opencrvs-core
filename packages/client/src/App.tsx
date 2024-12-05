@@ -60,7 +60,7 @@ import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
 import { Workqueues } from './v2-events/features/workqueues'
 import {
-  V2_EVENT_ROUTE,
+  V2_CREATE_EVENT_ROUTE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE
 } from './v2-events/routes'
@@ -397,7 +397,7 @@ export const routesConfig = [
         )
       },
       {
-        path: V2_EVENT_ROUTE,
+        path: V2_CREATE_EVENT_ROUTE,
         element: (
           <TRPCProvider>
             <EventFormWizardIndex />

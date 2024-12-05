@@ -20,9 +20,10 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useEventConfigurations } from './useEventConfiguration'
-import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from '@client/v2-events/routes'
-import { formatUrl } from '@client/navigation'
 import { useNavigate } from 'react-router-dom'
+import { V2_ROOT_ROUTE, V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
+import { Spinner } from '@opencrvs/components'
+import { formatUrl } from '@client/navigation'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -61,16 +62,12 @@ const constantsMessages = defineMessages({
   }
 })
 
-export const EventSelection = () => {
+const EventSelector = () => {
   const intl = useIntl()
   const navigate = useNavigate()
   const events = useEventConfigurations()
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
-
-  const goToHome = () => {
-    navigate(V2_ROOT_ROUTE)
-  }
 
   const handleContinue = () => {
     if (eventType === '') {
@@ -78,12 +75,63 @@ export const EventSelection = () => {
     }
 
     navigate(
-      formatUrl(V2_EVENT_ROUTE, {
+      formatUrl(V2_CREATE_EVENT_ROUTE, {
         eventType
       })
     )
   }
 
+  return (
+    <>
+      {noEventSelectedError && (
+        <ErrorText id="require-error">
+          {intl.formatMessage(messages.errorMessage)}
+        </ErrorText>
+      )}
+      <Stack
+        id="select_vital_event_view"
+        direction="column"
+        alignItems="left"
+        gap={16}
+      >
+        {events.map((event) => (
+          <RadioButton
+            size="large"
+            key={`${event.id}event`}
+            name={`${event.id}event`}
+            label={intl.formatMessage(event.label)}
+            value={event.id}
+            id="select_birth_event"
+            selected={eventType === event.id ? event.id : ''}
+            onChange={() => {
+              setEventType(event.id)
+              setNoEventSelectedError(false)
+            }}
+          />
+        ))}
+
+        <Button
+          key="select-vital-event-continue"
+          id="continue"
+          type="primary"
+          size="large"
+          fullWidth
+          onClick={handleContinue}
+        >
+          {intl.formatMessage(messages.continueButton)}
+        </Button>
+      </Stack>
+    </>
+  )
+}
+
+export const EventSelection = () => {
+  const intl = useIntl()
+  const navigate = useNavigate()
+
+  const goToHome = () => {
+    navigate(V2_ROOT_ROUTE)
+  }
   return (
     <Frame
       header={
@@ -117,46 +165,10 @@ export const EventSelection = () => {
       <Content
         size={ContentSize.SMALL}
         title={intl.formatMessage(messages.registerNewEventHeading)}
-        bottomActionButtons={[
-          <Button
-            key="select-vital-event-continue"
-            id="continue"
-            type="primary"
-            size="large"
-            fullWidth
-            onClick={handleContinue}
-          >
-            {intl.formatMessage(messages.continueButton)}
-          </Button>
-        ]}
       >
-        {noEventSelectedError && (
-          <ErrorText id="require-error">
-            {intl.formatMessage(messages.errorMessage)}
-          </ErrorText>
-        )}
-        <Stack
-          id="select_vital_event_view"
-          direction="column"
-          alignItems="left"
-          gap={0}
-        >
-          {events.data?.map((event) => (
-            <RadioButton
-              size="large"
-              key={`${event.id}event`}
-              name={`${event.id}event`}
-              label={intl.formatMessage(event.label)}
-              value={event.id}
-              id="select_birth_event"
-              selected={eventType === event.id ? event.id : ''}
-              onChange={() => {
-                setEventType(event.id)
-                setNoEventSelectedError(false)
-              }}
-            />
-          ))}
-        </Stack>
+        <React.Suspense fallback={<Spinner id="event-selector-spinner" />}>
+          <EventSelector />
+        </React.Suspense>
       </Content>
     </Frame>
   )
