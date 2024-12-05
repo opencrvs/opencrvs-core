@@ -86,6 +86,7 @@ export interface ISearch {
     eventLocationLevel3?: string
     eventLocationLevel4?: string
     eventLocationLevel5?: string
+    eventLocationLevel6?: string
     childFirstNames?: string
     childLastName?: string
     childDoB?: string
@@ -236,6 +237,7 @@ const AdvanceSearchParameters = new Schema(
     eventLocationLevel3: { type: String },
     eventLocationLevel4: { type: String },
     eventLocationLevel5: { type: String },
+    eventLocationLevel6: { type: String },
     childFirstNames: { type: String },
     childLastName: { type: String },
     childDoB: { type: String },

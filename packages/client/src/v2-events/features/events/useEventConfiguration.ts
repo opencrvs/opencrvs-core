@@ -11,22 +11,22 @@
 import { trpc } from '@client/v2-events/trcp'
 
 /**
- * Fetches configures events and finds a matching event
+ * Fetches configured events and finds a matching event
+ * @returns a list of event configurations
+ */
+export function useEventConfigurations() {
+  const [config] = trpc.config.get.useSuspenseQuery()
+  return config
+}
+
+/**
+ * Fetches configured events and finds a matching event
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
  * @returns event configuration
  */
-export function useEvent(eventIdentifier: string) {
-  const hook = trpc.config.get.useQuery()
-  const { error, data, isFetching } = hook
+export function useEventConfiguration(eventIdentifier: string) {
+  const [config] = trpc.config.get.useSuspenseQuery()
+  const event = config?.find((event) => event.id === eventIdentifier)
 
-  const event = data?.find((event) => event.id === eventIdentifier)
-
-  const noMatchingEvent = !isFetching && !event
-
-  return {
-    // We hide the distinction between fetching (all calls) and loading (initial call) from the caller.
-    isLoading: isFetching,
-    error: noMatchingEvent ? 'Event not found' : error?.message,
-    event: event
-  }
+  return { event }
 }
