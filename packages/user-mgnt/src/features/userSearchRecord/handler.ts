@@ -51,6 +51,7 @@ interface IUserCreateSearchPayload {
     eventLocationLevel3?: string
     eventLocationLevel4?: string
     eventLocationLevel5?: string
+    eventLocationLevel6?: string
     childFirstNames?: string
     childLastName?: string
     childDoB?: string
@@ -194,6 +195,7 @@ export const createSearchrequestSchema = Joi.object({
     eventLocationLevel3: Joi.string(),
     eventLocationLevel4: Joi.string(),
     eventLocationLevel5: Joi.string(),
+    eventLocationLevel6: Joi.string(),
     childFirstNames: Joi.string(),
     childLastName: Joi.string(),
     childDoB: Joi.string(),

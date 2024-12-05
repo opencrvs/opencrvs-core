@@ -8,22 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useState } from 'react'
+import { AppRouter } from './router'
+import { env } from '@gateway/environment'
 
-// TODO: Paginate with react-router-dom
-export const usePagination = (
-  /** Amount of pages to iterate through */
-  pages: number
-) => {
-  const [page, setPage] = useState(0)
+import { createTRPCClient, httpBatchLink, HTTPHeaders } from '@trpc/client'
 
-  const next = page < pages - 1 ? () => setPage(page + 1) : undefined
-  const previous = page > 0 ? () => setPage(page - 1) : undefined
+import superjson from 'superjson'
 
-  return {
-    /** Page number between 0 and pages - 1 */
-    page,
-    next,
-    previous
-  }
-}
+export const api = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: env.EVENTS_URL,
+      transformer: superjson,
+      headers({ opList }) {
+        const headers = opList[0].context?.headers
+        return headers as HTTPHeaders
+      }
+    })
+  ]
+})

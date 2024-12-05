@@ -10,15 +10,10 @@
  */
 import React from 'react'
 import { Field, ComponentsMap, FormFieldRenderer } from './FormFieldRenderer'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FieldValues, FormProvider, useForm } from 'react-hook-form'
 import { flatten } from './flatten-object'
 import { Button } from '../Button'
-
-/**
- * @example
- * { "informant.name": "John Doe", "informant.address": "123 Main St" }
- */
-type Values = Record<string, string>
+import { Stack } from '../Stack'
 
 /**
  * Definition of a page of the form wizard
@@ -32,13 +27,17 @@ type FormWizardProps<CM extends ComponentsMap> = {
   components: CM
   currentPage: number
   pages: Page<CM>[]
-  defaultValues?: Values
+  defaultValues?: FieldValues
   /** Callback when the user clicks the "Continue" button */
-  onNextPage: (() => void) | undefined
+  onNextPage?: () => void
   /** Callback when the user submits the form wizard */
-  onSubmit: (data: Values) => void
+  onSubmit: (data: FieldValues) => void
 }
 
+/**
+ * Form Wizard acts as a JSON input to component output mapper.
+ * It defines a concept of pages, which are collections of fields.
+ */
 export const FormWizard = <CM extends ComponentsMap>({
   currentPage,
   pages,
@@ -47,7 +46,8 @@ export const FormWizard = <CM extends ComponentsMap>({
   onNextPage,
   onSubmit
 }: FormWizardProps<CM>) => {
-  const methods = useForm({ defaultValues })
+  const form = useForm({ defaultValues, mode: 'onBlur' })
+
   const page = pages[currentPage]
 
   if (!page) {
@@ -58,21 +58,30 @@ export const FormWizard = <CM extends ComponentsMap>({
    * By default, react-hook-form extracts `foo.bar.baz` as a deep object,
    * but we wanna flatten it to `{ "foo.bar.baz": "value" }`.
    */
-  const flatOnSubmit = (data: Values) => onSubmit(flatten<Values>(data))
+  const flatOnSubmit = (data: FieldValues) =>
+    onSubmit(flatten<FieldValues>(data))
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(flatOnSubmit)}>
-        <FormFieldRenderer fields={page.fields} components={components} />
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(flatOnSubmit)}>
+        <Stack direction="column" gap={16} alignItems="stretch">
+          {page.fields.map((field) => (
+            <FormFieldRenderer
+              key={field.id}
+              field={field}
+              components={components}
+            />
+          ))}
 
-        {onNextPage ? (
-          <Button type="primary" onClick={onNextPage}>
-            Continue
-          </Button>
-        ) : (
-          // Initial simple submit for testing
-          <input type="submit" value="Submit" />
-        )}
+          {onNextPage ? (
+            <Button type="primary" onClick={onNextPage}>
+              Continue
+            </Button>
+          ) : (
+            // Initial simple submit for testing
+            <Button type="primary">Submit</Button>
+          )}
+        </Stack>
       </form>
     </FormProvider>
   )

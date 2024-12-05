@@ -549,6 +549,7 @@ input AdvancedSearchParametersInput {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -1521,6 +1522,7 @@ type AdvancedSeachParameters {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -1700,12 +1702,35 @@ type RegisterAction {
   data: [Field!]!
   identifiers: Identifiers!
 }
+enum AttachmentInputStatus {
+  approved
+  validated
+  deleted
+}
 
 type NotifyAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
   data: [Field!]!
+}
+
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
+}
+
+scalar FieldValue
+
+input ContactPointInput {
+  system: TelecomSystem
+  value: String
+  use: TelecomUse
 }
 
 type DeclareAction {
@@ -1738,6 +1763,21 @@ input ContactPointInput {
   system: TelecomSystem
   value: String
   use: TelecomUse
+}
+
+input AddressInput {
+  use: AddressUse
+  type: AddressType
+  text: String
+  line: [String!]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+  partOf: String
 }
 
 input AddressInput {

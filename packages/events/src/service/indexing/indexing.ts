@@ -106,23 +106,18 @@ export async function indexAllEvents() {
     }
   })
 
-  return esClient.helpers.bulk(
-    {
-      retries: 3,
-      wait: 3000,
-      datasource: stream.pipe(transformedStreamData),
-      onDocument: (doc: EventIndex) => ({
-        index: {
-          _index: 'events',
-          _id: doc.id
-        }
-      }),
-      refresh: 'wait_for'
-    },
-    {
-      meta: true
-    }
-  )
+  return esClient.helpers.bulk({
+    retries: 3,
+    wait: 3000,
+    datasource: stream.pipe(transformedStreamData),
+    onDocument: (doc: EventIndex) => ({
+      index: {
+        _index: 'events',
+        _id: doc.id
+      }
+    }),
+    refresh: 'wait_for'
+  })
 }
 export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()

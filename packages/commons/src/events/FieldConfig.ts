@@ -31,20 +31,44 @@ const DateField = z
     id: z.string(),
     required: z.boolean(),
     label: TranslationConfig,
-    options: z.object({
-      notice: TranslationConfig.describe('Text to display above the date input')
-    })
+    options: z
+      .object({
+        notice: TranslationConfig.describe(
+          'Text to display above the date input'
+        ).optional()
+      })
+      .optional()
   })
   .describe('A single date input (dd-mm-YYYY)')
 
 const Paragraph = z
-  .object({ type: z.literal('PARAGRAPH'), label: TranslationConfig })
+  .object({
+    id: z.string(),
+    type: z.literal('PARAGRAPH'),
+    label: TranslationConfig
+  })
   .describe('A read-only HTML <p> paragraph')
+
+const RadioGroup = z
+  .object({
+    type: z.literal('RADIO_GROUP'),
+    id: z.string(),
+    required: z.boolean(),
+    label: TranslationConfig,
+    options: z.array(
+      z.object({
+        value: z.string().describe('The value of the option'),
+        label: z.string().describe('The label of the option')
+      })
+    )
+  })
+  .describe('Grouped radio options')
 
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
-  Paragraph
+  Paragraph,
+  RadioGroup
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>

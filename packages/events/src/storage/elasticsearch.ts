@@ -15,9 +15,10 @@ let client: elasticsearch.Client
 
 export const getOrCreateClient = () => {
   if (!client) {
-    return new elasticsearch.Client({
+    client = new elasticsearch.Client({
       node: env.ES_HOST
     })
+    return client
   }
 
   return client

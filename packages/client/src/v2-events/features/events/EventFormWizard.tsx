@@ -16,28 +16,58 @@ import {
   Button,
   Icon,
   Content,
-  FormWizard
+  FormWizard,
+  Spinner
 } from '@opencrvs/components'
 import React from 'react'
-import { useEvent } from './useEvent'
+import { useEventConfiguration } from './useEventConfiguration'
+import { EventConfig } from '@opencrvs/commons/client'
+import {
+  TextField,
+  Paragraph,
+  DateField,
+  RadioGroup
+} from './registered-fields'
+import { usePagination } from '@client/v2-events/hooks/usePagination'
+import { useEventFormNavigation } from './useEventFormNavigation'
+import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import { TextField, Paragraph, DateField } from './registered-fields'
 
-export function PublishEvent() {
+export function EventFormWizardIndex() {
   const { eventType } = useParams<{ eventType: string }>()
-  const { title, event, exit, saveAndExit, previous, next, page } =
-    useEvent(eventType)
+  const { event } = useEventConfiguration(eventType)
+
+  if (!event) {
+    throw new Error('Event not found')
+  }
+
+  return (
+    <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+      <EventFormWizard event={event} />
+    </React.Suspense>
+  )
+}
+
+export function EventFormWizard({ event }: { event: EventConfig }) {
+  const intl = useIntl()
+  const { page, next, previous } = usePagination(
+    event.actions[0].forms[0].pages.length
+  )
+  const { modal, exit } = useEventFormNavigation()
 
   return (
     <Frame
       skipToContentText="Skip to form"
       header={
         <AppBar
-          mobileLeft={title}
-          desktopLeft={title}
+          mobileLeft={intl.formatMessage(event.label)}
+          desktopLeft={intl.formatMessage(event.label)}
           desktopRight={
             <Stack direction="row">
-              <Button type="primary" onClick={saveAndExit}>
+              <Button
+                type="primary"
+                onClick={() => alert('Whoops... Not implemented.')}
+              >
                 <Icon name="DownloadSimple" />
                 Save and exit
               </Button>
@@ -50,6 +80,8 @@ export function PublishEvent() {
         />
       }
     >
+      {modal}
+
       <Frame.LayoutForm>
         <Frame.SectionFormBackAction>
           {previous && (
@@ -61,17 +93,18 @@ export function PublishEvent() {
         </Frame.SectionFormBackAction>
 
         <Frame.Section>
-          <Content title={title}>
+          <Content title={intl.formatMessage(event.label)}>
             <FormWizard
               currentPage={page}
               pages={event.actions[0].forms[0].pages}
               components={{
                 TEXT: TextField,
                 PARAGRAPH: Paragraph,
-                DATE: DateField
+                DATE: DateField,
+                RADIO_GROUP: RadioGroup
               }}
               onNextPage={next}
-              onSubmit={(values) => console.log(values)}
+              onSubmit={() => {}}
             />
           </Content>
         </Frame.Section>
