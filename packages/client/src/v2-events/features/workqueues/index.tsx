@@ -30,9 +30,13 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useEvents } from '@client/v2-events/features/events/useEvents'
 import groupBy from 'lodash-es/groupBy'
 import { EventStatus } from '@events/schema/EventIndex'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
 export const Workqueues = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
+
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VIEW)
+
   const { getEvents } = useEvents()
   const events = getEvents.useQuery()
 
@@ -58,18 +62,30 @@ export const Workqueues = ({ children }: { children: React.ReactNode }) => {
           */}
           <NavigationGroup>
             <NavLink to={createQueueUrl(EventStatus.CREATED)}>
-              <NavigationItem
-                icon={() => <DeclarationIconSmall color={'purple'} />}
-                label="In progress"
-                count={eventsByStatus[EventStatus.CREATED]?.length}
-              />
+              {(props) => (
+                <NavigationItem
+                  isSelected={
+                    props.isActive &&
+                    searchParams.status === EventStatus.CREATED
+                  }
+                  icon={() => <DeclarationIconSmall color={'purple'} />}
+                  label="In progress"
+                  count={eventsByStatus[EventStatus.CREATED]?.length}
+                />
+              )}
             </NavLink>
             <NavLink to={createQueueUrl(EventStatus.DECLARED)}>
-              <NavigationItem
-                icon={() => <DeclarationIconSmall color={'teal'} />}
-                label="Ready for review"
-                count={eventsByStatus[EventStatus.DECLARED]?.length}
-              />
+              {(props) => (
+                <NavigationItem
+                  isSelected={
+                    props.isActive &&
+                    searchParams.status === EventStatus.DECLARED
+                  }
+                  icon={() => <DeclarationIconSmall color={'teal'} />}
+                  label="Ready for review"
+                  count={eventsByStatus[EventStatus.DECLARED]?.length}
+                />
+              )}
             </NavLink>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'orange'} />}
@@ -80,11 +96,17 @@ export const Workqueues = ({ children }: { children: React.ReactNode }) => {
               label="Sent for approval"
             />
             <NavLink to={createQueueUrl(EventStatus.REGISTERED)}>
-              <NavigationItem
-                icon={() => <DeclarationIconSmall color={'green'} />}
-                label="Ready to print"
-                count={eventsByStatus[EventStatus.REGISTERED]?.length}
-              />
+              {(props) => (
+                <NavigationItem
+                  isSelected={
+                    props.isActive &&
+                    searchParams.status === EventStatus.REGISTERED
+                  }
+                  icon={() => <DeclarationIconSmall color={'green'} />}
+                  label="Ready to print"
+                  count={eventsByStatus[EventStatus.REGISTERED]?.length}
+                />
+              )}
             </NavLink>
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'blue'} />}
