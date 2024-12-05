@@ -417,6 +417,7 @@ export interface GQLAdvancedSearchParametersInput {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -1436,6 +1437,7 @@ export interface GQLAdvancedSeachParameters {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -8684,6 +8686,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   eventLocationLevel3?: AdvancedSeachParametersToEventLocationLevel3Resolver<TParent>
   eventLocationLevel4?: AdvancedSeachParametersToEventLocationLevel4Resolver<TParent>
   eventLocationLevel5?: AdvancedSeachParametersToEventLocationLevel5Resolver<TParent>
+  eventLocationLevel6?: AdvancedSeachParametersToEventLocationLevel6Resolver<TParent>
   childFirstNames?: AdvancedSeachParametersToChildFirstNamesResolver<TParent>
   childLastName?: AdvancedSeachParametersToChildLastNameResolver<TParent>
   childDoB?: AdvancedSeachParametersToChildDoBResolver<TParent>
@@ -8996,6 +8999,18 @@ export interface AdvancedSeachParametersToEventLocationLevel4Resolver<
 }
 
 export interface AdvancedSeachParametersToEventLocationLevel5Resolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToEventLocationLevel6Resolver<
   TParent = any,
   TResult = any
 > {

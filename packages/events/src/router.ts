@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
 
@@ -58,6 +58,19 @@ export const appRouter = router({
   }),
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
+      const config = await getEventsConfig(options.ctx.token)
+
+      const eventIds = config.map((c) => c.id)
+
+      if (!eventIds.includes(options.input.type)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Invalid event type ${
+            options.input.type
+          }. Valid event types are: ${eventIds.join(', ')}`
+        })
+      }
+
       return createEvent(
         options.input,
         options.ctx.user.id,
