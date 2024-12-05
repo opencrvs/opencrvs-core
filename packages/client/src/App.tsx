@@ -79,7 +79,7 @@ import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { EventSelection } from './v2-events/features/events/EventSelection'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
-import { TRPCProvider } from './v2-events/trcp'
+import { TRPCProvider } from './v2-events/trpc'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line

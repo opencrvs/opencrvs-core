@@ -11,27 +11,29 @@
 
 import React from 'react'
 
+import { Debug } from '@client/v2-events/features/debug/debug'
+import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
 import {
-  Frame,
   AppBar,
-  Stack,
   Button,
-  Icon,
   Content,
+  ContentSize,
+  Frame,
+  Icon,
   LeftNavigation,
   NavigationGroup,
   NavigationItem,
-  ContentSize,
   SearchTool,
+  Stack,
   Text
 } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
 import { useNavigate } from 'react-router-dom'
 
 export const Workqueues = () => {
   const navigate = useNavigate()
+
   return (
     <Frame
       navigation={
@@ -117,6 +119,7 @@ export const Workqueues = () => {
           🚧🚧🚧🚧🚧🚧🚧🚧👷‍♂️👷👷🏻👷🏻‍♀️👷‍♂️👷‍♂️🚧🚧🚧🚧🚧🚧🚧🚧
         </Text>
       </Content>
+      <Debug />
     </Frame>
   )
 }
