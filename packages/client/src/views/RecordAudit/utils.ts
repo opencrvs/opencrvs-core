@@ -22,16 +22,14 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
+  AssignmentData,
   EventType,
   History,
   HumanName,
   Maybe,
   RegAction,
   RegStatus,
-  User,
-  AssignmentData,
-  Scope,
-  SCOPES
+  User
 } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
@@ -45,6 +43,7 @@ import {
   generateLocationName
 } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
 
