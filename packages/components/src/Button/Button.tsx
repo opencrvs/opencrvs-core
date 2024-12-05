@@ -34,6 +34,8 @@ interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean
   /** Element the button renders as */
   element?: 'a' | 'button'
+  /** Icon position */
+  iconPosition?: 'left' | 'right'
   /** Button type */
   type: ButtonType
 }
@@ -75,6 +77,7 @@ const StyledButton = styled.button.withConfig({
 export const Button = ({
   size = 'medium',
   fullWidth,
+  iconPosition = 'left',
   element = 'button',
   type,
   loading,
@@ -86,6 +89,7 @@ export const Button = ({
       size={size}
       fullWidth={fullWidth}
       variant={type}
+      iconPosition={iconPosition}
       loading={loading}
       as={element}
       {...props}
