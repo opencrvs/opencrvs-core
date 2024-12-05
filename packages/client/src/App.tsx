@@ -76,7 +76,7 @@ import {
 } from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
-import { TRPCProvider } from './v2-events/trcp'
+import { TRPCProvider } from './v2-events/trpc'
 import { EventSelection } from './v2-events/features/events/EventSelection'
 
 interface IAppProps {
