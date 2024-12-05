@@ -8,33 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi } from 'vitest'
 import { appRouter, t } from './router'
-import {
-  getClient,
-  resetServer as resetMongoServer,
-  setupServer as setupMongoServer
-} from './storage/__mocks__/mongodb'
-
-import {
-  resetServer as resetESServer,
-  setupServer as setupESServer
-} from './storage/__mocks__/elasticsearch'
+import { getClient } from './storage/__mocks__/mongodb'
 
 import { getUUID } from '@opencrvs/commons'
 
 const { createCallerFactory } = t
 
-vi.mock('@events/storage/mongodb')
-vi.mock('@events/storage/elasticsearch')
-
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
-afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
-
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
   const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' }
+    user: { id: '1', primaryOfficeId: '123' },
+    token: 'NOT_A_REAL_TOKEN'
   })
   return caller
 }
