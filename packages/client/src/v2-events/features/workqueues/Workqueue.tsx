@@ -35,14 +35,8 @@ import { ROUTES } from '@client/v2-events/routes'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-interface IBaseReviewTabProps {
-  loading?: boolean
-  error?: boolean
-}
 
-type IReviewTabProps = IBaseReviewTabProps
-
-export const WorkqueueIndex = ({ loading, error }: IReviewTabProps) => {
+export const WorkqueueIndex = () => {
   const intl = useIntl()
   const theme = useTheme()
   const { getEvents } = useEvents()
@@ -146,8 +140,8 @@ export const WorkqueueIndex = ({ loading, error }: IReviewTabProps) => {
       paginationId={Math.floor(searchParams.offset / searchParams.limit)}
       totalPages={totalPages}
       onPageChange={() => {}}
-      loading={loading}
-      error={error}
+      loading={events.isLoading}
+      error={!!events.error}
       noResultText={intl.formatMessage(wqMessages[searchParams.status])}
       noContent={statusEvents.length === 0}
     >
@@ -159,7 +153,7 @@ export const WorkqueueIndex = ({ loading, error }: IReviewTabProps) => {
       <Workqueue
         content={statusEvents}
         columns={getColumns()}
-        loading={loading}
+        loading={events.isLoading}
         sortOrder={sortOrder}
         hideLastBorder={!isShowPagination}
       />
