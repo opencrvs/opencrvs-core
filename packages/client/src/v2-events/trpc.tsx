@@ -90,7 +90,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
-      onSuccess={async (...args) => {
+      onSuccess={async () => {
         queryClient.resumePausedMutations()
 
         queryClient
