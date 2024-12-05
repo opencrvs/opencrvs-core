@@ -28,11 +28,9 @@ import {
   HTTP,
   IDateRangePickerValue,
   IDynamicFormField,
-  IFormData,
   IFormField,
   IFormFieldValue,
   IFormSectionData,
-  Ii18nButtonFormField,
   Ii18nFormField,
   Ii18nTextFormField,
   InitialValue,
@@ -41,7 +39,6 @@ import {
   NUMBER,
   PARAGRAPH,
   RADIO_GROUP,
-  REDIRECT,
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SUBSECTION_HEADER,
@@ -51,7 +48,8 @@ import {
   TIME,
   WARNING
 } from '@client/forms'
-import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { Checkbox, CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
@@ -74,13 +72,10 @@ import {
   internationaliseFieldObject,
   unflatten
 } from './utils'
+import { Errors, getValidationErrorsForForm } from './validation'
 
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
-import { ButtonField } from '@client/components/form/Button'
-import { RedirectField } from '@client/components/form/Redirect'
 
-import { buttonMessages } from '@client/i18n/messages/buttons'
-import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { BulletList, Divider } from '@opencrvs/components'
@@ -480,16 +475,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === REDIRECT) {
-      return (
-        <RedirectField
-          to={fieldDefinition.options.url}
-          form={values}
-          draft={formData}
-        />
-      )
-    }
-
     if (fieldDefinition.type === HIDDEN) {
       const { error, touched, ...allowedInputProps } = inputProps
 
@@ -504,22 +489,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
     if (fieldDefinition.type === HTTP) {
       return null
-    }
-
-    if (fieldDefinition.type === BUTTON) {
-      return (
-        <InputField {...inputFieldProps}>
-          <ButtonField
-            fields={fields}
-            fieldDefinition={fieldDefinition as Ii18nButtonFormField}
-            values={values}
-            formData={formData}
-            setFieldValue={setFieldValue}
-            disabled={disabled}
-            setFieldTouched={setFieldTouched}
-          />
-        </InputField>
-      )
     }
 
     return (

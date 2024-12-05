@@ -25,7 +25,7 @@ import { useHistory } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import { Spinner } from '@opencrvs/components'
 import { useEvents } from './useEvents'
-import { Debug } from '../debug/debug'
+import { Debug } from '@client/v2-events/features/debug/debug'
 
 const messages = defineMessages({
   registerNewEventTitle: {
