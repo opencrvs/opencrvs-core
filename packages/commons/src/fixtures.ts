@@ -14,7 +14,4 @@ export * from './fixtures/death-bundle'
 export * from './fixtures/marriage-bundle'
 export * from './fixtures/location'
 export * from './fixtures/practitioner'
-/*
- * @public
- */
 export * from './fixtures/tennis-club-membership-event'
