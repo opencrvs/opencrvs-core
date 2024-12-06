@@ -563,7 +563,7 @@ const UnassignModal: React.FC<{
         </Button>
       ]}
     >
-      <Text element="p" variant="reg16">
+      <Text element="p" variant="reg16" color="grey500">
         {isDownloaded
           ? intl.formatMessage(conflictsMessages.selfUnassignDesc)
           : intl.formatMessage(conflictsMessages.regUnassignDesc, {
