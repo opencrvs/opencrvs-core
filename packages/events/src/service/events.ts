@@ -110,14 +110,16 @@ export async function addAction(
     }
   )
 
-  return getEventById(eventId)
+  const event = await getEventById(eventId)
+  await indexEvent(event)
+  return event
 }
 
-export async function patchEvent(event: EventInputWithId) {
-  const existingEvent = await getEventById(event.id)
+export async function patchEvent(eventInput: EventInputWithId) {
+  const existingEvent = await getEventById(eventInput.id)
 
   if (!existingEvent) {
-    throw new EventNotFoundError(event.id)
+    throw new EventNotFoundError(eventInput.id)
   }
 
   const db = await getClient()
@@ -127,15 +129,17 @@ export async function patchEvent(event: EventInputWithId) {
 
   await collection.updateOne(
     {
-      id: event.id
+      id: eventInput.id
     },
     {
       $set: {
-        ...event,
+        ...eventInput,
         updatedAt: now
       }
     }
   )
 
-  return getEventById(event.id)
+  const event = await getEventById(existingEvent.id)
+  await indexEvent(event)
+  return event
 }

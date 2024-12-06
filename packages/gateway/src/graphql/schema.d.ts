@@ -1613,35 +1613,11 @@ export interface GQLRegisterAction {
   identifiers: GQLIdentifiers
 }
 
-export const enum GQLAttachmentInputStatus {
-  approved = 'approved',
-  validated = 'validated',
-  deleted = 'deleted'
-}
-
 export interface GQLNotifyAction {
   type: string
   createdAt: GQLDateTime
   createdBy: string
   data: Array<GQLField>
-}
-
-export const enum GQLPaymentType {
-  MANUAL = 'MANUAL'
-}
-
-export const enum GQLPaymentOutcomeType {
-  COMPLETED = 'COMPLETED',
-  ERROR = 'ERROR',
-  PARTIAL = 'PARTIAL'
-}
-
-export type GQLFieldValue = any
-
-export interface GQLContactPointInput {
-  system?: GQLTelecomSystem
-  value?: string
-  use?: GQLTelecomUse
 }
 
 export interface GQLDeclareAction {
@@ -1674,21 +1650,6 @@ export interface GQLContactPointInput {
   system?: GQLTelecomSystem
   value?: string
   use?: GQLTelecomUse
-}
-
-export interface GQLAddressInput {
-  use?: GQLAddressUse
-  type?: GQLAddressType
-  text?: string
-  line?: Array<string>
-  city?: string
-  district?: string
-  state?: string
-  postalCode?: string
-  country?: string
-  from?: GQLDate
-  to?: GQLDate
-  partOf?: string
 }
 
 export interface GQLAddressInput {
