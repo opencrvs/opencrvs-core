@@ -18,6 +18,18 @@ export const tennisClubMembershipEvent = defineConfig({
     description: 'This is what this event is referred as in the system',
     id: 'event.tennis-club-membership.label'
   },
+  summary: {
+    title: {
+      defaultMessage: 'Summary',
+      description: 'This is the title of the summary',
+      id: 'event.tennis-club-membership.summary.title'
+    },
+    fields: [
+      {
+        id: 'applicant.firstname'
+      }
+    ]
+  },
   actions: [
     {
       type: 'DECLARE',

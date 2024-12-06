@@ -11,6 +11,8 @@
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
+import { flattenDeep } from 'lodash'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -23,6 +25,7 @@ export const EventConfig = z.object({
     .describe(
       'A machine-readable identifier for the event, e.g. "birth" or "death"'
     ),
+  summary: SummaryConfig,
   label: TranslationConfig,
   actions: z.array(ActionConfig)
 })
@@ -33,4 +36,50 @@ export type EventConfig = z.infer<typeof EventConfig>
  * Builds a validated configuration for an event
  * @param config - Event specific configuration
  */
-export const defineConfig = (config: EventConfig) => EventConfig.parse(config)
+export const defineConfig = (
+  config:
+    | EventConfig
+    | (Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput })
+) => {
+  const parsed = EventConfig.extend({
+    summary: SummaryConfigInput
+  }).parse(config)
+
+  const summaryFieldsWithoutLabel = parsed.summary.fields.filter(
+    (field) => !field.label
+  )
+
+  if (summaryFieldsWithoutLabel.length === 0) {
+    return parsed
+  }
+  /** Allow passing field without label in the summary configuration. In that case, replace it with the corresponding one in form fields*/
+  const matchingPageFields = flattenDeep(
+    parsed.actions.map(({ forms }) =>
+      forms.map(({ pages }) =>
+        pages.map(({ fields }) =>
+          fields
+            .filter((field) =>
+              summaryFieldsWithoutLabel.some(
+                (summaryField) => summaryField.id === field.id
+              )
+            )
+            .map((field) => ({ id: field.id, label: field.label }))
+        )
+      )
+    )
+  )
+
+  return {
+    ...parsed,
+    summary: {
+      ...parsed.summary,
+      fields: parsed.summary.fields.map((field) => {
+        const matchingField = matchingPageFields.find(
+          (matchingField) => matchingField.id === field.id
+        )
+
+        return matchingField ?? field
+      })
+    }
+  }
+}
