@@ -10,9 +10,10 @@
  */
 
 import { IFormField } from '@client/forms'
+import { formatUrl } from '@client/navigation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import { EventConfig } from '@opencrvs/commons/client'
+import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
 import {
   AppBar,
   Button,
@@ -28,41 +29,11 @@ import { useHistory, useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents'
-import { formatUrl } from '@client/navigation'
-import { V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
-import { EventDocument } from '@events/schema'
 
 export function EventFormWizardIndex() {
-  const { eventId, actionType } = useParams<{
-    actionType: string
-    eventId: string
-  }>()
-  const events = useEvents()
-
-  const event = events.getEvent(eventId)
-  if (!event) {
-    throw new Error('Event not found')
-  }
-  const { eventConfiguration } = useEventConfiguration(event.type)
-  if (!eventConfiguration) {
-    throw new Error('Event configuration not found with type: ' + event.type)
-  }
-  const history = useHistory()
-
-  useEffect(() => {
-    if (eventId !== event.id && event.id !== event.transactionId) {
-      history.push(
-        formatUrl(V2_CREATE_EVENT_ROUTE, {
-          eventId: event.id,
-          actionType
-        })
-      )
-    }
-  }, [actionType, event.id, event.transactionId, eventId, history])
-
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
-      <EventFormWizard event={event} configuration={eventConfiguration} />
+      <EventFormWizard />
     </React.Suspense>
   )
 }
@@ -109,17 +80,42 @@ const messages = defineMessages({
   }
 })
 
-function EventFormWizard({
-  configuration,
-  event
-}: {
-  event: EventDocument
-  configuration: EventConfig
-}) {
+function EventFormWizard() {
+  const { eventId } = useParams<{
+    eventId: string
+  }>()
+  const events = useEvents()
+
+  const [event] = events.getEvent(eventId)
+  console.log({ event })
+
+  if (!event) {
+    throw new Error('Event not found')
+  }
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+
+  if (!configuration) {
+    throw new Error('Event configuration not found with type: ' + event.type)
+  }
+  const history = useHistory()
+
+  useEffect(() => {
+    const hasTemporaryId = event.id === event.transactionId
+
+    if (eventId !== event.id && !hasTemporaryId) {
+      history.push(
+        formatUrl(V2_DECLARE_ACTION_ROUTE, {
+          eventId: event.id
+        })
+      )
+    }
+  }, [event.id, event.transactionId, eventId, history])
+
   const intl = useIntl()
   const [formValues, setFormValues] = React.useState<any>({})
   const { modal, exit, goToHome } = useEventFormNavigation()
-  const events = useEvents()
 
   const pages = configuration.actions[0].forms[0].pages
   const {

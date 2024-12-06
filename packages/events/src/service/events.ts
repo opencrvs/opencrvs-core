@@ -77,10 +77,10 @@ export async function createEvent(
         createdAt: now,
         createdBy,
         createdAtLocation,
-        data: []
+        data: {}
       }
     ]
-  })
+  } satisfies EventDocument)
 
   const event = await getEventById(id)
   await indexEvent(event)

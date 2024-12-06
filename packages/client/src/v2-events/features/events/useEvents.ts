@@ -12,7 +12,8 @@
 import { storage } from '@client/storage'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { EventDocument } from '@events/schema'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
+import { getQueryKey } from '@trpc/react-query'
 
 export function preloadData() {
   utils.config.get.ensureData()
@@ -120,6 +121,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       ...old,
       optimisticEvent
     ])
+
     const events = await readEventsFromStorage()
     await writeEventsToStorage([...events, optimisticEvent])
     return optimisticEvent
@@ -134,6 +136,10 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
 
       await writeEventsToStorage([...eventsWithoutNew, response])
       queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
+
+      queryClient.invalidateQueries({
+        queryKey: getQueryKey(api.event.get, response.transactionId, 'query')
+      })
     }
   },
   onSuccess: (data) => {
@@ -142,6 +148,24 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     )
   }
 }))
+
+const observer = new QueryObserver<EventDocument[]>(queryClient, {
+  queryKey: ['persisted-events']
+})
+
+observer.subscribe((event) => {
+  event.data?.forEach((event) => {
+    queryClient.setQueryData(
+      getQueryKey(api.event.get, event.id, 'query'),
+      event
+    )
+
+    queryClient.setQueryData(
+      getQueryKey(api.event.get, event.transactionId, 'query'),
+      event
+    )
+  })
+})
 
 async function readEventsFromStorage() {
   const data = await storage
@@ -161,6 +185,9 @@ export function useEvents() {
   }
   const declare = () => {
     return api.event.actions.declare.useMutation({})
+  }
+  const getEvent = (id: string) => {
+    return api.event.get.useSuspenseQuery(id)
   }
 
   const events = useSuspenseQuery({

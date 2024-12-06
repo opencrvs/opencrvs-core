@@ -14,7 +14,7 @@ import { z } from 'zod'
 const ActionBase = z.object({
   createdAt: z.date(),
   createdBy: z.string(),
-  data: z.object({})
+  data: z.record(z.string(), z.any())
 })
 
 const AssignedAction = ActionBase.merge(

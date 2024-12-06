@@ -20,7 +20,10 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useEventConfigurations } from './useEventConfiguration'
-import { V2_ROOT_ROUTE, V2_CREATE_EVENT_ROUTE } from '@client/v2-events/routes'
+import {
+  V2_ROOT_ROUTE,
+  V2_DECLARE_ACTION_ROUTE
+} from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import { Spinner } from '@opencrvs/components'
@@ -86,9 +89,8 @@ const EventSelector = () => {
     })
 
     history.push(
-      formatUrl(V2_CREATE_EVENT_ROUTE, {
-        eventId: transactionId,
-        actionType: 'declare'
+      formatUrl(V2_DECLARE_ACTION_ROUTE, {
+        eventId: transactionId
       })
     )
   }

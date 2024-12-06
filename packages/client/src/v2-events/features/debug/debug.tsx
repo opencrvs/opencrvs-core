@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query'
 const Container = styled.div`
   background: #fff;
   position: fixed;
-  bottom: 1rem;
+  bottom: 5rem;
   right: 1rem;
   padding: 16px;
   border: 1px dashed #00c142;
@@ -86,7 +86,19 @@ export const Debug = () => {
             </Text>
           </li>
           <li>
-            <button onClick={() => queryClient.clear()}>Clear</button>
+            <button onClick={() => queryClient.clear()}>
+              Clear React Query buffer
+            </button>
+          </li>
+        </ul>
+        <Text variant="h4" element="span">
+          Local records
+        </Text>
+        <ul>
+          <li>
+            <button onClick={() => console.log(events.events.data)}>
+              console.log stored events
+            </button>
           </li>
           <li>
             <Text variant="reg12" element="span">
