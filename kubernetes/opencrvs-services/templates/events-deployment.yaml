@@ -28,8 +28,6 @@ spec:
       port: 5555
     middlewares:
       - name: sts-and-basic-response-headers
-  tls:
-    certResolver: myresolver
 ---
 apiVersion: apps/v1
 kind: Deployment

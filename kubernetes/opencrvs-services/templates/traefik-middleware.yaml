@@ -29,3 +29,14 @@ spec:
   ipAllowList:
     sourceRange:
       - 255.255.255.255
+---
+apiVersion: traefik.io/v1alpha1
+kind: TLSStore
+metadata:
+  name: default
+  namespace: traefik
+spec:
+  certificates:
+    - secretName: localhost-cert
+  defaultCertificate:
+    secretName: localhost-cert

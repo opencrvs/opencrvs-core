@@ -89,7 +89,11 @@ spec:
             - name: MONGO_URL
               value: mongodb://mongodb-0.mongodb.opencrvs-deps-dev.svc.cluster.local/user-mgnt
             - name: NODE_ENV
-              value: development
+              value: production
+            - name: DOMAIN
+              value: "{{ .Values.hostname }}"
+            - name: CLIENT_APP_URL
+              value: https://register.{{ .Values.hostname }}
           ports:
             - containerPort: 3040
               protocol: TCP
