@@ -61,6 +61,8 @@ function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
   }
 }
 
+const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
+
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   // This retry ensures on page reload if event have not yet synced,
   // the action will be retried once
@@ -68,7 +70,9 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retryDelay: 5000,
   mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
   onMutate: async (actionInput) => {
-    await queryClient.cancelQueries({ queryKey: ['persisted-events'] })
+    await queryClient.cancelQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
     const events = await readEventsFromStorage()
     const eventToUpdate = events.find(
       (e) =>
@@ -82,7 +86,9 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
     )
     const previousActions = eventToUpdate.actions
     await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
-    queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
+    queryClient.invalidateQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
     return { previousActions, events }
   },
   onSettled: async (response) => {
@@ -90,12 +96,16 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
      * Updates event in store
      */
     if (response) {
-      await queryClient.cancelQueries({ queryKey: ['persisted-events'] })
+      await queryClient.cancelQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
       const events = await readEventsFromStorage()
       const eventsWithoutNew = events.filter((e) => e.id !== response.id)
 
       await writeEventsToStorage([...eventsWithoutNew, response])
-      return queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
+      return queryClient.invalidateQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
     }
   }
 }))
@@ -113,14 +123,14 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       actions: []
     }
 
-    queryClient.cancelQueries({ queryKey: ['persisted-events'] })
+    queryClient.cancelQueries({ queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY })
 
     // Do this as very first synchronous operation so UI can trust
     // that the event is created when changing view for instance
-    queryClient.setQueryData(['persisted-events'], (old: EventDocument[]) => [
-      ...old,
-      optimisticEvent
-    ])
+    queryClient.setQueryData(
+      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
+      (old: EventDocument[]) => [...old, optimisticEvent]
+    )
 
     const events = await readEventsFromStorage()
     await writeEventsToStorage([...events, optimisticEvent])
@@ -128,14 +138,18 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
   },
   onSettled: async (response) => {
     if (response) {
-      await queryClient.cancelQueries({ queryKey: ['persisted-events'] })
+      await queryClient.cancelQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
       const events = await readEventsFromStorage()
       const eventsWithoutNew = events.filter(
         (e) => e.transactionId !== response.transactionId
       )
 
       await writeEventsToStorage([...eventsWithoutNew, response])
-      queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
+      queryClient.invalidateQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
 
       queryClient.invalidateQueries({
         queryKey: getQueryKey(api.event.get, response.transactionId, 'query')
@@ -143,14 +157,16 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     }
   },
   onSuccess: (data) => {
-    queryClient.setQueryData(['persisted-events'], (old: EventDocument[]) =>
-      old.filter((e) => e.transactionId !== data.transactionId).concat(data)
+    queryClient.setQueryData(
+      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
+      (old: EventDocument[]) =>
+        old.filter((e) => e.transactionId !== data.transactionId).concat(data)
     )
   }
 }))
 
 const observer = new QueryObserver<EventDocument[]>(queryClient, {
-  queryKey: ['persisted-events']
+  queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
 })
 
 observer.subscribe((event) => {
@@ -191,7 +207,7 @@ export function useEvents() {
   }
 
   const events = useSuspenseQuery({
-    queryKey: ['persisted-events'],
+    queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY,
     queryFn: () => {
       return readEventsFromStorage()
     }
