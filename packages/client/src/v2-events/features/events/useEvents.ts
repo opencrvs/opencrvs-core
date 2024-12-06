@@ -18,35 +18,54 @@ export function preloadData() {
   utils.config.get.ensureData()
 }
 
+function getCanonicalEventId(
+  events: EventDocument[],
+  eventIdOrTransactionId: string
+) {
+  const event = events.find(
+    (e) =>
+      e.id === eventIdOrTransactionId ||
+      e.transactionId === eventIdOrTransactionId
+  )
+
+  if (!event) {
+    throw new Error(`Event with id ${eventIdOrTransactionId} not found`)
+  }
+
+  return event.id
+}
+
+/**
+ * Wraps a canonical mutation function to handle outdated temporary IDs.
+ *
+ * When an event is created offline and actions referring to that event
+ * are also created offline, there may be cases where a request in the
+ * buffer still uses a temporary ID to reference the event. This wrapper
+ * ensures that the `eventId` parameter is updated to its canonical value
+ * before the mutation function is called.
+ *
+ * @param {function(params: T): Promise<R>} canonicalMutationFn - The mutation function to wrap.
+ * @returns {function(params: T): Promise<R>} - A wrapped mutation function that resolves the canonical `eventId` before invocation.
+ */
+function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
+  canonicalMutationFn: (params: T) => Promise<R>
+): (params: T) => Promise<R> {
+  return async (params: T) => {
+    const events = await readEventsFromStorage()
+    const modifiedParams: T = {
+      ...params,
+      eventId: getCanonicalEventId(events, params.eventId)
+    }
+    return canonicalMutationFn(modifiedParams)
+  }
+}
+
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   // This retry ensures on page reload if event have not yet synced,
   // the action will be retried once
   retry: 1,
   retryDelay: 5000,
-  mutationFn: async (actionInput) => {
-    /*
-     * Handles action being called with an outdated temporary id
-     *
-     * If you have created the event offline and you've also created the action
-     * offline, then once you come back online it might just happen that you have
-     * an action request in the buffer that still uses the temporary id to refer to the event
-     *
-     * This piece of code updates that id before the call is made
-     */
-    const events = await readEventsFromStorage()
-    const eventThatHadATemporaryId = events.find(
-      (e) => e.transactionId === actionInput.eventId
-    )
-
-    if (!eventThatHadATemporaryId) {
-      return canonicalMutationFn(actionInput)
-    }
-
-    return canonicalMutationFn({
-      ...actionInput,
-      eventId: eventThatHadATemporaryId.id
-    })
-  },
+  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
   onMutate: async (actionInput) => {
     await queryClient.cancelQueries({ queryKey: ['persisted-events'] })
     const events = await readEventsFromStorage()
