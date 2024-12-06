@@ -6,7 +6,13 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { Workqueues } from '@client/v2-events/features/workqueues'
 import { ROUTES } from './routes'
+import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 
+/**
+ * Configuration for the routes of the v2-events feature.
+ *
+ * Each route is defined as a child of the `ROUTES.V2` route.
+ */
 export const routesConfig = {
   path: ROUTES.V2.path,
   element: (
@@ -28,6 +34,20 @@ export const routesConfig = {
           index: true,
           path: ROUTES.V2.EVENTS.VIEW.path,
           element: <WorkqueueIndex />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.path,
+      element: (
+        <Workqueues>
+          <Outlet />
+        </Workqueues>
+      ),
+      children: [
+        {
+          path: ROUTES.V2.EVENTS.EVENT.path,
+          element: <EventOverviewIndex />
         }
       ]
     },

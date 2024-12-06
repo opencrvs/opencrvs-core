@@ -17,7 +17,11 @@ import {
   LoadingIndicator,
   withOnlineStatus,
   IOnlineStatusProps
-} from './LoadingIndicator'
+} from '@client/v2-events/components/LoadingIndicator'
+
+/**
+ * Based on packages/client/src/views/OfficeHome/WQContentWrapper.tsx
+ */
 
 interface IContentWrapper {
   isMobileSize: boolean
@@ -63,6 +67,7 @@ const Body = (props: IProps) => {
     isOnline,
     noContent
   } = props
+
   return (
     <>
       {props.children}
@@ -71,8 +76,8 @@ const Body = (props: IProps) => {
           <NoResultText id="no-record">{props.noResultText}</NoResultText>
         )}
         {isShowPagination &&
-          paginationId &&
-          totalPages &&
+          !!paginationId &&
+          !!totalPages &&
           onPageChange &&
           isOnline && (
             <Pagination
@@ -82,8 +87,8 @@ const Body = (props: IProps) => {
             />
           )}
         <LoadingIndicator
-          loading={loading ? true : false}
-          hasError={error ? true : false}
+          loading={!!loading}
+          hasError={!!error}
           noDeclaration={noContent}
         />
       </PaginationLoaderContainer>

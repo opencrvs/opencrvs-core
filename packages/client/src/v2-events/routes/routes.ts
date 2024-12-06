@@ -23,6 +23,9 @@ export const ROUTES = {
         'events',
         {},
         {
+          EVENT: route(':eventId', {
+            params: { eventId: string().defined() }
+          }),
           VIEW: route('view', {
             searchParams: {
               status: zod(z.nativeEnum(EventStatus)).default(

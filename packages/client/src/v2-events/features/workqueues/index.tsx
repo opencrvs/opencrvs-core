@@ -32,6 +32,9 @@ import groupBy from 'lodash-es/groupBy'
 import { EventStatus } from '@events/schema/EventIndex'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+/**
+ * Basic frame for the workqueues. Includes the left navigation and the app bar.
+ */
 export const Workqueues = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 

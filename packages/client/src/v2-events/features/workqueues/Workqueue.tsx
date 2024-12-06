@@ -10,7 +10,7 @@
  */
 
 import {
-  Workqueue,
+  Workqueue as WorkqueueComponent,
   COLUMNS,
   SORT_ORDER,
   ColumnContentAlignment
@@ -23,14 +23,22 @@ import {
   wqMessages,
   messages,
   navigationMessages
-} from './messages'
+} from '@client/v2-events/messages'
 import styled, { useTheme } from 'styled-components'
 import orderBy from 'lodash-es/orderBy'
-import { WQContentWrapper } from './ContentWrapper'
+import { WQContentWrapper } from './components/ContentWrapper'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { useEvents } from '@client/v2-events/features/events/useEvents'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { ROUTES } from '@client/v2-events/routes'
+import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { Link } from 'react-router-dom'
+import { EventIndex, EventStatus } from '@events/schema/EventIndex'
+
+/**
+ * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.
+ * Ideally we could use a single component for a workqueue.
+ */
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -60,22 +68,44 @@ const changeSortedColumn = (
 }
 
 export const WorkqueueIndex = () => {
-  const intl = useIntl()
-  const theme = useTheme()
   const { getEvents } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VIEW)
 
   const events = getEvents.useQuery()
 
-  const statusEvents = (
-    events.data?.filter((event) => event.status === searchParams.status) ?? []
-  ).map((event) => ({
-    assignedTo: event.assignedTo,
-    type: event.type,
-    createdAt: new Date(event.createdAt).toLocaleDateString(),
-    modifiedAt: new Date(event.modifiedAt).toLocaleString(),
-    id: event.id
-  }))
+  return <Workqueue events={events.data ?? []} {...searchParams} />
+}
+
+/**
+ * A Workqueue that displays a table of events based on search criteria.
+ */
+export const Workqueue = ({
+  events,
+  status,
+  limit,
+  offset
+}: {
+  events: EventIndex[]
+  status: EventStatus
+  limit: number
+  offset: number
+}) => {
+  const intl = useIntl()
+  const theme = useTheme()
+
+  const workqueue = events
+    .filter((event) => event.status === status)
+    .map((event) => ({
+      assignedTo: event.assignedTo,
+      type: event.type,
+      createdAt: new Date(event.createdAt).toLocaleDateString(),
+      modifiedAt: new Date(event.modifiedAt).toLocaleString(),
+      id: (
+        <Link to={ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id })}>
+          <IconWithName name={event.id} status={event.status} />
+        </Link>
+      )
+    }))
 
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState('createdAt')
@@ -96,7 +126,7 @@ export const WorkqueueIndex = () => {
     label?: string
     width: number
     // @TODO: Format payload and include contents of data somehow.
-    key: keyof (typeof statusEvents)[number] | string
+    key: keyof (typeof workqueue)[number] | string
     sortFunction?: (columnName: string) => void
     isActionColumn?: boolean
     isSorted?: boolean
@@ -107,9 +137,9 @@ export const WorkqueueIndex = () => {
         {
           label: intl.formatMessage(constantsMessages.name),
           width: 30,
-          key: 'assignedTo',
+          key: 'id',
           sortFunction: onColumnClick,
-          isSorted: sortedCol === 'assignedTo'
+          isSorted: sortedCol === 'id'
         },
         {
           label: intl.formatMessage(constantsMessages.event),
@@ -158,33 +188,32 @@ export const WorkqueueIndex = () => {
     }
   }
 
-  const totalPages = statusEvents.length
-    ? Math.ceil(statusEvents.length / searchParams.limit)
-    : 0
+  const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
-  const isShowPagination = totalPages > 0
+  const isShowPagination = totalPages >= 1
+
   return (
     <WQContentWrapper
-      title={intl.formatMessage(navigationMessages[searchParams.status])}
+      title={intl.formatMessage(navigationMessages[status])}
       isMobileSize={width < theme.grid.breakpoints.lg ? true : false}
       isShowPagination={isShowPagination}
-      paginationId={Math.floor(searchParams.offset / searchParams.limit)}
+      paginationId={Math.round(offset / limit)}
       totalPages={totalPages}
       onPageChange={() => {}}
-      loading={events.isLoading}
-      error={!!events.error}
-      noResultText={intl.formatMessage(wqMessages[searchParams.status])}
-      noContent={statusEvents.length === 0}
+      loading={false} // @TODO: Handle these on top level
+      error={false}
+      noResultText={intl.formatMessage(wqMessages[status])}
+      noContent={workqueue.length === 0}
     >
       <ReactTooltip id="validateTooltip">
         <ToolTipContainer>
           {intl.formatMessage(messages.empty)}
         </ToolTipContainer>
       </ReactTooltip>
-      <Workqueue
-        content={orderBy(statusEvents, sortedCol, sortOrder)}
+      <WorkqueueComponent
+        content={orderBy(workqueue, sortedCol, sortOrder)}
         columns={getColumns()}
-        loading={events.isLoading}
+        loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
         hideLastBorder={!isShowPagination}
       />
