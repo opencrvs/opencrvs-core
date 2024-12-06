@@ -62,7 +62,7 @@ export async function uploadCertificateAttachmentsToDocumentsStore<
     certificateDetails.collector.affidavit
   ) {
     for (const affidavit of certificateDetails.collector.affidavit) {
-      affidavit.data = await uploadSVGToMinio(affidavit.data, authHeader)
+      affidavit.data = await uploadFileToMinio(affidavit.data, authHeader)
     }
   }
   if ('data' in certificateDetails) {
