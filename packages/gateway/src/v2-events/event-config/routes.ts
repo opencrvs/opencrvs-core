@@ -10,12 +10,15 @@
  */
 import { env } from '@gateway/environment'
 import { ServerRoute } from '@hapi/hapi'
+import { logger } from '@opencrvs/commons'
 
 export const trpcProxy = [
   {
     method: '*',
     path: '/events/{path*}',
     handler: (req, h) => {
+      logger.info(`Proxying request to ${req.params.path}`)
+
       return h.proxy({
         uri: new URL(req.params.path, env.EVENTS_URL).toString(),
         passThrough: true
