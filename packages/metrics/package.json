@@ -24,7 +24,6 @@
     "csv-stringify": "^5.3.4",
     "csv-writer": "^1.6.0",
     "date-fns": "^2.28.0",
-    "envalid": "^8.0.0",
     "fast-csv": "^4.3.6",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-pino": "^9.0.0",

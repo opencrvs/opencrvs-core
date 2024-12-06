@@ -28,7 +28,7 @@ export const DOCUMENTS_URL = env.DOCUMENTS_URL
 export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const AUTH_URL = env.AUTH_URL
-export const DEFAULT_TIMEOUT = env.DEFAULT_TIMEOUT
+export const DEFAULT_TIMEOUT = 600000
 
 function getAvailableLanguages() {
   return env.LANGUAGES.split(',')
