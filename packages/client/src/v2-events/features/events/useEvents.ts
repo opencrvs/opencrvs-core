@@ -80,7 +80,7 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
       (e) => e.id !== actionInput.eventId
     )
     const previousActions = eventToUpdate.actions
-    await writeEventToStorage([...eventsWithoutUpdated, eventToUpdate])
+    await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
     queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
     return { previousActions, events }
   },
@@ -93,7 +93,7 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
       const events = await readEventsFromStorage()
       const eventsWithoutNew = events.filter((e) => e.id !== response.id)
 
-      await writeEventToStorage([...eventsWithoutNew, response])
+      await writeEventsToStorage([...eventsWithoutNew, response])
       return queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
     }
   }
@@ -111,7 +111,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       updatedAt: new Date(),
       actions: []
     }
-    console.log('setting it now', optimisticEvent)
+
     queryClient.cancelQueries({ queryKey: ['persisted-events'] })
 
     // Do this as very first synchronous operation so UI can trust
@@ -121,7 +121,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       optimisticEvent
     ])
     const events = await readEventsFromStorage()
-    await writeEventToStorage([...events, optimisticEvent])
+    await writeEventsToStorage([...events, optimisticEvent])
     return optimisticEvent
   },
   onSettled: async (response) => {
@@ -132,7 +132,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
         (e) => e.transactionId !== response.transactionId
       )
 
-      await writeEventToStorage([...eventsWithoutNew, response])
+      await writeEventsToStorage([...eventsWithoutNew, response])
       queryClient.invalidateQueries({ queryKey: ['persisted-events'] })
     }
   },
@@ -151,7 +151,7 @@ async function readEventsFromStorage() {
   return data
 }
 
-function writeEventToStorage(events: EventDocument[]) {
+function writeEventsToStorage(events: EventDocument[]) {
   return storage.setItem('events', events)
 }
 
