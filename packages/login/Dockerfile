@@ -24,6 +24,8 @@ COPY login/nginx/nginx-deploy-config.sh /
 COPY login/nginx/nginx-default.conf /etc/nginx/conf.d/default.conf
 RUN chmod +x /nginx-deploy-config.sh
 
+COPY login/nginx.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=0 /app/packages/login/build/ /usr/share/nginx/html/
 
 CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]

@@ -28,8 +28,6 @@ spec:
       port: 2021
     middlewares:
       - name: sts-and-basic-response-headers
-  tls:
-    certResolver: myresolver
 ---
 apiVersion: apps/v1
 kind: Deployment

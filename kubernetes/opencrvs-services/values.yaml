@@ -8,7 +8,7 @@ config:
   replicas: 1
 countryconfig:
   image:
-    name: opencrvs/ocrvs-farajaland
+    name: opencrvs/ocrvs-countryconfig
     tag: latest
   replicas: 1
 dashboards:
@@ -35,3 +35,4 @@ events:
   replicas: 1
 
 hostname: farajaland.com
+dev_mode: false
