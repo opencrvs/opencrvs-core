@@ -67,7 +67,7 @@ export function EventFormWizardIndex() {
   )
 }
 
-export const STATUSTOCOLOR: { [key: string]: string } = {
+const STATUSTOCOLOR: { [key: string]: string } = {
   ARCHIVED: 'grey',
   DRAFT: 'purple',
   IN_PROGRESS: 'purple',

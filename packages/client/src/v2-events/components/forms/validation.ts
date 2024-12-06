@@ -23,7 +23,7 @@ import {
 } from './utils'
 import { MessageDescriptor } from 'react-intl'
 
-export interface IFieldErrors {
+interface IFieldErrors {
   errors: IValidationResult[]
   nestedFields: {
     [fieldName: string]: IValidationResult[]
