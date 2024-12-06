@@ -11,6 +11,7 @@
 
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
+import { SummaryConfig } from '@opencrvs/commons/events'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
@@ -20,27 +21,34 @@ interface ILabel {
   [key: string]: string | undefined
 }
 
-export const EventSummary = ({ event }: { event: any }) => {
+export const EventSummary = ({
+  event,
+  summary
+}: {
+  event: any
+  summary: SummaryConfig
+}) => {
   const info: ILabel = {
     status: event?.status,
     type: event.type,
     trackingId: event.id
   }
+  console.log('info', info)
 
   return (
     <>
       <Summary id="summary">
-        {Object.entries(info).map(([key, value]) => {
+        {summary.fields.map((field) => {
           const message = 'message'
           const placeholder = message && 'placeholder'
 
           return (
             <Summary.Row
-              key={key}
-              data-testid={key}
-              label={key}
+              key={field.id}
+              data-testid={field.id}
+              label={field.label.defaultMessage}
               placeholder={placeholder}
-              value={value}
+              value={(event.data[field.id] as any) ?? '-'}
             />
           )
         })}

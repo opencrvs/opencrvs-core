@@ -10,41 +10,59 @@
  */
 import React from 'react'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useNavigate } from 'react-router-dom'
-import { useIntl } from 'react-intl'
-import { History } from '@client/utils/gateway'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents'
 import { EventSummary } from './components/EventSummary'
 import { EventHistory } from './components/EventHistory'
-import { EventConfig } from '@opencrvs/commons/client'
+
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { SummaryConfig } from '@opencrvs/commons'
+import { ActionDocument, EventIndex } from '@events/schema'
 
 /**
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
- *
  */
 
 export const EventOverviewIndex = () => {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
-  const foo = useEvents()
+  const { getEvents, getEventById } = useEvents()
 
-  const { data } = foo.getEvents.useQuery()
+  const [config] = useEventConfigurations()
 
-  const event = data?.find((event) => event.id === params.eventId)
+  console.log(params.eventId)
+  const { data: fullEvent } = getEventById.useQuery(params.eventId)
 
-  if (!event) {
+  const { data: events } = getEvents.useQuery()
+  const event = events?.find((event) => event.id === params.eventId)
+
+  console.log('event', event)
+  if (!event || !config || !fullEvent?.actions) {
     return null
   }
 
-  return <EventOverview event={event} />
+  return (
+    <EventOverview
+      event={event}
+      summary={config.summary}
+      history={fullEvent.actions}
+    />
+  )
 }
 
 /**
  * Renders the event overview page, including the event summary and history.
  */
-function EventOverview({ event }: { event: any }) {
+function EventOverview({
+  event,
+  summary,
+  history
+}: {
+  event: EventIndex
+  summary: SummaryConfig
+  history: ActionDocument[]
+}) {
   const actions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
 
@@ -53,13 +71,13 @@ function EventOverview({ event }: { event: any }) {
   return (
     <Content
       title={event.id || 'no name'}
-      titleColor={event.name ? 'copy' : 'grey600'}
+      titleColor={event.id ? 'copy' : 'grey600'}
       size={ContentSize.LARGE}
       topActionButtons={desktopActionsView}
-      icon={() => <IconWithName status={'orange'} name={event.event} />}
+      icon={() => <IconWithName status={'orange'} name={event.id} />}
     >
-      <EventSummary event={event} />
-      <EventHistory event={event} />
+      <EventSummary event={event} summary={summary} />
+      <EventHistory history={history} />
     </Content>
   )
 }

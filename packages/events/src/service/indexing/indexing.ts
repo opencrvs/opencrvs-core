@@ -48,11 +48,10 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
 
 function getData(actions: Array<ActionDocument>) {
   return actions.reduce((status, action) => {
-    if (action.type === 'CREATE') {
-      return action.data
+    return {
+      ...status,
+      ...action.data
     }
-
-    return status
   }, {})
 }
 
@@ -151,7 +150,9 @@ export async function getIndexedEvents() {
   const esClient = getOrCreateClient()
 
   const response = await esClient.search({
-    index: EVENTS_INDEX
+    index: EVENTS_INDEX,
+    size: 10000,
+    request_cache: false
   })
 
   return EventIndices.parse(response.hits.hits.map((hit) => hit._source))

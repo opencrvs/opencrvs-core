@@ -40,6 +40,7 @@ import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 import { constantsMessages } from '@client/v2-events/messages'
+import { ActionDocument } from '@events/schema'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -112,10 +113,12 @@ const GetNameWithAvatar = ({
   avatar: Avatar
   language: string
 }) => {
-  const nameObj = getIndividualNameObj(nameObject, language)
-  const userName = nameObj
-    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    : ''
+  // const nameObj = getIndividualNameObj(nameObject, language)
+  // const userName = nameObj
+  //   ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+  //   : ''
+
+  const userName = 'Unknown registar'
 
   return (
     <NameAvatar>
@@ -159,10 +162,10 @@ const getIndexByAction = (histories: any, index: number): number => {
 }
 
 export const EventHistory = ({
-  event,
+  history,
   toggleActionDetails,
   userDetails
-}: any & {
+}: { history: ActionDocument[]; toggleActionDetails: any; userDetails: any } & {
   toggleActionDetails: (actionItem: History, index?: number) => void
 }) => {
   const intl = useIntl()
@@ -193,48 +196,12 @@ export const EventHistory = ({
   //     </>
   //   )
 
-  let allHistoryData = (event?.history || []) as unknown as {
-    [key: string]: any
-  }[]
-  if (!allHistoryData.length && userDetails) {
-    allHistoryData.unshift({
-      date: new Date(event.savedOn || Date.now()).toISOString(),
-      regStatus: 'STARTED',
-      user: {
-        id: userDetails.userMgntUserID,
-        name: userDetails.name,
-        avatar: userDetails.avatar,
-        systemRole: userDetails.systemRole,
-        role: userDetails.role
-      },
-      office: userDetails.primaryOffice,
-      comments: [],
-      input: [],
-      output: []
-    })
-  }
-
-  if (!window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE) {
-    allHistoryData = allHistoryData.filter(
-      ({ regStatus }: Partial<History>) => {
-        return regStatus !== RegStatus.WaitingValidation
-      }
-    )
-  }
-
   // TODO: We need to figure out a way to sort the history in backend
-  const sortedHistory = allHistoryData.sort((fe, se) => {
-    return new Date(fe.date).getTime() - new Date(se.date).getTime()
-  })
+  const sortedHistory = history
 
-  const historiesForDisplay = getPageItems(
-    currentPageNumber,
-    DEFAULT_HISTORY_RECORD_PAGE_SIZE,
-    sortedHistory
-  )
-  const historyData = (historiesForDisplay as History[]).map((item, index) => ({
+  const historyData = history.map((item, index) => ({
     date: formatLongDate(
-      item?.date.toLocaleString(),
+      item?.createdAt.toLocaleString(),
       intl.locale,
       'MMMM dd, yyyy · hh.mm a'
     ),
@@ -250,87 +217,29 @@ export const EventHistory = ({
           toggleActionDetails(item, actionIndex)
         }}
       >
-        {getStatusLabel(
-          item.action,
-          item.regStatus,
-          intl,
-          item.user,
-          userDetails
-        )}
+        {item.type}
       </Link>
     ),
     user: (
-      <>
-        {isFlaggedAsPotentialDuplicate(item) ? (
-          <SystemUser name={item.system?.name || ''} />
-        ) : isVerifiedAction(item) ? (
-          <div />
-        ) : isSystemInitiated(item) ? (
-          <HealthSystemUser name={item.system?.name || ''} />
-        ) : isFieldAgent ? (
-          <GetNameWithAvatar
-            id={item?.user?.id as string}
-            nameObject={item?.user?.name as (GQLHumanName | null)[]}
-            avatar={item.user?.avatar as Avatar}
-            language={window.config.LANGUAGES}
-          />
-        ) : (
-          <Link
-            id="profile-link"
-            font="bold14"
-            onClick={() =>
-              navigate(
-                formatUrl(routes.USER_PROFILE, {
-                  userId: String(item?.user?.id)
-                })
-              )
-            }
-          >
-            <GetNameWithAvatar
-              id={item?.user?.id as string}
-              nameObject={item?.user?.name as (GQLHumanName | null)[]}
-              avatar={item.user?.avatar as Avatar}
-              language={window.config.LANGUAGES}
-            />
-          </Link>
-        )}
-      </>
-    ),
-    role: isFlaggedAsPotentialDuplicate(item) ? (
-      <div />
-    ) : isVerifiedAction(item) ? (
-      <div />
-    ) : isSystemInitiated(item) || !item.user?.systemRole ? (
-      ''
-    ) : (
-      // intl.formatMessage(getSystemType(item.system?.type || ''))
-      getUserRole(currentLanguage, item.user?.role)
-    ),
-
-    location:
-      isFlaggedAsPotentialDuplicate(item) ||
-      isVerifiedAction(item) ||
-      isSystemInitiated(item) ? (
-        <div />
-      ) : isFieldAgent ? (
-        <>{item.office?.name}</>
-      ) : (
-        <Link
-          font="bold14"
-          onClick={() => {
-            navigate({
-              pathname: routes.TEAM_USER_LIST,
-              search: stringify({
-                locationId: item?.office?.id as string
-              })
+      <Link
+        id="profile-link"
+        font="bold14"
+        onClick={() =>
+          navigate(
+            formatUrl(routes.USER_PROFILE, {
+              userId: item.createdBy
             })
-          }}
-        >
-          {item.office
-            ? getLocalizedLocationName(intl, item.office as any)
-            : ''}
-        </Link>
-      )
+          )
+        }
+      >
+        <GetNameWithAvatar
+          id={item?.createdBy}
+          nameObject={[null]}
+          avatar={null as any}
+          language={window.config.LANGUAGES}
+        />
+      </Link>
+    )
   }))
 
   const columns = [
@@ -378,7 +287,7 @@ export const EventHistory = ({
           highlightRowOnMouseOver
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        {/* {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
           <Pagination
             currentPage={currentPageNumber}
             totalPages={Math.ceil(
@@ -386,7 +295,7 @@ export const EventHistory = ({
             )}
             onPageChange={onPageChange}
           />
-        )}
+        )} */}
       </TableDiv>
     </>
   )
