@@ -36,7 +36,7 @@ export const EventIndex = z.object({
   modifiedAt: z.string().datetime(),
   assignedTo: z.string().nullable(),
   updatedBy: z.string(),
-  data: z.object({})
+  data: z.record(z.string(), z.unknown())
 })
 
 export type EventIndex = z.infer<typeof EventIndex>

@@ -35,6 +35,23 @@ export const Debug = () => {
   const online = useOnlineStatus()
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
+  const [lastId, setLastId] = React.useState<string | null>(null)
+
+  const declareEvent = (id: string) =>
+    events.actions.declare.mutate({
+      type: 'DECLARE',
+      transactionId: Math.random().toString(36).substring(2),
+      eventId: id,
+      data: {
+        'applicant.firstname': 'John',
+        'applicant.surname': 'Doe',
+        'recommender.firstname': 'Jane',
+        'recommender.surname': 'Jane',
+        'recommender.id': '123123'
+      }
+    })
+
+  console.log('lastId', lastId)
 
   const createEvents = () => {
     createMutation.mutate(
@@ -46,6 +63,7 @@ export const Debug = () => {
         onSuccess: (data) => {
           // eslint-disable-next-line no-console
           console.log('Event created', data)
+          setLastId(data.id)
         },
         onError: (error) => {
           // eslint-disable-next-line no-console
@@ -66,6 +84,17 @@ export const Debug = () => {
         </li>
         <li>
           <button onClick={createEvents}>Create event</button>
+        </li>
+        <li>
+          <button
+            disabled={!lastId}
+            onClick={() => {
+              declareEvent(lastId!)
+              setLastId(null)
+            }}
+          >
+            Declare previous event
+          </button>
         </li>
         <li>
           <Text variant="reg12" element="span">

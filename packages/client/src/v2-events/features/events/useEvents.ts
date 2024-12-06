@@ -26,11 +26,14 @@ export function useEvents() {
       retry: 3,
       retryDelay: 5000
     })
+
+  const getEventById = api.event.get
   return {
     createEvent,
     getEvents,
+    getEventById,
     actions: {
-      declare: api.event.actions.declare
+      declare: api.event.actions.declare.useMutation()
     }
   }
 }
