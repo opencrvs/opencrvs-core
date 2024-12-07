@@ -153,6 +153,8 @@ jobs:
 
       - name: Run Unit Test
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        env:
+          MONGOMS_DOWNLOAD_DIR: ${{ runner.temp }}/mongodb
         run: cd ${{ matrix.package }} && yarn test
 
   lint-knip:
