@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from '@opencrvs/commons'
+import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 
 const ActionBase = z.object({

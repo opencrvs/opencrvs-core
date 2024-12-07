@@ -11,7 +11,7 @@
 
 import { storage } from '@client/storage'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { EventDocument } from '@events/schema'
+import { EventDocument } from '@opencrvs/commons/client'
 import { QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
 
