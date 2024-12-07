@@ -11,8 +11,13 @@
 
 import { storage } from '@client/storage'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { EventDocument } from '@opencrvs/commons/client'
-import { QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
+
+import {
+  EventDocument,
+  EventInput,
+  DeclareActionInput
+} from '@opencrvs/commons/client'
+import { hashKey, QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
 
 export function preloadData() {
@@ -129,10 +134,13 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     // that the event is created when changing view for instance
     queryClient.setQueryData(
       EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (old: EventDocument[]) => [...old, optimisticEvent]
+      (old: EventDocument[]) => {
+        return [...old, optimisticEvent]
+      }
     )
 
     const events = await readEventsFromStorage()
+
     await writeEventsToStorage([...events, optimisticEvent])
     return optimisticEvent
   },
@@ -156,6 +164,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       })
     }
   },
+
   onSuccess: (data) => {
     queryClient.setQueryData(
       EVENTS_PERSISTENT_STORE_STORAGE_KEY,
@@ -195,35 +204,88 @@ function writeEventsToStorage(events: EventDocument[]) {
   return storage.setItem('events', events)
 }
 
+function getPendingMutations(
+  mutationCreator: Parameters<typeof getQueryKey>[0]
+) {
+  const key = getQueryKey(mutationCreator)
+  return queryClient
+    .getMutationCache()
+    .getAll()
+    .filter((mutation) => mutation.state.status !== 'success')
+    .filter(
+      (mutation) =>
+        mutation.options.mutationKey &&
+        hashKey(mutation.options.mutationKey) === hashKey(key)
+    )
+}
+
+function filterOutboxEventsWithMutation<
+  T extends typeof api.event.create | typeof api.event.actions.declare
+>(
+  events: EventDocument[],
+  mutation: T,
+  filter: (
+    event: EventDocument,
+    parameters: Exclude<ReturnType<T['useMutation']>['variables'], undefined>
+  ) => boolean
+) {
+  return getPendingMutations(mutation).flatMap((mutation) => {
+    const variables = mutation.state.variables as Exclude<
+      ReturnType<T['useMutation']>['variables'],
+      undefined
+    >
+    return events.filter((event) => filter(event, variables))
+  })
+}
+
 export function useEvents() {
   const createEvent = () => {
     return api.event.create.useMutation({})
   }
+
   const declare = () => {
     return api.event.actions.declare.useMutation({})
   }
+
   const getEvent = (id: string) => {
     return api.event.get.useSuspenseQuery(id)
   }
 
+  const getDrafts = () => {
+    return events.data.filter(
+      (event) => !event.actions.some((a) => a.type === 'DECLARE')
+    )
+  }
+
+  const getOutbox = () => {
+    const eventFromCreateMutations = filterOutboxEventsWithMutation(
+      events.data,
+      api.event.create,
+      (event, parameters) => event.transactionId === parameters.transactionId
+    )
+    const eventFromDeclareActions = filterOutboxEventsWithMutation(
+      events.data,
+      api.event.actions.declare,
+      (event, parameters) => event.id === parameters.eventId
+    )
+
+    return eventFromCreateMutations.concat(eventFromDeclareActions).filter(
+      /* uniqueById */
+      (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
+    )
+  }
+
   const events = useSuspenseQuery({
     queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-    queryFn: () => {
-      return readEventsFromStorage()
-    }
+    queryFn: () => readEventsFromStorage()
   })
 
   return {
     createEvent,
-    useStoredEvents: () =>
-      useSuspenseQuery({
-        queryKey: ['persisted-events'],
-        queryFn: () => {
-          return storage.getItem('events').then((e) => (e ? JSON.parse(e) : []))
-        }
-      }),
     events,
     getEvent,
+    getDrafts,
+    getOutbox,
     actions: {
       declare
     }

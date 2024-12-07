@@ -11,7 +11,7 @@
 /* stylelint-disable */
 import React from 'react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useEvents } from '@client/v2-events/features/events/useEvents'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
@@ -56,7 +56,7 @@ export const Debug = () => {
   }
 
   const mutations = queryClient.getMutationCache().getAll()
-  const storedEvents = events.useStoredEvents()
+  const storedEvents = events.events
   return (
     <>
       <Container>

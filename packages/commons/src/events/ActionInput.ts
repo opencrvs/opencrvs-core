@@ -47,6 +47,9 @@ export const DeclareActionInput = BaseActionInput.merge(
     type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
   })
 )
+
+export type DeclareActionInput = z.infer<typeof DeclareActionInput>
+
 const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),

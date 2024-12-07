@@ -28,7 +28,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormNavigation } from './useEventFormNavigation'
-import { useEvents } from './useEvents'
+import { useEvents } from './useEvents/useEvents'
 
 export function EventFormWizardIndex() {
   return (
