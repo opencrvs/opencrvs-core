@@ -11,4 +11,4 @@
 
 export const V2_ROOT_ROUTE = '/v2'
 export const V2_EVENTS_ROUTE = `${V2_ROOT_ROUTE}/events`
-export const V2_CREATE_EVENT_ROUTE = `/v2/events/:actionType/:eventId`
+export const V2_DECLARE_ACTION_ROUTE = '/v2/events/declare/:eventId'
