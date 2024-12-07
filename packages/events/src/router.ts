@@ -17,7 +17,7 @@ import {
   DeclareActionInput,
   EventInput,
   NotifyActionInput
-} from '@events/schema'
+} from '@opencrvs/commons/events'
 import { getEventsConfig } from './service/config/config'
 import {
   addAction,

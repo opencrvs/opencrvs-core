@@ -20,7 +20,8 @@ export const trpcProxy = [
       logger.info(`Proxying request to ${req.params.path}`)
 
       return h.proxy({
-        uri: new URL(req.params.path, env.EVENTS_URL).toString(),
+        uri:
+          new URL(req.params.path, env.EVENTS_URL).toString() + req.url.search,
         passThrough: true
       })
     },

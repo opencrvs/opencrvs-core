@@ -19,7 +19,10 @@ module.exports = {
           '!@client/components',
           '!@client/utils',
           '!@client/navigation',
-          '!@client/storage'
+          '!@client/storage',
+          '!@client/forms',
+          '!@client/i18n',
+          '!@client/search'
         ]
       }
     ]
