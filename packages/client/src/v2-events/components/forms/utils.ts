@@ -18,29 +18,25 @@ import {
   FETCH_BUTTON,
   HIDDEN,
   IButtonFormField,
-  IDateFormField,
+  ICheckboxOption,
   IDynamicFormField,
   IDynamicFormFieldValidators,
   IFormField,
   IFormFieldValue,
   IFormSectionData,
-  Ii18nButtonFormField,
   Ii18nFormField,
-  Ii18nHiddenFormField,
   ILoaderButton,
   INFORMATIVE_RADIO_GROUP,
   InitialValue,
-  PARAGRAPH,
+  IRadioOption,
+  ISelectOption,
   RADIO_GROUP,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  SELECT_WITH_OPTIONS,
-  ICheckboxOption,
-  IRadioOption,
-  ISelectOption
+  SELECT_WITH_OPTIONS
 } from '@client/forms'
 import { Validation } from '@client/utils/validate'
-import { Conditional } from './conditionals'
 import { IntlShape, MessageDescriptor } from 'react-intl'
+import { Conditional } from './conditionals'
 
 const internationaliseOptions = (
   intl: IntlShape,
@@ -68,80 +64,85 @@ export const internationaliseFieldObject = (
   intl: IntlShape,
   field: IFormField
 ): Ii18nFormField => {
-  const base = {
-    ...field,
-    label:
-      field.type === PARAGRAPH
-        ? field.label
-        : intl.formatMessage(field.label, field.labelParam),
+  const internationalisedForAll = {
     helperText: field.helperText && intl.formatMessage(field.helperText),
     tooltip: field.tooltip && intl.formatMessage(field.tooltip),
     unit: field.unit && intl.formatMessage(field.unit),
     description: field.description && intl.formatMessage(field.description),
-    placeholder: field.placeholder && intl.formatMessage(field.placeholder)
+    placeholder: field.placeholder && intl.formatMessage(field.placeholder),
+    label: field.label && intl.formatMessage(field.label),
+    nestedFields: undefined
   }
 
-  if (base.type === HIDDEN) {
-    return base as Ii18nHiddenFormField
-  }
-
-  if (
-    base.type === SELECT_WITH_OPTIONS ||
-    base.type === INFORMATIVE_RADIO_GROUP ||
-    base.type === CHECKBOX_GROUP ||
-    base.type === DOCUMENT_UPLOADER_WITH_OPTION
-  ) {
-    ;(base as any).options = internationaliseOptions(intl, base.options)
-  }
-
-  if (base.type === BULLET_LIST) {
-    ;(base as any).items = internationaliseListFieldObject(intl, base.items)
-  }
-
-  if (
-    base.type === RADIO_GROUP ||
-    base.type === RADIO_GROUP_WITH_NESTED_FIELDS
-  ) {
-    ;(base as any).options = internationaliseOptions(intl, base.options)
-    if ((field as IDateFormField).notice) {
-      ;(base as any).notice = intl.formatMessage(
-        // @ts-ignore
-        (field as IRadioGroupFormField).notice
-      )
+  if (field.type === HIDDEN) {
+    return {
+      ...field,
+      ...internationalisedForAll,
+      label: internationalisedForAll.label
     }
   }
 
-  if (base.type === DATE && (field as IDateFormField).notice) {
-    ;(base as any).notice = intl.formatMessage(
-      // @ts-ignore
-      (field as IDateFormField).notice
-    )
+  if (
+    field.type === SELECT_WITH_OPTIONS ||
+    field.type === INFORMATIVE_RADIO_GROUP ||
+    field.type === CHECKBOX_GROUP ||
+    field.type === DOCUMENT_UPLOADER_WITH_OPTION
+  ) {
+    return {
+      ...field,
+      ...internationalisedForAll,
+      options: internationaliseOptions(intl, field.options)
+    } as Ii18nFormField
   }
 
-  if (base.type === FETCH_BUTTON) {
-    ;(base as any).modalTitle = intl.formatMessage(
-      (field as ILoaderButton).modalTitle
-    )
-    ;(base as any).successTitle = intl.formatMessage(
-      (field as ILoaderButton).successTitle
-    )
-    ;(base as any).errorTitle = intl.formatMessage(
-      (field as ILoaderButton).errorTitle
-    )
+  if (field.type === BULLET_LIST) {
+    return {
+      ...field,
+      ...internationalisedForAll,
+      items: internationaliseListFieldObject(intl, field.items)
+    }
+  }
+
+  if (
+    field.type === RADIO_GROUP ||
+    field.type === RADIO_GROUP_WITH_NESTED_FIELDS
+  ) {
+    return {
+      ...field,
+      ...internationalisedForAll,
+      options: internationaliseOptions(intl, field.options),
+      notice: field.notice && intl.formatMessage(field.notice)
+    } as Ii18nFormField
+  }
+
+  if (field.type === DATE && field.notice) {
+    return {
+      ...field,
+      ...internationalisedForAll,
+      notice: intl.formatMessage(field.notice)
+    }
+  }
+
+  if (field.type === FETCH_BUTTON) {
+    return {
+      ...field,
+      ...internationalisedForAll,
+      modalTitle: intl.formatMessage((field as ILoaderButton).modalTitle),
+      successTitle: intl.formatMessage((field as ILoaderButton).successTitle),
+      errorTitle: intl.formatMessage((field as ILoaderButton).errorTitle)
+    } as Ii18nFormField
   }
 
   if (isFieldButton(field)) {
-    ;(base as Ii18nButtonFormField).buttonLabel = intl.formatMessage(
-      field.buttonLabel
-    )
-    if (field.loadingLabel) {
-      ;(base as Ii18nButtonFormField).loadingLabel = intl.formatMessage(
-        field.loadingLabel
-      )
+    return {
+      ...field,
+      ...internationalisedForAll,
+      buttonLabel: intl.formatMessage(field.buttonLabel),
+      loadingLabel: field.loadingLabel && intl.formatMessage(field.loadingLabel)
     }
   }
 
-  return base as Ii18nFormField
+  return { ...field, ...internationalisedForAll } as Ii18nFormField
 }
 
 export function handleInitialValue(
@@ -190,7 +191,7 @@ export const getConditionalActionsForField = (
     .map((conditional: Conditional) => conditional.action)
 }
 
-type FormData = Record<string, any>
+type FormData = Record<string, IFormFieldValue>
 export const evalExpressionInFieldDefinition = (
   expression: string,
   /*
@@ -218,7 +219,7 @@ export const getFieldValidation = (
   ) {
     field.dynamicDefinitions.validator.map(
       (element: IDynamicFormFieldValidators) => {
-        const params: any[] = []
+        const params: unknown[] = []
         element.dependencies.map((dependency: string) =>
           params.push(values[dependency])
         )

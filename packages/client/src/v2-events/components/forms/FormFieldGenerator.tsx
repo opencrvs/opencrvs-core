@@ -129,8 +129,8 @@ type GeneratedInputFieldProps = {
   values: IFormSectionData
   setFieldValue: (name: string, value: IFormFieldValue) => void
   onClick?: () => void
-  onChange: (e: React.ChangeEvent<any>) => void
-  onBlur: (e: React.FocusEvent<any>) => void
+  onChange: (e: React.ChangeEvent) => void
+  onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
   value: IFormFieldValue
   touched: boolean
@@ -526,7 +526,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-type FormData = Record<string, any>
+type FormData = Record<string, IFormFieldValue>
 
 const mapFieldsToValues = (fields: IFormField[], formData: FormData) =>
   fields.reduce((memo, field) => {

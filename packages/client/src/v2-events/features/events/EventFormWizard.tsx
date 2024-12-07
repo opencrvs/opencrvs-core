@@ -87,7 +87,6 @@ function EventFormWizard() {
   const events = useEvents()
 
   const [event] = events.getEvent(eventId)
-  console.log({ event })
 
   if (!event) {
     throw new Error('Event not found')
