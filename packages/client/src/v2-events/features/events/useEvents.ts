@@ -223,12 +223,7 @@ export function useEvents() {
         }
       }),
     events,
-    getEvent: (id: string) => {
-      return (
-        events.data.find((e) => e.id === id) ||
-        events.data.find((e) => e.transactionId === id)
-      )
-    },
+    getEvent,
     actions: {
       declare
     }
