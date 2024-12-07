@@ -12,11 +12,7 @@
 import { storage } from '@client/storage'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 
-import {
-  EventDocument,
-  EventInput,
-  DeclareActionInput
-} from '@opencrvs/commons/client'
+import { EventDocument } from '@opencrvs/commons/client'
 import { hashKey, QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
 
