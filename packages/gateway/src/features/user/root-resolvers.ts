@@ -23,7 +23,6 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getFullName,
-  hasScope,
   inScope,
   isTokenOwner,
   getUserId
