@@ -34,7 +34,7 @@ import { REQUEST_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { Router } from '@sentry/react/types/types'
+import { createMemoryRouter } from 'react-router-dom'
 
 const deathDeclaration: IDeclaration = {
   id: '85bccf72-6117-4cab-827d-47728becb0c1',
@@ -166,7 +166,7 @@ const birthDeclaration: IDeclaration = {
 const { store } = createStore()
 
 let wrapper: ReactWrapper<{}, {}>
-let router: Router
+let router: ReturnType<typeof createMemoryRouter>
 
 describe('Correction summary', () => {
   describe('for a birth declaration', () => {
