@@ -335,7 +335,6 @@ export function toIdentifierUpserted<T extends ValidRecord>(
   const task = getTaskFromSavedBundle(record)
   const event = getTaskEventType(task)
   const composition = getComposition(record)
-  // TBD: task history entry
   const patientWithUpsertedIdentifier = upsertPatientIdentifiers(
     record,
     composition,
