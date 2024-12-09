@@ -24,7 +24,8 @@ import {
   getResourceFromBundleById,
   resourceIdentifierToUUID,
   SupportedPatientIdentifierCode,
-  ValidRecord
+  ValidRecord,
+  PatientIdentifier
 } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -38,6 +39,7 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
+import { isEqual } from 'lodash'
 import fetch from 'node-fetch'
 
 export async function invokeRegistrationValidation(
@@ -206,12 +208,11 @@ export function updatePatientIdentifierWithRN(
   })
 }
 
-export function upsertPatientIdentifierWithRN(
+export function upsertPatientIdentifiers(
   record: ValidRecord,
   composition: Composition,
   sectionCodes: string[],
-  identifierType: SupportedPatientIdentifierCode,
-  registrationNumber: string
+  identifiers: PatientIdentifier[]
 ): Saved<Patient>[] {
   return sectionCodes.map((sectionCode) => {
     const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
@@ -223,25 +224,27 @@ export function upsertPatientIdentifierWithRN(
     if (!patient.identifier) {
       patient.identifier = []
     }
-    const rnIdentifier = patient.identifier.find(
-      (identifier: fhir3.Identifier) =>
-        identifier.type?.coding?.[0].code === identifierType
-    )
-    if (rnIdentifier) {
-      rnIdentifier.value = registrationNumber
-    } else {
-      patient.identifier.push({
-        type: {
-          coding: [
-            {
-              system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
-              code: identifierType
-            }
-          ]
-        },
-        value: registrationNumber
-      })
-    }
+    identifiers.forEach((id) => {
+      const existingIdentifier = patient.identifier!.find((existingId) =>
+        isEqual(existingId.type, id.type)
+      )
+      if (existingIdentifier) {
+        existingIdentifier.value = id.value
+      } else {
+        patient.identifier!.push({
+          type: {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                code: id.type.coding[0].code
+              }
+            ]
+          },
+          value: id.value
+        })
+      }
+    })
+
     return patient
   })
 }

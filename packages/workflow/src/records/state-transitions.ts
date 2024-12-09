@@ -49,7 +49,8 @@ import {
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory,
-  RejectedRecord
+  RejectedRecord,
+  PatientIdentifier
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -60,7 +61,8 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  upsertPatientIdentifiers
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -321,6 +323,32 @@ export async function toViewed<T extends ValidRecord>(
   } as T
 
   return viewedRecord
+}
+
+export function toUpserted<T extends ValidRecord>(
+  record: T,
+  identifiers: PatientIdentifier[]
+): T {
+  const task = getTaskFromSavedBundle(record)
+  const event = getTaskEventType(task)
+  const composition = getComposition(record)
+  // TBD: task history entry
+  const patientWithUpsertedIdentifier = upsertPatientIdentifiers(
+    record,
+    composition,
+    SECTION_CODE[event],
+    identifiers
+  )
+  const filteredEntry = record.entry.filter(
+    (e) =>
+      !patientWithUpsertedIdentifier
+        .map((patient) => patient.id)
+        .includes(e.resource.id)
+  )
+  return {
+    ...record,
+    entry: [...filteredEntry, ...patientWithUpsertedIdentifier]
+  }
 }
 
 export async function toDownloaded(

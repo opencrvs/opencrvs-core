@@ -11,27 +11,14 @@
 import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
-import { getEventType } from '@workflow/features/registration/utils'
 import { indexBundle } from '@workflow/records/search'
-import { auditEvent } from '@workflow/records/audit'
-import {
-  isNotificationEnabled,
-  sendNotification
-} from '@workflow/records/notification'
-import { invokeWebhooks } from '@workflow/records/webhooks'
-import {
-  SupportedPatientIdentifierCode,
-  RegisteredRecord
-} from '@opencrvs/commons/types'
+import { PatientIdentifier } from '@opencrvs/commons/types'
+import { toUpserted } from '@workflow/records/state-transitions'
 
 export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
-  error: string
-  identifiers?: {
-    type: SupportedPatientIdentifierCode
-    value: string
-  }[]
+  identifiers: PatientIdentifier[]
 }
 
 export async function upsertRegistrationHandler(
@@ -40,11 +27,7 @@ export async function upsertRegistrationHandler(
 ) {
   const token = getToken(request)
   const compositionId = request.params.id
-  const { error } = request.payload as EventRegistrationPayload
-
-  if (error) {
-    throw new Error(`Callback triggered with an error: ${error}`)
-  }
+  const { identifiers } = request.payload as EventRegistrationPayload
 
   const savedRecord = await getRecordById(
     compositionId,
@@ -64,20 +47,15 @@ export async function upsertRegistrationHandler(
     true
   )
   if (!savedRecord) {
-    throw new Error('Could not find record in elastic search!')
+    throw new Error(
+      'Could not find record with composition id: ' + compositionId
+    )
   }
 
-  const bundle = savedRecord as RegisteredRecord
-  const event = getEventType(bundle)
+  const upsertedRecord = toUpserted(savedRecord, identifiers)
 
-  await indexBundle(bundle, token)
-  await auditEvent('registered', bundle, token)
+  await indexBundle(upsertedRecord, token)
+  // TBD: audit event
 
-  if (await isNotificationEnabled('registered', event, token)) {
-    await sendNotification('registered', bundle, token)
-  }
-
-  await invokeWebhooks({ bundle, token, event })
-
-  return h.response(bundle).code(200)
+  return h.response(upsertedRecord).code(200)
 }
