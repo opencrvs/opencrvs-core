@@ -32,15 +32,18 @@ import {
 } from '@login/utils/authUtils'
 import { IAuthenticationData } from '@login/utils/authApi'
 import * as actions from '@login/login/actions'
-import { resetSubmissionError } from '@login/login/actions'
+import {
+  goToForgottenItemForm,
+  resetSubmissionError
+} from '@login/login/actions'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
+import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
 import { Text } from '@opencrvs/components/lib/Text/Text'
+import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
-import { Link } from 'react-router-dom'
-import { FORGOTTEN_ITEM } from '@login/navigation/routes'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
@@ -145,19 +148,14 @@ export function StepOneContainer() {
                 >
                   {intl.formatMessage(messages.submit)}
                 </Button>
-                <Link
-                  to={FORGOTTEN_ITEM}
+                <Button
+                  size="small"
+                  type="tertiary"
                   id="login-forgot-password"
-                  style={{
-                    textDecoration: 'none',
-                    display: 'flex',
-                    justifyContent: 'center'
-                  }}
+                  onClick={() => dispatch(goToForgottenItemForm())}
                 >
-                  <Button size="small" type="tertiary">
-                    {intl.formatMessage(messages.forgotPassword)}
-                  </Button>
-                </Link>
+                  {intl.formatMessage(messages.forgotPassword)}
+                </Button>
               </Stack>
             </FormWrapper>
           )}
