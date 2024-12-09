@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
-import styled from 'styled-components'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { EventDocument } from '@opencrvs/commons'
 import {
   Accordion,
   Button,
@@ -24,13 +24,14 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
+import React, { useState } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import { useEventConfiguration } from './useEventConfiguration'
-import { EventDocument } from '@opencrvs/commons'
-import { useModal } from '@client/v2-events/hooks/useModal'
+import styled from 'styled-components'
 import { FormHeader } from './EventFormWizard'
-import { useEvents } from './useEvents/useEvents'
+import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
+import { useEvents } from './useEvents/useEvents'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -117,6 +118,107 @@ const ReviewContainter = styled.div`
 `
 const DeclarationDataContainer = styled.div``
 
+const messages = defineMessages({
+  chagneButton: {
+    id: 'buttons.chagne',
+    defaultMessage: 'Change',
+    description: 'The label for the change button'
+  },
+  reviewActionTitle: {
+    id: 'reviewAction.title',
+    defaultMessage: 'Register member',
+    description: 'The title for review action'
+  },
+  reviewActionDescription: {
+    id: 'reviewAction.description',
+    defaultMessage:
+      'By clicking register, you confirm that the information entered is correct and the member can be registered.',
+    description: 'The description for review action'
+  },
+  reviewActionRegister: {
+    id: 'reviewAction.register',
+    defaultMessage: 'Register',
+    description: 'The label for register button of review action'
+  },
+  reviewActionReject: {
+    id: 'reviewAction.reject',
+    defaultMessage: 'Reject',
+    description: 'The label for reject button of review action'
+  },
+  registerModalCancel: {
+    id: 'registerModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of register modal'
+  },
+  registerModalRegister: {
+    id: 'registerModal.register',
+    defaultMessage: 'Register',
+    description: 'The label for register button of register modal'
+  },
+  registerModalTitle: {
+    id: 'registerModal.title',
+    defaultMessage: 'Register the member?',
+    description: 'The title for register modal'
+  },
+  registerModalDescription: {
+    id: 'registerModal.description',
+    defaultMessage:
+      'The declarant will be notified of this correction and a record of this decision will be recorded',
+    description: 'The description for register modal'
+  },
+  rejectModalCancel: {
+    id: 'rejectModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of reject modal'
+  },
+  rejectModalArchive: {
+    id: 'rejectModal.archive',
+    defaultMessage: 'Archive',
+    description: 'The label for archive button of reject modal'
+  },
+  rejectModalSendForUpdate: {
+    id: 'rejectModal.sendForUpdate',
+    defaultMessage: 'Send For Update',
+    description: 'The label for send For Update button of reject modal'
+  },
+  rejectModalTitle: {
+    id: 'rejectModal.title',
+    defaultMessage: 'Reason for rejection?',
+    description: 'The title for reject modal'
+  },
+  rejectModalDescription: {
+    id: 'rejectModal.description',
+    defaultMessage:
+      'Please describe the updates required to this record for follow up action.',
+    description: 'The description for reject modal'
+  },
+  rejectModalMarkAsDuplicate: {
+    id: 'rejectModal.markAsDuplicate',
+    defaultMessage: 'Mark as a duplicate',
+    description: 'The label for mark as duplicate checkbox of reject modal'
+  },
+  changeModalCancel: {
+    id: 'changeModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of change modal'
+  },
+  changeModalContinue: {
+    id: 'changeModal.continue',
+    defaultMessage: 'Continue',
+    description: 'The label for continue button of change modal'
+  },
+  changeModalTitle: {
+    id: 'changeModal.title',
+    defaultMessage: 'Edit declaration?',
+    description: 'The title for change modal'
+  },
+  changeModalDescription: {
+    id: 'changeModal.description',
+    defaultMessage: 'A record will be created of any changes you make',
+    description: 'The description for change modal'
+  }
+})
+
 enum REJECT_ACTIONS {
   ARCHIVE,
   SEND_FOR_UPDATE
@@ -139,6 +241,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   if (!configuration) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
+  const intl = useIntl()
 
   const { forms } = configuration.actions.filter(
     (action) => action.type === 'DECLARE'
@@ -230,7 +333,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                         labelForShowAction="Show"
                         action={
                           <Link onClick={(e) => handleEdit(e, page.id)}>
-                            Change
+                            {intl.formatMessage(messages.chagneButton)}
                           </Link>
                         }
                         expand={true}
@@ -250,7 +353,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                                 value={data[id] || ''}
                                 actions={
                                   <Link onClick={(e) => handleEdit(e, id)}>
-                                    Change
+                                    {intl.formatMessage(messages.chagneButton)}
                                   </Link>
                                 }
                               />
@@ -269,7 +372,6 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
             onReject={handleReject}
           />
         </LeftColumn>
-        <RightColumn></RightColumn>
       </Row>
       {modal}
     </Frame>
@@ -354,14 +456,14 @@ const ReviewActionComponent = ({
   onRegister: () => {}
   onReject: () => {}
 }) => {
+  const intl = useIntl()
   return (
     <Container>
       <UnderLayBackground background="success">
         <Content>
-          <Title>Register member</Title>
+          <Title>{intl.formatMessage(messages.reviewActionTitle)}</Title>
           <Description>
-            By clicking register, you confirm that the information entered is
-            correct and the member can be registered.
+            {intl.formatMessage(messages.reviewActionDescription)}
           </Description>
           <ActionContainer>
             <Button
@@ -371,7 +473,7 @@ const ReviewActionComponent = ({
               onClick={onRegister}
             >
               <Icon name="Check" />
-              Register
+              {intl.formatMessage(messages.reviewActionRegister)}
             </Button>
             <Button
               type="negative"
@@ -380,7 +482,7 @@ const ReviewActionComponent = ({
               onClick={onReject}
             >
               <Icon name="X" />
-              Reject
+              {intl.formatMessage(messages.reviewActionReject)}
             </Button>
           </ActionContainer>
         </Content>
@@ -391,43 +493,46 @@ const ReviewActionComponent = ({
 
 const RegisterModal: React.FC<{
   close: (result: boolean | null) => void
-}> = ({ close }) => (
-  <ResponsiveModal
-    autoHeight
-    responsive={false}
-    title="Register the member?"
-    actions={[
-      <Button
-        type="tertiary"
-        id="cancel_register"
-        key="cancel_register"
-        onClick={() => {
-          close(null)
-        }}
-      >
-        Cancel
-      </Button>,
-      <Button
-        type="primary"
-        key="confirm_register"
-        id="confirm_register"
-        onClick={() => {
-          close(true)
-        }}
-      >
-        Register
-      </Button>
-    ]}
-    show={true}
-    handleClose={() => close(null)}
-  >
-    <Stack>
-      <Text variant="reg16" element="p" color="grey500">
-        The action will be recorded.
-      </Text>
-    </Stack>
-  </ResponsiveModal>
-)
+}> = ({ close }) => {
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      autoHeight
+      responsive={false}
+      title={intl.formatMessage(messages.registerModalTitle)}
+      actions={[
+        <Button
+          type="tertiary"
+          id="cancel_register"
+          key="cancel_register"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(messages.registerModalCancel)}
+        </Button>,
+        <Button
+          type="primary"
+          key="confirm_register"
+          id="confirm_register"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(messages.registerModalRegister)}
+        </Button>
+      ]}
+      show={true}
+      handleClose={() => close(null)}
+    >
+      <Stack>
+        <Text variant="reg16" element="p" color="grey500">
+          {intl.formatMessage(messages.registerModalDescription)}
+        </Text>
+      </Stack>
+    </ResponsiveModal>
+  )
+}
 
 const RejectModal: React.FC<{
   close: (result: RejectionState | null) => void
@@ -438,11 +543,13 @@ const RejectModal: React.FC<{
     isDuplicate: false
   })
 
+  const intl = useIntl()
+
   return (
     <ResponsiveModal
       autoHeight
       responsive={false}
-      title="Reason for rejection?"
+      title={intl.formatMessage(messages.rejectModalTitle)}
       actions={[
         <Button
           type="tertiary"
@@ -452,7 +559,7 @@ const RejectModal: React.FC<{
             close(null)
           }}
         >
-          Cancel
+          {intl.formatMessage(messages.rejectModalCancel)}
         </Button>,
         <Button
           type="secondaryNegative"
@@ -465,7 +572,7 @@ const RejectModal: React.FC<{
             })
           }}
         >
-          Archive
+          {intl.formatMessage(messages.rejectModalArchive)}
         </Button>,
         <Button
           type="negative"
@@ -478,7 +585,7 @@ const RejectModal: React.FC<{
             })
           }}
         >
-          Send for updates
+          {intl.formatMessage(messages.rejectModalSendForUpdate)}
         </Button>
       ]}
       show={true}
@@ -486,8 +593,7 @@ const RejectModal: React.FC<{
     >
       <Stack direction="column" alignItems="left">
         <Text variant="reg16" element="p" color="grey500">
-          Please describe the updates required to this record for follow up
-          action.
+          {intl.formatMessage(messages.rejectModalDescription)}
         </Text>
         <TextInput
           required={true}
@@ -498,7 +604,7 @@ const RejectModal: React.FC<{
         />
         <Checkbox
           name={'markDUplicate'}
-          label={'Mark as a duplicate'}
+          label={intl.formatMessage(messages.rejectModalMarkAsDuplicate)}
           value={''}
           selected={state.isDuplicate}
           onChange={() =>
@@ -512,40 +618,43 @@ const RejectModal: React.FC<{
 
 const EditFieldModal: React.FC<{
   close: (result: boolean | null) => void
-}> = ({ close }) => (
-  <ResponsiveModal
-    autoHeight
-    responsive={false}
-    title="Edit declaration?"
-    actions={[
-      <Button
-        type="tertiary"
-        id="cancel_edit"
-        key="cancel_edit"
-        onClick={() => {
-          close(null)
-        }}
-      >
-        Cancel
-      </Button>,
-      <Button
-        type="primary"
-        key="confirm_edit"
-        id="confirm_edit"
-        onClick={() => {
-          close(true)
-        }}
-      >
-        Continue
-      </Button>
-    ]}
-    show={true}
-    handleClose={() => close(null)}
-  >
-    <Stack>
-      <Text variant="reg16" element="p" color="grey500">
-        A record will be created of any changes you make
-      </Text>
-    </Stack>
-  </ResponsiveModal>
-)
+}> = ({ close }) => {
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      autoHeight
+      responsive={false}
+      title={intl.formatMessage(messages.changeModalTitle)}
+      actions={[
+        <Button
+          type="tertiary"
+          id="cancel_edit"
+          key="cancel_edit"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(messages.changeModalCancel)}
+        </Button>,
+        <Button
+          type="primary"
+          key="confirm_edit"
+          id="confirm_edit"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(messages.changeModalContinue)}
+        </Button>
+      ]}
+      show={true}
+      handleClose={() => close(null)}
+    >
+      <Stack>
+        <Text variant="reg16" element="p" color="grey500">
+          {intl.formatMessage(messages.changeModalDescription)}
+        </Text>
+      </Stack>
+    </ResponsiveModal>
+  )
+}
