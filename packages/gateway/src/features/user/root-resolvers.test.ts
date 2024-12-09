@@ -54,7 +54,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: [SCOPES.USER_READ] },
+        { scope: [SCOPES.ORGANISATION_READ_LOCATIONS] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',

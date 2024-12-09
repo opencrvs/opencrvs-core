@@ -169,7 +169,7 @@ const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
   INFORMANT: formMessages.contactDetailsInformant,
-  OTHER: formMessages.otherFamilyMember,
+  OTHER: formMessages.someoneElse,
   LEGAL_GUARDIAN: formMessages.legalGuardian,
   GRANDMOTHER: formMessages.grandmother,
   GRANDFATHER: formMessages.grandfather,
@@ -719,8 +719,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   event
                 )
               }}
-              requiredJurisdictionTypes={
+              locationFilter={
                 window.config.DECLARATION_AUDIT_LOCATIONS
+                  ? ({ jurisdictionType }) =>
+                      Boolean(
+                        jurisdictionType &&
+                          window.config.DECLARATION_AUDIT_LOCATIONS.split(
+                            ','
+                          ).includes(jurisdictionType)
+                      )
+                  : undefined
               }
             />
             <PerformanceSelect

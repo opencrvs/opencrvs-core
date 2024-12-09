@@ -21,7 +21,6 @@ import {
   goToCreateNewUser,
   goToAdvancedSearch
 } from '@client/navigation'
-import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
@@ -41,7 +40,6 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
@@ -49,7 +47,6 @@ import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
 import { usePermissions } from '@client/hooks/useAuthorization'
 
 type IStateProps = {
-  scopes: Scope[] | null
   fieldNames: string[]
   language: string
   offlineData: IOfflineData
@@ -136,12 +133,11 @@ const HeaderComponent = (props: IFullProps) => {
     goToAdvancedSearch,
     goToSearchResult,
     setAdvancedSearchParam,
-    scopes,
     mapPerformanceClickHandler,
     changeTeamLocation
   } = props
 
-  const { canSearchRecords } = usePermissions()
+  const { canCreateUser, canSearchRecords } = usePermissions()
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = new URLSearchParams(location.search).get('locationId')
@@ -190,7 +186,7 @@ const HeaderComponent = (props: IFullProps) => {
             }
           ]
         }
-      } else if (scopes?.includes(SCOPES.USER_CREATE)) {
+      } else if (canCreateUser) {
         return {
           mobileLeft: [
             {
@@ -449,7 +445,6 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
-    scopes: getScope(store),
     offlineData: getOfflineData(store),
     fieldNames: Object.values(getRegisterForm(store))
       .flatMap((form) => form.sections)

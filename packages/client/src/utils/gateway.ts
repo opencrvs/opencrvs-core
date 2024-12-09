@@ -137,6 +137,7 @@ export type AdvancedSeachParameters = {
   eventLocationLevel3?: Maybe<Scalars['String']>
   eventLocationLevel4?: Maybe<Scalars['String']>
   eventLocationLevel5?: Maybe<Scalars['String']>
+  eventLocationLevel6?: Maybe<Scalars['String']>
   fatherDoB?: Maybe<Scalars['String']>
   fatherDoBEnd?: Maybe<Scalars['String']>
   fatherDoBStart?: Maybe<Scalars['String']>
@@ -204,6 +205,7 @@ export type AdvancedSearchParametersInput = {
   eventLocationLevel3?: InputMaybe<Scalars['String']>
   eventLocationLevel4?: InputMaybe<Scalars['String']>
   eventLocationLevel5?: InputMaybe<Scalars['String']>
+  eventLocationLevel6?: InputMaybe<Scalars['String']>
   fatherDoB?: InputMaybe<Scalars['String']>
   fatherDoBEnd?: InputMaybe<Scalars['String']>
   fatherDoBStart?: InputMaybe<Scalars['String']>
@@ -2483,6 +2485,7 @@ export type AdvancedSeachParametersFragment = {
   eventLocationLevel3?: string | null
   eventLocationLevel4?: string | null
   eventLocationLevel5?: string | null
+  eventLocationLevel6?: string | null
   childFirstNames?: string | null
   childLastName?: string | null
   childDoB?: string | null
@@ -2554,6 +2557,7 @@ export type BookmarkAdvancedSearchMutation = {
         eventLocationLevel3?: string | null
         eventLocationLevel4?: string | null
         eventLocationLevel5?: string | null
+        eventLocationLevel6?: string | null
         childFirstNames?: string | null
         childLastName?: string | null
         childDoB?: string | null
@@ -2628,6 +2632,7 @@ export type RemoveBookmarkedAdvancedSearchMutation = {
         eventLocationLevel3?: string | null
         eventLocationLevel4?: string | null
         eventLocationLevel5?: string | null
+        eventLocationLevel6?: string | null
         childFirstNames?: string | null
         childLastName?: string | null
         childDoB?: string | null
@@ -2748,6 +2753,7 @@ export type FetchUserQuery = {
         eventLocationLevel3?: string | null
         eventLocationLevel4?: string | null
         eventLocationLevel5?: string | null
+        eventLocationLevel6?: string | null
         childFirstNames?: string | null
         childLastName?: string | null
         childDoB?: string | null
@@ -2966,7 +2972,6 @@ export type SearchUsersQuery = {
     results?: Array<{
       __typename?: 'User'
       id: string
-      username?: string | null
       mobile?: string | null
       email?: string | null
       status: Status
@@ -2977,6 +2982,7 @@ export type SearchUsersQuery = {
         firstNames?: string | null
         familyName?: string | null
       }>
+      primaryOffice: { __typename?: 'Location'; id: string }
       role: {
         __typename?: 'UserRole'
         id: string
@@ -3040,6 +3046,7 @@ export type GetUserQuery = {
   getUser?: {
     __typename?: 'User'
     id: string
+    userMgntUserID: string
     username?: string | null
     mobile?: string | null
     email?: string | null

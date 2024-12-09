@@ -10,7 +10,7 @@
  */
 import { App } from '@client/App'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
-import { EventType, Status } from '@client/utils/gateway'
+import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -995,7 +995,7 @@ export async function goToSection(component: ReactWrapper, nth: number) {
     await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
     await flushPromises()
-    await component.update()
+    component.update()
   }
 }
 
@@ -1023,7 +1023,7 @@ export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
 ) {
-  await store.dispatch(setOfflineData(userDetails))
+  store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getRegisterForm(state)[event]
 }
@@ -1032,7 +1032,7 @@ export async function getReviewFormFromStore(
   store: Store<IStoreState, AnyAction>,
   event: EventType
 ) {
-  await store.dispatch(setOfflineData(userDetails))
+  store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getReviewForm(state)![event]
 }
@@ -1624,6 +1624,35 @@ export {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
+
+export function fetchUserMock(officeId: string): FetchUserQuery {
+  return {
+    getUser: {
+      id: '123',
+      userMgntUserID: '123',
+      primaryOffice: {
+        id: officeId
+      },
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Mohammad',
+          familyName: 'Ashraful'
+        }
+      ],
+      status: Status.Active,
+      practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
+      creationDate: '1701241360173',
+      role: {
+        label: {
+          id: 'userRoles.localSystemAdmin',
+          defaultMessage: 'Local System Admin',
+          description: 'Label for local system admin'
+        }
+      }
+    }
+  }
+}
 
 export function setScopes(scope: Scope[], store: AppStore) {
   const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {

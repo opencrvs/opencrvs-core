@@ -105,7 +105,6 @@ export const SCOPES = {
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
 
   // organisation
-  ORGANISATION_READ: 'organisation.read',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',
@@ -116,7 +115,7 @@ export const SCOPES = {
   USER_READ: 'user.read:all',
   USER_READ_MY_OFFICE: 'user.read:my-office',
   USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
-  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
+  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit', //v1.8
   USER_CREATE: 'user.create:all',
   USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
   USER_UPDATE: 'user.update:all',

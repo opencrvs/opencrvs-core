@@ -24,7 +24,6 @@ import * as React from 'react'
 import type { GQLRegistrationCountResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { ReactWrapper } from 'enzyme'
 import * as locationUtils from '@client/utils/locationUtils'
-import * as performanceUtils from '@client/views/SysAdmin/Performance/utils'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { StatusMapping } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { EventType } from '@client/utils/gateway'
@@ -48,9 +47,6 @@ describe('Status wise registration count', () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
     vi.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
-    vi.spyOn(performanceUtils, 'isUnderJurisdictionOfUser').mockReturnValue(
-      true
-    )
   })
 
   describe('when it has data in props', () => {
