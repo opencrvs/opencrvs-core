@@ -70,10 +70,10 @@ import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAct
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import {
+  V2_DECLARE_ACTION_REVIEW_ROUTE,
   V2_DECLARE_ACTION_ROUTE,
   V2_EVENTS_ROUTE,
-  V2_ROOT_ROUTE,
-  V2_EVENT_DECLARATION_REVIEW_ROUTE
+  V2_ROOT_ROUTE
 } from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
@@ -550,7 +550,7 @@ export function App(props: IAppProps) {
                                             <ProtectedRoute
                                               exact
                                               path={
-                                                V2_EVENT_DECLARATION_REVIEW_ROUTE
+                                                V2_DECLARE_ACTION_REVIEW_ROUTE
                                               }
                                               component={ReviewSection}
                                             />

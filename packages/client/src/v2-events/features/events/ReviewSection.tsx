@@ -33,7 +33,7 @@ import { useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventForm } from './useEventForm'
 import { EventConfig } from '@opencrvs/commons'
-import { useModal } from '@client/hooks/useModal'
+import { useModal } from '@client/v2-events/hooks/useModal'
 // @ToDO: Fix import
 
 const Row = styled.div<{
