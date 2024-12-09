@@ -291,7 +291,9 @@ export const resolvers: GQLResolver = {
         !inScope(authHeader, [
           SCOPES.USER_DATA_SEEDING,
           SCOPES.USER_CREATE,
-          SCOPES.USER_UPDATE
+          SCOPES.USER_CREATE_MY_JURISDICTION,
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
         ])
       ) {
         throw new Error('Create or update user is not allowed for this user')
@@ -355,7 +357,10 @@ export const resolvers: GQLResolver = {
     ) {
       if (
         !isTokenOwner(authHeader, userId) &&
-        !hasScope(authHeader, SCOPES.USER_UPDATE)
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
       )
         throw new Error('User can not be activated')
 
@@ -384,7 +389,10 @@ export const resolvers: GQLResolver = {
     ) {
       // Only token owner of CONFIG_UPDATE_ALL should be able to change their password
       if (
-        !hasScope(authHeader, SCOPES.USER_UPDATE) &&
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ]) &&
         !isTokenOwner(authHeader, userId)
       ) {
         throw new Error(
@@ -515,7 +523,11 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (
-        !inScope(authHeader, [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING])
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION,
+          SCOPES.USER_DATA_SEEDING
+        ])
       ) {
         throw new Error(
           `User ${userId} is not allowed to audit for not having the sys admin scope`
@@ -547,7 +559,12 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resendInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
         throw new Error('SMS invite can not be resent by this user')
       }
 
@@ -570,7 +587,12 @@ export const resolvers: GQLResolver = {
       return true
     },
     async usernameReminder(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
         throw new Error('Username reminder can not be resent by this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}usernameReminder`, {
@@ -592,7 +614,12 @@ export const resolvers: GQLResolver = {
       return true
     },
     async resetPasswordInvite(_, { userId }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.USER_UPDATE)) {
+      if (
+        !inScope(authHeader, [
+          SCOPES.USER_UPDATE,
+          SCOPES.USER_UPDATE_MY_JURISDICTION
+        ])
+      ) {
         throw new Error('Reset password can not be sent by this user')
       }
       const res = await fetch(`${USER_MANAGEMENT_URL}resetPasswordInvite`, {

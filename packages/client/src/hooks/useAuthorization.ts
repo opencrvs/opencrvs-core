@@ -119,6 +119,11 @@ export function usePermissions() {
     return false
   }
 
+  const canCreateUser = hasAnyScope([
+    SCOPES.USER_CREATE,
+    SCOPES.USER_CREATE_MY_JURISDICTION
+  ])
+
   const canAccessOffice = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOffice?.id) {
       return false
@@ -199,6 +204,7 @@ export function usePermissions() {
     canIssueRecord,
     canReadUser,
     canEditUser,
+    canCreateUser,
     canAccessOffice,
     canAddOfficeUsers,
     canUpdateRecord,
