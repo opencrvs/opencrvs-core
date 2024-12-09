@@ -110,16 +110,6 @@ export const Debug = () => {
             </Text>
           </li>
         </ul>
-        <input
-          placeholder="eventId"
-          onChange={(e) => setEventId(e.target.value)}
-          value={eventId}
-        />
-        <Link
-          to={V2_EVENTS_ROUTE + '/' + eventId.replace(/^"|"$/g, '') + '/review'}
-        >
-          Review
-        </Link>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
     </>
