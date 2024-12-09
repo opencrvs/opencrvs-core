@@ -193,11 +193,12 @@ function EventFormWizard() {
         })
       )
     }
-    console.log(pages[currentPage])
 
-    if (!pages.find((p) => p.id === pageId)) {
+    const reviewPage = !pages.find((p) => p.id === pageId)
+    if (reviewPage) {
       return
     }
+
     const pageChanged = pages[currentPage].id !== pageId
     if (pageChanged) {
       history.push(

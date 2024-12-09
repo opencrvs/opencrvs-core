@@ -9,5 +9,5 @@ type EventFormData = {
 
 export const useEventFormData = create<EventFormData>((set) => ({
   formValues: {},
-  setFormValues: (data: FormData) => set(() => data)
+  setFormValues: (data: FormData) => set(() => ({ formValues: data }))
 }))
