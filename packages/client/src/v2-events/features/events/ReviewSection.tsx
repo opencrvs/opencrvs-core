@@ -207,8 +207,8 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
                       key={'Section_' + page.title.defaultMessage}
                     >
                       <Accordion
-                        name={page.title.defaultMessage}
-                        label={page.title.defaultMessage}
+                        name={'Accordion_' + page.id}
+                        label={page.id}
                         labelForHideAction="Hide"
                         labelForShowAction="Show"
                         action={
@@ -218,20 +218,27 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
                         }
                         expand={true}
                       >
-                        <ListReview id={'Section_' + page.title.defaultMessage}>
-                          {page.fields.map((field, id) => (
-                            <ListReview.Row
-                              id={id.toString()}
-                              key={id}
-                              label={field.label.defaultMessage}
-                              value={getValueFromFieldId(declaration, field.id)}
-                              actions={
-                                <Link onClick={(e) => handleEdit(e, field.id)}>
-                                  Change
-                                </Link>
-                              }
-                            />
-                          ))}
+                        <ListReview id={'Section_' + page.id}>
+                          {page.fields.map((field, index) => {
+                            const id =
+                              field.type === 'TEXT' || field.type === 'DATE'
+                                ? field.id
+                                : index.toString()
+
+                            return (
+                              <ListReview.Row
+                                id={id}
+                                key={id}
+                                label={field.label.defaultMessage}
+                                value={getValueFromFieldId(declaration, id)}
+                                actions={
+                                  <Link onClick={(e) => handleEdit(e, id)}>
+                                    Change
+                                  </Link>
+                                }
+                              />
+                            )
+                          })}
                         </ListReview>
                       </Accordion>
                     </DeclarationDataContainer>
