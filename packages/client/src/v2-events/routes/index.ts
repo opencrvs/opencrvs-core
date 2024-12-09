@@ -10,7 +10,6 @@
  */
 
 export const V2_ROOT_ROUTE = '/v2'
-export const V2_EVENTS_ROUTE = `${V2_ROOT_ROUTE}/event`
-export const V2_EVENT_ROUTE = `${V2_EVENTS_ROUTE}/:eventType`
-export const V2_EVENT_DECLARATION_ROUTE = `${V2_EVENT_ROUTE}/:action/:declarationId`
-export const V2_EVENT_DECLARATION_REVIEW_ROUTE = `${V2_EVENT_DECLARATION_ROUTE}/review`
+export const V2_EVENTS_ROUTE = `${V2_ROOT_ROUTE}/events`
+export const V2_DECLARE_ACTION_ROUTE = '/v2/events/declare/:eventId'
+export const V2_DECLARE_ACTION_REVIEW_ROUTE = `${V2_DECLARE_ACTION_ROUTE}/review`

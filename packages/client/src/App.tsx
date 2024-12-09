@@ -70,14 +70,14 @@ import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAct
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import {
-  V2_EVENT_ROUTE,
+  V2_DECLARE_ACTION_ROUTE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE,
   V2_EVENT_DECLARATION_REVIEW_ROUTE
 } from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
 import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
-import { TRPCProvider } from './v2-events/trcp'
+import { TRPCProvider } from './v2-events/trpc'
 import { EventSelection } from './v2-events/features/events/EventSelection'
 import { ReviewSection } from './v2-events/features/events/ReviewSection'
 
@@ -544,7 +544,7 @@ export function App(props: IAppProps) {
                                             />
                                             <ProtectedRoute
                                               exact
-                                              path={V2_EVENT_ROUTE}
+                                              path={V2_DECLARE_ACTION_ROUTE}
                                               component={EventFormWizardIndex}
                                             />
                                             <ProtectedRoute
