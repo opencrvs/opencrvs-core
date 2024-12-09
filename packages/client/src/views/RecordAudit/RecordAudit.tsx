@@ -67,13 +67,12 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { IForm } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
   EventType,
-  History,
-  SCOPES,
-  Scope
+  History
 } from '@client/utils/gateway'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'

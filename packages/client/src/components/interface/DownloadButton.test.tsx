@@ -21,7 +21,7 @@ import { DownloadAction } from '@client/forms'
 import * as declarationReducer from '@client/declarations'
 import { ApolloClient } from '@apollo/client'
 import { createClient } from '@client/utils/apolloClient'
-import { SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 
 const { DOWNLOAD_STATUS } = declarationReducer
 

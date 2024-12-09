@@ -8,15 +8,66 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
-import { ActionInputFields } from './ActionInput'
 import { ActionType } from '@opencrvs/commons'
+import { z } from 'zod'
 
-export const ActionDocument = z.object({
-  type: z.nativeEnum(ActionType),
-  fields: ActionInputFields,
-  createdBy: z.string().describe('The user who created the action'),
-  createdAt: z.date()
+const ActionBase = z.object({
+  createdAt: z.date(),
+  createdBy: z.string(),
+  data: z.object({})
 })
 
+const AssignedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.ASSIGN),
+    assignedTo: z.string()
+  })
+)
+
+const UnassignedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.UNASSIGN)
+  })
+)
+
+const RegisterAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.REGISTER),
+    identifiers: z.object({
+      trackingId: z.string(),
+      registrationNumber: z.string()
+    })
+  })
+)
+
+const DeclareAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.DECLARE)
+  })
+)
+
+const CreatedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CREATE),
+    createdAtLocation: z.string()
+  })
+)
+
+const NotifiedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.NOTIFY),
+    createdAtLocation: z.string()
+  })
+)
+
+export const ActionDocument = z.discriminatedUnion('type', [
+  CreatedAction,
+  NotifiedAction,
+  RegisterAction,
+  DeclareAction,
+  AssignedAction,
+  UnassignedAction
+])
+
 export type ActionDocument = z.infer<typeof ActionDocument>
+export type CreatedAction = z.infer<typeof CreatedAction>

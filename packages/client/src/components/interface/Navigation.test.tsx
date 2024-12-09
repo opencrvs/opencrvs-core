@@ -28,7 +28,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { vi } from 'vitest'
-import { scopes as allScopes, Scope, SCOPES } from '@client/utils/gateway'
+import { scopes as allScopes, Scope, SCOPES } from '@opencrvs/commons/client'
 
 const mockFetchUserDetails = vi.fn()
 

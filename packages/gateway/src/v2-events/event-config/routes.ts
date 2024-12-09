@@ -8,5 +8,24 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const V2_ROOT_ROUTE = '/v2'
-export const V2_EVENT_ROUTE = `${V2_ROOT_ROUTE}/event/:eventType`
+import { env } from '@gateway/environment'
+import { ServerRoute } from '@hapi/hapi'
+
+export const trpcProxy = [
+  {
+    method: '*',
+    path: '/events/{path*}',
+    handler: (req, h) => {
+      return h.proxy({
+        uri: new URL(req.params.path, env.EVENTS_URL).toString(),
+        passThrough: true
+      })
+    },
+    options: {
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  }
+] satisfies Array<ServerRoute>

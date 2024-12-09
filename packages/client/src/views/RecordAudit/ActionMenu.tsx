@@ -56,7 +56,8 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
 import { client } from '@client/utils/apolloClient'
-import { EventType, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
 import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {

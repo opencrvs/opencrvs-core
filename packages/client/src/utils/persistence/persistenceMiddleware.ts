@@ -16,7 +16,7 @@ import { IStoreState } from '@client/store'
 //   PERFORMANCE_STATS
 // } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Action, Middleware } from 'redux'
-import { SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 // import startOfMonth from 'date-fns/startOfMonth'
 // import subMonths from 'date-fns/subMonths'
 // import { QueryOptions } from '@apollo/client/core'

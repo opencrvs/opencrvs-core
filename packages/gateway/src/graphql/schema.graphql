@@ -537,6 +537,7 @@ input AdvancedSearchParametersInput {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -785,47 +786,47 @@ input EventInput {
 }
 
 input NotifyActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input DeclareActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RegisterActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input CertifyActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input IssueActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RevokeActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input ReinstateActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RevokeCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RequestCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input ApproveCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 input RejectCorrectionActionInput {
-  fields: [FieldInput!]!
+  data: [FieldInput!]!
 }
 
 scalar Map
@@ -1467,6 +1468,7 @@ type AdvancedSeachParameters {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -1636,29 +1638,52 @@ type CreateAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
 }
 
 type RegisterAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
   identifiers: Identifiers!
+}
+enum AttachmentInputStatus {
+  approved
+  validated
+  deleted
 }
 
 type NotifyAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
+}
+
+enum PaymentType {
+  MANUAL
+}
+
+enum PaymentOutcomeType {
+  COMPLETED
+  ERROR
+  PARTIAL
+}
+
+scalar FieldValue
+
+input ContactPointInput {
+  system: TelecomSystem
+  value: String
+  use: TelecomUse
 }
 
 type DeclareAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
-  fields: [Field!]!
+  data: [Field!]!
   identifiers: Identifiers!
 }
 
@@ -1684,6 +1709,21 @@ input ContactPointInput {
   system: TelecomSystem
   value: String
   use: TelecomUse
+}
+
+input AddressInput {
+  use: AddressUse
+  type: AddressType
+  text: String
+  line: [String!]
+  city: String
+  district: String
+  state: String
+  postalCode: String
+  country: String
+  from: Date
+  to: Date
+  partOf: String
 }
 
 input AddressInput {

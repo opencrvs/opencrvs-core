@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { usePermissions } from '@client/hooks/useAuthorization'
-import { Scope } from '@client/utils/gateway'
+import { Scope } from '@opencrvs/commons/client'
 
 interface ScopeComponentProps {
   scopes?: Scope[]

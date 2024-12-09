@@ -658,6 +658,19 @@ describe('User root resolvers', () => {
     })
   })
   describe('activateUser mutation', () => {
+    const regsiterToken = jwt.sign(
+      { scope: ['SCOPES.REGISTER'] },
+      readFileSync('./test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    const newUserHeaders = {
+      Authorization: `Bearer ${regsiterToken}`
+    }
     it('activates the pending user', async () => {
       fetch.mockResponses(
         [
@@ -677,7 +690,7 @@ describe('User root resolvers', () => {
           securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
         },
         {
-          headers: undefined
+          headers: newUserHeaders
         }
       )
 
@@ -699,12 +712,50 @@ describe('User root resolvers', () => {
             securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
           },
           {
-            headers: undefined
+            headers: newUserHeaders
           }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't activate given user"
       )
+    })
+    it('fails to activate user if user is not token owner', async () => {
+      const regsiterToken = jwt.sign(
+        { scope: ['SCOPES.REGISTER'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'abcdefgh',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      const newUserHeaders = {
+        Authorization: `Bearer ${regsiterToken}`
+      }
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'abcdefgh'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      return expect(
+        resolvers.Mutation!.activateUser(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            password: 'test',
+            securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          },
+          {
+            headers: newUserHeaders
+          }
+        )
+      ).rejects.toThrowError('User can not be activated')
     })
   })
 

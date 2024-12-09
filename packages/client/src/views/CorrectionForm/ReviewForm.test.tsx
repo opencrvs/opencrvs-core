@@ -17,7 +17,8 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
-import { EventType, RegStatus, SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   IDeclaration,
   storeDeclaration,
