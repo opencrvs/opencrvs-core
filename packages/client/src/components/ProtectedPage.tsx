@@ -58,7 +58,6 @@ type Props = OwnProps &
   RouteComponentProps<{
     authenticated: boolean
     userDetailsFetched: boolean
-    userDetails: UserDetails | null
   }>
 
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
