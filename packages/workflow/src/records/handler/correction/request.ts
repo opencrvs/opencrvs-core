@@ -12,7 +12,7 @@
 import { conflict } from '@hapi/boom'
 import { getAuthHeader } from '@opencrvs/commons/http'
 import { CorrectionRequestedRecord } from '@opencrvs/commons/types'
-import { uploadFileToMinio } from '@workflow/documents'
+import { uploadBase64ToMinio } from '@workflow/documents'
 import {
   getLoggedInPractitionerResource,
   getPractitionerOfficeId
@@ -51,7 +51,7 @@ export const requestCorrectionRoute = createRoute({
 
     const paymentAttachmentUrl =
       correctionDetails.payment?.attachmentData &&
-      (await uploadFileToMinio(
+      (await uploadBase64ToMinio(
         correctionDetails.payment.attachmentData,
         getAuthHeader(request)
       ))
@@ -59,7 +59,7 @@ export const requestCorrectionRoute = createRoute({
     const proofOfLegalCorrectionAttachments = await Promise.all(
       correctionDetails.attachments.map(async (attachment) => ({
         type: attachment.type,
-        url: await uploadFileToMinio(attachment.data, getAuthHeader(request))
+        url: await uploadBase64ToMinio(attachment.data, getAuthHeader(request))
       }))
     )
 
