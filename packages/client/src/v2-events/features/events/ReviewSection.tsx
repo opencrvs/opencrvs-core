@@ -10,7 +10,6 @@
  */
 
 import React, { useState } from 'react'
-import { tennisClubMemberDeclaration as declaration } from './fixtures'
 import styled from 'styled-components'
 import {
   Accordion,
@@ -25,16 +24,12 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import { ReviewHeader } from '../../../views/RegisterForm/review/ReviewHeader'
-import { useSelector } from 'react-redux'
-import { getOfflineData } from '@client/offline/selectors'
 import { useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
 import { EventDocument } from '@opencrvs/commons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormHeader } from './EventFormWizard'
 import { useEvents } from './useEvents/useEvents'
-// @ToDO: Fix import
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -53,6 +48,29 @@ const Row = styled.div<{
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
   }
+`
+const HeaderContainer = styled.div`
+  padding: 16px 24px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+const HeaderContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  gap: 16px;
+  align-items: center;
+  ${({ theme }) => theme.fonts.h2}
+  color: ${({ theme }) => theme.colors.copy};
+`
+
+const TitleContainer = styled.div`
+  ${({ theme }) => theme.fonts.bold14}
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  text-transform: uppercase;
+`
+const SubjectContainer = styled.div`
+  ${({ theme }) => theme.fonts.h2}
+  overflow-wrap: anywhere;
 `
 const RightColumn = styled.div`
   width: 40%;
@@ -111,8 +129,6 @@ interface RejectionState {
 
 const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   const [modal, openModal] = useModal()
-
-  const offlineCountryConfig = useSelector(getOfflineData)
 
   const { data } = event.actions.filter(
     (action) => action.type === 'DECLARE'
@@ -182,17 +198,26 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
       <Row>
         <LeftColumn>
           <Card>
-            <ReviewHeader
-              id="review_header"
-              logoSource={offlineCountryConfig.config.COUNTRY_LOGO.file}
-              title={configuration.label.defaultMessage}
-              subject={
-                'Member registration for ' +
-                declaration.applicant.firstname +
-                ' ' +
-                declaration.applicant.surname
-              }
-            />
+            <HeaderContainer>
+              <HeaderContent>
+                <Stack
+                  direction="column"
+                  alignItems="flex-start"
+                  justify-content="flex-start"
+                  gap={6}
+                >
+                  <TitleContainer id={`header_title`}>
+                    {configuration.label.defaultMessage}
+                  </TitleContainer>
+                  <SubjectContainer id={`header_subject`}>
+                    {'Member registration for ' +
+                      (data['applicant.firstname'] || '') +
+                      ' ' +
+                      (data['applicant.surname'] || '')}
+                  </SubjectContainer>
+                </Stack>
+              </HeaderContent>
+            </HeaderContainer>
             <FormData>
               <ReviewContainter>
                 {forms[0].pages.map((page) => {
