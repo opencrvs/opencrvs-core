@@ -26,5 +26,6 @@ vi.mock('@events/service/config/config', () => ({
   getEventsConfig: () => Promise.all([tennisClubMembershipEvent])
 }))
 
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
+const setup = Promise.all([setupMongoServer(), setupESServer()])
+beforeAll(() => setup, 100000)
 afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
