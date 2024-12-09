@@ -579,7 +579,7 @@ input RejectRegistrationInput {
 }
 
 input UpsertRegistrationIdentifierInput {
-  registrationNumber: String!
+  registrationNumber: String
   identifiers: [IdentifierInput!]
 }
 

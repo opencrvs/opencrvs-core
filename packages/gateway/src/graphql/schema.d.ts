@@ -611,7 +611,7 @@ export interface GQLRejectRegistrationInput {
 }
 
 export interface GQLUpsertRegistrationIdentifierInput {
-  registrationNumber: string
+  registrationNumber?: string
   identifiers?: Array<GQLIdentifierInput>
 }
 

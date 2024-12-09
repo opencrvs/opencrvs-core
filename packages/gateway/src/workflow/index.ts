@@ -284,7 +284,7 @@ export async function upsertRegistrationIdentifier(
   id: string,
   authHeader: IAuthHeader,
   details: {
-    registrationNumber: string
+    registrationNumber?: string
     identifiers?: IdentifierInput[]
   }
 ) {

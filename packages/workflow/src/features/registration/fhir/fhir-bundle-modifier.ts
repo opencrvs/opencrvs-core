@@ -24,8 +24,7 @@ import {
   getResourceFromBundleById,
   resourceIdentifierToUUID,
   SupportedPatientIdentifierCode,
-  ValidRecord,
-  PatientIdentifier
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -212,7 +211,10 @@ export function upsertPatientIdentifiers(
   record: ValidRecord,
   composition: Composition,
   sectionCodes: string[],
-  identifiers: PatientIdentifier[]
+  identifiers: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
 ): Saved<Patient>[] {
   return sectionCodes.map((sectionCode) => {
     const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
@@ -236,7 +238,7 @@ export function upsertPatientIdentifiers(
             coding: [
               {
                 system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
-                code: id.type.coding[0].code
+                code: id.type
               }
             ]
           },

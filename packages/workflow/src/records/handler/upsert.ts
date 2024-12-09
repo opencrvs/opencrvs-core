@@ -12,13 +12,17 @@ import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
 import { indexBundle } from '@workflow/records/search'
-import { PatientIdentifier } from '@opencrvs/commons/types'
 import { toUpserted } from '@workflow/records/state-transitions'
+import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 
+interface IdentifierInput {
+  type: SupportedPatientIdentifierCode
+  value: string
+}
 export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
-  identifiers: PatientIdentifier[]
+  identifiers: IdentifierInput[]
 }
 
 export async function upsertRegistrationHandler(

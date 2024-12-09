@@ -50,7 +50,7 @@ import {
   toHistoryResource,
   TaskHistory,
   RejectedRecord,
-  PatientIdentifier
+  SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -327,7 +327,10 @@ export async function toViewed<T extends ValidRecord>(
 
 export function toUpserted<T extends ValidRecord>(
   record: T,
-  identifiers: PatientIdentifier[]
+  identifiers: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
 ): T {
   const task = getTaskFromSavedBundle(record)
   const event = getTaskEventType(task)
