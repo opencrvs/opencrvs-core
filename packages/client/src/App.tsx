@@ -15,7 +15,7 @@ import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { Provider } from 'react-redux'
-import { RouterProvider, createBrowserRouter, Outlet } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 
 import * as React from 'react'
@@ -58,12 +58,15 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
+import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
+import { EventSelection } from './v2-events/features/events/EventSelection'
 import { Workqueues } from './v2-events/features/workqueues'
 import {
-  V2_CREATE_EVENT_ROUTE,
+  V2_DECLARE_ACTION_ROUTE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE
 } from './v2-events/routes'
+import { TRPCProvider } from './v2-events/trpc'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReloadModal } from './views/Modals/ReloadModal'
@@ -77,9 +80,6 @@ import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
-import { EventSelection } from './v2-events/features/events/EventSelection'
-import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
-import { TRPCProvider } from './v2-events/trpc'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -397,7 +397,7 @@ export const routesConfig = [
         )
       },
       {
-        path: V2_CREATE_EVENT_ROUTE,
+        path: V2_DECLARE_ACTION_ROUTE,
         element: (
           <TRPCProvider>
             <EventFormWizardIndex />
@@ -407,6 +407,7 @@ export const routesConfig = [
     ]
   }
 ]
+
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
   store: AppStore

@@ -10,8 +10,8 @@
  */
 /* stylelint-disable */
 import React from 'react'
-
-import { useEvents } from '@client/v2-events/features/events/useEvents'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query'
 const Container = styled.div`
   background: #fff;
   position: fixed;
-  bottom: 1rem;
+  bottom: 5rem;
   right: 1rem;
   padding: 16px;
   border: 1px dashed #00c142;
@@ -56,34 +56,58 @@ export const Debug = () => {
   }
 
   const mutations = queryClient.getMutationCache().getAll()
+  const storedEvents = events.events
   return (
-    <Container>
-      <ul>
-        <li>
-          <Text variant="reg12" element="span">
-            {online ? 'Online' : 'Offline'}
-          </Text>
-        </li>
-        <li>
-          <button onClick={createEvents}>Create event</button>
-        </li>
-        <li>
-          <Text variant="reg12" element="span">
-            Failed requests in cache{' '}
-            {mutations
-              .filter((mutation) => mutation.state.isPaused)
-              .length.toString()}
-          </Text>
-        </li>
-        <li>
-          <Text variant="reg12" element="span">
-            Paused requests in cache{' '}
-            {mutations
-              .filter((mutation) => mutation.state.error)
-              .length.toString()}
-          </Text>
-        </li>
-      </ul>
-    </Container>
+    <>
+      <Container>
+        <ul>
+          <li>
+            <Text variant="reg12" element="span">
+              {online ? 'Online' : 'Offline'}
+            </Text>
+          </li>
+          <li>
+            <button onClick={createEvents}>Create event</button>
+          </li>
+          <li>
+            <Text variant="reg12" element="span">
+              Failed requests in cache{' '}
+              {mutations
+                .filter((mutation) => mutation.state.isPaused)
+                .length.toString()}
+            </Text>
+          </li>
+          <li>
+            <Text variant="reg12" element="span">
+              Paused requests in cache{' '}
+              {mutations
+                .filter((mutation) => mutation.state.error)
+                .length.toString()}
+            </Text>
+          </li>
+          <li>
+            <button onClick={() => queryClient.clear()}>
+              Clear React Query buffer
+            </button>
+          </li>
+        </ul>
+        <Text variant="h4" element="span">
+          Local records
+        </Text>
+        <ul>
+          <li>
+            <button onClick={() => console.log(events.events.data)}>
+              console.log stored events
+            </button>
+          </li>
+          <li>
+            <Text variant="reg12" element="span">
+              Events in offline storage: {storedEvents.data?.length}
+            </Text>
+          </li>
+        </ul>
+      </Container>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </>
   )
 }

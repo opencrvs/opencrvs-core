@@ -9,8 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, CreatedAction, EventDocument } from '@events/schema'
-import { EventIndex, Status } from '@events/schema/EventIndex'
+import {
+  ActionDocument,
+  CreatedAction,
+  EventDocument,
+  EventIndex,
+  Status
+} from '@opencrvs/commons/events'
+
 import { getClient } from '@events/storage'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { type estypes } from '@elastic/elasticsearch'

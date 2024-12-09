@@ -21,7 +21,7 @@ import { httpLink, loggerLink } from '@trpc/client'
 import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
 import React, { useEffect } from 'react'
 import superjson from 'superjson'
-import { preloadData } from './features/events/useEvents'
+import { preloadData } from './features/events/useEvents/useEvents'
 
 export const api = createTRPCReact<AppRouter>()
 
@@ -77,8 +77,9 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
 }
 
 const trpcClient = getTrpcClient()
-const queryClient = getQueryClient()
 const persister = createIDBPersister()
+
+export const queryClient = getQueryClient()
 
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
 
@@ -103,8 +104,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         maxAge: 1000 * 60 * 60 * 4,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
-          shouldDehydrateMutation: () => {
-            return true
+          shouldDehydrateMutation: (mut) => {
+            return mut.state.status !== 'success'
           }
         }
       }}
