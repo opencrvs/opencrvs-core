@@ -93,12 +93,13 @@ export const resolvers: GQLResolver = {
         },
         { headers: authHeader }
       ) => {
-        // Only sysadmin or registrar or registration agent should be able to search user
+        // Only users with organisation scope should be able to retrieve the list
+        // of users in a particular office
         if (
           !inScope(authHeader, [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
             SCOPES.USER_DATA_SEEDING
           ])
         ) {

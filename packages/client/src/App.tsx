@@ -444,9 +444,9 @@ export function App(props: IAppProps) {
                                           <ProtectedRoute
                                             exact
                                             scopes={[
-                                              SCOPES.USER_READ,
-                                              SCOPES.USER_READ_MY_OFFICE,
-                                              SCOPES.USER_READ_MY_JURISDICTION
+                                              SCOPES.ORGANISATION_READ_LOCATIONS,
+                                              SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+                                              SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
                                             ]}
                                             path={routes.TEAM_USER_LIST}
                                             component={UserList}

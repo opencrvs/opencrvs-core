@@ -280,9 +280,9 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
             SCOPES.USER_DATA_SEEDING
           ]
         },
