@@ -533,35 +533,37 @@ export function App(props: IAppProps) {
                                             component={PrintRecord}
                                           />
                                           <TRPCProvider>
-                                            <ProtectedRoute
-                                              exact
-                                              path={V2_ROOT_ROUTE}
-                                              component={Workqueues}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={V2_EVENTS_ROUTE}
-                                              component={EventSelection}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={V2_DECLARE_ACTION_ROUTE}
-                                              component={EventFormWizardIndex}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                V2_DECLARE_ACTION_REVIEW_ROUTE
-                                              }
-                                              component={ReviewSection}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={
-                                                V2_DECLARE_ACTION_ROUTE_WITH_PAGE
-                                              }
-                                              component={EventFormWizardIndex}
-                                            />
+                                            <Switch>
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_ROOT_ROUTE}
+                                                component={Workqueues}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_EVENTS_ROUTE}
+                                                component={EventSelection}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_DECLARE_ACTION_ROUTE}
+                                                component={EventFormWizardIndex}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={
+                                                  V2_DECLARE_ACTION_REVIEW_ROUTE
+                                                }
+                                                component={ReviewSection}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={
+                                                  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
+                                                }
+                                                component={EventFormWizardIndex}
+                                              />
+                                            </Switch>
                                           </TRPCProvider>
                                         </Switch>
                                       </>
