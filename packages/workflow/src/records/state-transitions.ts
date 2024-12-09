@@ -325,7 +325,7 @@ export async function toViewed<T extends ValidRecord>(
   return viewedRecord
 }
 
-export function toUpserted<T extends ValidRecord>(
+export function toIdentifierUpserted<T extends ValidRecord>(
   record: T,
   identifiers: {
     type: SupportedPatientIdentifierCode

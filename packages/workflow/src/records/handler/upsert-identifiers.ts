@@ -12,7 +12,7 @@ import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
 import { getRecordById } from '@workflow/records/index'
 import { indexBundle } from '@workflow/records/search'
-import { toUpserted } from '@workflow/records/state-transitions'
+import { toIdentifierUpserted } from '@workflow/records/state-transitions'
 import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 
@@ -20,9 +20,8 @@ interface IdentifierInput {
   type: SupportedPatientIdentifierCode
   value: string
 }
-export interface EventRegistrationPayload {
-  trackingId: string
-  registrationNumber: string
+
+interface EventRegistrationPayload {
   identifiers: IdentifierInput[]
 }
 
@@ -57,11 +56,10 @@ export async function upsertRegistrationHandler(
     )
   }
 
-  const upsertedRecord = toUpserted(savedRecord, identifiers)
+  const upsertedRecord = toIdentifierUpserted(savedRecord, identifiers)
 
   await sendBundleToHearth(upsertedRecord)
   await indexBundle(upsertedRecord, token)
-  // TBD: audit event
 
   return h.response(upsertedRecord).code(200)
 }

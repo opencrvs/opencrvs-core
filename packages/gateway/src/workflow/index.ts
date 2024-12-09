@@ -290,7 +290,7 @@ export async function upsertRegistrationIdentifier(
 ) {
   const res: ReadyForReviewRecord = await createRequest(
     'POST',
-    `/records/${id}/upsert`,
+    `/records/${id}/upsert-identifiers`,
     authHeader,
     details
   )
