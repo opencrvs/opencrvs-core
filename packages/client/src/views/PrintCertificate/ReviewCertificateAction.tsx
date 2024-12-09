@@ -133,7 +133,7 @@ export const ReviewCertificate = () => {
     isPrintInAdvance,
     canUserEditRecord,
     handleEdit
-  } = usePrintableCertificate(registrationId!)
+  } = usePrintableCertificate(registrationId)
 
   const intl = useIntl()
   const [modal, openModal] = useModal()
