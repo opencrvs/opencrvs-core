@@ -263,7 +263,11 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Retrieves a user mobile number',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE
+          ]
         },
         validate: {
           payload: userIdSchema
@@ -581,7 +585,11 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Gets count of users group by office ids',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE
+          ]
         },
         validate: {
           payload: Joi.object({

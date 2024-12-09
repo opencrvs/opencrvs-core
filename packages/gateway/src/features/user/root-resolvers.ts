@@ -50,7 +50,11 @@ export const resolvers: GQLResolver = {
       { requestsPerMinute: 20 },
       async (_, { userId }, { headers: authHeader, dataSources }) => {
         if (
-          !hasScope(authHeader, SCOPES.USER_UPDATE) &&
+          !inScope(authHeader, [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.USER_READ_MY_JURISDICTION
+          ]) &&
           !isTokenOwner(authHeader, userId!)
         ) {
           return await Promise.reject(
@@ -160,7 +164,8 @@ export const resolvers: GQLResolver = {
         if (
           !inScope(authHeader, [
             SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE
           ])
         ) {
           throw new Error('Search field agents is not allowed for this user')
