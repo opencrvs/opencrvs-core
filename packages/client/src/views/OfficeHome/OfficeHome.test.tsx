@@ -80,7 +80,15 @@ describe('OfficeHome related tests', () => {
   it('sets loading state while waiting for data', async () => {
     const { component: testComponent } = await createTestComponent(
       <OfficeHome />,
-      { store }
+      {
+        store,
+        path: REGISTRAR_HOME_TAB,
+        initialEntries: [
+          formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.inProgress
+          })
+        ]
+      }
     )
 
     expect(
@@ -110,7 +118,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ]
         }
       )
 
@@ -126,7 +140,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ]
         }
       )
       await flushPromises()
@@ -174,7 +194,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ]
         }
       )
       await waitForElement(testComponent, '#no-record')
@@ -184,7 +210,14 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress,
+              selectorId: SELECTOR_ID.fieldAgentDrafts
+            })
+          ]
         }
       )
       await waitForElement(testComponent, '#no-record')
@@ -204,7 +237,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          ]
         }
       )
       await waitForElement(testComponent, '#no-record')
@@ -214,7 +253,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.requiresUpdate
+            })
+          ]
         }
       )
       await waitForElement(testComponent, '#no-record')
@@ -224,7 +269,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.sentForApproval
+            })
+          ]
         }
       )
       await waitForElement(testComponent, '#no-record')
@@ -234,7 +285,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.readyToPrint
+            })
+          ]
         }
       )
       await waitForElement(testComponent, '#no-record')
@@ -245,7 +302,13 @@ describe('OfficeHome related tests', () => {
         <OfficeHome />,
         {
           store,
-          apolloClient: client
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.externalValidation
+            })
+          ]
         }
       )
 
