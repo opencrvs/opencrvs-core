@@ -350,7 +350,13 @@ export function toUpserted<T extends ValidRecord>(
   )
   return {
     ...record,
-    entry: [...filteredEntry, ...patientWithUpsertedIdentifier]
+    entry: [
+      ...filteredEntry,
+      ...patientWithUpsertedIdentifier.map((resource) => ({
+        ...record.entry.find((e) => e.resource.id === resource.id),
+        resource
+      }))
+    ]
   }
 }
 

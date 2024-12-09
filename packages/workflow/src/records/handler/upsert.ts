@@ -14,6 +14,7 @@ import { getRecordById } from '@workflow/records/index'
 import { indexBundle } from '@workflow/records/search'
 import { toUpserted } from '@workflow/records/state-transitions'
 import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
+import { sendBundleToHearth } from '@workflow/records/fhir'
 
 interface IdentifierInput {
   type: SupportedPatientIdentifierCode
@@ -58,6 +59,7 @@ export async function upsertRegistrationHandler(
 
   const upsertedRecord = toUpserted(savedRecord, identifiers)
 
+  await sendBundleToHearth(upsertedRecord)
   await indexBundle(upsertedRecord, token)
   // TBD: audit event
 
