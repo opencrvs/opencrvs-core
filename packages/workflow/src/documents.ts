@@ -36,7 +36,7 @@ export async function uploadFileToMinio(
   return res.refUrl
 }
 
-export async function uploadSVGToMinio(
+async function uploadSVGToMinio(
   fileData: string,
   authHeader: IAuthHeader
 ): Promise<string> {
