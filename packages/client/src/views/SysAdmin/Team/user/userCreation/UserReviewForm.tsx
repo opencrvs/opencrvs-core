@@ -340,11 +340,7 @@ const UserReviewFormComponent = ({
               locationId: locationDetails.id
             })
           })
-
-          return
-        }
-
-        if (userDetails?.primaryOffice?.id) {
+        } else if (userDetails?.primaryOffice?.id) {
           navigate({
             pathname: routes.TEAM_USER_LIST,
             search: stringify({
