@@ -23,6 +23,7 @@ export const usePagination = (
   return {
     page,
     next,
+    total: pages,
     previous
   }
 }
