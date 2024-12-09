@@ -32,6 +32,7 @@ import { FormHeader } from './EventFormWizard'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEvents } from './useEvents/useEvents'
+import { useEventFormNavigation } from './useEventFormNavigation'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -232,6 +233,11 @@ interface RejectionState {
 
 const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   const [modal, openModal] = useModal()
+  const events = useEvents()
+
+  const { goToHome } = useEventFormNavigation()
+  const declareMutation = events.actions.declare()
+
   const data = useEventFormData((state) => state.formValues)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
@@ -252,7 +258,12 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
       <RegisterModal close={close}></RegisterModal>
     ))
     if (confirmedRegister) {
-      alert('Registered new member')
+      declareMutation.mutate({
+        eventId: event.id,
+        data: data,
+        transactionId: Math.random().toString()
+      })
+      goToHome()
     }
     return
   }
