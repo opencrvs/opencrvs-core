@@ -50,11 +50,6 @@ export async function upsertRegistrationHandler(
     ],
     true
   )
-  if (!savedRecord) {
-    throw new Error(
-      'Could not find record with composition id: ' + compositionId
-    )
-  }
 
   const upsertedRecord = toIdentifierUpserted(savedRecord, identifiers)
 
