@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useState } from 'react'
-import styled from 'styled-components'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { EventConfig, EventDocument } from '@opencrvs/commons'
 import {
   Accordion,
   Button,
@@ -24,12 +24,10 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import { useParams } from 'react-router-dom'
-import { useEventConfiguration } from './useEventConfiguration'
-import { EventDocument } from '@opencrvs/commons'
-import { useModal } from '@client/v2-events/hooks/useModal'
+import React, { useState } from 'react'
+import styled from 'styled-components'
 import { FormHeader } from './EventFormWizard'
-import { useEvents } from './useEvents/useEvents'
+import { useEventConfiguration } from './useEventConfiguration'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -126,21 +124,13 @@ interface RejectionState {
   details: string
   isDuplicate: boolean
 }
+type Props = {
+  data: Record<string, any>
+  configuration: EventConfig
+}
 
-const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
+export const ReviewSection = ({ data, configuration }: Props) => {
   const [modal, openModal] = useModal()
-
-  const { data } = event.actions.filter(
-    (action) => action.type === 'DECLARE'
-  )[0]
-
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
-
-  if (!configuration) {
-    throw new Error('Event configuration not found with type: ' + event.type)
-  }
 
   const { forms } = configuration.actions.filter(
     (action) => action.type === 'DECLARE'
@@ -276,22 +266,6 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
       {modal}
     </Frame>
   )
-}
-
-export const ReviewSection = () => {
-  const { eventId } = useParams<{
-    eventId: string
-  }>()
-  const events = useEvents()
-
-  const [event] = events.getEvent(eventId)
-
-  if (!event) {
-    throw new Error('Event not found')
-  }
-
-  if (!event) return <div>Failed to get event</div>
-  return <ReviewSectionComponent event={event}></ReviewSectionComponent>
 }
 
 const Container = styled.div`

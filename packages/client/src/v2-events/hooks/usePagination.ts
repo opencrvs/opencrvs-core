@@ -17,7 +17,7 @@ export const usePagination = (
 ) => {
   const [page, setPage] = useState(0)
 
-  const next = page < pages - 1 ? () => setPage(page + 1) : undefined
+  const next = () => setPage(page + 1)
   const previous = page > 0 ? () => setPage(page - 1) : undefined
 
   return {
