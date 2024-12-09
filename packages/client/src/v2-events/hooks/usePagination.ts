@@ -13,9 +13,10 @@ import { useState } from 'react'
 // TODO: Paginate with react-router-dom v6 using ?page=1... etc.
 export const usePagination = (
   /** Amount of pages to iterate through */
-  pages: number
+  pages: number,
+  firstPage = 0
 ) => {
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(firstPage)
 
   const next = () => setPage(page + 1)
   const previous = page > 0 ? () => setPage(page - 1) : undefined

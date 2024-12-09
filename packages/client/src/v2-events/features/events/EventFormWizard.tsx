@@ -13,7 +13,10 @@ import { IFormField } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
+import {
+  V2_DECLARE_ACTION_ROUTE,
+  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
+} from '@client/v2-events/routes'
 import {
   AppBar,
   Button,
@@ -30,7 +33,7 @@ import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
 import type { TranslationConfig } from '@opencrvs/commons/events'
-import { ReviewSection } from './ReviewSection'
+import { useEventFormData } from './useEventFormData'
 
 export function EventFormWizardIndex() {
   return (
@@ -136,8 +139,9 @@ export const FormHeader = ({ label }: { label: TranslationConfig }) => {
 }
 
 function EventFormWizard() {
-  const { eventId } = useParams<{
+  const { eventId, pageId } = useParams<{
     eventId: string
+    pageId?: string
   }>()
   const events = useEvents()
 
@@ -154,6 +158,8 @@ function EventFormWizard() {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
   const history = useHistory()
+  const formValues = useEventFormData((state) => state.formValues)
+  const setFormValues = useEventFormData((state) => state.setFormValues)
 
   useEffect(() => {
     const hasTemporaryId = event.id === event.transactionId
@@ -167,21 +173,48 @@ function EventFormWizard() {
     }
   }, [event.id, event.transactionId, eventId, history])
 
-  const intl = useIntl()
-  const [formValues, setFormValues] = React.useState<any>({})
-  const { modal, goToHome } = useEventFormNavigation()
-
   const pages = configuration.actions[0].forms[0].pages
   const {
     page: currentPage,
     next,
     previous,
     total
-  } = usePagination(pages.length)
+  } = usePagination(
+    pages.length,
+    pageId ? pages.findIndex((p) => p.id === pageId) : 0
+  )
 
-  const declareMutation = events.actions.declare()
+  useEffect(() => {
+    if (!pageId) {
+      history.push(
+        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+          eventId: event.id,
+          pageId: pages[0].id
+        })
+      )
+    }
+    console.log(pages[currentPage])
+
+    if (!pages.find((p) => p.id === pageId)) {
+      return
+    }
+    const pageChanged = pages[currentPage].id !== pageId
+    if (pageChanged) {
+      history.push(
+        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+          eventId: event.id,
+          pageId: pages[currentPage].id
+        })
+      )
+    }
+  }, [event.id, history, pageId, pages, currentPage])
+
+  const intl = useIntl()
+
+  const { modal, goToReview } = useEventFormNavigation()
 
   const page = pages[currentPage]
+
   const fields = !page
     ? []
     : page.fields.map(
@@ -204,33 +237,23 @@ function EventFormWizard() {
       {modal}
       <FormWizard
         currentPage={currentPage}
-        totalPages={total + 1}
+        totalPages={total}
         onSubmit={() => {
-          declareMutation.mutate({
-            eventId: event.id,
-            data: formValues,
-            transactionId: Math.random().toString()
-          })
-          goToHome()
+          goToReview(event.id)
         }}
         pageTitle={page && intl.formatMessage(page.title)}
         onNextPage={next}
         onPreviousPage={previous}
       >
-        {currentPage < total && (
-          <FormFieldGenerator
-            id="locationForm"
-            setAllFieldsDirty={false}
-            onChange={(values) => {
-              setFormValues(values)
-            }}
-            formData={formValues}
-            fields={fields}
-          />
-        )}
-        {currentPage === total && (
-          <ReviewSection data={formValues} configuration={configuration} />
-        )}
+        <FormFieldGenerator
+          id="locationForm"
+          setAllFieldsDirty={false}
+          onChange={(values) => {
+            setFormValues(values)
+          }}
+          formData={formValues}
+          fields={fields}
+        />
       </FormWizard>
     </Frame>
   )

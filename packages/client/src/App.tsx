@@ -72,6 +72,7 @@ import { ReloadModal } from './views/Modals/ReloadModal'
 import {
   V2_DECLARE_ACTION_REVIEW_ROUTE,
   V2_DECLARE_ACTION_ROUTE,
+  V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE
 } from './v2-events/routes'
@@ -553,6 +554,13 @@ export function App(props: IAppProps) {
                                                 V2_DECLARE_ACTION_REVIEW_ROUTE
                                               }
                                               component={ReviewSection}
+                                            />
+                                            <ProtectedRoute
+                                              exact
+                                              path={
+                                                V2_DECLARE_ACTION_ROUTE_WITH_PAGE
+                                              }
+                                              component={EventFormWizardIndex}
                                             />
                                           </TRPCProvider>
                                         </Switch>
