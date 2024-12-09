@@ -37,7 +37,8 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
-import { GetUserQuery, SCOPES, Status } from '@client/utils/gateway'
+import { GetUserQuery, Status } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 
 describe('create new user tests', () => {
   let store: AppStore

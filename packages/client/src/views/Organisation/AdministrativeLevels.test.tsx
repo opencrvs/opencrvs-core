@@ -16,7 +16,7 @@ import {
   createTestComponent,
   fetchUserMock
 } from '@client/tests/util'
-import { SCOPES } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 import { History } from 'history'
 import { AdministrativeLevels } from './AdministrativeLevels'
 import { setUserDetails } from '@client/profile/profileActions'
