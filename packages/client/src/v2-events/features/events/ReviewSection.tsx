@@ -81,16 +81,6 @@ const Card = styled.div`
   }
 `
 
-export const ZeroDocument = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  height: 700px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`
-
 const FormData = styled.div`
   padding-top: 24px;
   background: ${({ theme }) => theme.colors.white};
