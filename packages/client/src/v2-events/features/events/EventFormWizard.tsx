@@ -29,6 +29,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
+import type { TranslationConfig } from '@opencrvs/commons/events'
 
 export function EventFormWizardIndex() {
   return (
@@ -80,6 +81,59 @@ const messages = defineMessages({
   }
 })
 
+export const FormHeader = ({ label }: { label: TranslationConfig }) => {
+  const intl = useIntl()
+  const { exit } = useEventFormNavigation()
+
+  const TODO = () => {}
+  const IS_TODO = Math.random() > 0.5
+  return (
+    <AppBar
+      desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
+      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+        event: intl.formatMessage(label)
+      })}
+      desktopRight={
+        <>
+          {
+            <Button
+              id="save-exit-btn"
+              type="primary"
+              size="small"
+              disabled={!IS_TODO}
+              onClick={TODO}
+            >
+              <Icon name="DownloadSimple" />
+              {intl.formatMessage(messages.saveExitButton)}
+            </Button>
+          }
+
+          <Button type="secondary" size="small" onClick={exit}>
+            <Icon name="X" />
+            {intl.formatMessage(messages.exitButton)}
+          </Button>
+        </>
+      }
+      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
+      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+        event: intl.formatMessage(label)
+      })}
+      mobileRight={
+        <>
+          {
+            <Button type="icon" size="small" disabled={!IS_TODO} onClick={TODO}>
+              <Icon name="DownloadSimple" />
+            </Button>
+          }
+          <Button type="icon" size="small" onClick={exit}>
+            <Icon name="X" />
+          </Button>
+        </>
+      }
+    />
+  )
+}
+
 function EventFormWizard() {
   const { eventId } = useParams<{
     eventId: string
@@ -114,7 +168,7 @@ function EventFormWizard() {
 
   const intl = useIntl()
   const [formValues, setFormValues] = React.useState<any>({})
-  const { modal, exit, goToHome } = useEventFormNavigation()
+  const { modal, goToHome } = useEventFormNavigation()
 
   const pages = configuration.actions[0].forms[0].pages
   const {
@@ -126,8 +180,6 @@ function EventFormWizard() {
 
   const declareMutation = events.actions.declare()
 
-  const TODO = () => {}
-  const IS_TODO = Math.random() > 0.5
   const page = pages[currentPage]
   const fields = page.fields.map(
     (field) =>
@@ -144,56 +196,7 @@ function EventFormWizard() {
   return (
     <Frame
       skipToContentText="Skip to form"
-      header={
-        <AppBar
-          desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-          desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-            event: intl.formatMessage(configuration.label)
-          })}
-          desktopRight={
-            <>
-              {
-                <Button
-                  id="save-exit-btn"
-                  type="primary"
-                  size="small"
-                  disabled={!IS_TODO}
-                  onClick={TODO}
-                >
-                  <Icon name="DownloadSimple" />
-                  {intl.formatMessage(messages.saveExitButton)}
-                </Button>
-              }
-
-              <Button type="secondary" size="small" onClick={exit}>
-                <Icon name="X" />
-                {intl.formatMessage(messages.exitButton)}
-              </Button>
-            </>
-          }
-          mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-          mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-            event: intl.formatMessage(configuration.label)
-          })}
-          mobileRight={
-            <>
-              {
-                <Button
-                  type="icon"
-                  size="small"
-                  disabled={!IS_TODO}
-                  onClick={TODO}
-                >
-                  <Icon name="DownloadSimple" />
-                </Button>
-              }
-              <Button type="icon" size="small" onClick={exit}>
-                <Icon name="X" />
-              </Button>
-            </>
-          }
-        />
-      }
+      header={<FormHeader label={configuration.label} />}
     >
       {modal}
       <FormWizard

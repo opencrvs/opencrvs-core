@@ -23,3 +23,4 @@ export const TranslationConfig = z.object({
       'Describe the translation for a translator to be able to identify it.'
     )
 })
+export type TranslationConfig = z.infer<typeof TranslationConfig>
