@@ -34,12 +34,12 @@ import { roleQueries } from '@client/forms/user/query/queries'
 import { Mock, describe, expect } from 'vitest'
 import { formatUrl } from '@client/navigation'
 import { CREATE_USER_SECTION } from '@client/navigation/routes'
-import { Router } from '@sentry/react/types/types'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('signature upload tests', () => {
   const { store } = createStore()
   let testComponent: ReactWrapper
-  let router: Router
+  let router: ReturnType<typeof createMemoryRouter>
 
   beforeEach(async () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)

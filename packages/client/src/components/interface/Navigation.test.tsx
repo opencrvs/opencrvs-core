@@ -26,7 +26,7 @@ import * as React from 'react'
 import { Navigation } from '@client/components/interface/Navigation'
 import { ReactWrapper } from 'enzyme'
 import { Mock, vi } from 'vitest'
-import { Router } from '@sentry/react/types/types'
+import { createMemoryRouter } from 'react-router-dom'
 
 const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
@@ -108,7 +108,7 @@ describe('Navigation for national system admin related tests', () => {
 
 describe('Navigation for Registration agent related tests', () => {
   let testComponent: ReactWrapper<{}, {}>
-  let router: Router
+  let router: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
