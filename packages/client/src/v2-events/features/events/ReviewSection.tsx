@@ -14,7 +14,6 @@ import { tennisClubMemberDeclaration as declaration } from './fixtures'
 import styled from 'styled-components'
 import {
   Accordion,
-  AppBar,
   Button,
   Checkbox,
   Frame,
@@ -31,9 +30,10 @@ import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { useParams } from 'react-router-dom'
 import { useEventConfiguration } from './useEventConfiguration'
-import { useEventForm } from './useEventForm'
-import { EventConfig } from '@opencrvs/commons'
+import { EventDocument } from '@opencrvs/commons'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { FormHeader } from './EventFormWizard'
+import { useEvents } from './useEvents/useEvents'
 // @ToDO: Fix import
 
 const Row = styled.div<{
@@ -98,10 +98,6 @@ const ReviewContainter = styled.div`
 `
 const DeclarationDataContainer = styled.div``
 
-// @ToDO: Fix any
-const getValueFromFieldId = (declaration: any, fieldId: any) =>
-  fieldId.split('.').reduce((acc: any, part: any) => acc?.[part], declaration)
-
 enum REJECT_ACTIONS {
   ARCHIVE,
   SEND_FOR_UPDATE
@@ -113,11 +109,26 @@ interface RejectionState {
   isDuplicate: boolean
 }
 
-const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
+const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   const [modal, openModal] = useModal()
 
-  const { title, pages, exit, saveAndExit } = useEventForm(event)
   const offlineCountryConfig = useSelector(getOfflineData)
+
+  const { data } = event.actions.filter(
+    (action) => action.type === 'DECLARE'
+  )[0]
+
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+
+  if (!configuration) {
+    throw new Error('Event configuration not found with type: ' + event.type)
+  }
+
+  const { forms } = configuration.actions.filter(
+    (action) => action.type === 'DECLARE'
+  )[0]
 
   const handleRegister = async () => {
     const confirmedRegister = await openModal<boolean | null>((close) => (
@@ -166,24 +177,7 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
   return (
     <Frame
       skipToContentText="Skip to form"
-      header={
-        <AppBar
-          mobileLeft={title}
-          desktopLeft={title}
-          desktopRight={
-            <Stack direction="row">
-              <Button type="primary" onClick={saveAndExit}>
-                <Icon name="DownloadSimple" />
-                Save and exit
-              </Button>
-              <Button type="secondary" onClick={exit}>
-                <Icon name="X" />
-                Exit
-              </Button>
-            </Stack>
-          }
-        />
-      }
+      header={<FormHeader label={configuration.label} />}
     >
       <Row>
         <LeftColumn>
@@ -191,7 +185,7 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
             <ReviewHeader
               id="review_header"
               logoSource={offlineCountryConfig.config.COUNTRY_LOGO.file}
-              title={event.label.defaultMessage}
+              title={configuration.label.defaultMessage}
               subject={
                 'Member registration for ' +
                 declaration.applicant.firstname +
@@ -201,7 +195,7 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
             />
             <FormData>
               <ReviewContainter>
-                {pages.map((page) => {
+                {forms[0].pages.map((page) => {
                   return (
                     <DeclarationDataContainer
                       key={'Section_' + page.title.defaultMessage}
@@ -230,7 +224,7 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
                                 id={id}
                                 key={id}
                                 label={field.label.defaultMessage}
-                                value={getValueFromFieldId(declaration, id)}
+                                value={data[id] || ''}
                                 actions={
                                   <Link onClick={(e) => handleEdit(e, id)}>
                                     Change
@@ -260,10 +254,17 @@ const ReviewSectionComponent = ({ event }: { event: EventConfig }) => {
 }
 
 export const ReviewSection = () => {
-  const { eventType } = useParams<{ eventType: string }>()
+  const { eventId } = useParams<{
+    eventId: string
+  }>()
+  const events = useEvents()
 
-  const { event, isLoading } = useEventConfiguration(eventType)
-  if (isLoading) return <div>Loading...</div>
+  const [event] = events.getEvent(eventId)
+
+  if (!event) {
+    throw new Error('Event not found')
+  }
+
   if (!event) return <div>Failed to get event</div>
   return <ReviewSectionComponent event={event}></ReviewSectionComponent>
 }
