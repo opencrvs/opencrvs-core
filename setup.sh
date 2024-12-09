@@ -154,6 +154,7 @@ elif [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[32m::::::::::::::::::::::::: You are running Mac OSX. :::::::::::::::::::::::::\033[0m"
   echo
   OS="MAC"
+  export NODE_OPTIONS="--dns-result-order=ipv4first"
 else
   echo "Sorry your operating system is not supported."
   echo "YOU MUST BE RUNNING A SUPPORTED OS: MAC or UBUNTU > 18.04"
@@ -383,6 +384,9 @@ set -- $(stty size) #$1=rows, $2=columns
 #start a new session in dettached mode with resizable panes
 tmux new-session -s opencrvs -n opencrvs -d -x "$2" -y "$(($1 - 1))"
 TMUX_STARTED=1
+if [ "$(uname)" == "Darwin" ]; then
+  tmux set-environment NODE_OPTIONS "--dns-result-order=ipv4first"
+fi
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
 tmux split-window -h -l '30%'
