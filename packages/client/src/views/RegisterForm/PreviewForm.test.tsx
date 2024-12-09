@@ -221,7 +221,7 @@ describe('when user is previewing the form data', () => {
     })
   })
 
-  describe('when user is in the marriage review sqection', () => {
+  describe('when user is in the marriage review section', () => {
     let customDraft: IDeclaration
 
     const registerScopeToken =

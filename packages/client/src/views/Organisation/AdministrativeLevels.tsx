@@ -141,7 +141,6 @@ export function AdministrativeLevels() {
     )
   }
 
-  //
   return (
     <Frame
       header={

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { History } from 'history'
 import {
   AnyAction,
   applyMiddleware,
@@ -70,9 +69,7 @@ export type AppStore = Store<IStoreState, AnyAction>
 
 const config = { DONT_LOG_ERRORS_ON_HANDLED_FAILURES: true }
 
-export const createStore = <T>(
-  existingHistory?: History<T>
-): { store: AppStore } => {
+export const createStore = (): { store: AppStore } => {
   const reducers = combineReducers<IStoreState>({
     profile: profileReducer,
     i18n: intlReducer,

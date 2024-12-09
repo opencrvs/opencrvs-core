@@ -154,7 +154,6 @@ const ReadyForReviewComponent = ({
                     reg.declarationStatus === 'CORRECTION_REQUESTED'
                       ? REVIEW_CORRECTION
                       : REVIEW_EVENT_PARENT_FORM_PAGE,
-
                   declarationId: reg.id,
                   pageId: 'review',
                   event: reg.event ? reg.event.toLowerCase() : ''

@@ -9,15 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  createTestApp,
   mockOfflineData,
   validToken,
   getItem,
   flushPromises,
   setItem,
-  userDetails
+  userDetails,
+  createTestStore
 } from '@client/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
 import {
   storeDeclaration,
   IDeclaration,
@@ -34,7 +33,6 @@ import { clone } from 'lodash'
 import { birthDraftData } from '@client/tests/mock-drafts'
 import createFetchMock from 'vitest-fetch-mock'
 import { vi } from 'vitest'
-import { formatUrl } from '@client/navigation'
 
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
@@ -59,20 +57,9 @@ describe('when draft data is transformed to graphql', () => {
       event: EventType.Birth,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
-
-    // @TODO: Check if this is even needed?
-    const testApp = await createTestApp(
-      { waitUntilOfflineCountryConfigLoaded: false },
-      [
-        formatUrl(DRAFT_BIRTH_PARENT_FORM, {
-          declarationId: customDraft.id.toString()
-        })
-      ]
-    )
-
+    ;({ store } = await createTestStore())
     await flushPromises()
 
-    store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
 
     store.dispatch(storeDeclaration(customDraft))
