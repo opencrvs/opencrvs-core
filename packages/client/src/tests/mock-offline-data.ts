@@ -122,6 +122,26 @@ export const mockOfflineData = {
       status: 'active',
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
+    },
+    '213ec5f3-e306-4f95-8058-f37893dbfbb6': {
+      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      name: 'Chittagong Union Parishad',
+      alias: 'চট্টগ্রাম ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '234',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
+    },
+    '93259d69-71af-488f-8ada-32d06678df17': {
+      id: '93259d69-71af-488f-8ada-32d06678df17',
+      name: 'Dhaka Union Parishad',
+      alias: 'ঢাকা ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '345',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
     }
   } satisfies Record<string, CRVSOffice>,
   locations: {

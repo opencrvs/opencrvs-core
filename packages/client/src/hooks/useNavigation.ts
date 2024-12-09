@@ -108,22 +108,24 @@ const routeAccess: NavigationConfig[] = [
     scopes: [
       SCOPES.ORGANISATION_READ_LOCATIONS,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
-      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
+      SCOPES.CONFIG_UPDATE_ALL
     ],
     tabs: [
       {
-        name: WORKQUEUE_TABS.performance,
-        scopes: [SCOPES.PERFORMANCE_READ]
-      },
-      {
         name: WORKQUEUE_TABS.organisation,
-        scopes: [SCOPES.ORGANISATION_READ_LOCATIONS]
+        scopes: [
+          SCOPES.ORGANISATION_READ_LOCATIONS,
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+        ]
       },
       {
         name: WORKQUEUE_TABS.team,
         scopes: [
           SCOPES.ORGANISATION_READ_LOCATIONS,
-          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+          SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
         ]
       },
       {
@@ -165,7 +167,7 @@ const routeAccess: NavigationConfig[] = [
         scopes: [SCOPES.PERFORMANCE_READ]
       },
       {
-        name: WORKQUEUE_TABS.report,
+        name: WORKQUEUE_TABS.performance,
         scopes: [SCOPES.PERFORMANCE_READ]
       },
       {

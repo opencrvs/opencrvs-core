@@ -40,6 +40,7 @@ import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -60,12 +61,11 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   margin-top: 20px;
 `
 
-// const con
-
 export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
   const dispatch = useDispatch()
+  const { canAccessOffice } = usePermissions()
   //
   const getNewLevel =
     (currentlySelectedLocation: string) =>
@@ -175,19 +175,23 @@ export function AdministrativeLevels() {
                   <ListViewItemSimplified
                     key={index}
                     label={
-                      <Link
-                        element="a"
-                        onClick={(e) => {
-                          if (level.type === 'ADMIN_STRUCTURE') {
+                      level.type === 'ADMIN_STRUCTURE' ? (
+                        <Link
+                          onClick={(e) => {
                             setCurrentPageNumber(1)
                             changeLevelAction(e, level.id)
-                          }
-                          if (level.type === 'CRVS_OFFICE')
-                            dispatch(goToTeamUserList(level.id))
-                        }}
-                      >
-                        {getLocalizedLocationName(intl, level)}
-                      </Link>
+                          }}
+                        >
+                          {getLocalizedLocationName(intl, level)}
+                        </Link>
+                      ) : level.type === 'CRVS_OFFICE' ? (
+                        <Link
+                          disabled={!canAccessOffice(level)}
+                          onClick={() => dispatch(goToTeamUserList(level.id))}
+                        >
+                          {getLocalizedLocationName(intl, level)}
+                        </Link>
+                      ) : null
                     }
                     actions={
                       <Button

@@ -105,7 +105,6 @@ export const SCOPES = {
   PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
 
   // organisation
-  ORGANISATION_READ: 'organisation.read',
   ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
   ORGANISATION_READ_LOCATIONS_MY_OFFICE:
     'organisation.read-locations:my-office',

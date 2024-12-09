@@ -256,6 +256,27 @@ export function getLocationHierarchy(
   })
 }
 
+export function isUnderJurisdiction(
+  officeId: string,
+  otherOfficeId: string,
+  locations: Record<string, AdminStructure | undefined>,
+  offices: Record<string, CRVSOffice | undefined>
+) {
+  const office = offices[officeId]
+  const otherOffice = offices[otherOfficeId]
+  const officeLocationId = office?.partOf.split('/').at(1)
+  const otherOfficeLocationId = otherOffice?.partOf.split('/').at(1)
+  if (!officeLocationId || !otherOfficeLocationId) {
+    return false
+  }
+  const parentLocation = locations[officeLocationId]
+  if (!parentLocation) {
+    return false
+  }
+  const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
+  return Object.values(hierarchy).includes(parentLocation.id)
+}
+
 export function generateFullAddress(
   address: Address,
   offlineData: IOfflineData
