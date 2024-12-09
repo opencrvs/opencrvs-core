@@ -53,13 +53,6 @@ export const CertifyRequestSchema = z.object({
   })
 })
 
-export const upsertIdentifierSchema = z.object({
-  identifier: z.object({
-    type: z.string(),
-    value: z.string()
-  })
-})
-
 const PaymentSchema = z.object({
   type: z.enum(['MANUAL']),
   amount: z.number(),
