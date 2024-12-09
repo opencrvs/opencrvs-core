@@ -610,11 +610,6 @@ export interface GQLRejectRegistrationInput {
   comment?: string
 }
 
-export interface GQLUpsertRegistrationIdentifierInput {
-  registrationNumber?: string
-  identifiers?: Array<GQLIdentifierInput>
-}
-
 export interface GQLUserInput {
   id?: string
   name: Array<GQLHumanNameInput>
@@ -3216,7 +3211,8 @@ export interface MutationToRejectRegistrationResolver<
 
 export interface MutationToUpsertRegistrationIdentifierArgs {
   id: string
-  details: GQLUpsertRegistrationIdentifierInput
+  identifierType: string
+  identifierValue: string
 }
 export interface MutationToUpsertRegistrationIdentifierResolver<
   TParent = any,

@@ -644,7 +644,7 @@ export const resolvers: GQLResolver = {
     },
     async upsertRegistrationIdentifier(
       _,
-      { id, details },
+      { id, identifierType, identifierValue },
       { headers: authHeader }
     ) {
       if (!hasRecordAccess(authHeader, id)) {
@@ -653,8 +653,7 @@ export const resolvers: GQLResolver = {
 
       try {
         const taskEntry = await upsertRegistrationIdentifier(id, authHeader, {
-          registrationNumber: details.registrationNumber,
-          identifiers: details.identifiers
+          identifiers: [{ type: identifierType, value: identifierValue }]
         })
 
         return taskEntry.resource.id
