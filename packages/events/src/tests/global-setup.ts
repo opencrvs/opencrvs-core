@@ -8,22 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MongoClient } from 'mongodb'
-import { inject } from 'vitest'
+import { MongoMemoryServer } from 'mongodb-memory-server'
 
-let client: MongoClient
-let databaseName = 'events_' + Date.now()
+export type { ProvidedContext } from 'vitest'
 
-export async function resetServer() {
-  databaseName = 'events_' + Date.now()
+declare module 'vitest' {
+  export interface ProvidedContext {
+    MONGO_URI: string
+  }
 }
 
-export async function getClient() {
-  if (!client) {
-    client = new MongoClient(inject('MONGO_URI'))
+export default async function setup({ provide }: any) {
+  const mongod = await MongoMemoryServer.create()
+  const uri = mongod.getUri()
+
+  provide('MONGO_URI', uri)
+
+  return async () => {
+    await mongod.stop()
   }
-
-  await client.connect()
-
-  return client.db(databaseName)
 }

@@ -19,9 +19,8 @@ import {
 } from '@tanstack/react-query-persist-client'
 import { httpLink, loggerLink } from '@trpc/client'
 import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
-import React, { useEffect } from 'react'
+import React from 'react'
 import superjson from 'superjson'
-import { preloadData } from './features/events/useEvents/useEvents'
 
 export const api = createTRPCReact<AppRouter>()
 
@@ -84,10 +83,6 @@ export const queryClient = getQueryClient()
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    preloadData()
-  }, [])
-
   return (
     <PersistQueryClientProvider
       client={queryClient}
