@@ -20,6 +20,12 @@ import { EventHistory } from './components/EventHistory'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { SummaryConfig } from '@opencrvs/commons'
 import { ActionDocument, EventIndex } from '@events/schema'
+import { useSelector } from 'react-redux'
+// eslint-disable-next-line no-restricted-imports
+import { getUserDetails } from '@client/profile/profileSelectors'
+// eslint-disable-next-line no-restricted-imports
+import { ProfileState } from '@client/profile/profileReducer'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 
 /**
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -28,16 +34,15 @@ import { ActionDocument, EventIndex } from '@events/schema'
 export const EventOverviewIndex = () => {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { getEvents, getEventById } = useEvents()
+  const user = useSelector(getUserDetails)
 
   const [config] = useEventConfigurations()
 
-  console.log(params.eventId)
   const { data: fullEvent } = getEventById.useQuery(params.eventId)
 
   const { data: events } = getEvents.useQuery()
   const event = events?.find((event) => event.id === params.eventId)
 
-  console.log('event', event)
   if (!event || !config || !fullEvent?.actions) {
     return null
   }
@@ -47,6 +52,7 @@ export const EventOverviewIndex = () => {
       event={event}
       summary={config.summary}
       history={fullEvent.actions}
+      user={user}
     />
   )
 }
@@ -57,12 +63,15 @@ export const EventOverviewIndex = () => {
 function EventOverview({
   event,
   summary,
-  history
+  history,
+  user
 }: {
   event: EventIndex
   summary: SummaryConfig
   history: ActionDocument[]
+  user: ProfileState['userDetails']
 }) {
+  const intl = useIntlFormatMessageWithFlattenedParams()
   const actions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
 
@@ -70,14 +79,14 @@ function EventOverview({
 
   return (
     <Content
-      title={event.id || 'no name'}
+      title={intl.formatMessage(summary.title, event.data)}
       titleColor={event.id ? 'copy' : 'grey600'}
       size={ContentSize.LARGE}
       topActionButtons={desktopActionsView}
-      icon={() => <IconWithName status={'orange'} name={event.id} />}
+      icon={() => <IconWithName status={'orange'} name={''} />}
     >
       <EventSummary event={event} summary={summary} />
-      <EventHistory history={history} />
+      <EventHistory history={history} user={user} />
     </Content>
   )
 }

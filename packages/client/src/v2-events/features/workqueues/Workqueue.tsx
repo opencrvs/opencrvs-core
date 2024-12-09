@@ -18,12 +18,8 @@ import {
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
-import {
-  constantsMessages,
-  wqMessages,
-  messages,
-  navigationMessages
-} from '@client/v2-events/messages'
+import { WorkqueueConfig } from '@opencrvs/commons'
+import { constantsMessages, messages } from '@client/v2-events/messages'
 import styled, { useTheme } from 'styled-components'
 import orderBy from 'lodash-es/orderBy'
 import { WQContentWrapper } from './components/ContentWrapper'
@@ -33,7 +29,10 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { ROUTES } from '@client/v2-events/routes'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { Link } from 'react-router-dom'
-import { EventIndex, EventStatus } from '@events/schema/EventIndex'
+import { EventIndex } from '@events/schema/EventIndex'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import mapKeys from 'lodash-es/mapKeys'
+import get from 'lodash-es/get'
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.
@@ -69,11 +68,27 @@ const changeSortedColumn = (
 
 export const WorkqueueIndex = () => {
   const { getEvents } = useEvents()
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VIEW)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
+
+  const [config] = useEventConfigurations()
+
+  const workqueueConfig =
+    config.workqueues.find((workqueue) => workqueue.id === searchParams.id) ??
+    config.workqueues[0]
+
+  if (!workqueueConfig) {
+    return null
+  }
 
   const events = getEvents.useQuery()
 
-  return <Workqueue events={events.data ?? []} {...searchParams} />
+  return (
+    <Workqueue
+      events={events.data ?? []}
+      config={workqueueConfig}
+      {...searchParams}
+    />
+  )
 }
 
 /**
@@ -81,28 +96,41 @@ export const WorkqueueIndex = () => {
  */
 export const Workqueue = ({
   events,
-  status,
+  config,
   limit,
   offset
 }: {
   events: EventIndex[]
-  status: EventStatus
+  config: WorkqueueConfig
   limit: number
   offset: number
 }) => {
   const intl = useIntl()
   const theme = useTheme()
 
+  const statuses = config.filters.flatMap((filter) => filter.status)
+
   const workqueue = events
-    .filter((event) => event.status === status)
+    .filter((event) => statuses.includes(event.status))
+    .map((event) =>
+      mapKeys(event, (value, key) => (key === 'data' ? key : `event.${key}`))
+    )
+    .map((event) => {
+      const { data, ...rest } = event
+      return { ...rest, ...mapKeys(data as any, (value, key) => `${key}`) }
+    })
     .map((event) => ({
-      assignedTo: event.assignedTo,
-      type: event.type,
-      createdAt: new Date(event.createdAt).toLocaleDateString(),
-      modifiedAt: new Date(event.modifiedAt).toLocaleString(),
-      id: (
-        <Link to={ROUTES.V2.EVENTS.EVENT.buildPath({ eventId: event.id })}>
-          <IconWithName name={event.id} status={event.status} />
+      ...event,
+      [config.fields[0].id]: (
+        <Link
+          to={ROUTES.V2.EVENTS.EVENT.buildPath({
+            eventId: get(event, 'event.id')
+          })}
+        >
+          <IconWithName
+            name={get(event, config.fields[0].id) ?? 'N/A'}
+            status={get(event, 'event.status')}
+          />
         </Link>
       )
     }))
@@ -125,66 +153,30 @@ export const Workqueue = ({
   const getColumns = (): Array<{
     label?: string
     width: number
-    // @TODO: Format payload and include contents of data somehow.
-    key: keyof (typeof workqueue)[number] | string
+    key: string
     sortFunction?: (columnName: string) => void
     isActionColumn?: boolean
     isSorted?: boolean
     alignment?: ColumnContentAlignment
   }> => {
     if (width > theme.grid.breakpoints.lg) {
-      return [
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 30,
-          key: 'id',
-          sortFunction: onColumnClick,
-          isSorted: sortedCol === 'id'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.event),
-          width: 16,
-          key: 'type',
-          sortFunction: onColumnClick,
-          isSorted: sortedCol === 'type'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.eventDate),
-          width: 18,
-          key: 'createdAt',
-          sortFunction: onColumnClick,
-          isSorted: sortedCol === 'createdAt'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.sentForReview),
-          width: 18,
-          key: 'modifiedAt',
-          sortFunction: onColumnClick,
-          isSorted: sortedCol === 'modifiedAt'
-        },
-        {
-          width: 18,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
+      return config.fields.map((field, i) => ({
+        label: intl.formatMessage(field.label!),
+        width: i === 0 ? 25 : 18,
+        key: field.id,
+        sortFunction: onColumnClick,
+        isSorted: sortedCol === field.id
+      }))
     } else {
-      return [
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: 'assignedTo',
+      return config.fields
+        .map((field, i) => ({
+          label: intl.formatMessage(field.label!),
+          width: i === 0 ? 25 : 75,
+          key: field.id,
           sortFunction: onColumnClick,
-          isSorted: sortedCol === 'assignedTo'
-        },
-        {
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ]
+          isSorted: sortedCol === field.id
+        }))
+        .slice(0, 2)
     }
   }
 
@@ -194,7 +186,7 @@ export const Workqueue = ({
 
   return (
     <WQContentWrapper
-      title={intl.formatMessage(navigationMessages[status])}
+      title={intl.formatMessage(config.title)}
       isMobileSize={width < theme.grid.breakpoints.lg ? true : false}
       isShowPagination={isShowPagination}
       paginationId={Math.round(offset / limit)}
@@ -202,7 +194,7 @@ export const Workqueue = ({
       onPageChange={() => {}}
       loading={false} // @TODO: Handle these on top level
       error={false}
-      noResultText={intl.formatMessage(wqMessages[status])}
+      noResultText={'No results'}
       noContent={workqueue.length === 0}
     >
       <ReactTooltip id="validateTooltip">

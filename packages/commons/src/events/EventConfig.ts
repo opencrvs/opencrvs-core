@@ -13,6 +13,8 @@ import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { flattenDeep } from 'lodash'
+import { WorkqueueConfig } from './WorkqueueConfig'
+import { eventMetadataLabelMap } from './EventMetadata'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -27,10 +29,61 @@ export const EventConfig = z.object({
     ),
   summary: SummaryConfig,
   label: TranslationConfig,
-  actions: z.array(ActionConfig)
+  actions: z.array(ActionConfig),
+  workqueues: z.array(WorkqueueConfig)
 })
 
 export type EventConfig = z.infer<typeof EventConfig>
+
+const findPageFields = (
+  config: Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput }
+) => {
+  return flattenDeep(
+    config.actions.map(({ forms }) =>
+      forms.map(({ pages }) =>
+        pages.map(({ fields }) =>
+          fields.map((field) => ({ id: field.id, label: field.label }))
+        )
+      )
+    )
+  )
+}
+
+const fillFieldLabels = ({
+  pageFields,
+  refFields
+}: {
+  pageFields: { id: string; label: TranslationConfig }[]
+  refFields: {
+    id: keyof typeof eventMetadataLabelMap | string
+    label?: TranslationConfig
+  }[]
+}) => {
+  return refFields.map((field) => {
+    if (field.label) {
+      return field
+    }
+
+    // @ts-ignore
+    const metadataLabel = eventMetadataLabelMap[field.id]
+    if (metadataLabel) {
+      return {
+        ...field,
+        label: metadataLabel
+      }
+    }
+
+    const pageLabel = pageFields.find((pageField) => pageField.id === field.id)
+    if (!pageLabel) {
+      throw new Error(`Referenced field ${field.id} does not have a label`)
+    }
+
+    return {
+      ...field,
+      label: pageLabel.label
+    }
+  })
+}
 
 /**
  * Builds a validated configuration for an event
@@ -45,41 +98,23 @@ export const defineConfig = (
     summary: SummaryConfigInput
   }).parse(config)
 
-  const summaryFieldsWithoutLabel = parsed.summary.fields.filter(
-    (field) => !field.label
-  )
+  const pageFields = findPageFields(parsed)
 
-  if (summaryFieldsWithoutLabel.length === 0) {
-    return parsed
-  }
-  /** Allow passing field without label in the summary configuration. In that case, replace it with the corresponding one in form fields*/
-  const matchingPageFields = flattenDeep(
-    parsed.actions.map(({ forms }) =>
-      forms.map(({ pages }) =>
-        pages.map(({ fields }) =>
-          fields
-            .filter((field) =>
-              summaryFieldsWithoutLabel.some(
-                (summaryField) => summaryField.id === field.id
-              )
-            )
-            .map((field) => ({ id: field.id, label: field.label }))
-        )
-      )
-    )
-  )
-
-  return {
+  return EventConfig.parse({
     ...parsed,
     summary: {
       ...parsed.summary,
-      fields: parsed.summary.fields.map((field) => {
-        const matchingField = matchingPageFields.find(
-          (matchingField) => matchingField.id === field.id
-        )
-
-        return matchingField ?? field
+      fields: fillFieldLabels({
+        pageFields,
+        refFields: parsed.summary.fields
       })
-    }
-  }
+    },
+    workqueues: parsed.workqueues.map((workqueue) => ({
+      ...workqueue,
+      fields: fillFieldLabels({
+        pageFields,
+        refFields: workqueue.fields
+      })
+    }))
+  })
 }

@@ -29,25 +29,32 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useEvents } from '@client/v2-events/features/events/useEvents'
 import groupBy from 'lodash-es/groupBy'
-import { EventStatus } from '@events/schema/EventIndex'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useIntlFormatMessageWithFlattenedParams } from './utils'
+import sumBy from 'lodash-es/sumBy'
+
+const colors = ['green', 'orange', 'red', 'teal', 'grey', 'purple']
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
 export const Workqueues = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
+  const intl = useIntlFormatMessageWithFlattenedParams()
 
-  const [searchParams] = useTypedSearchParams(ROUTES.V2.EVENTS.VIEW)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
 
   const { getEvents } = useEvents()
   const events = getEvents.useQuery()
 
-  const createQueueUrl = (status: EventStatus) =>
-    ROUTES.V2.EVENTS.VIEW.buildPath(
+  const [config] = useEventConfigurations()
+
+  const createQueueUrl = (id: string) =>
+    ROUTES.V2.WORKQUEUE.buildPath(
       {},
       {
-        status
+        id
       }
     )
 
@@ -60,61 +67,34 @@ export const Workqueues = ({ children }: { children: React.ReactNode }) => {
           applicationName="OpenCRVS-TS (Tennis club)"
           applicationVersion="0.1-alpha"
         >
-          {/* @TODO: Consider mapping through these once we know the mapping.
-            Currently it seems we would need to give that through configuration.
-          */}
           <NavigationGroup>
-            <NavLink to={createQueueUrl(EventStatus.CREATED)}>
-              {(props) => (
-                <NavigationItem
-                  isSelected={
-                    props.isActive &&
-                    searchParams.status === EventStatus.CREATED
-                  }
-                  icon={() => <DeclarationIconSmall color={'purple'} />}
-                  label="In progress"
-                  count={eventsByStatus[EventStatus.CREATED]?.length}
-                />
-              )}
-            </NavLink>
-            <NavLink to={createQueueUrl(EventStatus.DECLARED)}>
-              {(props) => (
-                <NavigationItem
-                  isSelected={
-                    props.isActive &&
-                    searchParams.status === EventStatus.DECLARED
-                  }
-                  icon={() => <DeclarationIconSmall color={'teal'} />}
-                  label="Ready for review"
-                  count={eventsByStatus[EventStatus.DECLARED]?.length}
-                />
-              )}
-            </NavLink>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              label="Requires updates"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
-              label="Sent for approval"
-            />
-            <NavLink to={createQueueUrl(EventStatus.REGISTERED)}>
-              {(props) => (
-                <NavigationItem
-                  isSelected={
-                    props.isActive &&
-                    searchParams.status === EventStatus.REGISTERED
-                  }
-                  icon={() => <DeclarationIconSmall color={'green'} />}
-                  label="Ready to print"
-                  count={eventsByStatus[EventStatus.REGISTERED]?.length}
-                />
-              )}
-            </NavLink>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'blue'} />}
-              label="Ready to issue"
-            />
+            {config.workqueues.map((workqueue, i) => {
+              const statuses = workqueue.filters.flatMap(
+                (filter) => filter.status
+              )
+              const count = sumBy(
+                statuses,
+                (status) => eventsByStatus[status]?.length ?? 0
+              )
+
+              return (
+                <NavLink
+                  to={createQueueUrl(workqueue.id)}
+                  key={workqueue.title.id}
+                >
+                  {(props) => (
+                    <NavigationItem
+                      isSelected={
+                        props.isActive && searchParams.id === workqueue.id
+                      }
+                      icon={() => <DeclarationIconSmall color={colors[i]} />}
+                      label={intl.formatMessage(workqueue.title)}
+                      count={count}
+                    />
+                  )}
+                </NavLink>
+              )
+            })}
           </NavigationGroup>
           <NavigationGroup>
             <NavigationItem

@@ -21,9 +21,9 @@ export const EventStatus = {
   REGISTERED: 'REGISTERED',
   CERTIFIED: 'CERTIFIED'
 } as const
-export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
-
 export const eventStatuses = Object.values(EventStatus)
+export type EventStatus = (typeof eventStatuses)[number]
+
 export const EventStatuses = z.nativeEnum(EventStatus)
 
 export const EventIndex = z.object({

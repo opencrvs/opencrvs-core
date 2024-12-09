@@ -41,6 +41,7 @@ import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
 import { constantsMessages } from '@client/v2-events/messages'
 import { ActionDocument } from '@events/schema'
+import { ProfileState } from '@client/profile/profileReducer'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -163,9 +164,13 @@ const getIndexByAction = (histories: any, index: number): number => {
 
 export const EventHistory = ({
   history,
-  toggleActionDetails,
-  userDetails
-}: { history: ActionDocument[]; toggleActionDetails: any; userDetails: any } & {
+  user,
+  toggleActionDetails
+}: {
+  history: ActionDocument[]
+  toggleActionDetails: any
+  user: ProfileState['userDetails']
+} & {
   toggleActionDetails: (actionItem: History, index?: number) => void
 }) => {
   const intl = useIntl()
@@ -173,30 +178,11 @@ export const EventHistory = ({
 
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
-    userDetails?.systemRole &&
-    FIELD_AGENT_ROLES.includes(userDetails.systemRole)
+    user?.systemRole && FIELD_AGENT_ROLES.includes(user.systemRole)
       ? true
       : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
-  const currentLanguage = 'en'
 
-  const onPageChange = (currentPageNumber: number) =>
-    setCurrentPageNumber(currentPageNumber)
-  // if (
-  //   !(draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) &&
-  //   !(draft?.submissionStatus === SUBMISSION_STATUS.DRAFT)
-  // )
-  //   return (
-  //     <>
-  //       <Divider />
-  //       <Text variant="h3" element="h3" color="copy">
-  //         {intl.formatMessage(constantsMessages.history)}
-  //       </Text>
-  //       <LargeGreyedInfo />
-  //     </>
-  //   )
-
-  // TODO: We need to figure out a way to sort the history in backend
   const sortedHistory = history
 
   const historyData = history.map((item, index) => ({

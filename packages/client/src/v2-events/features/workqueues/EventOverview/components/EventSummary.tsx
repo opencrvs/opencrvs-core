@@ -17,10 +17,6 @@ import { SummaryConfig } from '@opencrvs/commons/events'
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
-interface ILabel {
-  [key: string]: string | undefined
-}
-
 export const EventSummary = ({
   event,
   summary
@@ -28,13 +24,6 @@ export const EventSummary = ({
   event: any
   summary: SummaryConfig
 }) => {
-  const info: ILabel = {
-    status: event?.status,
-    type: event.type,
-    trackingId: event.id
-  }
-  console.log('info', info)
-
   return (
     <>
       <Summary id="summary">

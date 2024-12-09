@@ -26,15 +26,6 @@ export const ROUTES = {
           EVENT: route(':eventId', {
             params: { eventId: string().defined() }
           }),
-          VIEW: route('view', {
-            searchParams: {
-              status: zod(z.nativeEnum(EventStatus)).default(
-                EventStatus.CREATED
-              ),
-              limit: zod(z.number().min(1).max(100)).default(10),
-              offset: zod(z.number().min(0)).default(0)
-            }
-          }),
           CREATE: route(
             'create',
             {},
@@ -45,7 +36,14 @@ export const ROUTES = {
             }
           )
         }
-      )
+      ),
+      WORKQUEUE: route('workqueue', {
+        searchParams: {
+          id: string(),
+          limit: zod(z.number().min(1).max(100)).default(10),
+          offset: zod(z.number().min(0)).default(0)
+        }
+      })
     }
   )
 }

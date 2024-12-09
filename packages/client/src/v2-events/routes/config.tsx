@@ -32,7 +32,7 @@ export const routesConfig = {
       children: [
         {
           index: true,
-          path: ROUTES.V2.EVENTS.VIEW.path,
+          path: ROUTES.V2.WORKQUEUE.path,
           element: <WorkqueueIndex />
         }
       ]

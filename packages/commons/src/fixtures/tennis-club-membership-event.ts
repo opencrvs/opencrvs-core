@@ -30,6 +30,35 @@ export const tennisClubMembershipEvent = defineConfig({
       }
     ]
   },
+  workqueues: [
+    {
+      id: 'in-progress',
+      title: {
+        defaultMessage: 'In progress',
+        description: 'Label for in progress workqueue',
+        id: 'event.tennis-club-membership.workqueue.in-progress.label'
+      },
+      fields: [
+        {
+          id: 'applicant.firstname'
+        },
+        {
+          id: 'event.type'
+        },
+        {
+          id: 'event.createdAt'
+        },
+        {
+          id: 'event.modifiedAt'
+        }
+      ],
+      filters: [
+        {
+          status: ['CREATED']
+        }
+      ]
+    }
+  ],
   actions: [
     {
       type: 'DECLARE',
