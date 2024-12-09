@@ -46,6 +46,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 type IStateProps = {
   scopes: Scope[] | null
@@ -140,6 +141,8 @@ const HeaderComponent = (props: IFullProps) => {
     changeTeamLocation
   } = props
 
+  const { canCreateUser } = usePermissions()
+
   function hasSearch() {
     // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
     return scopes?.some((scope) =>
@@ -203,7 +206,7 @@ const HeaderComponent = (props: IFullProps) => {
             }
           ]
         }
-      } else if (scopes?.includes(SCOPES.USER_CREATE)) {
+      } else if (canCreateUser) {
         return {
           mobileLeft: [
             {

@@ -151,25 +151,12 @@ export function generateSearchableLocations(
 export function generateLocations(
   locations: { [key: string]: ILocation },
   intl: IntlShape,
-  filterByJurisdictionTypes?: string[],
-  filterByLocationTypes?: LocationType[]
+  filter?: (location: ILocation) => boolean
 ) {
   let locationArray = Object.values(locations)
 
-  if (filterByLocationTypes) {
-    locationArray = locationArray.filter(
-      (location) =>
-        location.type &&
-        filterByLocationTypes.includes(location.type as LocationType)
-    )
-  }
-
-  if (filterByJurisdictionTypes) {
-    locationArray = locationArray.filter(
-      (location) =>
-        location.jurisdictionType &&
-        filterByJurisdictionTypes.includes(location.jurisdictionType)
-    )
+  if (filter) {
+    locationArray = locationArray.filter(filter)
   }
 
   return generateSearchableLocations(locationArray, locations, intl)

@@ -12,7 +12,7 @@ import { FormFieldGenerator } from '@client/components/form'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
-import { userQueries, GET_USER } from '@client/user/queries'
+import { GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
@@ -21,7 +21,8 @@ import {
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
   mockRoles,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  setScopes
 } from '@client/tests/util'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -37,193 +38,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { History } from 'history'
 import { vi, Mock, describe, expect } from 'vitest'
 import { GetUserQuery, Status } from '@client/utils/gateway'
-
-const mockUsers = {
-  data: {
-    searchUsers: {
-      totalItems: 8,
-      results: [
-        {
-          id: '5db9f3fdd2ce28e4e2da1a7e',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'API',
-              familyName: 'User',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'api.user',
-          role: {
-            id: 'NATIONAL_REGISTRAR',
-            label: {
-              defaultMessage: 'National Registrar',
-              description: 'Name for user role National Regisrtar',
-              id: 'userRole.nationalRegistrar'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7d',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Sahriar',
-              familyName: 'Nafis',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'shahriar.nafis',
-          role: {
-            id: 'LOCAL_SYSTEM_ADMIN',
-            label: {
-              defaultMessage: 'Local System Admin',
-              description: 'Name for user role Local System Admin',
-              id: 'userRole.localSystemAdmin'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7c',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mohamed',
-              familyName: 'Abu Abdullah',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'mohamed.abu',
-          role: {
-            id: 'NATIONAL_REGISTRAR',
-            label: {
-              defaultMessage: 'National Registrar',
-              description: 'Name for user role National Registrar',
-              id: 'userRole.nationalRegistrar'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7b',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Nasreen Pervin',
-              familyName: 'Huq',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'nasreen.pervin',
-          role: {
-            id: 'STATE_REGISTRAR',
-            label: {
-              defaultMessage: 'State Registrar',
-              description: 'Name for user role State Registrar',
-              id: 'userRole.stateRegistrar'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7a',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Muhammad Abdul Muid',
-              familyName: 'Khan',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'muid.khan',
-          role: {
-            id: 'DISTRICT_REGISTRAR',
-            label: {
-              defaultMessage: 'District Registrar',
-              description: 'Name for user role District Registrar',
-              id: 'userRole.districtRegistrar'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a79',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mohammad',
-              familyName: 'Ashraful',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'mohammad.ashraful',
-          role: {
-            id: 'LOCAL_REGISTRAR',
-            label: {
-              defaultMessage: 'Local Registrar',
-              description: 'Name for user role Local Registrar',
-              id: 'userRole.localRegistrar'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a78',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Tamim',
-              familyName: 'Iqbal',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'tamim.iqbal',
-          role: {
-            id: 'REGISTRATION_AGENT',
-            label: {
-              defaultMessage: 'Registration Agent',
-              description: 'Name for user role Registration Agent',
-              id: 'userRole.registrationAgent'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a77',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Shakib',
-              familyName: 'Al Hasan',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'sakibal.hasan',
-          role: {
-            id: 'FIELD_AGENT',
-            label: {
-              defaultMessage: 'Field Agent',
-              description: 'Name for user role Field Agent',
-              id: 'userRole.fieldAgent'
-            }
-          },
-          status: 'active',
-          __typename: 'User'
-        }
-      ],
-      __typename: 'SearchUserResult'
-    }
-  }
-}
+import { SCOPES } from '@opencrvs/commons/client'
 
 describe('create new user tests', () => {
   let store: AppStore
@@ -231,11 +46,11 @@ describe('create new user tests', () => {
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
     history = s.history
+    setScopes([SCOPES.USER_CREATE], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -365,6 +180,7 @@ describe('edit user tests', () => {
         data: {
           getUser: {
             id: '5e835e4d81fbf01e4dc554db',
+            userMgntUserID: '5e835e4d81fbf01e4dc554db',
             name: [
               {
                 use: 'bn',
@@ -412,8 +228,8 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(async () => {
+    setScopes([SCOPES.USER_CREATE], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })

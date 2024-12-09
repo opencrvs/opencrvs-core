@@ -1094,8 +1094,7 @@ class FormSectionComponent extends React.Component<Props> {
                       }
                     }, {}),
                     intl,
-                    undefined,
-                    field.searchableType as LocationType[]
+                    (location) => field.searchableType.includes(location.type)
                   )
                 }
               : field

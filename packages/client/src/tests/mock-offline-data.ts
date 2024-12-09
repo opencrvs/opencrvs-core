@@ -123,8 +123,18 @@ export const mockOfflineData = {
       type: 'CRVS_OFFICE',
       partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
     },
+    'da672661-eb0a-437b-aa7a-a6d9a1711dd1': {
+      id: 'da672661-eb0a-437b-aa7a-a6d9a1711dd1',
+      name: 'Comilla Union Parishad',
+      alias: 'কুমিল্লা ইউনিয়ন পরিষদ',
+      physicalType: 'Building',
+      statisticalId: '456',
+      status: 'active',
+      type: 'CRVS_OFFICE',
+      partOf: 'Location/5926982b-845c-4463-80aa-cbfb86762e0a'
+    },
     '213ec5f3-e306-4f95-8058-f37893dbfbb6': {
-      id: '0d8474da-0361-4d32-979e-af91f012340a',
+      id: '213ec5f3-e306-4f95-8058-f37893dbfbb6',
       name: 'Chittagong Union Parishad',
       alias: 'চট্টগ্রাম ইউনিয়ন পরিষদ',
       physicalType: 'Building',

@@ -308,9 +308,11 @@ const UserReviewFormComponent = ({
   goToCreateUserSection,
   goToUserReviewForm
 }: IFullProps & IDispatchProps & IStateProps) => {
-  const { hasScope } = usePermissions()
-  const hasCreateUserScope = hasScope(SCOPES.USER_CREATE)
-  const hasUpdateUserScope = hasScope(SCOPES.USER_UPDATE)
+  const { hasAnyScope, canCreateUser } = usePermissions()
+  const hasUpdateUserScope = hasAnyScope([
+    SCOPES.USER_UPDATE,
+    SCOPES.USER_UPDATE_MY_JURISDICTION
+  ])
 
   let title: string | undefined
   let actionComponent: JSX.Element
@@ -399,7 +401,7 @@ const UserReviewFormComponent = ({
             intl,
             userId,
             hasUpdateUserScope,
-            hasCreateUserScope,
+            hasCreateUserScope: canCreateUser,
             userRoles,
             userDetails,
             offlineCountryConfiguration,

@@ -22,9 +22,11 @@ export const SEARCH_USERS = gql`
           firstNames
           familyName
         }
-        username
         mobile
         email
+        primaryOffice {
+          id
+        }
         role {
           id
           label {
@@ -88,6 +90,7 @@ export const GET_USER = gql`
   query getUser($userId: String!) {
     getUser(userId: $userId) {
       id
+      userMgntUserID
       name {
         use
         firstNames
