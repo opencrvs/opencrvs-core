@@ -30,6 +30,7 @@ import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
 import type { TranslationConfig } from '@opencrvs/commons/events'
+import { ReviewSection } from './ReviewSection'
 
 export function EventFormWizardIndex() {
   return (
@@ -181,17 +182,19 @@ function EventFormWizard() {
   const declareMutation = events.actions.declare()
 
   const page = pages[currentPage]
-  const fields = page.fields.map(
-    (field) =>
-      ({
-        name: field.id,
-        type: field.type,
-        required: true,
-        validator: [],
-        label: field.label,
-        initialValue: ''
-      } as IFormField)
-  )
+  const fields = !page
+    ? []
+    : page.fields.map(
+        (field) =>
+          ({
+            name: field.id,
+            type: field.type,
+            required: true,
+            validator: [],
+            label: field.label,
+            initialValue: ''
+          } as IFormField)
+      )
 
   return (
     <Frame
@@ -201,7 +204,7 @@ function EventFormWizard() {
       {modal}
       <FormWizard
         currentPage={currentPage}
-        totalPages={total}
+        totalPages={total + 1}
         onSubmit={() => {
           declareMutation.mutate({
             eventId: event.id,
@@ -210,19 +213,24 @@ function EventFormWizard() {
           })
           goToHome()
         }}
-        pageTitle={intl.formatMessage(page.title)}
+        pageTitle={page && intl.formatMessage(page.title)}
         onNextPage={next}
         onPreviousPage={previous}
       >
-        <FormFieldGenerator
-          id="locationForm"
-          setAllFieldsDirty={false}
-          onChange={(values) => {
-            setFormValues(values)
-          }}
-          formData={formValues}
-          fields={fields}
-        />
+        {currentPage < total && (
+          <FormFieldGenerator
+            id="locationForm"
+            setAllFieldsDirty={false}
+            onChange={(values) => {
+              setFormValues(values)
+            }}
+            formData={formValues}
+            fields={fields}
+          />
+        )}
+        {currentPage === total && (
+          <ReviewSection data={formValues} configuration={configuration} />
+        )}
       </FormWizard>
     </Frame>
   )
