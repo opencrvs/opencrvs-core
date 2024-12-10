@@ -189,7 +189,7 @@ describe('Certificate collector test for a birth registration without father det
           initialEntries: [
             '/',
             formatUrl(VERIFY_COLLECTOR, {
-              groupId: 'user-view-group',
+              groupId: 'certCollector',
               registrationId: birthDeclaration.id,
               eventType: birthDeclaration.event
             })
@@ -293,7 +293,7 @@ describe('Certificate collector test for a birth registration without father det
           path: CERTIFICATE_COLLECTOR,
           initialEntries: [
             formatUrl(CERTIFICATE_COLLECTOR, {
-              groupId: 'otherCollector',
+              groupId: 'certCollector',
               registrationId: birthDeclaration.id,
               eventType: birthDeclaration.event
             })
@@ -511,7 +511,7 @@ describe('Certificate collector test for a birth registration with father detail
           path: CERTIFICATE_COLLECTOR,
           initialEntries: [
             formatUrl(CERTIFICATE_COLLECTOR, {
-              groupId: 'collector',
+              groupId: 'certCollector',
               registrationId: birthDeclaration.id,
               eventType: birthDeclaration.event
             })
@@ -544,7 +544,7 @@ describe('Certificate collector test for a death registration', () => {
           path: CERTIFICATE_COLLECTOR,
           initialEntries: [
             formatUrl(CERTIFICATE_COLLECTOR, {
-              groupId: 'collector',
+              groupId: 'certCollector',
               registrationId: deathDeclaration.id,
               eventType: deathDeclaration.event
             })
@@ -594,7 +594,7 @@ describe('Certificate collector test for a marriage registration', () => {
           path: CERTIFICATE_COLLECTOR,
           initialEntries: [
             formatUrl(CERTIFICATE_COLLECTOR, {
-              groupId: 'collector',
+              groupId: 'certCollector',
               registrationId: marriageDeclaration.id,
               eventType: marriageDeclaration.event
             })
@@ -653,7 +653,7 @@ describe('Certificate collector test for a birth registration without father and
           path: CERTIFICATE_COLLECTOR,
           initialEntries: [
             formatUrl(CERTIFICATE_COLLECTOR, {
-              groupId: 'collector',
+              groupId: 'certCollector',
               registrationId: birthDeclaration.id,
               eventType: birthDeclaration.event
             })

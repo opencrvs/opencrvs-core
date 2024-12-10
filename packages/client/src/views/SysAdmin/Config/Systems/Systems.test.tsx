@@ -36,13 +36,9 @@ describe('render system integration', () => {
   beforeEach(async () => {
     const { store } = createStore()
 
-    const { component: testComponent } = await createTestComponent(
-      <SystemList />,
-      {
-        store
-      }
-    )
-    component = testComponent
+    ;({ component } = await createTestComponent(<SystemList />, {
+      store
+    }))
   })
 
   it('Render system integrations properly ', async () => {

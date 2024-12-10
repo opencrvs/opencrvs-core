@@ -72,7 +72,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
     const historyState = props.router.location.state
     this.state = {
       selectedLocation:
-        (historyState && historyState?.selectedLocation) || undefined
+        (historyState && historyState.selectedLocation) || undefined
     }
   }
 

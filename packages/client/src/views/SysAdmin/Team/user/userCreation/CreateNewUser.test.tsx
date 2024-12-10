@@ -39,6 +39,7 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Router } from '@sentry/react/types/types'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import { createMemoryRouter } from 'react-router-dom'
 import { Mock, describe, expect, vi } from 'vitest'
 
 const mockUsers = {
@@ -312,7 +313,7 @@ describe('create new user tests', () => {
 describe('edit user tests', () => {
   const { store } = createStore()
   let component: ReactWrapper<{}, {}>
-  let router: Router
+  let router: ReturnType<typeof createMemoryRouter>
   const submitMock: Mock = vi.fn()
 
   const graphqlMocks = [

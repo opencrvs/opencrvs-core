@@ -52,11 +52,11 @@ export const routesConfig = {
       ]
     },
     {
-      path: ROUTES.V2.EVENTS.CREATE.path,
+      path: ROUTES.V2.EVENTS.path,
       element: <EventSelection />
     },
     {
-      path: ROUTES.V2.EVENTS.CREATE.EVENT.path,
+      path: ROUTES.V2.EVENTS.DECLARE.EVENT.path,
       element: <EventFormWizardIndex />
     }
   ]

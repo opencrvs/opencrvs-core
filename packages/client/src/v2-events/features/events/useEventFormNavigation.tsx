@@ -88,5 +88,5 @@ export const useEventFormNavigation = () => {
     }
   }
 
-  return { exit, modal }
+  return { exit, modal, goToHome }
 }

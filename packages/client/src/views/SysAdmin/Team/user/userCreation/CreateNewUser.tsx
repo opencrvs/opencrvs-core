@@ -82,7 +82,8 @@ const SpinnerWrapper = styled.div`
   flex-direction: column;
   align-items: center;
 `
-
+// @TODO: Reverted back to class component, with react router update, the flow stopped working.
+// After merging the router fix, revert back to functional component and investigate the issue.
 class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
   async componentDidMount() {
     const { userId, client } = this.props

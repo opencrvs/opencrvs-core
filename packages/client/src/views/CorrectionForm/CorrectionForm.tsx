@@ -85,7 +85,7 @@ function FormSection({
   }
 }
 
-function mapStateToProps(state: IStoreState, props: IRouteProps) {
+function mapStateToProps(state: IStoreState, props: RouteComponentProps) {
   const { declarationId, pageId: sectionId } = props.router.match.params
   const declaration = state.declarationsState.declarations.find(
     ({ id }) => id === declarationId
@@ -103,13 +103,8 @@ type IDispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
 }
 
-type IRouteProps = RouteComponentProps<{
-  declarationId?: string
-  pageId?: string
-}>
-
 export const CorrectionForm = withRouter(
-  connect<IStateProps, IDispatchProps, IRouteProps, IStoreState>(
+  connect<IStateProps, IDispatchProps, RouteComponentProps, IStoreState>(
     mapStateToProps,
     { modifyDeclaration }
   )(CorrectionFormComponent)

@@ -10,21 +10,7 @@
  */
 
 import { z } from 'zod'
-
-/**
- * Event statuses recognized by the system
- */
-export const EventStatus = {
-  CREATED: 'CREATED',
-  NOTIFIED: 'NOTIFIED',
-  DECLARED: 'DECLARED',
-  REGISTERED: 'REGISTERED',
-  CERTIFIED: 'CERTIFIED'
-} as const
-export const eventStatuses = Object.values(EventStatus)
-export type EventStatus = (typeof eventStatuses)[number]
-
-export const EventStatuses = z.nativeEnum(EventStatus)
+import { EventStatuses } from './EventMetadata'
 
 export const EventIndex = z.object({
   id: z.string(),

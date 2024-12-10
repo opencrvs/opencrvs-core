@@ -151,7 +151,7 @@ function submitSuccess(
   return {
     type: SUBMIT_USER_FORM_DATA_SUCCESS,
     payload: {
-      isUpdate: !!isUpdate,
+      isUpdate,
       onSuccess
     }
   }

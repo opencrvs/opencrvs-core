@@ -58,7 +58,6 @@ type Props = OwnProps &
   RouteComponentProps<{
     authenticated: boolean
     userDetailsFetched: boolean
-    userDetails: UserDetails | null
   }>
 
 class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
@@ -252,7 +251,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
 const mapStateToProps = (store: IStoreState) => {
   return {
     authenticated: getAuthenticated(store),
-    userDetails: store.profile.userDetails,
     userDetailsFetched: store.profile.userDetailsFetched
   }
 }

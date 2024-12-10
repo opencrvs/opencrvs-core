@@ -15,7 +15,7 @@ import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { Provider } from 'react-redux'
-import { RouterProvider, createBrowserRouter, Outlet } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 
 import * as React from 'react'
@@ -376,6 +376,7 @@ export const routesConfig = [
     ]
   }
 ]
+
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
   store: AppStore

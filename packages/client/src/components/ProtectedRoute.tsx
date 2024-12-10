@@ -19,7 +19,6 @@ import { HOME } from '@client/navigation/routes'
 
 interface IProps {
   roles?: SystemRoleType[]
-  exact?: boolean
 }
 
 /**

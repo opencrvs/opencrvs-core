@@ -104,7 +104,7 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = (declarationId: string) => {
+export const usePrintableCertificate = (declarationId?: string) => {
   const navigate = useNavigate()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
@@ -221,6 +221,11 @@ export const usePrintableCertificate = (declarationId: string) => {
 
       dispatch(modifyDeclaration(updatedDeclaration))
       dispatch(writeDeclaration(updatedDeclaration))
+    }
+
+    if (!declarationId) {
+      console.error('No declaration id provided')
+      return
     }
 
     navigate(

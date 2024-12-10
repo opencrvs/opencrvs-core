@@ -26,12 +26,13 @@ export const ROUTES = {
           EVENT: route(':eventId', {
             params: { eventId: string().defined() }
           }),
-          CREATE: route(
-            'create',
+
+          DECLARE: route(
+            'declare',
             {},
             {
-              EVENT: route(':eventType', {
-                params: { eventType: string().defined() }
+              EVENT: route(':eventId', {
+                params: { eventId: string().defined() }
               })
             }
           )

@@ -15,9 +15,10 @@ import { z } from 'zod'
 
 import {
   DeclareActionInput,
+  EventIndex,
   EventInput,
   NotifyActionInput
-} from '@events/schema'
+} from '@opencrvs/commons/events'
 import { getEventsConfig } from './service/config/config'
 import {
   addAction,
@@ -28,7 +29,6 @@ import {
 } from './service/events'
 import { EventConfig } from '@opencrvs/commons'
 import { getIndexedEvents } from './service/indexing/indexing'
-import { EventIndices } from './schema/EventIndex'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -100,7 +100,7 @@ export const appRouter = router({
     })
   }),
   events: router({
-    get: publicProcedure.output(EventIndices).query(async () => {
+    get: publicProcedure.output(z.array(EventIndex)).query(async () => {
       return getIndexedEvents()
     })
   })

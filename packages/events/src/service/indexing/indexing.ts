@@ -11,16 +11,19 @@
 
 const EVENTS_INDEX = 'events'
 
-import { ActionDocument, CreatedAction, EventDocument } from '@events/schema'
 import {
+  ActionDocument,
+  CreatedAction,
+  EventDocument,
   EventIndex,
-  EventIndices,
   EventStatus
-} from '@events/schema/EventIndex'
+} from '@opencrvs/commons/events'
+
 import { getClient } from '@events/storage'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { type estypes } from '@elastic/elasticsearch'
 import { Transform } from 'stream'
+import { z } from 'zod'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
@@ -155,5 +158,5 @@ export async function getIndexedEvents() {
     request_cache: false
   })
 
-  return EventIndices.parse(response.hits.hits.map((hit) => hit._source))
+  return z.array(EventIndex).parse(response.hits.hits.map((hit) => hit._source))
 }

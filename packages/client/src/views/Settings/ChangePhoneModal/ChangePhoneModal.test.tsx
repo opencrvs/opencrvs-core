@@ -54,8 +54,8 @@ const graphqlMocks = [
 describe('Change phone modal tests', () => {
   let component: ReactWrapper
   const onSuccessMock = vi.fn()
-  const { history } = createRouterProps('/settings')
-  const { store } = createStore(history)
+
+  const { store } = createStore()
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 

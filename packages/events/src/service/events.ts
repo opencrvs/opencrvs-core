@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionInput, EventInput } from '@events/schema'
-import { EventDocument } from '@events/schema/EventDocument'
+import {
+  EventDocument,
+  ActionInput,
+  EventInput
+} from '@opencrvs/commons/events'
+
 import { getClient } from '@events/storage/mongodb'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
@@ -82,7 +86,7 @@ export async function createEvent(
         data: {}
       }
     ]
-  })
+  } satisfies EventDocument)
 
   const event = await getEventById(id)
   await indexEvent(event)

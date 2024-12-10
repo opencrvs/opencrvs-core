@@ -19,9 +19,8 @@ import {
 } from '@tanstack/react-query-persist-client'
 import { httpLink, loggerLink } from '@trpc/client'
 import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
-import React, { useEffect } from 'react'
+import React from 'react'
 import superjson from 'superjson'
-import { preloadData } from './features/events/useEvents'
 
 export const api = createTRPCReact<AppRouter>()
 
@@ -77,8 +76,9 @@ function createIDBPersister(idbValidKey = 'reactQuery') {
 }
 
 const trpcClient = getTrpcClient()
-const queryClient = getQueryClient()
 const persister = createIDBPersister()
+
+export const queryClient = getQueryClient()
 
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
 
@@ -91,10 +91,6 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
 }))
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    preloadData()
-  }, [])
-
   return (
     <PersistQueryClientProvider
       client={queryClient}
@@ -111,8 +107,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         maxAge: 1000 * 60 * 60 * 4,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
-          shouldDehydrateMutation: () => {
-            return true
+          shouldDehydrateMutation: (mut) => {
+            return mut.state.status !== 'success'
           }
         }
       }}
