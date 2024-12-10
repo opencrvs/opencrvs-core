@@ -16,9 +16,10 @@ import { EventDocument } from '@opencrvs/commons/client'
 import { hashKey, QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
 
-export function preloadData() {
-  utils.config.get.ensureData()
-}
+// @todo
+// export function preloadData() {
+//   utils.config.get.ensureData()
+// }
 
 function getCanonicalEventId(
   events: EventDocument[],
