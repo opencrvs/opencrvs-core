@@ -9,18 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { vi } from 'vitest'
-import {
-  resetServer as resetMongoServer,
-  setupServer as setupMongoServer
-} from './storage/__mocks__/mongodb'
+import { resetServer as resetMongoServer } from '@events/storage/__mocks__/mongodb'
 
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   resetServer as resetESServer,
   setupServer as setupESServer
-} from './storage/__mocks__/elasticsearch'
+} from '@events/storage/__mocks__/elasticsearch'
 
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
+vi.mock('@events/service/config/config', () => ({
+  getEventsConfig: () => Promise.all([tennisClubMembershipEvent])
+}))
 
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
+beforeAll(() => Promise.all([setupESServer()]), 100000)
 afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))

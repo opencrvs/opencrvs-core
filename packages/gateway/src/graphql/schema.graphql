@@ -219,6 +219,11 @@ type Mutation {
   ): ID!
   confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
   rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
+  upsertRegistrationIdentifier(
+    id: ID!
+    identifierType: String!
+    identifierValue: String!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -734,7 +739,6 @@ type Reinstated {
 
 input ConfirmRegistrationInput {
   registrationNumber: String!
-  error: String
   identifiers: [IdentifierInput!]
 }
 
@@ -1189,7 +1193,6 @@ enum SystemType {
 }
 
 enum IntegratingSystemType {
-  MOSIP
   OTHER
 }
 
@@ -1702,35 +1705,12 @@ type RegisterAction {
   data: [Field!]!
   identifiers: Identifiers!
 }
-enum AttachmentInputStatus {
-  approved
-  validated
-  deleted
-}
 
 type NotifyAction {
   type: String!
   createdAt: DateTime!
   createdBy: String!
   data: [Field!]!
-}
-
-enum PaymentType {
-  MANUAL
-}
-
-enum PaymentOutcomeType {
-  COMPLETED
-  ERROR
-  PARTIAL
-}
-
-scalar FieldValue
-
-input ContactPointInput {
-  system: TelecomSystem
-  value: String
-  use: TelecomUse
 }
 
 type DeclareAction {
@@ -1763,21 +1743,6 @@ input ContactPointInput {
   system: TelecomSystem
   value: String
   use: TelecomUse
-}
-
-input AddressInput {
-  use: AddressUse
-  type: AddressType
-  text: String
-  line: [String!]
-  city: String
-  district: String
-  state: String
-  postalCode: String
-  country: String
-  from: Date
-  to: Date
-  partOf: String
 }
 
 input AddressInput {
