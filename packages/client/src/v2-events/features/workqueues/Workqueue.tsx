@@ -11,7 +11,6 @@
 
 import {
   Workqueue as WorkqueueComponent,
-  COLUMNS,
   SORT_ORDER,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
@@ -19,7 +18,7 @@ import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import { WorkqueueConfig } from '@opencrvs/commons'
-import { constantsMessages, messages } from '@client/v2-events/messages'
+import { messages } from '@client/v2-events/messages'
 import styled, { useTheme } from 'styled-components'
 import orderBy from 'lodash-es/orderBy'
 import { WQContentWrapper } from './components/ContentWrapper'
@@ -29,10 +28,10 @@ import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { ROUTES } from '@client/v2-events/routes'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { Link } from 'react-router-dom'
-import { EventIndex } from '@events/schema/EventIndex'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import mapKeys from 'lodash-es/mapKeys'
 import get from 'lodash-es/get'
+import { EventIndex } from '@opencrvs/commons/client'
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.

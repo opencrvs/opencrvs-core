@@ -18,8 +18,11 @@ import { EventSummary } from './components/EventSummary'
 import { EventHistory } from './components/EventHistory'
 
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { SummaryConfig } from '@opencrvs/commons'
-import { ActionDocument, EventIndex } from '@events/schema'
+import {
+  ActionDocument,
+  EventIndex,
+  SummaryConfig
+} from '@opencrvs/commons/client'
 import { useSelector } from 'react-redux'
 // eslint-disable-next-line no-restricted-imports
 import { getUserDetails } from '@client/profile/profileSelectors'
