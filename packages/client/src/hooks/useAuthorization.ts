@@ -70,6 +70,16 @@ export function usePermissions() {
 
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
 
+  const canSearchRecords = () =>
+    hasAnyScope([
+      SCOPES.SEARCH_BIRTH,
+      SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+      SCOPES.SEARCH_DEATH,
+      SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+      SCOPES.SEARCH_MARRIAGE,
+      SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+    ])
+
   const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
     if (!userPrimaryOffice?.id) {
       return false
@@ -200,6 +210,7 @@ export function usePermissions() {
     hasScope,
     hasAnyScope,
     isRecordActionable,
+    canSearchRecords,
     canPrintRecord,
     canIssueRecord,
     canReadUser,
