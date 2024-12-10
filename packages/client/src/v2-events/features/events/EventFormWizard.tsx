@@ -29,7 +29,6 @@ import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
 export function EventFormWizardIndex() {
   return (

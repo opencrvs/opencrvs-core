@@ -52,7 +52,7 @@ export const routesConfig = {
       ]
     },
     {
-      path: ROUTES.V2.EVENTS.path,
+      path: ROUTES.V2.EVENTS.CREATE.path,
       element: <EventSelection />
     },
     {

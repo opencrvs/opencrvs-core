@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventStatus } from '@events/schema/EventIndex'
 import { route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import { z } from 'zod'
@@ -26,7 +25,7 @@ export const ROUTES = {
           EVENT: route(':eventId', {
             params: { eventId: string().defined() }
           }),
-
+          CREATE: route('create'),
           DECLARE: route(
             'declare',
             {},
