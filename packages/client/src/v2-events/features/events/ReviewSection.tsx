@@ -351,7 +351,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                     >
                       <Accordion
                         name={'Accordion_' + page.id}
-                        label={page.id}
+                        label={intl.formatMessage(page.title)}
                         labelForHideAction="Hide"
                         labelForShowAction="Show"
                         action={
@@ -366,7 +366,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                             <ListReview.Row
                               id={field.id}
                               key={field.id}
-                              label={field.label.defaultMessage}
+                              label={intl.formatMessage(field.label)}
                               value={data[field.id] || ''}
                               actions={
                                 <Link
