@@ -14,34 +14,16 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from 'styled-components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-// eslint-disable-next-line no-restricted-imports
-import {
-  getPageItems,
-  getStatusLabel,
-  isFlaggedAsPotentialDuplicate,
-  isSystemInitiated,
-  isVerifiedAction
-} from '@client/views/RecordAudit/utils'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
-import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
-import { getIndividualNameObj } from '@client/utils/userUtils'
-import { AvatarSmall } from '@client/components/Avatar'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { useIntl } from 'react-intl'
-import { Box } from '@opencrvs/components/lib/icons/Box'
-import { v4 as uuid } from 'uuid'
-import { History, Avatar, RegStatus, SystemType } from '@client/utils/gateway'
 import { Link } from '@opencrvs/components'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { getLocalizedLocationName } from '@client/utils/locationUtils'
-import { getUserRole } from '@client/utils'
 import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'query-string'
 import { constantsMessages } from '@client/v2-events/messages'
-import { ActionDocument } from '@events/schema'
+// eslint-disable-next-line no-restricted-imports
 import { ProfileState } from '@client/profile/profileReducer'
+import { ActionDocument } from '@opencrvs/commons/client'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -49,14 +31,6 @@ import { ProfileState } from '@client/profile/profileReducer'
 
 const TableDiv = styled.div`
   overflow: auto;
-`
-
-const LargeGreyedInfo = styled.div`
-  height: 231px;
-  background-color: ${({ theme }) => theme.colors.grey200};
-  max-width: 100%;
-  border-radius: 4px;
-  margin: 15px 0px;
 `
 
 const NameAvatar = styled.div`
@@ -67,125 +41,29 @@ const NameAvatar = styled.div`
   }
 `
 
-const HealthSystemLogo = styled.div`
-  border-radius: 100%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-  justify-content: center;
-  background-color: ${({ theme }) => theme.colors.grey200};
-`
-
-function SystemUser({ name }: { name?: string }) {
-  const intl = useIntl()
-  return (
-    <NameAvatar>
-      <HealthSystemLogo />
-      <span>
-        {/* {Boolean(name) ? name : intl.formatMessage(userMessages.system)} */}
-        {Boolean(name) ? name : 'system user'}
-      </span>
-    </NameAvatar>
-  )
-}
-
-function HealthSystemUser({ name }: { name?: string }) {
-  const intl = useIntl()
-  return (
-    <NameAvatar>
-      <HealthSystemLogo>
-        <Box />
-      </HealthSystemLogo>
-      {/* <span>{name ?? intl.formatMessage(userMessages.healthSystem)}</span> */}
-      <span>{name ?? 'health system user'}</span>
-    </NameAvatar>
-  )
-}
-
-const GetNameWithAvatar = ({
-  nameObject,
-  avatar,
-  language
-}: {
-  id: string
-  nameObject: Array<GQLHumanName | null>
-  avatar: Avatar
-  language: string
-}) => {
-  // const nameObj = getIndividualNameObj(nameObject, language)
-  // const userName = nameObj
-  //   ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-  //   : ''
-
+const GetNameWithAvatar = () => {
   const userName = 'Unknown registar'
 
   return (
     <NameAvatar>
-      <AvatarSmall avatar={avatar} name={userName} />
       <span>{userName}</span>
     </NameAvatar>
   )
 }
 
-function getSystemType(type: string | undefined) {
-  if (type === SystemType.RecordSearch) {
-    return 'record search'
-  }
-  return 'health system'
-}
-
-const getIndexByAction = (histories: any, index: number): number => {
-  const newHistories = [...histories]
-  if (
-    newHistories[index].action ||
-    !['ISSUED', 'CERTIFIED'].includes(newHistories[index].regStatus)
-  ) {
-    return -1
-  }
-
-  newHistories.map((item) => {
-    item.uuid = uuid()
-    return item
-  })
-
-  const uid = newHistories[index].uuid
-  const actionIndex = newHistories
-    .filter(
-      (item) =>
-        item.action === newHistories[index].action &&
-        (item.regStatus === 'ISSUED' || item.regStatus === 'CERTIFIED')
-    )
-    .findIndex((item) => item.uuid === uid)
-
-  return actionIndex
-}
-
 export const EventHistory = ({
   history,
-  user,
-  toggleActionDetails
+  user
 }: {
   history: ActionDocument[]
-  toggleActionDetails: any
   user: ProfileState['userDetails']
-} & {
-  toggleActionDetails: (actionItem: History, index?: number) => void
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
 
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const isFieldAgent =
-    user?.systemRole && FIELD_AGENT_ROLES.includes(user.systemRole)
-      ? true
-      : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
-  const sortedHistory = history
-
-  const historyData = history.map((item, index) => ({
+  const historyRows = history.map((item) => ({
     date: formatLongDate(
       item?.createdAt.toLocaleString(),
       intl.locale,
@@ -196,11 +74,7 @@ export const EventHistory = ({
       <Link
         font="bold14"
         onClick={() => {
-          const actionIndex = getIndexByAction(
-            sortedHistory,
-            index + (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE
-          )
-          toggleActionDetails(item, actionIndex)
+          window.alert('not implemented')
         }}
       >
         {item.type}
@@ -218,12 +92,7 @@ export const EventHistory = ({
           )
         }
       >
-        <GetNameWithAvatar
-          id={item?.createdBy}
-          nameObject={[null]}
-          avatar={null as any}
-          language={window.config.LANGUAGES}
-        />
+        <GetNameWithAvatar />
       </Link>
     )
   }))
@@ -269,19 +138,10 @@ export const EventHistory = ({
           fixedWidth={1088}
           noResultText=""
           columns={columns}
-          content={historyData}
+          content={historyRows}
           highlightRowOnMouseOver
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
-        {/* {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
-          <Pagination
-            currentPage={currentPageNumber}
-            totalPages={Math.ceil(
-              allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-            )}
-            onPageChange={onPageChange}
-          />
-        )} */}
       </TableDiv>
     </>
   )
