@@ -54,7 +54,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
@@ -361,9 +361,9 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         ''
 
       const eventTime =
-        draft.event === Event.Birth
+        draft.event === EventType.Birth
           ? draft.data.child?.childBirthDate || ''
-          : draft.event === Event.Death
+          : draft.event === EventType.Death
           ? draft.data.deathEvent?.deathDate || ''
           : draft.data.marriageEvent?.marriageDate || ''
 

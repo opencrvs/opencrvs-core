@@ -1,0 +1,17 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+export const V2_ROOT_ROUTE = '/v2'
+export const V2_EVENTS_ROUTE = `${V2_ROOT_ROUTE}/events`
+export const V2_DECLARE_ACTION_ROUTE = '/v2/events/declare/:eventId'
+export const V2_DECLARE_ACTION_ROUTE_WITH_PAGE =
+  '/v2/events/declare/:eventId/:pageId'
+export const V2_DECLARE_ACTION_REVIEW_ROUTE = `${V2_EVENTS_ROUTE}/declare/:eventId/review`

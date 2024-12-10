@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { IDataPoint, LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -24,7 +24,7 @@ interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
-  eventType?: Event
+  eventType?: EventType
   completenessRateTime?: CompletenessRateTime
 }
 
@@ -278,7 +278,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
                     messages.performanceWithinTargetDaysLabel,
                     {
                       target:
-                        eventType === Event.Birth
+                        eventType === EventType.Birth
                           ? window.config.BIRTH.REGISTRATION_TARGET
                           : window.config.DEATH.REGISTRATION_TARGET,
                       withPrefix: false

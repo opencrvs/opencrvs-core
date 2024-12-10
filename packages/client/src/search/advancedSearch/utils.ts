@@ -70,6 +70,7 @@ const baseKeysSameAsStore = [
   'eventLocationLevel3',
   'eventLocationLevel4',
   'eventLocationLevel5',
+  'eventLocationLevel6',
   'childFirstNames',
   'childLastName',
   'childGender',
@@ -115,6 +116,7 @@ export interface IAdvancedSearchFormState {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: IDateRangePickerValue
@@ -609,10 +611,11 @@ const getLabelForRegistrationStatus = (
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
     DECLARED: [RegStatus.Declared],
     IN_PROGRESS: [RegStatus.InProgress],
-    REGISTERED: [RegStatus.Registered],
+    REGISTERED: [RegStatus.Registered, RegStatus.Issued, RegStatus.Certified],
     REJECTED: [RegStatus.Rejected],
     VALIDATED: [RegStatus.Validated],
-    WAITING_VALIDATION: [RegStatus.WaitingValidation]
+    WAITING_VALIDATION: [RegStatus.WaitingValidation],
+    CORRECTION_REQUESTED: [RegStatus.CorrectionRequested]
   }
   const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
@@ -648,6 +651,16 @@ const getLabelForRegistrationStatus = (
     {
       value: RegStatus.Archived,
       label: intl.formatMessage(advancedSearchForm.recordStatusAchived)
+    },
+    {
+      value: RegStatus.CorrectionRequested,
+      label: intl.formatMessage(
+        advancedSearchForm.recordStatusCorrectionRequested
+      )
+    },
+    {
+      value: RegStatus.Validated,
+      label: intl.formatMessage(advancedSearchForm.recordStatusValidated)
     }
   ]
 
@@ -710,6 +723,12 @@ export const getFormattedAdvanceSearchParamPills = (
   intl: IntlShape,
   offlineData: IOfflineData
 ): pillKeyValueMap => {
+  const pillLabelFromTimePeriod = {
+    [TIME_PERIOD.LAST_90_DAYS]: advancedSearchForm.timePeriodLast90Days,
+    [TIME_PERIOD.LAST_30_DAYS]: advancedSearchForm.timePeriodLast30Days,
+    [TIME_PERIOD.LAST_7_DAYS]: advancedSearchForm.timePeriodLast7Days,
+    [TIME_PERIOD.LAST_YEAR]: advancedSearchForm.timePeriodLastYear
+  }
   const intlFormattedMapOfParams: pillKeyValueMap = {
     event:
       advancedSearchParamsState.event === 'birth'
@@ -725,7 +744,13 @@ export const getFormattedAdvanceSearchParamPills = (
           )
         : '',
 
-    timePeriodFrom: advancedSearchParamsState.timePeriodFrom,
+    timePeriodFrom:
+      advancedSearchParamsState.timePeriodFrom &&
+      intl.formatMessage(
+        pillLabelFromTimePeriod[
+          advancedSearchParamsState.timePeriodFrom as TIME_PERIOD
+        ]
+      ),
     trackingId: advancedSearchParamsState.trackingId,
     regNumber: advancedSearchParamsState.registrationNumber,
     childFirstName: advancedSearchParamsState.childFirstNames,

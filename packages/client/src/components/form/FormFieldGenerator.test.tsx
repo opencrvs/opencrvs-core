@@ -29,7 +29,7 @@ import {
   DATE,
   NUMBER
 } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { countries } from '@client/utils/countries'
 import { OFFLINE_LOCATIONS_KEY } from '@client/offline/reducer'
 import { formMessages } from '@client/i18n/messages'
@@ -42,7 +42,7 @@ describe('form component', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createDeclaration(Event.Birth)
+    const draft = createDeclaration(EventType.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = vi.fn()
     component = await createTestComponent(
@@ -216,7 +216,7 @@ describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createDeclaration(Event.Birth)
+    const draft = createDeclaration(EventType.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = vi.fn()
     component = await createTestComponent(
@@ -258,7 +258,7 @@ describe('when field definition has nested fields', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createDeclaration(Event.Birth)
+    const draft = createDeclaration(EventType.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = vi.fn()
     component = await createTestComponent(

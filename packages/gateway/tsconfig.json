@@ -3,7 +3,8 @@
     "skipLibCheck": true,
     "baseUrl": "./src",
     "paths": {
-      "@gateway/*": ["./*"]
+      "@gateway/*": ["./*"],
+      "@events/*": ["../../events/src/*"]
     },
     "target": "es6",
     "module": "node16",

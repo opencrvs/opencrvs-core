@@ -85,17 +85,36 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Extract dependencies for ${{ matrix.package }}
+        if: steps.check-scripts.outputs.skip != 'true'
+        id: extract-dependencies
+        run: |
+          DEPENDENCIES=$(node -e "
+            const { execSync } = require('child_process');
+            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
+            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+
+            const getDependencies = (pkg) =>
+              json[pkg].workspaceDependencies.concat(
+                json[pkg].workspaceDependencies.flatMap(getDependencies)
+              );
+
+            console.log(
+              getDependencies('${{ matrix.package }}').join(' ')
+            );
+          ")
+          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
+          echo "Found dependencies: $DEPENDENCIES"
+
       - name: Remove other package directories
         if: steps.check-scripts.outputs.skip != 'true'
         run: |
           for dir in packages/*; do
-            if [ "$dir" != "${{ matrix.package }}" ] && [ "$dir" != "packages/commons" ] && [ "$dir" != "packages/components" ]; then
-              if [ "${{ matrix.package }}" == "packages/client" ] && [ "$dir" == "packages/gateway" ] ; then
-                echo "Skipping $dir"
-              else
-                echo "Removing $dir"
-                rm -rf "$dir"
-              fi
+            if echo "${{ matrix.package }} $DEPENDENCIES" | grep -q -w "$dir"; then
+              echo "Skipping $dir"
+            else
+              echo "Removing $dir"
+              rm -rf "$dir"
             fi
           done
 
@@ -119,15 +138,13 @@ jobs:
 
       # TODO: Move out of the matrix to be built once and shared
       - name: Build common package
-        if: steps.check-scripts.outputs.skip != 'true'
+        if: steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
         run: cd packages/commons && yarn build
 
       - name: Build components client and login
-        if: steps.check-scripts.outputs.skip != 'true'
+        if: steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
         run: |
-          if [[ "${{ matrix.package }}" == "packages/client" || "${{ matrix.package }}" == "packages/login" ]]; then
-            cd packages/components && yarn build
-          fi
+          cd packages/components && yarn build
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
@@ -166,7 +183,7 @@ jobs:
       - name: Run knip on base branch
         id: knip_base
         run: |
-          npx knip --no-exit-code --exports --reporter=markdown > knip_report.md
+          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown > knip_report.md
           TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
           echo "Total $TOTAL issue(s) on base branch."
           echo "total=${TOTAL}" >> $GITHUB_OUTPUT
@@ -175,7 +192,7 @@ jobs:
       - name: Run knip on PR branch
         id: knip_pr
         run: |
-          npx knip --no-exit-code --exports --reporter=markdown > knip_report.md
+          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown > knip_report.md
           TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
           echo "Total $TOTAL issue(s) on PR branch."
           echo "total=${TOTAL}" >> $GITHUB_OUTPUT

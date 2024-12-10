@@ -9,27 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import {
-  DangerButton,
-  PrimaryButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { useDispatch } from 'react-redux'
-import { Icon, ResponsiveModal } from '@opencrvs/components'
-import {
-  goToCertificateCorrection,
-  goToHome,
-  goToIssueCertificate,
-  goToPage,
-  goToPrintCertificate,
-  goToViewRecordPage
-} from '@client/navigation'
-import { useIntl } from 'react-intl'
-import { Scope } from '@sentry/react'
-import { IDeclarationData } from './utils'
 import {
   clearCorrectionAndPrintChanges,
   deleteDeclaration,
@@ -38,21 +17,6 @@ import {
   SUBMISSION_STATUS,
   unassignDeclaration
 } from '@client/declarations'
-import { CorrectionSection } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  DRAFT_MARRIAGE_FORM_PAGE,
-  REVIEW_CORRECTION,
-  REVIEW_EVENT_PARENT_FORM_PAGE
-} from '@client/navigation/routes'
-import { messages } from '@client/i18n/messages/views/action'
-import { useModal } from '@client/hooks/useModal'
-import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
-import { client } from '@client/utils/apolloClient'
-import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   canBeCorrected,
   isArchivable,
@@ -64,7 +28,43 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { EVENT } from '@opencrvs/commons/client'
+import { CorrectionSection } from '@client/forms'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/action'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import {
+  goToCertificateCorrection,
+  goToHome,
+  goToIssueCertificate,
+  goToPage,
+  goToPrintCertificate,
+  goToViewRecordPage
+} from '@client/navigation'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
+import { client } from '@client/utils/apolloClient'
+import { EventType } from '@client/utils/gateway'
+import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
+import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
+import { Icon, ResponsiveModal } from '@opencrvs/components'
+import {
+  DangerButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
+import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
+import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
+import { Scope } from '@sentry/react'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { useDispatch } from 'react-redux'
+import { IDeclarationData } from './utils'
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
   scope: Scope
@@ -238,7 +238,7 @@ const CorrectRecordAction: React.FC<
   const intl = useIntl()
 
   const isBirthOrDeathEvent =
-    type && [EVENT.BIRTH, EVENT.DEATH].includes(type as EVENT)
+    type && [EventType.Birth, EventType.Death].includes(type as EventType)
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =

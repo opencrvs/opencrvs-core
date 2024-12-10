@@ -8,37 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const HOST = process.env.HOST || '0.0.0.0'
-export const PORT = process.env.PORT || 5050
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
-export const APPLICATION_CONFIG_URL =
-  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 
-export const NOTIFICATION_SERVICE_URL =
-  process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
+import { env } from '@workflow/environment'
 
-export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
-export const WEBHOOKS_URL = process.env.WEBHOOKS_URL || 'http://localhost:2525/'
-export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050/'
+export const HOST = env.HOST
+export const PORT = env.PORT
+export const FHIR_URL = env.FHIR_URL
+export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
 
-export const COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const DOCUMENTS_URL =
-  process.env.DOCUMENTS_URL || 'http://localhost:9050'
-export const USER_MANAGEMENT_URL =
-  process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
+export const NOTIFICATION_SERVICE_URL = env.NOTIFICATION_SERVICE_URL
+
+export const SEARCH_URL = env.SEARCH_URL
+export const WEBHOOKS_URL = env.WEBHOOKS_URL
+export const METRICS_URL = env.METRICS_URL
+
+export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
+export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
+export const DOCUMENTS_URL = env.DOCUMENTS_URL
+export const USER_MANAGEMENT_URL = env.USER_MANAGEMENT_URL
 export const SENTRY_DSN = process.env.SENTRY_DSN
-export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040/'
+export const AUTH_URL = env.AUTH_URL
+export const DEFAULT_TIMEOUT = 600000
 
 function getAvailableLanguages() {
-  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,fr'
-  return LANGUAGES.split(',')
+  return env.LANGUAGES.split(',')
 }
 
 export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
-export const DEFAULT_TIMEOUT = 600000

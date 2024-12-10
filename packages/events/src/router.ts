@@ -9,10 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
 
+import {
+  DeclareActionInput,
+  EventInput,
+  NotifyActionInput
+} from '@opencrvs/commons/events'
+import { getEventsConfig } from './service/config/config'
 import {
   addAction,
   createEvent,
@@ -20,9 +26,19 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
-import { ActionInput, EventInput } from '@opencrvs/commons'
+import { EventConfig } from '@opencrvs/commons'
 
-export const t = initTRPC.create({
+const ContextSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    primaryOfficeId: z.string()
+  }),
+  token: z.string()
+})
+
+type Context = z.infer<typeof ContextSchema>
+
+export const t = initTRPC.context<Context>().create({
   transformer: superjson
 })
 
@@ -35,17 +51,33 @@ const publicProcedure = t.procedure
 export type AppRouter = typeof appRouter
 
 export const appRouter = router({
+  config: router({
+    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
+      return getEventsConfig(options.ctx.token)
+    })
+  }),
   event: router({
-    create: publicProcedure
-      .input(
-        z.object({
-          transactionId: z.string(),
-          event: EventInput
+    create: publicProcedure.input(EventInput).mutation(async (options) => {
+      const config = await getEventsConfig(options.ctx.token)
+
+      const eventIds = config.map((c) => c.id)
+
+      if (!eventIds.includes(options.input.type)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Invalid event type ${
+            options.input.type
+          }. Valid event types are: ${eventIds.join(', ')}`
         })
+      }
+
+      return createEvent(
+        options.input,
+        options.ctx.user.id,
+        options.ctx.user.primaryOfficeId,
+        options.input.transactionId
       )
-      .mutation(async (options) => {
-        return createEvent(options.input.event, options.input.transactionId)
-      }),
+    }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
       return patchEvent(options.input)
     }),
@@ -53,16 +85,18 @@ export const appRouter = router({
       return getEventById(input)
     }),
     actions: router({
-      create: publicProcedure
-        .input(
-          z.object({
-            eventId: z.string(),
-            action: ActionInput
-          })
-        )
-        .mutation(async (options) => {
-          return addAction(options.input.eventId, options.input.action)
+      notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
         })
+      }),
+      declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
+        })
+      })
     })
   })
 })

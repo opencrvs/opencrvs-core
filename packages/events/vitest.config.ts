@@ -13,6 +13,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    globals: true
+    globals: true,
+    testTimeout: 60000,
+    hookTimeout: 60000,
+    setupFiles: ['./src/tests/setup.ts'],
+    globalSetup: ['./src/tests/global-setup.ts']
   }
 })

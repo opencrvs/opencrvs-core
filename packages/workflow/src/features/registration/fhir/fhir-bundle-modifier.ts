@@ -23,7 +23,8 @@ import {
   findExtension,
   getResourceFromBundleById,
   resourceIdentifierToUUID,
-  SupportedPatientIdentifierCode
+  SupportedPatientIdentifierCode,
+  ValidRecord
 } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
@@ -37,6 +38,7 @@ import {
 } from '@workflow/features/registration/fhir/fhir-utils'
 import { getPractitionerRef } from '@workflow/features/user/utils'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
+import { isEqual } from 'lodash'
 import fetch from 'node-fetch'
 
 export async function invokeRegistrationValidation(
@@ -201,6 +203,50 @@ export function updatePatientIdentifierWithRN(
         value: registrationNumber
       })
     }
+    return patient
+  })
+}
+
+export function upsertPatientIdentifiers(
+  record: ValidRecord,
+  composition: Composition,
+  sectionCodes: string[],
+  identifiers: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
+): Saved<Patient>[] {
+  return sectionCodes.map((sectionCode) => {
+    const sectionEntry = getSectionEntryBySectionCode(composition, sectionCode)
+    const patientId = resourceIdentifierToUUID(
+      sectionEntry.reference as ResourceIdentifier
+    )
+    const patient = getResourceFromBundleById<Patient>(record, patientId)
+
+    if (!patient.identifier) {
+      patient.identifier = []
+    }
+    identifiers.forEach((id) => {
+      const existingIdentifier = patient.identifier!.find((existingId) =>
+        isEqual(existingId.type, id.type)
+      )
+      if (existingIdentifier) {
+        existingIdentifier.value = id.value
+      } else {
+        patient.identifier!.push({
+          type: {
+            coding: [
+              {
+                system: `${OPENCRVS_SPECIFICATION_URL}identifier-type`,
+                code: id.type
+              }
+            ]
+          },
+          value: id.value
+        })
+      }
+    })
+
     return patient
   })
 }

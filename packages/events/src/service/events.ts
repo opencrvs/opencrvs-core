@@ -9,28 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/mongodb'
 import {
-  getUUID,
-  EventInput,
-  Event,
+  EventDocument,
   ActionInput,
-  ActionType
-} from '@opencrvs/commons'
+  EventInput
+} from '@opencrvs/commons/events'
+
+import { getClient } from '@events/storage/mongodb'
+import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
+import { indexEvent } from './indexing/indexing'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-const EventWithTransactionId = Event.extend({
-  transactionId: z.string()
-})
+export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const document = await collection.findOne({ transactionId })
 
@@ -45,7 +43,7 @@ class EventNotFoundError extends Error {
 export async function getEventById(id: string) {
   const db = await getClient()
 
-  const collection = db.collection<Event>('events')
+  const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
   if (!event) {
     throw new EventNotFoundError(id)
@@ -55,16 +53,18 @@ export async function getEventById(id: string) {
 
 export async function createEvent(
   eventInput: z.infer<typeof EventInput>,
+  createdBy: string,
+  createdAtLocation: string,
   transactionId: string
-): Promise<Event> {
+) {
   const existingEvent = await getEventByTransactionId(transactionId)
+
   if (existingEvent) {
     return existingEvent
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const now = new Date()
   const id = getUUID()
@@ -79,65 +79,71 @@ export async function createEvent(
       {
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy: '123-123-123',
-        fields: []
+        createdBy,
+        createdAtLocation,
+        data: {}
       }
     ]
-  })
+  } satisfies EventDocument)
 
-  return getEventById(id)
+  const event = await getEventById(id)
+  await indexEvent(event)
+
+  return event
 }
 
-export async function addAction(eventId: string, action: ActionInput) {
+export async function addAction(
+  input: ActionInput,
+  { eventId, createdBy }: { eventId: string; createdBy: string }
+) {
   const db = await getClient()
-  const collection = db.collection<Event>('events')
-
   const now = new Date()
 
-  await collection.updateOne(
+  await db.collection<EventDocument>('events').updateOne(
     {
       id: eventId
     },
     {
       $push: {
         actions: {
-          ...action,
-          createdAt: now,
-          createdBy: '123-123-123'
+          ...input,
+          createdBy,
+          createdAt: now
         }
       }
     }
   )
 
-  return getEventById(eventId)
+  const event = await getEventById(eventId)
+  await indexEvent(event)
+  return event
 }
 
-export async function patchEvent(
-  event: z.infer<typeof EventInputWithId>
-): Promise<Event> {
-  const existingEvent = await getEventById(event.id)
+export async function patchEvent(eventInput: EventInputWithId) {
+  const existingEvent = await getEventById(eventInput.id)
 
   if (!existingEvent) {
-    throw new EventNotFoundError(event.id)
+    throw new EventNotFoundError(eventInput.id)
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const now = new Date()
 
   await collection.updateOne(
     {
-      id: event.id
+      id: eventInput.id
     },
     {
       $set: {
-        ...event,
+        ...eventInput,
         updatedAt: now
       }
     }
   )
 
-  return getEventById(event.id)
+  const event = await getEventById(existingEvent.id)
+  await indexEvent(event)
+  return event
 }
