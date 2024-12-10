@@ -30,6 +30,7 @@
 - **Template Action Tracking**: Each template printed is tracked in the history table, showing which specific template was used.
 - **Template Selection Dropdown**: Updated print workflow to include a dropdown menu for template selection when issuing a certificate.
 - Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
+- A new GraphQL mutation `upsertRegistrationIdentifier` is added to allow updating the patient identifiers of a registration record such as NID [#8034](https://github.com/opencrvs/opencrvs-core/pull/8034)
 
 ### Improvements
 

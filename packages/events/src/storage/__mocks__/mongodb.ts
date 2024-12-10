@@ -8,29 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MongoMemoryServer } from 'mongodb-memory-server'
 import { MongoClient } from 'mongodb'
+import { inject } from 'vitest'
 
-let server: MongoMemoryServer
 let client: MongoClient
 let databaseName = 'events_' + Date.now()
-
-export async function setupServer() {
-  if (!server) {
-    server = await MongoMemoryServer.create()
-  }
-
-  return server
-}
 
 export async function resetServer() {
   databaseName = 'events_' + Date.now()
 }
 
 export async function getClient() {
-  const uri = server.getUri()
   if (!client) {
-    client = new MongoClient(uri)
+    client = new MongoClient(inject('MONGO_URI'))
   }
 
   await client.connect()
