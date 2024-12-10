@@ -138,15 +138,12 @@ async function saveOfflineData(offlineData: IOfflineData) {
 
 async function loadSingleCertificate(certificate: ICertificateData) {
   const { id } = certificate
-  const res = await fetch(
-    new URL(`/certificates/${id}`, window.config.COUNTRY_CONFIG_URL).toString(),
-    {
-      headers: {
-        Authorization: getToken(),
-        'If-None-Match': certificate?.hash ?? ''
-      }
+  const res = await fetch(certificate.svgUrl, {
+    headers: {
+      Authorization: getToken(),
+      'If-None-Match': certificate?.hash ?? ''
     }
-  )
+  })
   if (res.status === 304) {
     return {
       ...certificate,
