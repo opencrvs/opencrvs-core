@@ -126,5 +126,21 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "workspaces": {
+    "nohoist": [
+      "**/@types/react-router",
+      "**/@types/react-router/**",
+      "**/react-router",
+      "**/react-router/**",
+      "**/@types/react-router-dom",
+      "**/@types/react-router-dom/**",
+      "**/react-router-dom",
+      "**/react-router-dom/**",
+      "**/@types/connected-react-router",
+      "**/@types/connected-react-router/**",
+      "**/connected-react-router",
+      "**/connected-react-router/**"
+    ]
   }
 }
