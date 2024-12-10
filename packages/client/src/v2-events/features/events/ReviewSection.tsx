@@ -307,6 +307,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
       const focusTarget = fieldId ? '#' + fieldId : ''
       history.push(
         formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, { pageId, eventId }) +
+          '?from=review' +
           focusTarget
       )
     }
