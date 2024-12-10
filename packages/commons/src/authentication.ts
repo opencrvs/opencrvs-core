@@ -62,8 +62,6 @@ const systemScopes = {
   recordsearch: 'recordsearch',
   declare: 'declare',
   notificationApi: 'notification-api',
-  validatorApi: 'validator-api',
-  ageVerificationApi: 'age-verification-api',
   webhook: 'webhook',
   nationalId: 'nationalId'
 } as const
@@ -71,8 +69,6 @@ const systemScopes = {
 export const systemRoleScopes = {
   HEALTH: [systemScopes.declare, systemScopes.notificationApi],
   NATIONAL_ID: [systemScopes.nationalId],
-  EXTERNAL_VALIDATION: [systemScopes.validatorApi],
-  AGE_CHECK: [systemScopes.declare, systemScopes.ageVerificationApi],
   RECORD_SEARCH: [systemScopes.recordsearch],
   WEBHOOK: [systemScopes.webhook]
 }
