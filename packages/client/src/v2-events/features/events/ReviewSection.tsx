@@ -362,28 +362,23 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                         expand={true}
                       >
                         <ListReview id={'Section_' + page.id}>
-                          {page.fields.map((field, index) => {
-                            const id =
-                              field.type === 'TEXT' || field.type === 'DATE'
-                                ? field.id
-                                : index.toString()
-
-                            return (
-                              <ListReview.Row
-                                id={id}
-                                key={id}
-                                label={field.label.defaultMessage}
-                                value={data[id] || ''}
-                                actions={
-                                  <Link
-                                    onClick={(e) => handleEdit(e, page.id, id)}
-                                  >
-                                    {intl.formatMessage(messages.chagneButton)}
-                                  </Link>
-                                }
-                              />
-                            )
-                          })}
+                          {page.fields.map((field) => (
+                            <ListReview.Row
+                              id={field.id}
+                              key={field.id}
+                              label={field.label.defaultMessage}
+                              value={data[field.id] || ''}
+                              actions={
+                                <Link
+                                  onClick={(e) =>
+                                    handleEdit(e, page.id, field.id)
+                                  }
+                                >
+                                  {intl.formatMessage(messages.chagneButton)}
+                                </Link>
+                              }
+                            />
+                          ))}
                         </ListReview>
                       </Accordion>
                     </DeclarationDataContainer>
