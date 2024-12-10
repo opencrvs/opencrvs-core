@@ -49,8 +49,6 @@ export const useEventFormNavigation = () => {
   }
 
   const goToReview = (eventId: string) => {
-    console.log(formatUrl(V2_DECLARE_ACTION_REVIEW_ROUTE, { eventId: eventId }))
-
     history.push(
       formatUrl(V2_DECLARE_ACTION_REVIEW_ROUTE, { eventId: eventId })
     )
