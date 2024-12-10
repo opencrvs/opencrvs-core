@@ -8,22 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useState } from 'react'
+import { MongoMemoryServer } from 'mongodb-memory-server'
 
-// TODO: Paginate with react-router-dom
-export const usePagination = (
-  /** Amount of pages to iterate through */
-  pages: number
-) => {
-  const [page, setPage] = useState(0)
+export type { ProvidedContext } from 'vitest'
 
-  const next = page < pages - 1 ? () => setPage(page + 1) : undefined
-  const previous = page > 0 ? () => setPage(page - 1) : undefined
+declare module 'vitest' {
+  export interface ProvidedContext {
+    MONGO_URI: string
+  }
+}
 
-  return {
-    /** Page number between 0 and pages - 1 */
-    page,
-    next,
-    previous
+export default async function setup({ provide }: any) {
+  const mongod = await MongoMemoryServer.create()
+  const uri = mongod.getUri()
+
+  provide('MONGO_URI', uri)
+
+  return async () => {
+    await mongod.stop()
   }
 }

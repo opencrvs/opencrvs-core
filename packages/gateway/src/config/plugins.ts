@@ -22,7 +22,7 @@ export const getPlugins = () => {
   const swaggerOptions: HapiSwagger.RegisterOptions = {
     info: {
       title: 'Gateway API Documentation',
-      version: '1.3.0'
+      version: '1.7.0'
     },
     definitionPrefix: 'useLabel',
     basePath: '/v1/',

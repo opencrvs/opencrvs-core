@@ -22,7 +22,7 @@ import { TRPCError } from '@trpc/server'
 
 const server = createHTTPServer({
   router: appRouter,
-  createContext: function createContext(opts) {
+  createContext: async function createContext(opts) {
     const token = opts.req.headers.authorization
 
     if (!token) {
