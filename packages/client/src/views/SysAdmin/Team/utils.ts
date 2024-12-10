@@ -13,6 +13,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { SystemRoleType } from '@client/utils/gateway'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
+import { UserDetails } from '@client/utils/userUtils'
 
 export enum UserStatus {
   ACTIVE,
@@ -111,4 +112,8 @@ export function getUserSystemRole(
 
 export const getUserRoleIntlKey = (_roleId: string) => {
   return `role.${_roleId}`
+}
+
+export const canDeactivateUser = (id: string, userDetails: UserDetails) => {
+  return id !== userDetails.id ? true : false
 }

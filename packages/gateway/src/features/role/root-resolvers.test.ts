@@ -202,17 +202,42 @@ describe('Role root resolvers', () => {
       }
     ]
     it('returns full role list', async () => {
+      const sysAdminToken = jwt.sign(
+        { scope: ['natlsysadmin'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      const authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
       fetch.mockResponseOnce(JSON.stringify(dummyRoleList))
-
       const response = await resolvers.Query!.getSystemRoles(
         {},
         {},
-        { headers: undefined }
+        { headers: authHeaderSysAdmin }
       )
 
       expect(response).toEqual(dummyRoleList)
     })
     it('returns filtered role list', async () => {
+      const sysAdminToken = jwt.sign(
+        { scope: ['sysadmin'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      const authHeaderSysAdmin = {
+        Authorization: `Bearer ${sysAdminToken}`
+      }
       fetch.mockResponseOnce(JSON.stringify([dummyRoleList[2]]))
 
       const response = await resolvers.Query!.getSystemRoles(
@@ -225,7 +250,7 @@ describe('Role root resolvers', () => {
           type: 'Mayor',
           active: true
         },
-        { headers: undefined }
+        { headers: authHeaderSysAdmin }
       )
       expect(response).toEqual([dummyRoleList[2]])
     })
