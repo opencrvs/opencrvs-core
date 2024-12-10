@@ -12,7 +12,7 @@
 import { ActionInput } from '@opencrvs/commons/client'
 import { create } from 'zustand'
 
-type FormData = Record<string, ActionInput['data']>
+type FormData = ActionInput['data']
 
 type EventFormData = {
   formValues: FormData
