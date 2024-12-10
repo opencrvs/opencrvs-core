@@ -134,18 +134,16 @@ beforeEach<TestContext>(async (testContext) => {
 })
 
 describe('events that have unsynced actions', () => {
-  beforeEach<TestContext>(async ({ createEventHook: createHook }) => {
-    act(() => {
-      createHook.result.current.mutate({
-        type: 'birth',
-        transactionId: '_TEST_TRANSACTION_'
-      })
-    })
-  })
-
   test<TestContext>('creating a record first stores it locally with a temporary id', async ({
-    eventsHook
+    eventsHook,
+    createEventHook
   }) => {
+    server.use(http.post('/api/events/event.create', errorHandler))
+    createEventHook.result.current.mutate({
+      type: 'birth',
+      transactionId: '_TEST_TRANSACTION_'
+    })
+
     // Expect data store now to contain one event
     await waitFor(() => {
       expect(eventsHook.result.current.events.data).toHaveLength(1)
@@ -158,8 +156,13 @@ describe('events that have unsynced actions', () => {
   })
 
   test<TestContext>('temporary id is replaced with the real id when the event is synced to the backend', async ({
-    eventsHook
+    eventsHook,
+    createEventHook
   }) => {
+    await createEventHook.result.current.mutateAsync({
+      type: 'birth',
+      transactionId: '_TEST_TRANSACTION_'
+    })
     // Wait for backend to sync
     await waitFor(() =>
       expect(serverSpy).toHaveBeenCalledWith({
@@ -182,8 +185,13 @@ describe('events that have unsynced actions', () => {
   })
 
   test<TestContext>('event that has not been declared yet is interpreted as a draft', async ({
-    eventsHook
+    eventsHook,
+    createEventHook
   }) => {
+    await createEventHook.result.current.mutateAsync({
+      type: 'birth',
+      transactionId: '_TEST_TRANSACTION_'
+    })
     // Wait for backend to sync
     await waitFor(() =>
       expect(serverSpy).toHaveBeenCalledWith({
@@ -206,12 +214,11 @@ test<TestContext>('events that have unsynced actions are treated as "outbox" ', 
 }) => {
   server.use(http.post('/api/events/event.create', errorHandler))
 
-  act(() => {
-    createHook.result.current.mutate({
-      type: 'birth',
-      transactionId: '_TEST_FAILING_TRANSACTION_'
-    })
+  createHook.result.current.mutate({
+    type: 'birth',
+    transactionId: '_TEST_FAILING_TRANSACTION_'
   })
+
   await waitFor(() => {
     expect(eventsHook.result.current.events.data).toHaveLength(1)
   })
