@@ -51,14 +51,17 @@ const server = setupServer(
       })
     )
   }),
-  rest.post(`${window.config.AUTH_API_URL}/verifyUser`, (req, res, ctx) => {
-    return res(
-      ctx.json({
-        nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
-        securityQuestionKey: 'FAVORITE_MOVIE'
-      })
-    )
-  })
+  rest.post(
+    `${window.config.API_GATEWAY_URL}api/auth/verifyUser`,
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
+          securityQuestionKey: 'FAVORITE_MOVIE'
+        })
+      )
+    }
+  )
 )
 
 // Enable API mocking before tests.
@@ -172,7 +175,7 @@ describe('Test phone number verification form', () => {
       //change verifyUser api response
       server.use(
         rest.post(
-          `${window.config.AUTH_API_URL}/verifyUser`,
+          `${window.config.API_GATEWAY_URL}api/auth/verifyUser`,
           (req, res, ctx) => {
             return res(
               ctx.status(200),
@@ -203,7 +206,7 @@ describe('Test phone number verification form', () => {
       //change verifyUser api response
       server.use(
         rest.post(
-          `${window.config.AUTH_API_URL}/verifyUser`,
+          `${window.config.API_GATEWAY_URL}api/auth/verifyUser`,
           (req, res, ctx) => {
             return res(
               ctx.status(401),
