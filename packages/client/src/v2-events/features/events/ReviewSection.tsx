@@ -26,13 +26,15 @@ import {
 } from '@opencrvs/components'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { FormHeader } from './EventFormWizard'
 import { useEventConfiguration } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEvents } from './useEvents/useEvents'
 import { useEventFormNavigation } from './useEventFormNavigation'
+import { formatUrl } from '@client/navigation'
+import { V2_DECLARE_ACTION_ROUTE_WITH_PAGE } from '@client/v2-events/routes'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -234,6 +236,10 @@ interface RejectionState {
 const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   const [modal, openModal] = useModal()
   const events = useEvents()
+  const history = useHistory()
+  const { eventId } = useParams<{
+    eventId: string
+  }>()
 
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare()
@@ -290,14 +296,19 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
 
   const handleEdit = async (
     e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
-    fieldId: string
+    pageId: string,
+    fieldId?: string
   ) => {
     e.stopPropagation()
     const confirmedEdit = await openModal<boolean | null>((close) => (
       <EditFieldModal close={close}></EditFieldModal>
     ))
     if (confirmedEdit) {
-      alert('Editing field: ' + fieldId)
+      const focusTarget = fieldId ? '#' + fieldId : ''
+      history.push(
+        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, { pageId, eventId }) +
+          focusTarget
+      )
     }
     return
   }
@@ -363,7 +374,9 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                                 label={field.label.defaultMessage}
                                 value={data[id] || ''}
                                 actions={
-                                  <Link onClick={(e) => handleEdit(e, id)}>
+                                  <Link
+                                    onClick={(e) => handleEdit(e, page.id, id)}
+                                  >
                                     {intl.formatMessage(messages.chagneButton)}
                                   </Link>
                                 }
