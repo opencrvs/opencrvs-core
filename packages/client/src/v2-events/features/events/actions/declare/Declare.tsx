@@ -29,16 +29,16 @@ import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import React, { useEffect } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useHistory, useLocation, useParams } from 'react-router-dom'
-import { useEventConfiguration } from './useEventConfiguration'
-import { useEventFormNavigation } from './useEventFormNavigation'
-import { useEvents } from './useEvents/useEvents'
+import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
+import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
+import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import type { TranslationConfig } from '@opencrvs/commons/events'
-import { useEventFormData } from './useEventFormData'
+import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 
-export function EventFormWizardIndex() {
+export function DeclareIndex() {
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
-      <EventFormWizard />
+      <Declare />
     </React.Suspense>
   )
 }
@@ -138,7 +138,7 @@ export const FormHeader = ({ label }: { label: TranslationConfig }) => {
   )
 }
 
-function EventFormWizard() {
+function Declare() {
   const { eventId, pageId } = useParams<{
     eventId: string
     pageId?: string

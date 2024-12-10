@@ -77,10 +77,10 @@ import {
   V2_ROOT_ROUTE
 } from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
-import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
+import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 import { TRPCProvider } from './v2-events/trpc'
 import { EventSelection } from './v2-events/features/events/EventSelection'
-import { ReviewSection } from './v2-events/features/events/ReviewSection'
+import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -547,7 +547,7 @@ export function App(props: IAppProps) {
                                               <ProtectedRoute
                                                 exact
                                                 path={V2_DECLARE_ACTION_ROUTE}
-                                                component={EventFormWizardIndex}
+                                                component={DeclareIndex}
                                               />
                                               <ProtectedRoute
                                                 exact
@@ -561,7 +561,7 @@ export function App(props: IAppProps) {
                                                 path={
                                                   V2_DECLARE_ACTION_ROUTE_WITH_PAGE
                                                 }
-                                                component={EventFormWizardIndex}
+                                                component={DeclareIndex}
                                               />
                                             </Switch>
                                           </TRPCProvider>
