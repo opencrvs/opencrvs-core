@@ -18,7 +18,7 @@ import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
 
-import { Content, ContentSize, FormTabs, IFormTabs } from '@opencrvs/components'
+import { Content, ContentSize, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -488,7 +488,7 @@ const AdvancedSearch = () => {
     hasBirthSearchScopes() ? TabId.BIRTH : TabId.DEATH
   )
   const dispatch = useDispatch()
-  const tabSections: IFormTabs<TabId>[] = [
+  const tabSections = [
     {
       id: TabId.BIRTH,
       title: intl.formatMessage(messages.birthTabTitle),
@@ -500,6 +500,11 @@ const AdvancedSearch = () => {
       showTab: hasDeathSearchScopes()
     }
   ]
+
+  const filteredTabSections = tabSections
+    .filter((section) => section.showTab)
+    .map((sec) => ({ id: sec.id, title: sec.title }))
+
   return (
     <>
       <SysAdminContentWrapper
@@ -512,7 +517,7 @@ const AdvancedSearch = () => {
           size={ContentSize.SMALL}
           tabBarContent={
             <FormTabs
-              sections={tabSections}
+              sections={filteredTabSections}
               activeTabId={activeTabId}
               onTabClick={(id: TabId) => {
                 setActiveTabId(id)
