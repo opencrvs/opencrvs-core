@@ -123,7 +123,7 @@ const DeclarationDataContainer = styled.div``
 
 const messages = defineMessages({
   chagneButton: {
-    id: 'buttons.chagne',
+    id: 'buttons.change',
     defaultMessage: 'Change',
     description: 'The label for the change button'
   },
