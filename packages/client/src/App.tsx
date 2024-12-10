@@ -69,9 +69,18 @@ import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
 import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
-import { V2_EVENT_ROUTE, V2_ROOT_ROUTE } from './v2-events/routes/routes'
+import {
+  V2_DECLARE_ACTION_REVIEW_ROUTE,
+  V2_DECLARE_ACTION_ROUTE,
+  V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
+  V2_EVENTS_ROUTE,
+  V2_ROOT_ROUTE
+} from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
-import { PublishEvent } from './v2-events/features/events/PublishEvent'
+import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
+import { TRPCProvider } from './v2-events/trpc'
+import { EventSelection } from './v2-events/features/events/EventSelection'
+import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -96,6 +105,7 @@ const GlobalStyle = createGlobalStyle`
 
 export function App(props: IAppProps) {
   const { client } = useApolloClient(props.store)
+
   return (
     <ErrorBoundary>
       <GlobalStyle />
@@ -522,16 +532,39 @@ export function App(props: IAppProps) {
                                             path={routes.PRINT_RECORD}
                                             component={PrintRecord}
                                           />
-                                          <ProtectedRoute
-                                            exact
-                                            path={V2_ROOT_ROUTE}
-                                            component={Workqueues}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={V2_EVENT_ROUTE}
-                                            component={PublishEvent}
-                                          />
+                                          <TRPCProvider>
+                                            <Switch>
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_ROOT_ROUTE}
+                                                component={Workqueues}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_EVENTS_ROUTE}
+                                                component={EventSelection}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_DECLARE_ACTION_ROUTE}
+                                                component={DeclareIndex}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={
+                                                  V2_DECLARE_ACTION_REVIEW_ROUTE
+                                                }
+                                                component={ReviewSection}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={
+                                                  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
+                                                }
+                                                component={DeclareIndex}
+                                              />
+                                            </Switch>
+                                          </TRPCProvider>
                                         </Switch>
                                       </>
                                     )

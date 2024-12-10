@@ -10,39 +10,30 @@
  */
 
 import { appRouter, t } from '@events/router'
-const { createCallerFactory } = t
-import { vi } from 'vitest'
 import { indexAllEvents } from './indexing'
-import { getOrCreateClient } from '@events/storage/elasticsearch'
-import {
-  setupServer as setupMongoServer,
-  resetServer as resetMongoServer
-} from '@events/storage/__mocks__/mongodb'
-import {
-  resetServer as resetESServer,
-  setupServer as setupESServer
-} from '@events/storage/__mocks__/elasticsearch'
+const { createCallerFactory } = t
 
-vi.mock('@events/storage/mongodb')
-vi.mock('@events/storage/elasticsearch')
+import {
+  getOrCreateClient,
+  resetServer as resetESServer
+} from '@events/storage/__mocks__/elasticsearch'
 
 function createClient() {
   const createCaller = createCallerFactory(appRouter)
   const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' }
+    user: { id: '1', primaryOfficeId: '123' },
+    token: 'FAKE_TOKEN'
   })
+
   return caller
 }
-
-beforeAll(() => Promise.all([setupMongoServer(), setupESServer()]), 100000)
-afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
 
 const client = createClient()
 
 test('indexes all records from MongoDB with one function call', async () => {
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
   await resetESServer()
 
@@ -65,7 +56,7 @@ test('indexes all records from MongoDB with one function call', async () => {
 test('records are automatically indexed', async () => {
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   const esClient = getOrCreateClient()

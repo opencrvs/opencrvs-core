@@ -2101,7 +2101,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -3806,7 +3806,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -4709,7 +4709,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -5625,7 +5625,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -5693,7 +5693,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -7970,12 +7970,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "MOSIP",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "OTHER",
             "description": null,
             "isDeprecated": false,
@@ -7991,7 +7985,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -12507,7 +12501,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -12559,7 +12553,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -16477,7 +16471,7 @@
             "deprecationReason": null
           },
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "args": [],
             "type": {
@@ -16545,7 +16539,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -17513,7 +17507,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -17587,7 +17581,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -18390,7 +18384,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -18452,7 +18446,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -18487,7 +18481,7 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "fields",
+            "name": "data",
             "description": null,
             "type": {
               "kind": "NON_NULL",

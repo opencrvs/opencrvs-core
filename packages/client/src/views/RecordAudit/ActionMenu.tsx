@@ -52,7 +52,6 @@ import { client } from '@client/utils/apolloClient'
 import { EventType } from '@client/utils/gateway'
 import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
-import { EVENT } from '@opencrvs/commons/client'
 import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {
   DangerButton,
