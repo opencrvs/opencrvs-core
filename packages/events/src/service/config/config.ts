@@ -10,7 +10,9 @@
  */
 
 import { env } from '@events/environment'
+import { EventConfig } from '@opencrvs/commons'
 import fetch from 'node-fetch'
+import { array } from 'zod'
 
 export async function getEventsConfig(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
@@ -24,5 +26,5 @@ export async function getEventsConfig(token: string) {
     throw new Error('Failed to fetch events config')
   }
 
-  return res.json()
+  return array(EventConfig).parse(await res.json())
 }
