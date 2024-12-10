@@ -61,99 +61,37 @@ export async function advancedQueryBuilder(
     })
   }
 
-  if (
-    params.birthJurisdictionId ||
-    params.deathJurisdictionId ||
-    params.marriageJurisdictionId ||
-    params.event
-  ) {
-    let leafLevelJurisdictionIds: UUID[] = []
-
-    const jurisdictionId: UUID | null =
-      params.birthJurisdictionId ??
-      params.deathJurisdictionId ??
-      params.marriageJurisdictionId ??
-      null
-
-    if (jurisdictionId) {
-      leafLevelJurisdictionIds = await resolveLocationChildren(jurisdictionId)
-    }
-
+  if (params.event && params.event.length > 0) {
     const shouldConditions: any[] = []
 
-    if (params.birthJurisdictionId) {
-      shouldConditions.push({
-        bool: {
-          must: [
-            {
-              terms: {
-                'event.keyword': ['birth']
+    for (const { eventName, jurisdictionId } of params.event) {
+      if (jurisdictionId) {
+        const leafLevelJurisdictionIds = await resolveLocationChildren(
+          jurisdictionId as UUID
+        )
+        shouldConditions.push({
+          bool: {
+            must: [
+              {
+                terms: {
+                  'event.keyword': [eventName]
+                }
+              },
+              {
+                terms: {
+                  'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
+                }
               }
-            },
-            {
-              terms: {
-                'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
-              }
-            }
-          ]
-        }
-      })
-    } else if (params.event === 'birth') {
-      shouldConditions.push({
-        terms: {
-          'event.keyword': ['birth']
-        }
-      })
-    }
-
-    if (params.deathJurisdictionId) {
-      shouldConditions.push({
-        bool: {
-          must: [
-            {
-              terms: {
-                'event.keyword': ['death']
-              }
-            },
-            {
-              terms: {
-                'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
-              }
-            }
-          ]
-        }
-      })
-    } else if (params.event === 'death') {
-      shouldConditions.push({
-        terms: {
-          'event.keyword': ['death']
-        }
-      })
-    }
-
-    if (params.marriageJurisdictionId) {
-      shouldConditions.push({
-        bool: {
-          must: [
-            {
-              terms: {
-                'event.keyword': ['marriage']
-              }
-            },
-            {
-              terms: {
-                'declarationJurisdictionIds.keyword': leafLevelJurisdictionIds
-              }
-            }
-          ]
-        }
-      })
-    } else if (params.event === 'marriage') {
-      shouldConditions.push({
-        terms: {
-          'event.keyword': ['marriage']
-        }
-      })
+            ]
+          }
+        })
+      } else if (eventName) {
+        shouldConditions.push({
+          terms: {
+            'event.keyword': [eventName]
+          }
+        })
+      }
     }
 
     must.push({

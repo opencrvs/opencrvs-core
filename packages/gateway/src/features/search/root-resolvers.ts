@@ -107,8 +107,7 @@ export const resolvers: GQLResolver = {
       const filteredSearchParamsWithScopes = filterSearchParamsWithScope(
         authHeader.Authorization,
         advancedSearchParameters,
-        user,
-        advancedSearchParameters.event
+        user
       )
 
       const searchCriteria: ISearchCriteria = {
