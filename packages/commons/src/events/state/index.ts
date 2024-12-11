@@ -14,6 +14,9 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === 'DRAFT') {
       return 'DRAFT'
     }
+    if (action.type === 'REGISTER') {
+      return 'REGISTERED'
+    }
     return status
   }, 'CREATED')
 }

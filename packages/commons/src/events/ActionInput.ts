@@ -25,7 +25,7 @@ const CreateActionInput = BaseActionInput.merge(
   })
 )
 
-const RegisterActionInput = BaseActionInput.merge(
+export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
     identifiers: z.object({

@@ -53,7 +53,7 @@ export const RegisterIndex = () => {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
-  const registerMutation = events.actions.declare()
+  const registerMutation = events.actions.register()
 
   const [event] = events.getEvent(eventId)
 

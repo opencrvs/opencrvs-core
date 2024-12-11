@@ -18,7 +18,8 @@ import {
   EventIndex,
   EventInput,
   NotifyActionInput,
-  DraftActionInput
+  DraftActionInput,
+  RegisterActionInput
 } from '@opencrvs/commons/events'
 import { getEventsConfig } from './service/config/config'
 import {
@@ -28,7 +29,7 @@ import {
   getEventById,
   patchEvent
 } from './service/events'
-import { EventConfig } from '@opencrvs/commons'
+import { EventConfig, getUUID } from '@opencrvs/commons'
 import { getIndexedEvents } from './service/indexing/indexing'
 
 const ContextSchema = z.object({
@@ -103,7 +104,24 @@ export const appRouter = router({
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id
         })
-      })
+      }),
+      register: publicProcedure
+        .input(RegisterActionInput.omit({ identifiers: true }))
+        .mutation((options) => {
+          return addAction(
+            {
+              ...options.input,
+              identifiers: {
+                trackingId: getUUID(),
+                registrationNumber: getUUID()
+              }
+            },
+            {
+              eventId: options.input.eventId,
+              createdBy: options.ctx.user.id
+            }
+          )
+        })
     })
   }),
   events: router({

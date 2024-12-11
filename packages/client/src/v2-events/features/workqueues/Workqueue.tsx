@@ -30,7 +30,7 @@ import { Link } from 'react-router-dom'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import mapKeys from 'lodash-es/mapKeys'
 import get from 'lodash-es/get'
-import { EventIndex } from '@opencrvs/commons/client'
+import { EventIndex, getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 /**
@@ -70,7 +70,7 @@ const changeSortedColumn = (
 }
 
 export const WorkqueueIndex = () => {
-  const { getEvents } = useEvents()
+  const { getEvents, getOutbox } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
 
   const [config] = useEventConfigurations()
@@ -84,10 +84,16 @@ export const WorkqueueIndex = () => {
   }
 
   const events = getEvents.useQuery()
+  const outbox = getOutbox().map(getCurrentEventState)
+
+  const eventsWithoutOutbox =
+    events.data?.filter(
+      (event) => !outbox.find((outboxEvent) => outboxEvent.id === event.id)
+    ) || []
 
   return (
     <Workqueue
-      events={events.data ?? []}
+      events={eventsWithoutOutbox.concat(outbox)}
       config={workqueueConfig}
       {...searchParams}
     />
@@ -97,19 +103,24 @@ export const WorkqueueIndex = () => {
 /**
  * A Workqueue that displays a table of events based on search criteria.
  */
+
+type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
+
 export const Workqueue = ({
   events,
   config,
   limit,
   offset
 }: {
-  events: EventIndex[]
+  events: EventWithSyncStatus[]
   config: WorkqueueConfig
   limit: number
   offset: number
 }) => {
   const intl = useIntl()
   const theme = useTheme()
+  const { getOutbox } = useEvents()
+  const outbox = getOutbox()
 
   const statuses = config.filters.flatMap((filter) => filter.status)
 
@@ -122,31 +133,43 @@ export const Workqueue = ({
       const { data, ...rest } = event
       return { ...rest, ...mapKeys(data as any, (value, key) => `${key}`) }
     })
-    .map((event) => ({
-      ...event,
-      createdAt: intl.formatDate(new Date(event.createdAt)),
-      modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
-      status: intl.formatMessage(
-        {
-          id: `events.status`,
-          defaultMessage:
-            '{status, select, CREATED {Draft} DRAFT {Draft} DECLARED {Declared} other {Unknown}}'
-        },
-        { status: event.status }
-      ),
-      [config.fields[0].id]: (
-        <NondecoratedLink
-          to={ROUTES.V2.EVENTS.EVENT.buildPath({
-            eventId: event.id
-          })}
-        >
+    .map((event) => {
+      const isInOutbox = outbox.find(
+        (outboxEvent) => outboxEvent.id === event.id
+      )
+      return {
+        ...event,
+        createdAt: intl.formatDate(new Date(event.createdAt)),
+        modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
+
+        status: intl.formatMessage(
+          {
+            id: `events.status`,
+            defaultMessage:
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+          },
+          { status: isInOutbox ? 'OUTBOX' : event.status }
+        ),
+
+        [config.fields[0].id]: isInOutbox ? (
           <IconWithName
             name={get(event, config.fields[0].id) ?? 'N/A'}
-            status={event.status}
+            status={isInOutbox ? 'OUTBOX' : event.status}
           />
-        </NondecoratedLink>
-      )
-    }))
+        ) : (
+          <NondecoratedLink
+            to={ROUTES.V2.EVENTS.EVENT.buildPath({
+              eventId: event.id
+            })}
+          >
+            <IconWithName
+              name={get(event, config.fields[0].id) ?? 'N/A'}
+              status={event.status}
+            />
+          </NondecoratedLink>
+        )
+      }
+    })
 
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState('createdAt')

@@ -10,9 +10,10 @@
  */
 
 import { storage } from '@client/storage'
+
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 
-import { EventDocument } from '@opencrvs/commons/client'
+import { EventDocument, CreatedAction } from '@opencrvs/commons/client'
 import { hashKey, QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
 
@@ -172,6 +173,108 @@ utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
     })
   }
 }))
+utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
+  // This retry ensures on page reload if event have not yet synced,
+  // the action will be retried once
+  retry: 1,
+  retryDelay: 5000,
+  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
+  onMutate: async (actionInput) => {
+    await queryClient.cancelQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
+    const events = await readEventsFromStorage()
+    const eventToUpdate = events.find(
+      (e) =>
+        e.id === actionInput.eventId ||
+        // This hook is executed before mutationFn, so we need to check for both ids
+        e.transactionId === actionInput.eventId
+    )!
+
+    const eventsWithoutUpdated = events.filter(
+      (e) => e.id !== actionInput.eventId
+    )
+    const previousActions = eventToUpdate.actions
+    await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
+    queryClient.invalidateQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
+    return { previousActions, events }
+  },
+  onSettled: async (response) => {
+    /*
+     * Updates event in store
+     */
+    if (response) {
+      await queryClient.cancelQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
+      const events = await readEventsFromStorage()
+      const eventsWithoutNew = events.filter((e) => e.id !== response.id)
+
+      await writeEventsToStorage([...eventsWithoutNew, response])
+      return queryClient.invalidateQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
+    }
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: getQueryKey(api.events.get)
+    })
+  }
+}))
+utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
+  // This retry ensures on page reload if event have not yet synced,
+  // the action will be retried once
+  retry: 1,
+  retryDelay: 5000,
+  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
+  onMutate: async (actionInput) => {
+    await queryClient.cancelQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
+    const events = await readEventsFromStorage()
+    const eventToUpdate = events.find(
+      (e) =>
+        e.id === actionInput.eventId ||
+        // This hook is executed before mutationFn, so we need to check for both ids
+        e.transactionId === actionInput.eventId
+    )!
+
+    const eventsWithoutUpdated = events.filter(
+      (e) => e.id !== actionInput.eventId
+    )
+    const previousActions = eventToUpdate.actions
+    await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
+    queryClient.invalidateQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
+    return { previousActions, events }
+  },
+  onSettled: async (response) => {
+    /*
+     * Updates event in store
+     */
+    if (response) {
+      await queryClient.cancelQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
+      const events = await readEventsFromStorage()
+      const eventsWithoutNew = events.filter((e) => e.id !== response.id)
+
+      await writeEventsToStorage([...eventsWithoutNew, response])
+      return queryClient.invalidateQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
+    }
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: getQueryKey(api.events.get)
+    })
+  }
+}))
 
 utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: canonicalMutationFn,
@@ -183,7 +286,15 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      actions: []
+      actions: [
+        {
+          type: 'CREATE',
+          createdAt: new Date().toISOString(),
+          createdBy: 'offline',
+          createdAtLocation: 'TODO',
+          data: {}
+        } satisfies CreatedAction
+      ]
     }
 
     queryClient.cancelQueries({ queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY })
@@ -313,11 +424,8 @@ export function useEvents() {
     return api.event.actions.declare.useMutation({})
   }
 
-  /**
-   * @TODO: Replace with register mutation
-   */
   const register = () => {
-    return api.event.actions.declare.useMutation({})
+    return api.event.actions.register.useMutation({})
   }
 
   const getEvent = (id: string) => {
@@ -339,13 +447,52 @@ export function useEvents() {
     const eventFromDeclareActions = filterOutboxEventsWithMutation(
       events.data,
       api.event.actions.declare,
-      (event, parameters) => event.id === parameters.eventId
+      (event, parameters) => {
+        return (
+          event.id === parameters.eventId ||
+          event.transactionId === parameters.eventId
+        )
+      }
     )
 
-    return eventFromCreateMutations.concat(eventFromDeclareActions).filter(
-      /* uniqueById */
-      (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
+    const pendingActions = getPendingMutations(api.event.actions.declare).map(
+      (mutation) => {
+        const variables = mutation.state.variables as Exclude<
+          ReturnType<typeof api.event.actions.declare.useMutation>['variables'],
+          undefined
+        >
+        return {
+          eventId: variables.eventId,
+          action: {
+            type: 'DECLARE' as const,
+            createdAt: new Date().toISOString(),
+            createdBy: 'offline',
+            createdAtLocation: 'TODO',
+            data: variables.data
+          }
+        }
+      }
     )
+
+    return eventFromCreateMutations
+      .concat(eventFromDeclareActions)
+      .filter(
+        /* uniqueById */
+        (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
+      )
+      .map((event) => {
+        return {
+          ...event,
+          actions: event.actions.concat(
+            pendingActions
+              .filter(
+                (a) =>
+                  a.eventId === event.id || a.eventId === event.transactionId
+              )
+              .map((a) => a.action)
+          )
+        }
+      })
   }
 
   const events = useSuspenseQuery({

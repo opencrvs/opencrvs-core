@@ -32,6 +32,7 @@ interface IIconWith {
 }
 
 export const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
+  OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',
   IN_PROGRESS: 'purple',
