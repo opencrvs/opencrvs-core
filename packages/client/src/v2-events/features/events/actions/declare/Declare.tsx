@@ -166,7 +166,6 @@ function Declare() {
   if (!configuration) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
-
   const formValues = useEventFormData((state) => state.formValues)
   const setFormValues = useEventFormData((state) => state.setFormValues)
 

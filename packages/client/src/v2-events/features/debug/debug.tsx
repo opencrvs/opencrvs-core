@@ -16,6 +16,8 @@ import styled from 'styled-components'
 import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useQueryClient } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
+import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
 
 const Container = styled.div`
   background: #fff;

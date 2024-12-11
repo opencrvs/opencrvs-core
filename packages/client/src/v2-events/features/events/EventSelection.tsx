@@ -73,7 +73,6 @@ const EventSelector = () => {
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
-
   const clearForm = useEventFormData((state) => state.clear)
   const createEvent = events.createEvent()
 
@@ -143,7 +142,6 @@ const EventSelector = () => {
 
 export const EventSelection = () => {
   const intl = useIntl()
-
   const { goToHome } = useEventFormNavigation()
 
   return (
