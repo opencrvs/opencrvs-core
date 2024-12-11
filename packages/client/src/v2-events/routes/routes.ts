@@ -43,6 +43,15 @@ export const ROUTES = {
                 }
               )
             }
+          ),
+          REGISTER: route(
+            'register',
+            {},
+            {
+              EVENT: route(':eventId', {
+                params: { eventId: string().defined() }
+              })
+            }
           )
         }
       ),

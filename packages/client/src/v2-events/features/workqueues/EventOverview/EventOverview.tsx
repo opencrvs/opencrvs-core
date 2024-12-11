@@ -29,7 +29,9 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 // eslint-disable-next-line no-restricted-imports
 import { ProfileState } from '@client/profile/profileReducer'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
-import { useEvents } from '../../events/useEvents/useEvents'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+
+import { ActionMenu } from './components/ActionMenu'
 
 /**
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -76,17 +78,13 @@ function EventOverview({
   user: ProfileState['userDetails']
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const actions: React.ReactElement[] = []
-  const desktopActionsView: React.ReactElement[] = []
-
-  desktopActionsView.push(actions[actions.length - 1])
 
   return (
     <Content
       title={intl.formatMessage(summary.title, event.data)}
       titleColor={event.id ? 'copy' : 'grey600'}
       size={ContentSize.LARGE}
-      topActionButtons={desktopActionsView}
+      topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
       icon={() => <IconWithName status={'orange'} name={''} />}
     >
       <EventSummary event={event} summary={summary} />

@@ -10,7 +10,6 @@
  */
 
 import { IFormField } from '@client/forms'
-import { formatUrl } from '@client/navigation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 
@@ -39,22 +38,6 @@ export function DeclareIndex() {
       <Declare />
     </React.Suspense>
   )
-}
-
-const STATUSTOCOLOR: { [key: string]: string } = {
-  ARCHIVED: 'grey',
-  DRAFT: 'purple',
-  IN_PROGRESS: 'purple',
-  DECLARED: 'orange',
-  REJECTED: 'red',
-  VALIDATED: 'grey',
-  REGISTERED: 'green',
-  CERTIFIED: 'teal',
-  CORRECTION_REQUESTED: 'blue',
-  WAITING_VALIDATION: 'teal',
-  SUBMITTED: 'orange',
-  SUBMITTING: 'orange',
-  ISSUED: 'blue'
 }
 
 function getDeclarationIconColor(): string {

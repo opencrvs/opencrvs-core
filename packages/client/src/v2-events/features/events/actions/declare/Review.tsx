@@ -234,7 +234,7 @@ interface RejectionState {
   isDuplicate: boolean
 }
 
-const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
+export const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   const [modal, openModal] = useModal()
   const events = useEvents()
   const navigate = useNavigate()

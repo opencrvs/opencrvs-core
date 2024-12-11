@@ -19,6 +19,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { ROUTES } from './routes'
 import { ReviewSection } from '@client/v2-events/features/events/actions/declare/Review'
+import { RegisterIndex } from '@client/v2-events/features/events/actions/register/Register'
 
 /**
  * Configuration for the routes of the v2-events feature.
@@ -78,6 +79,10 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.path,
       element: <DeclareIndex />
+    },
+    {
+      path: ROUTES.V2.EVENTS.REGISTER.EVENT.path,
+      element: <RegisterIndex />
     }
   ]
 }
