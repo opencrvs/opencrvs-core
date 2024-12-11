@@ -26,6 +26,8 @@ type FormWizardProps = PropsWithChildren<{
   /** Callback when the user submits the form wizard */
   onSubmit: () => void
   pageTitle: string
+
+  showReviewButton?: boolean
 }>
 
 export const FormWizard = ({
@@ -35,7 +37,8 @@ export const FormWizard = ({
   onSubmit,
   pageTitle,
   onNextPage,
-  onPreviousPage
+  onPreviousPage,
+  showReviewButton
 }: FormWizardProps) => {
   return (
     <Frame.LayoutForm>
@@ -59,6 +62,11 @@ export const FormWizard = ({
             ) : (
               <Button type="primary" onClick={onSubmit}>
                 Submit
+              </Button>
+            )}
+            {showReviewButton && (
+              <Button type="secondary" onClick={onSubmit}>
+                Back to review
               </Button>
             )}
           </Stack>
