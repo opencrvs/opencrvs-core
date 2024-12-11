@@ -65,6 +65,10 @@ function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
 
 const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
 
+queryClient.setQueryDefaults(EVENTS_PERSISTENT_STORE_STORAGE_KEY, {
+  queryFn: () => readEventsFromStorage()
+})
+
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   // This retry ensures on page reload if event have not yet synced,
   // the action will be retried once
