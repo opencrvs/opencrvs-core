@@ -22,7 +22,7 @@ import {
   Spinner
 } from '@opencrvs/components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
@@ -31,7 +31,7 @@ import { useEvents } from '@client/v2-events//features/events/useEvents/useEvent
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { ROUTES } from '@client/v2-events/routes'
-
+import { v4 as uuid } from 'uuid'
 export function DeclareIndex() {
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
@@ -62,12 +62,18 @@ const messages = defineMessages({
   }
 })
 
-export const FormHeader = ({ label }: { label: TranslationConfig }) => {
+export const FormHeader = ({
+  label,
+  onExit,
+  onSaveAndExit
+}: {
+  label: TranslationConfig
+  onExit: () => void
+  onSaveAndExit: () => void
+}) => {
   const intl = useIntl()
-  const { exit, modal } = useEventFormNavigation()
+  const { modal } = useEventFormNavigation()
 
-  const TODO = () => {}
-  const IS_TODO = true
   return (
     <AppBar
       desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
@@ -81,14 +87,14 @@ export const FormHeader = ({ label }: { label: TranslationConfig }) => {
               id="save-exit-btn"
               type="primary"
               size="small"
-              disabled={!IS_TODO}
-              onClick={TODO}
+              disabled={false}
+              onClick={onSaveAndExit}
             >
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
             </Button>
           }
-          <Button type="secondary" size="small" onClick={exit}>
+          <Button type="secondary" size="small" onClick={onExit}>
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
           </Button>
@@ -102,11 +108,16 @@ export const FormHeader = ({ label }: { label: TranslationConfig }) => {
       mobileRight={
         <>
           {
-            <Button type="icon" size="small" disabled={!IS_TODO} onClick={TODO}>
+            <Button
+              type="icon"
+              size="small"
+              disabled={false}
+              onClick={onSaveAndExit}
+            >
               <Icon name="DownloadSimple" />
             </Button>
           }
-          <Button type="icon" size="small" onClick={exit}>
+          <Button type="icon" size="small" onClick={onExit}>
             <Icon name="X" />
           </Button>
         </>
@@ -197,7 +208,7 @@ function Declare() {
 
   const intl = useIntl()
 
-  const { modal, goToReview } = useEventFormNavigation()
+  const { modal, goToHome, goToReview, exit } = useEventFormNavigation()
 
   const page = pages[currentPage]
 
@@ -215,10 +226,23 @@ function Declare() {
           } as IFormField)
       )
 
+  const createDraft = events.actions.draft()
+
+  const saveAndExit = useCallback(() => {
+    createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })
+    goToHome()
+  }, [createDraft, eventId, formValues, goToHome])
+
   return (
     <Frame
       skipToContentText="Skip to form"
-      header={<FormHeader label={configuration.label} />}
+      header={
+        <FormHeader
+          onExit={exit}
+          onSaveAndExit={saveAndExit}
+          label={configuration.label}
+        />
+      }
     >
       {modal}
       <FormWizard

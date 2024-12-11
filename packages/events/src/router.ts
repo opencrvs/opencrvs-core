@@ -17,7 +17,8 @@ import {
   DeclareActionInput,
   EventIndex,
   EventInput,
-  NotifyActionInput
+  NotifyActionInput,
+  DraftActionInput
 } from '@opencrvs/commons/events'
 import { getEventsConfig } from './service/config/config'
 import {
@@ -86,6 +87,12 @@ export const appRouter = router({
     }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id
+        })
+      }),
+      draft: publicProcedure.input(DraftActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id

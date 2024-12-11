@@ -42,6 +42,14 @@ export const NotifyActionInput = BaseActionInput.merge(
   })
 )
 
+export const DraftActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.DRAFT).default(ActionType.DRAFT)
+  })
+)
+
+export type DraftActionInput = z.infer<typeof DraftActionInput>
+
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
@@ -64,6 +72,7 @@ const UnassignActionInput = BaseActionInput.merge(
 
 export const ActionInput = z.discriminatedUnion('type', [
   CreateActionInput,
+  DraftActionInput,
   RegisterActionInput,
   NotifyActionInput,
   DeclareActionInput,

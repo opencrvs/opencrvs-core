@@ -9,14 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MessageDescriptor, useIntl } from 'react-intl'
 import mapKeys from 'lodash/mapKeys'
+import { MessageDescriptor, useIntl } from 'react-intl'
 
 const INTERNAL_SEPARATOR = '___'
 function convertDotToTripleUnderscore(
   obj: Record<string, any>
 ): Record<string, any> {
-  return mapKeys(obj, (value, key) => key.replace(/\./g, INTERNAL_SEPARATOR))
+  const keysWithUnderscores = mapKeys(obj, (value, key) => {
+    return key.replace(/\./g, INTERNAL_SEPARATOR)
+  })
+
+  return keysWithUnderscores
 }
 
 function convertDotInCurlyBraces(str: string): string {
@@ -34,6 +38,8 @@ export const useIntlFormatMessageWithFlattenedParams = () => {
     message: MessageDescriptor,
     params?: Record<string, any>
   ) => {
+    const variables = convertDotToTripleUnderscore(params ?? {})
+
     return intl.formatMessage(
       {
         id: message.id,
@@ -42,7 +48,7 @@ export const useIntlFormatMessageWithFlattenedParams = () => {
           message.defaultMessage as string
         )
       },
-      convertDotToTripleUnderscore(params ?? {})
+      variables
     )
   }
 

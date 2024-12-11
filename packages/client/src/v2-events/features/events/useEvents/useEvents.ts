@@ -115,6 +115,52 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
     }
   }
 }))
+utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
+  // This retry ensures on page reload if event have not yet synced,
+  // the action will be retried once
+  retry: 1,
+  retryDelay: 5000,
+  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
+  onMutate: async (actionInput) => {
+    await queryClient.cancelQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
+    const events = await readEventsFromStorage()
+    const eventToUpdate = events.find(
+      (e) =>
+        e.id === actionInput.eventId ||
+        // This hook is executed before mutationFn, so we need to check for both ids
+        e.transactionId === actionInput.eventId
+    )!
+
+    const eventsWithoutUpdated = events.filter(
+      (e) => e.id !== actionInput.eventId
+    )
+    const previousActions = eventToUpdate.actions
+    await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
+    queryClient.invalidateQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
+    return { previousActions, events }
+  },
+  onSettled: async (response) => {
+    /*
+     * Updates event in store
+     */
+    if (response) {
+      await queryClient.cancelQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
+      const events = await readEventsFromStorage()
+      const eventsWithoutNew = events.filter((e) => e.id !== response.id)
+
+      await writeEventsToStorage([...eventsWithoutNew, response])
+      return queryClient.invalidateQueries({
+        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+      })
+    }
+  }
+}))
 
 utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: canonicalMutationFn,
@@ -248,6 +294,10 @@ export function useEvents() {
     return api.event.create.useMutation({})
   }
 
+  const draft = () => {
+    return api.event.actions.draft.useMutation({})
+  }
+
   const declare = () => {
     return api.event.actions.declare.useMutation({})
   }
@@ -294,6 +344,7 @@ export function useEvents() {
     getDrafts,
     getOutbox,
     actions: {
+      draft,
       declare
     }
   }
