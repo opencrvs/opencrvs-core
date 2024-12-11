@@ -740,6 +740,7 @@ type Reinstated {
 input ConfirmRegistrationInput {
   registrationNumber: String!
   identifiers: [IdentifierInput!]
+  comment: String
 }
 
 input RejectRegistrationInput {

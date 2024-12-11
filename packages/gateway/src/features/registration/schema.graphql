@@ -571,6 +571,7 @@ input IdentifierInput {
 input ConfirmRegistrationInput {
   registrationNumber: String!
   identifiers: [IdentifierInput!]
+  comment: String # For record audit
 }
 
 input RejectRegistrationInput {
