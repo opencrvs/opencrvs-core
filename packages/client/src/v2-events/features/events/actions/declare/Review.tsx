@@ -15,15 +15,9 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { EventDocument } from '@opencrvs/commons'
 import {
-  Accordion,
   Button,
   Checkbox,
-  Frame,
-  Icon,
-  Link,
-  ListReview,
   ResponsiveModal,
   Stack,
   Text,
@@ -31,96 +25,12 @@ import {
 } from '@opencrvs/components'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate, useParams } from 'react-router-dom'
-import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { FormHeader } from './Declare'
-
-const Row = styled.div<{
-  position?: 'left' | 'center'
-  background?: 'white' | 'background'
-}>`
-  display: flex;
-  gap: 24px;
-  width: 100%;
-  justify-content: ${({ position }) => position || 'center'};
-  background-color: ${({ theme, background }) =>
-    !background || background === 'background'
-      ? theme.colors.background
-      : theme.colors.white};
-  flex-direction: row;
-  padding: 24px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0;
-  }
-`
-const HeaderContainer = styled.div`
-  padding: 16px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-`
-const HeaderContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: left;
-  gap: 16px;
-  align-items: center;
-  ${({ theme }) => theme.fonts.h2}
-  color: ${({ theme }) => theme.colors.copy};
-`
-
-const TitleContainer = styled.div`
-  ${({ theme }) => theme.fonts.bold14}
-  color: ${({ theme }) => theme.colors.supportingCopy};
-  text-transform: uppercase;
-`
-const SubjectContainer = styled.div`
-  ${({ theme }) => theme.fonts.h2}
-  overflow-wrap: anywhere;
-`
-
-const LeftColumn = styled.div`
-  flex-grow: 1;
-  max-width: 840px;
-  overflow: hidden;
-`
-
-const Card = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: 4px;
-  margin-bottom: 40px;
-  &:last-child {
-    margin-bottom: 200px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    border: 0;
-    margin: 0;
-  }
-`
-
-const FormData = styled.div`
-  padding-top: 24px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
-  }
-`
-
-const ReviewContainter = styled.div`
-  padding: 0px 32px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0;
-  }
-`
-const DeclarationDataContainer = styled.div``
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { Preview } from '@client/v2-events/features/events/components/Preview'
 
 const messages = defineMessages({
-  chagneButton: {
-    id: 'buttons.change',
-    defaultMessage: 'Change',
-    description: 'The label for the change button'
-  },
   reviewActionTitle: {
     id: 'reviewAction.title',
     defaultMessage: 'Declare member',
@@ -141,28 +51,6 @@ const messages = defineMessages({
     id: 'reviewAction.reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of review action'
-  },
-  actionModalCancel: {
-    id: 'actionModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of action modal'
-  },
-  actionModalPrimaryAction: {
-    id: 'actionModal.PrimaryAction',
-    defaultMessage: '{action, select, declare{Declare} other{{action}}}',
-    description: 'The label for primary action button of action modal'
-  },
-  actionModalTitle: {
-    id: 'actionModal.title',
-    defaultMessage:
-      '{action, select, declare{Declare} other{{action}}} the member?',
-    description: 'The title for action modal'
-  },
-  actionModalDescription: {
-    id: 'actionModal.description',
-    defaultMessage:
-      'The declarant will be notified of this action and a record of this decision will be recorded',
-    description: 'The description for action modal'
   },
   rejectModalCancel: {
     id: 'rejectModal.cancel',
@@ -194,26 +82,6 @@ const messages = defineMessages({
     id: 'rejectModal.markAsDuplicate',
     defaultMessage: 'Mark as a duplicate',
     description: 'The label for mark as duplicate checkbox of reject modal'
-  },
-  changeModalCancel: {
-    id: 'changeModal.cancel',
-    defaultMessage: 'Cancel',
-    description: 'The label for cancel button of change modal'
-  },
-  changeModalContinue: {
-    id: 'changeModal.continue',
-    defaultMessage: 'Continue',
-    description: 'The label for continue button of change modal'
-  },
-  changeModalTitle: {
-    id: 'changeModal.title',
-    defaultMessage: 'Edit declaration?',
-    description: 'The title for change modal'
-  },
-  changeModalDescription: {
-    id: 'changeModal.description',
-    defaultMessage: 'A record will be created of any changes you make',
-    description: 'The description for change modal'
   }
 })
 
@@ -228,50 +96,68 @@ interface RejectionState {
   isDuplicate: boolean
 }
 
-export const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
-  const [modal, openModal] = useModal()
+export const ReviewSection = () => {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.EVENT.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
-
-  const { eventId } = useParams<{
-    eventId: string
-  }>()
-
-  if (!eventId) {
-    throw new Error('Event id is required')
-  }
+  const [modal, openModal] = useModal()
+  const intl = useIntl()
 
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare()
 
-  const data = useEventFormData((state) => state.formValues)
+  const [event] = events.getEvent(eventId)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  if (!configuration) {
+  if (!config) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
-  const intl = useIntl()
 
-  const { forms } = configuration.actions.filter(
+  const { forms: formConfigs } = config.actions.filter(
     (action) => action.type === 'DECLARE'
   )[0]
 
-  const handleRegister = async () => {
-    const confirmedRegister = await openModal<boolean | null>((close) => (
-      <ActionModal close={close} action="Declare"></ActionModal>
+  const form = useEventFormData((state) => state.formValues)
+
+  const handleEdit = async ({
+    pageId,
+    fieldId
+  }: {
+    pageId: string
+    fieldId?: string
+  }) => {
+    const confirmedEdit = await openModal<boolean | null>((close) => (
+      <Preview.EditModal close={close}></Preview.EditModal>
     ))
-    if (confirmedRegister) {
-      declareMutation.mutate({
-        eventId: event.id,
-        data: data,
-        transactionId: `tmp-${uuid()}`
-      })
-      goToHome()
+
+    if (confirmedEdit) {
+      navigate(
+        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath(
+          { pageId, eventId },
+          {
+            from: 'review'
+          },
+          fieldId
+        )
+      )
     }
     return
+  }
+
+  const handleDeclaration = async () => {
+    const confirmedDeclaration = await openModal<boolean | null>((close) => (
+      <Preview.ActionModal close={close} action="Declare" />
+    ))
+    if (confirmedDeclaration) {
+      declareMutation.mutate({
+        eventId: event.id,
+        data: form,
+        transactionId: `tmp-${uuid()}`
+      })
+
+      goToHome()
+    }
   }
 
   const handleReject = async () => {
@@ -294,260 +180,31 @@ export const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
     return
   }
 
-  const handleEdit = async (
-    e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>,
-    pageId: string,
-    fieldId?: string
-  ) => {
-    e.stopPropagation()
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <EditFieldModal close={close}></EditFieldModal>
-    ))
-
-    if (confirmedEdit) {
-      const focusTarget = fieldId ? '#' + fieldId : ''
-      navigate(
-        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath({ pageId, eventId }) +
-          '?from=review' +
-          focusTarget
-      )
-    }
-    return
-  }
-
   return (
-    <Frame
-      skipToContentText="Skip to form"
-      header={<FormHeader label={configuration.label} />}
-    >
-      <Row>
-        <LeftColumn>
-          <Card>
-            <HeaderContainer>
-              <HeaderContent>
-                <Stack
-                  direction="column"
-                  alignItems="flex-start"
-                  justify-content="flex-start"
-                  gap={6}
-                >
-                  <TitleContainer id={`header_title`}>
-                    {configuration.label.defaultMessage}
-                  </TitleContainer>
-                  <SubjectContainer id={`header_subject`}>
-                    {intl.formatMessage(forms[0].review.title, {
-                      firstname: data['applicant.firstname'],
-                      surname: data['applicant.surname']
-                    })}
-                  </SubjectContainer>
-                </Stack>
-              </HeaderContent>
-            </HeaderContainer>
-            <FormData>
-              <ReviewContainter>
-                {forms[0].pages.map((page) => {
-                  return (
-                    <DeclarationDataContainer
-                      key={'Section_' + page.title.defaultMessage}
-                    >
-                      <Accordion
-                        name={'Accordion_' + page.id}
-                        label={intl.formatMessage(page.title)}
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        action={
-                          <Link onClick={(e) => handleEdit(e, page.id)}>
-                            {intl.formatMessage(messages.chagneButton)}
-                          </Link>
-                        }
-                        expand={true}
-                      >
-                        <ListReview id={'Section_' + page.id}>
-                          {page.fields.map((field) => (
-                            <ListReview.Row
-                              id={field.id}
-                              key={field.id}
-                              label={intl.formatMessage(field.label)}
-                              value={data[field.id] || ''}
-                              actions={
-                                <Link
-                                  onClick={(e) =>
-                                    handleEdit(e, page.id, field.id)
-                                  }
-                                >
-                                  {intl.formatMessage(messages.chagneButton)}
-                                </Link>
-                              }
-                            />
-                          ))}
-                        </ListReview>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
-              </ReviewContainter>
-            </FormData>
-          </Card>
-          <ReviewActionComponent
-            onRegister={handleRegister}
-            onReject={handleReject}
-          />
-        </LeftColumn>
-      </Row>
+    <>
+      <Preview.Body
+        formConfig={formConfigs[0]}
+        eventConfig={config}
+        onEdit={handleEdit}
+        form={form}
+        // @todo: Update to use dynamic title
+        title={intl.formatMessage(formConfigs[0].review.title, {
+          firstname: form['applicant.firstname'],
+          surname: form['applicant.surname']
+        })}
+      >
+        <Preview.Actions
+          onConfirm={handleDeclaration}
+          onReject={handleReject}
+          messages={{
+            title: messages.reviewActionTitle,
+            description: messages.reviewActionDescription,
+            onConfirm: messages.reviewActionDeclare
+          }}
+        />
+      </Preview.Body>
       {modal}
-    </Frame>
-  )
-}
-
-export const ReviewSection = () => {
-  const { eventId } = useParams<{
-    eventId: string
-  }>()
-  const events = useEvents()
-
-  if (!eventId) {
-    throw new Error('Event id is required')
-  }
-
-  const [event] = events.getEvent(eventId)
-
-  if (!event) {
-    throw new Error('Event not found')
-  }
-
-  if (!event) return <div>Failed to get event</div>
-
-  return <ReviewSectionComponent event={event}></ReviewSectionComponent>
-}
-
-const Container = styled.div`
-  position: relative;
-  margin-top: 48px;
-  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    max-width: 100vw;
-  }
-`
-const Content = styled.div`
-  z-index: 1;
-  padding: 32px;
-  position: relative;
-  white-space: pre-wrap;
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
-    padding-bottom: 32px;
-  }
-`
-const UnderLayBackground = styled.div<{ background: string }>`
-  background-color: ${({ background, theme }) =>
-    background === 'success'
-      ? theme.colors.greenLighter
-      : background === 'error'
-      ? theme.colors.redLighter
-      : theme.colors.greenLighter};
-`
-
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2}
-  margin-bottom: 12px;
-`
-const Description = styled.div`
-  ${({ theme }) => theme.fonts.reg18};
-  margin-bottom: 32px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.reg16}
-  }
-`
-
-const ActionContainer = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-
-  button:first-child {
-    margin-right: 16px;
-  }
-
-  & > button {
-    margin-bottom: 8px;
-  }
-`
-
-const ReviewActionComponent = ({
-  onRegister,
-  onReject
-}: {
-  onRegister: () => {}
-  onReject: () => {}
-}) => {
-  const intl = useIntl()
-  return (
-    <Container>
-      <UnderLayBackground background="success">
-        <Content>
-          <Title>{intl.formatMessage(messages.reviewActionTitle)}</Title>
-          <Description>
-            {intl.formatMessage(messages.reviewActionDescription)}
-          </Description>
-          <ActionContainer>
-            <Button
-              type="positive"
-              size="large"
-              id="validateDeclarationBtn"
-              onClick={onRegister}
-            >
-              <Icon name="Check" />
-              {intl.formatMessage(messages.reviewActionDeclare)}
-            </Button>
-          </ActionContainer>
-        </Content>
-      </UnderLayBackground>
-    </Container>
-  )
-}
-
-const ActionModal: React.FC<{
-  close: (result: boolean | null) => void
-  action: string
-}> = ({ close, action }) => {
-  const intl = useIntl()
-  return (
-    <ResponsiveModal
-      autoHeight
-      responsive={false}
-      title={intl.formatMessage(messages.actionModalTitle, { action })}
-      actions={[
-        <Button
-          type="tertiary"
-          id={'cancel_' + action}
-          key={'cancel_' + action}
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(messages.actionModalCancel)}
-        </Button>,
-        <Button
-          type="primary"
-          key={'confirm_' + action}
-          id={'confirm_' + action}
-          onClick={() => {
-            close(true)
-          }}
-        >
-          {intl.formatMessage(messages.actionModalPrimaryAction, { action })}
-        </Button>
-      ]}
-      show={true}
-      handleClose={() => close(null)}
-    >
-      <Stack>
-        <Text variant="reg16" element="p" color="grey500">
-          {intl.formatMessage(messages.actionModalDescription)}
-        </Text>
-      </Stack>
-    </ResponsiveModal>
+    </>
   )
 }
 
@@ -628,49 +285,6 @@ const RejectModal: React.FC<{
             setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
           }
         />
-      </Stack>
-    </ResponsiveModal>
-  )
-}
-
-const EditFieldModal: React.FC<{
-  close: (result: boolean | null) => void
-}> = ({ close }) => {
-  const intl = useIntl()
-  return (
-    <ResponsiveModal
-      autoHeight
-      responsive={false}
-      title={intl.formatMessage(messages.changeModalTitle)}
-      actions={[
-        <Button
-          type="tertiary"
-          id="cancel_edit"
-          key="cancel_edit"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(messages.changeModalCancel)}
-        </Button>,
-        <Button
-          type="primary"
-          key="confirm_edit"
-          id="confirm_edit"
-          onClick={() => {
-            close(true)
-          }}
-        >
-          {intl.formatMessage(messages.changeModalContinue)}
-        </Button>
-      ]}
-      show={true}
-      handleClose={() => close(null)}
-    >
-      <Stack>
-        <Text variant="reg16" element="p" color="grey500">
-          {intl.formatMessage(messages.changeModalDescription)}
-        </Text>
       </Stack>
     </ResponsiveModal>
   )

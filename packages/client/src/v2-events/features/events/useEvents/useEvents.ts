@@ -313,6 +313,13 @@ export function useEvents() {
     return api.event.actions.declare.useMutation({})
   }
 
+  /**
+   * @TODO: Replace with register mutation
+   */
+  const register = () => {
+    return api.event.actions.declare.useMutation({})
+  }
+
   const getEvent = (id: string) => {
     return api.event.get.useSuspenseQuery(id)
   }
@@ -356,7 +363,8 @@ export function useEvents() {
     getOutbox,
     actions: {
       draft,
-      declare
+      declare,
+      register
     }
   }
 }
