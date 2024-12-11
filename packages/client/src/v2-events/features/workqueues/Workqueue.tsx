@@ -126,6 +126,14 @@ export const Workqueue = ({
       ...event,
       createdAt: intl.formatDate(new Date(event.createdAt)),
       modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
+      status: intl.formatMessage(
+        {
+          id: `events.status`,
+          defaultMessage:
+            '{status, select, CREATED {Draft} DRAFT {Draft} DECLARED {Declared} other {Unknown}}'
+        },
+        { status: event.status }
+      ),
       [config.fields[0].id]: (
         <NondecoratedLink
           to={ROUTES.V2.EVENTS.EVENT.buildPath({
