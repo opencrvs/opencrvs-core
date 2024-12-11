@@ -12,27 +12,53 @@
 import React from 'react'
 
 import { Debug } from '@client/v2-events/features/debug/debug'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
 import {
-  AppBar,
-  Button,
-  Content,
-  ContentSize,
   Frame,
+  AppBar,
+  Stack,
+  Button,
   Icon,
   LeftNavigation,
   NavigationGroup,
   NavigationItem,
-  SearchTool,
-  Stack,
-  Text
+  SearchTool
 } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
-import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@client/v2-events/routes'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useEvents } from '@client/v2-events/features/events/useEvents'
+import groupBy from 'lodash-es/groupBy'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useIntlFormatMessageWithFlattenedParams } from './utils'
+import sumBy from 'lodash-es/sumBy'
 
-export const Workqueues = () => {
+const colors = ['green', 'orange', 'red', 'teal', 'grey', 'purple']
+
+/**
+ * Basic frame for the workqueues. Includes the left navigation and the app bar.
+ */
+export const Workqueues = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
+  const intl = useIntlFormatMessageWithFlattenedParams()
+
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
+
+  const { getEvents } = useEvents()
+  const events = getEvents.useQuery()
+
+  const [config] = useEventConfigurations()
+
+  const createQueueUrl = (id: string) =>
+    ROUTES.V2.WORKQUEUE.buildPath(
+      {},
+      {
+        id
+      }
+    )
+
+  const eventsByStatus = groupBy(events.data, (event) => event.status)
 
   return (
     <Frame
@@ -42,30 +68,33 @@ export const Workqueues = () => {
           applicationVersion="0.1-alpha"
         >
           <NavigationGroup>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              label="In progress"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              label="Ready for review"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
-              label="Requires updates"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
-              label="Sent for approval"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'green'} />}
-              label="Ready to print"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'blue'} />}
-              label="Ready to issue"
-            />
+            {config.workqueues.map((workqueue, i) => {
+              const statuses = workqueue.filters.flatMap(
+                (filter) => filter.status
+              )
+              const count = sumBy(
+                statuses,
+                (status) => eventsByStatus[status]?.length ?? 0
+              )
+
+              return (
+                <NavLink
+                  to={createQueueUrl(workqueue.id)}
+                  key={workqueue.title.id}
+                >
+                  {(props) => (
+                    <NavigationItem
+                      isSelected={
+                        props.isActive && searchParams.id === workqueue.id
+                      }
+                      icon={() => <DeclarationIconSmall color={colors[i]} />}
+                      label={intl.formatMessage(workqueue.title)}
+                      count={count}
+                    />
+                  )}
+                </NavLink>
+              )
+            })}
           </NavigationGroup>
           <NavigationGroup>
             <NavigationItem
@@ -91,7 +120,7 @@ export const Workqueues = () => {
               <Button
                 type="iconPrimary"
                 onClick={() => {
-                  navigate(V2_EVENTS_ROUTE)
+                  navigate(ROUTES.V2.EVENTS.CREATE.path)
                 }}
               >
                 <Plus />
@@ -114,11 +143,7 @@ export const Workqueues = () => {
         />
       }
     >
-      <Content size={ContentSize.LARGE} title="Welcome">
-        <Text variant="h2" element="p">
-          🚧🚧🚧🚧🚧🚧🚧🚧👷‍♂️👷👷🏻👷🏻‍♀️👷‍♂️👷‍♂️🚧🚧🚧🚧🚧🚧🚧🚧
-        </Text>
-      </Content>
+      {children}
       <Debug />
     </Frame>
   )

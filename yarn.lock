@@ -21855,6 +21855,11 @@ react-router-dom@^6.28.0:
     "@remix-run/router" "1.21.0"
     react-router "6.28.0"
 
+react-router-typesafe-routes@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-router-typesafe-routes/-/react-router-typesafe-routes-1.2.2.tgz#548a8a46f3f71bfcd0da5cef789bcb5a422fbe71"
+  integrity sha512-aUTUO0XzEhevQTNACv82SJVRbUMnGCrQIecRwKWLRNt2oKXs01kW4nIJbRV8xwAvv9PR4WKM2Iifd84DiOr73w==
+
 react-router@5.3.4:
   version "5.3.4"
   resolved "https://registry.npmjs.org/react-router/-/react-router-5.3.4.tgz"

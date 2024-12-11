@@ -8,24 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
-import { MongoMemoryServer } from 'mongodb-memory-server'
+interface IErrorMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
+  queryError: MessageDescriptor
+}
 
-export type { ProvidedContext } from 'vitest'
-
-declare module 'vitest' {
-  export interface ProvidedContext {
-    MONGO_URI: string
+const messagesToDefine: IErrorMessages = {
+  queryError: {
+    defaultMessage: 'An error occurred while searching',
+    description: 'The error message shown when a search query fails',
+    id: 'error.search'
   }
 }
 
-export default async function setup({ provide }: any) {
-  const mongod = await MongoMemoryServer.create()
-  const uri = mongod.getUri()
-
-  provide('MONGO_URI', uri)
-
-  return async () => {
-    await mongod.stop()
-  }
-}
+export const errorMessages: IErrorMessages = defineMessages(messagesToDefine)

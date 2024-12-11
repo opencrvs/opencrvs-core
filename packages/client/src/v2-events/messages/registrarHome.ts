@@ -8,15 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { defineMessages, MessageDescriptor } from 'react-intl'
 
-/**
- * Copied over from core. Used until react-router-dom is updated to v6
- * @deprecated
- */
-export function formatUrl(url: string, props: { [key: string]: string }) {
-  const formattedUrl = Object.keys(props).reduce(
-    (str, key) => str.replace(`:${key}`, props[key]),
-    url
-  )
-  return formattedUrl.endsWith('?') ? formattedUrl.slice(0, -1) : formattedUrl
+interface IOfficeHomeMessages
+  extends Record<string | number | symbol, MessageDescriptor> {
+  empty: MessageDescriptor
 }
+
+const messagesToDefine: IOfficeHomeMessages = {
+  empty: {
+    defaultMessage: 'Empty message',
+    description: 'Label for workqueue tooltip',
+    id: 'regHome.issued'
+  }
+}
+
+export const messages: IOfficeHomeMessages = defineMessages(messagesToDefine)

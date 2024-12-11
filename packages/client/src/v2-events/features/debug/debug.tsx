@@ -94,11 +94,6 @@ export const Debug = () => {
               Clear React Query buffer
             </button>
           </li>
-        </ul>
-        <Text variant="h4" element="span">
-          Local records
-        </Text>
-        <ul>
           <li>
             <button onClick={() => console.log(events.events.data)}>
               console.log stored events
@@ -110,6 +105,9 @@ export const Debug = () => {
             </Text>
           </li>
         </ul>
+        <Text variant="h4" element="span">
+          Local records
+        </Text>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
     </>

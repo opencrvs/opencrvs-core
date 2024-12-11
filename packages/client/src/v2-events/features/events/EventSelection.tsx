@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { formatUrl } from '@client/navigation'
 import { Debug } from '@client/v2-events/features/debug/debug'
-import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -23,8 +22,8 @@ import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 import { useEventConfigurations } from './useEventConfiguration'
+import { useNavigate } from 'react-router-dom'
 import { useEvents } from './useEvents/useEvents'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEventFormData } from './useEventFormData'
@@ -90,7 +89,7 @@ const EventSelector = () => {
     clearForm()
 
     navigate(
-      formatUrl(V2_DECLARE_ACTION_ROUTE, {
+      ROUTES.V2.EVENTS.DECLARE.EVENT.buildPath({
         eventId: transactionId
       })
     )

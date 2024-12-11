@@ -11,6 +11,10 @@
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
+import { flattenDeep } from 'lodash'
+import { WorkqueueConfig } from './WorkqueueConfig'
+import { eventMetadataLabelMap } from './EventMetadata'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -23,14 +27,94 @@ export const EventConfig = z.object({
     .describe(
       'A machine-readable identifier for the event, e.g. "birth" or "death"'
     ),
+  summary: SummaryConfig,
   label: TranslationConfig,
-  actions: z.array(ActionConfig)
+  actions: z.array(ActionConfig),
+  workqueues: z.array(WorkqueueConfig)
 })
 
 export type EventConfig = z.infer<typeof EventConfig>
+
+const findPageFields = (
+  config: Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput }
+) => {
+  return flattenDeep(
+    config.actions.map(({ forms }) =>
+      forms.map(({ pages }) =>
+        pages.map(({ fields }) =>
+          fields.map((field) => ({ id: field.id, label: field.label }))
+        )
+      )
+    )
+  )
+}
+
+const fillFieldLabels = ({
+  pageFields,
+  refFields
+}: {
+  pageFields: { id: string; label: TranslationConfig }[]
+  refFields: {
+    id: keyof typeof eventMetadataLabelMap | string
+    label?: TranslationConfig
+  }[]
+}) => {
+  return refFields.map((field) => {
+    if (field.label) {
+      return field
+    }
+
+    // @ts-ignore
+    const metadataLabel = eventMetadataLabelMap[field.id]
+    if (metadataLabel) {
+      return {
+        ...field,
+        label: metadataLabel
+      }
+    }
+
+    const pageLabel = pageFields.find((pageField) => pageField.id === field.id)
+    if (!pageLabel) {
+      throw new Error(`Referenced field ${field.id} does not have a label`)
+    }
+
+    return {
+      ...field,
+      label: pageLabel.label
+    }
+  })
+}
 
 /**
  * Builds a validated configuration for an event
  * @param config - Event specific configuration
  */
-export const defineConfig = (config: EventConfig) => EventConfig.parse(config)
+export const defineConfig = (
+  config:
+    | EventConfig
+    | (Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput })
+) => {
+  const parsed = EventConfig.extend({
+    summary: SummaryConfigInput
+  }).parse(config)
+
+  const pageFields = findPageFields(parsed)
+
+  return EventConfig.parse({
+    ...parsed,
+    summary: {
+      ...parsed.summary,
+      fields: fillFieldLabels({
+        pageFields,
+        refFields: parsed.summary.fields
+      })
+    },
+    workqueues: parsed.workqueues.map((workqueue) => ({
+      ...workqueue,
+      fields: fillFieldLabels({
+        pageFields,
+        refFields: workqueue.fields
+      })
+    }))
+  })
+}

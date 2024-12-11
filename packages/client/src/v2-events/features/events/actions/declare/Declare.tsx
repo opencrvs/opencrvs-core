@@ -13,10 +13,7 @@ import { IFormField } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import {
-  V2_DECLARE_ACTION_ROUTE,
-  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
-} from '@client/v2-events/routes'
+
 import {
   AppBar,
   Button,
@@ -34,6 +31,7 @@ import { useEventFormNavigation } from '@client/v2-events//features/events/useEv
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
+import { ROUTES } from '@client/v2-events/routes'
 
 export function DeclareIndex() {
   return (
@@ -174,7 +172,7 @@ function Declare() {
 
     if (eventId !== event.id && !hasTemporaryId) {
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE, {
+        ROUTES.V2.EVENTS.DECLARE.EVENT.buildPath({
           eventId: event.id
         })
       )
@@ -195,7 +193,7 @@ function Declare() {
   useEffect(() => {
     if (!pageId) {
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath({
           eventId: event.id,
           pageId: pages[0].id
         })
@@ -210,7 +208,7 @@ function Declare() {
     const pageChanged = pages[currentPage].id !== pageId
     if (pageChanged) {
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath({
           eventId: event.id,
           pageId: pages[currentPage].id
         })

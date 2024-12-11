@@ -12,7 +12,7 @@ import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 
 const ActionBase = z.object({
-  createdAt: z.date(),
+  createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), z.any())
 })
