@@ -11,6 +11,8 @@
 
 import { ActionInput } from '@opencrvs/commons/client'
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import { storage } from '@client/storage'
 
 type FormData = ActionInput['data']
 
@@ -20,8 +22,27 @@ type EventFormData = {
   clear: () => void
 }
 
-export const useEventFormData = create<EventFormData>((set) => ({
-  formValues: {},
-  setFormValues: (data: FormData) => set(() => ({ formValues: data })),
-  clear: () => set(() => ({ formValues: {} }))
-}))
+export const useEventFormData = create<EventFormData>()(
+  persist(
+    (set) => ({
+      formValues: {},
+      setFormValues: (data: FormData) => set(() => ({ formValues: data })),
+      clear: () => set(() => ({ formValues: {} }))
+    }),
+    {
+      name: 'event-form-data',
+      storage: createJSONStorage(() => ({
+        getItem: async (key) => {
+          const value = await storage.getItem(key)
+          return value ? JSON.parse(value) : null
+        },
+        setItem: async (key, value) => {
+          await storage.setItem(key, JSON.stringify(value))
+        },
+        removeItem: async (key) => {
+          await storage.removeItem(key)
+        }
+      }))
+    }
+  )
+)

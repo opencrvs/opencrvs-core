@@ -62,17 +62,29 @@ const messages = defineMessages({
   }
 })
 
-export const FormHeader = ({
-  label,
-  onExit,
-  onSaveAndExit
-}: {
-  label: TranslationConfig
-  onExit: () => void
-  onSaveAndExit: () => void
-}) => {
+export const FormHeader = ({ label }: { label: TranslationConfig }) => {
   const intl = useIntl()
-  const { modal } = useEventFormNavigation()
+  const { modal, exit, goToHome } = useEventFormNavigation()
+  const events = useEvents()
+  const formValues = useEventFormData((state) => state.formValues)
+  const { eventId } = useParams<{
+    eventId: string
+  }>()
+
+  if (!eventId) {
+    throw new Error('Event id is required')
+  }
+
+  const createDraft = events.actions.draft()
+
+  const saveAndExit = useCallback(() => {
+    createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })
+    goToHome()
+  }, [createDraft, eventId, formValues, goToHome])
+
+  const onExit = useCallback(() => {
+    exit()
+  }, [exit])
 
   return (
     <AppBar
@@ -88,7 +100,7 @@ export const FormHeader = ({
               type="primary"
               size="small"
               disabled={false}
-              onClick={onSaveAndExit}
+              onClick={saveAndExit}
             >
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
@@ -112,7 +124,7 @@ export const FormHeader = ({
               type="icon"
               size="small"
               disabled={false}
-              onClick={onSaveAndExit}
+              onClick={saveAndExit}
             >
               <Icon name="DownloadSimple" />
             </Button>
@@ -208,7 +220,7 @@ function Declare() {
 
   const intl = useIntl()
 
-  const { modal, goToHome, goToReview, exit } = useEventFormNavigation()
+  const { modal, goToReview } = useEventFormNavigation()
 
   const page = pages[currentPage]
 
@@ -226,23 +238,10 @@ function Declare() {
           } as IFormField)
       )
 
-  const createDraft = events.actions.draft()
-
-  const saveAndExit = useCallback(() => {
-    createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })
-    goToHome()
-  }, [createDraft, eventId, formValues, goToHome])
-
   return (
     <Frame
       skipToContentText="Skip to form"
-      header={
-        <FormHeader
-          onExit={exit}
-          onSaveAndExit={saveAndExit}
-          label={configuration.label}
-        />
-      }
+      header={<FormHeader label={configuration.label} />}
     >
       {modal}
       <FormWizard
@@ -262,6 +261,7 @@ function Declare() {
           onChange={(values) => {
             setFormValues(values)
           }}
+          initialValues={formValues}
           formData={formValues}
           fields={fields}
         />

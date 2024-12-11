@@ -192,6 +192,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       touched: Boolean(touched),
       placeholder: fieldDefinition.placeholder
     }
+
     if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
       return (
         <InputField {...inputFieldProps}>
@@ -664,8 +665,6 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const errors = this.props.errors as unknown as Errors
 
-    const sectionName = this.props.id.split('-')[0]
-
     return (
       <section>
         {fields.map((field) => {
@@ -730,27 +729,29 @@ class FormSectionComponent extends React.Component<AllProps> {
                 key={`${field.name}`}
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
-                <Field name={field.name.replaceAll('.', '___')}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      setFieldTouched={setFieldTouched}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={error}
-                      fields={fields}
-                      values={values}
-                      formData={formData}
-                      disabled={isFieldDisabled}
-                    />
-                  )}
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => {
+                    return (
+                      <GeneratedInputField
+                        fieldDefinition={internationaliseFieldObject(
+                          intl,
+                          withDynamicallyGeneratedFields
+                        )}
+                        setFieldValue={this.setFieldValuesWithDependency}
+                        setFieldTouched={setFieldTouched}
+                        resetDependentSelectValues={
+                          this.resetDependentSelectValues
+                        }
+                        {...formikFieldProps.field}
+                        touched={touched[field.name] || false}
+                        error={error}
+                        fields={fields}
+                        values={values}
+                        formData={formData}
+                        disabled={isFieldDisabled}
+                      />
+                    )
+                  }}
                 </Field>
               </FormItem>
             )
@@ -760,7 +761,7 @@ class FormSectionComponent extends React.Component<AllProps> {
                 key={`${field.name}${language}`}
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
-                <Field name={field.name.replaceAll('.', '___')}>
+                <Field name={field.name}>
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <GeneratedInputField
@@ -805,11 +806,13 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
     props.onChange(flatten(values))
   }
 
+  const initialValues = unflatten<IFormFieldValue>(
+    props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
+  )
+
   return (
     <Formik<IFormSectionData>
-      initialValues={
-        props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
-      }
+      initialValues={initialValues}
       onSubmit={() => {}}
       validate={(values) =>
         getValidationErrorsForForm(
