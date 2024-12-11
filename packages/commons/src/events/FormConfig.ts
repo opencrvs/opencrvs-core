@@ -31,7 +31,12 @@ export const FormConfig = z.object({
     )
   }),
   active: z.boolean().default(false).describe('Whether the form is active'),
-  pages: z.array(FormPage)
+  pages: z.array(FormPage),
+  review: z.object({
+    title: TranslationConfig.describe(
+      'Title of the form to show in review page'
+    )
+  })
 })
 
 export type FormPage = z.infer<typeof FormPage>

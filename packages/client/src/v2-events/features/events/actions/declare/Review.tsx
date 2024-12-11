@@ -335,10 +335,10 @@ export const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                     {configuration.label.defaultMessage}
                   </TitleContainer>
                   <SubjectContainer id={`header_subject`}>
-                    {'Member declaration for ' +
-                      (data['applicant.firstname'] || '') +
-                      ' ' +
-                      (data['applicant.surname'] || '')}
+                    {intl.formatMessage(forms[0].review.title, {
+                      firstname: data['applicant.firstname'],
+                      surname: data['applicant.surname']
+                    })}
                   </SubjectContainer>
                 </Stack>
               </HeaderContent>
