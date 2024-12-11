@@ -110,9 +110,9 @@ export const Workqueue = ({
   const statuses = config.filters.flatMap((filter) => filter.status)
 
   const workqueue = events
-    .filter((event) => statuses.includes(event.status))
+    .filter((event) => statuses.length === 0 || statuses.includes(event.status))
     .map((event) =>
-      mapKeys(event, (value, key) => (key === 'data' ? key : `event.${key}`))
+      mapKeys(event, (value, key) => (key === 'data' ? key : `${key}`))
     )
     .map((event) => {
       const { data, ...rest } = event
@@ -120,15 +120,17 @@ export const Workqueue = ({
     })
     .map((event) => ({
       ...event,
+      createdAt: intl.formatDate(new Date(event.createdAt)),
+      modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
       [config.fields[0].id]: (
         <Link
           to={ROUTES.V2.EVENTS.EVENT.buildPath({
-            eventId: get(event, 'event.id')
+            eventId: event.id
           })}
         >
           <IconWithName
             name={get(event, config.fields[0].id) ?? 'N/A'}
-            status={get(event, 'event.status')}
+            status={event.status}
           />
         </Link>
       )
@@ -148,6 +150,48 @@ export const Workqueue = ({
     setSortOrder(newSortOrder)
   }
 
+  const getDefaultColumns = (): Array<{
+    label?: string
+    width: number
+    key: string
+    sortFunction?: (columnName: string) => void
+    isActionColumn?: boolean
+    isSorted?: boolean
+    alignment?: ColumnContentAlignment
+  }> => {
+    return [
+      {
+        label: intl.formatMessage({
+          id: 'events.workqueues.status',
+          defaultMessage: 'Status'
+        }),
+        width: 25,
+        key: 'status',
+        sortFunction: onColumnClick,
+        isSorted: sortedCol === 'status'
+      },
+      {
+        label: intl.formatMessage({
+          id: 'events.workqueues.createdAt',
+          defaultMessage: 'CreatedAt'
+        }),
+        width: 25,
+        key: 'createdAt',
+        sortFunction: onColumnClick,
+        isSorted: sortedCol === 'createdAt'
+      },
+      {
+        label: intl.formatMessage({
+          id: 'events.workqueues.modifiedAt',
+          defaultMessage: 'ModifiedAt'
+        }),
+        width: 25,
+        key: 'modifiedAt',
+        sortFunction: onColumnClick,
+        isSorted: sortedCol === 'modifiedAt'
+      }
+    ]
+  }
   // @TODO: separate types for action button vs other columns
   const getColumns = (): Array<{
     label?: string
@@ -161,7 +205,7 @@ export const Workqueue = ({
     if (width > theme.grid.breakpoints.lg) {
       return config.fields.map((field, i) => ({
         label: intl.formatMessage(field.label!),
-        width: i === 0 ? 25 : 18,
+        width: 35,
         key: field.id,
         sortFunction: onColumnClick,
         isSorted: sortedCol === field.id
@@ -170,7 +214,7 @@ export const Workqueue = ({
       return config.fields
         .map((field, i) => ({
           label: intl.formatMessage(field.label!),
-          width: i === 0 ? 25 : 75,
+          width: 35,
           key: field.id,
           sortFunction: onColumnClick,
           isSorted: sortedCol === field.id
@@ -203,7 +247,7 @@ export const Workqueue = ({
       </ReactTooltip>
       <WorkqueueComponent
         content={orderBy(workqueue, sortedCol, sortOrder)}
-        columns={getColumns()}
+        columns={getColumns().concat(getDefaultColumns())}
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
         hideLastBorder={!isShowPagination}
