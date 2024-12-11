@@ -37,6 +37,8 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
+import ProtectedComponent from '@client/components/ProtectedComponent'
+import { SCOPES } from '@opencrvs/commons/client'
 
 const Instruction = styled.div`
   margin-bottom: 28px;
@@ -156,23 +158,28 @@ class RejectRegistrationView extends React.Component<IFullProps, IState> {
             >
               {intl.formatMessage(buttonMessages.cancel)}
             </Button>,
-            <Button
-              key="submit_archive"
-              id="submit_archive"
-              size="medium"
-              type="secondaryNegative"
-              onClick={() => {
-                this.props.archiveDeclaration(
-                  payload.id,
-                  payload.reason as string,
-                  payload.comment as string
-                )
-                this.props.goToHome()
-              }}
-              disabled={!this.state.enableArchiveBtn}
+            <ProtectedComponent
+              key="protected_submit_archive"
+              scopes={[SCOPES.RECORD_DECLARATION_ARCHIVE]}
             >
-              {intl.formatMessage(buttonMessages.archive)}
-            </Button>,
+              <Button
+                key="submit_archive"
+                id="submit_archive"
+                size="medium"
+                type="secondaryNegative"
+                onClick={() => {
+                  this.props.archiveDeclaration(
+                    payload.id,
+                    payload.reason as string,
+                    payload.comment as string
+                  )
+                  this.props.goToHome()
+                }}
+                disabled={!this.state.enableArchiveBtn}
+              >
+                {intl.formatMessage(buttonMessages.archive)}
+              </Button>
+            </ProtectedComponent>,
             <Button
               key="submit_reject_form"
               size="medium"
