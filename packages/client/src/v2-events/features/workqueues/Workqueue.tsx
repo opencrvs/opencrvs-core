@@ -173,7 +173,7 @@ export const Workqueue = ({
       {
         label: intl.formatMessage({
           id: 'events.workqueues.createdAt',
-          defaultMessage: 'CreatedAt'
+          defaultMessage: 'Created'
         }),
         width: 25,
         key: 'createdAt',
@@ -183,7 +183,7 @@ export const Workqueue = ({
       {
         label: intl.formatMessage({
           id: 'events.workqueues.modifiedAt',
-          defaultMessage: 'ModifiedAt'
+          defaultMessage: 'Modified'
         }),
         width: 25,
         key: 'modifiedAt',
