@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { ROUTES } from '@client/v2-events/routes'
 import { EventDocument } from '@opencrvs/commons'
 import {
   Accordion,
@@ -28,13 +33,8 @@ import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
+import { v4 as uuid } from 'uuid'
 import { FormHeader } from './Declare'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { formatUrl } from '@client/navigation'
-import { V2_DECLARE_ACTION_ROUTE_WITH_PAGE } from '@client/v2-events/routes'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -272,7 +272,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
       declareMutation.mutate({
         eventId: event.id,
         data: data,
-        transactionId: Math.random().toString()
+        transactionId: `tmp-${uuid()}`
       })
       goToHome()
     }
@@ -312,7 +312,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
     if (confirmedEdit) {
       const focusTarget = fieldId ? '#' + fieldId : ''
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, { pageId, eventId }) +
+        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath({ pageId, eventId }) +
           '?from=review' +
           focusTarget
       )

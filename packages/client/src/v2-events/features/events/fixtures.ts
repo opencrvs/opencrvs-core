@@ -18,6 +18,106 @@ export const tennisClubMembershipEvent = {
     description: 'This is what this event is referred as in the system',
     id: 'event.tennis-club-membership.label'
   },
+  summary: {
+    title: {
+      defaultMessage: '{applicant.firstname} {applicant.surname}',
+      description: 'This is the title of the summary',
+      id: 'event.tennis-club-membership.summary.title'
+    },
+    fields: [
+      {
+        id: 'applicant.firstname',
+        label: {
+          defaultMessage: 'First name',
+          description: 'Label for the gien field from form.',
+          id: 'event.tennis-club-membership.summary.field.firstname.label'
+        }
+      }
+    ]
+  },
+  workqueues: [
+    {
+      id: 'in-progress',
+      title: {
+        defaultMessage: 'In progress',
+        description: 'Label for in progress workqueue',
+        id: 'event.tennis-club-membership.workqueue.in-progress.label'
+      },
+      fields: [
+        {
+          id: 'applicant.firstname'
+        },
+        {
+          id: 'event.type'
+        },
+        {
+          id: 'event.createdAt'
+        },
+        {
+          id: 'event.modifiedAt'
+        }
+      ],
+      filters: [
+        {
+          status: ['CREATED']
+        }
+      ]
+    },
+    {
+      id: 'ready-for-review',
+      title: {
+        defaultMessage: 'Ready for review',
+        description: 'Label for in review workqueue',
+        id: 'event.tennis-club-membership.workqueue.in-review.label'
+      },
+      fields: [
+        {
+          id: 'applicant.firstname'
+        },
+        {
+          id: 'event.type'
+        },
+        {
+          id: 'event.createdAt'
+        },
+        {
+          id: 'event.modifiedAt'
+        }
+      ],
+      filters: [
+        {
+          status: ['DECLARED']
+        }
+      ]
+    },
+    {
+      id: 'registered',
+      title: {
+        defaultMessage: 'Ready to print',
+        description: 'Label for registered workqueue',
+        id: 'event.tennis-club-membership.workqueue.registered.label'
+      },
+      fields: [
+        {
+          id: 'applicant.firstname'
+        },
+        {
+          id: 'event.type'
+        },
+        {
+          id: 'event.createdAt'
+        },
+        {
+          id: 'event.modifiedAt'
+        }
+      ],
+      filters: [
+        {
+          status: ['REGISTERED']
+        }
+      ]
+    }
+  ],
   actions: [
     {
       type: 'DECLARE',

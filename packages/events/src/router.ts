@@ -15,6 +15,7 @@ import { z } from 'zod'
 
 import {
   DeclareActionInput,
+  EventIndex,
   EventInput,
   NotifyActionInput
 } from '@opencrvs/commons/events'
@@ -27,6 +28,7 @@ import {
   patchEvent
 } from './service/events'
 import { EventConfig } from '@opencrvs/commons'
+import { getIndexedEvents } from './service/indexing/indexing'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -59,9 +61,7 @@ export const appRouter = router({
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
       const config = await getEventsConfig(options.ctx.token)
-
       const eventIds = config.map((c) => c.id)
-
       if (!eventIds.includes(options.input.type)) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -97,6 +97,11 @@ export const appRouter = router({
           createdBy: options.ctx.user.id
         })
       })
+    })
+  }),
+  events: router({
+    get: publicProcedure.output(z.array(EventIndex)).query(async () => {
+      return getIndexedEvents()
     })
   })
 })

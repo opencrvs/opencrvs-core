@@ -120,8 +120,8 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       id: newEvent.transactionId,
       type: newEvent.type,
       transactionId: newEvent.transactionId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       actions: []
     }
 
@@ -285,6 +285,8 @@ export function useEvents() {
     createEvent,
     events,
     getEvent,
+    getEventById: api.event.get,
+    getEvents: api.events.get,
     getDrafts,
     getOutbox,
     actions: {

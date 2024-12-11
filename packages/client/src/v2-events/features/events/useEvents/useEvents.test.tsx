@@ -52,12 +52,12 @@ const createHandler = trpcHandler(async ({ request }) => {
     transactionId: body.transactionId,
     type: 'TENNIS_CLUB_MEMBERSHIP',
     id: '_REAL_UUID_',
-    createdAt: new Date('2024-12-05T18:37:31.295Z'),
-    updatedAt: new Date('2024-12-05T18:37:31.295Z'),
+    createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
+    updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
       {
         type: 'CREATE',
-        createdAt: new Date('2024-12-05T18:37:31.295Z'),
+        createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
         data: []
