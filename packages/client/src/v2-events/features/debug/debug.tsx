@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* stylelint-disable */
-import React from 'react'
+import React, { useState } from 'react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import styled from 'styled-components'
@@ -35,6 +35,8 @@ export const Debug = () => {
   const online = useOnlineStatus()
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
+
+  const [eventId, setEventId] = useState('')
 
   const createEvents = () => {
     createMutation.mutate(

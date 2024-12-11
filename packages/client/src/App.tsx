@@ -62,7 +62,9 @@ import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizar
 import { EventSelection } from './v2-events/features/events/EventSelection'
 import { Workqueues } from './v2-events/features/workqueues'
 import {
+  V2_DECLARE_ACTION_REVIEW_ROUTE,
   V2_DECLARE_ACTION_ROUTE,
+  V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE
 } from './v2-events/routes'
@@ -80,6 +82,8 @@ import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
+import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
+import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -401,6 +405,22 @@ export const routesConfig = [
         element: (
           <TRPCProvider>
             <EventFormWizardIndex />
+          </TRPCProvider>
+        )
+      },
+      {
+        path: V2_DECLARE_ACTION_REVIEW_ROUTE,
+        element: (
+          <TRPCProvider>
+            <ReviewSection />
+          </TRPCProvider>
+        )
+      },
+      {
+        path: V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
+        element: (
+          <TRPCProvider>
+            <DeclareIndex />
           </TRPCProvider>
         )
       }

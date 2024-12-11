@@ -11,10 +11,7 @@
 
 import { formatUrl } from '@client/navigation'
 import { Debug } from '@client/v2-events/features/debug/debug'
-import {
-  V2_DECLARE_ACTION_ROUTE,
-  V2_ROOT_ROUTE
-} from '@client/v2-events/routes'
+import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -29,6 +26,8 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useEventConfigurations } from './useEventConfiguration'
 import { useEvents } from './useEvents/useEvents'
+import { useEventFormNavigation } from './useEventFormNavigation'
+import { useEventFormData } from './useEventFormData'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -75,6 +74,7 @@ const EventSelector = () => {
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
 
+  const clearForm = useEventFormData((state) => state.clear)
   const createEvent = events.createEvent()
 
   const handleContinue = async () => {
@@ -87,6 +87,8 @@ const EventSelector = () => {
       type: eventType,
       transactionId
     })
+
+    clearForm()
 
     navigate(
       formatUrl(V2_DECLARE_ACTION_ROUTE, {
@@ -141,11 +143,9 @@ const EventSelector = () => {
 
 export const EventSelection = () => {
   const intl = useIntl()
-  const navigate = useNavigate()
 
-  const goToHome = () => {
-    navigate(V2_ROOT_ROUTE)
-  }
+  const { goToHome } = useEventFormNavigation()
+
   return (
     <Frame
       header={
