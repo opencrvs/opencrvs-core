@@ -160,6 +160,9 @@ export const usePrintableCertificate = (registrationId: string) => {
 
   const certificateFonts = certificateTemplateConfig?.fonts ?? {}
   const svgTemplate = certificateTemplateConfig?.svg
+
+  if (!svgTemplate) return { svgCode: null }
+
   const svgWithoutFonts = compileSvg(
     svgTemplate,
     { ...declaration?.data.template, preview: true },
@@ -201,7 +204,7 @@ export const usePrintableCertificate = (registrationId: string) => {
       draft.data.template
     )
 
-    const svg = await compileSvg(
+    const svg = compileSvg(
       svgTemplate,
       { ...base64ReplacedTemplate, preview: false },
       state
