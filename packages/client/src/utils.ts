@@ -11,7 +11,7 @@
 import { storage } from '@client/storage'
 import { APPLICATION_VERSION, LANG_EN } from '@client/utils/constants'
 import { IUserData } from '@client/declarations'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { GetSystemRolesQuery, Role } from '@client/utils/gateway'
 
 export async function validateApplicationVersion() {
@@ -35,17 +35,26 @@ export function isNavigatorOnline() {
   return navigator.onLine
 }
 
-export function useOnlineStatus() {
-  const [isOnline, setOnline] = React.useState(isNavigatorOnline())
-  const ONLINE_CHECK_INTERVAL = 500
-  React.useEffect(() => {
-    const intervalID = setInterval(
-      () => setOnline(isNavigatorOnline()),
-      ONLINE_CHECK_INTERVAL
-    )
+const ONLINE = 'online'
+const OFFLINE = 'offline'
 
-    return () => clearInterval(intervalID)
+export function useOnlineStatus() {
+  const [isOnline, setOnline] = useState(isNavigatorOnline())
+
+  useEffect(() => {
+    const handleConnectionChange = () => {
+      setOnline(isNavigatorOnline())
+    }
+
+    window.addEventListener(ONLINE, handleConnectionChange)
+    window.addEventListener(OFFLINE, handleConnectionChange)
+
+    return () => {
+      window.removeEventListener(ONLINE, handleConnectionChange)
+      window.removeEventListener(OFFLINE, handleConnectionChange)
+    }
   }, [])
+
   return isOnline
 }
 
