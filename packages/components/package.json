@@ -13,6 +13,7 @@
     "phosphor-react": "^1.4.1",
     "polished": "^4.2.2",
     "postinstall-postinstall": "^2.0.0",
+    "qr-scanner": "^1.4.2",
     "rc-menu": "^7.4.13",
     "rc-progress": "^2.5.2",
     "react": "18.3.1",
