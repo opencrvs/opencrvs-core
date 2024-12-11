@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { route, string } from 'react-router-typesafe-routes/dom'
+import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { zod } from 'react-router-typesafe-routes/zod'
 import { z } from 'zod'
 
@@ -38,7 +38,11 @@ export const ROUTES = {
                 {
                   REVIEW: route('review'),
                   PAGE: route(':pageId', {
-                    params: { pageId: string().defined() }
+                    params: { pageId: string().defined() },
+                    searchParams: {
+                      from: string()
+                    },
+                    hash: hashValues()
                   })
                 }
               )
