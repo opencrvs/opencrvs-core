@@ -8,22 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MongoClient } from 'mongodb'
-import { inject } from 'vitest'
 
-let client: MongoClient
-let databaseName = 'events_' + Date.now()
+import { ActionInput } from '@opencrvs/commons/client'
+import { create } from 'zustand'
 
-export async function resetServer() {
-  databaseName = 'events_' + Date.now()
+type FormData = ActionInput['data']
+
+type EventFormData = {
+  formValues: FormData
+  setFormValues: (data: FormData) => void
+  clear: () => void
 }
 
-export async function getClient() {
-  if (!client) {
-    client = new MongoClient(inject('MONGO_URI'))
-  }
-
-  await client.connect()
-
-  return client.db(databaseName)
-}
+export const useEventFormData = create<EventFormData>((set) => ({
+  formValues: {},
+  setFormValues: (data: FormData) => set(() => ({ formValues: data })),
+  clear: () => set(() => ({ formValues: {} }))
+}))

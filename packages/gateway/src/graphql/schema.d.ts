@@ -88,6 +88,7 @@ export interface GQLMutation {
   markEventAsDuplicate: string
   confirmRegistration: string
   rejectRegistration: string
+  upsertRegistrationIdentifier: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -601,7 +602,6 @@ export interface GQLReinstated {
 
 export interface GQLConfirmRegistrationInput {
   registrationNumber: string
-  error?: string
   identifiers?: Array<GQLIdentifierInput>
 }
 
@@ -1080,7 +1080,6 @@ export const enum GQLSystemType {
 }
 
 export const enum GQLIntegratingSystemType {
-  MOSIP = 'MOSIP',
   OTHER = 'OTHER'
 }
 
@@ -2632,6 +2631,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
   rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
+  upsertRegistrationIdentifier?: MutationToUpsertRegistrationIdentifierResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -3203,6 +3203,23 @@ export interface MutationToRejectRegistrationResolver<
   (
     parent: TParent,
     args: MutationToRejectRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpsertRegistrationIdentifierArgs {
+  id: string
+  identifierType: string
+  identifierValue: string
+}
+export interface MutationToUpsertRegistrationIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpsertRegistrationIdentifierArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

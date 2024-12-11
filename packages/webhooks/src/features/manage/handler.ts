@@ -164,12 +164,7 @@ export async function subscribeWebhooksHandler(
 
 const getScopeType = (scopes: string[]) => {
   const isWebhookUser = scopes.includes('webhook')
-  const isNationalIDAPIUser = scopes.includes('nationalId')
-  return isWebhookUser
-    ? 'webhook'
-    : isNationalIDAPIUser
-    ? 'nationalId'
-    : 'health'
+  return isWebhookUser ? 'webhook' : 'health'
 }
 export const reqSubscribeWebhookSchema = Joi.object({
   hub: Joi.object({

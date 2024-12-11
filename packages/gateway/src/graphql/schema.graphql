@@ -219,6 +219,11 @@ type Mutation {
   ): ID!
   confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
   rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
+  upsertRegistrationIdentifier(
+    id: ID!
+    identifierType: String!
+    identifierValue: String!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -734,7 +739,6 @@ type Reinstated {
 
 input ConfirmRegistrationInput {
   registrationNumber: String!
-  error: String
   identifiers: [IdentifierInput!]
 }
 
@@ -1189,7 +1193,6 @@ enum SystemType {
 }
 
 enum IntegratingSystemType {
-  MOSIP
   OTHER
 }
 
