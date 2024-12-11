@@ -64,7 +64,7 @@ const messages = defineMessages({
 
 export const FormHeader = ({ label }: { label: TranslationConfig }) => {
   const intl = useIntl()
-  const { exit } = useEventFormNavigation()
+  const { exit, modal } = useEventFormNavigation()
 
   const TODO = () => {}
   const IS_TODO = true
@@ -88,11 +88,11 @@ export const FormHeader = ({ label }: { label: TranslationConfig }) => {
               {intl.formatMessage(messages.saveExitButton)}
             </Button>
           }
-
           <Button type="secondary" size="small" onClick={exit}>
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
           </Button>
+          {modal}
         </>
       }
       mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
