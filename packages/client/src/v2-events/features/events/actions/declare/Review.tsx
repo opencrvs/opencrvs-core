@@ -77,13 +77,7 @@ const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h2}
   overflow-wrap: anywhere;
 `
-const RightColumn = styled.div`
-  width: 40%;
-  border-radius: 4px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
+
 const LeftColumn = styled.div`
   flex-grow: 1;
   max-width: 840px;
