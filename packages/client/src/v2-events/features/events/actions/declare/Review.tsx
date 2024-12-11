@@ -129,45 +129,46 @@ const messages = defineMessages({
   },
   reviewActionTitle: {
     id: 'reviewAction.title',
-    defaultMessage: 'Register member',
+    defaultMessage: 'Declare member',
     description: 'The title for review action'
   },
   reviewActionDescription: {
     id: 'reviewAction.description',
     defaultMessage:
-      'By clicking register, you confirm that the information entered is correct and the member can be registered.',
+      'By clicking declare, you confirm that the information entered is correct and the member can be declared.',
     description: 'The description for review action'
   },
-  reviewActionRegister: {
-    id: 'reviewAction.register',
-    defaultMessage: 'Register',
-    description: 'The label for register button of review action'
+  reviewActionDeclare: {
+    id: 'reviewAction.Declare',
+    defaultMessage: 'Declare',
+    description: 'The label for declare button of review action'
   },
   reviewActionReject: {
     id: 'reviewAction.reject',
     defaultMessage: 'Reject',
     description: 'The label for reject button of review action'
   },
-  registerModalCancel: {
-    id: 'registerModal.cancel',
+  actionModalCancel: {
+    id: 'actionModal.cancel',
     defaultMessage: 'Cancel',
-    description: 'The label for cancel button of register modal'
+    description: 'The label for cancel button of action modal'
   },
-  registerModalRegister: {
-    id: 'registerModal.register',
-    defaultMessage: 'Register',
-    description: 'The label for register button of register modal'
+  actionModalPrimaryAction: {
+    id: 'actionModal.PrimaryAction',
+    defaultMessage: '{action, select, declare{Declare} other{{action}}}',
+    description: 'The label for primary action button of action modal'
   },
-  registerModalTitle: {
-    id: 'registerModal.title',
-    defaultMessage: 'Register the member?',
-    description: 'The title for register modal'
-  },
-  registerModalDescription: {
-    id: 'registerModal.description',
+  actionModalTitle: {
+    id: 'actionModal.title',
     defaultMessage:
-      'The declarant will be notified of this correction and a record of this decision will be recorded',
-    description: 'The description for register modal'
+      '{action, select, declare{Declare} other{{action}}} the member?',
+    description: 'The title for action modal'
+  },
+  actionModalDescription: {
+    id: 'actionModal.description',
+    defaultMessage:
+      'The declarant will be notified of this action and a record of this decision will be recorded',
+    description: 'The description for action modal'
   },
   rejectModalCancel: {
     id: 'rejectModal.cancel',
@@ -266,7 +267,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
 
   const handleRegister = async () => {
     const confirmedRegister = await openModal<boolean | null>((close) => (
-      <RegisterModal close={close}></RegisterModal>
+      <ActionModal close={close} action="Declare"></ActionModal>
     ))
     if (confirmedRegister) {
       declareMutation.mutate({
@@ -340,7 +341,7 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
                     {configuration.label.defaultMessage}
                   </TitleContainer>
                   <SubjectContainer id={`header_subject`}>
-                    {'Member registration for ' +
+                    {'Member declaration for ' +
                       (data['applicant.firstname'] || '') +
                       ' ' +
                       (data['applicant.surname'] || '')}
@@ -503,16 +504,7 @@ const ReviewActionComponent = ({
               onClick={onRegister}
             >
               <Icon name="Check" />
-              {intl.formatMessage(messages.reviewActionRegister)}
-            </Button>
-            <Button
-              type="negative"
-              size="large"
-              id="rejectDeclarationBtn"
-              onClick={onReject}
-            >
-              <Icon name="X" />
-              {intl.formatMessage(messages.reviewActionReject)}
+              {intl.formatMessage(messages.reviewActionDeclare)}
             </Button>
           </ActionContainer>
         </Content>
@@ -521,35 +513,36 @@ const ReviewActionComponent = ({
   )
 }
 
-const RegisterModal: React.FC<{
+const ActionModal: React.FC<{
   close: (result: boolean | null) => void
-}> = ({ close }) => {
+  action: string
+}> = ({ close, action }) => {
   const intl = useIntl()
   return (
     <ResponsiveModal
       autoHeight
       responsive={false}
-      title={intl.formatMessage(messages.registerModalTitle)}
+      title={intl.formatMessage(messages.actionModalTitle, { action })}
       actions={[
         <Button
           type="tertiary"
-          id="cancel_register"
-          key="cancel_register"
+          id={'cancel_' + action}
+          key={'cancel_' + action}
           onClick={() => {
             close(null)
           }}
         >
-          {intl.formatMessage(messages.registerModalCancel)}
+          {intl.formatMessage(messages.actionModalCancel)}
         </Button>,
         <Button
           type="primary"
-          key="confirm_register"
-          id="confirm_register"
+          key={'confirm_' + action}
+          id={'confirm_' + action}
           onClick={() => {
             close(true)
           }}
         >
-          {intl.formatMessage(messages.registerModalRegister)}
+          {intl.formatMessage(messages.actionModalPrimaryAction, { action })}
         </Button>
       ]}
       show={true}
@@ -557,7 +550,7 @@ const RegisterModal: React.FC<{
     >
       <Stack>
         <Text variant="reg16" element="p" color="grey500">
-          {intl.formatMessage(messages.registerModalDescription)}
+          {intl.formatMessage(messages.actionModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>
