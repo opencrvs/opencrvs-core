@@ -42,6 +42,10 @@ const ToolTipContainer = styled.span`
   text-align: center;
 `
 
+const NondecoratedLink = styled(Link)`
+  text-decoration: none;
+`
+
 const changeSortedColumn = (
   columnName: string,
   presentSortedCol: string,
@@ -123,7 +127,7 @@ export const Workqueue = ({
       createdAt: intl.formatDate(new Date(event.createdAt)),
       modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
       [config.fields[0].id]: (
-        <Link
+        <NondecoratedLink
           to={ROUTES.V2.EVENTS.EVENT.buildPath({
             eventId: event.id
           })}
@@ -132,7 +136,7 @@ export const Workqueue = ({
             name={get(event, config.fields[0].id) ?? 'N/A'}
             status={event.status}
           />
-        </Link>
+        </NondecoratedLink>
       )
     }))
 
