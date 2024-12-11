@@ -21,7 +21,6 @@ import {
   goToCreateNewUser,
   goToAdvancedSearch
 } from '@client/navigation'
-import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
@@ -41,15 +40,17 @@ import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
 import { HistoryNavigator } from './HistoryNavigator'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
-import { usePermissions } from '@client/hooks/useAuthorization'
+import {
+  RECORD_DECLARE_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 
 type IStateProps = {
-  scopes: Scope[] | null
   fieldNames: string[]
   language: string
   offlineData: IOfflineData
@@ -136,28 +137,11 @@ const HeaderComponent = (props: IFullProps) => {
     goToAdvancedSearch,
     goToSearchResult,
     setAdvancedSearchParam,
-    scopes,
     mapPerformanceClickHandler,
     changeTeamLocation
   } = props
 
-  const { canCreateUser } = usePermissions()
-
-  function hasSearch() {
-    // @TODO: use hooks here to check if the user has search access, or write this using a better helper than this custom one.
-    return scopes?.some((scope) =>
-      (
-        [
-          SCOPES.SEARCH_BIRTH,
-          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-          SCOPES.SEARCH_DEATH,
-          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-          SCOPES.SEARCH_MARRIAGE,
-          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-        ] as Scope[]
-      ).includes(scope)
-    )
-  }
+  const { canCreateUser, canSearchRecords } = usePermissions()
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
     const locationId = new URLSearchParams(location.search).get('locationId')
@@ -239,7 +223,7 @@ const HeaderComponent = (props: IFullProps) => {
           ]
         }
       }
-    } else if (!hasSearch()) {
+    } else if (!canSearchRecords) {
       return {
         mobileLeft: [
           {
@@ -388,23 +372,20 @@ const HeaderComponent = (props: IFullProps) => {
     },
     {
       element: (
-        <>
-          {hasSearch() && (
-            <HeaderCenter>
-              <Button
-                type="iconPrimary"
-                size="medium"
-                key="newEvent"
-                id="header_new_event"
-                onClick={goToEvents}
-              >
-                <Icon name="Plus" size="medium" />
-              </Button>
-
-              {renderSearchInput(props)}
-            </HeaderCenter>
-          )}
-        </>
+        <HeaderCenter>
+          <ProtectedComponent scopes={RECORD_DECLARE_SCOPES}>
+            <Button
+              type="iconPrimary"
+              size="medium"
+              key="newEvent"
+              id="header_new_event"
+              onClick={goToEvents}
+            >
+              <Icon name="Plus" size="medium" />
+            </Button>
+          </ProtectedComponent>
+          {canSearchRecords && renderSearchInput(props)}
+        </HeaderCenter>
       )
     },
     {
@@ -416,7 +397,7 @@ const HeaderComponent = (props: IFullProps) => {
     }
   ]
 
-  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !hasSearch()) {
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !canSearchRecords) {
     rightMenu = [
       {
         element: <HistoryNavigator />
@@ -465,7 +446,6 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.VSEXPORTS
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
-    scopes: getScope(store),
     offlineData: getOfflineData(store),
     fieldNames: Object.values(getRegisterForm(store))
       .flatMap((form) => form.sections)

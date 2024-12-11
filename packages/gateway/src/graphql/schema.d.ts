@@ -86,6 +86,7 @@ export interface GQLMutation {
   markEventAsDuplicate: string
   confirmRegistration: string
   rejectRegistration: string
+  upsertRegistrationIdentifier: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -585,7 +586,6 @@ export interface GQLReinstated {
 
 export interface GQLConfirmRegistrationInput {
   registrationNumber: string
-  error?: string
   identifiers?: Array<GQLIdentifierInput>
 }
 
@@ -1043,7 +1043,6 @@ export const enum GQLSystemType {
 }
 
 export const enum GQLIntegratingSystemType {
-  MOSIP = 'MOSIP',
   OTHER = 'OTHER'
 }
 
@@ -1568,35 +1567,11 @@ export interface GQLRegisterAction {
   identifiers: GQLIdentifiers
 }
 
-export const enum GQLAttachmentInputStatus {
-  approved = 'approved',
-  validated = 'validated',
-  deleted = 'deleted'
-}
-
 export interface GQLNotifyAction {
   type: string
   createdAt: GQLDateTime
   createdBy: string
   data: Array<GQLField>
-}
-
-export const enum GQLPaymentType {
-  MANUAL = 'MANUAL'
-}
-
-export const enum GQLPaymentOutcomeType {
-  COMPLETED = 'COMPLETED',
-  ERROR = 'ERROR',
-  PARTIAL = 'PARTIAL'
-}
-
-export type GQLFieldValue = any
-
-export interface GQLContactPointInput {
-  system?: GQLTelecomSystem
-  value?: string
-  use?: GQLTelecomUse
 }
 
 export interface GQLDeclareAction {
@@ -1629,21 +1604,6 @@ export interface GQLContactPointInput {
   system?: GQLTelecomSystem
   value?: string
   use?: GQLTelecomUse
-}
-
-export interface GQLAddressInput {
-  use?: GQLAddressUse
-  type?: GQLAddressType
-  text?: string
-  line?: Array<string>
-  city?: string
-  district?: string
-  state?: string
-  postalCode?: string
-  country?: string
-  from?: GQLDate
-  to?: GQLDate
-  partOf?: string
 }
 
 export interface GQLAddressInput {
@@ -2575,6 +2535,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
   rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
+  upsertRegistrationIdentifier?: MutationToUpsertRegistrationIdentifierResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -3145,6 +3106,23 @@ export interface MutationToRejectRegistrationResolver<
   (
     parent: TParent,
     args: MutationToRejectRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpsertRegistrationIdentifierArgs {
+  id: string
+  identifierType: string
+  identifierValue: string
+}
+export interface MutationToUpsertRegistrationIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpsertRegistrationIdentifierArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult

@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { trpc } from '@client/v2-events/trcp'
+import { api } from '@client/v2-events/trpc'
 
 /**
  * Fetches configured events and finds a matching event
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
-  const [config] = trpc.config.get.useSuspenseQuery()
+  const [config] = api.config.get.useSuspenseQuery()
   return config
 }
 
@@ -25,8 +25,10 @@ export function useEventConfigurations() {
  * @returns event configuration
  */
 export function useEventConfiguration(eventIdentifier: string) {
-  const [config] = trpc.config.get.useSuspenseQuery()
-  const event = config?.find((event) => event.id === eventIdentifier)
+  const [config] = api.config.get.useSuspenseQuery()
+  const eventConfiguration = config?.find(
+    (event) => event.id === eventIdentifier
+  )
 
-  return { event }
+  return { eventConfiguration }
 }
