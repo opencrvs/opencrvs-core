@@ -113,8 +113,14 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
         queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
       })
     }
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: getQueryKey(api.events.get)
+    })
   }
 }))
+
 utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
   // This retry ensures on page reload if event have not yet synced,
   // the action will be retried once
@@ -159,6 +165,11 @@ utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
         queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
       })
     }
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: getQueryKey(api.events.get)
+    })
   }
 }))
 
