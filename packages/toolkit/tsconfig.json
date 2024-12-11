@@ -15,6 +15,7 @@
       "@opencrvs/commons/conditionals": [
         "../commons/src/conditionals/conditionals.ts"
       ],
+      "@opencrvs/commons/scopes": ["../commons/src/scopes.ts"],
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
     }
   },
