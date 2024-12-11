@@ -33,7 +33,7 @@ const client = createClient()
 test('indexes all records from MongoDB with one function call', async () => {
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
   await resetESServer()
 
@@ -56,7 +56,7 @@ test('indexes all records from MongoDB with one function call', async () => {
 test('records are automatically indexed', async () => {
   await client.event.create({
     transactionId: '1',
-    type: 'birth'
+    type: 'TENNIS_CLUB_MEMBERSHIP'
   })
 
   const esClient = getOrCreateClient()

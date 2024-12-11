@@ -7946,12 +7946,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "MOSIP",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "OTHER",
             "description": null,
             "isDeprecated": false,
