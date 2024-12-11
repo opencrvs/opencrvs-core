@@ -10,11 +10,11 @@
  */
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 
 const fetch = fetchAny as fetchAny.FetchMock
 describe('authenticate handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()
