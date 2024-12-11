@@ -166,7 +166,8 @@ function Declare() {
   if (!configuration) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
-  const formValues = useEventFormData((state) => state.formValues)
+  const getFormValues = useEventFormData((state) => state.getFormValues)
+  const formValues = getFormValues(eventId)
   const setFormValues = useEventFormData((state) => state.setFormValues)
 
   useEffect(() => {
@@ -259,7 +260,7 @@ function Declare() {
           id="locationForm"
           setAllFieldsDirty={false}
           onChange={(values) => {
-            setFormValues(values)
+            setFormValues(eventId, values)
           }}
           initialValues={formValues}
           formData={formValues}

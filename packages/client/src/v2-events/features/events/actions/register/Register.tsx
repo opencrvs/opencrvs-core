@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -21,6 +21,8 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+
+import { getCurrentEventState } from '@opencrvs/commons/client'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -65,7 +67,14 @@ export const RegisterIndex = () => {
     (action) => action.type === 'REGISTER'
   )[0]
 
-  const form = useEventFormData((state) => state.formValues)
+  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const getFormValues = useEventFormData((state) => state.getFormValues)
+
+  useEffect(() => {
+    setFormValues(eventId, getCurrentEventState(event).data)
+  }, [event, eventId, setFormValues])
+
+  const form = getFormValues(eventId)
 
   const handleEdit = async ({
     pageId,
@@ -100,7 +109,7 @@ export const RegisterIndex = () => {
       registerMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: `tmp-${uuid()}`
+        transactionId: uuid()
       })
 
       goToHome()

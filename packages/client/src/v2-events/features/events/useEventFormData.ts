@@ -18,16 +18,22 @@ type FormData = ActionInput['data']
 
 type EventFormData = {
   formValues: FormData
-  setFormValues: (data: FormData) => void
+  setFormValues: (eventId: string, data: FormData) => void
+  getFormValues: (eventId: string) => FormData
   clear: () => void
+  eventId: string
 }
 
 export const useEventFormData = create<EventFormData>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       formValues: {},
-      setFormValues: (data: FormData) => set(() => ({ formValues: data })),
-      clear: () => set(() => ({ formValues: {} }))
+      eventId: '',
+      getFormValues: (eventId: string) =>
+        get().eventId === eventId ? get().formValues : {},
+      setFormValues: (eventId: string, data: FormData) =>
+        set(() => ({ eventId, formValues: data })),
+      clear: () => set(() => ({ eventId: '', formValues: {} }))
     }),
     {
       name: 'event-form-data',
