@@ -22,6 +22,7 @@ export const ActionConfigBase = z.object({
  */
 export const ActionType = {
   CREATE: 'CREATE',
+  DRAFT: 'DRAFT',
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN',
   REGISTER: 'REGISTER',

@@ -17,6 +17,7 @@ import { TranslationConfig } from './TranslationConfig'
  */
 export const EventStatus = {
   CREATED: 'CREATED',
+  DRAFT: 'DRAFT',
   NOTIFIED: 'NOTIFIED',
   DECLARED: 'DECLARED',
   REGISTERED: 'REGISTERED',

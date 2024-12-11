@@ -33,6 +33,9 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === 'DECLARE') {
       return 'DECLARED'
     }
+    if (action.type === 'DRAFT') {
+      return 'DRAFT'
+    }
     return status
   }, 'CREATED')
 }
