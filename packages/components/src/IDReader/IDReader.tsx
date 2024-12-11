@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box } from '../Box'
 import styled from 'styled-components'
 import { Stack } from '../Stack'
@@ -17,6 +17,7 @@ import { Icon } from '../Icon'
 import { Divider } from '../Divider'
 import { Text } from '../Text'
 import { Dialog } from '../Dialog'
+import Scanner from './scanner/Scanner'
 
 interface IDReaderProps {
   onScan: (code: Record<string, unknown>) => void
@@ -29,6 +30,12 @@ const StyledBox = styled(Box)`
 const StyledButton = styled(SecondaryButton)`
   width: 100%;
 `
+const ScannerBox = styled(Box)`
+  background: ${({ theme }) => theme.colors.background};
+  width: calc(100% -24px);
+  height: 386px;
+`
+
 const IDReader = (props: IDReaderProps) => {
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
   return (
@@ -51,8 +58,16 @@ const IDReader = (props: IDReaderProps) => {
         isOpen={isScannerDialogOpen}
         onClose={() => setScannerDialogOpen(false)}
         title="Scan ID QR code"
+        variant="large"
         actions={[]}
-      ></Dialog>
+      >
+        <Text variant="reg18" element="p">
+          Place the Notifier's ID card in front of the camera.
+        </Text>
+        <ScannerBox>
+          <Scanner onScan={props.onScan} onError={props.onError} />
+        </ScannerBox>
+      </Dialog>
     </StyledBox>
   )
 }

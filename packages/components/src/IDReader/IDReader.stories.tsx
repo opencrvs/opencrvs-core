@@ -10,6 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import IDReader from './IDReader'
+import React from 'react'
 
 const meta: Meta<typeof IDReader> = {
   title: 'Controls/IDReader',
@@ -20,6 +21,13 @@ export default meta
 
 type Story = StoryObj<typeof IDReader>
 
-export const Valid: Story = {
-  args: {}
+const IDReaderWithAlertFeedback = () => (
+  <IDReader
+    onScan={(data) => alert(JSON.stringify(data))}
+    onError={(error) => console.error(error)}
+  />
+)
+
+export const IDReaderWithAlertFeedbackStory: Story = {
+  render: () => <IDReaderWithAlertFeedback />
 }
