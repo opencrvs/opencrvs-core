@@ -13,7 +13,10 @@ import { IFormField } from '@client/forms'
 import { formatUrl } from '@client/navigation'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
+import {
+  V2_DECLARE_ACTION_ROUTE,
+  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
+} from '@client/v2-events/routes'
 import {
   AppBar,
   Button,
@@ -25,15 +28,17 @@ import {
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import React, { useEffect } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useEventConfiguration } from './useEventConfiguration'
-import { useEventFormNavigation } from './useEventFormNavigation'
-import { useEvents } from './useEvents/useEvents'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
+import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
+import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+import type { TranslationConfig } from '@opencrvs/commons/events'
+import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 
-export function EventFormWizardIndex() {
+export function DeclareIndex() {
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
-      <EventFormWizard />
+      <Declare />
     </React.Suspense>
   )
 }
@@ -80,10 +85,69 @@ const messages = defineMessages({
   }
 })
 
-function EventFormWizard() {
-  const { eventId } = useParams<{
+export const FormHeader = ({ label }: { label: TranslationConfig }) => {
+  const intl = useIntl()
+  const { exit } = useEventFormNavigation()
+
+  const TODO = () => {}
+  const IS_TODO = Math.random() > 0.5
+  return (
+    <AppBar
+      desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
+      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+        event: intl.formatMessage(label)
+      })}
+      desktopRight={
+        <>
+          {
+            <Button
+              id="save-exit-btn"
+              type="primary"
+              size="small"
+              disabled={!IS_TODO}
+              onClick={TODO}
+            >
+              <Icon name="DownloadSimple" />
+              {intl.formatMessage(messages.saveExitButton)}
+            </Button>
+          }
+
+          <Button type="secondary" size="small" onClick={exit}>
+            <Icon name="X" />
+            {intl.formatMessage(messages.exitButton)}
+          </Button>
+        </>
+      }
+      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
+      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+        event: intl.formatMessage(label)
+      })}
+      mobileRight={
+        <>
+          {
+            <Button type="icon" size="small" disabled={!IS_TODO} onClick={TODO}>
+              <Icon name="DownloadSimple" />
+            </Button>
+          }
+          <Button type="icon" size="small" onClick={exit}>
+            <Icon name="X" />
+          </Button>
+        </>
+      }
+    />
+  )
+}
+
+function Declare() {
+  const { eventId, pageId } = useParams<{
     eventId: string
+    pageId?: string
   }>()
+
+  const location = useLocation()
+  const navigate = useNavigate()
+  const searchParams = new URLSearchParams(location.search)
+  const fromPage = searchParams.get('from') || 'unknown'
   const events = useEvents()
 
   const [event] = events.getEvent(eventId!)
@@ -98,7 +162,9 @@ function EventFormWizard() {
   if (!configuration) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
-  const navigate = useNavigate()
+
+  const formValues = useEventFormData((state) => state.formValues)
+  const setFormValues = useEventFormData((state) => state.setFormValues)
 
   useEffect(() => {
     const hasTemporaryId = event.id === event.transactionId
@@ -112,104 +178,79 @@ function EventFormWizard() {
     }
   }, [event.id, event.transactionId, eventId, navigate])
 
-  const intl = useIntl()
-  const [formValues, setFormValues] = React.useState<any>({})
-  const { modal, exit, goToHome } = useEventFormNavigation()
-
   const pages = configuration.actions[0].forms[0].pages
   const {
     page: currentPage,
     next,
     previous,
     total
-  } = usePagination(pages.length)
-
-  const declareMutation = events.actions.declare()
-
-  const TODO = () => {}
-  const IS_TODO = Math.random() > 0.5
-  const page = pages[currentPage]
-  const fields = page.fields.map(
-    (field) =>
-      ({
-        name: field.id,
-        type: field.type,
-        required: true,
-        validator: [],
-        label: field.label,
-        initialValue: ''
-      } as IFormField)
+  } = usePagination(
+    pages.length,
+    pageId ? pages.findIndex((p) => p.id === pageId) : 0
   )
+
+  useEffect(() => {
+    if (!pageId) {
+      navigate(
+        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+          eventId: event.id,
+          pageId: pages[0].id
+        })
+      )
+    }
+
+    const reviewPage = !pages.find((p) => p.id === pageId)
+    if (reviewPage) {
+      return
+    }
+
+    const pageChanged = pages[currentPage].id !== pageId
+    if (pageChanged) {
+      navigate(
+        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+          eventId: event.id,
+          pageId: pages[currentPage].id
+        })
+      )
+    }
+  }, [event.id, pageId, pages, currentPage, navigate])
+
+  const intl = useIntl()
+
+  const { modal, goToReview } = useEventFormNavigation()
+
+  const page = pages[currentPage]
+
+  const fields = !page
+    ? []
+    : page.fields.map(
+        (field) =>
+          ({
+            name: field.id,
+            type: field.type,
+            required: true,
+            validator: [],
+            label: field.label,
+            initialValue: ''
+          } as IFormField)
+      )
 
   return (
     <Frame
       skipToContentText="Skip to form"
-      header={
-        <AppBar
-          desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-          desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-            event: intl.formatMessage(configuration.label)
-          })}
-          desktopRight={
-            <>
-              {
-                <Button
-                  id="save-exit-btn"
-                  type="primary"
-                  size="small"
-                  disabled={!IS_TODO}
-                  onClick={TODO}
-                >
-                  <Icon name="DownloadSimple" />
-                  {intl.formatMessage(messages.saveExitButton)}
-                </Button>
-              }
-
-              <Button type="secondary" size="small" onClick={exit}>
-                <Icon name="X" />
-                {intl.formatMessage(messages.exitButton)}
-              </Button>
-            </>
-          }
-          mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-          mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-            event: intl.formatMessage(configuration.label)
-          })}
-          mobileRight={
-            <>
-              {
-                <Button
-                  type="icon"
-                  size="small"
-                  disabled={!IS_TODO}
-                  onClick={TODO}
-                >
-                  <Icon name="DownloadSimple" />
-                </Button>
-              }
-              <Button type="icon" size="small" onClick={exit}>
-                <Icon name="X" />
-              </Button>
-            </>
-          }
-        />
-      }
+      header={<FormHeader label={configuration.label} />}
     >
       {modal}
       <FormWizard
         currentPage={currentPage}
         totalPages={total}
         onSubmit={() => {
-          declareMutation.mutate({
-            eventId: event.id,
-            data: formValues,
-            transactionId: Math.random().toString()
-          })
-          goToHome()
+          goToReview(event.id)
         }}
-        pageTitle={intl.formatMessage(page.title)}
+        pageTitle={page && intl.formatMessage(page.title)}
         onNextPage={next}
         onPreviousPage={previous}
+        showReviewButton={fromPage === 'review'}
       >
         <FormFieldGenerator
           id="locationForm"

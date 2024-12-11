@@ -58,7 +58,7 @@ import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
-import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
+import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 import { EventSelection } from './v2-events/features/events/EventSelection'
 import { Workqueues } from './v2-events/features/workqueues'
 import {
@@ -83,7 +83,6 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
-import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -404,7 +403,7 @@ export const routesConfig = [
         path: V2_DECLARE_ACTION_ROUTE,
         element: (
           <TRPCProvider>
-            <EventFormWizardIndex />
+            <DeclareIndex />
           </TRPCProvider>
         )
       },
