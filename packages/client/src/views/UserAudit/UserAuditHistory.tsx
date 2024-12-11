@@ -240,7 +240,7 @@ function UserAuditHistoryComponent(props: Props) {
           >
             {actionMessage}
           </Link>
-        ) : canSearchRecords() &&
+        ) : canSearchRecords &&
           !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
           <Link
             font="bold14"
@@ -263,7 +263,7 @@ function UserAuditHistoryComponent(props: Props) {
             >
               {actionMessage}
             </Link>
-          ) : canSearchRecords() ? (
+          ) : canSearchRecords ? (
             <Link
               onClick={() => {
                 toggleActionDetails(userAuditItem)
@@ -276,7 +276,7 @@ function UserAuditHistoryComponent(props: Props) {
           ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
-          canSearchRecords() ? (
+          canSearchRecords ? (
             <Link
               font="bold14"
               onClick={() =>

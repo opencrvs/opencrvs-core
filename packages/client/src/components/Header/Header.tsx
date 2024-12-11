@@ -44,7 +44,11 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { ADVANCED_SEARCH_TEXT } from '@client/utils/constants'
-import { usePermissions } from '@client/hooks/useAuthorization'
+import {
+  RECORD_DECLARE_SCOPES,
+  usePermissions
+} from '@client/hooks/useAuthorization'
+import ProtectedComponent from '@client/components/ProtectedComponent'
 
 type IStateProps = {
   fieldNames: string[]
@@ -219,7 +223,7 @@ const HeaderComponent = (props: IFullProps) => {
           ]
         }
       }
-    } else if (!canSearchRecords()) {
+    } else if (!canSearchRecords) {
       return {
         mobileLeft: [
           {
@@ -368,23 +372,20 @@ const HeaderComponent = (props: IFullProps) => {
     },
     {
       element: (
-        <>
-          {canSearchRecords() && (
-            <HeaderCenter>
-              <Button
-                type="iconPrimary"
-                size="medium"
-                key="newEvent"
-                id="header_new_event"
-                onClick={goToEvents}
-              >
-                <Icon name="Plus" size="medium" />
-              </Button>
-
-              {renderSearchInput(props)}
-            </HeaderCenter>
-          )}
-        </>
+        <HeaderCenter>
+          <ProtectedComponent scopes={RECORD_DECLARE_SCOPES}>
+            <Button
+              type="iconPrimary"
+              size="medium"
+              key="newEvent"
+              id="header_new_event"
+              onClick={goToEvents}
+            >
+              <Icon name="Plus" size="medium" />
+            </Button>
+          </ProtectedComponent>
+          {canSearchRecords && renderSearchInput(props)}
+        </HeaderCenter>
       )
     },
     {
@@ -396,7 +397,7 @@ const HeaderComponent = (props: IFullProps) => {
     }
   ]
 
-  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !canSearchRecords()) {
+  if (activeMenuItem !== ACTIVE_MENU_ITEM.DECLARATIONS && !canSearchRecords) {
     rightMenu = [
       {
         element: <HistoryNavigator />

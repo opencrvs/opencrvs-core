@@ -50,6 +50,24 @@ export const RECORD_ALLOWED_SCOPES = {
   REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
 }
 
+export const RECORD_DECLARE_SCOPES = [
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+]
+
+export const RECORD_SEARCH_SCOPES = [
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+  SCOPES.SEARCH_MARRIAGE,
+  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+]
+
 export function usePermissions() {
   const userScopes = useSelector(getScope)
   const currentUser = useSelector(getUserDetails)
@@ -70,15 +88,9 @@ export function usePermissions() {
 
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
 
-  const canSearchRecords = () =>
-    hasAnyScope([
-      SCOPES.SEARCH_BIRTH,
-      SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-      SCOPES.SEARCH_DEATH,
-      SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-      SCOPES.SEARCH_MARRIAGE,
-      SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-    ])
+  const canSearchRecords = hasAnyScope(RECORD_SEARCH_SCOPES)
+
+  const canDeclareRecords = hasAnyScope(RECORD_DECLARE_SCOPES)
 
   const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
     if (!userPrimaryOffice?.id) {
@@ -211,6 +223,7 @@ export function usePermissions() {
     hasAnyScope,
     isRecordActionable,
     canSearchRecords,
+    canDeclareRecords,
     canPrintRecord,
     canIssueRecord,
     canReadUser,
