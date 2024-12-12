@@ -29,10 +29,9 @@ const mockedUseParams = useParams as MockedFunction<
 
 describe('for user with read organisation in my jurisdiction scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION], store)
   })
 
@@ -42,9 +41,8 @@ describe('for user with read organisation in my jurisdiction scope', () => {
       locationId: '7a18cb4c-38f3-449f-b3dc-508473d485f3'
     })
 
-    const component = await createTestComponent(<AdministrativeLevels />, {
-      store,
-      history
+    const { component } = await createTestComponent(<AdministrativeLevels />, {
+      store
     })
     store.dispatch(
       setUserDetails({
@@ -69,9 +67,8 @@ describe('for user with read organisation in my jurisdiction scope', () => {
       locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
     })
 
-    const component = await createTestComponent(<AdministrativeLevels />, {
-      store,
-      history
+    const { component } = await createTestComponent(<AdministrativeLevels />, {
+      store
     })
     store.dispatch(
       setUserDetails({
@@ -96,7 +93,7 @@ describe('for user with read organisation scope', () => {
   let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.ORGANISATION_READ_LOCATIONS], store)
   })
 
@@ -106,9 +103,8 @@ describe('for user with read organisation scope', () => {
       locationId: '7a18cb4c-38f3-449f-b3dc-508473d485f3'
     })
 
-    const component = await createTestComponent(<AdministrativeLevels />, {
-      store,
-      history
+    const { component } = await createTestComponent(<AdministrativeLevels />, {
+      store
     })
     store.dispatch(
       setUserDetails({
@@ -133,9 +129,8 @@ describe('for user with read organisation scope', () => {
       locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b'
     })
 
-    const component = await createTestComponent(<AdministrativeLevels />, {
-      store,
-      history
+    const { component } = await createTestComponent(<AdministrativeLevels />, {
+      store
     })
     store.dispatch(
       setUserDetails({
@@ -157,10 +152,9 @@ describe('for user with read organisation scope', () => {
 
 describe('for user with read organisation my office scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE], store)
   })
 
@@ -170,9 +164,8 @@ describe('for user with read organisation my office scope', () => {
       locationId: '7a18cb4c-38f3-449f-b3dc-508473d485f3'
     })
 
-    const component = await createTestComponent(<AdministrativeLevels />, {
-      store,
-      history
+    const { component } = await createTestComponent(<AdministrativeLevels />, {
+      store
     })
     store.dispatch(
       setUserDetails({
@@ -197,9 +190,8 @@ describe('for user with read organisation my office scope', () => {
       locationId: '5926982b-845c-4463-80aa-cbfb86762e0a'
     })
 
-    const component = await createTestComponent(<AdministrativeLevels />, {
-      store,
-      history
+    const { component } = await createTestComponent(<AdministrativeLevels />, {
+      store
     })
     store.dispatch(
       setUserDetails({
@@ -209,7 +201,7 @@ describe('for user with read organisation my office scope', () => {
       })
     )
     component.update()
-    console.log(component.debug())
+
     expect(
       component
         .find({ children: 'Comilla Union Parishad' })

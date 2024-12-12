@@ -107,15 +107,16 @@ const SearchParamContainer = styled.div`
 type QueryData = SearchEventsQuery['searchEvents']
 
 interface IBaseSearchResultProps {
+  theme: ITheme
   language: string
-  scope: Scope | null
+  scope: Scope[] | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
 }
 
 type IFullProps = IBaseSearchResultProps & RouteComponentProps
 
-const AdvancedSearchResultComp = (props: IFullProps & { theme: ITheme }) => {
+const AdvancedSearchResultComp = (props: IFullProps) => {
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.NONE)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
 

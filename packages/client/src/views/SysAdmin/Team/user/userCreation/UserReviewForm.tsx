@@ -417,8 +417,7 @@ const UserReviewFormComponent = ({
             userRoles,
             userDetails,
             offlineCountryConfiguration,
-            goToCreateUserSection,
-            goToUserReviewForm
+            navigate
           }).map((sec, index) => {
             return (
               <React.Fragment key={index}>

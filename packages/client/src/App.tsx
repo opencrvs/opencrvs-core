@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Outlet } from 'react-router-dom'
-import styled, { createGlobalStyle } from 'styled-components'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
 import * as React from 'react'
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
@@ -72,6 +72,15 @@ import { TRPCProvider } from './v2-events/trpc'
 import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
 import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 import { SCOPES } from '@opencrvs/commons/client'
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
+import { AppStore } from './store'
+import { useApolloClient } from './utils/apolloClient'
+import { getTheme } from '@opencrvs/components'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { ApolloProvider } from './utils/ApolloProvider'
+import { Provider } from 'react-redux'
+import { I18nContainer } from './i18n/components/I18nContainer'
+import { StyledErrorBoundary } from './components/StyledErrorBoundary'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -378,3 +387,29 @@ export const routesConfig = [
     ]
   }
 ]
+
+interface IAppProps {
+  client?: ApolloClient<NormalizedCacheObject>
+  store: AppStore
+  router: ReturnType<typeof createBrowserRouter>
+}
+export function App({ client, store, router }: IAppProps) {
+  const { client: apolloClient } = useApolloClient(store)
+
+  return (
+    <ErrorBoundary>
+      <GlobalStyle />
+      <ApolloProvider client={client ?? apolloClient}>
+        <Provider store={store}>
+          <I18nContainer>
+            <ThemeProvider theme={getTheme()}>
+              <StyledErrorBoundary>
+                <RouterProvider router={router} />
+              </StyledErrorBoundary>
+            </ThemeProvider>
+          </I18nContainer>
+        </Provider>
+      </ApolloProvider>
+    </ErrorBoundary>
+  )
+}
