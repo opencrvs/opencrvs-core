@@ -43,6 +43,10 @@ const Info = styled(Stack)`
 const IDReader = (props: IDReaderProps) => {
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
   const isSmallDevice = window.innerWidth <= 1028
+  const handleScanSuccess = (data: Parameters<IDReaderProps['onScan']>[0]) => {
+    props.onScan(data)
+    setScannerDialogOpen(false)
+  }
   return (
     <StyledBox>
       <Stack direction="column" alignItems="center" gap={0}>
@@ -71,7 +75,7 @@ const IDReader = (props: IDReaderProps) => {
           Place the Notifier's ID card in front of the camera.
         </Text>
         <ScannerBox>
-          <Scanner onScan={props.onScan} onError={props.onError} />
+          <Scanner onScan={handleScanSuccess} onError={props.onError} />
         </ScannerBox>
         <Info
           gap={16}
