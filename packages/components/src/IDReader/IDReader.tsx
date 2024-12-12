@@ -18,6 +18,7 @@ import { Divider } from '../Divider'
 import { Text } from '../Text'
 import { Dialog } from '../Dialog'
 import Scanner from './scanner/Scanner'
+import InfoBox from './InfoBox'
 
 interface IDReaderProps {
   onScan: (code: Record<string, unknown>) => void
@@ -35,9 +36,13 @@ const ScannerBox = styled(Box)`
   width: calc(100% -24px);
   height: 386px;
 `
+const Info = styled(Stack)`
+  margin-top: 24px;
+`
 
 const IDReader = (props: IDReaderProps) => {
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
+  const isSmallDevice = window.innerWidth <= 1028
   return (
     <StyledBox>
       <Stack direction="column" alignItems="center" gap={0}>
@@ -57,6 +62,7 @@ const IDReader = (props: IDReaderProps) => {
       <Dialog
         isOpen={isScannerDialogOpen}
         onClose={() => setScannerDialogOpen(false)}
+        titleIcon={<Icon name="QrCode" size="large" color="primary" />}
         title="Scan ID QR code"
         variant="large"
         actions={[]}
@@ -67,6 +73,25 @@ const IDReader = (props: IDReaderProps) => {
         <ScannerBox>
           <Scanner onScan={props.onScan} onError={props.onError} />
         </ScannerBox>
+        <Info
+          gap={16}
+          justifyContent="space-between"
+          alignItems="stretch"
+          direction={isSmallDevice ? 'column' : 'row'}
+        >
+          <InfoBox
+            iconName={isSmallDevice ? 'DeviceTabletCamera' : 'Webcam'}
+            label="Ensure your camera is clean and functional."
+          />
+          <InfoBox
+            iconName="QrCode"
+            label="Hold the device steadily 6-12 inches away from the QR code."
+          />
+          <InfoBox
+            iconName="Sun"
+            label="Ensure the QR code is well-lit and not damaged or blurry."
+          />
+        </Info>
       </Dialog>
     </StyledBox>
   )
