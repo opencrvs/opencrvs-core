@@ -13,9 +13,11 @@ import styled from 'styled-components'
 import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
+import { Stack } from '../Stack'
 
 export interface IDialogProps {
   id?: string
+  titleIcon?: React.ReactNode
   title: string
   isOpen: boolean
   children?: React.ReactNode
@@ -96,7 +98,8 @@ export function Dialog({
   isOpen,
   children,
   actions,
-  variant = 'small'
+  variant = 'small',
+  titleIcon
 }: IDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -150,9 +153,12 @@ export function Dialog({
           <DialogContainer id={id} variant={variant} ref={dialogRef}>
             <DialogHeader hasOverflow={headerHasBorder}>
               <DialogTitle>
-                <Text variant="h2" element="h2" color="grey600">
-                  {title}
-                </Text>
+                <Stack alignItems="center">
+                  {titleIcon}
+                  <Text variant="h2" element="h2" color="grey600">
+                    {title}
+                  </Text>
+                </Stack>
               </DialogTitle>
               <Button type="icon" size="small" onClick={handleClose}>
                 <Icon name="X" size="medium" weight="bold" />
