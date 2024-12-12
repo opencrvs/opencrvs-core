@@ -13,128 +13,21 @@ import { IFormField } from '@client/forms'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 
-import {
-  AppBar,
-  Button,
-  FormWizard,
-  Frame,
-  Icon,
-  Spinner
-} from '@opencrvs/components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import React, { useCallback, useEffect } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { FormWizard, Frame, Spinner } from '@opencrvs/components'
+import React, { useEffect } from 'react'
+import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
-import type { TranslationConfig } from '@opencrvs/commons/events'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { ROUTES } from '@client/v2-events/routes'
-import { v4 as uuid } from 'uuid'
+import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 export function DeclareIndex() {
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
       <Declare />
     </React.Suspense>
-  )
-}
-
-function getDeclarationIconColor(): string {
-  return 'purple'
-}
-
-const messages = defineMessages({
-  saveExitButton: {
-    id: 'buttons.saveExit',
-    defaultMessage: 'Save & Exit',
-    description: 'The label for the save and exit button'
-  },
-  exitButton: {
-    id: 'buttons.exit',
-    defaultMessage: 'Exit',
-    description: 'The label for the exit button'
-  },
-  newVitalEventRegistration: {
-    id: 'event.newVitalEventRegistration',
-    defaultMessage: 'New "{event}" registration',
-    description: 'The title for the new vital event registration page'
-  }
-})
-
-export const FormHeader = ({ label }: { label: TranslationConfig }) => {
-  const intl = useIntl()
-  const { modal, exit, goToHome } = useEventFormNavigation()
-  const events = useEvents()
-  const formValues = useEventFormData((state) => state.formValues)
-  const { eventId } = useParams<{
-    eventId: string
-  }>()
-
-  if (!eventId) {
-    throw new Error('Event id is required')
-  }
-
-  const createDraft = events.actions.draft()
-
-  const saveAndExit = useCallback(() => {
-    createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })
-    goToHome()
-  }, [createDraft, eventId, formValues, goToHome])
-
-  const onExit = useCallback(() => {
-    exit()
-  }, [exit])
-
-  return (
-    <AppBar
-      desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
-      desktopRight={
-        <>
-          {
-            <Button
-              id="save-exit-btn"
-              type="primary"
-              size="small"
-              disabled={false}
-              onClick={saveAndExit}
-            >
-              <Icon name="DownloadSimple" />
-              {intl.formatMessage(messages.saveExitButton)}
-            </Button>
-          }
-          <Button type="secondary" size="small" onClick={onExit}>
-            <Icon name="X" />
-            {intl.formatMessage(messages.exitButton)}
-          </Button>
-          {modal}
-        </>
-      }
-      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
-      mobileRight={
-        <>
-          {
-            <Button
-              type="icon"
-              size="small"
-              disabled={false}
-              onClick={saveAndExit}
-            >
-              <Icon name="DownloadSimple" />
-            </Button>
-          }
-          <Button type="icon" size="small" onClick={onExit}>
-            <Icon name="X" />
-          </Button>
-        </>
-      }
-    />
   )
 }
 

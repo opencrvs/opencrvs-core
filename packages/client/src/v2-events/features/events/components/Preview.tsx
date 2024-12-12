@@ -26,7 +26,7 @@ import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
 import { FormConfig } from '@opencrvs/commons/client'
-import { FormHeader } from './FormHeader'
+import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
