@@ -82,14 +82,6 @@ export const queryClient = getQueryClient()
 
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
 
-utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn
-}))
-
-utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn
-}))
-
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider

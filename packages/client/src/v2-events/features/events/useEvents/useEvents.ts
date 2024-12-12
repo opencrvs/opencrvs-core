@@ -32,11 +32,7 @@ function getCanonicalEventId(
       e?.transactionId === eventIdOrTransactionId
   )
 
-  if (!event) {
-    throw new Error(`Event with id ${eventIdOrTransactionId} not found`)
-  }
-
-  return event.id
+  return event?.id
 }
 
 /**
@@ -56,6 +52,11 @@ function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
 ): (params: T) => Promise<R> {
   return async (params: T) => {
     const events = await readEventsFromStorage()
+    const id = getCanonicalEventId(events, params.eventId)
+    if (!id) {
+      return canonicalMutationFn(params)
+    }
+
     const modifiedParams: T = {
       ...params,
       eventId: getCanonicalEventId(events, params.eventId)
@@ -91,12 +92,11 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
     const eventsWithoutUpdated = events.filter(
       (e) => e.id !== actionInput.eventId
     )
-    const previousActions = eventToUpdate.actions
     await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
     queryClient.invalidateQueries({
       queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
     })
-    return { previousActions, events }
+    return { events }
   },
   onSettled: async (response) => {
     /*
@@ -143,12 +143,11 @@ utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
     const eventsWithoutUpdated = events.filter(
       (e) => e.id !== actionInput.eventId
     )
-    const previousActions = eventToUpdate.actions
     await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
     queryClient.invalidateQueries({
       queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
     })
-    return { previousActions, events }
+    return { events }
   },
   onSettled: async (response) => {
     /*
@@ -194,12 +193,11 @@ utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
     const eventsWithoutUpdated = events.filter(
       (e) => e.id !== actionInput.eventId
     )
-    const previousActions = eventToUpdate.actions
     await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
     queryClient.invalidateQueries({
       queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
     })
-    return { previousActions, events }
+    return { events }
   },
   onSettled: async (response) => {
     /*
@@ -245,12 +243,15 @@ utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
     const eventsWithoutUpdated = events.filter(
       (e) => e.id !== actionInput.eventId
     )
-    const previousActions = eventToUpdate.actions
-    await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
+    if (eventToUpdate) {
+      await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
+    } else {
+      await writeEventsToStorage(eventsWithoutUpdated)
+    }
     queryClient.invalidateQueries({
       queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
     })
-    return { previousActions, events }
+    return { events }
   },
   onSettled: async (response) => {
     /*
