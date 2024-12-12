@@ -70,14 +70,17 @@ import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAct
 import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
 import { ReloadModal } from './views/Modals/ReloadModal'
 import {
+  V2_DECLARE_ACTION_REVIEW_ROUTE,
   V2_DECLARE_ACTION_ROUTE,
+  V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
   V2_EVENTS_ROUTE,
   V2_ROOT_ROUTE
 } from './v2-events/routes'
 import { Workqueues } from './v2-events/features/workqueues'
-import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
+import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 import { TRPCProvider } from './v2-events/trpc'
 import { EventSelection } from './v2-events/features/events/EventSelection'
+import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
 
 interface IAppProps {
   client?: ApolloClient<NormalizedCacheObject>
@@ -530,21 +533,37 @@ export function App(props: IAppProps) {
                                             component={PrintRecord}
                                           />
                                           <TRPCProvider>
-                                            <ProtectedRoute
-                                              exact
-                                              path={V2_ROOT_ROUTE}
-                                              component={Workqueues}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={V2_EVENTS_ROUTE}
-                                              component={EventSelection}
-                                            />
-                                            <ProtectedRoute
-                                              exact
-                                              path={V2_DECLARE_ACTION_ROUTE}
-                                              component={EventFormWizardIndex}
-                                            />
+                                            <Switch>
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_ROOT_ROUTE}
+                                                component={Workqueues}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_EVENTS_ROUTE}
+                                                component={EventSelection}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={V2_DECLARE_ACTION_ROUTE}
+                                                component={DeclareIndex}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={
+                                                  V2_DECLARE_ACTION_REVIEW_ROUTE
+                                                }
+                                                component={ReviewSection}
+                                              />
+                                              <ProtectedRoute
+                                                exact
+                                                path={
+                                                  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
+                                                }
+                                                component={DeclareIndex}
+                                              />
+                                            </Switch>
                                           </TRPCProvider>
                                         </Switch>
                                       </>

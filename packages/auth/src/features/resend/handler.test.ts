@@ -12,10 +12,10 @@ import {
   createProductionEnvironmentServer,
   createServerWithEnvironment
 } from '@auth/tests/util'
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 
 describe('resend handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()

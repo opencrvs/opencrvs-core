@@ -391,7 +391,7 @@ function UserAuditHistoryComponent(props: Props) {
                       <Pagination
                         currentPage={state.currentPageNumber}
                         totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-                        onPageChange={(page: any) =>
+                        onPageChange={(page: number) =>
                           setState((prevState) => ({
                             ...prevState,
                             currentPageNumber: page

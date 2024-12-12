@@ -9,6 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { formatUrl } from '@client/navigation'
+import { Debug } from '@client/v2-events/features/debug/debug'
+import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
+import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -19,16 +23,11 @@ import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useEventConfigurations } from './useEventConfiguration'
-import {
-  V2_ROOT_ROUTE,
-  V2_DECLARE_ACTION_ROUTE
-} from '@client/v2-events/routes'
 import { useHistory } from 'react-router-dom'
-import { formatUrl } from '@client/navigation'
-import { Spinner } from '@opencrvs/components'
+import { useEventConfigurations } from './useEventConfiguration'
+import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
-import { Debug } from '@client/v2-events/features/debug/debug'
+import { useEventFormData } from './useEventFormData'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -74,7 +73,7 @@ const EventSelector = () => {
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
   const history = useHistory()
-
+  const clearForm = useEventFormData((state) => state.clear)
   const createEvent = events.createEvent()
 
   const handleContinue = async () => {
@@ -87,6 +86,8 @@ const EventSelector = () => {
       type: eventType,
       transactionId
     })
+
+    clearForm()
 
     history.push(
       formatUrl(V2_DECLARE_ACTION_ROUTE, {
@@ -141,11 +142,7 @@ const EventSelector = () => {
 
 export const EventSelection = () => {
   const intl = useIntl()
-  const history = useHistory()
-
-  const goToHome = () => {
-    history.push(V2_ROOT_ROUTE)
-  }
+  const { goToHome } = useEventFormNavigation()
 
   return (
     <Frame

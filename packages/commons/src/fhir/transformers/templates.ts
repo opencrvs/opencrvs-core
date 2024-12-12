@@ -154,7 +154,7 @@ export function createRelatedPersonTemplate(refUuid: UUID) {
 
 export function createCompositionTemplate(
   refUuid: UUID,
-  context: any
+  context: { event: EVENT_TYPE }
 ): BundleEntry<Composition> {
   let declarationText
   let declarationCode
