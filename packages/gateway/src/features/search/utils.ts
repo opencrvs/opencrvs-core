@@ -113,6 +113,7 @@ const addSearchParamForScope = (
       advancedSearchParameters.event.push({ eventName: event })
     } else throw new Error('Not enough scope to search')
   }
+  // add event in search params
 }
 
 export const filterSearchParamsWithScope = (
