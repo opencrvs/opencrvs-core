@@ -21,7 +21,6 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
@@ -33,6 +32,8 @@ import { vi, Mock } from 'vitest'
 import { SCOPES } from '@opencrvs/commons/client'
 import { SearchUsersQuery, Status } from '@client/utils/gateway'
 import { NetworkStatus } from '@apollo/client'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
+import { createMemoryRouter } from 'react-router-dom'
 
 const searchUserResultsMock = (
   officeId: string,
@@ -107,10 +108,9 @@ const mockNationalSystemAdmin = (officeId: string) => ({
 
 describe('for user with create my jurisdiction scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.USER_CREATE_MY_JURISDICTION], store)
   })
 
@@ -118,21 +118,18 @@ describe('for user with create my jurisdiction scope', () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
 
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId)
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
     store.dispatch(
       actions.setUserDetails({
         loading: false,
@@ -147,21 +144,18 @@ describe('for user with create my jurisdiction scope', () => {
   it('should not show add user button if office is not under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId)
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
     store.dispatch(
       actions.setUserDetails({
         loading: false,
@@ -176,31 +170,27 @@ describe('for user with create my jurisdiction scope', () => {
 
 describe('for user with create scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.USER_CREATE], store)
   })
 
   it('should show add user button if office is under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId)
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
     store.dispatch(
       actions.setUserDetails({
         loading: false,
@@ -215,21 +205,18 @@ describe('for user with create scope', () => {
   it('should show add user button even if office is not under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId)
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId)
+    })
     store.dispatch(
       actions.setUserDetails({
         loading: false,
@@ -244,10 +231,9 @@ describe('for user with create scope', () => {
 
 describe('for user with update my jurisdiction scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.USER_UPDATE_MY_JURISDICTION], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
   })
@@ -255,23 +241,20 @@ describe('for user with update my jurisdiction scope', () => {
   it('should show edit user button if office is under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
-          mockRegistrationAgent(selectedOfficeId)
-        ])
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
     await flushPromises()
     store.dispatch(
       actions.setUserDetails({
@@ -287,23 +270,20 @@ describe('for user with update my jurisdiction scope', () => {
   it('should not show edit user button if the other user has update all scope even if under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
-          mockNationalSystemAdmin(selectedOfficeId)
-        ])
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockNationalSystemAdmin(selectedOfficeId)
+      ])
+    })
     await flushPromises()
     store.dispatch(
       actions.setUserDetails({
@@ -319,23 +299,21 @@ describe('for user with update my jurisdiction scope', () => {
   it('should not show edit user button if office is not under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
-          mockRegistrationAgent(selectedOfficeId)
-        ])
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
+
     await flushPromises()
     store.dispatch(
       actions.setUserDetails({
@@ -351,10 +329,9 @@ describe('for user with update my jurisdiction scope', () => {
 
 describe('for user with update scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.USER_UPDATE], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
   })
@@ -362,23 +339,20 @@ describe('for user with update scope', () => {
   it('should show edit user button if office is under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
-          mockRegistrationAgent(selectedOfficeId)
-        ])
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
     await flushPromises()
     store.dispatch(
       actions.setUserDetails({
@@ -394,23 +368,20 @@ describe('for user with update scope', () => {
   it('should show edit user button even if the other user has update all scope', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
-          mockNationalSystemAdmin(selectedOfficeId)
-        ])
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockNationalSystemAdmin(selectedOfficeId)
+      ])
+    })
     await flushPromises()
     store.dispatch(
       actions.setUserDetails({
@@ -426,23 +397,20 @@ describe('for user with update scope', () => {
   it('should show edit user button even if office is not under jurisdiction', async () => {
     const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
     const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
-    const component = await createTestComponent(
-      <UserList
-        // @ts-ignore
-        location={{
-          search: stringify({
+    const { component } = await createTestComponent(<UserList />, {
+      store,
+      path: TEAM_USER_LIST,
+      initialEntries: [
+        TEAM_USER_LIST +
+          '?' +
+          stringify({
             locationId: selectedOfficeId
           })
-        }}
-      />,
-      {
-        store,
-        history,
-        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
-          mockRegistrationAgent(selectedOfficeId)
-        ])
-      }
-    )
+      ],
+      graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+        mockRegistrationAgent(selectedOfficeId)
+      ])
+    })
     await flushPromises()
     store.dispatch(
       actions.setUserDetails({
@@ -458,11 +426,10 @@ describe('for user with update scope', () => {
 
 describe('User list tests', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     setScopes([SCOPES.USER_UPDATE, SCOPES.USER_CREATE], store)
 
     const action = {
@@ -496,24 +463,25 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component, router } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
       const addUser = await waitForElement(component, '#add-user')
       addUser.hostNodes().simulate('click')
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUserInLocation')
+      expect(router.state.location.pathname).toContain('/createUserInLocation')
     })
     it('add user button redirects to office selection form for invalid location id', async () => {
       const userListMock = [
@@ -536,17 +504,18 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component, router } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
 
       const addUser = await waitForElement(component, '#add-user')
@@ -554,7 +523,7 @@ describe('User list tests', () => {
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUser')
+      expect(router.state.location.pathname).toContain('/createUser')
     })
   })
 
@@ -580,26 +549,26 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const testComponent = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
 
-      testComponent.update()
-      const app = testComponent
+      testComponent.component.update()
+      const app = testComponent.component
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
@@ -608,6 +577,7 @@ describe('User list tests', () => {
       userMutations.usernameReminderSend = vi.fn()
       userMutations.sendResetPasswordInvite = vi.fn()
       let component: ReactWrapper<{}, {}>
+      let router: ReturnType<typeof createMemoryRouter>
       const userListMock = [
         {
           request: {
@@ -751,25 +721,27 @@ describe('User list tests', () => {
           configurable: true,
           value: 1100
         })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
+        const testComponent = await createTestComponent(<UserList />, {
+          store,
+          path: TEAM_USER_LIST,
+          initialEntries: [
+            TEAM_USER_LIST +
+              '?' +
+              stringify({
                 locationId: '0d8474da-0361-4d32-979e-af91f012340a'
               })
-            }}
-          />,
-          { store, history, graphqlMocks: userListMock }
-        )
+          ],
+          graphqlMocks: userListMock
+        })
 
         // wait for mocked data to load mockedProvider
         await new Promise((resolve) => {
           setTimeout(resolve, 100)
         })
 
-        testComponent.update()
-        component = testComponent
+        testComponent.component.update()
+        component = testComponent.component
+        router = testComponent.router
       })
 
       it('renders list of users', () => {
@@ -807,7 +779,9 @@ describe('User list tests', () => {
           .at(0)
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
-        expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
+        expect(router.state.location.pathname).toMatch(
+          /.user\/(\w)+\/preview\/*/
+        )
       })
 
       it('clicking on menu options Resend invite sends invite', async () => {

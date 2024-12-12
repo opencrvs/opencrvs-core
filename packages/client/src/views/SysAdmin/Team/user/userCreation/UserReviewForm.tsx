@@ -31,12 +31,6 @@ import {
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'
-import {
-  goBack,
-  goToCreateUserSection,
-  goToTeamUserList,
-  goToUserReviewForm
-} from '@client/navigation'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -58,7 +52,6 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
-import { RouteComponentProps } from 'react-router-dom'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -75,6 +68,17 @@ import { SCOPES } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { draftToGqlTransformer } from '@client/transformer'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
+import {
+  generateCreateUserSectionUrl,
+  generateUserReviewFormUrl
+} from '@client/navigation'
 
 interface IUserReviewFormProps {
   userId?: string
@@ -90,11 +94,7 @@ interface IStateProps {
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
-  goToCreateUserSection: typeof goToCreateUserSection
-  goToUserReviewForm: typeof goToUserReviewForm
   submitForm: (variables: Record<string, any>) => void
-  goBack: typeof goBack
-  goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
 }
 
@@ -138,8 +138,7 @@ interface ISectionDataProps {
   userId: string | undefined
   hasUpdateUserScope: boolean
   hasCreateUserScope: boolean
-  goToUserReviewForm: typeof goToUserReviewForm
-  goToCreateUserSection: typeof goToCreateUserSection
+  navigate: ReturnType<typeof useNavigate>
 }
 
 const transformSectionData = ({
@@ -147,8 +146,7 @@ const transformSectionData = ({
   userId,
   hasUpdateUserScope,
   hasCreateUserScope,
-  goToCreateUserSection,
-  goToUserReviewForm,
+  navigate,
   ...props
 }: ISectionDataProps & ICommonProps) => {
   const { formData, intl } = props
@@ -211,16 +209,20 @@ const transformSectionData = ({
                     id={`btn_change_${field.name}`}
                     onClick={() => {
                       userId
-                        ? goToUserReviewForm(
-                            userId,
-                            userFormSection.id,
-                            group.id,
-                            field.name
+                        ? navigate(
+                            generateUserReviewFormUrl({
+                              userId,
+                              sectionId: userFormSection.id,
+                              groupId: group.id,
+                              userFormFieldNameHash: field.name
+                            })
                           )
-                        : goToCreateUserSection(
-                            userFormSection.id,
-                            group.id,
-                            field.name
+                        : navigate(
+                            generateCreateUserSectionUrl({
+                              sectionId: userFormSection.id,
+                              groupId: group.id,
+                              userFormFieldNameHash: field.name
+                            })
                           )
                     }}
                   >
@@ -300,14 +302,13 @@ const UserReviewFormComponent = ({
   userId,
   userFormSection,
   formData,
-  goToTeamUserList,
   userDetails,
   offlineCountryConfiguration,
   submitForm,
-  userRoles,
-  goToCreateUserSection,
-  goToUserReviewForm
+  userRoles
 }: IFullProps & IDispatchProps & IStateProps) => {
+  const navigate = useNavigate()
+
   const { hasAnyScope, canCreateUser } = usePermissions()
   const hasUpdateUserScope = hasAnyScope([
     SCOPES.USER_UPDATE,
@@ -384,13 +385,24 @@ const UserReviewFormComponent = ({
   return (
     <ActionPageLight
       title={title}
-      goBack={goBack}
-      goHome={() =>
-        locationDetails
-          ? goToTeamUserList(locationDetails.id)
-          : userDetails?.primaryOffice?.id &&
-            goToTeamUserList(userDetails.primaryOffice.id)
-      }
+      goBack={() => navigate(-1)}
+      goHome={() => {
+        if (locationDetails.id) {
+          navigate({
+            pathname: routes.TEAM_USER_LIST,
+            search: stringify({
+              locationId: locationDetails.id
+            })
+          })
+        } else if (userDetails?.primaryOffice?.id) {
+          navigate({
+            pathname: routes.TEAM_USER_LIST,
+            search: stringify({
+              locationId: userDetails.primaryOffice.id
+            })
+          })
+        }
+      }}
       hideBackground={true}
     >
       <Content title={intl.formatMessage(section.name)} showTitleOnMobile>
@@ -433,17 +445,15 @@ const UserReviewFormComponent = ({
 }
 
 const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
+  const navigateToUserList = () =>
+    props.router.navigate({
+      pathname: routes.TEAM_USER_LIST,
+      search: stringify({
+        locationId: props.formData.registrationOffice as string
+      })
+    })
+
   return {
-    goToCreateUserSection: (sec: string, group: string, fieldName?: string) =>
-      dispatch(goToCreateUserSection(sec, group, fieldName)),
-    goToUserReviewForm: (
-      userId: string,
-      sec: string,
-      group: string,
-      fieldName?: string
-    ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
-    goBack: () => dispatch(goBack()),
-    goToTeamUserList: (id: string) => dispatch(goToTeamUserList(id)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (variables: Record<string, any>) => {
       dispatch(
@@ -452,21 +462,21 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
           createOrUpdateUserMutation,
           variables,
           props.formData.registrationOffice as string,
-          Boolean(props.match.params.userId) // to detect if update or create
+          Boolean(props.router.match.params.userId), // to detect if update or create
+          navigateToUserList
         )
       )
     }
   }
 }
-export const UserReviewForm = connect((store: IStoreState) => {
-  return {
-    userFormSection: store.userForm.userForm!.sections[0],
-    offlineCountryConfiguration: getOfflineData(store),
-    userDetails: getUserDetails(store),
-    userRoles: store.userForm.userRoles
-  }
-}, mapDispatchToProps)(
-  injectIntl<'intl', IFullProps & IDispatchProps & IStateProps>(
-    UserReviewFormComponent
-  )
+
+export const UserReviewForm = withRouter(
+  connect((store: IStoreState) => {
+    return {
+      userFormSection: store.userForm.userForm!.sections[0],
+      offlineCountryConfiguration: getOfflineData(store),
+      userDetails: getUserDetails(store),
+      userRoles: store.userForm.userRoles
+    }
+  }, mapDispatchToProps)(injectIntl(UserReviewFormComponent))
 )

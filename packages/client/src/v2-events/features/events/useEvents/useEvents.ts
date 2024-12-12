@@ -27,8 +27,8 @@ function getCanonicalEventId(
 ) {
   const event = events.find(
     (e) =>
-      e.id === eventIdOrTransactionId ||
-      e.transactionId === eventIdOrTransactionId
+      e?.id === eventIdOrTransactionId ||
+      e?.transactionId === eventIdOrTransactionId
   )
 
   if (!event) {
@@ -177,13 +177,17 @@ const observer = new QueryObserver<EventDocument[]>(queryClient, {
 
 observer.subscribe((event) => {
   event.data?.forEach((event) => {
+    if (!event) {
+      return
+    }
+
     queryClient.setQueryData(
-      getQueryKey(api.event.get, event.id, 'query'),
+      getQueryKey(api.event.get, event?.id, 'query'),
       event
     )
 
     queryClient.setQueryData(
-      getQueryKey(api.event.get, event.transactionId, 'query'),
+      getQueryKey(api.event.get, event?.transactionId, 'query'),
       event
     )
   })

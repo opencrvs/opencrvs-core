@@ -93,7 +93,7 @@ import {
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { goToPageGroup } from '@client/navigation'
+import { generateGoToPageGroupUrl } from '@client/navigation'
 import {
   ILocation,
   IOfflineData,
@@ -136,6 +136,10 @@ import { DuplicateForm } from '@client/views/RegisterForm/duplicate/DuplicateFor
 import { Button } from '@opencrvs/components/lib/Button'
 import { UserDetails } from '@client/utils/userUtils'
 import { FormFieldGenerator } from '@client/components/form'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -269,7 +273,6 @@ interface IProps {
   form: IForm
   pageRoute: string
   rejectDeclarationClickEvent?: () => void
-  goToPageGroup: typeof goToPageGroup
   modifyDeclaration: typeof modifyDeclaration
   submitClickEvent: (
     declaration: IDeclaration,
@@ -301,7 +304,7 @@ export interface IErrorsBySection {
   [sectionId: string]: Errors
 }
 
-type FullProps = IProps & IntlShapeProps
+type FullProps = IProps & IntlShapeProps & RouteComponentProps
 
 function renderSelectOrRadioLabel(
   value: IFormFieldValue,
@@ -792,30 +795,36 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     groupId: string,
     fieldName?: string
   ) => {
-    const { draft, pageRoute, goToPageGroup } = this.props
+    const { draft, pageRoute } = this.props
     const declaration = draft
     declaration.review = true
-    goToPageGroup(
-      pageRoute,
-      declaration.id,
-      sectionId,
-      groupId,
-      declaration.event.toLowerCase(),
-      fieldName
+
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute,
+        declarationId: declaration.id,
+        pageId: sectionId,
+        groupId,
+        event: declaration.event.toLowerCase(),
+        fieldNameHash: fieldName
+      })
     )
   }
 
   replaceHandler(sectionId: string, groupId: string) {
-    const { draft, pageRoute, writeDeclaration, goToPageGroup } = this.props
+    const { draft, pageRoute, writeDeclaration } = this.props
     const declaration = draft
     declaration.data[sectionId] = {}
     writeDeclaration(declaration)
-    goToPageGroup(
-      pageRoute,
-      declaration.id,
-      sectionId,
-      groupId,
-      declaration.event.toLowerCase()
+
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute,
+        declarationId: declaration.id,
+        pageId: sectionId,
+        groupId,
+        event: declaration.event.toLowerCase()
+      })
     )
   }
 
@@ -2085,22 +2094,27 @@ function fieldToReadOnlyFields(field: IFormField): IFormField {
   }
   return readyOnlyField
 }
-export const ReviewSection = connect(
-  (state: IStoreState, { form }: { form: IForm }) => {
-    const registrationSection = form.sections.find(
-      ({ id }) => id === 'registration'
-    )
-    const documentsSection = form.sections.find(({ id }) => id === 'documents')
-    if (!registrationSection || !documentsSection) {
-      throw new Error('"registration" & "documents" are required sections')
-    }
-    return {
-      registrationSection,
-      documentsSection,
-      scope: getScope(state),
-      offlineCountryConfiguration: getOfflineData(state),
-      language: getLanguage(state)
-    }
-  },
-  { goToPageGroup, writeDeclaration, modifyDeclaration }
-)(injectIntl(ReviewSectionComp))
+
+export const ReviewSection = withRouter(
+  connect(
+    (state: IStoreState, { form }: { form: IForm }) => {
+      const registrationSection = form.sections.find(
+        ({ id }) => id === 'registration'
+      )
+      const documentsSection = form.sections.find(
+        ({ id }) => id === 'documents'
+      )
+      if (!registrationSection || !documentsSection) {
+        throw new Error('"registration" & "documents" are required sections')
+      }
+      return {
+        registrationSection,
+        documentsSection,
+        scope: getScope(state),
+        offlineCountryConfiguration: getOfflineData(state),
+        language: getLanguage(state)
+      }
+    },
+    { writeDeclaration, modifyDeclaration }
+  )(injectIntl(ReviewSectionComp))
+)

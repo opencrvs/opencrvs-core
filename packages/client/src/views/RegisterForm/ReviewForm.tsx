@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -47,7 +51,7 @@ type IProps = IReviewProps &
   IDeclarationProp &
   FullProps &
   IntlShapeProps &
-  RouteComponentProps<{}>
+  RouteComponentProps
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -85,7 +89,7 @@ class ReviewFormView extends React.Component<IProps> {
     }
     if (!declaration) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyForReview,
             selectorId: ''
@@ -97,6 +101,7 @@ class ReviewFormView extends React.Component<IProps> {
     }
   }
 }
+
 function getEvent(eventType: string) {
   switch (eventType && eventType.toLocaleLowerCase()) {
     case 'birth':
@@ -124,10 +129,11 @@ function mapStatetoProps(
     event: string
   }>
 ) {
-  const { match } = props
-  if (!match.params.event) {
+  const match = props.router.match
+  if (!match?.params?.event) {
     throw new Error('Event is not provided as path param')
   }
+
   const reviewFormState: IReviewFormState = getReviewForm(
     state
   ) as IReviewFormState
@@ -147,6 +153,8 @@ function mapStatetoProps(
   }
 }
 
-export const ReviewForm = connect<any, {}, any, IStoreState>(mapStatetoProps)(
-  injectIntl(withTheme(ReviewFormView))
+export const ReviewForm = withRouter(
+  connect<any, {}, any, IStoreState>(mapStatetoProps)(
+    injectIntl(withTheme(ReviewFormView))
+  )
 )

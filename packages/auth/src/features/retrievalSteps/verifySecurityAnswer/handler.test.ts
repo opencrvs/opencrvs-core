@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetchAny from 'jest-fetch-mock'
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 import {
   RetrievalSteps,
   storeRetrievalStepInformation,
@@ -19,7 +19,7 @@ import {
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('security question answer checking', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()
@@ -52,7 +52,10 @@ describe('security question answer checking', () => {
   })
 
   describe('when submitted security answer is correct', () => {
-    let res: any
+    let res: {
+      statusCode: number
+      payload: string
+    }
     beforeEach(async () => {
       res = await server.server.inject({
         method: 'POST',

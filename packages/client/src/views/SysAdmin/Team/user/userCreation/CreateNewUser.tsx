@@ -16,7 +16,6 @@ import {
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
-import { goBack } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import {
@@ -30,22 +29,18 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ApolloClient } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
-import React, { useEffect } from 'react'
+import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-
-interface IMatchParams {
-  userId?: string
-  locationId?: string
-  sectionId: string
-  groupId: string
-}
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 type IUserProps = {
   userId?: string
@@ -60,15 +55,11 @@ type IUserProps = {
 }
 
 interface IDispatchProps {
-  goBack: typeof goBack
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
-type Props = RouteComponentProps<IMatchParams> &
-  IUserProps &
-  IDispatchProps &
-  IntlShapeProps
+type Props = RouteComponentProps & IUserProps & IDispatchProps & IntlShapeProps
 
 const Container = styled.div`
   display: flex;
@@ -90,80 +81,79 @@ const SpinnerWrapper = styled.div`
   flex-direction: column;
   align-items: center;
 `
-
-const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
-  const {
-    userId,
-    match,
-    intl,
-    goBack,
-    submitting,
-    clearUserFormData,
-    fetchAndStoreUserData,
-    client,
-    section,
-    userDetailsStored,
-    loadingRoles
-  } = props
-
-  useEffect(() => {
-    const initialize = async () => {
-      if (match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])) {
-        clearUserFormData()
-      }
-      if (userId) {
-        fetchAndStoreUserData(client as ApolloClient<any>, {
-          userId
-        })
-      }
+// @TODO: Reverted back to class component, with react router update, the flow stopped working.
+// After merging the router fix, revert back to functional component and investigate the issue.
+class CreateNewUserComponent extends React.Component<WithApolloClient<Props>> {
+  async componentDidMount() {
+    const { userId, client } = this.props
+    if (
+      this.props.router.location.pathname.includes(
+        CREATE_USER_ON_LOCATION.split('/:')[0]
+      )
+    ) {
+      this.props.clearUserFormData()
     }
-
-    initialize()
-
-    return () => {
-      clearUserFormData()
-    }
-  }, [userId, match.path, clearUserFormData, fetchAndStoreUserData, client])
-
-  const renderLoadingPage = () => (
-    <ActionPageLight
-      title={
+    if (userId) {
+      this.props.fetchAndStoreUserData(client as ApolloClient<any>, {
         userId
-          ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-          : intl.formatMessage(formMessages.userFormTitle)
-      }
-      goBack={goBack}
-      hideBackground={true}
-    >
-      <Container>
-        {submitting ? (
-          <SpinnerWrapper>
+      })
+    }
+  }
+
+  async componentWillUnmount() {
+    this.props.clearUserFormData()
+  }
+
+  renderLoadingPage = () => {
+    const { intl, userId } = this.props
+    return (
+      <ActionPageLight
+        title={
+          userId
+            ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
+            : intl.formatMessage(formMessages.userFormTitle)
+        }
+        goBack={() => this.props.router.navigate(-1)}
+        hideBackground={true}
+      >
+        <Container>
+          {this.props.submitting ? (
+            <SpinnerWrapper>
+              <Spinner id="user-form-submitting-spinner" size={25} />
+              <p>
+                {this.props.userId
+                  ? intl.formatMessage(userFormMessages.updatingUser)
+                  : intl.formatMessage(userFormMessages.creatingNewUser)}
+              </p>
+            </SpinnerWrapper>
+          ) : (
             <Spinner id="user-form-submitting-spinner" size={25} />
-            <p>
-              {userId
-                ? intl.formatMessage(userFormMessages.updatingUser)
-                : intl.formatMessage(userFormMessages.creatingNewUser)}
-            </p>
-          </SpinnerWrapper>
-        ) : (
-          <Spinner id="user-form-submitting-spinner" size={25} />
-        )}
-      </Container>
-    </ActionPageLight>
-  )
-
-  if (submitting || loadingRoles || (userId && !userDetailsStored)) {
-    return renderLoadingPage()
+          )}
+        </Container>
+      </ActionPageLight>
+    )
   }
 
-  if (section.viewType === 'form') {
-    return <UserForm {...props} />
-  }
+  render() {
+    const { section, submitting, userDetailsStored, loadingRoles, userId } =
+      this.props
+    if (submitting || loadingRoles || (userId && !userDetailsStored)) {
+      return this.renderLoadingPage()
+    }
 
-  if (section.viewType === 'preview') {
-    return <UserReviewForm client={client as ApolloClient<any>} {...props} />
+    if (section.viewType === 'form') {
+      return <UserForm {...this.props} />
+    }
+
+    if (section.viewType === 'preview') {
+      return (
+        <UserReviewForm
+          client={this.props.client as ApolloClient<any>}
+          {...this.props}
+        />
+      )
+    }
   }
-  return null
 }
 
 function getNextSectionIds(
@@ -202,11 +192,11 @@ function getNextSectionIds(
   }
 }
 
-const mapStateToProps = (state: IStoreState, props: Props) => {
+const mapStateToProps = (state: IStoreState, props: RouteComponentProps) => {
   const config = getOfflineData(state)
   const user = getUserDetails(state)
   const sectionId =
-    props.match.params.sectionId || state.userForm.userForm!.sections[0].id
+    props.router.params.sectionId || state.userForm.userForm!.sections[0].id
 
   const section = state.userForm.userForm.sections.find(
     (section) => section.id === sectionId
@@ -217,14 +207,13 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   }
 
   let formData = { ...state.userForm.userFormData }
-
-  if (props.match.params.locationId) {
+  if (props.router.params.locationId) {
     formData = {
       ...gqlToDraftTransformer(
         { sections: [section] },
         {
           [section.id]: {
-            primaryOffice: { id: props.match.params.locationId }
+            primaryOffice: { id: props.router.params.locationId }
           }
         }
       )[section.id],
@@ -238,7 +227,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
     }
   }
   const groupId =
-    props.match.params.groupId ||
+    props.router.params.groupId ||
     getVisibleSectionGroupsBasedOnConditions(section, formData)[0].id
   const group = section.groups.find(
     (group) => group.id === groupId
@@ -259,7 +248,7 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   ) || { sectionId: '', groupId: '' }
 
   return {
-    userId: props.match.params.userId,
+    userId: props.router.params.userId,
     sectionId,
     section,
     formData,
@@ -275,8 +264,9 @@ const mapStateToProps = (state: IStoreState, props: Props) => {
   }
 }
 
-export const CreateNewUser = connect(mapStateToProps, {
-  goBack,
-  clearUserFormData,
-  fetchAndStoreUserData
-})(injectIntl(withApollo<Props>(CreateNewUserComponent)))
+export const CreateNewUser = withRouter(
+  connect(mapStateToProps, {
+    clearUserFormData,
+    fetchAndStoreUserData
+  })(injectIntl(withApollo<Props>(CreateNewUserComponent)))
+)

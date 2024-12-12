@@ -19,7 +19,7 @@ import {
   wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
@@ -60,14 +60,14 @@ import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { RegStatus } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 interface IBaseApprovalTabProps {
   theme: ITheme
-  goToPage: typeof goToPage
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   scope: Scope[] | null
   queryData: {
@@ -83,6 +83,7 @@ interface IBaseApprovalTabProps {
 type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
 
 function SentForReviewComponent(props: IApprovalTabProps) {
+  const navigate = useNavigate()
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.SENT_FOR_APPROVAL)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
@@ -232,9 +233,12 @@ function SentForReviewComponent(props: IApprovalTabProps) {
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            canSendForApproval
-              ? props.goToDeclarationRecordAudit('approvalTab', reg.id)
-              : props.goToDeclarationRecordAudit('reviewTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: canSendForApproval ? 'approvalTab' : 'reviewTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {reg.name}
@@ -243,9 +247,12 @@ function SentForReviewComponent(props: IApprovalTabProps) {
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            canSendForApproval
-              ? props.goToDeclarationRecordAudit('approvalTab', reg.id)
-              : props.goToDeclarationRecordAudit('reviewTab', reg.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: canSendForApproval ? 'approvalTab' : 'reviewTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -350,7 +357,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const SentForReview = connect(mapStateToProps, {
-  goToPage,
-  goToDeclarationRecordAudit
-})(injectIntl(withTheme(SentForReviewComponent)))
+export const SentForReview = connect(mapStateToProps)(
+  injectIntl(withTheme(SentForReviewComponent))
+)

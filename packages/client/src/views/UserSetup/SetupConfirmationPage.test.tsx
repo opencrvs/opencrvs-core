@@ -19,15 +19,15 @@ import { createStore } from '@client/store'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
 
 describe('Setup confirmation page tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   beforeAll(async () => {
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
   })
   it('renders page successfully', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <SetupConfirmationPage />,
-      { store, history }
+      { store }
     )
     const app = testComponent
     expect(app.find('#user-setup-complete-page').hostNodes()).toHaveLength(1)

@@ -14,12 +14,11 @@ import * as React from 'react'
 import { GenericErrorToast } from './GenericErrorToast'
 
 describe('Test toast notification', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   it('checks if the appropriate toast is rendered', async () => {
-    const component = await createTestComponent(<GenericErrorToast />, {
-      store,
-      history
+    const { component } = await createTestComponent(<GenericErrorToast />, {
+      store
     })
 
     expect(component.find('#error-toast').hostNodes()).toHaveLength(1)

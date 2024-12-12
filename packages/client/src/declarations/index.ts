@@ -28,7 +28,6 @@ import {
   RegStatus
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
@@ -82,6 +81,7 @@ import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
+import { IDynamicValues } from '@client/navigation'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -454,7 +454,6 @@ export type Action =
   | IWriteDeclarationAction
   | IWriteDeclarationSuccessAction
   | IWriteDeclarationFailedAction
-  | NavigationAction
   | IDeleteDeclarationAction
   | IDeleteDeclarationSuccessAction
   | IDeleteDeclarationFailedAction
@@ -1238,28 +1237,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   action: Action
 ): IDeclarationsState | Loop<IDeclarationsState, Action> => {
   switch (action.type) {
-    case GO_TO_PAGE: {
-      const declaration = state.declarations.find(
-        ({ id }) => id === action.payload.declarationId
-      )
-
-      if (
-        !declaration ||
-        declaration.data[action.payload.pageId] ||
-        action.payload.pageId === 'preview' ||
-        action.payload.pageId === 'review'
-      ) {
-        return state
-      }
-      const modifiedDeclaration = {
-        ...declaration,
-        data: {
-          ...declaration.data,
-          [action.payload.pageId]: {}
-        }
-      }
-      return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
-    }
     case STORE_DECLARATION:
       return {
         ...state,

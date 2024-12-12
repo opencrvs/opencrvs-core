@@ -23,10 +23,10 @@ import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useEventConfigurations } from './useEventConfiguration'
-import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
+import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEventFormData } from './useEventFormData'
 
 const messages = defineMessages({
@@ -68,11 +68,11 @@ const constantsMessages = defineMessages({
 
 const EventSelector = () => {
   const intl = useIntl()
+  const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
-  const history = useHistory()
   const clearForm = useEventFormData((state) => state.clear)
   const createEvent = events.createEvent()
 
@@ -89,7 +89,7 @@ const EventSelector = () => {
 
     clearForm()
 
-    history.push(
+    navigate(
       formatUrl(V2_DECLARE_ACTION_ROUTE, {
         eventId: transactionId
       })
