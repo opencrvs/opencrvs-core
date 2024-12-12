@@ -9,8 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, CreatedAction, EventDocument } from '@events/schema'
-import { EventIndex, Status } from '@events/schema/EventIndex'
+import {
+  ActionDocument,
+  CreatedAction,
+  EventDocument,
+  EventIndex,
+  Status
+} from '@opencrvs/commons/events'
+
 import { getClient } from '@events/storage'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { type estypes } from '@elastic/elasticsearch'
@@ -18,6 +24,12 @@ import { Transform } from 'stream'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<Status>((status, action) => {
+    if (action.type === 'CREATE') {
+      return 'CREATED'
+    }
+    if (action.type === 'DECLARE') {
+      return 'DECLARED'
+    }
     return status
   }, 'CREATED')
 }
@@ -106,30 +118,30 @@ export async function indexAllEvents() {
     }
   })
 
-  return esClient.helpers.bulk(
-    {
-      retries: 3,
-      wait: 3000,
-      datasource: stream.pipe(transformedStreamData),
-      onDocument: (doc: EventIndex) => ({
-        index: {
-          _index: 'events',
-          _id: doc.id
-        }
-      }),
-      refresh: 'wait_for'
-    },
-    {
-      meta: true
-    }
-  )
+  return esClient.helpers.bulk({
+    retries: 3,
+    wait: 3000,
+    datasource: stream.pipe(transformedStreamData),
+    onDocument: (doc: EventIndex) => ({
+      index: {
+        _index: 'events',
+        _id: doc.id
+      }
+    }),
+    refresh: 'wait_for'
+  })
 }
+
 export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
-  return esClient.index({
+
+  return esClient.update({
     index: 'events',
     id: event.id,
-    body: eventToEventIndex(event),
+    body: {
+      doc: eventToEventIndex(event),
+      doc_as_upsert: true
+    },
     refresh: 'wait_for'
   })
 }

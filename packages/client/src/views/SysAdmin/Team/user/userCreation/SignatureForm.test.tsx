@@ -20,7 +20,8 @@ import {
   mockFetchRoleGraphqlOperation,
   mockDataWithRegistarRoleSelected,
   mockRoles,
-  mockUserGraphqlOperation
+  mockUserGraphqlOperation,
+  setScopes
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
@@ -29,6 +30,7 @@ import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { Mock, describe, expect } from 'vitest'
+import { SCOPES } from '@opencrvs/commons/client'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
@@ -36,13 +38,13 @@ describe('signature upload tests', () => {
 
   beforeEach(async () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    setScopes([SCOPES.USER_CREATE], store)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
-      ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
       testComponent = await createTestComponent(
         // @ts-ignore
         <CreateNewUser

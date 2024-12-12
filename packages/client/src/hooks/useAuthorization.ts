@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { useSelector } from 'react-redux'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope, User, Location, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { User, Location } from '@client/utils/gateway'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import {
   canBeCorrected,
@@ -23,6 +23,9 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
+import { isUnderJurisdiction } from '@client/utils/locationUtils'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
 
 export const RECORD_ALLOWED_SCOPES = {
   UPDATE: [
@@ -47,23 +50,34 @@ export const RECORD_ALLOWED_SCOPES = {
   REVIEW_CORRECTION: [SCOPES.RECORD_REGISTRATION_CORRECT]
 }
 
-export const RECORD_SEARCH_SCOPES = {
-  BIRTH: [SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_BIRTH_MY_JURISDICTION],
-  DEATH: [SCOPES.SEARCH_DEATH, SCOPES.SEARCH_DEATH_MY_JURISDICTION],
-  MARRIAGE: [SCOPES.SEARCH_MARRIAGE, SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION],
-  ALL_EVENT_SEARCH: [
-    SCOPES.SEARCH_BIRTH,
-    SCOPES.SEARCH_DEATH,
-    SCOPES.SEARCH_MARRIAGE,
-    SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-    SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-    SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-  ]
-}
+export const RECORD_DECLARE_SCOPES = [
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+]
+
+export const RECORD_SEARCH_SCOPES = [
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+  SCOPES.SEARCH_MARRIAGE,
+  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+]
 
 export function usePermissions() {
   const userScopes = useSelector(getScope)
-  const userPrimaryOffice = useSelector(getUserDetails)?.primaryOffice
+  const currentUser = useSelector(getUserDetails)
+  const userPrimaryOffice = currentUser?.primaryOffice
+  const locations = useSelector(getOfflineData).locations
+  const offices = useSelector(getOfflineData).offices
+  const roles = useSelector((store: IStoreState) => store.userForm.userRoles)
+
+  const roleScopes = (role: string) =>
+    roles.find(({ id }) => id === role)?.scopes ?? []
 
   const hasScopes = (neededScopes: Scope[]) =>
     neededScopes.every((scope) => userScopes?.includes(scope))
@@ -74,35 +88,101 @@ export function usePermissions() {
 
   const hasScope = (neededScope: Scope) => hasAnyScope([neededScope])
 
-  const canReadUser = (user: Pick<User, 'primaryOffice'>) => {
-    if (hasScope(SCOPES.USER_READ)) return true
-    if (hasScope(SCOPES.USER_READ_MY_OFFICE))
+  const canSearchRecords = hasAnyScope(RECORD_SEARCH_SCOPES)
+
+  const canDeclareRecords = hasAnyScope(RECORD_DECLARE_SCOPES)
+
+  const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
+    if (!userPrimaryOffice?.id) {
+      return false
+    }
+    if (hasScope(SCOPES.USER_READ)) {
+      return true
+    }
+    if (hasScope(SCOPES.USER_READ_MY_OFFICE)) {
       return user.primaryOffice.id === userPrimaryOffice?.id
+    }
+    if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
+      return isUnderJurisdiction(
+        userPrimaryOffice.id,
+        user.primaryOffice.id,
+        locations,
+        offices
+      )
+    }
+    if (hasScope(SCOPES.USER_READ_ONLY_MY_AUDIT)) {
+      return user.id === currentUser?.id
+    }
 
     return false
   }
 
-  const canEditUser = (user: Pick<User, 'primaryOffice'>) => {
-    if (hasScope(SCOPES.USER_UPDATE)) return true
-    if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION))
-      return user.primaryOffice.id === userPrimaryOffice?.id
+  const canEditUser = (
+    user: Pick<User, 'primaryOffice'> & { role: { id: string } }
+  ) => {
+    if (!userPrimaryOffice?.id) {
+      return false
+    }
+    if (hasScope(SCOPES.USER_UPDATE)) {
+      return true
+    }
+    if (hasScope(SCOPES.USER_UPDATE_MY_JURISDICTION)) {
+      if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
+        return false
+      }
+      return isUnderJurisdiction(
+        userPrimaryOffice.id,
+        user.primaryOffice.id,
+        locations,
+        offices
+      )
+    }
 
     return false
   }
 
-  const canReadOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) return true
-    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE))
-      return office.id === userPrimaryOffice?.id
+  const canCreateUser = hasAnyScope([
+    SCOPES.USER_CREATE,
+    SCOPES.USER_CREATE_MY_JURISDICTION
+  ])
 
+  const canAccessOffice = (office: Pick<Location, 'id'>) => {
+    if (!userPrimaryOffice?.id) {
+      return false
+    }
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS)) {
+      return true
+    }
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE)) {
+      return office.id === userPrimaryOffice.id
+    }
+
+    if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
+      return isUnderJurisdiction(
+        userPrimaryOffice.id,
+        office.id,
+        locations,
+        offices
+      )
+    }
     return false
   }
 
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
-    if (hasScope(SCOPES.USER_CREATE)) return true
-    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION))
-      return office.id === userPrimaryOffice?.id
-
+    if (!userPrimaryOffice?.id) {
+      return false
+    }
+    if (hasScope(SCOPES.USER_CREATE)) {
+      return true
+    }
+    if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
+      return isUnderJurisdiction(
+        userPrimaryOffice.id,
+        office.id,
+        locations,
+        offices
+      )
+    }
     return false
   }
 
@@ -123,12 +203,15 @@ export function usePermissions() {
   const canReviewCorrection = () =>
     hasAnyScope(RECORD_ALLOWED_SCOPES.REVIEW_CORRECTION)
 
-  const hasSearchScopes = () =>
-    hasAnyScope(RECORD_SEARCH_SCOPES.ALL_EVENT_SEARCH)
+  const canSearchBirthRecords = hasAnyScope([
+    SCOPES.SEARCH_BIRTH,
+    SCOPES.SEARCH_BIRTH_MY_JURISDICTION
+  ])
 
-  const hasBirthSearchScopes = () => hasAnyScope(RECORD_SEARCH_SCOPES.BIRTH)
-
-  const hasDeathSearchScopes = () => hasAnyScope(RECORD_SEARCH_SCOPES.DEATH)
+  const canSearchDeathRecords = hasAnyScope([
+    SCOPES.SEARCH_DEATH,
+    SCOPES.SEARCH_DEATH_MY_JURISDICTION
+  ])
 
   const isRecordActionable = (status: SUBMISSION_STATUS) =>
     [
@@ -149,19 +232,21 @@ export function usePermissions() {
     hasScope,
     hasAnyScope,
     isRecordActionable,
+    canSearchRecords,
+    canSearchBirthRecords,
+    canSearchDeathRecords,
+    canDeclareRecords,
     canPrintRecord,
     canIssueRecord,
     canReadUser,
     canEditUser,
-    canReadOfficeUsers,
+    canCreateUser,
+    canAccessOffice,
     canAddOfficeUsers,
     canUpdateRecord,
     canReviewRecord,
     canCorrectRecord,
     canArchiveRecord,
-    canReinstateRecord,
-    hasSearchScopes,
-    hasBirthSearchScopes,
-    hasDeathSearchScopes
+    canReinstateRecord
   }
 }

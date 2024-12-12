@@ -263,7 +263,11 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Retrieves a user mobile number',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE
+          ]
         },
         validate: {
           payload: userIdSchema
@@ -280,9 +284,9 @@ export const getRoutes = () => {
       options: {
         auth: {
           scope: [
-            SCOPES.USER_READ,
-            SCOPES.USER_READ_MY_JURISDICTION,
-            SCOPES.USER_READ_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+            SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION,
             SCOPES.USER_DATA_SEEDING
           ]
         },
@@ -312,7 +316,11 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Creates a new user',
         auth: {
-          scope: [SCOPES.USER_CREATE, SCOPES.USER_DATA_SEEDING]
+          scope: [
+            SCOPES.USER_CREATE,
+            SCOPES.USER_CREATE_MY_JURISDICTION,
+            SCOPES.USER_DATA_SEEDING
+          ]
         }
       }
     },
@@ -324,7 +332,11 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Updates an existing user',
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
+          scope: [
+            SCOPES.USER_UPDATE,
+            SCOPES.USER_UPDATE_MY_JURISDICTION,
+            SCOPES.USER_DATA_SEEDING
+          ]
         }
       }
     },
@@ -365,7 +377,11 @@ export const getRoutes = () => {
       handler: userAuditHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE, SCOPES.USER_DATA_SEEDING]
+          scope: [
+            SCOPES.USER_UPDATE,
+            SCOPES.USER_UPDATE_MY_JURISDICTION,
+            SCOPES.USER_DATA_SEEDING
+          ]
         },
         validate: {
           payload: userAuditSchema
@@ -421,7 +437,7 @@ export const getRoutes = () => {
       handler: resendInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
         },
         validate: {
           payload: resendInviteRequestSchema
@@ -436,7 +452,7 @@ export const getRoutes = () => {
       handler: usernameReminderHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
         },
         validate: {
           payload: usernameReminderRequestSchema
@@ -451,7 +467,7 @@ export const getRoutes = () => {
       handler: resetPasswordInviteHandler,
       options: {
         auth: {
-          scope: [SCOPES.USER_UPDATE]
+          scope: [SCOPES.USER_UPDATE, SCOPES.USER_UPDATE_MY_JURISDICTION]
         },
         validate: {
           payload: resetPasswordRequestSchema
@@ -581,7 +597,11 @@ export const getRoutes = () => {
         tags: ['api'],
         description: 'Gets count of users group by office ids',
         auth: {
-          scope: [SCOPES.USER_READ]
+          scope: [
+            SCOPES.USER_READ,
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_READ_MY_OFFICE
+          ]
         },
         validate: {
           payload: Joi.object({

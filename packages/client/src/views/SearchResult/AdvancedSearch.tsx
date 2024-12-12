@@ -483,21 +483,23 @@ const DeathSection = () => {
 
 const AdvancedSearch = () => {
   const intl = useIntl()
-  const { hasBirthSearchScopes, hasDeathSearchScopes } = usePermissions()
-  const [activeTabId, setActiveTabId] = useState(
-    hasBirthSearchScopes() ? TabId.BIRTH : TabId.DEATH
-  )
+  const { canSearchBirthRecords, canSearchDeathRecords } = usePermissions()
+  const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
+  const activeTabId =
+    advancedSearchParamState.event || canSearchDeathRecords
+      ? TabId.BIRTH
+      : TabId.DEATH
   const dispatch = useDispatch()
   const tabSections = [
     {
       id: TabId.BIRTH,
       title: intl.formatMessage(messages.birthTabTitle),
-      showTab: hasBirthSearchScopes()
+      showTab: canSearchBirthRecords
     },
     {
       id: TabId.DEATH,
       title: intl.formatMessage(messages.deathTabTitle),
-      showTab: hasDeathSearchScopes()
+      showTab: canSearchDeathRecords
     }
   ]
 
@@ -520,7 +522,6 @@ const AdvancedSearch = () => {
               sections={filteredTabSections}
               activeTabId={activeTabId}
               onTabClick={(id: TabId) => {
-                setActiveTabId(id)
                 dispatch(
                   setAdvancedSearchParam({
                     ...advancedSearchInitialState,

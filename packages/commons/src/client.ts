@@ -10,5 +10,6 @@
  */
 export * from './search'
 export * from './events'
+export * from './scopes'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

@@ -142,6 +142,7 @@ const getDefaultAddressLines = (): string[] => [
   '',
   '',
   '',
+  '',
   ''
 ] // lines must be available as empty strings for GraphQL to parse all options
 

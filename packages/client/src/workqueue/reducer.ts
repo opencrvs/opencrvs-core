@@ -43,7 +43,7 @@ import {
   UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
   UPDATE_WORKQUEUE_PAGINATION
 } from './actions'
-import { Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 
 export interface IQueryData {
   inProgressTab: GQLEventSearchResultSet

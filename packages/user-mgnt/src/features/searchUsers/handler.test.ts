@@ -22,7 +22,7 @@ beforeEach(async () => {
 })
 
 const token = jwt.sign(
-  { scope: [SCOPES.USER_READ] },
+  { scope: [SCOPES.ORGANISATION_READ_LOCATIONS] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',

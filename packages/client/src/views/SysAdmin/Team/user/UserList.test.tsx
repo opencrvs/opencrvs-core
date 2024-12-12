@@ -13,9 +13,10 @@ import {
   mockLocalSysAdminUserResponse,
   createTestComponent,
   flushPromises,
+  mockRoles,
   setScopes,
   mockOfflineDataDispatch,
-  mockUserResponse
+  fetchUserMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -27,58 +28,431 @@ import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
-
+import { roleQueries } from '@client/forms/user/query/queries'
 import { vi, Mock } from 'vitest'
-import { SCOPES, SearchUsersQuery, Status } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { SearchUsersQuery, Status } from '@client/utils/gateway'
+import { NetworkStatus } from '@apollo/client'
 
-describe('user list without admin scope', () => {
+const searchUserResultsMock = (
+  officeId: string,
+  searchUserResults?: NonNullable<SearchUsersQuery['searchUsers']>['results']
+) => [
+  {
+    request: {
+      query: SEARCH_USERS,
+      variables: {
+        primaryOfficeId: officeId,
+        count: 10,
+        skip: 0
+      }
+    },
+    result: {
+      data: {
+        searchUsers: {
+          totalItems: 0,
+          results: searchUserResults ?? []
+        }
+      }
+    }
+  }
+]
+
+const mockRegistrationAgent = (officeId: string) => ({
+  id: '5d08e102542c7a19fc55b790',
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Rabindranath',
+      familyName: 'Tagore'
+    }
+  ],
+  primaryOffice: {
+    id: officeId
+  },
+  role: {
+    id: 'REGISTRATION_AGENT',
+    label: {
+      id: 'userRoles.registrationAgent',
+      defaultMessage: 'Registration_agent',
+      description: ''
+    }
+  },
+  status: Status.Active,
+  underInvestigation: false
+})
+const mockNationalSystemAdmin = (officeId: string) => ({
+  id: '5d08e102542c7a19fc55b791',
+  name: [
+    {
+      use: 'en',
+      firstNames: 'Mohammad',
+      familyName: 'Ashraful'
+    }
+  ],
+  primaryOffice: {
+    id: officeId
+  },
+  role: {
+    id: 'NATIONAL_SYSTEM_ADMIN',
+    label: {
+      id: 'userRoles.nationalSystemAdmin',
+      defaultMessage: 'Natinoal System Admin',
+      description: ''
+    }
+  },
+  status: Status.Active,
+  underInvestigation: false
+})
+
+describe('for user with create my jurisdiction scope', () => {
   let store: AppStore
   let history: History<any>
 
-  it('no add user button', async () => {
-    Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
-    const action = {
-      type: actions.SET_USER_DETAILS,
-      payload: mockUserResponse
-    }
-    await store.dispatch(action)
-    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
-    await flushPromises()
+  beforeEach(async () => {
+    ;({ store, history } = createStore())
+    setScopes([SCOPES.USER_CREATE_MY_JURISDICTION], store)
+  })
 
-    const userListMock = [
-      {
-        request: {
-          query: SEARCH_USERS,
-          variables: {
-            primaryOfficeId: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-            count: 10
-          }
-        },
-        result: {
-          data: {
-            searchUsers: {
-              totalItems: 0,
-              results: []
-            }
-          }
-        }
-      }
-    ]
+  it('should show add user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
 
     const component = await createTestComponent(
       <UserList
         // @ts-ignore
         location={{
           search: stringify({
-            locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+            locationId: selectedOfficeId
           })
         }}
       />,
-      { store, history, graphqlMocks: userListMock }
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId)
+      }
+    )
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
     )
     component.update()
-    expect(component.find('#add-user').length).toBe(0)
+    expect(component.find('#add-user').hostNodes().length).toBe(1)
+  })
+
+  it('should not show add user button if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId)
+      }
+    )
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#add-user').hostNodes().length).toBe(0)
+  })
+})
+
+describe('for user with create scope', () => {
+  let store: AppStore
+  let history: History<any>
+
+  beforeEach(async () => {
+    ;({ store, history } = createStore())
+    setScopes([SCOPES.USER_CREATE], store)
+  })
+
+  it('should show add user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId)
+      }
+    )
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#add-user').hostNodes().length).toBe(1)
+  })
+
+  it('should show add user button even if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId)
+      }
+    )
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#add-user').hostNodes().length).toBe(1)
+  })
+})
+
+describe('for user with update my jurisdiction scope', () => {
+  let store: AppStore
+  let history: History<any>
+
+  beforeEach(async () => {
+    ;({ store, history } = createStore())
+    setScopes([SCOPES.USER_UPDATE_MY_JURISDICTION], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+  })
+
+  it('should show edit user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockRegistrationAgent(selectedOfficeId)
+        ])
+      }
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+  })
+
+  it('should not show edit user button if the other user has update all scope even if under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockNationalSystemAdmin(selectedOfficeId)
+        ])
+      }
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(false)
+  })
+
+  it('should not show edit user button if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockRegistrationAgent(selectedOfficeId)
+        ])
+      }
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(false)
+  })
+})
+
+describe('for user with update scope', () => {
+  let store: AppStore
+  let history: History<any>
+
+  beforeEach(async () => {
+    ;({ store, history } = createStore())
+    setScopes([SCOPES.USER_UPDATE], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+  })
+
+  it('should show edit user button if office is under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockRegistrationAgent(selectedOfficeId)
+        ])
+      }
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+  })
+
+  it('should show edit user button even if the other user has update all scope', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // This office is under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockNationalSystemAdmin(selectedOfficeId)
+        ])
+      }
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
+  })
+
+  it('should show edit user button even if office is not under jurisdiction', async () => {
+    const userOfficeId = 'da672661-eb0a-437b-aa7a-a6d9a1711dd1'
+    const selectedOfficeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // This office is not under the user's office in hierarchy
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: selectedOfficeId
+          })
+        }}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks: searchUserResultsMock(selectedOfficeId, [
+          mockRegistrationAgent(selectedOfficeId)
+        ])
+      }
+    )
+    await flushPromises()
+    store.dispatch(
+      actions.setUserDetails({
+        loading: false,
+        data: fetchUserMock(userOfficeId),
+        networkStatus: NetworkStatus.ready
+      })
+    )
+    component.update()
+    expect(component.find('#user-item-0-menu').length >= 1).toBe(true)
   })
 })
 
@@ -88,14 +462,14 @@ describe('User list tests', () => {
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store, history } = createStore())
     setScopes([SCOPES.USER_UPDATE, SCOPES.USER_CREATE], store)
 
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockLocalSysAdminUserResponse
     }
-    await store.dispatch(action)
+    store.dispatch(action)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -258,7 +632,9 @@ describe('User list tests', () => {
                         familyName: 'Tagore'
                       }
                     ],
-                    username: 'r.tagore',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'REGISTRATION_AGENT',
                       label: {
@@ -279,7 +655,9 @@ describe('User list tests', () => {
                         familyName: 'Ashraful'
                       }
                     ],
-                    username: 'm.ashraful',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'LOCAL_REGISTRAR',
                       label: {
@@ -300,7 +678,9 @@ describe('User list tests', () => {
                         familyName: 'Muid Khan'
                       }
                     ],
-                    username: 'ma.muidkhan',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'DISTRICT_REGISTRAR',
                       label: {
@@ -321,7 +701,9 @@ describe('User list tests', () => {
                         familyName: 'Huq'
                       }
                     ],
-                    username: 'np.huq',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'STATE_REGISTRAR',
                       label: {
@@ -342,7 +724,9 @@ describe('User list tests', () => {
                         familyName: 'Islam'
                       }
                     ],
-                    username: 'ma.islam',
+                    primaryOffice: {
+                      id: '0d8474da-0361-4d32-979e-af91f012340a'
+                    },
                     role: {
                       id: 'FIELD_AGENT',
                       label: {

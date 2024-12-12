@@ -405,8 +405,16 @@ function FieldAgentListComponent(props: IProps) {
               onChangeLocation={(newLocationId) => {
                 props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
               }}
-              requiredJurisdictionTypes={
+              locationFilter={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
+                  ? ({ jurisdictionType }) =>
+                      Boolean(
+                        jurisdictionType &&
+                          window.config.FIELD_AGENT_AUDIT_LOCATIONS.split(
+                            ','
+                          ).includes(jurisdictionType)
+                      )
+                  : undefined
               }
             />
             <PerformanceSelect

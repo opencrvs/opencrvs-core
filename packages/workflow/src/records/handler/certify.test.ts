@@ -58,7 +58,7 @@ describe('Certify record endpoint', () => {
 
     // Upload certificate to minio
     mswServer.use(
-      rest.post('http://localhost:9050/upload', (_, res, ctx) => {
+      rest.post('http://localhost:9050/upload-svg', (_, res, ctx) => {
         return res(
           ctx.json({ refUrl: '/ocrvs/6e964d7a-25d0-4524-bdc2-b1f29d1e816c' })
         )
@@ -154,7 +154,7 @@ describe('Certify record endpoint', () => {
 
     // Upload certificate to minio
     mswServer.use(
-      rest.post('http://localhost:9050/upload', (_, res, ctx) => {
+      rest.post('http://localhost:9050/upload-svg', (_, res, ctx) => {
         return res(
           ctx.json({ refUrl: '/ocrvs/6e964d7a-25d0-4524-bdc2-b1f29d1e816c' })
         )

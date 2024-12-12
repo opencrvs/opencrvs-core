@@ -22,8 +22,9 @@ import { TRPCError } from '@trpc/server'
 
 const server = createHTTPServer({
   router: appRouter,
-  createContext: function createContext(opts) {
+  createContext: async function createContext(opts) {
     const token = opts.req.headers.authorization
+
     if (!token) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
@@ -42,7 +43,8 @@ const server = createHTTPServer({
       user: {
         id: userId,
         primaryOfficeId: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176'
-      }
+      },
+      token
     }
   }
 })

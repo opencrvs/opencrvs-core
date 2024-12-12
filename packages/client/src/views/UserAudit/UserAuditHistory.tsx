@@ -46,6 +46,7 @@ import format from '@client/utils/date-formatting'
 import { Link } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import { usePermissions } from '@client/hooks/useAuthorization'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -112,7 +113,7 @@ type State = {
 const isUserAuditItemWithDeclarationDetials = (
   item: GQLUserAuditLogResultItem
 ): item is GQLUserAuditLogItemWithComposition => {
-  return (item as any).data
+  return 'data' in item
 }
 
 function UserAuditHistoryComponent(props: Props) {
@@ -128,6 +129,8 @@ function UserAuditHistoryComponent(props: Props) {
     showModal: false,
     actionDetailsData: null
   })
+
+  const { canSearchRecords } = usePermissions()
 
   function setDateRangePickerValues(startDate: Date, endDate: Date) {
     setState((prevState) => ({
@@ -225,38 +228,33 @@ function UserAuditHistoryComponent(props: Props) {
       }
       const actionMessage = getActionMessage(userAuditItem)
 
-      const isSystemAdmin =
-        ('@TODO: Handle these cases' as any) === 'NATIONAL_SYSTEM_ADMIN' ||
-        ('@TODO: Handle these cases' as any) === 'LOCAL_SYSTEM_ADMIN'
-
       return {
-        actionDescription:
-          isSystemAdmin &&
-          isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
-            <Link
-              font="bold14"
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : !isSystemAdmin &&
-            !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
-            <Link
-              font="bold14"
-              onClick={() => {
-                toggleActionDetails(userAuditItem)
-              }}
-            >
-              {actionMessage}
-            </Link>
-          ) : (
-            <BoldContent>{actionMessage}</BoldContent>
-          ),
+        actionDescription: !isUserAuditItemWithDeclarationDetials(
+          userAuditItem
+        ) ? (
+          <Link
+            font="bold14"
+            onClick={() => {
+              toggleActionDetails(userAuditItem)
+            }}
+          >
+            {actionMessage}
+          </Link>
+        ) : canSearchRecords &&
+          !ADMIN_ACTIONS.includes(userAuditItem.action) ? (
+          <Link
+            font="bold14"
+            onClick={() => {
+              toggleActionDetails(userAuditItem)
+            }}
+          >
+            {actionMessage}
+          </Link>
+        ) : (
+          <BoldContent>{actionMessage}</BoldContent>
+        ),
 
         actionDescriptionWithAuditTime:
-          isSystemAdmin &&
           isUserAuditItemWithDeclarationDetials(userAuditItem) === undefined ? (
             <Link
               onClick={() => {
@@ -265,7 +263,7 @@ function UserAuditHistoryComponent(props: Props) {
             >
               {actionMessage}
             </Link>
-          ) : !isSystemAdmin ? (
+          ) : canSearchRecords ? (
             <Link
               onClick={() => {
                 toggleActionDetails(userAuditItem)
@@ -278,7 +276,7 @@ function UserAuditHistoryComponent(props: Props) {
           ),
         trackingId:
           isUserAuditItemWithDeclarationDetials(userAuditItem) &&
-          !isSystemAdmin ? (
+          canSearchRecords ? (
             <Link
               font="bold14"
               onClick={() =>

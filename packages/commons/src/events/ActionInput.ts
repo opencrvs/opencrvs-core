@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '@opencrvs/commons'
+import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 
 const BaseActionInput = z.object({
@@ -47,6 +47,9 @@ export const DeclareActionInput = BaseActionInput.merge(
     type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
   })
 )
+
+export type DeclareActionInput = z.infer<typeof DeclareActionInput>
+
 const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),

@@ -19,20 +19,16 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
   Attachment,
   EventType,
   History,
   Query,
-  RegStatus,
-  SCOPES
+  RegStatus
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  Action as NavigationAction,
-  GO_TO_PAGE,
-  IDynamicValues
-} from '@client/navigation'
+import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
@@ -70,7 +66,6 @@ import {
   ShowUnassignedDeclarations,
   showUnassignedDeclarations
 } from '@client/notification/actions'
-import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import {
   UpdateRegistrarWorkqueueAction,
@@ -717,37 +712,8 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     (uData) => uData.userID === currentUserID
   )
-  let currentUserDeclarations: IDeclaration[] =
+  const currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
-
-  if (
-    '@TODO: Ask what we are going to do with the field agent downloaded records getting pruned in 24 hours' ===
-      ('no' as any) &&
-    currentUserData
-  ) {
-    currentUserDeclarations = currentUserData.declarations.filter((d) => {
-      if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        const history = d.originalData?.history as unknown as IDynamicValues
-        const downloadedTime = (
-          history.filter((h: IDynamicValues) => {
-            return h.action === DOWNLOAD_STATUS.DOWNLOADED
-          }) as IDynamicValues[]
-        ).sort((fe, se) => {
-          return new Date(se.date).getTime() - new Date(fe.date).getTime()
-        })
-
-        return (
-          differenceInMinutes(new Date(), new Date(downloadedTime[0].date)) <
-          1500 // 25 hours, used munites for better accuracy
-        )
-      }
-      return true
-    })
-
-    // Storing the declarations again by excluding the 24 hours old downloaded declaration
-    currentUserData.declarations = currentUserDeclarations
-    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-  }
 
   const payload: IUserData = {
     userID: currentUserID,

@@ -22,14 +22,14 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
+  AssignmentData,
   EventType,
   History,
   HumanName,
   Maybe,
   RegAction,
   RegStatus,
-  User,
-  AssignmentData
+  User
 } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
@@ -43,6 +43,7 @@ import {
   generateLocationName
 } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
 
@@ -462,7 +463,8 @@ export function getStatusLabel(
   regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
   performedBy: Maybe<User> | undefined,
-  loggedInUser: UserDetails | null
+  loggedInUser: UserDetails | null,
+  scopes: Scope[] | null
 ) {
   if (action) {
     return intl.formatMessage(regActionMessages[action], {
@@ -471,10 +473,8 @@ export function getStatusLabel(
   }
   if (
     regStatus === RegStatus.Declared &&
-    performedBy?.id === loggedInUser?.userMgntUserID
-    // @TODO: How do we handle this specific case with scopes?
-    // && loggedInUser?.systemRole &&
-    // FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
+    performedBy?.id === loggedInUser?.userMgntUserID &&
+    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }

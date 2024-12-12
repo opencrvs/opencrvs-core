@@ -189,7 +189,7 @@ jobs:
       - name: Run knip on base branch
         id: knip_base
         run: |
-          npx knip --no-exit-code --exports --reporter=markdown > knip_report.md
+          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown > knip_report.md
           TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
           echo "Total $TOTAL issue(s) on base branch."
           echo "total=${TOTAL}" >> $GITHUB_OUTPUT
@@ -198,7 +198,7 @@ jobs:
       - name: Run knip on PR branch
         id: knip_pr
         run: |
-          npx knip --no-exit-code --exports --reporter=markdown > knip_report.md
+          npx knip --tags=-knipignore --no-exit-code --exports --reporter=markdown > knip_report.md
           TOTAL=$(grep -oP '## [A-Za-z\s]+ \(\K[0-9]+' knip_report.md | awk '{sum+=$1} END {print sum}')
           echo "Total $TOTAL issue(s) on PR branch."
           echo "total=${TOTAL}" >> $GITHUB_OUTPUT

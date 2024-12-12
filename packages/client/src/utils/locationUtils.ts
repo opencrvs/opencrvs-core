@@ -151,25 +151,12 @@ export function generateSearchableLocations(
 export function generateLocations(
   locations: { [key: string]: ILocation },
   intl: IntlShape,
-  filterByJurisdictionTypes?: string[],
-  filterByLocationTypes?: LocationType[]
+  filter?: (location: ILocation) => boolean
 ) {
   let locationArray = Object.values(locations)
 
-  if (filterByLocationTypes) {
-    locationArray = locationArray.filter(
-      (location) =>
-        location.type &&
-        filterByLocationTypes.includes(location.type as LocationType)
-    )
-  }
-
-  if (filterByJurisdictionTypes) {
-    locationArray = locationArray.filter(
-      (location) =>
-        location.jurisdictionType &&
-        filterByJurisdictionTypes.includes(location.jurisdictionType)
-    )
+  if (filter) {
+    locationArray = locationArray.filter(filter)
   }
 
   return generateSearchableLocations(locationArray, locations, intl)
@@ -256,6 +243,27 @@ export function getLocationHierarchy(
   })
 }
 
+export function isUnderJurisdiction(
+  officeId: string,
+  otherOfficeId: string,
+  locations: Record<string, AdminStructure | undefined>,
+  offices: Record<string, CRVSOffice | undefined>
+) {
+  const office = offices[officeId]
+  const otherOffice = offices[otherOfficeId]
+  const officeLocationId = office?.partOf.split('/').at(1)
+  const otherOfficeLocationId = otherOffice?.partOf.split('/').at(1)
+  if (!officeLocationId || !otherOfficeLocationId) {
+    return false
+  }
+  const parentLocation = locations[officeLocationId]
+  if (!parentLocation) {
+    return false
+  }
+  const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
+  return Object.values(hierarchy).includes(parentLocation.id)
+}
+
 export function generateFullAddress(
   address: Address,
   offlineData: IOfflineData
@@ -274,7 +282,11 @@ export function generateFullAddress(
   const eventLocationLevel5 =
     address?.line?.[12] && offlineData.locations[address.line[12]]?.name
 
+  const eventLocationLevel6 =
+    address?.line?.[13] && offlineData.locations[address.line[13]]?.name
+
   return [
+    eventLocationLevel6,
     eventLocationLevel5,
     eventLocationLevel4,
     eventLocationLevel3,

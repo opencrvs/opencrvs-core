@@ -19,7 +19,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { AppStore } from '@client/store'
-import { Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 
 describe('when user is selecting the vital event', () => {
   let app: ReactWrapper

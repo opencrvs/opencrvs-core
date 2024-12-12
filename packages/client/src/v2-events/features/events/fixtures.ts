@@ -10,6 +10,7 @@
  */
 import { EventConfig } from '@opencrvs/commons/client'
 
+/** @knipignore */
 export const tennisClubMembershipEvent = {
   id: 'TENNIS_CLUB_MEMBERSHIP',
   label: {
@@ -79,14 +80,6 @@ export const tennisClubMembershipEvent = {
                     defaultMessage: "Applicant's date of birth",
                     description: 'This is the label for the field',
                     id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
-                  },
-                  options: {
-                    notice: {
-                      id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.notice',
-                      defaultMessage:
-                        'This is the notice for the date of birth field',
-                      description: 'This is the description for the notice'
-                    }
                   }
                 }
               ]

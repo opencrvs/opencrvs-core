@@ -39,8 +39,7 @@ export const WORKQUEUE_TABS = {
   readyToIssue: 'readyToIssue',
   dashboard: 'dashboard',
   statistics: 'statistics',
-  leaderboards: 'leaderboards',
-  report: 'report'
+  leaderboards: 'leaderboards'
 } as const
 
 export const TAB_GROUPS = {

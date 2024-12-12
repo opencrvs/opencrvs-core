@@ -209,6 +209,11 @@ type Mutation {
   ): ID!
   confirmRegistration(id: ID!, details: ConfirmRegistrationInput!): ID!
   rejectRegistration(id: ID!, details: RejectRegistrationInput!): ID!
+  upsertRegistrationIdentifier(
+    id: ID!
+    identifierType: String!
+    identifierValue: String!
+  ): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -537,6 +542,7 @@ input AdvancedSearchParametersInput {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -709,7 +715,6 @@ type Reinstated {
 
 input ConfirmRegistrationInput {
   registrationNumber: String!
-  error: String
   identifiers: [IdentifierInput!]
 }
 
@@ -1143,7 +1148,6 @@ enum SystemType {
 }
 
 enum IntegratingSystemType {
-  MOSIP
   OTHER
 }
 
@@ -1467,6 +1471,7 @@ type AdvancedSeachParameters {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String

@@ -71,7 +71,8 @@ import {
   REJECTED,
   VALIDATED
 } from '@client/utils/constants'
-import { EventType, RegStatus, Scope, SCOPES } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import {
   bytesToSize,
@@ -1129,6 +1130,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             type="tertiary"
                             size="small"
                             onClick={this.props.goBack}
+                            disabled={!canContinue}
                           >
                             <Icon name="ArrowLeft" size="medium" />
                             {intl.formatMessage(buttonMessages.back)}

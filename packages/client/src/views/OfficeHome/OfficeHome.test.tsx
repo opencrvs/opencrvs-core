@@ -29,7 +29,7 @@ import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './inProgress/InProgress'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
-import { Scope, SCOPES, scopes } from '@client/utils/gateway'
+import { Scope, SCOPES, scopes } from '@opencrvs/commons/client'
 
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()

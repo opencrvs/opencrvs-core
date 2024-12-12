@@ -16,175 +16,6 @@
 /* eslint-disable */
 import { PlainDate } from '@client/utils/date-formatting'
 
-export const scopes = [
-  'natlsysadmin',
-  'bypassratelimit',
-  'declare',
-  'register',
-  'validate',
-  'demo',
-  'certify',
-  'performance',
-  'sysadmin',
-  'teams',
-  'config',
-  'webhook',
-  'nationalId',
-  'notification-api',
-  'recordsearch',
-  'record.declare-birth',
-  'record.declare-birth:my-jurisdiction',
-  'record.declare-death',
-  'record.declare-death:my-jurisdiction',
-  'record.declare-marriage',
-  'record.declare-marriage:my-jurisdiction',
-  'record.declaration-submit-incomplete',
-  'record.declaration-submit-for-review',
-  'record.unassign-others',
-  'record.declaration-submit-for-approval',
-  'record.declaration-submit-for-updates',
-  'record.declaration-edit',
-  'record.review-duplicates',
-  'record.declaration-archive',
-  'record.declaration-reinstate',
-  'record.register',
-  'record.export-records',
-  'record.declaration-print',
-  'record.declaration-print-supporting-documents',
-  'record.registration-print',
-  'record.registration-print&issue-certified-copies',
-  'record.registration-print-certified-copies',
-  'record.registration-bulk-print-certified-copies',
-  'record.registration-verify-certified-copies',
-  'record.registration-request-correction',
-  'record.registration-correct',
-  'record.registration-request-revocation',
-  'record.registration-revoke',
-  'record.registration-request-reinstatement',
-  'record.registration-reinstate',
-  'record.confirm-registration',
-  'record.reject-registration',
-  'search.birth:my-jurisdiction',
-  'search.birth',
-  'search.death:my-jurisdiction',
-  'search.death',
-  'search.marriage:my-jurisdiction',
-  'search.marriage',
-  'record.read',
-  'record.read-audit',
-  'record.read-comments',
-  'record.create-comments',
-  'profile.update',
-  'profile.electronic-signature',
-  'performance.read',
-  'performance.read-dashboards',
-  'performance.vital-statistics-export',
-  'organisation.read',
-  'organisation.read-locations:all',
-  'organisation.read-locations:my-office',
-  'organisation.read-locations:my-jurisdiction',
-  'user.read:all',
-  'user.read:my-office',
-  'user.read:my-jurisdiction',
-  'user.read:only-my-audit',
-  'user.create:all',
-  'user.create:my-jurisdiction',
-  'user.update:all',
-  'user.update:my-jurisdiction',
-  'config.update:all',
-  'user.data-seeding'
-] as const
-export type Scope = (typeof scopes)[number]
-
-export const SCOPES = {
-  NATLSYSADMIN: 'natlsysadmin',
-  BYPASSRATELIMIT: 'bypassratelimit',
-  DECLARE: 'declare',
-  REGISTER: 'register',
-  VALIDATE: 'validate',
-  DEMO: 'demo',
-  CERTIFY: 'certify',
-  PERFORMANCE: 'performance',
-  SYSADMIN: 'sysadmin',
-  TEAMS: 'teams',
-  CONFIG: 'config',
-  WEBHOOK: 'webhook',
-  NATIONALID: 'nationalId',
-  NOTIFICATION_API: 'notification-api',
-  RECORDSEARCH: 'recordsearch',
-  RECORD_DECLARE_BIRTH: 'record.declare-birth',
-  RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
-  RECORD_DECLARE_DEATH: 'record.declare-death',
-  RECORD_DECLARE_DEATH_MY_JURISDICTION: 'record.declare-death:my-jurisdiction',
-  RECORD_DECLARE_MARRIAGE: 'record.declare-marriage',
-  RECORD_DECLARE_MARRIAGE_MY_JURISDICTION:
-    'record.declare-marriage:my-jurisdiction',
-  RECORD_SUBMIT_INCOMPLETE: 'record.declaration-submit-incomplete',
-  RECORD_SUBMIT_FOR_REVIEW: 'record.declaration-submit-for-review',
-  RECORD_UNASSIGN_OTHERS: 'record.unassign-others',
-  RECORD_SUBMIT_FOR_APPROVAL: 'record.declaration-submit-for-approval',
-  RECORD_SUBMIT_FOR_UPDATES: 'record.declaration-submit-for-updates',
-  RECORD_DECLARATION_EDIT: 'record.declaration-edit',
-  RECORD_REVIEW_DUPLICATES: 'record.review-duplicates',
-  RECORD_DECLARATION_ARCHIVE: 'record.declaration-archive',
-  RECORD_DECLARATION_REINSTATE: 'record.declaration-reinstate',
-  RECORD_REGISTER: 'record.register',
-  RECORD_EXPORT_RECORDS: 'record.export-records',
-  RECORD_DECLARATION_PRINT: 'record.declaration-print',
-  RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
-    'record.declaration-print-supporting-documents',
-  RECORD_REGISTRATION_PRINT: 'record.registration-print',
-  RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
-    'record.registration-print&issue-certified-copies',
-  RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies',
-  RECORD_BULK_PRINT_CERTIFIED_COPIES:
-    'record.registration-bulk-print-certified-copies',
-  RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES:
-    'record.registration-verify-certified-copies',
-  RECORD_REGISTRATION_REQUEST_CORRECTION:
-    'record.registration-request-correction',
-  RECORD_REGISTRATION_CORRECT: 'record.registration-correct',
-  RECORD_REGISTRATION_REQUEST_REVOCATION:
-    'record.registration-request-revocation',
-  RECORD_REGISTRATION_REVOKE: 'record.registration-revoke',
-  RECORD_REGISTRATION_REQUEST_REINSTATEMENT:
-    'record.registration-request-reinstatement',
-  RECORD_REGISTRATION_REINSTATE: 'record.registration-reinstate',
-  RECORD_CONFIRM_REGISTRATION: 'record.confirm-registration',
-  RECORD_REJECT_REGISTRATION: 'record.reject-registration',
-  SEARCH_BIRTH_MY_JURISDICTION: 'search.birth:my-jurisdiction',
-  SEARCH_BIRTH: 'search.birth',
-  SEARCH_DEATH_MY_JURISDICTION: 'search.death:my-jurisdiction',
-  SEARCH_DEATH: 'search.death',
-  SEARCH_MARRIAGE_MY_JURISDICTION: 'search.marriage:my-jurisdiction',
-  SEARCH_MARRIAGE: 'search.marriage',
-  RECORD_READ: 'record.read',
-  RECORD_READ_AUDIT: 'record.read-audit',
-  RECORD_READ_COMMENTS: 'record.read-comments',
-  RECORD_CREATE_COMMENTS: 'record.create-comments',
-  PROFILE_UPDATE: 'profile.update',
-  PROFILE_ELECTRONIC_SIGNATURE: 'profile.electronic-signature',
-  PERFORMANCE_READ: 'performance.read',
-  PERFORMANCE_READ_DASHBOARDS: 'performance.read-dashboards',
-  PERFORMANCE_EXPORT_VITAL_STATISTICS: 'performance.vital-statistics-export',
-  ORGANISATION_READ: 'organisation.read',
-  ORGANISATION_READ_LOCATIONS: 'organisation.read-locations:all',
-  ORGANISATION_READ_LOCATIONS_MY_OFFICE:
-    'organisation.read-locations:my-office',
-  ORGANISATION_READ_LOCATIONS_MY_JURISDICTION:
-    'organisation.read-locations:my-jurisdiction',
-  USER_READ: 'user.read:all',
-  USER_READ_MY_OFFICE: 'user.read:my-office',
-  USER_READ_MY_JURISDICTION: 'user.read:my-jurisdiction',
-  USER_READ_ONLY_MY_AUDIT: 'user.read:only-my-audit',
-  USER_CREATE: 'user.create:all',
-  USER_CREATE_MY_JURISDICTION: 'user.create:my-jurisdiction',
-  USER_UPDATE: 'user.update:all',
-  USER_UPDATE_MY_JURISDICTION: 'user.update:my-jurisdiction',
-  CONFIG_UPDATE_ALL: 'config.update:all',
-  USER_DATA_SEEDING: 'user.data-seeding'
-} as const
-
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -306,6 +137,7 @@ export type AdvancedSeachParameters = {
   eventLocationLevel3?: Maybe<Scalars['String']>
   eventLocationLevel4?: Maybe<Scalars['String']>
   eventLocationLevel5?: Maybe<Scalars['String']>
+  eventLocationLevel6?: Maybe<Scalars['String']>
   fatherDoB?: Maybe<Scalars['String']>
   fatherDoBEnd?: Maybe<Scalars['String']>
   fatherDoBStart?: Maybe<Scalars['String']>
@@ -373,6 +205,7 @@ export type AdvancedSearchParametersInput = {
   eventLocationLevel3?: InputMaybe<Scalars['String']>
   eventLocationLevel4?: InputMaybe<Scalars['String']>
   eventLocationLevel5?: InputMaybe<Scalars['String']>
+  eventLocationLevel6?: InputMaybe<Scalars['String']>
   fatherDoB?: InputMaybe<Scalars['String']>
   fatherDoBEnd?: InputMaybe<Scalars['String']>
   fatherDoBStart?: InputMaybe<Scalars['String']>
@@ -407,7 +240,7 @@ export type AdvancedSearchParametersInput = {
 }
 
 export type ApproveCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type AssignmentData = {
@@ -585,7 +418,7 @@ export type CertificationMetric = {
 }
 
 export type CertifyActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Comment = {
@@ -666,7 +499,7 @@ export type CreateAction = {
   __typename?: 'CreateAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   type: Scalars['String']
 }
 
@@ -757,13 +590,13 @@ export type DeclareAction = {
   __typename?: 'DeclareAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   identifiers: Identifiers
   type: Scalars['String']
 }
 
 export type DeclareActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Dummy = {
@@ -1019,12 +852,11 @@ export type IntegratedSystem = {
 }
 
 export enum IntegratingSystemType {
-  Mosip = 'MOSIP',
   Other = 'OTHER'
 }
 
 export type IssueActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type LocalRegistrar = {
@@ -1560,12 +1392,12 @@ export type NotifyAction = {
   __typename?: 'NotifyAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   type: Scalars['String']
 }
 
 export type NotifyActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type ObservationFhirids = {
@@ -1999,13 +1831,13 @@ export type RegisterAction = {
   __typename?: 'RegisterAction'
   createdAt: Scalars['DateTime']
   createdBy: Scalars['String']
-  fields: Array<Field>
+  data: Array<Field>
   identifiers: Identifiers
   type: Scalars['String']
 }
 
 export type RegisterActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Registration = {
@@ -2097,7 +1929,7 @@ export enum RegistrationType {
 }
 
 export type ReinstateActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type Reinstated = {
@@ -2107,7 +1939,7 @@ export type Reinstated = {
 }
 
 export type RejectCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type RejectRegistrationInput = {
@@ -2178,15 +2010,15 @@ export type RemoveBookmarkedSeachInput = {
 }
 
 export type RequestCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type RevokeActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type RevokeCorrectionActionInput = {
-  fields: Array<FieldInput>
+  data: Array<FieldInput>
 }
 
 export type SearchFieldAgentResponse = {
@@ -2301,7 +2133,6 @@ export enum SystemStatus {
 
 export enum SystemType {
   Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Webhook = 'WEBHOOK'
 }
@@ -2652,6 +2483,7 @@ export type AdvancedSeachParametersFragment = {
   eventLocationLevel3?: string | null
   eventLocationLevel4?: string | null
   eventLocationLevel5?: string | null
+  eventLocationLevel6?: string | null
   childFirstNames?: string | null
   childLastName?: string | null
   childDoB?: string | null
@@ -2723,6 +2555,7 @@ export type BookmarkAdvancedSearchMutation = {
         eventLocationLevel3?: string | null
         eventLocationLevel4?: string | null
         eventLocationLevel5?: string | null
+        eventLocationLevel6?: string | null
         childFirstNames?: string | null
         childLastName?: string | null
         childDoB?: string | null
@@ -2797,6 +2630,7 @@ export type RemoveBookmarkedAdvancedSearchMutation = {
         eventLocationLevel3?: string | null
         eventLocationLevel4?: string | null
         eventLocationLevel5?: string | null
+        eventLocationLevel6?: string | null
         childFirstNames?: string | null
         childLastName?: string | null
         childDoB?: string | null
@@ -2917,6 +2751,7 @@ export type FetchUserQuery = {
         eventLocationLevel3?: string | null
         eventLocationLevel4?: string | null
         eventLocationLevel5?: string | null
+        eventLocationLevel6?: string | null
         childFirstNames?: string | null
         childLastName?: string | null
         childDoB?: string | null
@@ -3135,7 +2970,6 @@ export type SearchUsersQuery = {
     results?: Array<{
       __typename?: 'User'
       id: string
-      username?: string | null
       mobile?: string | null
       email?: string | null
       status: Status
@@ -3146,6 +2980,7 @@ export type SearchUsersQuery = {
         firstNames?: string | null
         familyName?: string | null
       }>
+      primaryOffice: { __typename?: 'Location'; id: string }
       role: {
         __typename?: 'UserRole'
         id: string
@@ -3209,6 +3044,7 @@ export type GetUserQuery = {
   getUser?: {
     __typename?: 'User'
     id: string
+    userMgntUserID: string
     username?: string | null
     mobile?: string | null
     email?: string | null

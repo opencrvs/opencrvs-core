@@ -40,7 +40,8 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
-import { Scope, SCOPES, SearchEventsQuery } from '@client/utils/gateway'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { Redirect, RouteComponentProps } from 'react-router-dom'

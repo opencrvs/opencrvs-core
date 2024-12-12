@@ -28,7 +28,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { vi } from 'vitest'
-import { scopes as allScopes, Scope, SCOPES } from '@client/utils/gateway'
+import { scopes as allScopes, Scope, SCOPES } from '@opencrvs/commons/client'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -483,178 +483,144 @@ describe('Given a user with scopes views Navigation', () => {
     })
   })
 
-  describe('and user has organisation scopes', async () => {
-    const orgScopes = [
+  describe('Organisation', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.organisation}`
+
+    const requiredScopes = [
       SCOPES.ORGANISATION_READ_LOCATIONS,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
       SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
     ] as Scope[]
 
-    describe('Performance', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.performance}`
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
 
-      const requiredScopes = ([SCOPES.PERFORMANCE_READ] as Scope[]).concat(
-        orgScopes
-      )
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
 
-      const allOtherScopes = allScopes.filter(
-        (scope) => !requiredScopes.includes(scope)
-      )
-
-      const withoutOrgScopes = allScopes.filter(
-        (scope) => !orgScopes.includes(scope)
-      )
-
-      const tests = [
-        [requiredScopes, true],
-        [allOtherScopes, false],
-        [withoutOrgScopes, false]
-      ]
-
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes}`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          expect(testComponent.exists(id)).toBe(exists)
-        })
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
       })
     })
+  })
 
-    describe('Organisation', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.organisation}`
+  describe('Team', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.team}`
 
-      const requiredScopes = [SCOPES.ORGANISATION_READ_LOCATIONS] as Scope[]
+    const requiredScopes = [
+      SCOPES.ORGANISATION_READ_LOCATIONS,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+      SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
+    ] as Scope[]
 
-      const allOtherScopes = allScopes.filter(
-        (scope) => !requiredScopes.includes(scope)
-      )
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
 
-      const tests = [
-        [requiredScopes, true],
-        [allOtherScopes, false]
-      ]
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
 
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes}`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          expect(testComponent.exists(id)).toBe(exists)
-        })
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
       })
     })
+  })
 
-    describe('Team', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.team}`
+  describe('Config', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.config}_main`
 
-      const requiredScopes = [
-        SCOPES.ORGANISATION_READ_LOCATIONS,
-        SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE
-      ] as Scope[]
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
-      const allOtherScopes = allScopes.filter(
-        (scope) => !requiredScopes.includes(scope)
-      )
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
 
-      const tests = [
-        [[requiredScopes[0]], true],
-        [[requiredScopes[1]], true],
-        [allOtherScopes, false]
-      ]
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
 
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes}`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          expect(testComponent.exists(id)).toBe(exists)
-        })
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
       })
     })
+  })
 
-    describe('Config', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.config}_main`
+  describe('Systems', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.systems}`
 
-      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
-      const allOtherScopes = allScopes.filter(
-        (scope) => !requiredScopes.includes(scope)
-      )
+    const tests = [[requiredScopes, true]]
 
-      const tests = [
-        [requiredScopes, true],
-        [allOtherScopes, false]
-      ]
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes} and clicks config expander`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        testComponent
+          .find(`#navigation_${WORKQUEUE_TABS.config}_main`)
+          .hostNodes()
+          .simulate('click')
 
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes}`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          expect(testComponent.exists(id)).toBe(exists)
-        })
+        expect(testComponent.exists(id)).toBe(exists)
       })
     })
+  })
 
-    describe('Systems', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.systems}`
+  describe('Communications', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.communications}_main`
 
-      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
-      const tests = [[requiredScopes, true]]
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
 
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes} and clicks config expander`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          testComponent
-            .find(`#navigation_${WORKQUEUE_TABS.config}_main`)
-            .hostNodes()
-            .simulate('click')
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
 
-          expect(testComponent.exists(id)).toBe(exists)
-        })
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
       })
     })
+  })
 
-    describe('Communications', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.communications}_main`
+  describe('Email all users', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.emailAllUsers}`
 
-      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
+    const requiredScopes = [SCOPES.CONFIG_UPDATE_ALL] as Scope[]
 
-      const allOtherScopes = allScopes.filter(
-        (scope) => !requiredScopes.includes(scope)
-      )
+    const tests = [[requiredScopes, true]]
 
-      const tests = [
-        [requiredScopes, true],
-        [allOtherScopes, false]
-      ]
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes} and clicks communciation expander`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        testComponent
+          .find(`#navigation_${WORKQUEUE_TABS.communications}_main`)
+          .hostNodes()
+          .simulate('click')
 
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes}`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          expect(testComponent.exists(id)).toBe(exists)
-        })
-      })
-    })
-
-    describe('Email all users', async () => {
-      const id = `#navigation_${WORKQUEUE_TABS.emailAllUsers}`
-
-      const requiredScopes = [...orgScopes, SCOPES.CONFIG_UPDATE_ALL] as Scope[]
-
-      const tests = [[requiredScopes, true]]
-
-      tests.forEach(async ([scopes, exists]) => {
-        it(`should render when user has correct scopes ${scopes} and clicks communciation expander`, async () => {
-          setScopes(scopes as Scope[], store)
-          testComponent = await build()
-          testComponent
-            .find(`#navigation_${WORKQUEUE_TABS.communications}_main`)
-            .hostNodes()
-            .simulate('click')
-
-          expect(testComponent.exists(id)).toBe(exists)
-        })
+        expect(testComponent.exists(id)).toBe(exists)
       })
     })
   })
@@ -663,6 +629,29 @@ describe('Given a user with scopes views Navigation', () => {
     const id = `#navigation_${WORKQUEUE_TABS.dashboard}`
 
     const requiredScopes = [SCOPES.PERFORMANCE_READ_DASHBOARDS] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+
+    const tests = [
+      [requiredScopes, true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(async ([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('Performance', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.performance}`
+
+    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -730,29 +719,6 @@ describe('Given a user with scopes views Navigation', () => {
 
   describe('Statistics', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.leaderboards}`
-
-    const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
-
-    const allOtherScopes = allScopes.filter(
-      (scope) => !requiredScopes.includes(scope)
-    )
-
-    const tests = [
-      [requiredScopes, true],
-      [allOtherScopes, false]
-    ]
-
-    tests.forEach(async ([scopes, exists]) => {
-      it(`should render when user has correct scopes ${scopes}`, async () => {
-        setScopes(scopes as Scope[], store)
-        testComponent = await build()
-        expect(testComponent.exists(id)).toBe(exists)
-      })
-    })
-  })
-
-  describe('Report', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.report}`
 
     const requiredScopes = [SCOPES.PERFORMANCE_READ] as Scope[]
 
