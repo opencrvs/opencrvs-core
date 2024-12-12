@@ -222,60 +222,6 @@ utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
     })
   }
 }))
-utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
-  // This retry ensures on page reload if event have not yet synced,
-  // the action will be retried once
-  retry: 1,
-  retryDelay: 5000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
-  onMutate: async (actionInput) => {
-    await queryClient.cancelQueries({
-      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    })
-    const events = await readEventsFromStorage()
-    const eventToUpdate = events.find(
-      (e) =>
-        e.id === actionInput.eventId ||
-        // This hook is executed before mutationFn, so we need to check for both ids
-        e.transactionId === actionInput.eventId
-    )!
-
-    const eventsWithoutUpdated = events.filter(
-      (e) => e.id !== actionInput.eventId
-    )
-    if (eventToUpdate) {
-      await writeEventsToStorage([...eventsWithoutUpdated, eventToUpdate])
-    } else {
-      await writeEventsToStorage(eventsWithoutUpdated)
-    }
-    queryClient.invalidateQueries({
-      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    })
-    return { events }
-  },
-  onSettled: async (response) => {
-    /*
-     * Updates event in store
-     */
-    if (response) {
-      await queryClient.cancelQueries({
-        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-      })
-      const events = await readEventsFromStorage()
-      const eventsWithoutNew = events.filter((e) => e.id !== response.id)
-
-      await writeEventsToStorage([...eventsWithoutNew, response])
-      return queryClient.invalidateQueries({
-        queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-      })
-    }
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: getQueryKey(api.events.get)
-    })
-  }
-}))
 
 utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: canonicalMutationFn,
@@ -394,7 +340,10 @@ function getPendingMutations(
 }
 
 function filterOutboxEventsWithMutation<
-  T extends typeof api.event.create | typeof api.event.actions.declare
+  T extends
+    | typeof api.event.create
+    | typeof api.event.actions.declare
+    | typeof api.event.actions.register
 >(
   events: EventDocument[],
   mutation: T,
@@ -456,6 +405,17 @@ export function useEvents() {
       }
     )
 
+    const eventFromRegisterActions = filterOutboxEventsWithMutation(
+      events.data,
+      api.event.actions.register,
+      (event, parameters) => {
+        return (
+          event.id === parameters.eventId ||
+          event.transactionId === parameters.eventId
+        )
+      }
+    )
+
     const pendingActions = getPendingMutations(api.event.actions.declare).map(
       (mutation) => {
         const variables = mutation.state.variables as Exclude<
@@ -477,6 +437,7 @@ export function useEvents() {
 
     return eventFromCreateMutations
       .concat(eventFromDeclareActions)
+      .concat(eventFromRegisterActions)
       .filter(
         /* uniqueById */
         (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
