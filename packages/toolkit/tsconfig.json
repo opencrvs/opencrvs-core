@@ -12,7 +12,8 @@
     "rootDir": "./src",
     "outDir": "dist",
     "paths": {
-      "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
+      "@opencrvs/commons/events": ["../commons/src/events/index.ts"],
+      "@opencrvs/commons/scopes": ["../commons/src/scopes/index.ts"]
     }
   },
   "references": [{ "path": "../commons" }],
