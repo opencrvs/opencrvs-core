@@ -599,7 +599,7 @@ function UserListComponent(props: IProps) {
 
   const onClickAddUser = useCallback(
     function onClickAddUser() {
-      if (searchedLocation?.id) {
+      if (searchedLocation) {
         navigate(
           formatUrl(routes.CREATE_USER_ON_LOCATION, {
             locationId: searchedLocation.id
