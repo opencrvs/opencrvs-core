@@ -225,6 +225,7 @@ export const usePrintableCertificate = (declarationId?: string) => {
     }
 
     if (!declarationId) {
+      // eslint-disable-next-line no-console
       console.error('No declaration id provided')
       return
     }

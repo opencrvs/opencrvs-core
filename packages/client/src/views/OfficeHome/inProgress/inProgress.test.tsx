@@ -45,7 +45,6 @@ import type {
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
-import { History } from 'history'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -685,7 +684,7 @@ describe('In Progress tab', () => {
 
     describe('handles download status', () => {
       let store: AppStore
-      let history: History
+
       const TIME_STAMP = '1562912635549'
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       const inprogressProps = {

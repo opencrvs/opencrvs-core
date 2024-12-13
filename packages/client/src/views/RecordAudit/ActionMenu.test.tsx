@@ -122,7 +122,7 @@ describe('View action', () => {
   it('Draft', async () => {
     const { store } = createStore()
     setScopes([], store)
-    const { component, router } = await createTestComponent(
+    const { component } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,

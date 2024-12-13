@@ -28,7 +28,7 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { vi, Mock } from 'vitest'
+import { vi } from 'vitest'
 import { EventType } from '@client/utils/gateway'
 
 const nameObj = {

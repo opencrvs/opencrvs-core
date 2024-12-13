@@ -35,7 +35,6 @@ import {
   validImageB64String
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { Store } from 'redux'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'

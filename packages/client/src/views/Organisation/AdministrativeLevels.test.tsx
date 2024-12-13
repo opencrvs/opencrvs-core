@@ -17,7 +17,6 @@ import {
   fetchUserMock
 } from '@client/tests/util'
 import { SCOPES } from '@opencrvs/commons/client'
-import { History } from 'history'
 import { AdministrativeLevels } from './AdministrativeLevels'
 import { setUserDetails } from '@client/profile/profileActions'
 import { useParams } from 'react-router-dom'
@@ -90,7 +89,6 @@ describe('for user with read organisation in my jurisdiction scope', () => {
 
 describe('for user with read organisation scope', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeEach(async () => {
     ;({ store } = createStore())

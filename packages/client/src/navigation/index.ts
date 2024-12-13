@@ -10,7 +10,7 @@
  */
 
 import { IWORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
-import { CorrectionSection, UserSection } from '@client/forms'
+import { CorrectionSection } from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
   CERTIFICATE_CORRECTION,
@@ -31,7 +31,6 @@ import {
   WORKFLOW_STATUS
 } from '@client/navigation/routes'
 import { EventType } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 

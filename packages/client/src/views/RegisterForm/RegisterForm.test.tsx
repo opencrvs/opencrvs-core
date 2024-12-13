@@ -405,7 +405,6 @@ describe('when user is in the register form review section', () => {
     setScopes([SCOPES.RECORD_REGISTER, SCOPES.RECORD_SUBMIT_FOR_UPDATES], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
@@ -454,7 +453,6 @@ describe('when user is in the register form from review edit', () => {
     setScopes([SCOPES.RECORD_REGISTER], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
@@ -507,7 +505,6 @@ describe('when user is in the register form from sent for review edit', () => {
 
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
