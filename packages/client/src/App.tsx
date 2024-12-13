@@ -40,7 +40,6 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
-import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 
 import { SystemRoleType } from '@client/utils/gateway'
@@ -347,26 +346,6 @@ export const routesConfig = [
       {
         path: routes.WORKFLOW_STATUS,
         element: <WorkflowStatus />
-      },
-      {
-        path: routes.TEAM_SEARCH,
-        element: (
-          <ProtectedRoute
-            roles={[
-              SystemRoleType.RegistrationAgent,
-              SystemRoleType.LocalRegistrar,
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement
-            ]}
-          >
-            <TeamSearch />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.CREATE_USER,
-        element: <CreateNewUser />
       },
       {
         path: routes.CREATE_USER_ON_LOCATION,
