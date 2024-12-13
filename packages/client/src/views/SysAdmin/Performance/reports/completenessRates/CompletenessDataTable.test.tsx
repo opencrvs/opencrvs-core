@@ -16,15 +16,12 @@ import { createTestComponent } from '@client/tests/util'
 import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { EventType } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
-
-import { History } from 'history'
 import { COMPLETENESS_RATE_REPORT_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
 describe('CompletenessDataTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   const mockData = [
     {
@@ -48,11 +45,11 @@ describe('CompletenessDataTable tests for over time option', () => {
   ]
 
   beforeAll(async () => {
-    ;({ history, store } = createStore())
+    ;({ store } = createStore())
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <CompletenessDataTable
         completenessRateTime={CompletenessRateTime.Within1Year}
         loading={false}
@@ -60,8 +57,9 @@ describe('CompletenessDataTable tests for over time option', () => {
         eventType={EventType.Birth}
         data={mockData}
       />,
-      { store, history }
+      { store }
     )
+    component = testComponent
   })
 
   it('runs without crashing', async () => {
@@ -86,7 +84,6 @@ describe('CompletenessDataTable tests for over time option', () => {
 describe('CompletenessDataTable tests for by location option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   const mockData = [
     {
@@ -112,11 +109,11 @@ describe('CompletenessDataTable tests for by location option', () => {
   ]
 
   beforeAll(async () => {
-    ;({ history, store } = createStore())
+    ;({ store } = createStore())
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <CompletenessDataTable
         completenessRateTime={CompletenessRateTime.Within1Year}
         loading={false}
@@ -127,8 +124,9 @@ describe('CompletenessDataTable tests for by location option', () => {
         eventType={EventType.Birth}
         data={mockData}
       />,
-      { store, history }
+      { store }
     )
+    component = testComponent
   })
 
   it('runs without crashing', async () => {

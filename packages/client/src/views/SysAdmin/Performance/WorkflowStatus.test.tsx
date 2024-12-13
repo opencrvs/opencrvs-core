@@ -8,35 +8,33 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { formatUrl } from '@client/navigation'
+import { WORKFLOW_STATUS } from '@client/navigation/routes'
 import { AppStore } from '@client/store'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createTestComponent,
+  createTestStore,
+  TestComponentWithRouteMock
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { EventType } from '@client/utils/gateway'
-import {
-  IHistoryStateProps,
-  WorkflowStatus
-} from '@client/views/SysAdmin/Performance/WorkflowStatus'
+import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
-import { createBrowserHistory, createLocation, History } from 'history'
 import { parse, stringify } from 'query-string'
 import * as React from 'react'
-import { match } from 'react-router-dom'
 import { vi } from 'vitest'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 
 describe('Workflow status tests', () => {
   let store: AppStore
-  let history: History<any>
   let component: ReactWrapper<{}, {}>
-  const timeStart = new Date(2019, 11, 6)
-  const timeEnd = new Date(2019, 11, 13)
+  let router: TestComponentWithRouteMock['router']
   const locationId = 'bfe8306c-0910-48fe-8bf5-0db906cf3155'
 
   beforeAll(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
     Date.now = vi.fn(() => 1590220497869)
   })
 
@@ -229,30 +227,25 @@ describe('Workflow status tests', () => {
     ]
 
     beforeEach(async () => {
-      const path = '/performance/operations/workflowStatus'
-      const location = createLocation(path, {
-        timeStart,
-        timeEnd
-      })
-      const history = createBrowserHistory<IHistoryStateProps>()
-      history.location = location
-      location.search = stringify({
-        locationId,
-        event: 'BIRTH',
-        status: 'REGISTERED'
-      })
-      const match: match = {
-        isExact: false,
-        path,
-        url: path,
-        params: {}
-      }
-      const testComponent = await createTestComponent(
-        <WorkflowStatus match={match} history={history} location={location} />,
-        { store, history, graphqlMocks }
-      )
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<WorkflowStatus />, {
+          store,
+          graphqlMocks,
+          path: WORKFLOW_STATUS,
+          initialEntries: [
+            '/',
+            formatUrl(WORKFLOW_STATUS, {}) +
+              '?' +
+              stringify({
+                locationId,
+                event: 'BIRTH',
+                status: 'REGISTERED'
+              })
+          ]
+        })
 
       component = testComponent
+      router = testRouter
 
       component.update()
       await waitForElement(component, '#declaration-status-list')
@@ -264,7 +257,7 @@ describe('Workflow status tests', () => {
         '#header-go-back-button'
       )
       backButton.hostNodes().simulate('click')
-      expect(history.location.pathname).toBe('/')
+      expect(router.state.location.pathname).toBe('/')
     })
 
     it('renders data', async () => {
@@ -307,7 +300,7 @@ describe('Workflow status tests', () => {
       const eventSelect = await waitForElement(component, '#event-select')
       eventSelect.at(0).prop('onChange')({ label: 'Deaths', value: 'DEATH' })
       component.update()
-      expect(parse(history.location.search).event).toBe('DEATH')
+      expect(parse(router.state.location.search).event).toBe('DEATH')
     })
 
     it('update status from select updates query params', async () => {
@@ -317,7 +310,7 @@ describe('Workflow status tests', () => {
         value: 'REGISTERED'
       })
       component.update()
-      expect(parse(history.location.search).status).toBe('REGISTERED')
+      expect(parse(router.state.location.search).status).toBe('REGISTERED')
     })
   })
 
@@ -341,27 +334,22 @@ describe('Workflow status tests', () => {
     ]
 
     beforeEach(async () => {
-      const path = '/performance/operations/workflowStatus'
-      const location = createLocation(path, {
-        timeStart,
-        timeEnd
-      })
-      const history = createBrowserHistory<IHistoryStateProps>()
-      history.location = location
-      location.search = stringify({
-        locationId,
-        event: 'BIRTH',
-        status: 'REGISTERED'
-      })
-      const match: match = {
-        isExact: false,
-        path,
-        url: path,
-        params: {}
-      }
-      const testComponent = await createTestComponent(
-        <WorkflowStatus match={match} history={history} location={location} />,
-        { store, history, graphqlMocks: graphqlMocksWithError }
+      const { component: testComponent } = await createTestComponent(
+        <WorkflowStatus />,
+        {
+          store,
+          path: WORKFLOW_STATUS,
+          initialEntries: [
+            formatUrl(WORKFLOW_STATUS, {}) +
+              '?' +
+              stringify({
+                locationId,
+                event: 'BIRTH',
+                status: 'REGISTERED'
+              })
+          ],
+          graphqlMocks: graphqlMocksWithError
+        }
       )
 
       component = testComponent

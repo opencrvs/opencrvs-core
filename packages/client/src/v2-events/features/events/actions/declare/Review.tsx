@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/components'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useHistory, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { FormHeader } from './Declare'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -236,10 +236,15 @@ interface RejectionState {
 const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
   const [modal, openModal] = useModal()
   const events = useEvents()
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const { eventId } = useParams<{
     eventId: string
   }>()
+
+  if (!eventId) {
+    throw new Error('Event id is required')
+  }
 
   const { goToHome } = useEventFormNavigation()
   const declareMutation = events.actions.declare()
@@ -303,9 +308,10 @@ const ReviewSectionComponent = ({ event }: { event: EventDocument }) => {
     const confirmedEdit = await openModal<boolean | null>((close) => (
       <EditFieldModal close={close}></EditFieldModal>
     ))
+
     if (confirmedEdit) {
       const focusTarget = fieldId ? '#' + fieldId : ''
-      history.push(
+      navigate(
         formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, { pageId, eventId }) +
           '?from=review' +
           focusTarget
@@ -403,6 +409,10 @@ export const ReviewSection = () => {
     eventId: string
   }>()
   const events = useEvents()
+
+  if (!eventId) {
+    throw new Error('Event id is required')
+  }
 
   const [event] = events.getEvent(eventId)
 

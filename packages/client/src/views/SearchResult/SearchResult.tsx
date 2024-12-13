@@ -28,11 +28,10 @@ import { messages as registrarHomeMessages } from '@client/i18n/messages/views/r
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
 import { messages } from '@client/i18n/messages/views/search'
 import {
-  goToDeclarationRecordAudit,
-  goToEvents as goToEventsAction,
-  goToIssueCertificate as goToIssueCertificateAction,
-  goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction
+  formatUrl,
+  generateGoToPageUrl,
+  generateIssueCertificateUrl,
+  generatePrintCertificateUrl
 } from '@client/navigation'
 import {
   REVIEW_CORRECTION,
@@ -60,7 +59,6 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -75,6 +73,8 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { SearchCriteria } from '@client/utils/referenceApi'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import * as routes from '@client/navigation/routes'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -119,28 +119,18 @@ interface IBaseSearchResultProps {
   theme: ITheme
   language: string
   scope: Scope | null
-  goToEvents: typeof goToEventsAction
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
-  goToPage: typeof goToPageAction
-  goToPrintCertificate: typeof goToPrintCertificateAction
-  goToIssueCertificate: typeof goToIssueCertificateAction
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
-interface IMatchParams {
-  searchText: string
-  searchType: string
-}
-
-type ISearchResultProps = IntlShapeProps &
-  ISearchInputProps &
-  IBaseSearchResultProps &
-  RouteComponentProps<IMatchParams>
+type ISearchResultProps = IntlShapeProps & IBaseSearchResultProps
 
 type QueryData = SearchEventsQuery['searchEvents']
 
 function SearchResultView(props: ISearchResultProps) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const { width } = useWindowSize()
 
   const getColumns = () => {
@@ -234,7 +224,8 @@ function SearchResultView(props: ISearchResultProps) {
           reg.duplicates.length > 0 &&
           reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
           reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-        const { intl, location, userDetails } = props
+        const { intl, userDetails } = props
+
         const search = location.search
         const params = new URLSearchParams(search)
         const [searchText, searchType] = [
@@ -265,7 +256,13 @@ function SearchResultView(props: ISearchResultProps) {
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToPrintCertificate(reg.id, reg.event)
+
+                navigate(
+                  generatePrintCertificateUrl({
+                    registrationId: reg.id,
+                    event: reg.event
+                  })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -276,7 +273,10 @@ function SearchResultView(props: ISearchResultProps) {
                 e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
               ) => {
                 e && e.stopPropagation()
-                props.goToIssueCertificate(reg.id)
+
+                navigate(
+                  generateIssueCertificateUrl({ registrationId: reg.id })
+                )
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -287,13 +287,16 @@ function SearchResultView(props: ISearchResultProps) {
                   ? props.intl.formatMessage(constantsMessages.update)
                   : props.intl.formatMessage(constantsMessages.review),
               handler: () =>
-                props.goToPage(
-                  reg.declarationStatus === 'CORRECTION_REQUESTED'
-                    ? REVIEW_CORRECTION
-                    : REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
+                navigate(
+                  generateGoToPageUrl({
+                    pageRoute:
+                      reg.declarationStatus === 'CORRECTION_REQUESTED'
+                        ? REVIEW_CORRECTION
+                        : REVIEW_EVENT_PARENT_FORM_PAGE,
+                    declarationId: reg.id,
+                    pageId: 'review',
+                    event: reg.event.toLowerCase()
+                  })
                 ),
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
@@ -375,14 +378,28 @@ function SearchResultView(props: ISearchResultProps) {
         const NameComponent = reg.name ? (
           <NameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {reg.name}
           </NameContainer>
         ) : (
           <NoNameContainer
             id={`name_${index}`}
-            onClick={() => props.goToDeclarationRecordAudit('search', reg.id)}
+            onClick={() =>
+              navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'search',
+                  declarationId: reg.id
+                })
+              )
+            }
           >
             {intl.formatMessage(constantsMessages.noNameProvided)}
           </NoNameContainer>
@@ -416,7 +433,7 @@ function SearchResultView(props: ISearchResultProps) {
       })
   }
 
-  const { intl, location, userDetails } = props
+  const { intl, userDetails } = props
   const search = location.search
   const params = new URLSearchParams(search)
   const [searchText, searchType] = [
@@ -525,18 +542,9 @@ function SearchResultView(props: ISearchResultProps) {
     </Frame>
   )
 }
-export const SearchResult = connect(
-  (state: IStoreState) => ({
-    language: state.i18n.language,
-    scope: getScope(state),
-    userDetails: getUserDetails(state),
-    outboxDeclarations: state.declarationsState.declarations
-  }),
-  {
-    goToEvents: goToEventsAction,
-    goToPage: goToPageAction,
-    goToPrintCertificate: goToPrintCertificateAction,
-    goToIssueCertificate: goToIssueCertificateAction,
-    goToDeclarationRecordAudit
-  }
-)(injectIntl(withTheme(SearchResultView)))
+export const SearchResult = connect((state: IStoreState) => ({
+  language: state.i18n.language,
+  scope: getScope(state),
+  userDetails: getUserDetails(state),
+  outboxDeclarations: state.declarationsState.declarations
+}))(injectIntl(withTheme(SearchResultView)))

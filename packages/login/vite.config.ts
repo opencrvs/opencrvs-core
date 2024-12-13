@@ -19,7 +19,7 @@ import dns from 'node:dns'
 dns.setDefaultResultOrder('ipv4first')
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }): any => {
   const env = loadEnv(mode, 'env')
 
   const htmlPlugin = () => {
@@ -87,7 +87,7 @@ export default defineConfig(({ mode }) => {
         '/api/countryconfig/': {
           target: 'http://localhost:3040',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
+          rewrite: (path: string) => path.replace(/^\/api\/countryconfig/, '')
         }
       }
     }

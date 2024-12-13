@@ -16,7 +16,6 @@ import { AppStore, createStore } from '@client/store'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { GraphQLError } from 'graphql'
-import { History } from 'history'
 import { vi, Mock } from 'vitest'
 import { SystemRoleType, Status } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -179,11 +178,10 @@ const graphqlMocksOfReactivate = [
 describe('user audit action modal tests', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
   let onCloseMock: Mock
 
   beforeEach(async () => {
-    ;({ history, store } = await createStore())
+    ;({ store } = await createStore())
 
     onCloseMock = vi.fn()
   })
@@ -195,13 +193,13 @@ describe('user audit action modal tests', () => {
   describe('in case of successful deactivate audit action', () => {
     beforeEach(async () => {
       const [successMock] = graphqlMocksOfDeactivate
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
           user={users[0]}
           onClose={onCloseMock}
         />,
-        { store, history, graphqlMocks: [successMock] }
+        { store, graphqlMocks: [successMock] }
       )
       component = testComponent
     })
@@ -257,14 +255,15 @@ describe('user audit action modal tests', () => {
   describe('in case of failed deactivate audit action', () => {
     beforeEach(async () => {
       const [, errorMock] = graphqlMocksOfDeactivate
-      component = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
           user={users[0]}
           onClose={onCloseMock}
         />,
-        { store, history, graphqlMocks: [errorMock] }
+        { store, graphqlMocks: [errorMock] }
       )
+      component = testComponent
     })
 
     describe('after filling mandatory data', () => {
@@ -290,13 +289,13 @@ describe('user audit action modal tests', () => {
   describe('in case of successful reactivate audit action', () => {
     beforeEach(async () => {
       const [successMock] = graphqlMocksOfReactivate
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
           user={users[1]}
           onClose={onCloseMock}
         />,
-        { store, history, graphqlMocks: [successMock] }
+        { store, graphqlMocks: [successMock] }
       )
       component = testComponent
     })
@@ -339,14 +338,15 @@ describe('user audit action modal tests', () => {
   describe('in case of failed reactivate audit action', () => {
     beforeEach(async () => {
       const [, errorMock] = graphqlMocksOfReactivate
-      component = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <UserAuditActionModal
           show={true}
           user={users[1]}
           onClose={onCloseMock}
         />,
-        { store, history, graphqlMocks: [errorMock] }
+        { store, graphqlMocks: [errorMock] }
       )
+      component = testComponent
     })
 
     describe('after filling mandatory data', () => {

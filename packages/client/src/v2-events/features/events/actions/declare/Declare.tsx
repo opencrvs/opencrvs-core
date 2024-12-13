@@ -28,7 +28,7 @@ import {
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import React, { useEffect } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useHistory, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
@@ -147,8 +147,12 @@ function Declare() {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const fromPage = searchParams.get('from') || 'unknown'
-
+  const navigate = useNavigate()
   const events = useEvents()
+
+  if (!eventId) {
+    throw new Error('Event ID is required')
+  }
 
   const [event] = events.getEvent(eventId)
 
@@ -162,7 +166,6 @@ function Declare() {
   if (!configuration) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
-  const history = useHistory()
   const formValues = useEventFormData((state) => state.formValues)
   const setFormValues = useEventFormData((state) => state.setFormValues)
 
@@ -170,13 +173,13 @@ function Declare() {
     const hasTemporaryId = event.id === event.transactionId
 
     if (eventId !== event.id && !hasTemporaryId) {
-      history.push(
+      navigate(
         formatUrl(V2_DECLARE_ACTION_ROUTE, {
           eventId: event.id
         })
       )
     }
-  }, [event.id, event.transactionId, eventId, history])
+  }, [event.id, event.transactionId, eventId, navigate])
 
   const pages = configuration.actions[0].forms[0].pages
   const {
@@ -191,7 +194,7 @@ function Declare() {
 
   useEffect(() => {
     if (!pageId) {
-      history.push(
+      navigate(
         formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
           eventId: event.id,
           pageId: pages[0].id
@@ -206,14 +209,14 @@ function Declare() {
 
     const pageChanged = pages[currentPage].id !== pageId
     if (pageChanged) {
-      history.push(
+      navigate(
         formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
           eventId: event.id,
           pageId: pages[currentPage].id
         })
       )
     }
-  }, [event.id, history, pageId, pages, currentPage])
+  }, [event.id, navigate, pageId, pages, currentPage])
 
   const intl = useIntl()
 
