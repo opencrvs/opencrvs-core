@@ -60,7 +60,7 @@ import {
   isObservation,
   isURLReference,
   urlReferenceToResourceIdentifier,
-  BundleEntryWithFullUrl,
+  // BundleEntryWithFullUrl,
   findEntryFromBundle
 } from '..'
 
@@ -743,10 +743,14 @@ export function setInformantReference<T extends CompositionSectionCode>(
     throw new Error(`${sectionCode} not found in composition!`)
   }
   const personSectionEntry = section.entry[0]
-  const personEntry = fhirBundle.entry.find(
-    (entry): entry is BundleEntryWithFullUrl<Patient> =>
-      entry.fullUrl === personSectionEntry.reference
+  const personEntry = findEntryFromBundle(
+    fhirBundle,
+    personSectionEntry.reference
   )
+  // const personEntry =  fhirBundle.entry.find(
+  //   (entry): entry is BundleEntryWithFullUrl<Patient> =>
+  //     entry.fullUrl === personSectionEntry.reference
+  // )
   if (!personEntry) {
     return
   }
