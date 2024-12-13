@@ -143,7 +143,6 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
                 }&lang=${getState().i18n.language}`
               )
             } else {
-              console.log('action.payload.inAppRedirect', action)
               action.payload.inAppRedirect()
             }
           },

@@ -170,6 +170,9 @@ export const applicationConfigFailedAction = (
 
 export const authenticate = (
   values: IAuthenticationData,
+  /**
+   * fallback redirection if system does not return token
+   */
   inAppRedirect: () => void
 ): AuthenticationDataAction | AuthenticationFieldValidationAction => {
   if (!values.username || !values.password) {

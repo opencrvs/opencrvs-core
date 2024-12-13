@@ -78,7 +78,6 @@ describe('when user has a valid token in url but an expired one in localStorage'
       ['/?token=' + token]
     )
 
-    app.debug()
     expect(assign.mock.calls).toHaveLength(0)
   })
 })
