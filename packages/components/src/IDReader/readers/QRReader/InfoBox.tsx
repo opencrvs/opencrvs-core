@@ -1,9 +1,9 @@
 import React from 'react'
-import { Box } from '../Box'
+import { Box } from '../../../Box'
 import styled from 'styled-components'
-import { Stack } from '../Stack'
-import { Text } from '../Text'
-import { Icon, IconProps } from '../Icon'
+import { Stack } from '../../../Stack'
+import { Text } from '../../../Text'
+import { Icon, IconProps } from '../../../Icon'
 
 interface InfoBoxProps {
   iconName: IconProps['name']
