@@ -37,6 +37,7 @@ const sign = promisify<
   jwt.SignOptions,
   string
 >(jwt.sign)
+
 export interface IUserName {
   use: string
   family: string
@@ -199,6 +200,8 @@ export async function generateAndSendVerificationCode(
   mobile?: string,
   email?: string
 ) {
+  console.log('env.qa_env', env.QA_ENV)
+
   const isDemoUser = scope.indexOf('demo') > -1 || env.QA_ENV
   logger.info(
     `isDemoUser,
@@ -213,6 +216,8 @@ export async function generateAndSendVerificationCode(
   } else {
     verificationCode = await generateVerificationCode(nonce)
   }
+  console.log('env', env)
+
   if (!env.isProd || env.QA_ENV) {
     logger.info(
       `Sending a verification to,

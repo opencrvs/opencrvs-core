@@ -8,18 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FORGOTTEN_ITEMS,
-  goToPhoneNumberVerificationForm,
-  goToSecurityQuestionForm
-} from '@login/login/actions'
 import { NotificationEvent, authApi } from '@login/utils/authApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+
 import styled from 'styled-components'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -31,42 +25,34 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { constantsMessages } from '@login/i18n/messages/constants'
-
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 const Actions = styled.div`
   & > div {
     margin-bottom: 16px;
   }
 `
 
-interface BaseProps
-  extends RouteComponentProps<
-    {},
-    {},
-    {
-      forgottenItem: FORGOTTEN_ITEMS
-      nonce: string
-      mobile?: string
-      email?: string
-    }
-  > {
-  goToPhoneNumberVerificationForm: typeof goToPhoneNumberVerificationForm
-  goToSecurityQuestionForm: typeof goToSecurityQuestionForm
-}
-
-type Props = BaseProps & WrappedComponentProps
+type Props = WrappedComponentProps
 const RECOVERY_CODE_LENGTH = 6
 
-const RecoveryCodeEntryComponent = ({
-  intl,
-  goToPhoneNumberVerificationForm,
-  goToSecurityQuestionForm,
-  location
-}: Props) => {
+const RecoveryCodeEntryComponent = ({ intl }: Props) => {
   const [recoveryCode, setRecoveryCode] = useState('')
   const [touched, setTouched] = useState(false)
   const [error, setError] = useState(true)
   const [resentAuthenticationCode, setResentAuthenticationCode] =
     useState(false)
+
+  // {
+  //   forgottenItem: FORGOTTEN_ITEMS
+  //   nonce: string
+  //   mobile?: string
+  //   email?: string
+  // }
+  const location = useLocation()
+  const navigate = useNavigate()
+  const goToPhoneNumberVerificationForm = (forgottenItem: string) =>
+    navigate(routes.PHONE_NUMBER_VERIFICATION, { state: { forgottenItem } })
 
   const handleChange = (value: string) => {
     setRecoveryCode(value)
@@ -85,11 +71,13 @@ const RecoveryCodeEntryComponent = ({
         location.state.nonce,
         recoveryCode
       )
-      goToSecurityQuestionForm(
-        nonce,
-        securityQuestionKey,
-        location.state.forgottenItem
-      )
+      navigate(routes.SECURITY_QUESTION, {
+        state: {
+          nonce,
+          securityQuestionKey,
+          forgottenItem: location.state.forgottenItem
+        }
+      })
     } catch (error) {
       setError(true)
     }
@@ -230,7 +218,4 @@ const RecoveryCodeEntryComponent = ({
   )
 }
 
-export const RecoveryCodeEntry = connect(null, {
-  goToPhoneNumberVerificationForm,
-  goToSecurityQuestionForm
-})(withRouter(injectIntl(RecoveryCodeEntryComponent)))
+export const RecoveryCodeEntry = injectIntl(RecoveryCodeEntryComponent)
