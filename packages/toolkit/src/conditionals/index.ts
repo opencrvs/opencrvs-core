@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { JSONSchema } from '@opencrvs/commons/conditionals'
 
-export type Noop = () => void
-
-export const noop: Noop = () => {}
+export function defineConditional(conditional: JSONSchema): JSONSchema {
+  return conditional
+}
