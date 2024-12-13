@@ -11,7 +11,13 @@
 
 import { css } from 'styled-components'
 
-export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
+export const base = ({
+  fullWidth,
+  iconPosition = 'left'
+}: {
+  fullWidth?: boolean
+  iconPosition?: 'left' | 'right'
+}) => css`
   ${({ theme }) => theme.fonts.bold16};
   display: inline-flex;
   justify-content: center;
@@ -34,12 +40,19 @@ export const base = ({ fullWidth }: { fullWidth?: boolean }) => css`
   `}
 
   svg {
-    height: 24px;
-    width: 24px;
     vertical-align: top;
-    margin-left: -2px;
-    margin-right: 8px;
     pointer-events: none;
+
+    ${iconPosition === 'left' &&
+    css`
+      margin-left: -2px;
+      margin-right: 8px;
+    `}
+    ${iconPosition === 'right' &&
+    css`
+      margin-left: 8px;
+      margin-right: -2px;
+    `}
   }
 
   &:focus-visible {
@@ -181,13 +194,6 @@ export const small = ({ loading }: { loading?: boolean }) => css`
   height: 32px;
   padding: 8px;
 
-  svg {
-    height: 18px;
-    width: 18px;
-    margin-right: 6px;
-    margin-left: -1px;
-  }
-
   ${loading &&
   css`
     svg {
@@ -201,22 +207,12 @@ export const medium = css`
   ${({ theme }) => theme.fonts.bold16};
   height: 40px;
   padding: 0 12px;
-
-  svg {
-    height: 20px;
-    width: 20px;
-  }
 `
 
 export const large = css`
   ${({ theme }) => theme.fonts.bold18};
   height: 54px;
   padding: 0 16px;
-
-  svg {
-    height: 24px;
-    width: 24px;
-  }
 `
 
 export const loading = css`
