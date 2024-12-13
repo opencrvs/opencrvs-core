@@ -69,9 +69,6 @@ describe('when user starts a new declaration', () => {
       )
 
       draft = createDeclaration(EventType.Birth)
-      store.dispatch(storeDeclaration(draft))
-
-      draft = createDeclaration(EventType.Birth)
 
       const testApp = await createTestApp(
         { waitUntilOfflineCountryConfigLoaded: true },
@@ -83,6 +80,8 @@ describe('when user starts a new declaration', () => {
       )
       app = testApp.app
       store = testApp.store
+      store.dispatch(storeDeclaration(draft))
+
       setScopes([SCOPES.RECORD_DECLARE_BIRTH], store)
 
       await store.dispatch(storeDeclaration(draft))

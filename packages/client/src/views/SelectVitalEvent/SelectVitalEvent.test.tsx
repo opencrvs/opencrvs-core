@@ -30,6 +30,7 @@ describe('when user is selecting the vital event', () => {
     const testApp = await createTestApp()
     app = testApp.app
     router = testApp.router
+    store = testApp.store
 
     await waitForReady(app)
   })
@@ -51,6 +52,7 @@ describe('when user is selecting the vital event', () => {
     it('lists the options', () => {
       expect(app.find('#select_vital_event_view').hostNodes()).toHaveLength(1)
     })
+
     describe('when selects "Birth"', () => {
       beforeEach(() => {
         app.find('#select_birth_event').hostNodes().simulate('change')

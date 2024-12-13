@@ -64,10 +64,6 @@ describe('Review form for an declaration', () => {
   beforeEach(async () => {
     await flushPromises()
 
-    setScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION], store)
-    await waitForReady(wrapper)
-    store.dispatch(storeDeclaration(declaration))
-
     const appBundle = await createTestApp(undefined, [
       formatUrl(CERTIFICATE_CORRECTION_REVIEW, {
         declarationId: declaration.id,
@@ -80,6 +76,8 @@ describe('Review form for an declaration', () => {
     store = appBundle.store
     router = appBundle.router
 
+    setScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION], store)
+    await waitForReady(wrapper)
     store.dispatch(storeDeclaration(declaration))
 
     await flushPromises()

@@ -358,9 +358,10 @@ describe('when user is in the register form preview section and has the submit c
 
     it('should be able to submit the form', () => {
       component.component
-        .find('#submit_form_review')
+        .find('#submit_for_review')
         .hostNodes()
         .simulate('click')
+
       component.component.update()
 
       const cancelBtn = component.component.find('#cancel-btn').hostNodes()

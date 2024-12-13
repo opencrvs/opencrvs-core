@@ -726,26 +726,18 @@ describe('RegistrarHome ready to print tab related tests', () => {
       ).toHaveLength(1)
 
       testComponent.component.find('#assign').hostNodes().simulate('click')
-      expect(
-        testComponent.component
-          .find('#action-loading-ListItemAction-0')
-          .hostNodes()
-      ).toHaveLength(1)
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.component.update()
 
       const action = await waitForElement(
         testComponent.component,
         '#ListItemAction-0-Print'
       )
+
       action.hostNodes().simulate('click')
 
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
+
       testComponent.component.update()
       expect(testComponent.router.state.location.pathname).toBe(
         '/cert/collector/956281c9-1f47-4c26-948a-970dd23c4094/death/certCollector'

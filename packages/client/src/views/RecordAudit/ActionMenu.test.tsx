@@ -511,7 +511,7 @@ describe('Review action', () => {
   it('Validated - Assigned', async () => {
     const { store } = createStore()
     setScopes([SCOPES.RECORD_REGISTER], store)
-    const { component } = await createTestComponent(
+    const { component, router } = await createTestComponent(
       <ActionMenu
         declaration={{
           ...defaultDeclaration,
@@ -536,7 +536,9 @@ describe('Review action', () => {
 
     await flushPromises()
 
-    expect(window.location.href).toContain('reviews/' + defaultDeclaration.id)
+    expect(router.state.location.pathname).toContain(
+      'reviews/' + defaultDeclaration.id
+    )
   })
 
   it('Validated - Not downloaded - Has scope', async () => {
@@ -813,52 +815,6 @@ describe('Review potential duplicate action', () => {
 
     const { status } = actionStatus(component, [ACTION.REVIEW_DECLARATION])
     expect(status).toBe(ACTION_STATUS.HIDDEN)
-  })
-
-  it('Validated - Downloaded', async () => {
-    const { store } = createStore()
-    const { component, router } = await createTestComponent(
-      <ActionMenu
-        declaration={{
-          ...defaultDeclaration,
-          status: SUBMISSION_STATUS.VALIDATED
-        }}
-        draft={draftBirthDownloaded}
-        toggleDisplayDialog={() => {}}
-      />,
-      { store }
-    )
-
-    const { status, node } = actionStatus(component, [
-      ACTION.REVIEW_DECLARATION
-    ])
-    expect(status).toBe(ACTION_STATUS.ENABLED)
-
-    node?.simulate('click')
-
-    await flushPromises()
-
-    expect(router.state.location.pathname).toContain(
-      'reviews/' + defaultDeclaration.id
-    )
-  })
-
-  it('Validated - Not downloaded - Has scope', async () => {
-    const { store } = createStore()
-    const { component } = await createTestComponent(
-      <ActionMenu
-        declaration={{
-          ...defaultDeclaration,
-          status: SUBMISSION_STATUS.VALIDATED
-        }}
-        draft={draftBirthNotDownloaded}
-        toggleDisplayDialog={() => {}}
-      />,
-      { store }
-    )
-
-    const { status } = actionStatus(component, [ACTION.REVIEW_DECLARATION])
-    expect(status).toBe(ACTION_STATUS.DISABLED)
   })
 
   it('Validated - Does not have scope', async () => {

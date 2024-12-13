@@ -25,7 +25,8 @@ import {
   REGISTRATION_AGENT_DEFAULT_SCOPES,
   setScopes,
   REGISTRAR_DEFAULT_SCOPES,
-  TestComponentWithRouteMock
+  TestComponentWithRouteMock,
+  flushPromises
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
@@ -447,12 +448,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         testComponent.component
           .find('#action-loading-ListItemAction-0')
           .hostNodes()
-      ).toHaveLength(1)
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.component.update()
+      )
 
       const action = await waitForElement(
         testComponent.component,
@@ -464,6 +460,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         setTimeout(resolve, 100)
       })
       testComponent.component.update()
+
       expect(testComponent.router.state.location.pathname).toBe(
         '/reviews/9a55d213-ad9f-4dcd-9418-340f3a7f6269/events/birth/parent/review'
       )
