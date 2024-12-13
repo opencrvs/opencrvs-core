@@ -19,9 +19,29 @@ import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/action'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { validate } from '@opencrvs/commons/client'
 
 export const ActionMenu = ({ eventId }: { eventId: string }) => {
   const intl = useIntl()
+  const events = useEvents()
+  const [event] = events.getEvent(eventId)
+
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+
+  const registerActionConfiguration = configuration?.actions.find(
+    (action) => action.type === 'REGISTER'
+  )
+
+  const registerActionShouldBeVisible =
+    !registerActionConfiguration?.allowedWhen
+      ? true
+      : validate(registerActionConfiguration.allowedWhen, {
+          $event: event
+        })
 
   return (
     <>
@@ -32,7 +52,9 @@ export const ActionMenu = ({ eventId }: { eventId: string }) => {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <RegisterAction eventId={eventId} />
+          {registerActionShouldBeVisible && (
+            <RegisterAction eventId={eventId} />
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>

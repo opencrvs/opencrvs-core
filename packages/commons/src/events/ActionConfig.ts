@@ -11,9 +11,15 @@
 import { z } from 'zod'
 import { FormConfig } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
+import { JSONSchema } from 'src/conditionals/conditionals'
+
+function typedZodAny<T>() {
+  return z.any() as z.ZodType<T>
+}
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
+  allowedWhen: typedZodAny<JSONSchema>().optional(),
   forms: z.array(FormConfig)
 })
 
