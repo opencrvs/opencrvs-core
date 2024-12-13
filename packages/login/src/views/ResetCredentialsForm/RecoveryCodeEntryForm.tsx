@@ -43,12 +43,6 @@ const RecoveryCodeEntryComponent = ({ intl }: Props) => {
   const [resentAuthenticationCode, setResentAuthenticationCode] =
     useState(false)
 
-  // {
-  //   forgottenItem: FORGOTTEN_ITEMS
-  //   nonce: string
-  //   mobile?: string
-  //   email?: string
-  // }
   const location = useLocation()
   const navigate = useNavigate()
   const goToPhoneNumberVerificationForm = (forgottenItem: string) =>

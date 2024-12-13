@@ -26,7 +26,6 @@ import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { constantsMessages } from '@login/i18n/messages/constants'
 import { RouteComponentProps, withRouter } from '@login/common/WithRouterProps'
 import * as routes from '@login/navigation/routes'
-import { stat } from 'fs'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};

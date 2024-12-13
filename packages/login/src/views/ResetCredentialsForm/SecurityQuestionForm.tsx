@@ -86,12 +86,6 @@ const SecurityQuestionComponent = ({ intl }: Props) => {
   const [touched, setTouched] = useState<boolean>(false)
   const [error, setError] = useState<boolean>(false)
 
-  // {
-  //   forgottenItem: FORGOTTEN_ITEMS
-  //   nonce: string
-  //   securityQuestionKey: QUESTION_KEYS
-  // }
-
   const location = useLocation()
   const navigate = useNavigate()
 
