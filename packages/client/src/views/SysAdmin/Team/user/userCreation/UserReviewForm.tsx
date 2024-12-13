@@ -22,8 +22,7 @@ import {
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
   getVisibleSectionGroupsBasedOnConditions,
-  getConditionalActionsForField,
-  getListOfLocations
+  getConditionalActionsForField
 } from '@client/forms/utils'
 import {
   buttonMessages as messages,
@@ -79,6 +78,7 @@ import {
   generateCreateUserSectionUrl,
   generateUserReviewFormUrl
 } from '@client/navigation'
+import { getListOfLocations } from '@client/utils/validate'
 
 interface IUserReviewFormProps {
   userId?: string

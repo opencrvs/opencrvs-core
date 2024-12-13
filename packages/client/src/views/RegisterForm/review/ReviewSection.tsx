@@ -76,7 +76,6 @@ import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getSectionFields,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
@@ -120,7 +119,7 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { ReviewHeader } from './ReviewHeader'
-import { IValidationResult } from '@client/utils/validate'
+import { getListOfLocations, IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadField/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'

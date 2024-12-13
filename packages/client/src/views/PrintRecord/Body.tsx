@@ -43,7 +43,6 @@ import {
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import {
@@ -80,6 +79,7 @@ import { EventType, History, RegStatus } from '@client/utils/gateway'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { PrintRecordTable as Table } from '@client/views/PrintRecord/Table'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { getListOfLocations } from '@client/utils/validate'
 
 interface PrintRecordTableProps {
   declaration: IDeclaration
