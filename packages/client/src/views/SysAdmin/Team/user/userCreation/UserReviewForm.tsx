@@ -129,7 +129,7 @@ const UserReviewFormComponent = ({
 }: IFullProps & IDispatchProps) => {
   const navigate = useNavigate()
 
-  const locationId = formData['registrationOffice']
+  const locationId = formData['registrationOffice'] as string
 
   const getValue = (field: IFormField) => {
     if (field.type === LOCATION_SEARCH_INPUT) {
@@ -286,11 +286,10 @@ const UserReviewFormComponent = ({
 
   let title: string | undefined
   let actionComponent: JSX.Element
-
   const locationDetails =
-    offlineCountryConfiguration['locations'][`${locationId}`] ||
-    offlineCountryConfiguration['facilities'][`${locationId}`] ||
-    offlineCountryConfiguration['offices'][`${locationId}`]
+    offlineCountryConfiguration['locations'][locationId] ||
+    offlineCountryConfiguration['facilities'][locationId] ||
+    offlineCountryConfiguration['offices'][locationId]
   if (userId) {
     title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
     actionComponent = (
