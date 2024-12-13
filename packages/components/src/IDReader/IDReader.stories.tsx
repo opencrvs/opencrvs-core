@@ -25,6 +25,22 @@ const IDReaderWithAlertFeedback = () => (
   <IDReader
     onScan={(data) => alert(JSON.stringify(data))}
     onError={(error) => console.error(error)}
+    labels={{
+      divider: 'Or',
+      manualInputInstruction: 'Complete fields below',
+      qrCode: {
+        button: 'Scan ID QR code',
+        scannerDialogSupportingCopy:
+          "Place the Notifier's ID card in front of the camera.",
+        tutorial: {
+          cameraCleanliness: 'Ensure your camera is clean and functional.',
+          distance:
+            'Hold the device steadily 6-12 inches away from the QR code.',
+          lightBalance:
+            'Ensure the QR code is well-lit and not damaged or blurry.'
+        }
+      }
+    }}
   />
 )
 
