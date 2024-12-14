@@ -11,7 +11,7 @@
 import { z } from 'zod'
 import { FormConfig } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { JSONSchema } from 'src/conditionals/conditionals'
+import { JSONSchema } from '../conditionals/conditionals'
 
 function typedZodAny<T>() {
   return z.any() as z.ZodType<T>
