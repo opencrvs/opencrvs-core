@@ -17,28 +17,3 @@ export type ConditionalData = {
   $event: EventDocument
 }
 export type JSONSchema = Omit<JSONSchemaType<ConditionalData>, 'properties'>
-
-const foo: JSONSchema = {
-  type: 'object',
-  allOf: [
-    {
-      properties: {
-        $event: {
-          properties: {
-            actions: {
-              contains: {
-                type: 'object',
-                properties: {
-                  type: {
-                    const: 'DECLARE'
-                  }
-                },
-                required: ['type']
-              }
-            }
-          }
-        }
-      }
-    }
-  ]
-}
