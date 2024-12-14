@@ -15,6 +15,7 @@ import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { flattenDeep } from 'lodash'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { eventMetadataLabelMap } from './EventMetadata'
+import { FormConfig } from './FormConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -92,8 +93,14 @@ const fillFieldLabels = ({
 export const defineConfig = (
   config:
     | EventConfig
-    | (Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput })
+    | (Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput }),
+  options = {
+    validate: true
+  }
 ) => {
+  if (!options.validate) {
+    return config
+  }
   const parsed = EventConfig.extend({
     summary: SummaryConfigInput
   }).parse(config)
@@ -118,3 +125,5 @@ export const defineConfig = (
     }))
   })
 }
+
+export const defineForm = (form: FormConfig): FormConfig => form

@@ -9,7 +9,75 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { JSONSchema } from '@opencrvs/commons/conditionals'
+import { ActionDocument } from '@opencrvs/commons/events'
 
 export function defineConditional(conditional: JSONSchema): JSONSchema {
   return conditional
+}
+
+export function and(...conditions: JSONSchema[]): JSONSchema {
+  return {
+    type: 'object',
+    allOf: conditions
+  }
+}
+
+export function or(...conditions: JSONSchema[]): JSONSchema {
+  return {
+    type: 'object',
+    anyOf: conditions
+  }
+}
+
+export function not(condition: JSONSchema): JSONSchema {
+  return {
+    type: 'object',
+    not: condition
+  }
+}
+
+export function userHasScope(scope: string) {
+  return {
+    properties: {
+      $user: {
+        required: ['scope'],
+        properties: {
+          scope: {
+            contains: {
+              type: 'string',
+              const: scope
+            }
+          }
+        }
+      }
+    },
+    required: ['$user']
+  }
+}
+
+export function eventHasAction(type: ActionDocument['type']) {
+  return {
+    type: 'object',
+    properties: {
+      $event: {
+        type: 'object',
+        properties: {
+          actions: {
+            type: 'array',
+            contains: {
+              type: 'object',
+              properties: {
+                type: {
+                  const: type
+                }
+              },
+              required: ['type']
+            }
+          }
+        },
+        required: ['actions']
+      }
+    },
+    required: ['$event']
+  }
 }

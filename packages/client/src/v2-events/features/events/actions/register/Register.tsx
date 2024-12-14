@@ -48,7 +48,7 @@ const messages = defineMessages({
  * Preview of event to be registered.
  */
 export const RegisterIndex = () => {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.EVENT)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
   const events = useEvents()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
@@ -89,7 +89,7 @@ export const RegisterIndex = () => {
 
     if (confirmedEdit) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath(
+        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath(
           { pageId, eventId },
           {
             from: 'register'
@@ -118,6 +118,7 @@ export const RegisterIndex = () => {
 
   return (
     <Preview.Body
+      title=""
       formConfig={formConfigs[0]}
       eventConfig={config}
       onEdit={handleEdit}

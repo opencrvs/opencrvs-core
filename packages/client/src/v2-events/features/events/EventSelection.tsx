@@ -90,7 +90,7 @@ const EventSelector = () => {
     clearForm()
 
     navigate(
-      ROUTES.V2.EVENTS.DECLARE.EVENT.buildPath({
+      ROUTES.V2.EVENTS.DECLARE.buildPath({
         eventId: transactionId
       })
     )

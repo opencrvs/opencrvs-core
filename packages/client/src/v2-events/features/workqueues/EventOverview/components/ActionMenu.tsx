@@ -22,26 +22,31 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validate } from '@opencrvs/commons/client'
+import { type ActionConfig } from '@opencrvs/commons'
+import { useAuthentication } from '@client/utils/userUtils'
 
 export const ActionMenu = ({ eventId }: { eventId: string }) => {
   const intl = useIntl()
   const events = useEvents()
+  const navigate = useNavigate()
+  const authentication = useAuthentication()
   const [event] = events.getEvent(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
 
-  const registerActionConfiguration = configuration?.actions.find(
-    (action) => action.type === 'REGISTER'
-  )
+  const isActionVisible = (action: ActionConfig) => {
+    if (!action?.allowedWhen) {
+      return true
+    }
+    const params = {
+      $event: event,
+      $user: authentication
+    }
 
-  const registerActionShouldBeVisible =
-    !registerActionConfiguration?.allowedWhen
-      ? true
-      : validate(registerActionConfiguration.allowedWhen, {
-          $event: event
-        })
+    return validate(action.allowedWhen, params)
+  }
 
   return (
     <>
@@ -52,26 +57,23 @@ export const ActionMenu = ({ eventId }: { eventId: string }) => {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {registerActionShouldBeVisible && (
-            <RegisterAction eventId={eventId} />
-          )}
+          {configuration?.actions.filter(isActionVisible).map((action) => (
+            <DropdownMenu.Item
+              key={action.type}
+              onClick={() => {
+                if (action.type === 'CREATE' || action.type === 'CUSTOM') {
+                  alert(`Action ${action.type} is not implemented yet.`)
+                  return
+                }
+
+                navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+              }}
+            >
+              {intl.formatMessage(action.label)}
+            </DropdownMenu.Item>
+          ))}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
-  )
-}
-
-const RegisterAction = ({ eventId }: { eventId: string }) => {
-  const navigate = useNavigate()
-
-  return (
-    <DropdownMenu.Item
-      onClick={() => {
-        navigate(ROUTES.V2.EVENTS.REGISTER.EVENT.buildPath({ eventId }))
-      }}
-    >
-      <Icon name="CheckSquare" color="currentColor" size="large" />
-      Register
-    </DropdownMenu.Item>
   )
 }

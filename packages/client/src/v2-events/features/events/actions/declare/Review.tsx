@@ -97,7 +97,7 @@ interface RejectionState {
 }
 
 export const ReviewSection = () => {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.EVENT.REVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
@@ -133,7 +133,7 @@ export const ReviewSection = () => {
 
     if (confirmedEdit) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath(
+        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath(
           { pageId, eventId },
           {
             from: 'review'

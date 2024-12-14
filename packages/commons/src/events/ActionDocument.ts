@@ -46,6 +46,12 @@ const DeclareAction = ActionBase.merge(
   })
 )
 
+const ValidateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.VALIDATE)
+  })
+)
+
 const DraftAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.DRAFT)
@@ -66,14 +72,22 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const CustomAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM)
+  })
+)
+
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
   DraftAction,
+  ValidateAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,
   AssignedAction,
-  UnassignedAction
+  UnassignedAction,
+  CustomAction
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>

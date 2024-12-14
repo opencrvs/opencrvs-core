@@ -45,7 +45,7 @@ export const useEventFormNavigation = () => {
   }
 
   const goToReview = (eventId: string) => {
-    navigate(ROUTES.V2.EVENTS.DECLARE.EVENT.REVIEW.buildPath({ eventId }))
+    navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
   }
 
   const exit = async () => {

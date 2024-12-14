@@ -69,19 +69,19 @@ export const routesConfig = {
       element: <EventSelection />
     },
     {
-      path: ROUTES.V2.EVENTS.DECLARE.EVENT.REVIEW.path,
+      path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
       element: <ReviewSection />
     },
     {
-      path: ROUTES.V2.EVENTS.DECLARE.EVENT.path,
+      path: ROUTES.V2.EVENTS.DECLARE.path,
       element: <DeclareIndex />
     },
     {
-      path: ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.path,
+      path: ROUTES.V2.EVENTS.DECLARE.PAGE.path,
       element: <DeclareIndex />
     },
     {
-      path: ROUTES.V2.EVENTS.REGISTER.EVENT.path,
+      path: ROUTES.V2.EVENTS.REGISTER.path,
       element: <RegisterIndex />
     }
   ]
