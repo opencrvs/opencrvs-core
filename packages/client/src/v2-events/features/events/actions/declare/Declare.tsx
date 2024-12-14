@@ -68,7 +68,7 @@ function Declare() {
 
     if (eventId !== event.id && !hasTemporaryId) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.EVENT.buildPath({
+        ROUTES.V2.EVENTS.DECLARE.buildPath({
           eventId: event.id
         })
       )
@@ -89,7 +89,7 @@ function Declare() {
   useEffect(() => {
     if (!pageId) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath({
+        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath({
           eventId: event.id,
           pageId: pages[0].id
         })
@@ -104,7 +104,7 @@ function Declare() {
     const pageChanged = pages[currentPage].id !== pageId
     if (pageChanged) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.EVENT.PAGE.buildPath({
+        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath({
           eventId: event.id,
           pageId: pages[currentPage].id
         })

@@ -27,36 +27,27 @@ export const ROUTES = {
           }),
           CREATE: route('create'),
           DECLARE: route(
-            'declare',
-            {},
+            'declare/:eventId',
             {
-              EVENT: route(
-                ':eventId',
-                {
-                  params: { eventId: string().defined() }
+              params: { eventId: string().defined() }
+            },
+            {
+              REVIEW: route('review'),
+              PAGE: route(':pageId', {
+                params: { pageId: string().defined() },
+                searchParams: {
+                  from: string()
                 },
-                {
-                  REVIEW: route('review'),
-                  PAGE: route(':pageId', {
-                    params: { pageId: string().defined() },
-                    searchParams: {
-                      from: string()
-                    },
-                    hash: hashValues()
-                  })
-                }
-              )
-            }
-          ),
-          REGISTER: route(
-            'register',
-            {},
-            {
-              EVENT: route(':eventId', {
-                params: { eventId: string().defined() }
+                hash: hashValues()
               })
             }
-          )
+          ),
+          VALIDATE: route('validate/:eventId', {
+            params: { eventId: string().defined() }
+          }),
+          REGISTER: route('register/:eventId', {
+            params: { eventId: string().defined() }
+          })
         }
       ),
       WORKQUEUE: route('workqueue', {
