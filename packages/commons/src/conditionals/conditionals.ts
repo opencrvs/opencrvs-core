@@ -10,7 +10,7 @@
  */
 
 import { JSONSchemaType } from 'ajv'
-import { EventDocument } from 'src/events'
+import { EventDocument } from '../events'
 
 export type ConditionalData = {
   $form?: Record<string, any>
