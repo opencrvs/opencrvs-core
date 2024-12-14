@@ -18,7 +18,7 @@ import { useEventFormNavigation } from '@client/v2-events//features/events/useEv
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
 
 function getDeclarationIconColor(): string {
   return 'purple'
