@@ -81,3 +81,30 @@ export function eventHasAction(type: ActionDocument['type']) {
     required: ['$event']
   }
 }
+
+export function field(fieldId: string) {
+  return {
+    isBeforeNow: () => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              type: 'string',
+              format: 'date',
+              // https://ajv.js.org/packages/ajv-formats.html#keywords-to-compare-values-formatmaximum-formatminimum-and-formatexclusivemaximum-formatexclusiveminimum
+              formatMaximum: { $data: '2/$now' }
+            }
+          },
+          required: [fieldId]
+        },
+        $now: {
+          type: 'string',
+          format: 'date'
+        }
+      },
+      required: ['$form', '$now']
+    })
+  }
+}
