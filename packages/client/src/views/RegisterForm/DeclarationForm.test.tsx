@@ -128,11 +128,16 @@ describe('when user starts a new declaration', () => {
           })
         )
 
+        app.update()
+        await flushPromises()
+
         await goToChildSection(app)
       })
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
+          await flushPromises()
+
           app
             .find('#firstNamesEng')
             .hostNodes()
@@ -285,6 +290,7 @@ describe('when user starts a new declaration', () => {
             .first()
             .simulate('click')
         })
+
         it('renders preview page', async () => {
           const button = await waitForElement(app, '#back-to-review-button')
 
