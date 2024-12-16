@@ -106,7 +106,7 @@ export const WorkqueueIndex = () => {
 
 type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
 
-export const Workqueue = ({
+const Workqueue = ({
   events,
   config,
   limit,

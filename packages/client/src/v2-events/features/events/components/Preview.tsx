@@ -161,7 +161,7 @@ const messages = defineMessages({
  * Preview component, used to display the "read-only" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
  */
-export const PreviewComponent = ({
+const PreviewComponent = ({
   eventConfig,
   formConfig,
   form,
