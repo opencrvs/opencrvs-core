@@ -64,7 +64,7 @@ export function AdministrativeLevels() {
   const navigate = useNavigate()
 
   const getNewLevel =
-    (currentlySelectedLocation: string) =>
+    (currentlySelectedLocation?: string) =>
     (store: IStoreState): IGetNewLevel => {
       const location = currentlySelectedLocation ?? '0'
       const locations = store.offline.offlineData.locations as {
@@ -121,7 +121,7 @@ export function AdministrativeLevels() {
     }
 
   const dataLocations = useSelector<IStoreState, IGetNewLevel>(
-    getNewLevel(locationId!)
+    getNewLevel(locationId)
   )
   const totalNumber = dataLocations.childLocations.length
   const [currentPageNumber, setCurrentPageNumber] = React.useState<number>(1)
