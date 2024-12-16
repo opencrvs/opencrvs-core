@@ -35,4 +35,5 @@ const messagesToDefine: IWorkQueueMessages = {
   }
 }
 
+/** @knipignore */
 export const wqMessages: IWorkQueueMessages = defineMessages(messagesToDefine)

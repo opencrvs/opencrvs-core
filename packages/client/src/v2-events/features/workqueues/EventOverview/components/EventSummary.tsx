@@ -12,6 +12,7 @@
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
+import { EventIndex } from '@opencrvs/commons/client'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
@@ -21,7 +22,7 @@ export const EventSummary = ({
   event,
   summary
 }: {
-  event: any
+  event: EventIndex
   summary: SummaryConfig
 }) => {
   return (
@@ -35,7 +36,7 @@ export const EventSummary = ({
             <Summary.Row
               key={field.id}
               data-testid={field.id}
-              label={field.label.defaultMessage}
+              label={field.label?.defaultMessage ?? ''}
               placeholder={placeholder}
               value={(event.data[field.id] as any) ?? '-'}
             />

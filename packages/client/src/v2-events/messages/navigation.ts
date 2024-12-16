@@ -35,5 +35,6 @@ const messagesToDefine: INavigationMessages = {
   }
 }
 
+/** @knipignore */
 export const navigationMessages: INavigationMessages =
   defineMessages(messagesToDefine)
