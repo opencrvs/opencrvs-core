@@ -145,6 +145,7 @@ describe('AdvancedSearchResult Bookmark', () => {
 
   beforeEach(async () => {
     ;({ store } = createStore())
+    await flushPromises()
 
     store.dispatch(
       setAdvancedSearchParam({
@@ -216,6 +217,8 @@ describe('AdvancedSearchResult Bookmark', () => {
   })
 
   it('should bookmark advanced search result & show notification if click on confirm button', async () => {
+    await flushPromises()
+
     component.find('#toggleIconEmpty').hostNodes().simulate('click')
     component.update()
     component
