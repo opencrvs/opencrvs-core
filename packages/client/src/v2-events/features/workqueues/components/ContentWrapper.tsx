@@ -24,9 +24,9 @@ import {
  */
 
 interface IContentWrapper {
+  children: React.ReactNode | React.ReactNode[]
   isMobileSize: boolean
   title: string
-  children: React.ReactNode | React.ReactNode[]
   tabBarContent?: React.ReactNode
   isShowPagination?: boolean
   paginationId?: number
@@ -65,12 +65,10 @@ function Body({
   error,
   isOnline,
   noContent,
-  children,
   noResultText
-}: IProps) {
+}: Omit<IProps, 'children'>) {
   return (
     <>
-      {children}
       <PaginationLoaderContainer isShowPagination={isShowPagination}>
         {noContent && !loading && (
           <NoResultText id="no-record">{noResultText}</NoResultText>
@@ -110,11 +108,13 @@ function WQContentWrapperComp({
           {tabBarContent && <TabBarContainer>{tabBarContent}</TabBarContainer>}
           <MobileChildrenContainer>
             <Body
+              error
               isMobileSize
-              showTitleOnMobile
-              tabBarContent
-              title
-              topActionButtons
+              isOnline
+              isShowPagination
+              loading
+              noContent
+              title={title}
             />
           </MobileChildrenContainer>
         </>
@@ -126,7 +126,15 @@ function WQContentWrapperComp({
           title={title}
           topActionButtons={topActionButtons}
         >
-          <Body {...props} />
+          <Body
+            error
+            isMobileSize
+            isOnline
+            isShowPagination
+            loading
+            noContent
+            title={title}
+          />
         </Content>
       )}
     </>
