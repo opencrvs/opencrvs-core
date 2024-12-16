@@ -128,11 +128,16 @@ describe('when user starts a new declaration', () => {
           })
         )
 
+        app.update()
+        await flushPromises()
+
         await goToChildSection(app)
       })
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
+          await flushPromises()
+
           app
             .find('#firstNamesEng')
             .hostNodes()
@@ -207,9 +212,11 @@ describe('when user starts a new declaration', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
+            await flushPromises()
             await goToDocumentsSection(app)
           })
           it('renders list of document upload field', async () => {
+            await flushPromises()
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
@@ -278,6 +285,7 @@ describe('when user starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
+          await flushPromises()
           await goToSection(app, 5)
           app
             .find('#btn_change_child_familyNameEng')
@@ -285,6 +293,7 @@ describe('when user starts a new declaration', () => {
             .first()
             .simulate('click')
         })
+
         it('renders preview page', async () => {
           const button = await waitForElement(app, '#back-to-review-button')
 
