@@ -212,9 +212,11 @@ describe('when user starts a new declaration', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
+            await flushPromises()
             await goToDocumentsSection(app)
           })
           it('renders list of document upload field', async () => {
+            await flushPromises()
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
@@ -283,6 +285,7 @@ describe('when user starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
+          await flushPromises()
           await goToSection(app, 5)
           app
             .find('#btn_change_child_familyNameEng')
@@ -302,6 +305,7 @@ describe('when user starts a new declaration', () => {
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
+
         it('should go to input field when user press change button to edit information', async () => {
           const backToReviewButton = await waitForElement(
             app,
@@ -327,9 +331,11 @@ describe('when user starts a new declaration', () => {
       })
       describe('when user clicks the "mother" page', () => {
         beforeEach(() => goToMotherSection(app))
+
         it('changes to the mother details section', () => {
           expect(router.state.location.pathname).toContain('mother')
         })
+
         it('hides everything with pinpad if is page loses focus', async () => {
           setPageVisibility(false)
           await waitForElement(app, '#unlockPage')
