@@ -18,7 +18,7 @@ export const SummaryConfig = z
       .array(
         z.object({
           id: z.string().describe('Id of a field defined under form.'),
-          label: TranslationConfig
+          label: TranslationConfig.optional()
         })
       )
       .describe('Fields to be rendered under in summary.')
@@ -26,19 +26,4 @@ export const SummaryConfig = z
   .describe('Configuration for summary in event.')
 
 export type SummaryConfig = z.infer<typeof SummaryConfig>
-
-export const SummaryConfigInput = z
-  .object({
-    title: TranslationConfig.describe('Header title of summary'),
-    fields: z
-      .array(
-        z.object({
-          id: z.string().describe('Id of a field defined under form pages.'),
-          label: TranslationConfig.optional()
-        })
-      )
-      .describe('Fields to be rendered under summary.')
-  })
-  .describe('Input format for summary used in defineConfig')
-
-export type SummaryConfigInput = z.infer<typeof SummaryConfigInput>
+export type SummaryConfigInput = z.input<typeof SummaryConfig>

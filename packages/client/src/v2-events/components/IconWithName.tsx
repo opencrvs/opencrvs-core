@@ -31,7 +31,7 @@ interface IIconWith {
   isArchived?: boolean
 }
 
-export const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
+const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',

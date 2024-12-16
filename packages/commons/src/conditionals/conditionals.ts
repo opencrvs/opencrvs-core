@@ -10,10 +10,27 @@
  */
 
 import { JSONSchemaType } from 'ajv'
+import { z } from 'zod'
 import { EventDocument } from '../events'
 
-export type ConditionalData = {
-  $form?: Record<string, any>
-  $event: EventDocument
+export function Conditional() {
+  return z.any() as z.ZodType<JSONSchema>
 }
-export type JSONSchema = Omit<JSONSchemaType<ConditionalData>, 'properties'>
+
+export type ConditionalParameters = { $now: string } & (
+  | {
+      $event: EventDocument
+    }
+  | {
+      $event: EventDocument
+      $form: Record<string, any>
+    }
+  | {
+      $form: Record<string, any>
+    }
+)
+
+export type JSONSchema = Omit<
+  JSONSchemaType<ConditionalParameters>,
+  'properties'
+>

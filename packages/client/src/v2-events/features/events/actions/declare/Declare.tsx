@@ -9,20 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IFormField } from '@client/forms'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 
+import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
+import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
+import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
+import { ROUTES } from '@client/v2-events/routes'
 import { FormWizard, Frame, Spinner } from '@opencrvs/components'
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
-import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
-import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
-import { ROUTES } from '@client/v2-events/routes'
-import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 export function DeclareIndex() {
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
@@ -118,20 +117,6 @@ function Declare() {
 
   const page = pages[currentPage]
 
-  const fields = !page
-    ? []
-    : page.fields.map(
-        (field) =>
-          ({
-            name: field.id,
-            type: field.type,
-            required: true,
-            validator: [],
-            label: field.label,
-            initialValue: ''
-          } as IFormField)
-      )
-
   return (
     <Frame
       skipToContentText="Skip to form"
@@ -157,7 +142,7 @@ function Declare() {
           }}
           initialValues={formValues}
           formData={formValues}
-          fields={fields}
+          fields={page.fields}
         />
       </FormWizard>
     </Frame>

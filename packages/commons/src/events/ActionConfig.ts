@@ -9,17 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import { Conditional } from '../conditionals/conditionals'
 import { FormConfig } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { JSONSchema } from '../conditionals/conditionals'
-
-function typedZodAny<T>() {
-  return z.any() as z.ZodType<T>
-}
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
-  allowedWhen: typedZodAny<JSONSchema>().optional(),
+  allowedWhen: Conditional().optional(),
   forms: z.array(FormConfig)
 })
 
