@@ -268,11 +268,10 @@ function Workqueue({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
-
   return (
     <WQContentWrapper
       error={false}
-      isMobileSize={width < theme.grid.breakpoints.lg ? true : false}
+      isMobileSize={width < theme.grid.breakpoints.lg}
       isShowPagination={isShowPagination}
       loading={false} // @TODO: Handle these on top level
       noContent={workqueue.length === 0}

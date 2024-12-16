@@ -23,11 +23,7 @@ import {
  * Based on packages/client/src/views/OfficeHome/WQContentWrapper.tsx
  */
 
-interface IContentWrapper {
-  children: React.ReactNode | React.ReactNode[]
-  isMobileSize: boolean
-  title: string
-  tabBarContent?: React.ReactNode
+interface BodyProps {
   isShowPagination?: boolean
   paginationId?: number
   totalPages?: number
@@ -36,6 +32,14 @@ interface IContentWrapper {
   noContent?: boolean
   loading?: boolean
   error?: boolean
+  children: React.ReactNode | React.ReactNode[]
+}
+
+interface IContentWrapper extends BodyProps {
+  isMobileSize: boolean
+  title: string
+  tabBarContent?: React.ReactNode
+
   topActionButtons?: React.ReactElement[]
   showTitleOnMobile?: boolean
 }
@@ -65,10 +69,12 @@ function Body({
   error,
   isOnline,
   noContent,
-  noResultText
-}: Omit<IProps, 'children'>) {
+  noResultText,
+  children
+}: IProps) {
   return (
     <>
+      {children}
       <PaginationLoaderContainer isShowPagination={isShowPagination}>
         {noContent && !loading && (
           <NoResultText id="no-record">{noResultText}</NoResultText>
@@ -99,7 +105,17 @@ function WQContentWrapperComp({
   tabBarContent,
   title,
   topActionButtons,
-  showTitleOnMobile
+  showTitleOnMobile,
+  error,
+  loading,
+  noContent,
+  isShowPagination,
+  isOnline,
+  onPageChange,
+  paginationId,
+  totalPages,
+  noResultText,
+  children
 }: IProps) {
   return (
     <>
@@ -108,14 +124,20 @@ function WQContentWrapperComp({
           {tabBarContent && <TabBarContainer>{tabBarContent}</TabBarContainer>}
           <MobileChildrenContainer>
             <Body
-              error
-              isMobileSize
-              isOnline
-              isShowPagination
-              loading
-              noContent
+              error={error}
+              isMobileSize={isMobileSize}
+              isOnline={isOnline}
+              isShowPagination={isShowPagination}
+              loading={loading}
+              noContent={noContent}
+              noResultText={noResultText}
+              paginationId={paginationId}
               title={title}
-            />
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            >
+              {children}
+            </Body>
           </MobileChildrenContainer>
         </>
       ) : (
@@ -127,14 +149,20 @@ function WQContentWrapperComp({
           topActionButtons={topActionButtons}
         >
           <Body
-            error
-            isMobileSize
-            isOnline
-            isShowPagination
-            loading
-            noContent
+            error={error}
+            isMobileSize={isMobileSize}
+            isOnline={isOnline}
+            isShowPagination={isShowPagination}
+            loading={loading}
+            noContent={noContent}
+            noResultText={noResultText}
+            paginationId={paginationId}
             title={title}
-          />
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          >
+            {children}
+          </Body>
         </Content>
       )}
     </>
