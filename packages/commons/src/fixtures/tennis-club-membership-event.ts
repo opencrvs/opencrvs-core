@@ -104,6 +104,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   id: 'applicant.firstname',
                   type: 'TEXT',
                   required: true,
+                  conditionals: [],
                   label: {
                     defaultMessage: "Applicant's first name",
                     description: 'This is the label for the field',
@@ -114,6 +115,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   id: 'applicant.surname',
                   type: 'TEXT',
                   required: true,
+                  conditionals: [],
                   label: {
                     defaultMessage: "Applicant's surname",
                     description: 'This is the label for the field',
@@ -124,6 +126,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   id: 'applicant.dob',
                   type: 'DATE',
                   required: true,
+                  conditionals: [],
                   label: {
                     defaultMessage: "Applicant's date of birth",
                     description: 'This is the label for the field',
@@ -144,6 +147,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   id: 'recommender.firstname',
                   type: 'TEXT',
                   required: true,
+                  conditionals: [],
                   label: {
                     defaultMessage: "Recommender's first name",
                     description: 'This is the label for the field',
@@ -154,6 +158,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   id: 'recommender.surname',
                   type: 'TEXT',
                   required: true,
+                  conditionals: [],
                   label: {
                     defaultMessage: "Recommender's surname",
                     description: 'This is the label for the field',
@@ -164,6 +169,7 @@ export const tennisClubMembershipEvent = defineConfig({
                   id: 'recommender.id',
                   type: 'TEXT',
                   required: true,
+                  conditionals: [],
                   label: {
                     defaultMessage: "Recommender's membership ID",
                     description: 'This is the label for the field',

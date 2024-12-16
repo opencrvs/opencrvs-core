@@ -10,10 +10,16 @@
  */
 
 import Ajv from 'ajv'
-import { ConditionalData, JSONSchema } from './conditionals'
+import { ConditionalParameters, JSONSchema } from './conditionals'
+import addFormats from 'ajv-formats'
 
-const ajv = new Ajv()
+const ajv = new Ajv({
+  $data: true
+})
 
-export function validate(schema: JSONSchema, data: ConditionalData) {
+// https://ajv.js.org/packages/ajv-formats.html
+addFormats(ajv)
+
+export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
 }

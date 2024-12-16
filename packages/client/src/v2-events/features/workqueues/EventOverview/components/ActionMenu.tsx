@@ -13,7 +13,6 @@ import React from 'react'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
-import { Icon } from '@opencrvs/components'
 import { useIntl } from 'react-intl'
 
 import { messages } from '@client/i18n/messages/views/action'
@@ -42,7 +41,8 @@ export const ActionMenu = ({ eventId }: { eventId: string }) => {
     }
     const params = {
       $event: event,
-      $user: authentication
+      $user: authentication,
+      $now: new Date().toISOString().split('T')[0]
     }
 
     return validate(action.allowedWhen, params)
