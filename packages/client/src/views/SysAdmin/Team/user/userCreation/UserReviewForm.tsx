@@ -232,7 +232,6 @@ const UserReviewFormComponent = ({
                               generateCreateUserSectionUrl({
                                 sectionId: userFormSection.id,
                                 groupId: group.id,
-                                // @TODO: check if this is the one?
                                 userFormFieldNameHash: field.name
                               })
                             )

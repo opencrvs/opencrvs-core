@@ -220,11 +220,14 @@ describe('when user starts a new declaration', () => {
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
             await flushPromises()
+            app.update()
+            await flushPromises()
+
             const fileInputs = app
-              .update()
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
+
             expect(fileInputs).toEqual(5)
           })
           it('No error while uploading valid file', async () => {

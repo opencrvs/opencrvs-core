@@ -260,6 +260,7 @@ describe('AdvancedSearchResult Bookmark', () => {
 
     await flushPromises()
     component.update()
+    await flushPromises()
     expect(
       component.find('#success-save-bookmark-notification').hostNodes()
     ).toHaveLength(1)
