@@ -28,7 +28,7 @@ module.exports = {
     '@typescript-eslint/require-await': 2,
     '@typescript-eslint/return-await': 2,
     '@typescript-eslint/switch-exhaustiveness-check': 2,
-    'func-style': ['error', 'expression'],
+    'func-style': ['error', 'declaration'],
     'no-shadow': 1,
     'no-undef-init': 2,
     'no-return-assign': 2,
