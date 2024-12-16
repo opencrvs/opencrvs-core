@@ -15,7 +15,7 @@ import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { flattenDeep } from 'lodash'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { eventMetadataLabelMap } from './EventMetadata'
-import { FormConfig } from './FormConfig'
+import { FormConfig, FormConfigInput } from './FormConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -35,6 +35,7 @@ export const EventConfig = z.object({
 })
 
 export type EventConfig = z.infer<typeof EventConfig>
+export type EventConfigInput = z.input<typeof EventConfig>
 
 const findPageFields = (
   config: Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput }
@@ -90,20 +91,8 @@ const fillFieldLabels = ({
  * Builds a validated configuration for an event
  * @param config - Event specific configuration
  */
-export const defineConfig = (
-  config:
-    | EventConfig
-    | (Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput }),
-  options = {
-    validate: true
-  }
-) => {
-  if (!options.validate) {
-    return config
-  }
-  const parsed = EventConfig.extend({
-    summary: SummaryConfigInput
-  }).parse(config)
+export const defineConfig = (config: EventConfigInput) => {
+  const parsed = EventConfig.parse(config)
 
   const pageFields = findPageFields(parsed)
 
@@ -126,4 +115,5 @@ export const defineConfig = (
   })
 }
 
-export const defineForm = (form: FormConfig): FormConfig => form
+export const defineForm = (form: FormConfigInput): FormConfig =>
+  FormConfig.parse(form)

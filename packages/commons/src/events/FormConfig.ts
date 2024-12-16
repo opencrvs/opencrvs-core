@@ -41,3 +41,4 @@ export const FormConfig = z.object({
 
 export type FormPage = z.infer<typeof FormPage>
 export type FormConfig = z.infer<typeof FormConfig>
+export type FormConfigInput = z.input<typeof FormConfig>
