@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { push } from 'connected-react-router'
 
 import React from 'react'
 
@@ -30,10 +29,10 @@ import {
 } from '@opencrvs/components'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
-import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 export const Workqueues = () => {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   return (
     <Frame
@@ -92,7 +91,7 @@ export const Workqueues = () => {
               <Button
                 type="iconPrimary"
                 onClick={() => {
-                  dispatch(push(V2_EVENTS_ROUTE))
+                  navigate(V2_EVENTS_ROUTE)
                 }}
               >
                 <Plus />
