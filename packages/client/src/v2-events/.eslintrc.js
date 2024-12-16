@@ -15,7 +15,7 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': 1,
     '@typescript-eslint/default-param-last': 2,
     '@typescript-eslint/no-dynamic-delete': 2,
-    '@typescript-eslint/no-explicit-any': 2,
+    '@typescript-eslint/no-explicit-any': 1,
     '@typescript-eslint/no-floating-promises': 2,
     '@typescript-eslint/no-misused-promises': 2,
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': 2,
@@ -40,12 +40,30 @@ module.exports = {
     'no-multiple-empty-lines': 1,
     'prefer-const': 1,
     'block-scoped-var': 1,
-    'import/order': 1,
+    'import/order': [
+      'error',
+      {
+        pathGroups: [
+          {
+            pattern: '@opencrvs/**',
+            group: 'external',
+            position: 'after'
+          },
+          {
+            pattern: '@client/**',
+            group: 'external',
+            position: 'after'
+          }
+        ],
+        pathGroupsExcludedImportTypes: ['builtin']
+      }
+    ],
     'import/no-cycle': 1,
-    'max-lines': ['warn', 400],
+    'max-lines': ['warn', 600],
     'react/jsx-sort-props': [
       1,
       {
+        reservedFirst: true,
         callbacksLast: true,
         shorthandFirst: true
       }

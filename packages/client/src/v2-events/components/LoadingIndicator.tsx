@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
+import { ConnectionError } from '@opencrvs/components/lib/icons'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { errorMessages, constantsMessages } from '@client/v2-events/messages'
 import { useOnlineStatus } from '@client/utils'
 
@@ -66,7 +66,7 @@ const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
   }
 `
 
-type IBaseLoadingProps = {
+interface IBaseLoadingProps {
   loading: boolean
   hasError?: boolean
   noDeclaration?: boolean
@@ -74,36 +74,38 @@ type IBaseLoadingProps = {
 
 type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
-const LoadingIndicatorComp = ({
+function LoadingIndicatorComp({
   loading,
   noDeclaration,
   hasError,
   intl,
   isOnline
-}: IProps) => (
-  <Wrapper>
-    {isOnline && loading && (
-      <LoadingContainer>
-        <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
-      </LoadingContainer>
-    )}
-    <MobileViewContainer noDeclaration={noDeclaration}>
-      {isOnline && hasError && (
-        <ErrorText id="search-result-error-text-count">
-          {intl.formatMessage(errorMessages.queryError)}
-        </ErrorText>
+}: IProps) {
+  return (
+    <Wrapper>
+      {isOnline && loading && (
+        <LoadingContainer>
+          <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
+        </LoadingContainer>
       )}
-      {!isOnline && (
-        <ConnectivityContainer>
-          <NoConnectivity />
-          <Text id="wait-connection-text">
-            {intl.formatMessage(constantsMessages.noConnection)}
-          </Text>
-        </ConnectivityContainer>
-      )}
-    </MobileViewContainer>
-  </Wrapper>
-)
+      <MobileViewContainer noDeclaration={noDeclaration}>
+        {isOnline && hasError && (
+          <ErrorText id="search-result-error-text-count">
+            {intl.formatMessage(errorMessages.queryError)}
+          </ErrorText>
+        )}
+        {!isOnline && (
+          <ConnectivityContainer>
+            <NoConnectivity />
+            <Text id="wait-connection-text">
+              {intl.formatMessage(constantsMessages.noConnection)}
+            </Text>
+          </ConnectivityContainer>
+        )}
+      </MobileViewContainer>
+    </Wrapper>
+  )
+}
 
 export function withOnlineStatus<T>(
   WrappedComponent: React.ComponentType<T & IOnlineStatusProps>
@@ -114,7 +116,7 @@ export function withOnlineStatus<T>(
   }
 }
 
-export type IOnlineStatusProps = {
+export interface IOnlineStatusProps {
   isOnline: boolean
 }
 

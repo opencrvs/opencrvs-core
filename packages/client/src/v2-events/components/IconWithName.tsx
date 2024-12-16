@@ -10,8 +10,8 @@
  */
 
 import * as React from 'react'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 
 const Flex = styled.div`
   display: flex;
@@ -57,7 +57,7 @@ const Icon = styled.div`
   width: 24px;
 `
 
-const IconComp = ({
+function IconComp({
   status,
   isValidatedOnReview,
   isArchived
@@ -65,31 +65,31 @@ const IconComp = ({
   status: string
   isValidatedOnReview?: boolean
   isArchived?: boolean
-}) => {
+}) {
   return (
     <Icon>
       <DeclarationIcon
         color={STATUS_TO_COLOR_MAP[status]}
-        isValidatedOnReview={isValidatedOnReview}
         isArchive={isArchived}
+        isValidatedOnReview={isValidatedOnReview}
       />
     </Icon>
   )
 }
 
-export const IconWithName = ({
+export function IconWithName({
   status,
   name,
   isValidatedOnReview,
   isArchived
-}: IIconWith) => {
+}: IIconWith) {
   return (
     <Flex id="flex">
       {status && (
         <IconComp
-          status={status}
-          isValidatedOnReview={isValidatedOnReview}
           isArchived={isArchived}
+          isValidatedOnReview={isValidatedOnReview}
+          status={status}
         />
       )}
       {name}

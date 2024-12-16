@@ -8,33 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { InputField } from '@client/components/form/InputField'
-import {
-  DATE,
-  HIDDEN,
-  IFormFieldValue,
-  IFormSectionData,
-  PARAGRAPH,
-  TEXT
-} from '@client/forms'
-import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
-import { DateField } from '@opencrvs/components/lib/DateField'
-import { Text } from '@opencrvs/components/lib/Text'
-import { TextInput } from '@opencrvs/components/lib/TextInput'
+/* eslint-disable */
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import {
-  evalExpressionInFieldDefinition,
-  flatten,
-  getConditionalActionsForField,
-  getDependentFields,
-  handleInitialValue,
-  hasInitialValueDependencyInfo,
-  unflatten
-} from './utils'
-import { Errors, getValidationErrorsForForm } from './validation'
 
-import { FieldConfig } from '@opencrvs/commons'
 import {
   Field,
   FieldProps,
@@ -49,6 +26,30 @@ import {
   MessageDescriptor,
   useIntl
 } from 'react-intl'
+import { FieldConfig } from '@opencrvs/commons'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { Text } from '@opencrvs/components/lib/Text'
+import { DateField } from '@opencrvs/components/lib/DateField'
+import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
+import {
+  DATE,
+  HIDDEN,
+  IFormFieldValue,
+  IFormSectionData,
+  PARAGRAPH,
+  TEXT
+} from '@client/forms'
+import { InputField } from '@client/components/form/InputField'
+import {
+  evalExpressionInFieldDefinition,
+  flatten,
+  getConditionalActionsForField,
+  getDependentFields,
+  handleInitialValue,
+  hasInitialValueDependencyInfo,
+  unflatten
+} from './utils'
+import { Errors, getValidationErrorsForForm } from './validation'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -63,7 +64,7 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-type GeneratedInputFieldProps = {
+interface GeneratedInputFieldProps {
   fieldDefinition: FieldConfig
   fields: FieldConfig[]
   values: IFormSectionData
@@ -137,8 +138,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InputField {...inputFieldProps}>
           <DateField
             {...inputProps}
-            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
             value={value as string}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
           />
         </InputField>
       )
@@ -157,8 +158,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       return (
         <Text
-          variant={fieldDefinition.options.fontVariant ?? 'reg16'}
           element="p"
+          variant={fieldDefinition.options.fontVariant ?? 'reg16'}
         >
           <span dangerouslySetInnerHTML={{ __html: message }} />
         </Text>
@@ -182,9 +183,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           <TextInput
             type="text"
             {...inputProps}
-            value={inputProps.value as string}
-            maxLength={fieldDefinition.options?.maxLength}
             isDisabled={disabled}
+            maxLength={fieldDefinition.options?.maxLength}
+            value={inputProps.value as string}
           />
         </InputField>
       )
@@ -205,7 +206,7 @@ const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
 
-type ExposedProps = {
+interface ExposedProps {
   fields: FieldConfig[]
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
@@ -363,18 +364,18 @@ class FormSectionComponent extends React.Component<AllProps> {
                   return (
                     <GeneratedInputField
                       fieldDefinition={field}
-                      setFieldValue={this.setFieldValuesWithDependency}
-                      setFieldTouched={setFieldTouched}
                       resetDependentSelectValues={
                         this.resetDependentSelectValues
                       }
+                      setFieldTouched={setFieldTouched}
+                      setFieldValue={this.setFieldValuesWithDependency}
                       {...formikFieldProps.field}
-                      touched={flatten(touched)[field.id] || false}
-                      error={isFieldDisabled ? '' : error}
-                      formData={formData}
-                      fields={fields}
-                      values={values}
                       disabled={isFieldDisabled}
+                      error={isFieldDisabled ? '' : error}
+                      fields={fields}
+                      formData={formData}
+                      touched={flatten(touched)[field.id] || false}
+                      values={values}
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged
                       }
@@ -406,7 +407,6 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   return (
     <Formik<IFormSectionData>
       initialValues={initialValues}
-      onSubmit={() => {}}
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
@@ -414,14 +414,15 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
           props.requiredErrorMessage
         )
       }
+      onSubmit={() => {}}
     >
       {(formikProps) => {
         return (
           <FormSectionComponent
             {...props}
             {...formikProps}
-            intl={intl}
             formData={nestedFormData}
+            intl={intl}
             onChange={onChange}
           />
         )

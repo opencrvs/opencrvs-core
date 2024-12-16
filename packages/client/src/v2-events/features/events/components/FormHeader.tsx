@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { AppBar, Button, Icon } from '@opencrvs/components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
-import type { TranslationConfig } from '@opencrvs/commons/events'
-import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { v4 as uuid } from 'uuid'
+import type { TranslationConfig } from '@opencrvs/commons/events'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { AppBar, Button, Icon } from '@opencrvs/components'
+import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
+import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 
 function getDeclarationIconColor(): string {
   return 'purple'
@@ -42,7 +42,7 @@ const messages = defineMessages({
   }
 })
 
-export const FormHeader = ({ label }: { label: TranslationConfig }) => {
+export function FormHeader({ label }: { label: TranslationConfig }) {
   const intl = useIntl()
   const { modal, exit, goToHome } = useEventFormNavigation()
   const events = useEvents()
@@ -62,58 +62,58 @@ export const FormHeader = ({ label }: { label: TranslationConfig }) => {
     goToHome()
   }, [createDraft, eventId, formValues, goToHome])
 
-  const onExit = useCallback(() => {
-    exit()
+  const onExit = useCallback(async () => {
+    await exit()
   }, [exit])
 
   return (
     <AppBar
       desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
       desktopRight={
         <>
           {
             <Button
-              id="save-exit-btn"
-              type="primary"
-              size="small"
               disabled={false}
+              id="save-exit-btn"
+              size="small"
+              type="primary"
               onClick={saveAndExit}
             >
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
             </Button>
           }
-          <Button type="secondary" size="small" onClick={onExit}>
+          <Button size="small" type="secondary" onClick={onExit}>
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
           </Button>
           {modal}
         </>
       }
-      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
         event: intl.formatMessage(label)
       })}
+      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
       mobileRight={
         <>
           {
             <Button
-              type="icon"
-              size="small"
               disabled={false}
+              size="small"
+              type="icon"
               onClick={saveAndExit}
             >
               <Icon name="DownloadSimple" />
             </Button>
           }
-          <Button type="icon" size="small" onClick={onExit}>
+          <Button size="small" type="icon" onClick={onExit}>
             <Icon name="X" />
           </Button>
         </>
       }
+      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
+        event: intl.formatMessage(label)
+      })}
     />
   )
 }

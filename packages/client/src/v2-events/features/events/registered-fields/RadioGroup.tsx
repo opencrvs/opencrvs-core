@@ -16,17 +16,17 @@ import {
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
 
-export const RadioGroup = ({ id, options }: FieldProps<'RADIO_GROUP'>) => {
+export function RadioGroup({ id, options }: FieldProps<'RADIO_GROUP'>) {
   const { setValue, watch } = useFormContext()
   const value = watch(id)
 
   return (
     <InputField id={id} touched={false}>
       <RadioGroupComponent
-        options={options}
         name={id}
-        onChange={(val) => setValue(id, val)}
+        options={options}
         value={value}
+        onChange={(val) => setValue(id, val)}
       />
     </InputField>
   )

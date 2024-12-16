@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import styled from 'styled-components'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
@@ -56,24 +56,24 @@ const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
   height: auto;
 `
 
-const Body = (props: IProps) => {
-  const {
-    isShowPagination,
-    paginationId,
-    totalPages,
-    onPageChange,
-    loading,
-    error,
-    isOnline,
-    noContent
-  } = props
-
+function Body({
+  isShowPagination,
+  paginationId,
+  totalPages,
+  onPageChange,
+  loading,
+  error,
+  isOnline,
+  noContent,
+  children,
+  noResultText
+}: IProps) {
   return (
     <>
-      {props.children}
+      {children}
       <PaginationLoaderContainer isShowPagination={isShowPagination}>
         {noContent && !loading && (
-          <NoResultText id="no-record">{props.noResultText}</NoResultText>
+          <NoResultText id="no-record">{noResultText}</NoResultText>
         )}
         {isShowPagination &&
           !!paginationId &&
@@ -87,8 +87,8 @@ const Body = (props: IProps) => {
             />
           )}
         <LoadingIndicator
-          loading={!!loading}
           hasError={!!error}
+          loading={!!loading}
           noDeclaration={noContent}
         />
       </PaginationLoaderContainer>
@@ -96,25 +96,35 @@ const Body = (props: IProps) => {
   )
 }
 
-const WQContentWrapperComp = (props: IProps) => {
+function WQContentWrapperComp({
+  isMobileSize,
+  tabBarContent,
+  title,
+  topActionButtons,
+  showTitleOnMobile
+}: IProps) {
   return (
     <>
-      {props.isMobileSize ? (
+      {isMobileSize ? (
         <>
-          {props.tabBarContent && (
-            <TabBarContainer>{props.tabBarContent}</TabBarContainer>
-          )}
+          {tabBarContent && <TabBarContainer>{tabBarContent}</TabBarContainer>}
           <MobileChildrenContainer>
-            <Body {...props} />
+            <Body
+              isMobileSize
+              showTitleOnMobile
+              tabBarContent
+              title
+              topActionButtons
+            />
           </MobileChildrenContainer>
         </>
       ) : (
         <Content
-          title={props.title}
+          showTitleOnMobile={showTitleOnMobile}
           size={ContentSize.LARGE}
-          tabBarContent={props.tabBarContent}
-          topActionButtons={props.topActionButtons}
-          showTitleOnMobile={props.showTitleOnMobile}
+          tabBarContent={tabBarContent}
+          title={title}
+          topActionButtons={topActionButtons}
         >
           <Body {...props} />
         </Content>

@@ -9,27 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ROUTES } from '@client/v2-events/routes'
-
-import { EventSummary } from './components/EventSummary'
-import { EventHistory } from './components/EventHistory'
-
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useSelector } from 'react-redux'
 import {
   ActionDocument,
   EventIndex,
   SummaryConfig
 } from '@opencrvs/commons/client'
-import { useSelector } from 'react-redux'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { ROUTES } from '@client/v2-events/routes'
+
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 // eslint-disable-next-line no-restricted-imports
 import { getUserDetails } from '@client/profile/profileSelectors'
 // eslint-disable-next-line no-restricted-imports
 import { ProfileState } from '@client/profile/profileReducer'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { EventHistory } from './components/EventHistory'
+import { EventSummary } from './components/EventSummary'
 
 import { ActionMenu } from './components/ActionMenu'
 
@@ -37,18 +36,20 @@ import { ActionMenu } from './components/ActionMenu'
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
  */
 
-export const EventOverviewIndex = () => {
+export function EventOverviewIndex() {
   const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
   const { getEvents, getEventById } = useEvents()
   const user = useSelector(getUserDetails)
 
+  // @TODO: double check whether this indeed returns always non falsy value
   const [config] = useEventConfigurations()
 
   const { data: fullEvent } = getEventById.useQuery(params.eventId)
 
   const { data: events } = getEvents.useQuery()
-  const event = events?.find((event) => event.id === params.eventId)
+  const event = events?.find((e) => e.id === params.eventId)
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!event || !config || !fullEvent?.actions) {
     return null
   }
@@ -56,8 +57,8 @@ export const EventOverviewIndex = () => {
   return (
     <EventOverview
       event={event}
-      summary={config.summary}
       history={fullEvent.actions}
+      summary={config.summary}
       user={user}
     />
   )
@@ -81,11 +82,11 @@ function EventOverview({
 
   return (
     <Content
+      icon={() => <IconWithName name={''} status={'orange'} />}
+      size={ContentSize.LARGE}
       title={intl.formatMessage(summary.title, event.data)}
       titleColor={event.id ? 'copy' : 'grey600'}
-      size={ContentSize.LARGE}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
-      icon={() => <IconWithName status={'orange'} name={''} />}
     >
       <EventSummary event={event} summary={summary} />
       <EventHistory history={history} user={user} />
