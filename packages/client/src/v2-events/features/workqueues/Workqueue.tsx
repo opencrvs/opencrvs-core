@@ -20,7 +20,8 @@ import ReactTooltip from 'react-tooltip'
 import { WorkqueueConfig } from '@opencrvs/commons'
 import { messages } from '@client/v2-events/messages'
 import styled, { useTheme } from 'styled-components'
-import orderBy from 'lodash-es/orderBy'
+import { orderBy, mapKeys, get } from 'lodash'
+
 import { WQContentWrapper } from './components/ContentWrapper'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
@@ -28,8 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { Link } from 'react-router-dom'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import mapKeys from 'lodash-es/mapKeys'
-import get from 'lodash-es/get'
+
 import { EventIndex, getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
@@ -127,11 +127,11 @@ export const Workqueue = ({
   const workqueue = events
     .filter((event) => statuses.length === 0 || statuses.includes(event.status))
     .map((event) =>
-      mapKeys(event, (value, key) => (key === 'data' ? key : `${key}`))
+      mapKeys(event, (_, key) => (key === 'data' ? key : `${key}`))
     )
     .map((event) => {
       const { data, ...rest } = event
-      return { ...rest, ...mapKeys(data as any, (value, key) => `${key}`) }
+      return { ...rest, ...mapKeys(data as any, (_, key) => `${key}`) }
     })
     .map((event) => {
       const isInOutbox = outbox.find(

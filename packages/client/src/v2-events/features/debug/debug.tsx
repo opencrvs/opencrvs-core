@@ -36,8 +36,6 @@ export const Debug = () => {
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
-  const [eventId, setEventId] = useState('')
-
   const createEvents = () => {
     createMutation.mutate(
       {

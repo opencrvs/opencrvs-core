@@ -43,7 +43,7 @@ import {
   FormikTouched,
   FormikValues
 } from 'formik'
-import { cloneDeep, has, isEqual, set } from 'lodash'
+import { cloneDeep, isEqual, set } from 'lodash'
 import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor,
@@ -282,7 +282,7 @@ class FormSectionComponent extends React.Component<AllProps> {
     this.props.setTouched(touched)
   }
 
-  handleBlur = (e: React.FocusEvent<any>) => {
+  handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     this.props.setFieldTouched(e.target.name)
   }
 
