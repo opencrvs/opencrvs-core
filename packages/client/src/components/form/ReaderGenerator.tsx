@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { ReaderType, Scan } from '../types'
-import { QRReader } from './QRReader/QRReader'
+import { ReaderType, Scan } from '@opencrvs/components/src/IDReader/types'
+import { QRReader } from '@opencrvs/components/src/IDReader/readers/QRReader/QRReader'
 
 interface ReaderGeneratorProps extends Scan {
   readers: ReaderType[]

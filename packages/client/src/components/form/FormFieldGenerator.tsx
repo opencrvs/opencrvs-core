@@ -94,7 +94,7 @@ import {
   Ii18nButtonFormField,
   REDIRECT,
   IDocumentUploaderWithOptionsFormField,
-  QR_SCANNER
+  ID_READER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -131,12 +131,18 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import { DateRangePickerForFormField } from '@client/components/DateRangePickerForFormField'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { UserDetails } from '@client/utils/userUtils'
-import { BulletList, Divider, InputLabel, Stack } from '@opencrvs/components'
+import {
+  BulletList,
+  Divider,
+  IDReader,
+  InputLabel,
+  Stack
+} from '@opencrvs/components'
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { RedirectField } from '@client/components/form/Redirect'
-import QRCodeScanner from './QRCodeScanner/QRCodeScanner'
+import { ReaderGenerator } from './ReaderGenerator'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -266,17 +272,19 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === QR_SCANNER) {
+    if (fieldDefinition.type === ID_READER) {
       return (
         <InputField {...inputFieldProps} hideInputHeader>
-          <QRCodeScanner
-            label={fieldDefinition.label}
-            fallbackErrorMessage="Video capture not allowed by the browser"
-            onScanSuccess={(data) => {
-              setFieldValue(fieldDefinition.name, JSON.parse(data))
-            }}
-            variant_Experimental={fieldDefinition.variant_Experimental}
-          />
+          <IDReader
+            dividerLabel="Or"
+            manualInputInstructionLabel="Complete fields below"
+          >
+            <ReaderGenerator
+              readers={fieldDefinition.readers}
+              onScan={(data) => setFieldValue(fieldDefinition.name, data)}
+              onError={(error) => console.error(error)}
+            />
+          </IDReader>
         </InputField>
       )
     }

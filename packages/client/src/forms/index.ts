@@ -38,6 +38,7 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
+import { ReaderType } from '@opencrvs/components/lib/IDReader/types'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -75,7 +76,7 @@ export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
 export const REDIRECT = 'REDIRECT'
-export const QR_SCANNER = 'QR_SCANNER'
+export const ID_READER = 'ID_READER'
 
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
@@ -735,9 +736,11 @@ export interface IRedirectFormField extends IFormFieldBase {
   }
 }
 
-export interface IQRScannerFormField extends IFormFieldBase {
-  type: typeof QR_SCANNER
-  variant_Experimental: number
+export interface IDReaderFormField extends IFormFieldBase {
+  type: typeof ID_READER
+  dividerLabel: MessageDescriptor
+  manualInputInstructionLabel: MessageDescriptor
+  readers: [ReaderType, ...ReaderType[]]
 }
 
 export type IFormField =
@@ -776,7 +779,7 @@ export type IFormField =
   | IHttpFormField
   | IButtonFormField
   | IRedirectFormField
-  | IQRScannerFormField
+  | IDReaderFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1244,9 +1247,11 @@ interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   }
 }
 
-interface Ii18nQRScannerFormField extends Ii18nFormFieldBase {
-  type: typeof QR_SCANNER
-  variant_Experimental: number
+export interface Ii18nIDReaderFormField extends Ii18nFormFieldBase {
+  type: typeof ID_READER
+  dividerLabel: string
+  manualInputInstructionLabel: string
+  readers: [ReaderType, ...ReaderType[]]
 }
 
 export type Ii18nFormField =
@@ -1283,7 +1288,7 @@ export type Ii18nFormField =
   | Ii18nHttpFormField
   | Ii18nButtonFormField
   | Ii18nRedirectFormField
-  | Ii18nQRScannerFormField
+  | Ii18nIDReaderFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

@@ -53,7 +53,10 @@ import {
   BUTTON,
   Ii18nButtonFormField,
   IRedirectFormField,
-  REDIRECT
+  REDIRECT,
+  IDReaderFormField,
+  ID_READER,
+  Ii18nIDReaderFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -197,6 +200,14 @@ export const internationaliseFieldObject = (
         field.loadingLabel
       )
     }
+  }
+
+  if (isFieldIDReader(field)) {
+    ;(base as Ii18nIDReaderFormField).dividerLabel = intl.formatMessage(
+      field.dividerLabel
+    )
+    ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
+      intl.formatMessage(field.manualInputInstructionLabel)
   }
 
   return base as Ii18nFormField
@@ -764,6 +775,10 @@ export function getSelectedOption(
 
 export function isFieldButton(field: IFormField): field is IButtonFormField {
   return field.type === BUTTON
+}
+
+export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
+  return field.type === ID_READER
 }
 
 export function isFieldHttp(field: IFormField): field is IHttpFormField {

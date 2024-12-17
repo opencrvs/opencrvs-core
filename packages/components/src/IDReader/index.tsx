@@ -14,26 +14,19 @@ import styled from 'styled-components'
 import { Stack } from '../Stack'
 import { Divider } from '../Divider'
 import { Text } from '../Text'
-import { ScannableIDReader } from './types'
-import { ReaderGenerator } from './readers/ReaderGenerator'
+import { IDReaderProps } from './types'
 
 const StyledBox = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
 `
 
-export const IDReader = (props: ScannableIDReader) => {
-  const {
-    dividerLabel,
-    manualInputInstructionLabel,
-    readers,
-    onScan,
-    onError
-  } = props
+export const IDReader = (props: IDReaderProps) => {
+  const { dividerLabel, manualInputInstructionLabel, children } = props
 
   return (
     <StyledBox>
       <Stack direction="column" alignItems="center" gap={0}>
-        <ReaderGenerator readers={readers} onScan={onScan} onError={onError} />
+        {children}
         <Divider>
           <Text variant="reg18" element="p" align="center" color="grey500">
             {dividerLabel}
