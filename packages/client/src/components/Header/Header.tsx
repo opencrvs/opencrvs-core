@@ -178,11 +178,10 @@ const HeaderComponent = (props: IFullProps) => {
             icon: () => <Icon name="UserPlus" size="medium" color="primary" />,
             handler: () => {
               if (locationId) {
-                router.navigate(formatUrl(routes.CREATE_USER, { locationId }))
-                return
+                router.navigate(
+                  formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                )
               }
-
-              router.navigate(routes.CREATE_USER)
             }
           }
         ]
@@ -208,11 +207,7 @@ const HeaderComponent = (props: IFullProps) => {
                 router.navigate(
                   formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
                 )
-
-                return
               }
-
-              router.navigate(routes.CREATE_USER)
             }
           }
         ]

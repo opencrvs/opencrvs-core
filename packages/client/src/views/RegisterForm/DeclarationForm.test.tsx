@@ -145,7 +145,12 @@ describe('when user starts a new declaration', () => {
               target: { id: 'firstNamesEng', value: 'hello' }
             })
 
+          app.update()
+          await flushPromises()
+
           app.find('#next_section').hostNodes().simulate('click')
+          app.update()
+
           await flushPromises()
         })
         it('redirect to home when pressed save and exit button', async () => {
