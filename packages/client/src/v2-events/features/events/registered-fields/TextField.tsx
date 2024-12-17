@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useIntl } from 'react-intl'
 import {
   get,
   InputField,
@@ -16,9 +17,8 @@ import {
   useFormContext
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
-import { useIntl } from 'react-intl'
 
-export const TextField = ({ id, label, required }: FieldProps<'TEXT'>) => {
+export function TextField({ id, label, required }: FieldProps<'TEXT'>) {
   const intl = useIntl()
   const {
     register,
@@ -29,10 +29,10 @@ export const TextField = ({ id, label, required }: FieldProps<'TEXT'>) => {
 
   return (
     <InputField
-      id={id}
-      touched={touched}
-      label={intl.formatMessage(label)}
       error={error}
+      id={id}
+      label={intl.formatMessage(label)}
+      touched={touched}
     >
       <TextInput
         type="text"

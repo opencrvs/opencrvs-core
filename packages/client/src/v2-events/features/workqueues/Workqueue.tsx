@@ -9,29 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import React, { useState } from 'react'
+import { useIntl } from 'react-intl'
+import ReactTooltip from 'react-tooltip'
+import styled, { useTheme } from 'styled-components'
+import { orderBy, mapKeys, get } from 'lodash'
+
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import { Link } from 'react-router-dom'
+
+import { EventIndex, getCurrentEventState } from '@opencrvs/commons/client'
+import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import { WorkqueueConfig } from '@opencrvs/commons'
 import {
   Workqueue as WorkqueueComponent,
   SORT_ORDER,
   ColumnContentAlignment
 } from '@opencrvs/components/lib/Workqueue'
-import React, { useState } from 'react'
-import { useIntl } from 'react-intl'
-import ReactTooltip from 'react-tooltip'
-import { WorkqueueConfig } from '@opencrvs/commons'
-import { messages } from '@client/v2-events/messages'
-import styled, { useTheme } from 'styled-components'
-import { orderBy, mapKeys, get } from 'lodash'
-
-import { WQContentWrapper } from './components/ContentWrapper'
-import { useWindowSize } from '@opencrvs/components/lib/hooks'
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
-import { ROUTES } from '@client/v2-events/routes'
-import { IconWithName } from '@client/v2-events/components/IconWithName'
-import { Link } from 'react-router-dom'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-
-import { EventIndex, getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { IconWithName } from '@client/v2-events/components/IconWithName'
+import { ROUTES } from '@client/v2-events/routes'
+import { messages } from '@client/v2-events/messages'
+import { WQContentWrapper } from './components/ContentWrapper'
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.
@@ -46,16 +46,16 @@ const NondecoratedLink = styled(Link)`
   text-decoration: none;
 `
 
-const changeSortedColumn = (
+function changeSortedColumn(
   columnName: string,
   presentSortedCol: string,
   presentSortOrder: SORT_ORDER
-) => {
+) {
   const initialSortOrder = SORT_ORDER.ASCENDING
   const isInitialSortOrder = presentSortOrder === initialSortOrder
   const isSameColumn = columnName === presentSortedCol
 
-  const toggle = () => {
+  function toggle() {
     if (isSameColumn) {
       return isInitialSortOrder ? SORT_ORDER.DESCENDING : SORT_ORDER.ASCENDING
     }
@@ -69,7 +69,7 @@ const changeSortedColumn = (
   }
 }
 
-export const WorkqueueIndex = () => {
+export function WorkqueueIndex() {
   const { getEvents, getOutbox } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
 
@@ -79,6 +79,7 @@ export const WorkqueueIndex = () => {
     config.workqueues.find((workqueue) => workqueue.id === searchParams.id) ??
     config.workqueues[0]
 
+  // eslint-disable-next-line
   if (!workqueueConfig) {
     return null
   }
@@ -93,8 +94,8 @@ export const WorkqueueIndex = () => {
 
   return (
     <Workqueue
-      events={eventsWithoutOutbox.concat(outbox)}
       config={workqueueConfig}
+      events={eventsWithoutOutbox.concat(outbox)}
       {...searchParams}
     />
   )
@@ -106,7 +107,7 @@ export const WorkqueueIndex = () => {
 
 type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
 
-const Workqueue = ({
+function Workqueue({
   events,
   config,
   limit,
@@ -116,7 +117,7 @@ const Workqueue = ({
   config: WorkqueueConfig
   limit: number
   offset: number
-}) => {
+}) {
   const intl = useIntl()
   const theme = useTheme()
   const { getOutbox } = useEvents()
@@ -131,15 +132,19 @@ const Workqueue = ({
     )
     .map((event) => {
       const { data, ...rest } = event
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { ...rest, ...mapKeys(data as any, (_, key) => `${key}`) }
     })
     .map((event) => {
-      const isInOutbox = outbox.find(
+      const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+
       return {
         ...event,
+        // eslint-disable-next-line
         createdAt: intl.formatDate(new Date(event.createdAt)),
+        // eslint-disable-next-line
         modifiedAt: intl.formatDate(new Date(event.modifiedAt)),
 
         status: intl.formatMessage(
@@ -154,7 +159,7 @@ const Workqueue = ({
         [config.fields[0].id]: isInOutbox ? (
           <IconWithName
             name={get(event, config.fields[0].id) ?? 'N/A'}
-            status={isInOutbox ? 'OUTBOX' : event.status}
+            status={'OUTBOX'}
           />
         ) : (
           <NondecoratedLink
@@ -175,7 +180,7 @@ const Workqueue = ({
   const [sortedCol, setSortedCol] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
 
-  const onColumnClick = (columnName: string) => {
+  function onColumnClick(columnName: string) {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
       sortedCol,
@@ -185,7 +190,7 @@ const Workqueue = ({
     setSortOrder(newSortOrder)
   }
 
-  const getDefaultColumns = (): Array<{
+  function getDefaultColumns(): Array<{
     label?: string
     width: number
     key: string
@@ -193,7 +198,7 @@ const Workqueue = ({
     isActionColumn?: boolean
     isSorted?: boolean
     alignment?: ColumnContentAlignment
-  }> => {
+  }> {
     return [
       {
         label: intl.formatMessage({
@@ -228,7 +233,7 @@ const Workqueue = ({
     ]
   }
   // @TODO: separate types for action button vs other columns
-  const getColumns = (): Array<{
+  function getColumns(): Array<{
     label?: string
     width: number
     key: string
@@ -236,9 +241,10 @@ const Workqueue = ({
     isActionColumn?: boolean
     isSorted?: boolean
     alignment?: ColumnContentAlignment
-  }> => {
+  }> {
     if (width > theme.grid.breakpoints.lg) {
       return config.fields.map((field, i) => ({
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         label: intl.formatMessage(field.label!),
         width: 35,
         key: field.id,
@@ -248,6 +254,7 @@ const Workqueue = ({
     } else {
       return config.fields
         .map((field, i) => ({
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           label: intl.formatMessage(field.label!),
           width: 35,
           key: field.id,
@@ -261,19 +268,17 @@ const Workqueue = ({
   const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
 
   const isShowPagination = totalPages >= 1
-
   return (
     <WQContentWrapper
-      title={intl.formatMessage(config.title)}
-      isMobileSize={width < theme.grid.breakpoints.lg ? true : false}
-      isShowPagination={isShowPagination}
-      paginationId={Math.round(offset / limit)}
-      totalPages={totalPages}
-      onPageChange={() => {}}
-      loading={false} // @TODO: Handle these on top level
       error={false}
-      noResultText={'No results'}
+      isMobileSize={width < theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      loading={false} // @TODO: Handle these on top level
       noContent={workqueue.length === 0}
+      noResultText={'No results'}
+      paginationId={Math.round(offset / limit)}
+      title={intl.formatMessage(config.title)}
+      totalPages={totalPages}
     >
       <ReactTooltip id="validateTooltip">
         <ToolTipContainer>
@@ -281,11 +286,11 @@ const Workqueue = ({
         </ToolTipContainer>
       </ReactTooltip>
       <WorkqueueComponent
-        content={orderBy(workqueue, sortedCol, sortOrder)}
         columns={getColumns().concat(getDefaultColumns())}
+        content={orderBy(workqueue, sortedCol, sortOrder)}
+        hideLastBorder={!isShowPagination}
         loading={false} // @TODO: Handle these on top level
         sortOrder={sortOrder}
-        hideLastBorder={!isShowPagination}
       />
     </WQContentWrapper>
   )

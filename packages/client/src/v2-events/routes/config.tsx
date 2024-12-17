@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import React from 'react'
+import { Outlet } from 'react-router-dom'
 import { DeclareIndex } from '@client/v2-events//features/events/actions/declare/Declare'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { Workqueues } from '@client/v2-events/features/workqueues'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import React from 'react'
-import { Outlet } from 'react-router-dom'
-import { ROUTES } from './routes'
 import { ReviewSection } from '@client/v2-events/features/events/actions/declare/Review'
 import { RegisterIndex } from '@client/v2-events/features/events/actions/register/Register'
+import { ROUTES } from './routes'
 
 /**
  * Configuration for the routes of the v2-events feature.
