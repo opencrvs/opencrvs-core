@@ -25,6 +25,7 @@ import {
   ViewType
 } from '@client/forms'
 import { formMessages } from '@client/i18n/messages'
+import { formatUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import * as profileSelectors from '@client/profile/profileSelectors'
@@ -36,6 +37,7 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch,
   resizeWindow,
+  TestComponentWithRouteMock,
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -55,7 +57,7 @@ import { createIntl } from 'react-intl'
 import { v4 as uuid } from 'uuid'
 import { Mock, SpyInstance, vi } from 'vitest'
 
-const { store, history } = createStore()
+const { store } = createStore()
 const mockHandler = vi.fn()
 
 const draft = createDeclaration(EventType.Birth)
@@ -117,9 +119,10 @@ describe('when in device of large viewport', () => {
   const intl = createIntl({ locale: 'en' })
 
   describe('when user is in the review page', () => {
-    let reviewSectionComponent: ReactWrapper<{}, {}>
+    let reviewSectionComponent: TestComponentWithRouteMock['component']
+    let reviewSectionRouter: TestComponentWithRouteMock['router']
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -129,9 +132,13 @@ describe('when in device of large viewport', () => {
           onChangeReviewForm={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        {
+          store,
+          initialEntries: [formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {})]
+        }
       )
       reviewSectionComponent = testComponent
+      reviewSectionRouter = router
       await waitForElement(reviewSectionComponent, '#review_header')
     })
 
@@ -169,7 +176,7 @@ describe('when in device of large viewport', () => {
           .simulate('click')
         reviewSectionComponent.update()
         await flushPromises()
-        expect(history.location.pathname).toContain('reviews')
+        expect(reviewSectionRouter.state.location.pathname).toContain('reviews')
       })
     })
 
@@ -236,7 +243,7 @@ describe('when in device of large viewport', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -245,7 +252,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -261,7 +268,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected death declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -270,7 +277,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -286,7 +293,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected marriage declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -295,7 +302,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -309,10 +316,12 @@ describe('when in device of large viewport', () => {
   })
 
   describe('when user is in the review page to validate birth declaration', () => {
-    let reviewSectionComponent: ReactWrapper<{}, {}>
+    let reviewSectionComponent: TestComponentWithRouteMock['component']
+    let reviewSectionRouter: TestComponentWithRouteMock['router']
+
     beforeEach(async () => {
       vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -321,9 +330,10 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
+      reviewSectionRouter = router
     })
 
     it('Should click the validator Declaration Button', async () => {
@@ -363,7 +373,7 @@ describe('when in device of large viewport', () => {
           .simulate('click')
         reviewSectionComponent.update()
         await flushPromises()
-        expect(history.location.pathname).toContain('reviews')
+        expect(reviewSectionRouter.state.location.pathname).toContain('reviews')
       })
     })
   })
@@ -471,7 +481,7 @@ describe('when in device of large viewport', () => {
 
       const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -480,7 +490,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -584,7 +594,7 @@ describe('when in device of large viewport', () => {
 
       const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -593,7 +603,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -734,7 +744,7 @@ describe('when in device of large viewport', () => {
 
       const simpleDraft = createReviewDeclaration(uuid(), data, EventType.Birth)
 
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <ReviewSection
           form={form}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -743,7 +753,7 @@ describe('when in device of large viewport', () => {
           submitClickEvent={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
       reviewSectionComponent = testComponent
     })
@@ -888,7 +898,7 @@ describe('when in device of small viewport', () => {
       DeclarationEvent.Birth
     )
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReviewSection
         form={form}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -898,7 +908,7 @@ describe('when in device of small viewport', () => {
         onChangeReviewForm={mockHandler}
         userDetails={userDetails}
       />,
-      { store, history }
+      { store }
     )
 
     reviewSectionComponent = testComponent

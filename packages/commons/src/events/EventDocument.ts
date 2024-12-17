@@ -9,6 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export type Noop = () => void
+import { z } from 'zod'
+import { ActionDocument } from './ActionDocument'
 
-export const noop: Noop = () => {}
+export const EventDocument = z.object({
+  id: z.string(),
+  type: z.string(),
+  transactionId: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  actions: z.array(ActionDocument)
+})
+
+export type EventDocument = z.infer<typeof EventDocument>

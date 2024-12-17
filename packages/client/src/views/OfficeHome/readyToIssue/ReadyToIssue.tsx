@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  goToDeclarationRecordAudit,
-  goToIssueCertificate
-} from '@client/navigation'
+import { formatUrl, generateIssueCertificateUrl } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
 import {
   ColumnContentAlignment,
@@ -57,6 +54,8 @@ import { useState } from 'react'
 import { useTheme } from 'styled-components'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 interface IBasePrintTabProps {
   queryData: {
@@ -77,6 +76,7 @@ export const ReadyToIssue = ({
   loading,
   error
 }: IBasePrintTabProps) => {
+  const navigate = useNavigate()
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
@@ -181,7 +181,8 @@ export const ReadyToIssue = ({
             e && e.stopPropagation()
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               dispatch(clearCorrectionAndPrintChanges(reg.id))
-              dispatch(goToIssueCertificate(reg.id))
+
+              navigate(generateIssueCertificateUrl({ registrationId: reg.id }))
             }
           }
         })
@@ -210,7 +211,12 @@ export const ReadyToIssue = ({
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            dispatch(goToDeclarationRecordAudit('issueTab', reg.id))
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'issueTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {reg.name}
@@ -219,7 +225,12 @@ export const ReadyToIssue = ({
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            dispatch(goToDeclarationRecordAudit('issueTab', reg.id))
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'issueTab',
+                declarationId: reg.id
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}

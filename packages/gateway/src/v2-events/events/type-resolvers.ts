@@ -13,7 +13,7 @@ import {
   GQLResolver
 } from '@gateway/graphql/schema'
 import { ActionType } from '@opencrvs/commons'
-import { ActionDocument } from '@opencrvs/events/src/schema'
+import { ActionDocument } from '@opencrvs/commons/events'
 
 const ActionResolver: GQLCreateActionTypeResolver = {
   data: (list) =>

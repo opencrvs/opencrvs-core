@@ -23,17 +23,19 @@ import { EventType } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
 import { checkAuth } from '@client/profile/profileActions'
-import { vi, Mock } from 'vitest'
+import { Mock } from 'vitest'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import {
+  PRINT_CERTIFICATE_PAYMENT,
+  REGISTRAR_HOME_TAB
+} from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 
 const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
 
 describe('verify collector tests', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = vi.fn()
+  const { store } = createStore()
 
   const birthDeclaration = {
     id: 'mockBirth1234',
@@ -75,21 +77,18 @@ describe('verify collector tests', () => {
     })
 
     it('when mother is collector renders Payment component', async () => {
-      const testComponent = await createTestComponent(
-        <Payment
-          history={history}
-          location={mockLocation}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <Payment />,
+        {
+          store,
+          path: PRINT_CERTIFICATE_PAYMENT,
+          initialEntries: [
+            formatUrl(PRINT_CERTIFICATE_PAYMENT, {
               registrationId: 'mockBirth1234',
               eventType: EventType.Birth
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#service').hostNodes().text()).toContain(
@@ -109,7 +108,7 @@ describe('verify collector tests', () => {
 
     it('print payment receipt', async () => {
       const printMoneyReceiptSpy = vi.spyOn(PDFUtils, 'printMoneyReceipt')
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
@@ -123,7 +122,8 @@ describe('verify collector tests', () => {
             url: ''
           }}
         />,
-        { store, history }
+        { store, initialEntries: [formatUrl('/', {
+         })] }
       )
 
       testComponent.find('#print-receipt').hostNodes().simulate('click')
@@ -132,23 +132,17 @@ describe('verify collector tests', () => {
     })*/
 
     it('invalid declaration id', async () => {
-      await createTestComponent(
-        <Payment
-          location={mockLocation}
-          history={history}
-          match={{
-            params: {
-              registrationId: 'mockBirth',
-              eventType: EventType.Birth
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
-      expect(history.location.pathname).toEqual(
+      const { router } = await createTestComponent(<Payment />, {
+        store,
+        path: PRINT_CERTIFICATE_PAYMENT,
+        initialEntries: [
+          formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+            registrationId: 'mockBirth',
+            eventType: EventType.Birth
+          })
+        ]
+      })
+      expect(router.state.location.pathname).toEqual(
         formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToPrint,
           selectorId: ''
@@ -164,21 +158,18 @@ describe('verify collector tests', () => {
     })
 
     it('when informant is collector', async () => {
-      const testComponent = await createTestComponent(
-        <Payment
-          location={mockLocation}
-          history={history}
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <Payment />,
+        {
+          store,
+          path: PRINT_CERTIFICATE_PAYMENT,
+          initialEntries: [
+            formatUrl(PRINT_CERTIFICATE_PAYMENT, {
               registrationId: 'mockDeath1234',
               eventType: EventType.Death
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
 
       expect(testComponent.find('#service').hostNodes().text()).toContain(

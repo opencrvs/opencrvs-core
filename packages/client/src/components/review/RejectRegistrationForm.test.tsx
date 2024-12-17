@@ -17,14 +17,14 @@ import { EventType } from '@client/utils/gateway'
 import { createDeclaration } from '@client/declarations'
 import { vi } from 'vitest'
 
-const { store, history } = createStore()
+const { store } = createStore()
 const mockHandler = vi.fn()
 
 describe('reject registration form', () => {
   let component: ReactWrapper<{}, {}>
   const draftDeclaration = createDeclaration(EventType.Birth)
   beforeEach(async () => {
-    component = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <RejectRegistrationForm
         onClose={mockHandler}
         duplicate={true}
@@ -33,8 +33,9 @@ describe('reject registration form', () => {
         draftId="04ba2b0e-ba38-4049-ad74-332e4ee9fbfe"
         event={EventType.Birth}
       />,
-      { store, history }
+      { store }
     )
+    component = testComponent
   })
 
   it('renders form', () => {

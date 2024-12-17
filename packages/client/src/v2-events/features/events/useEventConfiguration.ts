@@ -8,21 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { trpc } from '@client/v2-events/trcp'
+import { api } from '@client/v2-events/trpc'
 
 /**
  * Fetches configured events and finds a matching event
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
-  const res = trpc.config.get.useQuery()
-  const { failureReason } = res
-  if (failureReason) {
-    // eslint-disable-next-line no-console
-    console.error(failureReason?.data?.stack)
-  }
-
-  return res
+  const [config] = api.config.get.useSuspenseQuery()
+  return config
 }
 
 /**
@@ -31,17 +25,10 @@ export function useEventConfigurations() {
  * @returns event configuration
  */
 export function useEventConfiguration(eventIdentifier: string) {
-  const hook = useEventConfigurations()
-  const { error, data, isFetching } = hook
+  const [config] = api.config.get.useSuspenseQuery()
+  const eventConfiguration = config.find(
+    (event) => event.id === eventIdentifier
+  )
 
-  const event = data?.find((event) => event.id === eventIdentifier)
-
-  const noMatchingEvent = !isFetching && !event
-
-  return {
-    // We hide the distinction between fetching (all calls) and loading (initial call) from the caller.
-    isLoading: isFetching,
-    error: noMatchingEvent ? 'Event not found' : error?.message,
-    event: event
-  }
+  return { eventConfiguration }
 }

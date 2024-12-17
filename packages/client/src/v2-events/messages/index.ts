@@ -8,22 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useState } from 'react'
 
-// TODO: Paginate with react-router-dom
-export const usePagination = (
-  /** Amount of pages to iterate through */
-  pages: number
-) => {
-  const [page, setPage] = useState(0)
-
-  const next = page < pages - 1 ? () => setPage(page + 1) : undefined
-  const previous = page > 0 ? () => setPage(page - 1) : undefined
-
-  return {
-    /** Page number between 0 and pages - 1 */
-    page,
-    next,
-    previous
-  }
-}
+export * from './constants'
+export * from './registrarHome'
+export * from './workqueue'
+export * from './navigation'
+export * from './errors'

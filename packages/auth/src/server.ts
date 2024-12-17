@@ -66,6 +66,12 @@ import anonymousTokenHandler, {
   responseSchema
 } from './features/anonymousToken/handler'
 
+export type AuthServer = {
+  server: Hapi.Server
+  start: () => Promise<void>
+  stop: () => Promise<void>
+}
+
 export async function createServer() {
   let whitelist: string[] = [env.DOMAIN]
   if (env.DOMAIN[0] !== '*') {
@@ -85,7 +91,7 @@ export async function createServer() {
   server.route({
     method: 'GET',
     path: '/ping',
-    handler: (request: any, h: any) =>
+    handler: () =>
       // Perform any health checks and return true or false for success prop
       ({
         success: true
@@ -376,7 +382,14 @@ export async function createServer() {
   await server.register(getPlugins())
   server.ext({
     type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope?: any }, h) {
+    method(
+      request: Hapi.Request & {
+        sentryScope?: {
+          setExtra: (key: string, value: unknown) => void
+        }
+      },
+      h
+    ) {
       request.sentryScope?.setExtra('payload', request.payload)
       return h.continue
     }

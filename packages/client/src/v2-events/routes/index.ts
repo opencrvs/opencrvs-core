@@ -8,7 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-export const V2_ROOT_ROUTE = '/v2'
-export const V2_EVENTS_ROUTE = `${V2_ROOT_ROUTE}/event`
-export const V2_EVENT_ROUTE = `${V2_EVENTS_ROUTE}/:eventType`
+export * from './routes'
+export * from './config'

@@ -8,13 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from '@opencrvs/commons'
+import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 
 const ActionBase = z.object({
-  createdAt: z.date(),
+  createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.object({})
+  data: z.record(z.string(), z.any())
 })
 
 const AssignedAction = ActionBase.merge(
@@ -46,6 +46,18 @@ const DeclareAction = ActionBase.merge(
   })
 )
 
+const ValidateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.VALIDATE)
+  })
+)
+
+const DraftAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.DRAFT)
+  })
+)
+
 const CreatedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE),
@@ -60,13 +72,22 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const CustomAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM)
+  })
+)
+
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
+  DraftAction,
+  ValidateAction,
   NotifiedAction,
   RegisterAction,
   DeclareAction,
   AssignedAction,
-  UnassignedAction
+  UnassignedAction,
+  CustomAction
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>

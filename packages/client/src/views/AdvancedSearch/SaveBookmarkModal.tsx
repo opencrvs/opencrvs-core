@@ -56,7 +56,7 @@ export function BookmarkAdvancedSearchModal({
   const isOnline = useOnlineStatus()
   const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
-  const { searchId, ...advancedSearchParams } = useSelector(
+  const { searchId, bookmarkName, ...advancedSearchParams } = useSelector(
     getAdvancedSearchParamsState
   )
   //remove null and empty properties

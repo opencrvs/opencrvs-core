@@ -342,23 +342,26 @@ describe('archiveDeclaration tests', () => {
     }
 
     // Mocking storage reading
-    storage.getItem = vi.fn((key: string) => {
-      switch (key) {
-        case 'USER_DATA':
-        case 'USER_DETAILS':
-          return Promise.resolve(indexedDB[key])
-        default:
-          return Promise.resolve(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    storage.getItem = vi.fn<[string], Promise<any | null>>(
+      <T = string>(key: string): Promise<T | null> => {
+        switch (key) {
+          case 'USER_DATA':
+          case 'USER_DETAILS':
+            return Promise.resolve(indexedDB[key] as T)
+          default:
+            return Promise.resolve(null)
+        }
       }
-    })
+    )
 
     // Mocking storage writing
-    storage.setItem = vi.fn((key: string, value: string) => {
+    storage.setItem = vi.fn(<T = string>(key: string, value: T): Promise<T> => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
-          indexedDB[key] = value
-          return Promise.resolve(indexedDB[key])
+          indexedDB[key] = value as string // Cast to string to match the logic
+          return Promise.resolve(value)
         default:
           return Promise.resolve(value)
       }

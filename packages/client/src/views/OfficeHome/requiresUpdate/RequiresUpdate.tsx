@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { formatUrl, generateGoToPageUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
@@ -56,12 +56,12 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 interface IBaseRejectTabProps {
   theme: ITheme
   scope: Scope | null
-  goToPage: typeof goToPage
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
@@ -76,6 +76,8 @@ interface IBaseRejectTabProps {
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
 function RequiresUpdateComponent(props: IRejectTabProps) {
+  const navigate = useNavigate()
+
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState<COLUMNS>(COLUMNS.SENT_FOR_UPDATES)
   const [sortOrder, setSortOrder] = useState<SORT_ORDER>(SORT_ORDER.ASCENDING)
@@ -175,12 +177,17 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
-              e && e.stopPropagation()
-              props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
+              if (e) {
+                e.stopPropagation()
+              }
+
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+                  declarationId: reg.id,
+                  pageId: 'review',
+                  event: reg.event ? reg.event.toLowerCase() : ''
+                })
               )
             }
           })
@@ -219,14 +226,28 @@ function RequiresUpdateComponent(props: IRejectTabProps) {
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'rejectTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('rejectTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'rejectTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -308,7 +329,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const RequiresUpdate = connect(mapStateToProps, {
-  goToPage,
-  goToDeclarationRecordAudit
-})(injectIntl(withTheme(RequiresUpdateComponent)))
+export const RequiresUpdate = connect(mapStateToProps)(
+  injectIntl(withTheme(RequiresUpdateComponent))
+)

@@ -9,12 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionInput, EventInput } from '@events/schema'
-import { EventDocument } from '@events/schema/EventDocument'
+import {
+  EventDocument,
+  ActionInput,
+  EventInput
+} from '@opencrvs/commons/events'
+
 import { getClient } from '@events/storage/mongodb'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
 import { indexEvent } from './indexing/indexing'
+import * as _ from 'lodash'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -41,6 +46,7 @@ export async function getEventById(id: string) {
 
   const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
+
   if (!event) {
     throw new EventNotFoundError(id)
   }
@@ -62,7 +68,7 @@ export async function createEvent(
   const db = await getClient()
   const collection = db.collection<EventDocument>('events')
 
-  const now = new Date()
+  const now = new Date().toISOString()
   const id = getUUID()
 
   await collection.insertOne({
@@ -77,10 +83,10 @@ export async function createEvent(
         createdAt: now,
         createdBy,
         createdAtLocation,
-        data: []
+        data: {}
       }
     ]
-  })
+  } satisfies EventDocument)
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -93,7 +99,7 @@ export async function addAction(
   { eventId, createdBy }: { eventId: string; createdBy: string }
 ) {
   const db = await getClient()
-  const now = new Date()
+  const now = new Date().toISOString()
 
   await db.collection<EventDocument>('events').updateOne(
     {
@@ -110,32 +116,37 @@ export async function addAction(
     }
   )
 
-  return getEventById(eventId)
+  const event = await getEventById(eventId)
+  await indexEvent(event)
+  return event
 }
 
-export async function patchEvent(event: EventInputWithId) {
-  const existingEvent = await getEventById(event.id)
+export async function patchEvent(eventInput: EventInputWithId) {
+  const existingEvent = await getEventById(eventInput.id)
 
   if (!existingEvent) {
-    throw new EventNotFoundError(event.id)
+    throw new EventNotFoundError(eventInput.id)
   }
 
   const db = await getClient()
   const collection = db.collection<EventDocument>('events')
 
-  const now = new Date()
+  const now = new Date().toISOString()
 
   await collection.updateOne(
     {
-      id: event.id
+      id: eventInput.id
     },
     {
       $set: {
-        ...event,
+        ...eventInput,
         updatedAt: now
       }
     }
   )
 
-  return getEventById(event.id)
+  const event = await getEventById(existingEvent.id)
+  await indexEvent(event)
+
+  return event
 }

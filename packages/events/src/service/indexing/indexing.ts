@@ -9,58 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, CreatedAction, EventDocument } from '@events/schema'
-import { EventIndex, Status } from '@events/schema/EventIndex'
+const EVENTS_INDEX = 'events'
+
+import {
+  EventDocument,
+  EventIndex,
+  getCurrentEventState
+} from '@opencrvs/commons/events'
+
+import { type estypes } from '@elastic/elasticsearch'
 import { getClient } from '@events/storage'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
-import { type estypes } from '@elastic/elasticsearch'
 import { Transform } from 'stream'
-
-function getStatusFromActions(actions: Array<ActionDocument>) {
-  return actions.reduce<Status>((status, action) => {
-    return status
-  }, 'CREATED')
-}
-
-function getAssignedUserFromActions(actions: Array<ActionDocument>) {
-  return actions.reduce<null | string>((status, action) => {
-    if (action.type === 'ASSIGN') {
-      return action.assignedTo
-    }
-    if (action.type === 'UNASSIGN') {
-      return null
-    }
-    return status
-  }, null)
-}
-
-function getData(actions: Array<ActionDocument>) {
-  return actions.reduce<Record<string, any>>((status, action) => {
-    if (action.type === 'CREATE') {
-      return action.data
-    }
-    return status
-  }, {})
-}
+import { z } from 'zod'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
-  const creationAction = event.actions.find(
-    (action) => action.type === 'CREATE'
-  ) as CreatedAction
-  const latestAction = event.actions[event.actions.length - 1]
-
-  return {
-    id: event.id,
-    type: event.type,
-    status: getStatusFromActions(event.actions),
-    createdAt: event.createdAt,
-    createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation,
-    modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(event.actions),
-    updatedBy: latestAction.createdBy,
-    data: getData(event.actions)
-  }
+  return getCurrentEventState(event)
 }
 
 /*
@@ -94,9 +58,9 @@ function createIndex(indexName: string) {
 export async function indexAllEvents() {
   const mongoClient = await getClient()
   const esClient = getOrCreateClient()
-  await createIndex('events')
+  await createIndex(EVENTS_INDEX)
 
-  const stream = mongoClient.collection('events').find().stream()
+  const stream = mongoClient.collection(EVENTS_INDEX).find().stream()
 
   const transformedStreamData = new Transform({
     readableObjectMode: true,
@@ -112,19 +76,36 @@ export async function indexAllEvents() {
     datasource: stream.pipe(transformedStreamData),
     onDocument: (doc: EventIndex) => ({
       index: {
-        _index: 'events',
+        _index: EVENTS_INDEX,
         _id: doc.id
       }
     }),
     refresh: 'wait_for'
   })
 }
+
 export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
-  return esClient.index({
-    index: 'events',
+
+  return esClient.update({
+    index: EVENTS_INDEX,
     id: event.id,
-    body: eventToEventIndex(event),
+    body: {
+      doc: eventToEventIndex(event),
+      doc_as_upsert: true
+    },
     refresh: 'wait_for'
   })
+}
+
+export async function getIndexedEvents() {
+  const esClient = getOrCreateClient()
+
+  const response = await esClient.search({
+    index: EVENTS_INDEX,
+    size: 10000,
+    request_cache: false
+  })
+
+  return z.array(EventIndex).parse(response.hits.hits.map((hit) => hit._source))
 }

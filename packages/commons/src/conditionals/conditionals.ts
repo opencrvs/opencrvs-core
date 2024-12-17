@@ -9,28 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { JSONSchemaType } from 'ajv'
 import { z } from 'zod'
+import { EventDocument } from '../events'
 
-const Status = z.enum([
-  'CREATED',
-  'NOTIFIED',
-  'DECLARED',
-  'REGISTERED',
-  'CERTIFIED'
-])
+export function Conditional() {
+  return z.any() as z.ZodType<JSONSchema>
+}
 
-export type Status = z.infer<typeof Status>
-export const EventIndex = z.object({
-  id: z.string(),
-  type: z.string(),
-  status: Status,
-  createdAt: z.date(),
-  createdBy: z.string(),
-  createdAtLocation: z.string(),
-  modifiedAt: z.date(),
-  assignedTo: z.string().nullable(),
-  updatedBy: z.string(),
-  data: z.object({})
-})
+export type ConditionalParameters = { $now: string } & (
+  | {
+      $event: EventDocument
+    }
+  | {
+      $event: EventDocument
+      $form: Record<string, any>
+    }
+  | {
+      $form: Record<string, any>
+    }
+)
 
-export type EventIndex = z.infer<typeof EventIndex>
+export type JSONSchema = Omit<
+  JSONSchemaType<ConditionalParameters>,
+  'properties'
+>

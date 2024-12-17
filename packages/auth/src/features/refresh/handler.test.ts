@@ -8,10 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
+import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
 describe('authenticate handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
@@ -31,37 +33,47 @@ describe('authenticate handler receives a request', () => {
         mobile: '+345345343'
       })
 
-      const authRes = await server.server.inject({
-        method: 'POST',
-        url: '/authenticate',
-        payload: {
-          username: '+345345343',
-          password: '2r23432'
-        }
-      })
+      const authRes: { result?: AuthenticateResponse } =
+        await server.server.inject({
+          method: 'POST',
+          url: '/authenticate',
+          payload: {
+            username: '+345345343',
+            password: '2r23432'
+          }
+        })
+
+      expect(authRes.result).toBeDefined()
+
       const authCode = codeSpy.mock.calls[0][0]
-      const res = await server.server.inject({
+      const res: { result?: { token: string } } = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
-          nonce: authRes.result.nonce,
+          nonce: authRes.result!.nonce,
           code: authCode
         }
       })
 
-      const refreshResponse = await server.server.inject({
-        method: 'POST',
-        url: '/refreshToken',
-        payload: {
-          nonce: authRes.result.nonce,
-          token: res.result.token
-        }
-      })
+      expect(res.result).toBeDefined()
 
-      expect(refreshResponse.result.token).toBeDefined()
-      expect(refreshResponse.result.token.split('.')).toHaveLength(3)
+      const refreshResponse: { result?: { token: string } } =
+        await server.server.inject({
+          method: 'POST',
+          url: '/refreshToken',
+          payload: {
+            nonce: authRes.result!.nonce,
+            token: res.result!.token
+          }
+        })
+      expect(refreshResponse.result).toBeDefined()
 
-      const [, payload] = refreshResponse.result.token.split('.')
+      const { token } = refreshResponse.result!
+
+      expect(token).toBeDefined()
+      expect(token.split('.')).toHaveLength(3)
+
+      const [, payload] = token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual(['admin'])
       expect(body.sub).toBe('1')
@@ -78,31 +90,38 @@ describe('authenticate handler receives a request', () => {
         username: '+345345343'
       })
 
-      const authRes = await server.server.inject({
-        method: 'POST',
-        url: '/authenticate',
-        payload: {
-          username: '+345345343',
-          password: '2r23432'
-        }
-      })
+      const authRes: { result?: AuthenticateResponse } =
+        await server.server.inject({
+          method: 'POST',
+          url: '/authenticate',
+          payload: {
+            username: '+345345343',
+            password: '2r23432'
+          }
+        })
       const smsCode = codeSpy.mock.calls[0][1]
+
+      expect(authRes.result).toBeDefined()
+
       await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
-          nonce: authRes.result.nonce,
+          nonce: authRes.result!.nonce,
           code: smsCode
         }
       })
 
       const badToken = 'ilgiglig'
 
-      const refreshResponse = await server.server.inject({
+      const refreshResponse: {
+        result?: { token: string }
+        statusCode: number
+      } = await server.server.inject({
         method: 'POST',
         url: '/refreshToken',
         payload: {
-          nonce: authRes.result.nonce,
+          nonce: authRes.result!.nonce,
           token: badToken
         }
       })

@@ -22,7 +22,7 @@ import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -66,9 +66,9 @@ import {
   StatusWiseDeclarationCountView
 } from './reports/operational/StatusWiseDeclarationCountView'
 import {
-  goToWorkflowStatus,
-  goToCompletenessRates,
-  goToPerformanceHome
+  generateCompletenessRatesUrl,
+  generatePerformanceHomeUrl,
+  generateWorkflowStatusUrl
 } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
@@ -178,10 +178,6 @@ const Text = styled.div`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-  timeStart: Date
-  timeEnd: Date
-  event: EventType
-  selectedLocation: ISearchLocation
   currency: ICurrency
 }
 
@@ -205,16 +201,8 @@ type IOnlineStatusProps = {
   isOnline: boolean
 }
 
-interface IDispatchProps {
-  goToWorkflowStatus: typeof goToWorkflowStatus
-  goToCompletenessRates: typeof goToCompletenessRates
-  goToPerformanceHome: typeof goToPerformanceHome
-}
-
 type Props = WrappedComponentProps &
-  IDispatchProps &
-  IOnlineStatusProps &
-  RouteComponentProps & { userDetails: UserDetails | null } & IConnectProps & {
+  IOnlineStatusProps & { userDetails: UserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 
@@ -231,21 +219,34 @@ interface ICorrectionsQueryResult {
 }
 
 const PerformanceHomeComponent = (props: Props) => {
-  const {
-    selectedLocation,
-    locations,
-    offices,
-    intl,
-    goToPerformanceHome,
-    goToWorkflowStatus,
-    goToCompletenessRates,
-    timeStart,
-    timeEnd,
-    event,
-    isOnline,
-    userDetails,
-    currency
-  } = props
+  const { locations, offices, intl, isOnline, userDetails, currency } = props
+
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const parsedSearch = parse(location.search) as unknown as ISearchParams
+
+  const searchParams = {
+    locationId: parsedSearch.locationId,
+    timeStart:
+      (parsedSearch.timeStart && new Date(parsedSearch.timeStart)) ||
+      new Date(
+        startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
+      ),
+    timeEnd:
+      (parsedSearch.timeEnd && new Date(parsedSearch.timeEnd)) ||
+      new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
+    event: parsedSearch.event || EventType.Birth
+  }
+
+  const selectedLocation = !searchParams.locationId
+    ? getAdditionalLocations(props.intl)[0]
+    : selectLocation(
+        searchParams.locationId,
+        generateLocations({ ...locations, ...offices }, props.intl).concat(
+          getAdditionalLocations(props.intl)
+        )
+      )
 
   const isOfficeSelected = useCallback(
     (selectedLocation?: ISearchLocation) => {
@@ -298,14 +299,17 @@ const PerformanceHomeComponent = (props: Props) => {
   }
 
   const onClickDetails = (time: CompletenessRateTime) => {
-    goToCompletenessRates(
-      event,
-      selectedLocation && !isCountry(selectedLocation)
-        ? selectedLocation.id
-        : undefined,
-      timeStart,
-      timeEnd,
-      time
+    navigate(
+      generateCompletenessRatesUrl({
+        time,
+        locationId:
+          selectedLocation && !isCountry(selectedLocation)
+            ? selectedLocation.id
+            : undefined,
+        eventType: searchParams.event,
+        timeStart: searchParams.timeStart,
+        timeEnd: searchParams.timeEnd
+      })
     )
   }
 
@@ -328,22 +332,32 @@ const PerformanceHomeComponent = (props: Props) => {
                 intl
               ).concat(getAdditionalLocations(intl))
             )
-            goToPerformanceHome(timeStart, timeEnd, event, newLocation.id)
+
+            navigate(
+              generatePerformanceHomeUrl({
+                timeStart: searchParams.timeStart,
+                timeEnd: searchParams.timeEnd,
+                event: searchParams.event,
+                locationId: newLocation.id
+              })
+            )
           }}
         />
         <PerformanceSelect
           onChange={(option) => {
-            goToPerformanceHome(
-              timeStart,
-              timeEnd,
-              option.value as EventType,
-              locationId
+            navigate(
+              generatePerformanceHomeUrl({
+                timeStart: searchParams.timeStart,
+                timeEnd: searchParams.timeEnd,
+                event: option.value as EventType,
+                locationId
+              })
             )
           }}
           id="eventSelect"
           withLightTheme={true}
           defaultWidth={110}
-          value={event}
+          value={searchParams.event}
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
@@ -356,10 +370,17 @@ const PerformanceHomeComponent = (props: Props) => {
           ]}
         />
         <DateRangePicker
-          startDate={timeStart}
-          endDate={timeEnd}
+          startDate={searchParams.timeStart}
+          endDate={searchParams.timeEnd}
           onDatesChange={({ startDate, endDate }) => {
-            goToPerformanceHome(startDate, endDate, event, locationId)
+            navigate(
+              generatePerformanceHomeUrl({
+                timeStart: startDate,
+                timeEnd: endDate,
+                event: searchParams.event,
+                locationId: searchParams.locationId
+              })
+            )
           }}
         />
       </>
@@ -368,13 +389,21 @@ const PerformanceHomeComponent = (props: Props) => {
 
   const onClickStatusDetails = (status?: keyof IStatusMapping) => {
     const { id: locationId } = selectedLocation
-    goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
+    navigate(
+      generateWorkflowStatusUrl({
+        locationId,
+        timeStart: searchParams.timeStart,
+        timeEnd: searchParams.timeEnd,
+        status,
+        event: searchParams.event
+      })
+    )
   }
 
   const queryVariablesWithoutLocationId = {
-    timeStart: timeStart.toISOString(),
-    timeEnd: timeEnd.toISOString(),
-    event: event.toUpperCase()
+    timeStart: searchParams.timeStart.toISOString(),
+    timeEnd: searchParams.timeEnd.toISOString(),
+    event: searchParams.event.toUpperCase()
   }
 
   return (
@@ -428,7 +457,9 @@ const PerformanceHomeComponent = (props: Props) => {
                           <CompletenessReport
                             data={data!.getTotalMetrics}
                             selectedEvent={
-                              event.toUpperCase() as 'BIRTH' | 'DEATH'
+                              searchParams.event.toUpperCase() as
+                                | 'BIRTH'
+                                | 'DEATH'
                             }
                             onClickDetails={onClickDetails}
                           />
@@ -436,10 +467,12 @@ const PerformanceHomeComponent = (props: Props) => {
                         <RegistrationsReport
                           data={data!.getTotalMetrics}
                           selectedEvent={
-                            event.toUpperCase() as 'BIRTH' | 'DEATH'
+                            searchParams.event.toUpperCase() as
+                              | 'BIRTH'
+                              | 'DEATH'
                           }
-                          timeStart={timeStart.toISOString()}
-                          timeEnd={timeEnd.toISOString()}
+                          timeStart={searchParams.timeStart.toISOString()}
+                          timeEnd={searchParams.timeEnd.toISOString()}
                           locationId={selectedLocation.id}
                         />
                         <CertificationRatesReport
@@ -461,9 +494,9 @@ const PerformanceHomeComponent = (props: Props) => {
                               ? undefined
                               : selectedLocation.id
                           }
-                          timeStart={timeStart.toISOString()}
-                          timeEnd={timeEnd.toISOString()}
-                          event={event}
+                          timeStart={searchParams.timeStart.toISOString()}
+                          timeEnd={searchParams.timeEnd.toISOString()}
+                          event={searchParams.event}
                         />
                       </>
                     )
@@ -551,8 +584,8 @@ const PerformanceHomeComponent = (props: Props) => {
               selectedLocation && !isCountry(selectedLocation)
                 ? selectedLocation.id
                 : undefined,
-            populationYear: timeEnd.getFullYear(),
-            event,
+            populationYear: searchParams.timeEnd.getFullYear(),
+            event: searchParams.event,
             status: [
               'IN_PROGRESS',
               'DECLARED',
@@ -585,7 +618,7 @@ const PerformanceHomeComponent = (props: Props) => {
                       <>
                         {isOnline && (
                           <StatusWiseDeclarationCountView
-                            selectedEvent={event}
+                            selectedEvent={searchParams.event}
                             isAccessibleOffice={isAccessibleOffice}
                             statusMapping={StatusMapping}
                             data={data.fetchRegistrationCountByStatus}
@@ -644,7 +677,7 @@ const PerformanceHomeComponent = (props: Props) => {
                       <Spinner id="registration-status-loading" size={24} />
                     ) : (
                       <StatusWiseDeclarationCountView
-                        selectedEvent={event}
+                        selectedEvent={searchParams.event}
                         isAccessibleOffice={isAccessibleOffice}
                         statusMapping={StatusMapping}
                         data={data.fetchRegistrationCountByStatus}
@@ -662,52 +695,22 @@ const PerformanceHomeComponent = (props: Props) => {
   )
 }
 
-function mapStateToProps(
-  state: IStoreState,
-  props: RouteComponentProps & WrappedComponentProps
-) {
+function mapStateToProps(state: IStoreState) {
   const offlineCountryConfiguration = getOfflineData(state)
 
   const locations = offlineCountryConfiguration.locations
   const offices = offlineCountryConfiguration.offices
-  const {
-    location: { search }
-  } = props
-  const { timeStart, timeEnd, locationId, event } = parse(
-    search
-  ) as unknown as ISearchParams
-
-  const selectedLocation = !locationId
-    ? getAdditionalLocations(props.intl)[0]
-    : selectLocation(
-        locationId,
-        generateLocations({ ...locations, ...offices }, props.intl).concat(
-          getAdditionalLocations(props.intl)
-        )
-      )
 
   return {
     locations,
-    timeStart:
-      (timeStart && new Date(timeStart)) ||
-      new Date(
-        startOfMonth(subMonths(new Date(Date.now()), 11)).setHours(0, 0, 0, 0)
-      ),
-    timeEnd:
-      (timeEnd && new Date(timeEnd)) ||
-      new Date(new Date(Date.now()).setHours(23, 59, 59, 999)),
-    event: event || EventType.Birth,
-    selectedLocation,
-    offices: offlineCountryConfiguration.offices,
+    offices,
     userDetails: getUserDetails(state),
     currency: offlineCountryConfiguration.config.CURRENCY
   }
 }
 
 export const PerformanceHome = injectIntl(
-  connect(mapStateToProps, {
-    goToWorkflowStatus,
-    goToCompletenessRates,
-    goToPerformanceHome
-  })(withTheme(withOnlineStatus(PerformanceHomeComponent)))
+  connect(mapStateToProps)(
+    withTheme(withOnlineStatus(PerformanceHomeComponent))
+  )
 )
