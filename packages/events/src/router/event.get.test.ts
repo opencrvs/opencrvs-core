@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '../tests/generators'
+import { payloadGenerator } from '@events/tests/generators'
 
 const client = createTestClient()
 const generator = payloadGenerator()

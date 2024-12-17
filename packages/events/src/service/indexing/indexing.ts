@@ -105,6 +105,7 @@ export async function getIndexedEvents() {
 
   if (!hasEventsIndex) {
     // @TODO: We probably want to create the index on startup or as part of the deployment process.
+    // eslint-disable-next-line no-console
     console.error('Events index does not exist. Creating one.')
     await createIndex(EVENTS_INDEX)
 

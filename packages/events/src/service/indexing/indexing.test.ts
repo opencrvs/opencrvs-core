@@ -15,7 +15,7 @@ import {
   resetServer as resetESServer
 } from '@events/storage/__mocks__/elasticsearch'
 import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '../../tests/generators'
+import { payloadGenerator } from '@events/tests/generators'
 
 const client = createTestClient()
 const generator = payloadGenerator()
