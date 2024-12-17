@@ -15,7 +15,7 @@
     "build-common-scopes:js": "esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external",
     "build-common-conditionals:js": "esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external",
     "copy-common-events:ts": "cp -r ../commons/build/dist/common/events/*.d.ts ./dist/events",
-    "build-common-scopes:ts": "cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts",
+    "copy-common-scopes:ts": "cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts",
     "copy-common-conditionals:ts": "cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/conditionals"
   },
   "dependencies": {
