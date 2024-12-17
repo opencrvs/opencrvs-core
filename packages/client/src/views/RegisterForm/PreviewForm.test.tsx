@@ -30,7 +30,6 @@ import {
   createReviewDeclaration
 } from '@client/declarations'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { Store } from 'redux'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
@@ -45,16 +44,27 @@ import {
   marriageReviewDraftData
 } from '@client/tests/mock-drafts'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
+import { createBrowserRouter } from 'react-router-dom'
 
 describe('when user is previewing the form data', () => {
   let app: ReactWrapper
-  let history: History
+  let router: ReturnType<typeof createBrowserRouter>
   let store: Store
 
   beforeEach(async () => {
-    const testApp = await createTestApp()
+    const testApp = await createTestApp(
+      { waitUntilOfflineCountryConfigLoaded: true },
+      [
+        formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+          event: 'death',
+          pageId: 'review'
+        })
+      ]
+    )
     app = testApp.app
-    history = testApp.history
+
+    router = testApp.router
     store = testApp.store
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     await waitForReady(app)
@@ -75,15 +85,14 @@ describe('when user is previewing the form data', () => {
       customDraft = { id: uuid(), data, review: true, event: EventType.Death }
 
       store.dispatch(storeDeclaration(customDraft))
-
-      history.replace(
-        REVIEW_EVENT_PARENT_FORM_PAGE.replace(
-          ':declarationId',
-          customDraft.id.toString()
-        )
-          .replace(':event', 'death')
-          .replace(':pageId', 'review')
+      router.navigate(
+        formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+          declarationId: customDraft.id.toString(),
+          event: 'death',
+          pageId: 'review'
+        })
       )
+
       await waitForElement(app, '#readyDeclaration')
     })
 
@@ -112,7 +121,7 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -134,8 +143,7 @@ describe('when user is previewing the form data', () => {
       )
       await flushPromises()
       store.dispatch(storeDeclaration(customDraft))
-
-      history.replace(
+      router.navigate(
         DRAFT_BIRTH_PARENT_FORM.replace(
           ':declarationId',
           customDraft.id.toString()
@@ -171,7 +179,7 @@ describe('when user is previewing the form data', () => {
           })
           it('should redirect to home page', () => {
             app.find('#submit_confirm').hostNodes().simulate('click')
-            expect(history.location.pathname).toBe(REGISTRAR_HOME)
+            expect(router.state.location.pathname).toBe(REGISTRAR_HOME)
           })
         })
       })
@@ -189,7 +197,7 @@ describe('when user is previewing the form data', () => {
 
       customDraft = { id: uuid(), data, review: true, event: EventType.Birth }
       store.dispatch(storeDeclaration(customDraft))
-      history.replace(
+      router.navigate(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
           ':declarationId',
           customDraft.id.toString()
@@ -217,7 +225,7 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -239,7 +247,7 @@ describe('when user is previewing the form data', () => {
         event: EventType.Marriage
       }
       store.dispatch(storeDeclaration(customDraft))
-      history.replace(
+      router.navigate(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
           ':declarationId',
           customDraft.id.toString()
@@ -266,7 +274,7 @@ describe('when user is previewing the form data', () => {
         })
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(history.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
     })
   })
 
@@ -284,7 +292,7 @@ describe('when user is previewing the form data', () => {
       customDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
 
       store.dispatch(storeDeclaration(customDraft))
-      history.replace(
+      router.navigate(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
           ':declarationId',
           customDraft.id.toString()

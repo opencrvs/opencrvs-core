@@ -664,8 +664,6 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const errors = this.props.errors as unknown as Errors
 
-    const sectionName = this.props.id.split('-')[0]
-
     return (
       <section>
         {fields.map((field) => {

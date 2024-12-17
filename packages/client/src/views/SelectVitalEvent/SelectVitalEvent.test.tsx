@@ -15,21 +15,21 @@ import {
   waitForReady
 } from '@client/tests/util'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { AppStore } from '@client/store'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { ReactWrapper } from 'enzyme'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('when user is selecting the vital event', () => {
   let app: ReactWrapper
-  let history: History
+  let router: ReturnType<typeof createMemoryRouter>
   let store: AppStore
 
   beforeEach(async () => {
     const testApp = await createTestApp()
     app = testApp.app
-    history = testApp.history
+    router = testApp.router
     store = testApp.store
 
     await waitForReady(app)
@@ -46,12 +46,13 @@ describe('when user is selecting the vital event', () => {
         store
       )
       await waitForReady(app)
-      history.replace(SELECT_VITAL_EVENT)
+      router.navigate(SELECT_VITAL_EVENT, { replace: true })
       await waitForElement(app, '#select_vital_event_view')
     })
     it('lists the options', () => {
       expect(app.find('#select_vital_event_view').hostNodes()).toHaveLength(1)
     })
+
     describe('when selects "Birth"', () => {
       beforeEach(() => {
         app.find('#select_birth_event').hostNodes().simulate('change')
@@ -70,8 +71,8 @@ describe('when user is selecting the vital event', () => {
         app.find('#select_death_event').hostNodes().simulate('change')
         app.find('#continue').hostNodes().simulate('click')
       })
-      it('takses user to the death registration form', () => {
-        expect(history.location.pathname).toContain('events/death')
+      it('takes user to the death registration form', () => {
+        expect(router.state.location.pathname).toContain('events/death')
       })
     })
 
@@ -106,7 +107,7 @@ describe('when user is selecting the vital event', () => {
     tests.forEach(([scopes, length]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
-        history.replace(SELECT_VITAL_EVENT)
+        router.navigate(SELECT_VITAL_EVENT, { replace: true })
         await waitForElement(app, '#select_vital_event_view')
         expect(app.exists('#select_birth_event')).toBe(length)
       })
@@ -123,7 +124,7 @@ describe('when user is selecting the vital event', () => {
     tests.forEach(([scopes, exists]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
-        history.replace(SELECT_VITAL_EVENT)
+        router.navigate(SELECT_VITAL_EVENT, { replace: true })
 
         await waitForElement(app, '#select_vital_event_view')
         expect(app.exists('#select_death_event')).toBe(exists)
@@ -141,7 +142,8 @@ describe('when user is selecting the vital event', () => {
     tests.forEach(([scopes, exists]) => {
       it(`should render when user has correct scopes ${scopes}`, async () => {
         setScopes(scopes as Scope[], store)
-        history.replace(SELECT_VITAL_EVENT)
+        router.navigate(SELECT_VITAL_EVENT, { replace: true })
+
         await waitForElement(app, '#select_vital_event_view')
         expect(app.exists('#select_marriage_event')).toBe(exists)
       })

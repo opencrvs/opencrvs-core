@@ -114,7 +114,7 @@ export function selectOrCreatePersonResource<T extends CompositionSectionCode>(
 
 export function selectOrCreateEncounterResource(
   fhirBundle: Bundle,
-  context: any,
+  context: { event: EVENT_TYPE },
   isCorrection?: boolean
 ): Encounter {
   let sectionCode: CompositionSectionEncounterReference

@@ -24,7 +24,7 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import {
   getOfflineData,
   selectApplicationName,
@@ -33,7 +33,7 @@ import {
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Spinner, Stack } from '@opencrvs/components'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import formatDate, { formatPlainDate } from '@client/utils/date-formatting'
 import {
   BirthRegistration,
@@ -42,7 +42,6 @@ import {
   RegStatus
 } from '@client/utils/gateway'
 import { useTimeout } from '@client/hooks/useTimeout'
-import { goToHome } from '@client/navigation'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { compact } from 'lodash'
 import {
@@ -51,6 +50,7 @@ import {
 } from './useVerificationRecordDetails'
 import { useLocationIntl } from '@client/hooks/useLocationIntl'
 import { generateFullAddress } from '@client/utils/locationUtils'
+import * as routes from '@client/navigation/routes'
 
 const Container = styled.div<{ size: string; checking: boolean }>`
   position: relative;
@@ -179,9 +179,9 @@ const isDeathRegistration = (
 
 export function VerifyCertificatePage() {
   const intl = useIntl()
-  const dispatch = useDispatch()
   const { declarationId } = useParams<{ declarationId: string }>()
   const { localizeLocation } = useLocationIntl()
+  const navigate = useNavigate()
 
   const logo = useSelector(selectCountryLogo)
   const appName = useSelector(selectApplicationName)
@@ -312,7 +312,7 @@ export function VerifyCertificatePage() {
             <Button
               size="medium"
               type="icon"
-              onClick={() => dispatch(goToHome())}
+              onClick={() => navigate(routes.HOME)}
             >
               <Icon name={'X'} weight={'bold'} />
             </Button>
@@ -321,7 +321,7 @@ export function VerifyCertificatePage() {
             <Button
               size="medium"
               type="icon"
-              onClick={() => dispatch(goToHome())}
+              onClick={() => navigate(routes.HOME)}
             >
               <Icon name={'X'} weight={'bold'} />
             </Button>

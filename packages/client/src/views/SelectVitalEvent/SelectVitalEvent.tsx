@@ -21,16 +21,9 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
-import {
-  goBack,
-  goToHome,
-  goToDeathInformant,
-  goToBirthRegistrationAsParent,
-  goToMarriageInformant
-} from '@client/navigation'
+import { formatUrl } from '@client/navigation'
 import { messages } from '@client/i18n/messages/views/selectVitalEvent'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-
 import {
   storeDeclaration,
   IDeclaration,
@@ -38,26 +31,22 @@ import {
 } from '@client/declarations'
 import ProtectedComponent from '@client/components/ProtectedComponent'
 
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+
+type DispatchProps = {
+  storeDeclaration: typeof storeDeclaration
+}
+
 type GoToType = '' | EventType
 
 const SelectVitalEventView = (
-  props: IntlShapeProps & {
-    goBack: typeof goBack
-    goToHome: typeof goToHome
-    storeDeclaration: typeof storeDeclaration
-    goToBirthRegistrationAsParent: typeof goToBirthRegistrationAsParent
-    goToDeathInformant: typeof goToDeathInformant
-    goToMarriageInformant: typeof goToMarriageInformant
-  }
+  props: IntlShapeProps & RouteComponentProps<IntlShapeProps> & DispatchProps
 ) => {
-  const {
-    intl,
-    goToHome,
-    storeDeclaration,
-    goToBirthRegistrationAsParent,
-    goToDeathInformant,
-    goToMarriageInformant
-  } = props
+  const { intl, storeDeclaration } = props
 
   const [goTo, setGoTo] = useState<GoToType>('')
   const [noEventSelectedError, setNoEventSelectedError] = useState(false)
@@ -71,17 +60,30 @@ const SelectVitalEventView = (
       case EventType.Birth:
         declaration = createDeclaration(EventType.Birth)
         storeDeclaration(declaration)
-        goToBirthRegistrationAsParent(declaration.id)
+
+        props.router.navigate(
+          formatUrl(routes.DRAFT_BIRTH_PARENT_FORM, {
+            declarationId: declaration.id
+          })
+        )
         break
       case EventType.Death:
         declaration = createDeclaration(EventType.Death)
         storeDeclaration(declaration)
-        goToDeathInformant(declaration.id)
+        props.router.navigate(
+          formatUrl(routes.DRAFT_DEATH_FORM, {
+            declarationId: declaration.id
+          })
+        )
         break
       case EventType.Marriage:
         declaration = createDeclaration(EventType.Marriage)
         storeDeclaration(declaration)
-        goToMarriageInformant(declaration.id)
+        props.router.navigate(
+          formatUrl(routes.DRAFT_MARRIAGE_FORM, {
+            declarationId: declaration.id
+          })
+        )
         break
       default:
         throw new Error(`Unknown eventType ${goTo}`)
@@ -99,7 +101,7 @@ const SelectVitalEventView = (
               id="goBack"
               type="secondary"
               size="small"
-              onClick={goToHome}
+              onClick={() => props.router.navigate(routes.HOME)}
             >
               <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
@@ -108,7 +110,11 @@ const SelectVitalEventView = (
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileRight={
-            <Button type="icon" size="medium" onClick={goToHome}>
+            <Button
+              type="icon"
+              size="medium"
+              onClick={() => props.router.navigate(routes.HOME)}
+            >
               <Icon name="X" />
             </Button>
           }
@@ -215,11 +221,8 @@ const SelectVitalEventView = (
   )
 }
 
-export const SelectVitalEvent = connect(null, {
-  goBack,
-  goToHome,
-  storeDeclaration,
-  goToBirthRegistrationAsParent,
-  goToDeathInformant,
-  goToMarriageInformant
-})(injectIntl(SelectVitalEventView))
+export const SelectVitalEvent = withRouter(
+  connect(null, {
+    storeDeclaration
+  })(injectIntl(SelectVitalEventView))
+)

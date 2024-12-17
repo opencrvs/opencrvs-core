@@ -39,10 +39,9 @@ import { messages } from '@client/i18n/messages/views/correction'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { getLanguage } from '@client/i18n/selectors'
 import {
-  goBack,
-  goToCertificateCorrection,
-  goToHomeTab,
-  goToPageGroup
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
 } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
@@ -83,6 +82,10 @@ import {
   sectionHasError,
   updateDeclarationRegistrationWithCorrection
 } from './utils'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -100,9 +103,9 @@ interface IProps {
   scopes: Scope[] | null
 }
 
-type IStateProps = {
+type IStateProps = RouteComponentProps<{
   declaration: IDeclaration
-}
+}>
 
 type IState = {
   isFileUploading: boolean
@@ -110,11 +113,7 @@ type IState = {
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
   modifyDeclaration: typeof modifyDeclaration
-  goToPageGroup: typeof goToPageGroup
-  goToCertificateCorrection: typeof goToCertificateCorrection
-  goToHomeTab: typeof goToHomeTab
   writeDeclaration: typeof writeDeclaration
 }
 
@@ -145,10 +144,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       registerForm,
       declaration,
       intl,
-      goBack,
       declaration: { event },
       userDetails,
-      offlineResources
+      offlineResources,
+      router
     } = this.props
 
     const currencySymbol = getCurrencySymbol(offlineResources.config.CURRENCY)
@@ -218,8 +217,14 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           id="corrector_form"
           title={intl.formatMessage(messages.title)}
           hideBackground
-          goBack={goBack}
-          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
+          goBack={() => router.navigate(-1)}
+          goHome={() =>
+            router.navigate(
+              generateGoToHomeTabUrl({
+                tabId: WORKQUEUE_TABS.readyForReview
+              })
+            )
+          }
         >
           <Content
             title={intl.formatMessage(messages.correctionSummaryTitle)}
@@ -939,9 +944,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <LinkButton
           id="change-reason-link"
           onClick={() =>
-            this.props.goToCertificateCorrection(
-              this.props.declaration.id,
-              CorrectionSection.Reason
+            this.props.router.navigate(
+              generateCertificateCorrectionUrl({
+                declarationId: this.props.declaration.id,
+                pageId: CorrectionSection.Reason
+              })
             )
           }
         >
@@ -961,9 +968,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <LinkButton
           id="change-comment-link"
           onClick={() =>
-            this.props.goToCertificateCorrection(
-              this.props.declaration.id,
-              CorrectionSection.Reason
+            this.props.router.navigate(
+              generateCertificateCorrectionUrl({
+                declarationId: this.props.declaration.id,
+                pageId: CorrectionSection.Reason
+              })
             )
           }
         >
@@ -999,9 +1008,11 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         <LinkButton
           id="upload-supporting-doc-link"
           onClick={() =>
-            this.props.goToCertificateCorrection(
-              this.props.declaration.id,
-              CorrectionSection.SupportingDocuments
+            this.props.router.navigate(
+              generateCertificateCorrectionUrl({
+                declarationId: this.props.declaration.id,
+                pageId: CorrectionSection.SupportingDocuments
+              })
             )
           }
         >
@@ -1041,38 +1052,46 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     if (
       this.props.scopes?.includes(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION)
     ) {
-      this.props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId: WORKQUEUE_TABS.sentForApproval
+        })
+      )
     } else {
-      this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId: WORKQUEUE_TABS.readyForReview
+        })
+      )
     }
   }
 
   gotoReviewPage = () => {
-    this.props.goToPageGroup(
-      CERTIFICATE_CORRECTION_REVIEW,
-      this.props.declaration.id,
-      ReviewSection.Review,
-      'review-view-group',
-      this.props.declaration.event
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute: CERTIFICATE_CORRECTION_REVIEW,
+        declarationId: this.props.declaration.id,
+        pageId: ReviewSection.Review,
+        groupId: 'review-view-group',
+        event: this.props.declaration.event
+      })
     )
   }
 }
 
-export const CorrectionSummary = connect(
-  (state: IStoreState) => ({
-    registerForm: getRegisterForm(state),
-    offlineResources: getOfflineData(state),
-    language: getLanguage(state),
-    userPrimaryOffice: getUserDetails(state)?.primaryOffice,
-    scopes: getScope(state),
-    userDetails: getUserDetails(state)
-  }),
-  {
-    modifyDeclaration,
-    writeDeclaration,
-    goBack,
-    goToPageGroup,
-    goToCertificateCorrection,
-    goToHomeTab
-  }
-)(injectIntl(CorrectionSummaryComponent))
+export const CorrectionSummary = withRouter(
+  connect(
+    (state: IStoreState) => ({
+      registerForm: getRegisterForm(state),
+      offlineResources: getOfflineData(state),
+      language: getLanguage(state),
+      userPrimaryOffice: getUserDetails(state)?.primaryOffice,
+      scopes: getScope(state),
+      userDetails: getUserDetails(state)
+    }),
+    {
+      modifyDeclaration,
+      writeDeclaration
+    }
+  )(injectIntl(CorrectionSummaryComponent))
+)

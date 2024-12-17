@@ -24,14 +24,14 @@ import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
 import * as builtInValidators from '@client/utils/validate'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserForm
         section={deserializeFormSection(
@@ -49,7 +49,7 @@ describe('Create new user page tests', () => {
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,
-      { store, history }
+      { store }
     )
     component = testComponent
   })

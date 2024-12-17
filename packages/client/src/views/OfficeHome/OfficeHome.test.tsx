@@ -28,8 +28,10 @@ import * as React from 'react'
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './inProgress/InProgress'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
-import { vi } from 'vitest'
 import { Scope, SCOPES, scopes } from '@opencrvs/commons/client'
+import { vi } from 'vitest'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import { formatUrl } from '@client/navigation'
 
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
@@ -65,35 +67,34 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
-let { store, history } = createStore()
+let { store } = createStore()
 let client = createClient(store)
 beforeEach(async () => {
-  ;({ store, history } = createStore())
+  ;({ store } = createStore())
   client = createClient(store)
   setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 })
 
 describe('OfficeHome related tests', () => {
   it('sets loading state while waiting for data', async () => {
-    const testComponent = await createTestComponent(
-      <OfficeHome
-        match={{
-          params: {
+    const { component: testComponent } = await createTestComponent(
+      <OfficeHome />,
+      {
+        store,
+        path: REGISTRAR_HOME_TAB,
+        initialEntries: [
+          formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.inProgress
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
 
-    // @ts-ignore
-    expect(testComponent.containsMatchingElement(Spinner)).toBe(true)
+    expect(
+      testComponent.containsMatchingElement(
+        Spinner as unknown as React.ReactElement
+      )
+    ).toBe(true)
   })
 
   describe('should load data', () => {
@@ -112,19 +113,18 @@ describe('OfficeHome related tests', () => {
       client.query = mockListSyncController
     })
     it('renders page with five tabs', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.inProgress },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ]
+        }
       )
 
       await waitForElement(testComponent, '#navigation_progress')
@@ -135,19 +135,18 @@ describe('OfficeHome related tests', () => {
     })
 
     it('renders tabs with count', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.inProgress },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ]
+        }
       )
       await flushPromises()
 
@@ -190,184 +189,128 @@ describe('OfficeHome related tests', () => {
       client.query = mockListSyncController
     })
     it('shows no-record message in inProgress drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.inProgress },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
       await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message in inProgress fieldagent drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
               tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
       await waitForElement(testComponent, '#no-record')
     })
     it('shows no-record message in inProgress hospital drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
-              tabId: WORKQUEUE_TABS.inProgress,
-              selectorId: SELECTOR_ID.hospitalDrafts
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
       await waitForElement(testComponent, '#no-record')
     })
-    it('shows no-record message  in review tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.readyForReview },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows no-record message in review tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       await waitForElement(testComponent, '#no-record')
     })
-    it('shows no-record message  in reject tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.requiresUpdate },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows no-record message in reject tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.requiresUpdate
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       await waitForElement(testComponent, '#no-record')
     })
-    it('shows no-record message  in approval tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.sentForApproval },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows no-record message in approval tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.sentForApproval
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       await waitForElement(testComponent, '#no-record')
     })
-    it('shows no-record message  in print tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.readyToPrint },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows no-record message in print tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.readyToPrint
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       await waitForElement(testComponent, '#no-record')
     })
 
-    it('shows no-record message  in externalValidation tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.externalValidation },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows no-record message in externalValidation tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.externalValidation
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
 
-      testComponent.update()
       await waitForElement(testComponent, '#no-record')
     })
   })
@@ -380,180 +323,140 @@ describe('OfficeHome related tests', () => {
       client.query = mockListSyncController
     })
     it('shows error message in inProgress fieldagent drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
               tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
     it('shows error message in inProgress hospital drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
               tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
-    it('shows error message  in review tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.readyForReview },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows error message in review tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.readyForReview
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
-    it('shows error message  in reject tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.requiresUpdate },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows error message in reject tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.requiresUpdate
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
-    it('shows error message  in approval tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.sentForApproval },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows error message in approval tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.sentForApproval
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
-    it('shows error message  in print tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.readyToPrint },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows error message in print tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.readyToPrint
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
-    it('shows error message  in externalValidation tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.externalValidation },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
+    it('shows error message in externalValidation tab', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.externalValidation
+            })
+          ]
+        }
       )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
+
       await waitForElement(testComponent, '#search-result-error-text-count')
     })
   })
 
   describe('new event button should be visible when the user has the correct scopes', () => {
     const build = async () =>
-      await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.inProgress },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
+      await createTestComponent(<OfficeHome />, {
+        store,
+        apolloClient: client,
+        path: REGISTRAR_HOME_TAB,
+        initialEntries: [
+          formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.inProgress
+          })
+        ]
+      })
 
     const requiredScopes = [
       SCOPES.RECORD_DECLARE_BIRTH,
@@ -581,7 +484,9 @@ describe('OfficeHome related tests', () => {
         setScopes(scopes as Scope[], store)
         const testComponent = await build()
 
-        expect(testComponent.exists('#new_event_declaration')).toBe(visible)
+        expect(testComponent.component.exists('#new_event_declaration')).toBe(
+          visible
+        )
       })
     })
   })

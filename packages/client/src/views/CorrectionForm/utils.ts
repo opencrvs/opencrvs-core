@@ -44,7 +44,6 @@ import {
 } from '@client/forms'
 import {
   getConditionalActionsForField,
-  getListOfLocations,
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { getValidationErrorsForForm } from '@client/forms/validation'
@@ -69,6 +68,7 @@ import {
 } from '@client/utils/gateway'
 import { generateLocations } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { getListOfLocations } from '@client/utils/validate'
 import { camelCase, clone, flattenDeep, get, isArray, isEqual } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 

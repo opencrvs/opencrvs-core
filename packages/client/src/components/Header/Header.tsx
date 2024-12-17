@@ -12,15 +12,6 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/header'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import {
-  goToEvents as goToEventsAction,
-  goToSearch,
-  goToSearchResult,
-  goToSettings,
-  goToCreateNewUserWithLocationId,
-  goToCreateNewUser,
-  goToAdvancedSearch
-} from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { Hamburger } from './Hamburger'
@@ -34,7 +25,6 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
@@ -49,6 +39,13 @@ import {
   usePermissions
 } from '@client/hooks/useAuthorization'
 import ProtectedComponent from '@client/components/ProtectedComponent'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import { parse, stringify } from 'query-string'
+import { formatUrl } from '@client/navigation'
+import * as routes from '@client/navigation/routes'
 
 type IStateProps = {
   fieldNames: string[]
@@ -57,16 +54,10 @@ type IStateProps = {
 }
 
 type IDispatchProps = {
-  goToEvents: typeof goToEventsAction
-  goToSearch: typeof goToSearch
-  goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
-  goToCreateNewUser: typeof goToCreateNewUser
-  goToAdvancedSearch: typeof goToAdvancedSearch
-  goToSearchResult: typeof goToSearchResult
   setAdvancedSearchParam: typeof setAdvancedSearchParam
 }
 
-interface IProps extends RouteComponentProps {
+interface IProps {
   activeMenuItem: ACTIVE_MENU_ITEM
   title?: string
   searchText?: string
@@ -85,7 +76,7 @@ interface IProps extends RouteComponentProps {
 type IFullProps = IntlShapeProps &
   IStateProps &
   IDispatchProps &
-  IProps &
+  RouteComponentProps<IProps> &
   IDomProps
 
 enum ACTIVE_MENU_ITEM {
@@ -123,19 +114,13 @@ const HeaderRight = styled.div`
 
 const HeaderComponent = (props: IFullProps) => {
   const {
-    location,
+    router,
     mobileSearchBar,
     offlineData,
     className,
     intl,
     activeMenuItem,
     mobileRight,
-    goToSearch,
-    goToEvents,
-    goToCreateNewUserWithLocationId,
-    goToCreateNewUser,
-    goToAdvancedSearch,
-    goToSearchResult,
     setAdvancedSearchParam,
     mapPerformanceClickHandler,
     changeTeamLocation
@@ -144,7 +129,7 @@ const HeaderComponent = (props: IFullProps) => {
   const { canCreateUser, canSearchRecords } = usePermissions()
 
   const getMobileHeaderActionProps = (activeMenuItem: ACTIVE_MENU_ITEM) => {
-    const locationId = new URLSearchParams(location.search).get('locationId')
+    const locationId = parse(router.location.search).locationId as string
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
         mobileLeft: [
@@ -182,9 +167,11 @@ const HeaderComponent = (props: IFullProps) => {
               ),
               handler: () => {
                 if (locationId) {
-                  goToCreateNewUserWithLocationId(locationId)
+                  router.navigate(
+                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                  )
                 } else {
-                  goToCreateNewUser()
+                  router.navigate(routes.CREATE_USER)
                 }
               }
             }
@@ -205,9 +192,11 @@ const HeaderComponent = (props: IFullProps) => {
               ),
               handler: () => {
                 if (locationId) {
-                  goToCreateNewUserWithLocationId(locationId)
+                  router.navigate(
+                    formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
+                  )
                 } else {
-                  goToCreateNewUser()
+                  router.navigate(routes.CREATE_USER)
                 }
               }
             }
@@ -256,7 +245,7 @@ const HeaderComponent = (props: IFullProps) => {
               icon: () => (
                 <Icon name="MagnifyingGlass" size="medium" color="primary" />
               ),
-              handler: goToSearch
+              handler: () => router.navigate(routes.SEARCH)
             }
           ]
         }
@@ -324,7 +313,7 @@ const HeaderComponent = (props: IFullProps) => {
         id: ADVANCED_SEARCH_TEXT,
         onClick: () => {
           setAdvancedSearchParam(advancedSearchInitialState)
-          goToAdvancedSearch()
+          router.navigate(routes.ADVANCED_SEARCH)
         }
       }
     ]
@@ -340,7 +329,20 @@ const HeaderComponent = (props: IFullProps) => {
         searchTypeList={searchTypeList}
         // @TODO: How to hide the navigation list from field agents? Ask JPF
         navigationList={navigationList}
-        searchHandler={(text, type) => goToSearchResult(text, type, isMobile)}
+        searchHandler={(text, type) =>
+          props.router.navigate(
+            {
+              pathname: routes.SEARCH_RESULT,
+              search: stringify({
+                searchText: text,
+                searchType: type
+              })
+            },
+            {
+              replace: isMobile
+            }
+          )
+        }
       />
     )
   }
@@ -379,7 +381,7 @@ const HeaderComponent = (props: IFullProps) => {
               size="medium"
               key="newEvent"
               id="header_new_event"
-              onClick={goToEvents}
+              onClick={() => router.navigate(routes.SELECT_VITAL_EVENT)}
             >
               <Icon name="Plus" size="medium" />
             </Button>
@@ -426,44 +428,39 @@ const HeaderComponent = (props: IFullProps) => {
   )
 }
 
-export const Header = connect(
-  (store: IStoreState) => ({
-    activeMenuItem: window.location.href.includes('performance')
-      ? ACTIVE_MENU_ITEM.PERFORMANCE
-      : window.location.href.includes(TEAM_USER_LIST)
-      ? ACTIVE_MENU_ITEM.USERS
-      : window.location.href.includes('team')
-      ? ACTIVE_MENU_ITEM.TEAM
-      : window.location.href.includes('config/certificate')
-      ? ACTIVE_MENU_ITEM.CERTIFICATE
-      : window.location.href.includes('config/application')
-      ? ACTIVE_MENU_ITEM.APPLICATION
-      : window.location.href.includes('config/form')
-      ? ACTIVE_MENU_ITEM.FORM
-      : window.location.href.includes('config/integration')
-      ? ACTIVE_MENU_ITEM.INTEGRATION
-      : window.location.href.includes('vsexports')
-      ? ACTIVE_MENU_ITEM.VSEXPORTS
-      : ACTIVE_MENU_ITEM.DECLARATIONS,
-    language: store.i18n.language,
-    offlineData: getOfflineData(store),
-    fieldNames: Object.values(getRegisterForm(store))
-      .flatMap((form) => form.sections)
-      .flatMap((section) => section.groups)
-      .flatMap((group) => group.fields)
-      .map((field) => field.name)
-  }),
-  {
-    goToSearch,
-    goToSettings,
-    goToEvents: goToEventsAction,
-    goToCreateNewUserWithLocationId,
-    goToCreateNewUser,
-    goToAdvancedSearch: goToAdvancedSearch,
-    setAdvancedSearchParam: setAdvancedSearchParam,
-    goToSearchResult
-  }
-)(injectIntl(withRouter(HeaderComponent)))
+export const Header = withRouter(
+  connect(
+    (store: IStoreState) => ({
+      activeMenuItem: window.location.href.includes('performance')
+        ? ACTIVE_MENU_ITEM.PERFORMANCE
+        : window.location.href.includes(TEAM_USER_LIST)
+        ? ACTIVE_MENU_ITEM.USERS
+        : window.location.href.includes('team')
+        ? ACTIVE_MENU_ITEM.TEAM
+        : window.location.href.includes('config/certificate')
+        ? ACTIVE_MENU_ITEM.CERTIFICATE
+        : window.location.href.includes('config/application')
+        ? ACTIVE_MENU_ITEM.APPLICATION
+        : window.location.href.includes('config/form')
+        ? ACTIVE_MENU_ITEM.FORM
+        : window.location.href.includes('config/integration')
+        ? ACTIVE_MENU_ITEM.INTEGRATION
+        : window.location.href.includes('vsexports')
+        ? ACTIVE_MENU_ITEM.VSEXPORTS
+        : ACTIVE_MENU_ITEM.DECLARATIONS,
+      language: store.i18n.language,
+      offlineData: getOfflineData(store),
+      fieldNames: Object.values(getRegisterForm(store))
+        .flatMap((form) => form.sections)
+        .flatMap((section) => section.groups)
+        .flatMap((group) => group.fields)
+        .map((field) => field.name)
+    }),
+    {
+      setAdvancedSearchParam: setAdvancedSearchParam
+    }
+  )(injectIntl(HeaderComponent))
+)
 
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`

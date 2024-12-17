@@ -24,10 +24,8 @@ import {
   validationMessages as messages
 } from '@client/i18n/messages'
 import {
-  goBack,
-  goToCreateUserSection,
-  goToTeamUserList,
-  goToUserReviewForm
+  generateCreateUserSectionUrl,
+  generateUserReviewFormUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -45,6 +43,12 @@ import { getOfflineData } from '@client/offline/selectors'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -68,14 +72,10 @@ type IState = {
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
-  goToTeamUserList: typeof goToTeamUserList
   modifyUserFormData: typeof modifyUserFormData
-  goToCreateUserSection: typeof goToCreateUserSection
-  goToUserReviewForm: typeof goToUserReviewForm
   clearUserFormData: typeof clearUserFormData
 }
-type IFullProps = IntlShapeProps & IProps & IDispatchProps
+type IFullProps = IntlShapeProps & IProps & IDispatchProps & RouteComponentProps
 
 class UserFormComponent extends React.Component<IFullProps, IState> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -95,14 +95,18 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       this.showAllValidationErrors()
     } else {
       this.props.userId
-        ? this.props.goToUserReviewForm(
-            this.props.userId,
-            this.props.nextSectionId,
-            this.props.nextGroupId
+        ? this.props.router.navigate(
+            generateUserReviewFormUrl({
+              userId: this.props.userId,
+              sectionId: this.props.nextSectionId,
+              groupId: this.props.nextGroupId
+            })
           )
-        : this.props.goToCreateUserSection(
-            this.props.nextSectionId,
-            this.props.nextGroupId
+        : this.props.router.navigate(
+            generateCreateUserSectionUrl({
+              sectionId: this.props.nextSectionId,
+              groupId: this.props.nextGroupId
+            })
           )
     }
   }
@@ -123,7 +127,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   handleBackAction = () => {
-    this.props.goBack()
+    this.props.router.navigate(-1)
   }
 
   modifyData = (values: any) => {
@@ -152,8 +156,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
-      this.props
+    const { section, intl, activeGroup, userId, formData } = this.props
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
@@ -167,7 +170,14 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               : section.title && intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
-          goHome={() => goToTeamUserList(String(formData.registrationOffice))}
+          goHome={() =>
+            this.props.router.navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId: String(formData.registrationOffice)
+              })
+            })
+          }
           hideBackground={true}
         >
           <Content size={ContentSize.SMALL} title={title}>
@@ -214,11 +224,9 @@ const mapStateToProps = (state: IStoreState) => {
   }
 }
 
-export const UserForm = connect(mapStateToProps, {
-  modifyUserFormData,
-  goToCreateUserSection,
-  goToUserReviewForm,
-  goBack,
-  goToTeamUserList,
-  clearUserFormData
-})(injectIntl(UserFormComponent))
+export const UserForm = withRouter(
+  connect(mapStateToProps, {
+    modifyUserFormData,
+    clearUserFormData
+  })(injectIntl(UserFormComponent))
+)
