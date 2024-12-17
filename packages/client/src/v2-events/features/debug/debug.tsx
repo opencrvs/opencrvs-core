@@ -16,9 +16,7 @@ import styled from 'styled-components'
 import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
-
+import { v4 as uuid } from 'uuid'
 const Container = styled.div`
   background: #fff;
   position: fixed;
@@ -38,13 +36,11 @@ export const Debug = () => {
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
-  const [eventId, setEventId] = useState('')
-
   const createEvents = () => {
     createMutation.mutate(
       {
         type: 'TENNIS_CLUB_MEMBERSHIP',
-        transactionId: Math.random().toString(36).substring(2)
+        transactionId: `tmp-${uuid()}`
       },
       {
         onSuccess: (data) => {
@@ -94,11 +90,6 @@ export const Debug = () => {
               Clear React Query buffer
             </button>
           </li>
-        </ul>
-        <Text variant="h4" element="span">
-          Local records
-        </Text>
-        <ul>
           <li>
             <button onClick={() => console.log(events.events.data)}>
               console.log stored events
@@ -110,6 +101,9 @@ export const Debug = () => {
             </Text>
           </li>
         </ul>
+        <Text variant="h4" element="span">
+          Local records
+        </Text>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
     </>

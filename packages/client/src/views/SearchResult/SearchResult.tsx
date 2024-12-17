@@ -102,19 +102,6 @@ export function getRejectionReasonDisplayValue(reason: string) {
   }
 }
 
-interface ISerachInputCustomProps {
-  searchValue?: string
-  error?: boolean
-  touched?: boolean
-  focusInput?: boolean
-  buttonLabel: string
-  onSearchTextChange?: (searchText: string) => void
-  onSubmit: (searchText: string) => any
-}
-
-export type ISearchInputProps = ISerachInputCustomProps &
-  React.InputHTMLAttributes<HTMLInputElement>
-
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string

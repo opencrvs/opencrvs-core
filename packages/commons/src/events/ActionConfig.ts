@@ -9,11 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import { Conditional } from '../conditionals/conditionals'
 import { FormConfig } from './FormConfig'
 import { TranslationConfig } from './TranslationConfig'
 
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
+  allowedWhen: Conditional().optional(),
   forms: z.array(FormConfig)
 })
 
@@ -22,6 +24,7 @@ export const ActionConfigBase = z.object({
  */
 export const ActionType = {
   CREATE: 'CREATE',
+  DRAFT: 'DRAFT',
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN',
   REGISTER: 'REGISTER',
@@ -29,7 +32,8 @@ export const ActionType = {
   CORRECT: 'CORRECT',
   DETECT_DUPLICATE: 'DETECT_DUPLICATE',
   NOTIFY: 'NOTIFY',
-  DECLARE: 'DECLARE'
+  DECLARE: 'DECLARE',
+  CUSTOM: 'CUSTOM'
 } as const
 
 const CreateConfig = ActionConfigBase.merge(
@@ -44,14 +48,30 @@ const DeclareConfig = ActionConfigBase.merge(
   })
 )
 
+const ValidateConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.VALIDATE)
+  })
+)
+
 const RegisterConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER)
   })
 )
 
+const CustomConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.CUSTOM)
+  })
+)
+
 export const ActionConfig = z.discriminatedUnion('type', [
   CreateConfig,
   DeclareConfig,
-  RegisterConfig
+  ValidateConfig,
+  RegisterConfig,
+  CustomConfig
 ])
+
+export type ActionConfig = z.infer<typeof ActionConfig>
