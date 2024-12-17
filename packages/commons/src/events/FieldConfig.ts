@@ -67,18 +67,20 @@ const BaseField = z.object({
 
 export type BaseField = z.infer<typeof BaseField>
 
-export const FieldTypes = {
+export const FieldType = {
   TEXT: 'TEXT',
   DATE: 'DATE',
   PARAGRAPH: 'PARAGRAPH',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
   HIDDEN: 'HIDDEN'
-}
-export type FieldTypes = (typeof FieldTypes)[keyof typeof FieldTypes]
+} as const
+
+export const fieldTypes = Object.values(FieldType)
+export type FieldType = (typeof fieldTypes)[number]
 
 const TextField = BaseField.extend({
-  type: z.literal(FieldTypes.TEXT),
+  type: z.literal(FieldType.TEXT),
   options: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text')
@@ -88,7 +90,7 @@ const TextField = BaseField.extend({
 }).describe('Text input')
 
 const DateField = BaseField.extend({
-  type: z.literal(FieldTypes.DATE),
+  type: z.literal(FieldType.DATE),
   options: z
     .object({
       notice: TranslationConfig.describe(
@@ -99,7 +101,7 @@ const DateField = BaseField.extend({
 }).describe('A single date input (dd-mm-YYYY)')
 
 const Paragraph = BaseField.extend({
-  type: z.literal(FieldTypes.PARAGRAPH),
+  type: z.literal(FieldType.PARAGRAPH),
   options: z
     .object({
       fontVariant: z.literal('reg16').optional()
@@ -108,15 +110,15 @@ const Paragraph = BaseField.extend({
 }).describe('A read-only HTML <p> paragraph')
 
 const File = BaseField.extend({
-  type: z.literal(FieldTypes.FILE)
+  type: z.literal(FieldType.FILE)
 }).describe('File upload')
 
 const Hidden = BaseField.extend({
-  type: z.literal(FieldTypes.HIDDEN)
+  type: z.literal(FieldType.HIDDEN)
 }).describe('Hidden field')
 
 const RadioGroup = BaseField.extend({
-  type: z.literal(FieldTypes.RADIO_GROUP),
+  type: z.literal(FieldType.RADIO_GROUP),
   options: z.array(
     z.object({
       value: z.string().describe('The value of the option'),
@@ -135,5 +137,4 @@ export const FieldConfig = z.discriminatedUnion('type', [
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>
-export type FieldType = FieldConfig['type']
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
