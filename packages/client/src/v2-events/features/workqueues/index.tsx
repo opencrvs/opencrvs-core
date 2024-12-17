@@ -11,8 +11,8 @@
 
 import React from 'react'
 
-import { Debug } from '@client/v2-events/features/debug/debug'
-import { ROUTES } from '@client/v2-events/routes'
+import { useNavigate } from 'react-router-dom'
+import { noop } from 'lodash'
 import {
   AppBar,
   Button,
@@ -22,17 +22,17 @@ import {
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@client/v2-events/routes'
+import { Debug } from '@client/v2-events/features/debug/debug'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
-export const Workqueues = ({ children }: { children: React.ReactNode }) => {
+export function Workqueues({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
 
   return (
     <Frame
-      skipToContentText="skip"
       header={
         <AppBar
           desktopCenter={
@@ -48,6 +48,7 @@ export const Workqueues = ({ children }: { children: React.ReactNode }) => {
 
               <SearchTool
                 language="en"
+                searchHandler={noop}
                 searchTypeList={[
                   {
                     name: 'TRACKING_ID',
@@ -56,12 +57,12 @@ export const Workqueues = ({ children }: { children: React.ReactNode }) => {
                     placeHolderText: 'Search'
                   }
                 ]}
-                searchHandler={() => {}}
               />
             </Stack>
           }
         />
       }
+      skipToContentText="skip"
     >
       {children}
       <Debug />

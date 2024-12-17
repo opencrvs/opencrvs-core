@@ -14,6 +14,7 @@ import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Preview } from '@client/v2-events/features/events/components/Preview'
@@ -21,8 +22,6 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-
-import { getCurrentEventState } from '@opencrvs/commons/client'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -47,7 +46,7 @@ const messages = defineMessages({
  *
  * Preview of event to be registered.
  */
-export const RegisterIndex = () => {
+export function RegisterIndex() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
   const events = useEvents()
   const [modal, openModal] = useModal()
@@ -76,13 +75,13 @@ export const RegisterIndex = () => {
 
   const form = getFormValues(eventId)
 
-  const handleEdit = async ({
+  async function handleEdit({
     pageId,
     fieldId
   }: {
     pageId: string
     fieldId?: string
-  }) => {
+  }) {
     const confirmedEdit = await openModal<boolean | null>((close) => (
       <Preview.EditModal close={close} />
     ))
@@ -101,9 +100,9 @@ export const RegisterIndex = () => {
     return
   }
 
-  const handleRegistration = async () => {
+  async function handleRegistration() {
     const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <Preview.ActionModal close={close} action="Register" />
+      <Preview.ActionModal action="Register" close={close} />
     ))
     if (confirmedRegistration) {
       registerMutation.mutate({
@@ -118,19 +117,19 @@ export const RegisterIndex = () => {
 
   return (
     <Preview.Body
-      title=""
-      formConfig={formConfigs[0]}
       eventConfig={config}
-      onEdit={handleEdit}
       form={form}
+      formConfig={formConfigs[0]}
+      title=""
+      onEdit={handleEdit}
     >
       <Preview.Actions
-        onConfirm={handleRegistration}
         messages={{
           title: messages.registerActionTitle,
           description: messages.registerActionDescription,
           onConfirm: messages.registerActionDeclare
         }}
+        onConfirm={handleRegistration}
       />
       {modal}
     </Preview.Body>

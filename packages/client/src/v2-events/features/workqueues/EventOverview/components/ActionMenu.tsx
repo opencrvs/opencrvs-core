@@ -10,21 +10,21 @@
  */
 
 import React from 'react'
-import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { useIntl } from 'react-intl'
 
-import { messages } from '@client/i18n/messages/views/action'
 import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@client/v2-events/routes'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validate } from '@opencrvs/commons/client'
 import { type ActionConfig } from '@opencrvs/commons'
+import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
+import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useAuthentication } from '@client/utils/userUtils'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { ROUTES } from '@client/v2-events/routes'
+import { messages } from '@client/i18n/messages/views/action'
 
-export const ActionMenu = ({ eventId }: { eventId: string }) => {
+export function ActionMenu({ eventId }: { eventId: string }) {
   const intl = useIntl()
   const events = useEvents()
   const navigate = useNavigate()
@@ -35,8 +35,8 @@ export const ActionMenu = ({ eventId }: { eventId: string }) => {
     event.type
   )
 
-  const isActionVisible = (action: ActionConfig) => {
-    if (!action?.allowedWhen) {
+  function isActionVisible(action: ActionConfig) {
+    if (!action.allowedWhen) {
       return true
     }
     const params = {

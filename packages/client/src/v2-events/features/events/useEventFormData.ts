@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionInput } from '@opencrvs/commons/client'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { ActionInput } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 
 type FormData = ActionInput['data']
 
-type EventFormData = {
+interface EventFormData {
   formValues: FormData
   setFormValues: (eventId: string, data: FormData) => void
   getFormValues: (eventId: string) => FormData

@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { BaseField, FieldConfig, validate } from '@opencrvs/commons/client'
 import {
   DependencyInfo,
   IFormFieldValue,
   IFormSectionData
 } from '@client/forms'
-
-import { BaseField, FieldConfig, validate } from '@opencrvs/commons/client'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -33,10 +32,11 @@ export function handleInitialValue(
 
 export type FlatFormData = Record<string, IFormFieldValue>
 
-export const getConditionalActionsForField = (
+export function getConditionalActionsForField(
   field: FieldConfig,
   values: FlatFormData
-) => {
+) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!field.conditionals) {
     return []
   }
@@ -50,13 +50,13 @@ export const getConditionalActionsForField = (
     .map((conditional) => conditional.type)
 }
 
-export const evalExpressionInFieldDefinition = (
+export function evalExpressionInFieldDefinition(
   expression: string,
   /*
    * These are used in the eval expression
    */
   { $form }: { $form: FlatFormData }
-) => {
+) {
   // eslint-disable-next-line no-eval
   return eval(expression) as IFormFieldValue
 }
