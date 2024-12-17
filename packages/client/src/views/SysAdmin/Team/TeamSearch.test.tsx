@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { TEAM_SEARCH } from '@client/navigation/routes'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
 import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
 import {
@@ -141,7 +140,7 @@ describe('Team search test', () => {
           store,
           initialEntries: [
             {
-              pathname: TEAM_SEARCH,
+              pathname: TEAM_USER_LIST,
               state: {
                 selectedLocation: {
                   id: '',

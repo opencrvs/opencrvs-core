@@ -38,5 +38,6 @@ src/
 
 #### Gotchas, good to know
 
+- All dependencies of the functions and moduless used from `packages/commons` **must** be also defined in the package.json of the toolkit. Otherwise someone installing the package will get errors.
 - Package is published and should be used without knowledge of rest of the monorepo
 - Package exposes `/events` directory, with types, from `packages/commons` through the library, others are excluded.

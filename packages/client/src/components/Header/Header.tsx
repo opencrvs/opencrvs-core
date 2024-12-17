@@ -170,8 +170,6 @@ const HeaderComponent = (props: IFullProps) => {
                   router.navigate(
                     formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
                   )
-                } else {
-                  router.navigate(routes.CREATE_USER)
                 }
               }
             }
@@ -195,8 +193,6 @@ const HeaderComponent = (props: IFullProps) => {
                   router.navigate(
                     formatUrl(routes.CREATE_USER_ON_LOCATION, { locationId })
                   )
-                } else {
-                  router.navigate(routes.CREATE_USER)
                 }
               }
             }

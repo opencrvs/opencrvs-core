@@ -12,77 +12,26 @@
 import React from 'react'
 
 import { Debug } from '@client/v2-events/features/debug/debug'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes'
 import {
   AppBar,
   Button,
-  Content,
-  ContentSize,
   Frame,
   Icon,
-  LeftNavigation,
-  NavigationGroup,
-  NavigationItem,
   SearchTool,
-  Stack,
-  Text
+  Stack
 } from '@opencrvs/components'
-import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
 import { useNavigate } from 'react-router-dom'
 
-export const Workqueues = () => {
+/**
+ * Basic frame for the workqueues. Includes the left navigation and the app bar.
+ */
+export const Workqueues = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
 
   return (
     <Frame
-      navigation={
-        <LeftNavigation
-          applicationName="OpenCRVS-TS (Tennis club)"
-          applicationVersion="0.1-alpha"
-        >
-          <NavigationGroup>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              label="In progress"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              label="Ready for review"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
-              label="Requires updates"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
-              label="Sent for approval"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'green'} />}
-              label="Ready to print"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'blue'} />}
-              label="Ready to issue"
-            />
-          </NavigationGroup>
-          <NavigationGroup>
-            <NavigationItem
-              icon={() => <Icon name="Buildings" size="medium" />}
-              label="Organisation"
-            />
-            <NavigationItem
-              icon={() => <Icon name="Users" size="medium" />}
-              label="Team"
-            />
-            <NavigationItem
-              icon={() => <Icon name="Activity" size="medium" />}
-              label="Performance"
-            />
-          </NavigationGroup>
-        </LeftNavigation>
-      }
       skipToContentText="skip"
       header={
         <AppBar
@@ -91,7 +40,7 @@ export const Workqueues = () => {
               <Button
                 type="iconPrimary"
                 onClick={() => {
-                  navigate(V2_EVENTS_ROUTE)
+                  navigate(ROUTES.V2.EVENTS.CREATE.path)
                 }}
               >
                 <Plus />
@@ -114,11 +63,7 @@ export const Workqueues = () => {
         />
       }
     >
-      <Content size={ContentSize.LARGE} title="Welcome">
-        <Text variant="h2" element="p">
-          🚧🚧🚧🚧🚧🚧🚧🚧👷‍♂️👷👷🏻👷🏻‍♀️👷‍♂️👷‍♂️🚧🚧🚧🚧🚧🚧🚧🚧
-        </Text>
-      </Content>
+      {children}
       <Debug />
     </Frame>
   )

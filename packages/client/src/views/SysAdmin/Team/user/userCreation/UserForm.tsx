@@ -67,7 +67,6 @@ type IProps = {
 }
 
 type IState = {
-  disableContinueOnLocation: boolean
   fileUploading: boolean
 }
 
@@ -82,7 +81,6 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      disableContinueOnLocation: false,
       fileUploading: false
     }
   }
@@ -132,27 +130,12 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
 
   modifyData = (values: any) => {
     const { formData } = this.props
-
     if (values.role) {
       values.scopes = this.props.userRoles.find(
         (role) => role.id === values.role
       )!.scopes
-
-      this.props.modifyUserFormData({ ...formData, ...values })
     }
-    if (
-      values['registrationOffice'] !== '0' &&
-      values['registrationOffice'] !== ''
-    ) {
-      this.props.modifyUserFormData({ ...formData, ...values })
-      this.setState({
-        disableContinueOnLocation: false
-      })
-    } else {
-      this.setState({
-        disableContinueOnLocation: true
-      })
-    }
+    this.props.modifyUserFormData({ ...formData, ...values })
   }
 
   render = () => {
@@ -201,10 +184,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
                 size="large"
                 fullWidth
                 onClick={this.handleFormAction}
-                disabled={
-                  this.state.disableContinueOnLocation ||
-                  this.state.fileUploading
-                }
+                disabled={this.state.fileUploading}
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
               </Button>

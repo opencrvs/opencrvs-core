@@ -11,17 +11,48 @@
 
 import { ActionInput } from '@opencrvs/commons/client'
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import { storage } from '@client/storage'
 
 type FormData = ActionInput['data']
 
 type EventFormData = {
   formValues: FormData
-  setFormValues: (data: FormData) => void
+  setFormValues: (eventId: string, data: FormData) => void
+  getFormValues: (eventId: string) => FormData
+  getTouchedFields: () => Record<string, boolean>
   clear: () => void
+  eventId: string
 }
 
-export const useEventFormData = create<EventFormData>((set) => ({
-  formValues: {},
-  setFormValues: (data: FormData) => set(() => ({ formValues: data })),
-  clear: () => set(() => ({ formValues: {} }))
-}))
+export const useEventFormData = create<EventFormData>()(
+  persist(
+    (set, get) => ({
+      formValues: {},
+      eventId: '',
+      getFormValues: (eventId: string) =>
+        get().eventId === eventId ? get().formValues : {},
+      setFormValues: (eventId: string, data: FormData) =>
+        set(() => ({ eventId, formValues: data })),
+      getTouchedFields: () =>
+        Object.fromEntries(
+          Object.entries(get().formValues).map(([key, value]) => [key, true])
+        ),
+      clear: () => set(() => ({ eventId: '', formValues: {} }))
+    }),
+    {
+      name: 'event-form-data',
+      storage: createJSONStorage(() => ({
+        getItem: async (key) => {
+          return storage.getItem(key)
+        },
+        setItem: async (key, value) => {
+          await storage.setItem(key, value)
+        },
+        removeItem: async (key) => {
+          await storage.removeItem(key)
+        }
+      }))
+    }
+  )
+)

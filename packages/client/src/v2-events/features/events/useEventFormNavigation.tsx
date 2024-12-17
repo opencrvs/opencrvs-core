@@ -13,11 +13,7 @@ import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useNavigate } from 'react-router-dom'
-import { formatUrl } from '@client/navigation'
-import {
-  V2_DECLARE_ACTION_REVIEW_ROUTE,
-  V2_ROOT_ROUTE
-} from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes'
 
 const modalMessages = defineMessages({
   cancel: {
@@ -45,11 +41,11 @@ export const useEventFormNavigation = () => {
   const [modal, openModal] = useModal()
 
   const goToHome = () => {
-    navigate(V2_ROOT_ROUTE)
+    navigate(ROUTES.V2.path)
   }
 
   const goToReview = (eventId: string) => {
-    navigate(formatUrl(V2_DECLARE_ACTION_REVIEW_ROUTE, { eventId: eventId }))
+    navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
   }
 
   const exit = async () => {

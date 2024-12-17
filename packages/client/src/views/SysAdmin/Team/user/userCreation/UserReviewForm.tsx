@@ -317,11 +317,11 @@ const UserReviewFormComponent = ({
 
   let title: string | undefined
   let actionComponent: JSX.Element
-  const locationId = formData['registrationOffice']
+  const locationId = formData['registrationOffice'] as string
   const locationDetails =
-    offlineCountryConfiguration['locations'][`${locationId}`] ||
-    offlineCountryConfiguration['facilities'][`${locationId}`] ||
-    offlineCountryConfiguration['offices'][`${locationId}`]
+    offlineCountryConfiguration['locations'][locationId] ||
+    offlineCountryConfiguration['facilities'][locationId] ||
+    offlineCountryConfiguration['offices'][locationId]
 
   const userRole = userRoles.find(({ id }) => id === formData.role)
 

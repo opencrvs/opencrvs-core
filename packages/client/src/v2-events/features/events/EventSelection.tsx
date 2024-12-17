@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { formatUrl } from '@client/navigation'
 import { Debug } from '@client/v2-events/features/debug/debug'
-import { V2_DECLARE_ACTION_ROUTE } from '@client/v2-events/routes'
+import { ROUTES } from '@client/v2-events/routes'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -24,10 +23,11 @@ import { Stack } from '@opencrvs/components/lib/Stack'
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
 import { useEventConfigurations } from './useEventConfiguration'
-import { useEvents } from './useEvents/useEvents'
-import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEventFormData } from './useEventFormData'
+import { useEventFormNavigation } from './useEventFormNavigation'
+import { useEvents } from './useEvents/useEvents'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -80,7 +80,7 @@ const EventSelector = () => {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
-    const transactionId = Math.random().toString()
+    const transactionId = `tmp-${uuid()}`
 
     createEvent.mutate({
       type: eventType,
@@ -90,7 +90,7 @@ const EventSelector = () => {
     clearForm()
 
     navigate(
-      formatUrl(V2_DECLARE_ACTION_ROUTE, {
+      ROUTES.V2.EVENTS.DECLARE.buildPath({
         eventId: transactionId
       })
     )

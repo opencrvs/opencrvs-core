@@ -8,122 +8,100 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { httpErrorResponseValidator } from '@client/components/form/http'
+import { IValidationResult } from '@client/utils/validate'
 import {
-  IDynamicFormField,
-  IFormField,
-  IFormSectionData,
-  RADIO_GROUP_WITH_NESTED_FIELDS
-} from '@client/forms'
-import { IValidationResult, required } from '@client/utils/validate'
-import {
-  getConditionalActionsForField,
-  getFieldValidation,
-  isFieldButton
-} from './utils'
+  ConditionalParameters,
+  FieldConfig,
+  validate
+} from '@opencrvs/commons/client'
 import { MessageDescriptor } from 'react-intl'
+import { FlatFormData, getConditionalActionsForField } from './utils'
 
 interface IFieldErrors {
   errors: IValidationResult[]
-  nestedFields: {
-    [fieldName: string]: IValidationResult[]
-  }
 }
 
 export type Errors = {
   [fieldName: string]: IFieldErrors
 }
 
-const getValidationErrors = {
-  forField: function (
-    field: IFormField,
-    values: IFormSectionData,
-    requiredErrorMessage?: MessageDescriptor,
-    checkValidationErrorsOnly?: boolean
+function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
+  const hasShowRule = field.conditionals.some(
+    (conditional) => conditional.type === 'SHOW'
+  )
+  const validConditionals = getConditionalActionsForField(field, params)
+  const isVisible = !hasShowRule || validConditionals.includes('SHOW')
+  return !isVisible
+}
+
+function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
+  const hasEnableRule = field.conditionals.some(
+    (conditional) => conditional.type === 'ENABLE'
+  )
+  const validConditionals = getConditionalActionsForField(field, params)
+  const isEnabled = !hasEnableRule || validConditionals.includes('ENABLE')
+  return !isEnabled
+}
+
+function getValidationErrors(
+  field: FieldConfig,
+  values: FlatFormData,
+  requiredErrorMessage?: MessageDescriptor,
+  checkValidationErrorsOnly?: boolean
+) {
+  const conditionalParameters = {
+    $form: values,
+    $now: new Date().toISOString().split('T')[0]
+  }
+
+  if (
+    isFieldHidden(field, conditionalParameters) ||
+    isFieldDisabled(field, conditionalParameters)
   ) {
-    const value =
-      field.nestedFields && values[field.name]
-        ? (values[field.name] as IFormSectionData).value
-        : values[field.name]
-    const conditionalActions = getConditionalActionsForField(field, {
-      $form: values
-    })
-    if (
-      conditionalActions.includes('hide') ||
-      (conditionalActions.includes('disable') && !isFieldButton(field))
-    ) {
-      return {
-        errors: [],
-        nestedFields: {}
-      }
-    }
-
-    let validators = field.validator ? Array.from(field.validator) : []
-
-    validators.push(...getFieldValidation(field as IDynamicFormField, values))
-
-    if (field.required && !checkValidationErrorsOnly) {
-      validators.push(required(requiredErrorMessage))
-    } else if (isFieldButton(field)) {
-      const { trigger } = field.options
-      validators.push(httpErrorResponseValidator(trigger))
-    } else if (field.validateEmpty) {
-    } else if (!value && value !== 0) {
-      validators = []
-    }
-
-    const validationResults = validators
-      .map((validator) => validator(value, { $form: values }))
-      .filter((error) => error !== undefined) as IValidationResult[]
-
     return {
-      errors: validationResults,
-      nestedFields: this.forNestedField(field, values, requiredErrorMessage)
+      errors: []
     }
-  },
-  forNestedField: function (
-    field: IFormField,
-    values: IFormSectionData,
-    requiredErrorMessage?: MessageDescriptor
-  ): {
-    [fieldName: string]: IValidationResult[]
-  } {
-    if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
-      const parentValue =
-        values[field.name] && (values[field.name] as IFormSectionData).value
-      const nestedFieldDefinitions =
-        (parentValue && field.nestedFields[parentValue as string]) || []
-      return nestedFieldDefinitions.reduce((nestedErrors, nestedField) => {
-        const errors = this.forField(
-          nestedField,
-          (values[field.name] as IFormSectionData)
-            .nestedFields as IFormSectionData
-        ).errors
+  }
 
-        return {
-          ...nestedErrors,
-          [nestedField.name]: errors
-        }
-      }, {})
-    }
+  const validators = field.validation ? field.validation : []
 
-    return {}
+  // if (field.required && !checkValidationErrorsOnly) {
+  //   validators.push(required(requiredErrorMessage))
+  // } else if (isFieldButton(field)) {
+  //   const { trigger } = field.options
+  //   validators.push(httpErrorResponseValidator(trigger))
+  // } else if (field.validateEmpty) {
+  // } else if (!value && value !== 0) {
+  //   validators = []
+  // }
+
+  const validationResults = validators
+    .filter((validation) => {
+      return !validate(validation.validator, {
+        $form: values,
+        $now: new Date().toISOString().split('T')[0]
+      })
+    })
+    .map((validation) => ({ message: validation.message }))
+
+  return {
+    errors: validationResults
   }
 }
 export function getValidationErrorsForForm(
-  fields: IFormField[],
-  values: IFormSectionData,
+  fields: FieldConfig[],
+  values: FlatFormData,
   requiredErrorMessage?: MessageDescriptor,
   checkValidationErrorsOnly?: boolean
 ) {
   return fields.reduce(
     (errorsForAllFields: Errors, field) =>
-      errorsForAllFields[field.name] &&
-      errorsForAllFields[field.name].errors.length > 0
+      errorsForAllFields[field.id] &&
+      errorsForAllFields[field.id].errors.length > 0
         ? errorsForAllFields
         : {
             ...errorsForAllFields,
-            [field.name]: getValidationErrors.forField(
+            [field.id]: getValidationErrors(
               field,
               values,
               requiredErrorMessage,

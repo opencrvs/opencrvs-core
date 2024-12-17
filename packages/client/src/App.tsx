@@ -9,9 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
-import * as React from 'react'
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
 import { ProtectedPage } from '@client/components/ProtectedPage'
@@ -19,8 +16,17 @@ import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import * as routes from '@client/navigation/routes'
+import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
+import { Home } from '@client/views/OfficeHome/Home'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
+import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
+import { Leaderboards } from '@client/views/Performance/Leaderboards'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -32,55 +38,37 @@ import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
-import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
-import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
-import { RecordAudit } from './views/RecordAudit/RecordAudit'
-import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
-import VSExport from './views/SysAdmin/Vsexports/VSExport'
-import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
-import { UserAudit } from './views/UserAudit/UserAudit'
-import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
-import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
-import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import { Home } from '@client/views/OfficeHome/Home'
-import { PrintRecord } from './views/PrintRecord/PrintRecord'
-import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
-import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
-import { ReloadModal } from './views/Modals/ReloadModal'
-import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
-import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
-import { EventFormWizardIndex } from './v2-events/features/events/EventFormWizard'
-import { EventSelection } from './v2-events/features/events/EventSelection'
-import { Workqueues } from './v2-events/features/workqueues'
-import {
-  V2_DECLARE_ACTION_REVIEW_ROUTE,
-  V2_DECLARE_ACTION_ROUTE,
-  V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
-  V2_EVENTS_ROUTE,
-  V2_ROOT_ROUTE
-} from './v2-events/routes'
-import { TRPCProvider } from './v2-events/trpc'
-import { ReviewSection } from './v2-events/features/events/actions/declare/Review'
-import { DeclareIndex } from './v2-events/features/events/actions/declare/Declare'
 import { SCOPES } from '@opencrvs/commons/client'
+import { getTheme } from '@opencrvs/components'
+import * as React from 'react'
+import { Provider } from 'react-redux'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { I18nContainer } from './i18n/components/I18nContainer'
+import { useApolloClient } from './utils/apolloClient'
+import { ApolloProvider } from './utils/ApolloProvider'
+
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
-import { useApolloClient } from './utils/apolloClient'
-import { getTheme } from '@opencrvs/components'
-import { ErrorBoundary } from './components/ErrorBoundary'
-import { ApolloProvider } from './utils/ApolloProvider'
-import { Provider } from 'react-redux'
-import { I18nContainer } from './i18n/components/I18nContainer'
-import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
+import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
+import { ReloadModal } from './views/Modals/ReloadModal'
+import { ReviewCertificate } from './views/PrintCertificate/ReviewCertificateAction'
+import { PrintRecord } from './views/PrintRecord/PrintRecord'
+import { RecordAudit } from './views/RecordAudit/RecordAudit'
+import { ReviewCorrection } from './views/ReviewCorrection/ReviewCorrection'
+import { AdvancedSearchConfig } from './views/SearchResult/AdvancedSearch'
+import AllUserEmail from './views/SysAdmin/Communications/AllUserEmail/AllUserEmail'
+import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
+import { UserList } from './views/SysAdmin/Team/user/UserList'
+import VSExport from './views/SysAdmin/Vsexports/VSExport'
+import { UserAudit } from './views/UserAudit/UserAudit'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -311,24 +299,6 @@ export const routesConfig = [
         element: <WorkflowStatus />
       },
       {
-        path: routes.TEAM_SEARCH,
-        element: (
-          <ProtectedRoute
-            scopes={[
-              SCOPES.USER_READ,
-              SCOPES.USER_READ_MY_OFFICE,
-              SCOPES.USER_READ_MY_JURISDICTION
-            ]}
-          >
-            <TeamSearch />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: routes.CREATE_USER,
-        element: <CreateNewUser />
-      },
-      {
         path: routes.CREATE_USER_ON_LOCATION,
         element: <CreateNewUser />
       },
@@ -344,46 +314,7 @@ export const routesConfig = [
         path: routes.REVIEW_USER_DETAILS,
         element: <CreateNewUser />
       },
-      {
-        path: V2_ROOT_ROUTE,
-        element: (
-          <TRPCProvider>
-            <Workqueues />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: V2_EVENTS_ROUTE,
-        element: (
-          <TRPCProvider>
-            <EventSelection />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: V2_DECLARE_ACTION_ROUTE,
-        element: (
-          <TRPCProvider>
-            <EventFormWizardIndex />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: V2_DECLARE_ACTION_REVIEW_ROUTE,
-        element: (
-          <TRPCProvider>
-            <ReviewSection />
-          </TRPCProvider>
-        )
-      },
-      {
-        path: V2_DECLARE_ACTION_ROUTE_WITH_PAGE,
-        element: (
-          <TRPCProvider>
-            <DeclareIndex />
-          </TRPCProvider>
-        )
-      }
+      v2RoutesConfig
     ]
   }
 ]

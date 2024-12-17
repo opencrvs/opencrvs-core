@@ -564,11 +564,7 @@ function UserListComponent(props: IProps) {
             locationId: searchedLocation.id
           })
         )
-
-        return
       }
-
-      navigate(routes.CREATE_USER)
     },
     [searchedLocation, navigate]
   )
@@ -584,8 +580,6 @@ function UserListComponent(props: IProps) {
           }
         }
       })
-    } else {
-      navigate(routes.TEAM_SEARCH)
     }
   }
 
