@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-import { SecondaryButton } from '../../../buttons'
+import { Button } from '../../../Button'
 import { Icon } from '../../../Icon'
 import styled from 'styled-components'
 import { Dialog } from '../../../Dialog'
@@ -30,10 +30,6 @@ const Info = styled(Stack)`
   margin-top: 24px;
 `
 
-const StyledButton = styled(SecondaryButton)`
-  width: 100%;
-`
-
 export const QRReader = (props: ScannableQRReader) => {
   const { labels } = props
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
@@ -47,10 +43,15 @@ export const QRReader = (props: ScannableQRReader) => {
   }
   return (
     <>
-      <StyledButton size="large" onClick={() => setScannerDialogOpen(true)}>
+      <Button
+        size="large"
+        type="secondary"
+        fullWidth
+        onClick={() => setScannerDialogOpen(true)}
+      >
         <Icon name="QrCode" size="medium" />
         {labels.button}
-      </StyledButton>
+      </Button>
       <Dialog
         isOpen={isScannerDialogOpen}
         onClose={() => setScannerDialogOpen(false)}
