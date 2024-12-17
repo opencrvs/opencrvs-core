@@ -124,6 +124,7 @@ interface IGenderBasisPoint {
   locationLevel3?: string
   locationLevel4?: string
   locationLevel5?: string
+  locationLevel6?: string
 }
 
 type Payment = {
@@ -371,7 +372,7 @@ export async function getCurrentAndLowerLocationLevels(
   const oneLevelLowerLocationColumn =
     locationLevelOfQueryId &&
     locationLevelOfQueryId.replace(/\d/, (level: string) =>
-      level === '5' ? level : String(Number(level) + 1)
+      level === '6' ? level : String(Number(level) + 1)
     )
 
   if (!locationLevelOfQueryId || !oneLevelLowerLocationColumn) {

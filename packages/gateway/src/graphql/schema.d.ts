@@ -401,6 +401,7 @@ export interface GQLAdvancedSearchParametersInput {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -1040,45 +1041,6 @@ export interface GQLOIDPUserInfo {
   updated_at?: number
 }
 
-export interface GQLPersonInput {
-  _fhirID?: string
-  identifier?: Array<GQLIdentityInput | null>
-  name?: Array<GQLHumanNameInput | null>
-  telecom?: Array<GQLContactPointInput | null>
-  gender?: GQLGender
-  birthDate?: GQLPlainDate
-  age?: number
-  maritalStatus?: string
-  occupation?: string
-  detailsExist?: boolean
-  reasonNotApplying?: string
-  dateOfMarriage?: GQLPlainDate
-  multipleBirth?: number
-  address?: Array<GQLAddressInput | null>
-  photo?: Array<GQLAttachmentInput>
-  deceased?: GQLDeceasedInput
-  nationality?: Array<string | null>
-  educationalAttainment?: string
-  ageOfIndividualInYears?: number
-}
-
-export interface GQLLocationInput {
-  _fhirID?: string
-  identifier?: Array<string | null>
-  status?: string
-  name?: string
-  alias?: Array<string | null>
-  description?: string
-  partOf?: string
-  type?: string
-  telecom?: Array<GQLContactPointInput | null>
-  address?: GQLAddressInput
-  longitude?: number
-  latitude?: number
-  altitude?: number
-  geoData?: string
-}
-
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
@@ -1107,6 +1069,23 @@ export interface GQLCorrectionValueInput {
   fieldName: string
   oldValue?: GQLFieldValue
   newValue: GQLFieldValue
+}
+
+export interface GQLLocationInput {
+  _fhirID?: string
+  identifier?: Array<string | null>
+  status?: string
+  name?: string
+  alias?: Array<string | null>
+  description?: string
+  partOf?: string
+  type?: string
+  telecom?: Array<GQLContactPointInput | null>
+  address?: GQLAddressInput
+  longitude?: number
+  latitude?: number
+  altitude?: number
+  geoData?: string
 }
 
 export interface GQLFHIRIDMap {
@@ -1143,6 +1122,28 @@ export interface GQLRegistrationInput {
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
   changedValues?: Array<GQLCorrectionValueInput>
+}
+
+export interface GQLPersonInput {
+  _fhirID?: string
+  identifier?: Array<GQLIdentityInput | null>
+  name?: Array<GQLHumanNameInput | null>
+  telecom?: Array<GQLContactPointInput | null>
+  gender?: GQLGender
+  birthDate?: GQLPlainDate
+  age?: number
+  maritalStatus?: string
+  occupation?: string
+  detailsExist?: boolean
+  reasonNotApplying?: string
+  dateOfMarriage?: GQLPlainDate
+  multipleBirth?: number
+  address?: Array<GQLAddressInput | null>
+  photo?: Array<GQLAttachmentInput>
+  deceased?: GQLDeceasedInput
+  nationality?: Array<string | null>
+  educationalAttainment?: string
+  ageOfIndividualInYears?: number
 }
 
 export interface GQLRelatedPersonInput {
@@ -1347,6 +1348,7 @@ export interface GQLAdvancedSeachParameters {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -1523,46 +1525,6 @@ export interface GQLOIDPUserAddress {
   country?: string
 }
 
-export interface GQLIdentityInput {
-  id?: string
-  type?: string
-  otherType?: string
-  fieldsModifiedByIdentity?: Array<string | null>
-}
-
-export interface GQLContactPointInput {
-  system?: GQLTelecomSystem
-  value?: string
-  use?: GQLTelecomUse
-}
-
-export const enum GQLGender {
-  male = 'male',
-  female = 'female',
-  other = 'other',
-  unknown = 'unknown'
-}
-
-export interface GQLAddressInput {
-  use?: GQLAddressUse
-  type?: GQLAddressType
-  text?: string
-  line?: Array<string>
-  city?: string
-  district?: string
-  state?: string
-  postalCode?: string
-  country?: string
-  from?: GQLDate
-  to?: GQLDate
-  partOf?: string
-}
-
-export interface GQLDeceasedInput {
-  deceased?: boolean
-  deathDate?: GQLPlainDate
-}
-
 export const enum GQLAttachmentInputStatus {
   approved = 'approved',
   validated = 'validated',
@@ -1580,6 +1542,27 @@ export const enum GQLPaymentOutcomeType {
 }
 
 export type GQLFieldValue = any
+
+export interface GQLContactPointInput {
+  system?: GQLTelecomSystem
+  value?: string
+  use?: GQLTelecomUse
+}
+
+export interface GQLAddressInput {
+  use?: GQLAddressUse
+  type?: GQLAddressType
+  text?: string
+  line?: Array<string>
+  city?: string
+  district?: string
+  state?: string
+  postalCode?: string
+  country?: string
+  from?: GQLDate
+  to?: GQLDate
+  partOf?: string
+}
 
 export interface GQLObservationFHIRIDS {
   maleDependentsOfDeceased?: string
@@ -1613,6 +1596,25 @@ export interface GQLCertificateInput {
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPaymentInput | null>
   data?: string
+}
+
+export interface GQLIdentityInput {
+  id?: string
+  type?: string
+  otherType?: string
+  fieldsModifiedByIdentity?: Array<string | null>
+}
+
+export const enum GQLGender {
+  male = 'male',
+  female = 'female',
+  other = 'other',
+  unknown = 'unknown'
+}
+
+export interface GQLDeceasedInput {
+  deceased?: boolean
+  deathDate?: GQLPlainDate
 }
 
 export interface GQLLabelInput {
@@ -8548,6 +8550,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   eventLocationLevel3?: AdvancedSeachParametersToEventLocationLevel3Resolver<TParent>
   eventLocationLevel4?: AdvancedSeachParametersToEventLocationLevel4Resolver<TParent>
   eventLocationLevel5?: AdvancedSeachParametersToEventLocationLevel5Resolver<TParent>
+  eventLocationLevel6?: AdvancedSeachParametersToEventLocationLevel6Resolver<TParent>
   childFirstNames?: AdvancedSeachParametersToChildFirstNamesResolver<TParent>
   childLastName?: AdvancedSeachParametersToChildLastNameResolver<TParent>
   childDoB?: AdvancedSeachParametersToChildDoBResolver<TParent>
@@ -8848,6 +8851,18 @@ export interface AdvancedSeachParametersToEventLocationLevel4Resolver<
 }
 
 export interface AdvancedSeachParametersToEventLocationLevel5Resolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToEventLocationLevel6Resolver<
   TParent = any,
   TResult = any
 > {

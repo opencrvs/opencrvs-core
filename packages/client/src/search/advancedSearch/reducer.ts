@@ -32,6 +32,7 @@ export type IAdvancedSearchParamState = {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -82,6 +83,7 @@ export const advancedSearchInitialState: IAdvancedSearchParamState = {
   eventLocationLevel3: '',
   eventLocationLevel4: '',
   eventLocationLevel5: '',
+  eventLocationLevel6: '',
   childFirstNames: '',
   childLastName: '',
   childDoB: '',
