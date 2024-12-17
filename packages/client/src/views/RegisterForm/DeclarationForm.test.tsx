@@ -193,6 +193,8 @@ describe('when user starts a new declaration', () => {
 
       describe('when user enters childBirthDate and clicks to documents page', () => {
         beforeEach(async () => {
+          await flushPromises()
+
           Date.now = vi.fn(() => 1549607679507) // 08-02-2019
           await waitForElement(app, '#childBirthDate-dd')
           app
@@ -213,6 +215,8 @@ describe('when user starts a new declaration', () => {
             .simulate('change', {
               target: { id: 'childBirthDate-yyyy', value: '2018' }
             })
+
+          app.update()
         })
 
         describe('when user goes to documents page', () => {
@@ -220,6 +224,7 @@ describe('when user starts a new declaration', () => {
             await flushPromises()
             await goToDocumentsSection(app)
           })
+
           it('renders list of document upload field', async () => {
             await flushPromises()
             const fileInputs = app
