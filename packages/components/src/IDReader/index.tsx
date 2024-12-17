@@ -14,8 +14,8 @@ import styled from 'styled-components'
 import { Stack } from '../Stack'
 import { Divider } from '../Divider'
 import { Text } from '../Text'
-import { QRReader } from './readers/QRReader/QRReader'
-import { ReaderType, ScannableIDReader } from './types'
+import { ScannableIDReader } from './types'
+import { ReaderGenerator } from './readers/ReaderGenerator'
 
 const StyledBox = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
@@ -29,24 +29,11 @@ export const IDReader = (props: ScannableIDReader) => {
     onScan,
     onError
   } = props
-  const renderReader = (reader: ReaderType) => {
-    const { type, ...readerProps } = reader
-    if (type === 'qr') {
-      return (
-        <QRReader
-          key={type}
-          {...readerProps}
-          onScan={onScan}
-          onError={onError}
-        />
-      )
-    } else return null
-  }
 
   return (
     <StyledBox>
       <Stack direction="column" alignItems="center" gap={0}>
-        {readers.map(renderReader)}
+        <ReaderGenerator readers={readers} onScan={onScan} onError={onError} />
         <Divider>
           <Text variant="reg18" element="p" align="center" color="grey500">
             {dividerLabel}
