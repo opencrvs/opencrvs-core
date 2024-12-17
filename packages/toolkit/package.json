@@ -6,7 +6,8 @@
   "exports": {
     "./lib": "./dist/lib.js",
     "./events": "./dist/events/index.js",
-    "./scopes": "./dist/scopes/index.js""./conditionals": "./dist/conditionals/index.js"
+    "./scopes": "./dist/scopes/index.js",
+    "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
     "build": "rimraf dist && tsc --build && yarn build-common-events:js && yarn copy-common-events:ts && yarn build-common-scopes:js && yarn copy-common-scopes:ts && yarn build-common-conditionals:js && yarn copy-common-conditionals:ts",
