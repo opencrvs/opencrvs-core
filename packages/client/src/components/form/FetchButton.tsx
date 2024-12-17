@@ -25,7 +25,7 @@ import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
 import { useOnlineStatus } from '@client/utils'
 
-interface IFetchButtonProps {
+interface IFetchButtonProps<T = unknown> {
   id: string
   queryData?: IQuery
   label: string
@@ -33,7 +33,7 @@ interface IFetchButtonProps {
   modalTitle: string
   successTitle: string
   errorTitle: string
-  onFetch?: (response: any) => void
+  onFetch?: (response: T) => void
   isDisabled?: boolean
 }
 
