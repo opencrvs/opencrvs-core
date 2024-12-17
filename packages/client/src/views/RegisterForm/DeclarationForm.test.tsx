@@ -335,9 +335,14 @@ describe('when user starts a new declaration', () => {
         })
       })
       describe('when user clicks the "mother" page', () => {
-        beforeEach(() => goToMotherSection(app))
+        beforeEach(async () => {
+          await flushPromises()
+          await goToMotherSection(app)
+        })
 
-        it('changes to the mother details section', () => {
+        it('changes to the mother details section', async () => {
+          await flushPromises()
+          app.update()
           expect(router.state.location.pathname).toContain('mother')
         })
 
