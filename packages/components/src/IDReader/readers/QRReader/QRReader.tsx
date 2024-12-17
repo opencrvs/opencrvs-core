@@ -71,12 +71,11 @@ export const QRReader = (props: ScannableQRReader) => {
           alignItems="stretch"
           direction={isSmallDevice ? 'column' : 'row'}
         >
-          <InfoBox
-            iconName={isSmallDevice ? 'DeviceTabletCamera' : 'Webcam'}
-            label={labels.tutorial.cameraCleanliness}
-          />
-          <InfoBox iconName="QrCode" label={labels.tutorial.distance} />
-          <InfoBox iconName="Sun" label={labels.tutorial.lightBalance} />
+          <InfoBox iconName={isSmallDevice ? 'DeviceTabletCamera' : 'Webcam'}>
+            {labels.tutorial.cameraCleanliness}
+          </InfoBox>
+          <InfoBox iconName="QrCode">{labels.tutorial.distance}</InfoBox>
+          <InfoBox iconName="Sun">{labels.tutorial.lightBalance}</InfoBox>
         </Info>
       </Dialog>
     </>

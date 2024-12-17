@@ -17,7 +17,7 @@ import { Icon, IconProps } from '../../../Icon'
 
 interface InfoBoxProps {
   iconName: IconProps['name']
-  label: string
+  children: React.ReactNode
 }
 
 const Container = styled(Box)`
@@ -46,7 +46,7 @@ const InfoBox = (props: InfoBoxProps) => {
           <Icon name={props.iconName} size="large" />
         </IconContainer>
         <Text variant="reg14" element="p">
-          {props.label}
+          {props.children}
         </Text>
       </Stack>
     </Container>
