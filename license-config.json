@@ -45,7 +45,8 @@
     "packages/dashboards/plugins/*.jar",
     "packages/dashboards/data/metabase/*.db",
     "packages/client/dev-dist",
-    "packages/toolkit/.npmignore"
+    "packages/toolkit/.npmignore",
+    "packages/toolkit/tsconfig.tsbuildinfo"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

@@ -17,7 +17,12 @@ module.exports = {
           '@client/*',
           '!@client/v2-events',
           '!@client/components',
-          '!@client/utils'
+          '!@client/utils',
+          '!@client/navigation',
+          '!@client/storage',
+          '!@client/forms',
+          '!@client/i18n',
+          '!@client/search'
         ]
       }
     ]

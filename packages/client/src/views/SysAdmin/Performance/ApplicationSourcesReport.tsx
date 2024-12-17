@@ -25,8 +25,9 @@ import { messages } from '@client/i18n/messages/views/performance'
 import type { GQLTotalMetricsResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { goToFieldAgentList } from '@client/navigation'
-import { connect } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
@@ -36,14 +37,10 @@ interface ApplicationSourcesProps {
   timeStart: string
   timeEnd: string
 }
-interface IDispatchProps {
-  goToFieldAgentList: typeof goToFieldAgentList
-}
 
-function ApplicationSourcesReport(
-  props: ApplicationSourcesProps & IDispatchProps
-) {
+function ApplicationSourcesReport(props: ApplicationSourcesProps) {
   const { data, isAccessibleOffice } = props
+  const navigate = useNavigate()
   const intl = useIntl()
 
   return (
@@ -100,12 +97,15 @@ function ApplicationSourcesReport(
               <LinkButton
                 id="field-agent-list-view"
                 onClick={() =>
-                  props.goToFieldAgentList(
-                    props.timeStart,
-                    props.timeEnd,
-                    props.locationId,
-                    props.event
-                  )
+                  navigate({
+                    pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                    search: stringify({
+                      locationId: props.locationId,
+                      timeStart: props.timeStart,
+                      timeEnd: props.timeEnd,
+                      event: props.event
+                    })
+                  })
                 }
               >
                 {intl.formatMessage(buttonMessages.view)}
@@ -209,9 +209,4 @@ function ApplicationSourcesReport(
     </ListContainer>
   )
 }
-export const AppSources = connect<ApplicationSourcesProps, IDispatchProps>(
-  undefined,
-  {
-    goToFieldAgentList
-  }
-)(ApplicationSourcesReport)
+export const AppSources = ApplicationSourcesReport

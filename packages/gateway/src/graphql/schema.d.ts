@@ -88,6 +88,7 @@ export interface GQLMutation {
   markEventAsDuplicate: string
   confirmRegistration: string
   rejectRegistration: string
+  upsertRegistrationIdentifier: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -416,6 +417,7 @@ export interface GQLAdvancedSearchParametersInput {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -600,7 +602,6 @@ export interface GQLReinstated {
 
 export interface GQLConfirmRegistrationInput {
   registrationNumber: string
-  error?: string
   identifiers?: Array<GQLIdentifierInput>
 }
 
@@ -1079,7 +1080,6 @@ export const enum GQLSystemType {
 }
 
 export const enum GQLIntegratingSystemType {
-  MOSIP = 'MOSIP',
   OTHER = 'OTHER'
 }
 
@@ -1431,6 +1431,7 @@ export interface GQLAdvancedSeachParameters {
   eventLocationLevel3?: string
   eventLocationLevel4?: string
   eventLocationLevel5?: string
+  eventLocationLevel6?: string
   childFirstNames?: string
   childLastName?: string
   childDoB?: string
@@ -2630,6 +2631,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markEventAsDuplicate?: MutationToMarkEventAsDuplicateResolver<TParent>
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
   rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
+  upsertRegistrationIdentifier?: MutationToUpsertRegistrationIdentifierResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -3201,6 +3203,23 @@ export interface MutationToRejectRegistrationResolver<
   (
     parent: TParent,
     args: MutationToRejectRegistrationArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpsertRegistrationIdentifierArgs {
+  id: string
+  identifierType: string
+  identifierValue: string
+}
+export interface MutationToUpsertRegistrationIdentifierResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToUpsertRegistrationIdentifierArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -8662,6 +8681,7 @@ export interface GQLAdvancedSeachParametersTypeResolver<TParent = any> {
   eventLocationLevel3?: AdvancedSeachParametersToEventLocationLevel3Resolver<TParent>
   eventLocationLevel4?: AdvancedSeachParametersToEventLocationLevel4Resolver<TParent>
   eventLocationLevel5?: AdvancedSeachParametersToEventLocationLevel5Resolver<TParent>
+  eventLocationLevel6?: AdvancedSeachParametersToEventLocationLevel6Resolver<TParent>
   childFirstNames?: AdvancedSeachParametersToChildFirstNamesResolver<TParent>
   childLastName?: AdvancedSeachParametersToChildLastNameResolver<TParent>
   childDoB?: AdvancedSeachParametersToChildDoBResolver<TParent>
@@ -8974,6 +8994,18 @@ export interface AdvancedSeachParametersToEventLocationLevel4Resolver<
 }
 
 export interface AdvancedSeachParametersToEventLocationLevel5Resolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface AdvancedSeachParametersToEventLocationLevel6Resolver<
   TParent = any,
   TResult = any
 > {

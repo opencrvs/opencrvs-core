@@ -8,7 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './EventInput'
-export * from './EventDocument'
-export * from './ActionInput'
-export * from './ActionDocument'
+
+import { ActionInput } from '@opencrvs/commons/client'
+import { create } from 'zustand'
+
+type FormData = ActionInput['data']
+
+type EventFormData = {
+  formValues: FormData
+  setFormValues: (data: FormData) => void
+  clear: () => void
+}
+
+export const useEventFormData = create<EventFormData>((set) => ({
+  formValues: {},
+  setFormValues: (data: FormData) => set(() => ({ formValues: data })),
+  clear: () => set(() => ({ formValues: {} }))
+}))

@@ -54,12 +54,11 @@ const graphqlMocks = [
 describe('Change email modal tests', () => {
   let component: ReactWrapper
   const onSuccessMock = vi.fn()
-  const { history } = createRouterProps('/settings')
-  const { store } = createStore(history)
+  const { store } = createStore()
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ChangeEmailModal
         show={true}
         onSuccess={onSuccessMock}
@@ -67,7 +66,6 @@ describe('Change email modal tests', () => {
       />,
       {
         store,
-        history,
         graphqlMocks
       }
     )

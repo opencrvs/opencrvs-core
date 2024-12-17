@@ -11,7 +11,6 @@
 import { createTestComponent, createTestStore } from '@client/tests/util'
 import { DownloadButton } from './DownloadButton'
 import { AppStore } from '@client/store'
-import { History } from 'history'
 import * as React from 'react'
 import { DownloadAction } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
@@ -23,7 +22,7 @@ const { DOWNLOAD_STATUS } = declarationReducer
 
 describe('download button tests', () => {
   let store: AppStore
-  let history: History<unknown>
+
   let testComponent: ReactWrapper<{}, {}>
   let client: ApolloClient<{}>
 
@@ -32,9 +31,9 @@ describe('download button tests', () => {
       beforeEach(async () => {
         const testStore = await createTestStore()
         store = testStore.store
-        history = testStore.history
+
         client = createClient(store)
-        testComponent = await createTestComponent(
+        const { component } = await createTestComponent(
           <DownloadButton
             downloadConfigs={{
               event: 'birth',
@@ -45,8 +44,10 @@ describe('download button tests', () => {
             }}
             status={DOWNLOAD_STATUS.DOWNLOADED}
           />,
-          { store, history, apolloClient: client }
+          { store, apolloClient: client }
         )
+
+        testComponent = component
       })
 
       it('download button renders', () => {
@@ -57,9 +58,9 @@ describe('download button tests', () => {
       beforeEach(async () => {
         const testStore = await createTestStore()
         store = testStore.store
-        history = testStore.history
+
         client = createClient(store)
-        testComponent = await createTestComponent(
+        const { component } = await createTestComponent(
           <DownloadButton
             downloadConfigs={{
               event: 'birth',
@@ -76,8 +77,10 @@ describe('download button tests', () => {
             }}
             status={DOWNLOAD_STATUS.DOWNLOADED}
           />,
-          { store, history, apolloClient: client }
+          { store, apolloClient: client }
         )
+
+        testComponent = component
       })
 
       it('download button renders', () => {

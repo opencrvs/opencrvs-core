@@ -29,6 +29,7 @@ import { approveCorrectionRoute } from '@workflow/records/handler/correction/app
 import { requestCorrectionRoute } from '@workflow/records/handler/correction/request'
 import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
 import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
+import { upsertRegistrationHandler } from '@workflow/records/handler/upsert-identifiers'
 
 export const getRoutes = () => {
   const routes = [
@@ -67,6 +68,16 @@ export const getRoutes = () => {
         tags: ['api'],
         description:
           'Register event based on tracking id and registration number.'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/records/{id}/upsert-identifiers',
+      handler: upsertRegistrationHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Upsert Register event based on tracking id and registration number.'
       }
     },
     {

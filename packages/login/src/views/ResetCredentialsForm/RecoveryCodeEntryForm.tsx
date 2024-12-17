@@ -16,7 +16,7 @@ import {
 import { NotificationEvent, authApi } from '@login/utils/authApi'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -53,200 +53,181 @@ interface BaseProps
   goToSecurityQuestionForm: typeof goToSecurityQuestionForm
 }
 
-interface State {
-  recoveryCode: string
-  touched: boolean
-  error: boolean
-  resentAuthenticationCode: boolean
-}
-
 type Props = BaseProps & WrappedComponentProps
+const RECOVERY_CODE_LENGTH = 6
 
-class RecoveryCodeEntryComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      recoveryCode: '',
-      touched: false,
-      error: true,
-      resentAuthenticationCode: false
-    }
+const RecoveryCodeEntryComponent = ({
+  intl,
+  goToPhoneNumberVerificationForm,
+  goToSecurityQuestionForm,
+  location
+}: Props) => {
+  const [recoveryCode, setRecoveryCode] = useState('')
+  const [touched, setTouched] = useState(false)
+  const [error, setError] = useState(true)
+  const [resentAuthenticationCode, setResentAuthenticationCode] =
+    useState(false)
+
+  const handleChange = (value: string) => {
+    setRecoveryCode(value)
+    setTouched(true)
+    setError(value.length !== RECOVERY_CODE_LENGTH)
+    setResentAuthenticationCode(false)
   }
 
-  handleChange = (value: string) => {
-    this.setState({
-      error: value.length !== 6,
-      recoveryCode: value,
-      touched: true,
-      resentAuthenticationCode: false
-    })
-  }
-
-  handleContinue = async (event: React.FormEvent) => {
+  const handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (this.state.error) {
+    if (error) {
       return
     }
     try {
       const { nonce, securityQuestionKey } = await authApi.verifyNumber(
-        this.props.location.state.nonce,
-        this.state.recoveryCode
+        location.state.nonce,
+        recoveryCode
       )
-      this.props.goToSecurityQuestionForm(
+      goToSecurityQuestionForm(
         nonce,
         securityQuestionKey,
-        this.props.location.state.forgottenItem
+        location.state.forgottenItem
       )
     } catch (error) {
-      this.setState({
-        error: true
-      })
+      setError(true)
     }
   }
 
-  resendAuthenticationCode = async (notificationEvent: NotificationEvent) => {
+  const resendAuthenticationCode = async (
+    notificationEvent: NotificationEvent
+  ) => {
     await authApi.resendAuthenticationCode(
-      this.props.location.state.nonce,
+      location.state.nonce,
       notificationEvent,
       true
     )
-    this.setState({ resentAuthenticationCode: true })
+    setResentAuthenticationCode(true)
   }
-  render() {
-    const { intl, goToPhoneNumberVerificationForm } = this.props
-    const { forgottenItem } = this.props.location.state
-    const { resentAuthenticationCode } = this.state
-    const notificationEvent = NotificationEvent.PASSWORD_RESET
-    const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
+  const { forgottenItem } = location.state
+  const notificationEvent = NotificationEvent.PASSWORD_RESET
+  const notificationMethod = window.config.USER_NOTIFICATION_DELIVERY_METHOD
 
-    return (
-      <>
-        <Frame
-          header={
-            <AppBar
-              desktopLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
+  return (
+    <>
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileTitle={intl.formatMessage(
+              messages.credentialsResetFormTitle,
+              {
+                forgottenItem
               }
-              mobileLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={() => goToPhoneNumberVerificationForm(forgottenItem)}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
+            )}
+            desktopTitle={intl.formatMessage(
+              messages.credentialsResetFormTitle,
+              {
+                forgottenItem
               }
-              mobileTitle={intl.formatMessage(
-                messages.credentialsResetFormTitle,
-                {
-                  forgottenItem
-                }
-              )}
-              desktopTitle={intl.formatMessage(
-                messages.credentialsResetFormTitle,
-                {
-                  forgottenItem
-                }
-              )}
-            />
-          }
-          skipToContentText={intl.formatMessage(
-            constantsMessages.skipToMainContent
-          )}
-        >
-          <form id="recovery-code-entry-form" onSubmit={this.handleContinue}>
-            <Content
-              size={ContentSize.SMALL}
-              title={intl.formatMessage(
-                messages.recoveryCodeEntryFormBodyHeader
-              )}
-              showTitleOnMobile
-              subtitle={intl.formatMessage(
-                notificationMethod === 'sms'
-                  ? messages.recoveryCodeEntryFormBodySubheaderMobile
-                  : messages.recoveryCodeEntryFormBodySubheaderEmail,
-                {
-                  link: (
-                    <Link
-                      onClick={() => {
-                        this.resendAuthenticationCode(notificationEvent)
-                      }}
-                      id="retrieve-login-mobile-resend"
-                      font="bold16"
-                      type="button"
-                    >
-                      {intl.formatMessage(messages.resend, {
-                        notificationMethod
-                      })}
-                    </Link>
-                  )
-                }
-              )}
-              bottomActionButtons={[
-                <Button
-                  key="1"
-                  id="continue"
-                  onClick={this.handleContinue}
-                  type="primary"
-                  size="large"
-                >
-                  {intl.formatMessage(messages.continueButtonLabel)}
-                </Button>
-              ]}
-            >
-              {resentAuthenticationCode && (
-                <Toast type="success">
-                  {intl.formatMessage(messages.resentSMS, {
-                    number:
-                      notificationMethod === 'sms'
-                        ? this.props.location.state.mobile
-                        : this.props.location.state.email
-                  })}
-                </Toast>
-              )}
+            )}
+          />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <form id="recovery-code-entry-form" onSubmit={handleContinue}>
+          <Content
+            size={ContentSize.SMALL}
+            title={intl.formatMessage(messages.recoveryCodeEntryFormBodyHeader)}
+            showTitleOnMobile
+            subtitle={intl.formatMessage(
+              notificationMethod === 'sms'
+                ? messages.recoveryCodeEntryFormBodySubheaderMobile
+                : messages.recoveryCodeEntryFormBodySubheaderEmail,
+              {
+                link: (
+                  <Link
+                    onClick={() => {
+                      resendAuthenticationCode(notificationEvent)
+                    }}
+                    id="retrieve-login-mobile-resend"
+                    font="bold16"
+                    type="button"
+                  >
+                    {intl.formatMessage(messages.resend, {
+                      notificationMethod
+                    })}
+                  </Link>
+                )
+              }
+            )}
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={handleContinue}
+                type="primary"
+                size="large"
+              >
+                {intl.formatMessage(messages.continueButtonLabel)}
+              </Button>
+            ]}
+          >
+            {resentAuthenticationCode && (
+              <Toast type="success">
+                {intl.formatMessage(messages.resentSMS, {
+                  number:
+                    notificationMethod === 'sms'
+                      ? location.state.mobile
+                      : location.state.email
+                })}
+              </Toast>
+            )}
 
-              <Actions id="recovery-code-verification">
-                <InputField
-                  id="recovery-code"
-                  key="recoveryCodeFieldContainer"
-                  label={this.props.intl.formatMessage(
-                    messages.verificationCodeFieldLabel
-                  )}
-                  touched={this.state.touched}
-                  error={
-                    this.state.error
-                      ? this.props.intl.formatMessage(messages.error)
-                      : ''
-                  }
-                  hideAsterisk
-                >
-                  <TextInput
-                    id="recovery-code-input"
-                    type="number"
-                    key="recoveryCodeInputField"
-                    name="recoveryCodeInput"
-                    isSmallSized
-                    value={this.state.recoveryCode}
-                    onChange={(e) => this.handleChange(e.target.value)}
-                    touched={this.state.touched}
-                    error={this.state.error}
-                  />
-                </InputField>
-              </Actions>
-            </Content>
-          </form>
-        </Frame>
-      </>
-    )
-  }
+            <Actions id="recovery-code-verification">
+              <InputField
+                id="recovery-code"
+                key="recoveryCodeFieldContainer"
+                label={intl.formatMessage(messages.verificationCodeFieldLabel)}
+                touched={touched}
+                error={error ? intl.formatMessage(messages.error) : ''}
+                hideAsterisk
+              >
+                <TextInput
+                  id="recovery-code-input"
+                  type="number"
+                  key="recoveryCodeInputField"
+                  name="recoveryCodeInput"
+                  isSmallSized
+                  value={recoveryCode}
+                  onChange={(e) => handleChange(e.target.value)}
+                  touched={touched}
+                  error={error}
+                />
+              </InputField>
+            </Actions>
+          </Content>
+        </form>
+      </Frame>
+    </>
+  )
 }
 
 export const RecoveryCodeEntry = connect(null, {

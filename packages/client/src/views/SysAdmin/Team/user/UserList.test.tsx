@@ -14,12 +14,12 @@ import {
   createTestComponent,
   flushPromises,
   mockOfflineDataDispatch,
-  mockUserResponse
+  mockUserResponse,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import { stringify } from 'query-string'
 import * as React from 'react'
 import { UserList } from './UserList'
@@ -27,14 +27,14 @@ import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
 import { vi, Mock } from 'vitest'
+import { TEAM_USER_LIST } from '@client/navigation/routes'
 
 describe('user list without admin scope', () => {
   let store: AppStore
-  let history: History<any>
 
   it('no add user button', async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store } = await createStore())
     const action = {
       type: actions.SET_USER_DETAILS,
       payload: mockUserResponse
@@ -63,7 +63,7 @@ describe('user list without admin scope', () => {
       }
     ]
 
-    const component = await createTestComponent(
+    const { component } = await createTestComponent(
       <UserList
         // @ts-ignore
         location={{
@@ -72,8 +72,19 @@ describe('user list without admin scope', () => {
           })
         }}
       />,
-      { store, history, graphqlMocks: userListMock }
+      {
+        store,
+        graphqlMocks: userListMock,
+        initialEntries: [
+          '/' +
+            '?' +
+            stringify({
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+            })
+        ]
+      }
     )
+
     component.update()
     expect(component.find('#add-user').length).toBe(0)
   })
@@ -81,11 +92,10 @@ describe('user list without admin scope', () => {
 
 describe('User list tests', () => {
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createStore())
+    ;({ store } = await createStore())
 
     const action = {
       type: actions.SET_USER_DETAILS,
@@ -118,24 +128,26 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component, router } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          '/',
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
       const addUser = await waitForElement(component, '#add-user')
       addUser.hostNodes().simulate('click')
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUserInLocation')
+      expect(router.state.location.pathname).toContain('/createUserInLocation')
     })
     it('add user button redirects to office selection form for invalid location id', async () => {
       const userListMock = [
@@ -158,17 +170,18 @@ describe('User list tests', () => {
           }
         }
       ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
+      const { component, router } = await createTestComponent(<UserList />, {
+        store,
+        path: TEAM_USER_LIST,
+        initialEntries: [
+          TEAM_USER_LIST +
+            '?' +
+            stringify({
               locationId: '0d8474da-0361-4d32-979e-af91f012340a'
             })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
+        ],
+        graphqlMocks: userListMock
+      })
       component.update()
 
       const addUser = await waitForElement(component, '#add-user')
@@ -176,7 +189,7 @@ describe('User list tests', () => {
 
       component.update()
 
-      expect(history.location.pathname).toContain('/createUser')
+      expect(router.state.location.pathname).toContain('/createUser')
     })
   })
 
@@ -202,17 +215,19 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
+      const { component: testComponent } = await createTestComponent(
+        <UserList />,
+        {
+          store,
+          initialEntries: [
+            TEAM_USER_LIST +
+              '?' +
+              stringify({
+                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+              })
+          ],
+          graphqlMocks: userListMock
+        }
       )
 
       // wait for mocked data to load mockedProvider
@@ -230,6 +245,7 @@ describe('User list tests', () => {
       userMutations.usernameReminderSend = vi.fn()
       userMutations.sendResetPasswordInvite = vi.fn()
       let component: ReactWrapper<{}, {}>
+      let router: TestComponentWithRouteMock['router']
       const userListMock = [
         {
           request: {
@@ -333,17 +349,20 @@ describe('User list tests', () => {
           configurable: true,
           value: 1100
         })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-              })
-            }}
-          />,
-          { store, history, graphqlMocks: userListMock }
-        )
+        const { component: testComponent, router: testRouter } =
+          await createTestComponent(<UserList />, {
+            store,
+            path: TEAM_USER_LIST,
+            initialEntries: [
+              '/',
+              TEAM_USER_LIST +
+                '?' +
+                stringify({
+                  locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+                })
+            ],
+            graphqlMocks: userListMock
+          })
 
         // wait for mocked data to load mockedProvider
         await new Promise((resolve) => {
@@ -352,6 +371,7 @@ describe('User list tests', () => {
 
         testComponent.update()
         component = testComponent
+        router = testRouter
       })
 
       it('renders list of users', () => {
@@ -389,7 +409,9 @@ describe('User list tests', () => {
           .at(0)
         menuOptionButton.hostNodes().simulate('click')
         await flushPromises()
-        expect(history.location.pathname).toMatch(/.user\/(\w)+\/preview\/*/)
+        expect(router.state.location.pathname).toMatch(
+          /.user\/(\w)+\/preview\/*/
+        )
       })
 
       it('clicking on menu options Resend invite sends invite', async () => {
@@ -748,7 +770,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -940,7 +962,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{
@@ -1362,7 +1384,7 @@ describe('User list tests', () => {
           }
         }
       ]
-      const testComponent = await createTestComponent(
+      const {router: testComponent} = await createTestComponent(
         <UserList
           // @ts-ignore
           location={{

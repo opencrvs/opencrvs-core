@@ -244,7 +244,6 @@ export async function confirmRegistration(
   id: string,
   authHeader: IAuthHeader,
   details: {
-    error: string | undefined
     registrationNumber: string
     identifiers?: IdentifierInput[]
   }
@@ -277,6 +276,29 @@ export async function rejectRegistration(
   )
 
   const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')!
+
+  return taskEntry
+}
+
+export async function upsertRegistrationIdentifier(
+  id: string,
+  authHeader: IAuthHeader,
+  details: {
+    registrationNumber?: string
+    identifiers?: IdentifierInput[]
+  }
+) {
+  const res: ReadyForReviewRecord = await createRequest(
+    'POST',
+    `/records/${id}/upsert-identifiers`,
+    authHeader,
+    details
+  )
+
+  const taskEntry = res.entry.find((e) => e.resource.resourceType === 'Task')
+  if (!taskEntry) {
+    throw new Error('No task entry found in the confirmation response')
+  }
 
   return taskEntry
 }

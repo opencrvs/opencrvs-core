@@ -11,8 +11,12 @@
 
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+
+import {
+  createTestComponent,
+  createTestStore,
+  TestComponentWithRouteMock
+} from '@client/tests/util'
 import { AppStore } from '@client/store'
 import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { EVENT_COMPLETENESS_RATES } from '@client/navigation/routes'
@@ -24,6 +28,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { stringify, parse } from 'query-string'
 import { GraphQLError } from 'graphql'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
 
 const LOCATION_DHAKA_DIVISION = {
   displayLabel: 'Dhaka Division',
@@ -91,37 +96,37 @@ describe('Registraion Rates tests', () => {
     }
   ]
   let component: ReactWrapper<{}, {}>
+  let router: TestComponentWithRouteMock['router']
   let store: AppStore
-  let history: History<any>
 
   beforeAll(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     store = testStore
-    history = testHistory
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
-      <CompletenessRates
-        match={{
-          params: { eventType: 'birth' },
-          isExact: true,
-          path: EVENT_COMPLETENESS_RATES,
-          url: ''
-        }}
-        // @ts-ignore
-        location={{
-          search: stringify({
-            time: 'withinTarget',
-            locationId: LOCATION_DHAKA_DIVISION.id,
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1456868800000).toISOString()
-          })
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMocks }
-    )
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(<CompletenessRates />, {
+        store,
+        path: EVENT_COMPLETENESS_RATES,
+        initialEntries: [
+          formatUrl(EVENT_COMPLETENESS_RATES, {
+            eventType: 'birth'
+          }) +
+            '?' +
+            stringify({
+              time: 'withinTarget',
+              locationId: LOCATION_DHAKA_DIVISION.id,
+              timeEnd: new Date(1487076708000).toISOString(),
+              timeStart: new Date(1456868800000).toISOString()
+            })
+        ],
+        graphqlMocks: graphqlMocks
+      })
+
+    component = testComponent
+    router = testRouter
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
@@ -146,7 +151,7 @@ describe('Registraion Rates tests', () => {
       '#date-range-picker-action'
     )
     expect(dateRangePickerElement.hostNodes().text()).toBe('Last 12 months')
-    const previousQueryParams = history.location.search
+    const previousQueryParams = router.state.location.search
     dateRangePickerElement.hostNodes().simulate('click')
     const last30DaysPresetButtonElement = await waitForElement(
       component,
@@ -158,7 +163,7 @@ describe('Registraion Rates tests', () => {
       '#date-range-confirm-action'
     )
     confirmButtonElement.hostNodes().simulate('click')
-    expect(history.location.search).not.toBe(previousQueryParams)
+    expect(router.state.location.search).not.toBe(previousQueryParams)
   })
 
   it('click on close button or outside modal closes location picker modal', async () => {
@@ -181,7 +186,10 @@ describe('Registraion Rates tests', () => {
   })
 
   it('changing location id from location picker updates the query params', async () => {
-    const locationIdBeforeChange = parse(history.location.search).locationId
+    const locationIdBeforeChange = parse(
+      router.state.location.search
+    ).locationId
+
     const locationPickerElement = await waitForElement(
       component,
       '#location-range-picker-action'
@@ -202,7 +210,8 @@ describe('Registraion Rates tests', () => {
       '#locationOptionbfe8306c-0910-48fe-8bf5-0db906cf3155'
     )
     searchResultOption.hostNodes().simulate('click')
-    const newLocationId = parse(history.location.search).locationId
+
+    const newLocationId = parse(router.state.location.search).locationId
     expect(newLocationId).not.toBe(locationIdBeforeChange)
     expect(newLocationId).toBe('bfe8306c-0910-48fe-8bf5-0db906cf3155')
   })
@@ -238,33 +247,32 @@ describe('Registraion Rates error state tests', () => {
   ]
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
 
   beforeEach(async () => {
     Date.now = vi.fn(() => 1487076708000)
-    ;({ store, history } = await createTestStore())
+    ;({ store } = await createTestStore())
 
-    component = await createTestComponent(
-      <CompletenessRates
-        match={{
-          params: { eventType: 'birth' },
-          isExact: true,
-          path: EVENT_COMPLETENESS_RATES,
-          url: ''
-        }}
-        // @ts-ignore
-        location={{
-          search: stringify({
-            time: 'withinTarget',
-            locationId: LOCATION_DHAKA_DIVISION.id,
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
-      />,
-      { store, history, graphqlMocks: graphqlMocks }
+    const { component: testComponent } = await createTestComponent(
+      <CompletenessRates />,
+      {
+        store,
+        path: EVENT_COMPLETENESS_RATES,
+        initialEntries: [
+          formatUrl(EVENT_COMPLETENESS_RATES, {
+            eventType: 'birth'
+          }) +
+            '?' +
+            stringify({
+              time: 'withinTarget',
+              locationId: LOCATION_DHAKA_DIVISION.id,
+              timeEnd: new Date(1487076708000).toISOString(),
+              timeStart: new Date(1455454308000).toISOString()
+            })
+        ],
+        graphqlMocks: graphqlMocks
+      }
     )
-
+    component = testComponent
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
