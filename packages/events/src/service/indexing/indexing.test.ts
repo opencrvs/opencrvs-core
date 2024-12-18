@@ -21,15 +21,14 @@ const client = createTestClient()
 const generator = payloadGenerator()
 
 test('indexes all records from MongoDB with one function call', async () => {
-  for await (const _ of Array(2).keys()) {
-    await client.event.create(generator.event.create())
-  }
-
   await resetESServer()
-
   const esClient = getOrCreateClient()
 
   await indexAllEvents()
+
+  for await (const _ of Array(2).keys()) {
+    await client.event.create(generator.event.create())
+  }
 
   const body = await esClient.search({
     index: 'events',
