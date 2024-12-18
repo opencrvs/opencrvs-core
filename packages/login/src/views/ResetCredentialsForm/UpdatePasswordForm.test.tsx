@@ -11,20 +11,23 @@
 import * as routes from '@login/navigation/routes'
 import { createTestApp } from '@login/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 
 describe('Test password update form', () => {
   let app: ReactWrapper
-  let history: History
 
   beforeEach(async () => {
-    const appBundle = await createTestApp()
-    app = appBundle.app
-    history = appBundle.history
-
-    history.replace(routes.UPDATE_PASSWORD, {
-      nonce: '123456789'
+    const appBundle = await createTestApp({
+      initialEntries: [
+        {
+          pathname: routes.UPDATE_PASSWORD,
+          state: {
+            nonce: '123456789'
+          }
+        }
+      ]
     })
+    app = appBundle.app
+
     app.update()
   })
 

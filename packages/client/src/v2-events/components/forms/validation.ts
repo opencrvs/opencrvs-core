@@ -8,20 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IValidationResult } from '@client/utils/validate'
+import { MessageDescriptor } from 'react-intl'
 import {
   ConditionalParameters,
   FieldConfig,
   validate
 } from '@opencrvs/commons/client'
-import { MessageDescriptor } from 'react-intl'
+import { IValidationResult } from '@client/utils/validate'
 import { FlatFormData, getConditionalActionsForField } from './utils'
 
 interface IFieldErrors {
   errors: IValidationResult[]
 }
 
-export type Errors = {
+export interface Errors {
   [fieldName: string]: IFieldErrors
 }
 
@@ -96,6 +96,7 @@ export function getValidationErrorsForForm(
 ) {
   return fields.reduce(
     (errorsForAllFields: Errors, field) =>
+      // eslint-disable-next-line
       errorsForAllFields[field.id] &&
       errorsForAllFields[field.id].errors.length > 0
         ? errorsForAllFields

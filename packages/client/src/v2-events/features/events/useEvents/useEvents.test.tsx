@@ -8,25 +8,25 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { renderHook, RenderHookResult, waitFor } from '@testing-library/react'
 import React, { act, PropsWithChildren } from 'react'
-import { useEvents } from './useEvents'
 
-import { EventDocument, EventInput } from '@opencrvs/commons/client'
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
 import { serialize } from 'superjson'
 import { vi } from 'vitest'
-import { storage } from '@client/storage'
 import { TRPCError } from '@trpc/server'
+import { EventDocument, EventInput } from '@opencrvs/commons/client'
+import { storage } from '@client/storage'
+import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
+import { useEvents } from './useEvents'
 
 const serverSpy = vi.fn()
 
 function trpcHandler(
   fn: HttpResponseResolver<never, EventInput, EventDocument>
 ): HttpResponseResolver<never, EventInput, EventDocument> {
-  const wrapHttpResponseJson = async <T extends HttpResponse>(response: T) => {
+  async function wrapHttpResponseJson<T extends HttpResponse>(response: T) {
     const jsonBody = await response.json()
     return HttpResponse.json({
       result: { data: serialize(jsonBody), type: 'data' }
@@ -37,7 +37,7 @@ function trpcHandler(
     const body = (await options.request.json()) as unknown as {
       json: EventInput
     }
-    options.request.json = () => Promise.resolve(body.json)
+    options.request.json = async () => Promise.resolve(body.json)
     const response = (await fn(options)) as HttpResponse
     return wrapHttpResponseJson(response)
   }) as HttpResponseResolver<never, EventInput, EventDocument>
@@ -66,7 +66,7 @@ const createHandler = trpcHandler(async ({ request }) => {
   })
 })
 
-const errorHandler = () => {
+function errorHandler() {
   return new HttpResponse(
     JSON.stringify({
       error: {
@@ -91,7 +91,7 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-type TestContext = {
+interface TestContext {
   eventsHook: RenderHookResult<ReturnType<typeof useEvents>, {}>
   createEventHook: RenderHookResult<
     ReturnType<ReturnType<typeof useEvents>['createEvent']>,
@@ -106,12 +106,12 @@ type TestContext = {
 beforeEach<TestContext>(async (testContext) => {
   queryClient.clear()
   serverSpy.mockClear()
-  storage.removeItem('events')
-  storage.removeItem('reactQuery')
+  await storage.removeItem('events')
+  await storage.removeItem('reactQuery')
 
-  const wrapper = ({ children }: PropsWithChildren) => (
-    <TRPCProvider>{children}</TRPCProvider>
-  )
+  function wrapper({ children }: PropsWithChildren) {
+    return <TRPCProvider>{children}</TRPCProvider>
+  }
   const eventsHook = renderHook(() => useEvents(), { wrapper })
   await waitFor(() => expect(eventsHook.result.current).not.toBeNull(), {
     timeout: 3000
@@ -238,7 +238,9 @@ test<TestContext>('events that have unsynced actions are treated as "outbox" ', 
   const mutationCache = queryClient.getMutationCache().getAll()
 
   await Promise.all(
-    mutationCache.map((mutation) => mutation.execute(mutation.state.variables))
+    mutationCache.map(async (mutation) =>
+      mutation.execute(mutation.state.variables)
+    )
   )
 
   await waitFor(() => expect(serverSpy.mock.calls).toHaveLength(1))

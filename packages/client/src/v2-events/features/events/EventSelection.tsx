@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Debug } from '@client/v2-events/features/debug/debug'
-import { ROUTES } from '@client/v2-events/routes'
+import React, { useState } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
 import { Spinner } from '@opencrvs/components'
 import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -20,14 +22,12 @@ import { Frame } from '@opencrvs/components/lib/Frame'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
-import React, { useState } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
-import { useEventConfigurations } from './useEventConfiguration'
-import { useEventFormData } from './useEventFormData'
-import { useEventFormNavigation } from './useEventFormNavigation'
+import { ROUTES } from '@client/v2-events/routes'
+import { Debug } from '@client/v2-events/features/debug/debug'
 import { useEvents } from './useEvents/useEvents'
+import { useEventFormNavigation } from './useEventFormNavigation'
+import { useEventFormData } from './useEventFormData'
+import { useEventConfigurations } from './useEventConfiguration'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -66,7 +66,7 @@ const constantsMessages = defineMessages({
   }
 })
 
-const EventSelector = () => {
+function EventSelector() {
   const intl = useIntl()
   const navigate = useNavigate()
   const [eventType, setEventType] = useState('')
@@ -76,7 +76,7 @@ const EventSelector = () => {
   const clearForm = useEventFormData((state) => state.clear)
   const createEvent = events.createEvent()
 
-  const handleContinue = async () => {
+  function handleContinue() {
     if (eventType === '') {
       return setNoEventSelectedError(true)
     }
@@ -104,20 +104,20 @@ const EventSelector = () => {
         </ErrorText>
       )}
       <Stack
-        id="select_vital_event_view"
-        direction="column"
         alignItems="left"
+        direction="column"
         gap={16}
+        id="select_vital_event_view"
       >
         {eventConfigurations.map((event) => (
           <RadioButton
-            size="large"
             key={`${event.id}event`}
-            name={`${event.id}event`}
-            label={intl.formatMessage(event.label)}
-            value={event.id}
             id="select_birth_event"
+            label={intl.formatMessage(event.label)}
+            name={`${event.id}event`}
             selected={eventType === event.id ? event.id : ''}
+            size="large"
+            value={event.id}
             onChange={() => {
               setEventType(event.id)
               setNoEventSelectedError(false)
@@ -127,10 +127,10 @@ const EventSelector = () => {
 
         <Button
           key="select-vital-event-continue"
-          id="continue"
-          type="primary"
-          size="large"
           fullWidth
+          id="continue"
+          size="large"
+          type="primary"
           onClick={handleContinue}
         >
           {intl.formatMessage(messages.continueButton)}
@@ -140,7 +140,7 @@ const EventSelector = () => {
   )
 }
 
-export const EventSelection = () => {
+export function EventSelection() {
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
 
@@ -149,25 +149,25 @@ export const EventSelection = () => {
       header={
         <AppBar
           desktopLeft={<Icon name="Draft" size="large" />}
-          desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           desktopRight={
             <Button
               id="goBack"
-              type="secondary"
               size="small"
+              type="secondary"
               onClick={goToHome}
             >
               <Icon name="X" />
               {intl.formatMessage(messages.exitButton)}
             </Button>
           }
+          desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileLeft={<Icon name="Draft" size="large" />}
-          mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileRight={
-            <Button type="icon" size="medium" onClick={goToHome}>
+            <Button size="medium" type="icon" onClick={goToHome}>
               <Icon name="X" />
             </Button>
           }
+          mobileTitle={intl.formatMessage(messages.registerNewEventTitle)}
         />
       }
       skipToContentText={intl.formatMessage(

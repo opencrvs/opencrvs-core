@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig } from '@opencrvs/commons'
+import React from 'react'
+import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
+import styled from 'styled-components'
+
+import { FormConfig, FieldConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
@@ -21,11 +25,8 @@ import {
   ListReview,
   Stack
 } from '@opencrvs/components'
-import React from 'react'
-import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
-import styled from 'styled-components'
 
-import { FieldConfig, FormConfig } from '@opencrvs/commons/client'
+import { EventConfig } from '@opencrvs/commons'
 import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 
@@ -108,7 +109,7 @@ const ReviewContainter = styled.div`
 `
 const DeclarationDataContainer = styled.div``
 
-const messages = defineMessages({
+const previewMessages = defineMessages({
   changeButton: {
     id: 'buttons.change',
     defaultMessage: 'Change',
@@ -158,7 +159,7 @@ const messages = defineMessages({
   }
 })
 
-type Stringifiable = {
+interface Stringifiable {
   toString(): string
 }
 
@@ -172,14 +173,14 @@ const FIELD_TYPE_FORMATTERS: Partial<
 }
 
 function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
-  return <>{value?.toString() || ''}</>
+  return <>{value.toString() || ''}</>
 }
 
 /**
  * Preview component, used to display the "read-only" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
  */
-const PreviewComponent = ({
+function PreviewComponent({
   eventConfig,
   formConfig,
   form,
@@ -190,16 +191,16 @@ const PreviewComponent = ({
   children: React.ReactNode
   eventConfig: EventConfig
   formConfig: FormConfig
-  form: Record<string, any>
+  form: Record<string, string | React.ReactNode>
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
-}) => {
+}) {
   const intl = useIntl()
 
   return (
     <Frame
-      skipToContentText="Skip to form"
       header={<FormHeader label={eventConfig.label} />}
+      skipToContentText="Skip to form"
     >
       <Row>
         <LeftColumn>
@@ -207,10 +208,10 @@ const PreviewComponent = ({
             <HeaderContainer>
               <HeaderContent>
                 <Stack
-                  direction="column"
                   alignItems="flex-start"
-                  justify-content="flex-start"
+                  direction="column"
                   gap={6}
+                  justify-content="flex-start"
                 >
                   <TitleContainer id={`header_title`}>
                     {eventConfig.label.defaultMessage}
@@ -229,10 +230,6 @@ const PreviewComponent = ({
                       key={'Section_' + page.title.defaultMessage}
                     >
                       <Accordion
-                        name={'Accordion_' + page.id}
-                        label={intl.formatMessage(page.title)}
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
                         action={
                           <Link
                             onClick={(e) => {
@@ -240,10 +237,14 @@ const PreviewComponent = ({
                               onEdit({ pageId: page.id })
                             }}
                           >
-                            {intl.formatMessage(messages.changeButton)}
+                            {intl.formatMessage(previewMessages.changeButton)}
                           </Link>
                         }
                         expand={true}
+                        label={intl.formatMessage(page.title)}
+                        labelForHideAction="Hide"
+                        labelForShowAction="Show"
+                        name={'Accordion_' + page.id}
                       >
                         <ListReview id={'Section_' + page.id}>
                           {page.fields
@@ -256,13 +257,9 @@ const PreviewComponent = ({
                               const Output =
                                 FIELD_TYPE_FORMATTERS[field.type] ||
                                 DefaultOutput
-
                               return (
                                 <ListReview.Row
-                                  id={field.id}
                                   key={field.id}
-                                  label={intl.formatMessage(field.label)}
-                                  value={<Output value={form[field.id]} />}
                                   actions={
                                     <Link
                                       onClick={(e) => {
@@ -275,10 +272,13 @@ const PreviewComponent = ({
                                       }}
                                     >
                                       {intl.formatMessage(
-                                        messages.changeButton
+                                        previewMessages.changeButton
                                       )}
                                     </Link>
                                   }
+                                  id={field.id}
+                                  label={intl.formatMessage(field.label)}
+                                  value={<Output value={form[field.id]} />}
                                 />
                               )
                             })}
@@ -317,12 +317,13 @@ const Content = styled.div`
   }
 `
 const UnderLayBackground = styled.div<{ background: string }>`
-  background-color: ${({ background, theme }) =>
-    background === 'success'
-      ? theme.colors.greenLighter
-      : background === 'error'
-      ? theme.colors.redLighter
-      : theme.colors.greenLighter};
+  background-color: ${({ background, theme }) => {
+    if (background === 'error') {
+      return theme.colors.redLighter
+    }
+
+    return theme.colors.greenLighter
+  }};
 `
 
 const Title = styled.div`
@@ -351,7 +352,7 @@ const ActionContainer = styled.div`
   }
 `
 
-const PreviewActionComponent = ({
+function PreviewActionComponent({
   onConfirm,
   onReject,
   messages
@@ -363,7 +364,7 @@ const PreviewActionComponent = ({
     description: MessageDescriptor
     onConfirm: MessageDescriptor
   }
-}) => {
+}) {
   const intl = useIntl()
   return (
     <Container>
@@ -373,9 +374,9 @@ const PreviewActionComponent = ({
           <Description>{intl.formatMessage(messages.description)}</Description>
           <ActionContainer>
             <Button
-              type="positive"
-              size="large"
               id="validateDeclarationBtn"
+              size="large"
+              type="positive"
               onClick={onConfirm}
             >
               <Icon name="Check" />
@@ -388,87 +389,90 @@ const PreviewActionComponent = ({
   )
 }
 
-const EditModal: React.FC<{
-  close: (result: boolean | null) => void
-}> = ({ close }) => {
+function EditModal({ close }: { close: (result: boolean | null) => void }) {
   const intl = useIntl()
   return (
     <ResponsiveModal
       autoHeight
-      responsive={false}
-      title={intl.formatMessage(messages.changeModalTitle)}
       actions={[
         <Button
-          type="tertiary"
-          id="cancel_edit"
           key="cancel_edit"
+          id="cancel_edit"
+          type="tertiary"
           onClick={() => {
             close(null)
           }}
         >
-          {intl.formatMessage(messages.changeModalCancel)}
+          {intl.formatMessage(previewMessages.changeModalCancel)}
         </Button>,
         <Button
-          type="primary"
           key="confirm_edit"
           id="confirm_edit"
+          type="primary"
           onClick={() => {
             close(true)
           }}
         >
-          {intl.formatMessage(messages.changeModalContinue)}
+          {intl.formatMessage(previewMessages.changeModalContinue)}
         </Button>
       ]}
-      show={true}
       handleClose={() => close(null)}
+      responsive={false}
+      show={true}
+      title={intl.formatMessage(previewMessages.changeModalTitle)}
     >
       <Stack>
-        <Text variant="reg16" element="p" color="grey500">
-          {intl.formatMessage(messages.changeModalDescription)}
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(previewMessages.changeModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>
   )
 }
 
-const ActionModal: React.FC<{
+function ActionModal({
+  close,
+  action
+}: {
   close: (result: boolean | null) => void
   action: string
-}> = ({ close, action }) => {
+}) {
   const intl = useIntl()
   return (
     <ResponsiveModal
       autoHeight
-      responsive={false}
-      title={intl.formatMessage(messages.actionModalTitle, { action })}
       actions={[
         <Button
-          type="tertiary"
-          id={'cancel_' + action}
           key={'cancel_' + action}
+          id={'cancel_' + action}
+          type="tertiary"
           onClick={() => {
             close(null)
           }}
         >
-          {intl.formatMessage(messages.actionModalCancel)}
+          {intl.formatMessage(previewMessages.actionModalCancel)}
         </Button>,
         <Button
-          type="primary"
           key={'confirm_' + action}
           id={'confirm_' + action}
+          type="primary"
           onClick={() => {
             close(true)
           }}
         >
-          {intl.formatMessage(messages.actionModalPrimaryAction, { action })}
+          {intl.formatMessage(previewMessages.actionModalPrimaryAction, {
+            action
+          })}
         </Button>
       ]}
-      show={true}
       handleClose={() => close(null)}
+      responsive={false}
+      show={true}
+      title={intl.formatMessage(previewMessages.actionModalTitle, { action })}
     >
       <Stack>
-        <Text variant="reg16" element="p" color="grey500">
-          {intl.formatMessage(messages.actionModalDescription)}
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(previewMessages.actionModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>

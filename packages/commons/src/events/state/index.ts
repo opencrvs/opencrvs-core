@@ -9,35 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionDocument, CreatedAction } from '../ActionDocument'
+import { ActionType } from '../ActionConfig'
+import { ActionDocument } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 
 function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
-    if (action.type === 'CREATE') {
-      return 'CREATED'
+    if (action.type === ActionType.CREATE) {
+      return EventStatus.CREATED
     }
-    if (action.type === 'DECLARE') {
-      return 'DECLARED'
+    if (action.type === ActionType.DECLARE) {
+      return EventStatus.DECLARED
     }
-    if (action.type === 'DRAFT') {
-      return 'DRAFT'
+    if (action.type === ActionType.DRAFT) {
+      return EventStatus.DRAFT
     }
-    if (action.type === 'REGISTER') {
-      return 'REGISTERED'
+    if (action.type === ActionType.REGISTER) {
+      return EventStatus.REGISTERED
     }
     return status
-  }, 'CREATED')
+  }, EventStatus.CREATED)
 }
 
 function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<null | string>((status, action) => {
-    if (action.type === 'ASSIGN') {
+    if (action.type === ActionType.ASSIGN) {
       return action.assignedTo
     }
-    if (action.type === 'UNASSIGN') {
+    if (action.type === ActionType.UNASSIGN) {
       return null
     }
     return status
@@ -55,8 +56,13 @@ function getData(actions: Array<ActionDocument>) {
 
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
-    (action) => action.type === 'CREATE'
-  ) as CreatedAction
+    (action) => action.type === ActionType.CREATE
+  )
+
+  if (!creationAction) {
+    throw new Error(`Event ${event.id} has no creation action`)
+  }
+
   const latestAction = event.actions[event.actions.length - 1]
 
   return {

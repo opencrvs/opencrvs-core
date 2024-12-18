@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useModal } from '@client/v2-events/hooks/useModal'
-import { ROUTES } from '@client/v2-events/routes'
+import React, { useState } from 'react'
+import { defineMessages, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   Button,
   Checkbox,
@@ -23,11 +22,12 @@ import {
   Text,
   TextInput
 } from '@opencrvs/components'
-import React, { useState } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { ROUTES } from '@client/v2-events/routes'
 import { Preview } from '@client/v2-events/features/events/components/Preview'
 
 const messages = defineMessages({
@@ -85,6 +85,7 @@ const messages = defineMessages({
   }
 })
 
+// eslint-disable-next-line no-shadow
 enum REJECT_ACTIONS {
   ARCHIVE,
   SEND_FOR_UPDATE
@@ -96,7 +97,7 @@ interface RejectionState {
   isDuplicate: boolean
 }
 
-export const ReviewSection = () => {
+export function ReviewSection() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
@@ -120,13 +121,13 @@ export const ReviewSection = () => {
 
   const form = useEventFormData((state) => state.formValues)
 
-  const handleEdit = async ({
+  async function handleEdit({
     pageId,
     fieldId
   }: {
     pageId: string
     fieldId?: string
-  }) => {
+  }) {
     const confirmedEdit = await openModal<boolean | null>((close) => (
       <Preview.EditModal close={close}></Preview.EditModal>
     ))
@@ -142,12 +143,13 @@ export const ReviewSection = () => {
         )
       )
     }
+
     return
   }
 
-  const handleDeclaration = async () => {
+  async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
-      <Preview.ActionModal close={close} action="Declare" />
+      <Preview.ActionModal action="Declare" close={close} />
     ))
     if (confirmedDeclaration) {
       declareMutation.mutate({
@@ -160,7 +162,7 @@ export const ReviewSection = () => {
     }
   }
 
-  const handleReject = async () => {
+  async function handleReject() {
     const confirmedReject = await openModal<RejectionState | null>((close) => (
       <RejectModal close={close}></RejectModal>
     ))
@@ -183,9 +185,10 @@ export const ReviewSection = () => {
   return (
     <>
       <Preview.Body
-        formConfig={formConfigs[0]}
         eventConfig={config}
-        onEdit={handleEdit}
+        formConfig={formConfigs[0]}
+        // eslint-disable-next-line
+        onEdit={handleEdit} // will be fixed on eslint-plugin-react, 7.19.0. Update separately.
         form={form}
         // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfigs[0].review.title, {
@@ -194,13 +197,13 @@ export const ReviewSection = () => {
         })}
       >
         <Preview.Actions
-          onConfirm={handleDeclaration}
-          onReject={handleReject}
           messages={{
             title: messages.reviewActionTitle,
             description: messages.reviewActionDescription,
             onConfirm: messages.reviewActionDeclare
           }}
+          onConfirm={handleDeclaration}
+          onReject={handleReject}
         />
       </Preview.Body>
       {modal}
@@ -208,9 +211,11 @@ export const ReviewSection = () => {
   )
 }
 
-const RejectModal: React.FC<{
+function RejectModal({
+  close
+}: {
   close: (result: RejectionState | null) => void
-}> = ({ close }) => {
+}) {
   const [state, setState] = useState<RejectionState>({
     rejectAction: REJECT_ACTIONS.ARCHIVE,
     details: '',
@@ -222,13 +227,11 @@ const RejectModal: React.FC<{
   return (
     <ResponsiveModal
       autoHeight
-      responsive={false}
-      title={intl.formatMessage(messages.rejectModalTitle)}
       actions={[
         <Button
-          type="tertiary"
-          id="cancel_reject"
           key="cancel_reject"
+          id="cancel_reject"
+          type="tertiary"
           onClick={() => {
             close(null)
           }}
@@ -236,9 +239,9 @@ const RejectModal: React.FC<{
           {intl.formatMessage(messages.rejectModalCancel)}
         </Button>,
         <Button
-          type="secondaryNegative"
           key="confirm_reject_with_archive"
           id="confirm_reject_with_archive"
+          type="secondaryNegative"
           onClick={() => {
             close({
               ...state,
@@ -249,9 +252,9 @@ const RejectModal: React.FC<{
           {intl.formatMessage(messages.rejectModalArchive)}
         </Button>,
         <Button
-          type="negative"
           key="confirm_reject_with_update"
           id="confirm_reject_with_update"
+          type="negative"
           onClick={() => {
             close({
               ...state,
@@ -262,11 +265,13 @@ const RejectModal: React.FC<{
           {intl.formatMessage(messages.rejectModalSendForUpdate)}
         </Button>
       ]}
-      show={true}
       handleClose={() => close(null)}
+      responsive={false}
+      show={true}
+      title={intl.formatMessage(messages.rejectModalTitle)}
     >
-      <Stack direction="column" alignItems="left">
-        <Text variant="reg16" element="p" color="grey500">
+      <Stack alignItems="left" direction="column">
+        <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(messages.rejectModalDescription)}
         </Text>
         <TextInput
@@ -277,10 +282,10 @@ const RejectModal: React.FC<{
           }
         />
         <Checkbox
-          name={'markDUplicate'}
           label={intl.formatMessage(messages.rejectModalMarkAsDuplicate)}
-          value={''}
+          name={'markDUplicate'}
           selected={state.isDuplicate}
+          value={''}
           onChange={() =>
             setState((prev) => ({ ...prev, isDuplicate: !prev.isDuplicate }))
           }

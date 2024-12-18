@@ -11,10 +11,8 @@
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
-import { flattenDeep } from 'lodash'
+import { SummaryConfig } from './SummaryConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { eventMetadataLabelMap } from './EventMetadata'
 import { FormConfig, FormConfigInput } from './FormConfig'
 
 /**
@@ -36,84 +34,6 @@ export const EventConfig = z.object({
 
 export type EventConfig = z.infer<typeof EventConfig>
 export type EventConfigInput = z.input<typeof EventConfig>
-
-const findPageFields = (
-  config: Omit<EventConfig, 'summary'> & { summary: SummaryConfigInput }
-) => {
-  return flattenDeep(
-    config.actions.map(({ forms }) =>
-      forms.map(({ pages }) =>
-        pages.map(({ fields }) =>
-          fields.map((field) => ({ id: field.id, label: field.label }))
-        )
-      )
-    )
-  )
-}
-
-const fillFieldLabels = ({
-  pageFields,
-  refFields
-}: {
-  pageFields: { id: string; label: TranslationConfig }[]
-  refFields: {
-    id: keyof typeof eventMetadataLabelMap | string
-    label?: TranslationConfig
-  }[]
-}) => {
-  return refFields.map((field) => {
-    if (field.label) {
-      return field
-    }
-
-    // @ts-ignore
-    const metadataLabel = eventMetadataLabelMap[field.id]
-    if (metadataLabel) {
-      return {
-        ...field,
-        label: metadataLabel
-      }
-    }
-
-    const pageLabel = pageFields.find((pageField) => pageField.id === field.id)
-    if (!pageLabel) {
-      throw new Error(`Referenced field ${field.id} does not have a label`)
-    }
-
-    return {
-      ...field,
-      label: pageLabel.label
-    }
-  })
-}
-
-/**
- * Builds a validated configuration for an event
- * @param config - Event specific configuration
- */
-export const defineConfig = (config: EventConfigInput) => {
-  const parsed = EventConfig.parse(config)
-
-  const pageFields = findPageFields(parsed)
-
-  return EventConfig.parse({
-    ...parsed,
-    summary: {
-      ...parsed.summary,
-      fields: fillFieldLabels({
-        pageFields,
-        refFields: parsed.summary.fields
-      })
-    },
-    workqueues: parsed.workqueues.map((workqueue) => ({
-      ...workqueue,
-      fields: fillFieldLabels({
-        pageFields,
-        refFields: workqueue.fields
-      })
-    }))
-  })
-}
 
 export const defineForm = (form: FormConfigInput): FormConfig =>
   FormConfig.parse(form)

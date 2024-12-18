@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* stylelint-disable */
-import { useOnlineStatus } from '@client/utils'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { Text } from '@opencrvs/components'
 import { useQueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { v4 as uuid } from 'uuid'
+import { Text } from '@opencrvs/components'
+import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useOnlineStatus } from '@client/utils'
 const Container = styled.div`
   background: #fff;
   position: fixed;
@@ -31,7 +31,7 @@ const Container = styled.div`
   }
 `
 
-export const Debug = () => {
+export function Debug() {
   const events = useEvents()
   const online = useOnlineStatus()
   const queryClient = useQueryClient()
@@ -76,7 +76,7 @@ export const Debug = () => {
       <Container>
         <ul>
           <li>
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               {online ? 'Online' : 'Offline'}
             </Text>
           </li>
@@ -84,7 +84,7 @@ export const Debug = () => {
             <button onClick={createEvents}>Create event</button>
           </li>
           <li>
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               Failed requests in cache{' '}
               {mutations
                 .filter((mutation) => mutation.state.isPaused)
@@ -92,7 +92,7 @@ export const Debug = () => {
             </Text>
           </li>
           <li>
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               Paused requests in cache{' '}
               {mutations
                 .filter((mutation) => mutation.state.error)
@@ -105,18 +105,19 @@ export const Debug = () => {
             </button>
           </li>
           <li>
+            {/* eslint-disable-next-line no-console */}
             <button onClick={() => console.log(events.events.data)}>
               console.log stored events
             </button>
           </li>
           <li>
-            <Text variant="reg12" element="span">
-              Events in offline storage: {storedEvents.data?.length}
+            <Text element="span" variant="reg12">
+              Events in offline storage: {storedEvents.data.length}
             </Text>
           </li>
           <li>
             <br />
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               Test file uploads
             </Text>
             <br />

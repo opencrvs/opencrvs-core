@@ -18,27 +18,27 @@ import { EventIndex } from '@opencrvs/commons/client'
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
-export const EventSummary = ({
+export function EventSummary({
   event,
   summary
 }: {
   event: EventIndex
   summary: SummaryConfig
-}) => {
+}) {
   return (
     <>
       <Summary id="summary">
         {summary.fields.map((field) => {
           const message = 'message'
-          const placeholder = message && 'placeholder'
 
           return (
             <Summary.Row
               key={field.id}
               data-testid={field.id}
               label={field.label?.defaultMessage ?? ''}
-              placeholder={placeholder}
-              value={(event.data[field.id] as any) ?? '-'}
+              placeholder={message}
+              // @ts-ignore
+              value={event.data[field.id] ?? '-'}
             />
           )
         })}

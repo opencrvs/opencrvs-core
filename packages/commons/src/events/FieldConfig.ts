@@ -12,15 +12,23 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from '../conditionals/conditionals'
 
+export const ConditionalTypes = {
+  SHOW: 'SHOW',
+  ENABLE: 'ENABLE'
+} as const
+
+export type ConditionalTypes =
+  (typeof ConditionalTypes)[keyof typeof ConditionalTypes]
+
 const FieldId = z.string()
 
 const ShowConditional = z.object({
-  type: z.literal('SHOW'),
+  type: z.literal(ConditionalTypes.SHOW),
   conditional: Conditional()
 })
 
 const EnableConditional = z.object({
-  type: z.literal('ENABLE'),
+  type: z.literal(ConditionalTypes.ENABLE),
   conditional: Conditional()
 })
 
@@ -60,8 +68,20 @@ const BaseField = z.object({
 
 export type BaseField = z.infer<typeof BaseField>
 
+export const FieldType = {
+  TEXT: 'TEXT',
+  DATE: 'DATE',
+  PARAGRAPH: 'PARAGRAPH',
+  RADIO_GROUP: 'RADIO_GROUP',
+  FILE: 'FILE',
+  HIDDEN: 'HIDDEN'
+} as const
+
+export const fieldTypes = Object.values(FieldType)
+export type FieldType = (typeof fieldTypes)[number]
+
 const TextField = BaseField.extend({
-  type: z.literal('TEXT'),
+  type: z.literal(FieldType.TEXT),
   options: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text')
@@ -71,7 +91,7 @@ const TextField = BaseField.extend({
 }).describe('Text input')
 
 const DateField = BaseField.extend({
-  type: z.literal('DATE'),
+  type: z.literal(FieldType.DATE),
   options: z
     .object({
       notice: TranslationConfig.describe(
@@ -82,7 +102,7 @@ const DateField = BaseField.extend({
 }).describe('A single date input (dd-mm-YYYY)')
 
 const Paragraph = BaseField.extend({
-  type: z.literal('PARAGRAPH'),
+  type: z.literal(FieldType.PARAGRAPH),
   options: z
     .object({
       fontVariant: z.literal('reg16').optional()
@@ -91,11 +111,11 @@ const Paragraph = BaseField.extend({
 }).describe('A read-only HTML <p> paragraph')
 
 const File = BaseField.extend({
-  type: z.literal('FILE')
+  type: z.literal(FieldType.FILE)
 }).describe('File upload')
 
 const RadioGroup = BaseField.extend({
-  type: z.literal('RADIO_GROUP'),
+  type: z.literal(FieldType.RADIO_GROUP),
   options: z.array(
     z.object({
       value: z.string().describe('The value of the option'),
@@ -113,5 +133,4 @@ export const FieldConfig = z.discriminatedUnion('type', [
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>
-export type FieldType = FieldConfig['type']
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

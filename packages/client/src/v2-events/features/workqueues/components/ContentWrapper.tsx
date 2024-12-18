@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import styled from 'styled-components'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
@@ -23,11 +23,7 @@ import {
  * Based on packages/client/src/views/OfficeHome/WQContentWrapper.tsx
  */
 
-interface IContentWrapper {
-  isMobileSize: boolean
-  title: string
-  children: React.ReactNode | React.ReactNode[]
-  tabBarContent?: React.ReactNode
+interface BodyProps {
   isShowPagination?: boolean
   paginationId?: number
   totalPages?: number
@@ -36,6 +32,14 @@ interface IContentWrapper {
   noContent?: boolean
   loading?: boolean
   error?: boolean
+  children: React.ReactNode | React.ReactNode[]
+}
+
+interface IContentWrapper extends BodyProps {
+  isMobileSize: boolean
+  title: string
+  tabBarContent?: React.ReactNode
+
   topActionButtons?: React.ReactElement[]
   showTitleOnMobile?: boolean
 }
@@ -56,24 +60,24 @@ const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
   height: auto;
 `
 
-const Body = (props: IProps) => {
-  const {
-    isShowPagination,
-    paginationId,
-    totalPages,
-    onPageChange,
-    loading,
-    error,
-    isOnline,
-    noContent
-  } = props
-
+function Body({
+  isShowPagination,
+  paginationId,
+  totalPages,
+  onPageChange,
+  loading,
+  error,
+  isOnline,
+  noContent,
+  noResultText,
+  children
+}: IProps) {
   return (
     <>
-      {props.children}
+      {children}
       <PaginationLoaderContainer isShowPagination={isShowPagination}>
         {noContent && !loading && (
-          <NoResultText id="no-record">{props.noResultText}</NoResultText>
+          <NoResultText id="no-record">{noResultText}</NoResultText>
         )}
         {isShowPagination &&
           !!paginationId &&
@@ -87,8 +91,8 @@ const Body = (props: IProps) => {
             />
           )}
         <LoadingIndicator
-          loading={!!loading}
           hasError={!!error}
+          loading={!!loading}
           noDeclaration={noContent}
         />
       </PaginationLoaderContainer>
@@ -96,27 +100,69 @@ const Body = (props: IProps) => {
   )
 }
 
-const WQContentWrapperComp = (props: IProps) => {
+function WQContentWrapperComp({
+  isMobileSize,
+  tabBarContent,
+  title,
+  topActionButtons,
+  showTitleOnMobile,
+  error,
+  loading,
+  noContent,
+  isShowPagination,
+  isOnline,
+  onPageChange,
+  paginationId,
+  totalPages,
+  noResultText,
+  children
+}: IProps) {
   return (
     <>
-      {props.isMobileSize ? (
+      {isMobileSize ? (
         <>
-          {props.tabBarContent && (
-            <TabBarContainer>{props.tabBarContent}</TabBarContainer>
-          )}
+          {tabBarContent && <TabBarContainer>{tabBarContent}</TabBarContainer>}
           <MobileChildrenContainer>
-            <Body {...props} />
+            <Body
+              error={error}
+              isMobileSize={isMobileSize}
+              isOnline={isOnline}
+              isShowPagination={isShowPagination}
+              loading={loading}
+              noContent={noContent}
+              noResultText={noResultText}
+              paginationId={paginationId}
+              title={title}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            >
+              {children}
+            </Body>
           </MobileChildrenContainer>
         </>
       ) : (
         <Content
-          title={props.title}
+          showTitleOnMobile={showTitleOnMobile}
           size={ContentSize.LARGE}
-          tabBarContent={props.tabBarContent}
-          topActionButtons={props.topActionButtons}
-          showTitleOnMobile={props.showTitleOnMobile}
+          tabBarContent={tabBarContent}
+          title={title}
+          topActionButtons={topActionButtons}
         >
-          <Body {...props} />
+          <Body
+            error={error}
+            isMobileSize={isMobileSize}
+            isOnline={isOnline}
+            isShowPagination={isShowPagination}
+            loading={loading}
+            noContent={noContent}
+            noResultText={noResultText}
+            paginationId={paginationId}
+            title={title}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          >
+            {children}
+          </Body>
         </Content>
       )}
     </>

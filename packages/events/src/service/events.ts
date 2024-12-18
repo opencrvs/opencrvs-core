@@ -56,12 +56,17 @@ export async function getEventById(id: string) {
   return event
 }
 
-export async function createEvent(
-  eventInput: z.infer<typeof EventInput>,
-  createdBy: string,
-  createdAtLocation: string,
+export async function createEvent({
+  eventInput,
+  createdAtLocation,
+  createdBy,
+  transactionId
+}: {
+  eventInput: z.infer<typeof EventInput>
+  createdBy: string
+  createdAtLocation: string
   transactionId: string
-) {
+}) {
   const existingEvent = await getEventByTransactionId(transactionId)
 
   if (existingEvent) {
