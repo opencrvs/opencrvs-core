@@ -54,9 +54,14 @@ function getFullURL(filename: string) {
 async function cacheFile(filename: string, file: File) {
   const temporaryBlob = new Blob([file], { type: file.type })
   const cacheKeys = await caches.keys()
-  const cache = await caches.open(
-    cacheKeys.find((key) => key.startsWith(CACHE_NAME))!
-  )
+
+  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
+
+  if (!cacheKey) {
+    throw new Error(`Cache ${CACHE_NAME} not found`)
+  }
+
+  const cache = await caches.open(cacheKey)
   return cache.put(
     getFullURL(filename),
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
@@ -65,9 +70,13 @@ async function cacheFile(filename: string, file: File) {
 
 async function removeCached(filename: string) {
   const cacheKeys = await caches.keys()
-  const cache = await caches.open(
-    cacheKeys.find((key) => key.startsWith(CACHE_NAME))!
-  )
+  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
+
+  if (!cacheKey) {
+    throw new Error(`Cache ${CACHE_NAME} not found`)
+  }
+
+  const cache = await caches.open(cacheKey)
   return cache.delete(getFullURL(filename))
 }
 
@@ -94,7 +103,7 @@ export function useFileUpload(fieldId: string) {
       setState({ filename: temporaryUrl })
     },
     onSuccess: (data, _, context) => {
-      removeCached(data.url)
+      void removeCached(data.url)
     }
   })
 
