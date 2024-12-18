@@ -249,10 +249,6 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       ]
     }
 
-    await queryClient.cancelQueries({
-      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    })
-
     // Do this as very first synchronous operation so UI can trust
     // that the event is created when changing view for instance
     queryClient.setQueryData(
@@ -261,6 +257,10 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
         return [...old, optimisticEvent]
       }
     )
+
+    await queryClient.cancelQueries({
+      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    })
 
     const events = await readEventsFromStorage()
 
@@ -301,12 +301,15 @@ const observer = new QueryObserver<EventDocument[]>(queryClient, {
   queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
 })
 
-observer.subscribe((event) => {
-  event.data?.forEach((e) => {
-    queryClient.setQueryData(getQueryKey(api.event.get, e.id, 'query'), event)
+observer.subscribe((observerEvent) => {
+  observerEvent.data?.forEach((event) => {
+    queryClient.setQueryData(
+      getQueryKey(api.event.get, event.id, 'query'),
+      event
+    )
 
     queryClient.setQueryData(
-      getQueryKey(api.event.get, e.transactionId, 'query'),
+      getQueryKey(api.event.get, event.transactionId, 'query'),
       event
     )
   })
