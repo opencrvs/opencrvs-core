@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => {
       srcDir: 'src/',
       filename: 'src-sw.ts',
       devOptions: {
-        enabled: false,
+        enabled: true,
         type: 'module',
         navigateFallback: 'index.html'
       }

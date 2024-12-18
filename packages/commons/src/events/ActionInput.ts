@@ -11,11 +11,12 @@
 
 import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { FieldValue } from './FieldValue'
 
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
-  data: z.record(z.any())
+  data: z.record(z.string(), FieldValue)
 })
 
 const CreateActionInput = BaseActionInput.merge(

@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { documentUploadHandler } from '@documents/features/uploadDocument/handler'
+import {
+  fileUploadHandler,
+  documentUploadHandler,
+  fileExistsHandler
+} from '@documents/features/uploadDocument/handler'
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
 import { createPreSignedUrl } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
@@ -31,6 +35,29 @@ export const getRoutes = () => {
       handler: createPreSignedUrl,
       config: {
         tags: ['api']
+      }
+    },
+    // check if file exists
+    {
+      method: 'GET',
+      path: '/files/{filename}',
+      handler: fileExistsHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    // upload a file to minio
+    {
+      method: 'POST',
+      path: '/files',
+      handler: fileUploadHandler,
+      config: {
+        tags: ['api'],
+        payload: {
+          allow: ['multipart/form-data'],
+          multipart: true,
+          output: 'stream'
+        }
       }
     },
     // upload a document

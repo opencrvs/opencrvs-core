@@ -90,19 +90,22 @@ export const appRouter = router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
-          createdBy: options.ctx.user.id
+          createdBy: options.ctx.user.id,
+          token: options.ctx.token
         })
       }),
       draft: publicProcedure.input(DraftActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
-          createdBy: options.ctx.user.id
+          createdBy: options.ctx.user.id,
+          token: options.ctx.token
         })
       }),
       declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
-          createdBy: options.ctx.user.id
+          createdBy: options.ctx.user.id,
+          token: options.ctx.token
         })
       }),
       register: publicProcedure
@@ -118,7 +121,8 @@ export const appRouter = router({
             },
             {
               eventId: options.input.eventId,
-              createdBy: options.ctx.user.id
+              createdBy: options.ctx.user.id,
+              token: options.ctx.token
             }
           )
         })

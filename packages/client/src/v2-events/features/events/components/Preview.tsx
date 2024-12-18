@@ -25,8 +25,9 @@ import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
-import { FormConfig } from '@opencrvs/commons/client'
+import { FieldConfig, FormConfig } from '@opencrvs/commons/client'
 import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
+import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -157,6 +158,23 @@ const messages = defineMessages({
   }
 })
 
+type Stringifiable = {
+  toString(): string
+}
+
+const FIELD_TYPE_FORMATTERS: Partial<
+  Record<
+    FieldConfig['type'],
+    null | ((props: { value: Stringifiable }) => JSX.Element)
+  >
+> = {
+  FILE: FileOutput
+}
+
+function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
+  return <>{value?.toString() || ''}</>
+}
+
 /**
  * Preview component, used to display the "read-only" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
@@ -228,28 +246,42 @@ const PreviewComponent = ({
                         expand={true}
                       >
                         <ListReview id={'Section_' + page.id}>
-                          {page.fields.map((field) => (
-                            <ListReview.Row
-                              id={field.id}
-                              key={field.id}
-                              label={intl.formatMessage(field.label)}
-                              value={form[field.id] || ''}
-                              actions={
-                                <Link
-                                  onClick={(e) => {
-                                    e.stopPropagation()
+                          {page.fields
 
-                                    onEdit({
-                                      pageId: page.id,
-                                      fieldId: field.id
-                                    })
-                                  }}
-                                >
-                                  {intl.formatMessage(messages.changeButton)}
-                                </Link>
-                              }
-                            />
-                          ))}
+                            .filter(
+                              (field) =>
+                                FIELD_TYPE_FORMATTERS[field.type] !== null
+                            )
+                            .map((field) => {
+                              const Output =
+                                FIELD_TYPE_FORMATTERS[field.type] ||
+                                DefaultOutput
+
+                              return (
+                                <ListReview.Row
+                                  id={field.id}
+                                  key={field.id}
+                                  label={intl.formatMessage(field.label)}
+                                  value={<Output value={form[field.id]} />}
+                                  actions={
+                                    <Link
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+
+                                        onEdit({
+                                          pageId: page.id,
+                                          fieldId: field.id
+                                        })
+                                      }}
+                                    >
+                                      {intl.formatMessage(
+                                        messages.changeButton
+                                      )}
+                                    </Link>
+                                  }
+                                />
+                              )
+                            })}
                         </ListReview>
                       </Accordion>
                     </DeclarationDataContainer>

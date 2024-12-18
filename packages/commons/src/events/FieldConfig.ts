@@ -43,6 +43,7 @@ const BaseField = z.object({
     .optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
+  hidden: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z
     .array(
@@ -93,10 +94,6 @@ const File = BaseField.extend({
   type: z.literal('FILE')
 }).describe('File upload')
 
-const Hidden = BaseField.extend({
-  type: z.literal('HIDDEN')
-}).describe('Hidden field')
-
 const RadioGroup = BaseField.extend({
   type: z.literal('RADIO_GROUP'),
   options: z.array(
@@ -112,7 +109,6 @@ export const FieldConfig = z.discriminatedUnion('type', [
   DateField,
   Paragraph,
   RadioGroup,
-  Hidden,
   File
 ])
 

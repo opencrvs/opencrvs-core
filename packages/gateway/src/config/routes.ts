@@ -21,6 +21,7 @@ import sendVerifyCodeHandler, {
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
 import { trpcProxy } from '@gateway/v2-events/event-config/routes'
+import { DOCUMENTS_URL } from '@gateway/constants'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -74,6 +75,27 @@ export const getRoutes = () => {
         },
         response: {
           schema: responseSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/upload',
+      handler: async (req, h) => {
+        if (process.env.NODE_ENV !== 'production') {
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.random() * 30000)
+          )
+        }
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files`,
+          passThrough: true
+        })
+      },
+      options: {
+        payload: {
+          output: 'data',
+          parse: false
         }
       }
     },

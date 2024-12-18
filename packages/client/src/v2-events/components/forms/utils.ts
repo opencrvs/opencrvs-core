@@ -13,6 +13,7 @@ import {
   IFormFieldValue,
   IFormSectionData
 } from '@client/forms'
+import { FormConfig } from '@opencrvs/commons'
 
 import { BaseField, FieldConfig, validate } from '@opencrvs/commons/client'
 
@@ -84,48 +85,4 @@ export function getDependentFields(
     }
     return field.initialValue.dependsOn.includes(fieldName)
   })
-}
-
-export function flatten<T>(
-  obj: Record<string, T>,
-  parentKey = '',
-  separator = '.'
-): Record<string, T> {
-  const result: Record<string, T> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    const newKey = parentKey ? `${parentKey}${separator}${key}` : key
-
-    if (isRecord(value)) {
-      Object.assign(
-        result,
-        flatten(value as Record<string, T>, newKey, separator)
-      )
-    } else {
-      result[newKey] = value
-    }
-  }
-
-  return result
-}
-
-export function unflatten<T>(
-  obj: Record<string, T>,
-  separator = '.'
-): Record<string, T | Record<string, T>> {
-  const result: Record<string, T | Record<string, T>> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    const keys = key.split(separator)
-    let current: Record<string, T | Record<string, T>> = result
-
-    keys.forEach((part, index) => {
-      if (!current[part] || typeof current[part] !== 'object') {
-        current[part] = index === keys.length - 1 ? value : {}
-      }
-      current = current[part] as Record<string, T | Record<string, T>>
-    })
-  }
-
-  return result
 }

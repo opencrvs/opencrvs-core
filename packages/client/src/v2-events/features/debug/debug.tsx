@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* stylelint-disable */
-import React, { useState } from 'react'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import styled from 'styled-components'
-import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { Text } from '@opencrvs/components'
 import { useQueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import React, { useEffect } from 'react'
+import styled from 'styled-components'
 import { v4 as uuid } from 'uuid'
 const Container = styled.div`
   background: #fff;
@@ -36,6 +37,8 @@ export const Debug = () => {
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
+  const { filename, uploadFiles, getFullURL } = useFileUpload('test')
+
   const createEvents = () => {
     createMutation.mutate(
       {
@@ -54,6 +57,17 @@ export const Debug = () => {
       }
     )
   }
+
+  useEffect(() => {
+    async function fetchEvents() {
+      if (filename) {
+        const res = await fetch(getFullURL(filename))
+        console.log(res)
+        console.log(await res.text())
+      }
+    }
+    fetchEvents()
+  }, [getFullURL, filename])
 
   const mutations = queryClient.getMutationCache().getAll()
   const storedEvents = events.events
@@ -100,10 +114,18 @@ export const Debug = () => {
               Events in offline storage: {storedEvents.data?.length}
             </Text>
           </li>
+          <li>
+            <br />
+            <Text variant="reg12" element="span">
+              Test file uploads
+            </Text>
+            <br />
+            <input
+              type="file"
+              onChange={(e) => e.target.files && uploadFiles(e.target.files[0])}
+            />
+          </li>
         </ul>
-        <Text variant="h4" element="span">
-          Local records
-        </Text>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
     </>

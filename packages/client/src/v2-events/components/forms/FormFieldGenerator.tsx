@@ -11,7 +11,6 @@
 import { InputField } from '@client/components/form/InputField'
 import {
   DATE,
-  HIDDEN,
   IFormFieldValue,
   IFormSectionData,
   PARAGRAPH,
@@ -25,16 +24,18 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import {
   evalExpressionInFieldDefinition,
-  flatten,
   getConditionalActionsForField,
   getDependentFields,
   handleInitialValue,
-  hasInitialValueDependencyInfo,
-  unflatten
+  hasInitialValueDependencyInfo
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
-import { FieldConfig } from '@opencrvs/commons'
+import {
+  FieldConfig,
+  FieldValue,
+  FileFieldValue
+} from '@opencrvs/commons/client'
 import {
   Field,
   FieldProps,
@@ -49,6 +50,7 @@ import {
   MessageDescriptor,
   useIntl
 } from 'react-intl'
+import { FileInput } from './inputs/FileInput/FileInput'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -67,7 +69,7 @@ type GeneratedInputFieldProps = {
   fieldDefinition: FieldConfig
   fields: FieldConfig[]
   values: IFormSectionData
-  setFieldValue: (name: string, value: IFormFieldValue) => void
+  setFieldValue: (name: string, value: FieldValue) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent) => void
   onBlur: (e: React.FocusEvent) => void
@@ -132,6 +134,11 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         intl.formatMessage(fieldDefinition.placeholder)
     }
 
+    const handleFileChange = React.useCallback(
+      (value: FileFieldValue) => setFieldValue(fieldDefinition.id, value),
+      [fieldDefinition.id, setFieldValue]
+    )
+
     if (fieldDefinition.type === DATE) {
       return (
         <InputField {...inputFieldProps}>
@@ -165,17 +172,6 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === HIDDEN) {
-      const { error, touched, ...allowedInputProps } = inputProps
-
-      return (
-        <input
-          type="hidden"
-          {...allowedInputProps}
-          value={inputProps.value as string}
-        />
-      )
-    }
     if (fieldDefinition.type === TEXT) {
       return (
         <InputField {...inputFieldProps}>
@@ -186,6 +182,13 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             maxLength={fieldDefinition.options?.maxLength}
             isDisabled={disabled}
           />
+        </InputField>
+      )
+    }
+    if (fieldDefinition.type === 'FILE') {
+      return (
+        <InputField {...inputFieldProps}>
+          <FileInput {...inputProps} onChange={handleFileChange} />
         </InputField>
       )
     }
@@ -327,12 +330,24 @@ class FormSectionComponent extends React.Component<AllProps> {
   }
 
   render() {
-    const { values, fields, setFieldTouched, touched, intl, formData } =
-      this.props
+    const {
+      values,
+      fields: fieldsWithDotIds,
+      setFieldTouched,
+      touched,
+      intl,
+      formData
+    } = this.props
 
     const language = this.props.intl.locale
 
     const errors = this.props.errors as unknown as Errors
+
+    const fields = fieldsWithDotIds.map((field) => {
+      const newField = { ...field }
+      newField.id = field.id.replaceAll('.', FIELD_SEPARATOR)
+      return newField
+    })
 
     return (
       <section>
@@ -388,6 +403,25 @@ class FormSectionComponent extends React.Component<AllProps> {
       </section>
     )
   }
+}
+
+const FIELD_SEPARATOR = '____'
+function unflatten<T>(data: Record<string, T>) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key.replaceAll('.', FIELD_SEPARATOR),
+      value
+    ])
+  )
+}
+
+function flatten<T>(data: Record<string, T>) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key.replaceAll(FIELD_SEPARATOR, '.'),
+      value
+    ])
+  )
 }
 
 export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {

@@ -10,11 +10,12 @@
  */
 import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { FieldValue } from './FieldValue'
 
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), z.any())
+  data: z.record(z.string(), FieldValue)
 })
 
 const AssignedAction = ActionBase.merge(
