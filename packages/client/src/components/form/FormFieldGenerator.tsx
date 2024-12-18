@@ -274,24 +274,22 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
     if (fieldDefinition.type === ID_READER) {
       return (
-        <InputField {...inputFieldProps} hideInputHeader>
-          <IDReader
-            dividerLabel={fieldDefinition.dividerLabel}
-            manualInputInstructionLabel={
-              fieldDefinition.manualInputInstructionLabel
-            }
-          >
-            <ReaderGenerator
-              readers={fieldDefinition.readers}
-              form={values}
-              draft={draftData}
-              fields={fields}
-              setFieldValue={setFieldValue}
-              onScan={(data) => setFieldValue(fieldDefinition.name, data)}
-              onError={(error) => console.error(error)}
-            />
-          </IDReader>
-        </InputField>
+        <IDReader
+          dividerLabel={fieldDefinition.dividerLabel}
+          manualInputInstructionLabel={
+            fieldDefinition.manualInputInstructionLabel
+          }
+        >
+          <ReaderGenerator
+            readers={fieldDefinition.readers}
+            form={values}
+            draft={draftData}
+            fields={fields}
+            setFieldValue={setFieldValue}
+            onScan={(data) => setFieldValue(fieldDefinition.name, data)}
+            onError={(error) => console.error(error)}
+          />
+        </IDReader>
       )
     }
 

@@ -20,6 +20,7 @@ import {
 } from '@client/forms'
 import { RedirectField } from './Redirect'
 import { isReaderQR, isReaderRedirect } from '@client/forms/utils'
+import { Stack } from '@opencrvs/components'
 
 interface ReaderGeneratorProps extends Scan {
   readers: Ii18nReaderType[]
@@ -37,29 +38,33 @@ export const ReaderGenerator = ({
   fields,
   setFieldValue
 }: ReaderGeneratorProps) => {
-  return readers.map((reader) => {
-    const { type } = reader
-    if (isReaderQR(reader)) {
-      return (
-        <QRReader
-          key={type}
-          labels={reader.labels}
-          onScan={onScan}
-          onError={onError}
-        />
-      )
-    } else if (isReaderRedirect(reader)) {
-      return (
-        <RedirectField
-          key={type}
-          form={form}
-          draft={draft}
-          fieldDefinition={reader}
-          fields={fields}
-          setFieldValue={setFieldValue}
-          isDisabled={false}
-        />
-      )
-    } else return null
-  })
+  return (
+    <Stack justifyContent="space-between">
+      {readers.map((reader) => {
+        const { type } = reader
+        if (isReaderQR(reader)) {
+          return (
+            <QRReader
+              key={type}
+              labels={reader.labels}
+              onScan={onScan}
+              onError={onError}
+            />
+          )
+        } else if (isReaderRedirect(reader)) {
+          return (
+            <RedirectField
+              key={type}
+              form={form}
+              draft={draft}
+              fieldDefinition={reader}
+              fields={fields}
+              setFieldValue={setFieldValue}
+              isDisabled={false}
+            />
+          )
+        } else return null
+      })}
+    </Stack>
+  )
 }
