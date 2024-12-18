@@ -22,7 +22,7 @@ test('Returns empty list when no events', async () => {
 })
 
 test('Returns multiple events', async () => {
-  for await (const _ of Array(10).keys()) {
+  for (let i = 0; i < 10; i++) {
     await client.event.create(generator.event.create())
   }
 

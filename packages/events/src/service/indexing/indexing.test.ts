@@ -26,7 +26,7 @@ test('indexes all records from MongoDB with one function call', async () => {
 
   await indexAllEvents()
 
-  for await (const _ of Array(2).keys()) {
+  for (let i = 0; i < 2; i++) {
     await client.event.create(generator.event.create())
   }
 
