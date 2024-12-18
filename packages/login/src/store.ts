@@ -17,19 +17,7 @@ import {
   Store,
   StoreEnhancer
 } from 'redux'
-import { createBrowserHistory } from 'history'
-import {
-  combineReducers,
-  install,
-  StoreCreator,
-  getModel,
-  LoopReducer
-} from 'redux-loop'
-import {
-  connectRouter,
-  routerMiddleware,
-  RouterState
-} from 'connected-react-router'
+import { combineReducers, install, StoreCreator, getModel } from 'redux-loop'
 import { loginReducer, LoginState } from '@login/login/reducer'
 import { intlReducer, IntlState } from '@login/i18n/reducer'
 import * as Sentry from '@sentry/react'
@@ -37,7 +25,6 @@ import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {
   login: LoginState
-  router: RouterState
   i18n: IntlState
 }
 
@@ -48,17 +35,13 @@ const enhancedCreateStore = createReduxStore as StoreCreator
 export type AppStore = Store<IStoreState, AnyAction>
 
 export const createStore = () => {
-  const history = createBrowserHistory()
-
   const reducers = combineReducers<IStoreState>({
     login: loginReducer,
-    router: connectRouter(history) as any, // @todo
     i18n: intlReducer
   })
 
   const enhancer = compose(
     install(),
-    applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),
 
@@ -72,5 +55,5 @@ export const createStore = () => {
     getModel(reducers(undefined, { type: 'NOOP' })),
     enhancer
   )
-  return { store, history }
+  return { store }
 }

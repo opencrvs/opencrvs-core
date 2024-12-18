@@ -12,20 +12,31 @@ import { createTestComponent, wait } from '@login/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { ForgottenItem } from './ForgottenItemForm'
+import { createStore } from '@login/store'
+import { FORGOTTEN_ITEM } from '@login/navigation/routes'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('Test forgotten item form', () => {
   let component: ReactWrapper
-  beforeEach(() => {
-    component = createTestComponent(<ForgottenItem />)
+  let router: ReturnType<typeof createMemoryRouter>
+
+  beforeEach(async () => {
+    const { store } = createStore()
+    ;({ component, router } = createTestComponent(<ForgottenItem />, {
+      store,
+      path: FORGOTTEN_ITEM,
+      initialEntries: [FORGOTTEN_ITEM]
+    }))
   })
 
   it('shows error when no option is chosen and pressed continue', async () => {
     component.find('form').simulate('submit')
     await wait()
+
     expect(component.find('#error-text').hostNodes()).toHaveLength(1)
   })
 
-  it('redirect to phone number confirmation form for valid form submision', async () => {
+  it('redirect to phone number confirmation form for valid form submission', async () => {
     component
       .find('#usernameOption')
       .hostNodes()
@@ -34,6 +45,8 @@ describe('Test forgotten item form', () => {
     component.find('form').simulate('submit')
     await wait()
 
-    expect(window.location.href).toContain('/phone-number-verification')
+    expect(router.state.location.pathname).toContain(
+      '/phone-number-verification'
+    )
   })
 })

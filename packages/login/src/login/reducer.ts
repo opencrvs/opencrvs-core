@@ -9,10 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { loop, LoopReducer, Cmd, Loop, RunCmd } from 'redux-loop'
-import { push } from 'connected-react-router'
 import * as actions from '@login/login/actions'
-import { authApi, IApplicationConfig } from '@login/utils/authApi'
-import * as routes from '@login/navigation/routes'
+import {
+  authApi,
+  IApplicationConfig,
+  IAuthenticateResponse
+} from '@login/utils/authApi'
+
 import { merge } from 'lodash'
 import { IStoreState } from '@login/store'
 
@@ -87,7 +90,8 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           actions.AuthenticationFailedAction,
           actions.AuthenticateResponseAction
         >(authApi.authenticate, {
-          successActionCreator: actions.completeAuthentication,
+          successActionCreator: (args: IAuthenticateResponse) =>
+            actions.completeAuthentication(args, action.payload.inAppRedirect),
           failActionCreator: actions.failAuthentication,
           args: [action.payload]
         })
@@ -129,18 +133,22 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
             email: action.payload.email
           }
         },
-        (action.payload.token &&
-          Cmd.run(
-            (getState: () => IStoreState) => {
+
+        Cmd.run(
+          (getState: () => IStoreState) => {
+            if (action.payload.token) {
               window.location.assign(
                 `${window.config.CLIENT_APP_URL}?token=${
                   action.payload.token
                 }&lang=${getState().i18n.language}`
               )
-            },
-            { args: [Cmd.getState] }
-          )) ||
-          Cmd.action(push(routes.STEP_TWO))
+            } else {
+              action.payload.inAppRedirect()
+            }
+          },
+
+          { args: [Cmd.getState] }
+        )
       )
     case actions.RESEND_AUTHENTICATION_CODE:
       const notificationEvent = action.payload
