@@ -8,8 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { storage } from '@client/storage'
-import { getToken } from '@client/utils/authUtils'
 import type { AppRouter } from '@gateway/v2-events/events/router'
 import { QueryClient } from '@tanstack/react-query'
 import {
@@ -21,10 +19,12 @@ import { httpLink, loggerLink } from '@trpc/client'
 import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
 import React from 'react'
 import superjson from 'superjson'
+import { getToken } from '@client/utils/authUtils'
+import { storage } from '@client/storage'
 
 export const api = createTRPCReact<AppRouter>()
 
-const getTrpcClient = () => {
+function getTrpcClient() {
   return api.createClient({
     links: [
       loggerLink({
@@ -35,7 +35,7 @@ const getTrpcClient = () => {
       httpLink({
         url: '/api/events',
         transformer: superjson,
-        async headers() {
+        headers() {
           return {
             authorization: `Bearer ${getToken()}`
           }
@@ -45,7 +45,7 @@ const getTrpcClient = () => {
   })
 }
 
-const getQueryClient = () => {
+function getQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
@@ -86,14 +86,6 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
-      onSuccess={async () => {
-        queryClient.resumePausedMutations()
-
-        queryClient
-          .getMutationCache()
-          .getAll()
-          .map((m) => m.continue())
-      }}
       persistOptions={{
         persister,
         maxAge: 1000 * 60 * 60 * 4,
@@ -103,6 +95,14 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
             return mut.state.status !== 'success'
           }
         }
+      }}
+      onSuccess={async () => {
+        await queryClient.resumePausedMutations()
+
+        queryClient
+          .getMutationCache()
+          .getAll()
+          .map(async (m) => m.continue())
       }}
     >
       <api.Provider client={trpcClient} queryClient={queryClient}>

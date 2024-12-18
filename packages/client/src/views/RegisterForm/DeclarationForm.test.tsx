@@ -128,11 +128,16 @@ describe('when user starts a new declaration', () => {
           })
         )
 
+        app.update()
+        await flushPromises()
+
         await goToChildSection(app)
       })
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
+          await flushPromises()
+
           app
             .find('#firstNamesEng')
             .hostNodes()
@@ -140,7 +145,12 @@ describe('when user starts a new declaration', () => {
               target: { id: 'firstNamesEng', value: 'hello' }
             })
 
+          app.update()
+          await flushPromises()
+
           app.find('#next_section').hostNodes().simulate('click')
+          app.update()
+
           await flushPromises()
         })
         it('redirect to home when pressed save and exit button', async () => {
@@ -207,9 +217,11 @@ describe('when user starts a new declaration', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
+            await flushPromises()
             await goToDocumentsSection(app)
           })
           it('renders list of document upload field', async () => {
+            await flushPromises()
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
@@ -278,6 +290,7 @@ describe('when user starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
+          await flushPromises()
           await goToSection(app, 5)
           app
             .find('#btn_change_child_familyNameEng')
@@ -285,6 +298,7 @@ describe('when user starts a new declaration', () => {
             .first()
             .simulate('click')
         })
+
         it('renders preview page', async () => {
           const button = await waitForElement(app, '#back-to-review-button')
 
@@ -296,6 +310,7 @@ describe('when user starts a new declaration', () => {
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
+
         it('should go to input field when user press change button to edit information', async () => {
           const backToReviewButton = await waitForElement(
             app,
@@ -320,10 +335,17 @@ describe('when user starts a new declaration', () => {
         })
       })
       describe('when user clicks the "mother" page', () => {
-        beforeEach(() => goToMotherSection(app))
-        it('changes to the mother details section', () => {
+        beforeEach(async () => {
+          await flushPromises()
+          await goToMotherSection(app)
+        })
+
+        it('changes to the mother details section', async () => {
+          await flushPromises()
+          app.update()
           expect(router.state.location.pathname).toContain('mother')
         })
+
         it('hides everything with pinpad if is page loses focus', async () => {
           setPageVisibility(false)
           await waitForElement(app, '#unlockPage')

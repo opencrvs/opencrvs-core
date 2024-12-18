@@ -123,7 +123,7 @@ class OfficeHomeView extends React.Component<
 > {
   pageSize = 10
   showPaginated = false
-  interval: any = undefined
+  interval: NodeJS.Timeout | undefined = undefined
   role = this.props.userDetails && this.props.userDetails.systemRole
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)

@@ -457,7 +457,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                 isShowPagination={!loading && total > DEFAULT_PAGE_SIZE}
                 totalPages={Math.ceil(total / DEFAULT_PAGE_SIZE)}
                 paginationId={currentPageNumber}
-                onPageChange={(page: any) => setCurrentPageNumber(page)}
+                onPageChange={(page: number) => setCurrentPageNumber(page)}
                 topActionButtons={[
                   <BookmarkAdvancedSearchResult key="bookmark-advanced-search-result" />
                 ]}

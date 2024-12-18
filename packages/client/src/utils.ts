@@ -11,7 +11,7 @@
 import { storage } from '@client/storage'
 import { APPLICATION_VERSION, LANG_EN } from '@client/utils/constants'
 import { IUserData } from '@client/declarations'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GetSystemRolesQuery, Role } from '@client/utils/gateway'
 
 export async function validateApplicationVersion() {

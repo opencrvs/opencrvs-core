@@ -10,27 +10,10 @@
  */
 
 import { z } from 'zod'
+import { EventMetadata } from './EventMetadata'
 
-const Status = z.enum([
-  'CREATED',
-  'NOTIFIED',
-  'DECLARED',
-  'REGISTERED',
-  'CERTIFIED'
-])
-
-export type Status = z.infer<typeof Status>
-export const EventIndex = z.object({
-  id: z.string(),
-  type: z.string(),
-  status: Status,
-  createdAt: z.date(),
-  createdBy: z.string(),
-  createdAtLocation: z.string(),
-  modifiedAt: z.date(),
-  assignedTo: z.string().nullable(),
-  updatedBy: z.string(),
-  data: z.object({})
+export const EventIndex = EventMetadata.extend({
+  data: z.record(z.string(), z.any())
 })
 
 export type EventIndex = z.infer<typeof EventIndex>
