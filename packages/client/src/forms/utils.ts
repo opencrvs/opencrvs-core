@@ -56,7 +56,9 @@ import {
   REDIRECT,
   IDReaderFormField,
   ID_READER,
-  Ii18nIDReaderFormField
+  Ii18nIDReaderFormField,
+  QRReaderType,
+  Ii18nQRReaderType
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -125,6 +127,27 @@ const internationaliseListFieldObject = (
   return options.map((opt) => intl.formatMessage(opt))
 }
 
+const internationaliseQRReaderFieldObject = (
+  intl: IntlShape,
+  field: QRReaderType
+): Ii18nQRReaderType => {
+  return {
+    ...field,
+    labels: {
+      button: intl.formatMessage(field.labels.button),
+      scannerDialogSupportingCopy: intl.formatMessage(
+        field.labels.scannerDialogSupportingCopy
+      ),
+      tutorial: {
+        cameraCleanliness: intl.formatMessage(
+          field.labels.tutorial.cameraCleanliness
+        ),
+        distance: intl.formatMessage(field.labels.tutorial.distance),
+        lightBalance: intl.formatMessage(field.labels.tutorial.lightBalance)
+      }
+    }
+  }
+}
 export const internationaliseFieldObject = (
   intl: IntlShape,
   field: IFormField
@@ -208,6 +231,8 @@ export const internationaliseFieldObject = (
     )
     ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
       intl.formatMessage(field.manualInputInstructionLabel)
+    ;(base as Ii18nIDReaderFormField).readers[0] =
+      internationaliseQRReaderFieldObject(intl, field.readers[0])
   }
 
   return base as Ii18nFormField

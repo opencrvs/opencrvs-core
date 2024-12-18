@@ -38,7 +38,6 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
-import { ReaderType } from '@opencrvs/components/lib/IDReader/types'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -736,6 +735,20 @@ export interface IRedirectFormField extends IFormFieldBase {
   }
 }
 
+export interface QRReaderType {
+  type: 'qr'
+  labels: {
+    button: MessageDescriptor
+    scannerDialogSupportingCopy: MessageDescriptor
+    tutorial: {
+      cameraCleanliness: MessageDescriptor
+      distance: MessageDescriptor
+      lightBalance: MessageDescriptor
+    }
+  }
+}
+
+type ReaderType = QRReaderType
 export interface IDReaderFormField extends IFormFieldBase {
   type: typeof ID_READER
   dividerLabel: MessageDescriptor
@@ -1247,11 +1260,25 @@ interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   }
 }
 
+export interface Ii18nQRReaderType {
+  type: 'qr'
+  labels: {
+    button: string
+    scannerDialogSupportingCopy: string
+    tutorial: {
+      cameraCleanliness: string
+      distance: string
+      lightBalance: string
+    }
+  }
+}
+
+export type Ii18nReaderType = Ii18nQRReaderType
 export interface Ii18nIDReaderFormField extends Ii18nFormFieldBase {
   type: typeof ID_READER
   dividerLabel: string
   manualInputInstructionLabel: string
-  readers: [ReaderType, ...ReaderType[]]
+  readers: [Ii18nQRReaderType, ...Ii18nQRReaderType[]]
 }
 
 export type Ii18nFormField =

@@ -276,8 +276,10 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <InputField {...inputFieldProps} hideInputHeader>
           <IDReader
-            dividerLabel="Or"
-            manualInputInstructionLabel="Complete fields below"
+            dividerLabel={fieldDefinition.dividerLabel}
+            manualInputInstructionLabel={
+              fieldDefinition.manualInputInstructionLabel
+            }
           >
             <ReaderGenerator
               readers={fieldDefinition.readers}

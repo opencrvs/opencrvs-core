@@ -21,9 +21,6 @@ export interface QRReaderType {
   }
 }
 
-// union of other reader types
-export type ReaderType = QRReaderType
-
 export interface IDReaderProps {
   dividerLabel: string
   manualInputInstructionLabel: string
