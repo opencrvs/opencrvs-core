@@ -62,12 +62,12 @@ function getQueryClient() {
 
 function createIDBPersister(idbValidKey = 'reactQuery') {
   return {
-    persistClient: async () => {
-      // https://stackoverflow.com/questions/27584993/indexeddb-error-uncaught-datacloneerror-failed-to-execute-put-on-idbobjects
-      await storage.setItem(idbValidKey, 'client')
+    persistClient: async (client: PersistedClient) => {
+      await storage.setItem(idbValidKey, JSON.stringify(client))
     },
     restoreClient: async () => {
       const client = await storage.getItem<PersistedClient>(idbValidKey)
+
       return client || undefined
     },
     removeClient: async () => {
