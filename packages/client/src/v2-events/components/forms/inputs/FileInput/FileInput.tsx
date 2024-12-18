@@ -9,21 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { SimpleDocumentUploader } from './SimpleDocumentUploader'
-import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { FileFieldValue } from '@opencrvs/commons/client'
 import React, { ComponentProps, useEffect } from 'react'
+import { FileFieldValue } from '@opencrvs/commons/client'
+import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 
 export function FileInput(
   props: Omit<
     ComponentProps<typeof SimpleDocumentUploader>,
-    'onComplete' | 'label'
+    'onComplete' | 'label' | 'error'
   > & {
     value: FileFieldValue
     onChange: (value: FileFieldValue | null) => void
+    error?: boolean
   }
 ) {
-  const { value, error, onChange, name, description, allowedDocType } = props
+  const { value, onChange, name, description, allowedDocType, error } = props
 
   const {
     getFullURL,
@@ -38,7 +39,7 @@ export function FileInput(
     if (file === null) {
       return onChange(file)
     }
-    if (uploadedFileName && file) {
+    if (uploadedFileName) {
       return onChange({ ...file, filename: uploadedFileName })
     }
   }, [file, uploadedFileName, onChange])
@@ -46,10 +47,9 @@ export function FileInput(
   return (
     <SimpleDocumentUploader
       {...props}
-      name={name}
-      label={file ? file.originalFilename : ''}
-      description={description}
       allowedDocType={allowedDocType}
+      description={description}
+      error={''}
       files={
         value
           ? {
@@ -60,15 +60,16 @@ export function FileInput(
             }
           : undefined
       }
-      error={error}
-      onComplete={(file) => {
-        if (file) {
+      label={file ? file.originalFilename : ''}
+      name={name}
+      onComplete={(newFile) => {
+        if (newFile) {
           setFile({
-            filename: file.name,
-            originalFilename: file.name,
-            type: file.type
+            filename: newFile.name,
+            originalFilename: newFile.name,
+            type: newFile.type
           })
-          uploadFiles(file)
+          uploadFiles(newFile)
         }
       }}
     />
