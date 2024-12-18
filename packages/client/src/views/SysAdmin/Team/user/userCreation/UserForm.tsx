@@ -24,10 +24,8 @@ import {
   validationMessages as messages
 } from '@client/i18n/messages'
 import {
-  goBack,
-  goToCreateUserSection,
-  goToTeamUserList,
-  goToUserReviewForm
+  generateCreateUserSectionUrl,
+  generateUserReviewFormUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -49,6 +47,12 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { selectSystemRoleMap } from '@client/user/selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 export const Action = styled.div`
   margin-top: 32px;
@@ -67,26 +71,20 @@ type IProps = {
 }
 
 type IState = {
-  disableContinueOnLocation: boolean
   fileUploading: boolean
 }
 
 type IDispatchProps = {
-  goBack: typeof goBack
-  goToTeamUserList: typeof goToTeamUserList
   modifyUserFormData: typeof modifyUserFormData
-  goToCreateUserSection: typeof goToCreateUserSection
-  goToUserReviewForm: typeof goToUserReviewForm
   clearUserFormData: typeof clearUserFormData
 }
-type IFullProps = IntlShapeProps & IProps & IDispatchProps
+type IFullProps = IntlShapeProps & IProps & IDispatchProps & RouteComponentProps
 
 class UserFormComponent extends React.Component<IFullProps, IState> {
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      disableContinueOnLocation: false,
       fileUploading: false
     }
   }
@@ -97,14 +95,18 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
       this.showAllValidationErrors()
     } else {
       this.props.userId
-        ? this.props.goToUserReviewForm(
-            this.props.userId,
-            this.props.nextSectionId,
-            this.props.nextGroupId
+        ? this.props.router.navigate(
+            generateUserReviewFormUrl({
+              userId: this.props.userId,
+              sectionId: this.props.nextSectionId,
+              groupId: this.props.nextGroupId
+            })
           )
-        : this.props.goToCreateUserSection(
-            this.props.nextSectionId,
-            this.props.nextGroupId
+        : this.props.router.navigate(
+            generateCreateUserSectionUrl({
+              sectionId: this.props.nextSectionId,
+              groupId: this.props.nextGroupId
+            })
           )
     }
   }
@@ -125,33 +127,20 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   handleBackAction = () => {
-    this.props.goBack()
+    this.props.router.navigate(-1)
   }
 
   modifyData = (values: any) => {
     const { formData } = this.props
-    if (
-      values['registrationOffice'] !== '0' &&
-      values['registrationOffice'] !== ''
-    ) {
-      if (values.role) {
-        const getSystemRoles = this.props.systemRoleMap
-        values.systemRole = getSystemRoles[values.role]
-      }
-      this.props.modifyUserFormData({ ...formData, ...values })
-      this.setState({
-        disableContinueOnLocation: false
-      })
-    } else {
-      this.setState({
-        disableContinueOnLocation: true
-      })
+    if (values.role) {
+      const getSystemRoles = this.props.systemRoleMap
+      values.systemRole = getSystemRoles[values.role]
     }
+    this.props.modifyUserFormData({ ...formData, ...values })
   }
 
   render = () => {
-    const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
-      this.props
+    const { section, intl, activeGroup, userId, formData } = this.props
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
@@ -165,7 +154,14 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               : section.title && intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
-          goHome={() => goToTeamUserList(String(formData.registrationOffice))}
+          goHome={() =>
+            this.props.router.navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId: String(formData.registrationOffice)
+              })
+            })
+          }
           hideBackground={true}
         >
           <Content size={ContentSize.SMALL} title={title}>
@@ -189,10 +185,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
                 size="large"
                 fullWidth
                 onClick={this.handleFormAction}
-                disabled={
-                  this.state.disableContinueOnLocation ||
-                  this.state.fileUploading
-                }
+                disabled={this.state.fileUploading}
               >
                 {intl.formatMessage(buttonMessages.continueButton)}
               </Button>
@@ -218,11 +211,9 @@ const mapStateToProps = (
   }
 }
 
-export const UserForm = connect(mapStateToProps, {
-  modifyUserFormData,
-  goToCreateUserSection,
-  goToUserReviewForm,
-  goBack,
-  goToTeamUserList,
-  clearUserFormData
-})(injectIntl(UserFormComponent))
+export const UserForm = withRouter(
+  connect(mapStateToProps, {
+    modifyUserFormData,
+    clearUserFormData
+  })(injectIntl(UserFormComponent))
+)

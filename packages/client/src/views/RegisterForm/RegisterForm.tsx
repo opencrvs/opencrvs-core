@@ -17,7 +17,6 @@ import {
   useIntl
 } from 'react-intl'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import { isNull, isUndefined, merge, flatten, isEqual, get } from 'lodash'
 import debounce from 'lodash/debounce'
 import {
@@ -43,72 +42,77 @@ import {
   writeDeclaration,
   DOWNLOAD_STATUS
 } from '@client/declarations'
+import { Stack, ToggleMenu } from '@client/../../components/lib'
 import {
   FormFieldGenerator,
   ITouchedNestedFields,
   mapFieldsToValues
 } from '@client/components/form'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
+import { TimeMounted } from '@client/components/TimeMounted'
 import {
+  CorrectionSection,
   IForm,
+  IFormData,
   IFormField,
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormData,
-  CorrectionSection,
   SubmissionAction
 } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
 import {
-  goBack as goBackAction,
-  goToCertificateCorrection,
-  goToHome,
-  goToHomeTab,
-  goToPageGroup as goToPageGroupAction,
-  goToPrintRecordView
+  evalExpressionInFieldDefinition,
+  getNextSectionIds,
+  getSectionFields,
+  getVisibleGroupFields,
+  getVisibleSectionGroupsBasedOnConditions,
+  handleInitialValue,
+  hasFormError,
+  VIEW_TYPE
+} from '@client/forms/utils'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
+import { messages } from '@client/i18n/messages/views/register'
+import {
+  formatUrl,
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl,
+  generateGoToPageGroupUrl
 } from '@client/navigation'
-import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
+import { toggleDraftSavedNotification } from '@client/notification/actions'
+import { IOfflineData } from '@client/offline/reducer'
+import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
-import styled from 'styled-components'
+import { client } from '@client/utils/apolloClient'
 import { Scope } from '@client/utils/authUtils'
-import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
-  getVisibleSectionGroupsBasedOnConditions,
-  getVisibleGroupFields,
-  hasFormError,
-  getSectionFields,
-  getNextSectionIds,
-  VIEW_TYPE,
-  handleInitialValue
-} from '@client/forms/utils'
-import { messages } from '@client/i18n/messages/views/register'
-import { duplicateMessages } from '@client/i18n/messages/views/duplicates'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
+  ACCUMULATED_FILE_SIZE,
   DECLARED,
   REJECTED,
-  VALIDATED,
-  ACCUMULATED_FILE_SIZE
+  VALIDATED
 } from '@client/utils/constants'
-import { TimeMounted } from '@client/components/TimeMounted'
+import { EventType, RegStatus } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
 import {
   bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { DuplicateFormTabs } from '@client/views/RegisterForm/duplicate/DuplicateFormTabs'
-import { UserDetails } from '@client/utils/userUtils'
-import { client } from '@client/utils/apolloClient'
-import { Stack, ToggleMenu } from '@client/../../components/lib'
-import { useModal } from '@client/hooks/useModal'
+import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import { Text } from '@opencrvs/components/lib/Text'
-import { getOfflineData } from '@client/offline/selectors'
-import { IOfflineData } from '@client/offline/reducer'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+import { Params, useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
 
 const Notice = styled.div`
   background: ${({ theme }) => theme.colors.primary};
@@ -146,32 +150,23 @@ const ErrorText = styled(Text)`
   text-align: center;
   margin-top: 100px;
 `
-
-interface IFormProps {
+type IFormProps = RouteComponentProps<{
   declaration: IDeclaration
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
   reviewSummaryHeader?: React.ReactNode
-}
-
-export type RouteProps = RouteComponentProps<{
-  pageId: string
-  groupId: string
-  declarationId: string
+  /**
+   * In Review Correction, the component gives in additional props to override router props.
+   */
+  match?: { params: Params<string> }
 }>
 
 type DispatchProps = {
-  goToPageGroup: typeof goToPageGroupAction
-  goBack: typeof goBackAction
-  goToCertificateCorrection: typeof goToCertificateCorrection
-  goToHome: typeof goToHome
-  goToHomeTab: typeof goToHomeTab
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
   deleteDeclaration: typeof deleteDeclaration
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
-  goToPrintRecord: typeof goToPrintRecordView
 }
 
 type Props = {
@@ -188,7 +183,7 @@ export type FullProps = IFormProps &
   Props &
   DispatchProps &
   IntlShapeProps &
-  RouteProps
+  RouteComponentProps
 
 type State = {
   isDataAltered: boolean
@@ -258,7 +253,8 @@ function FormAppBar({
   duplicate,
   modifyDeclarationMethod,
   deleteDeclarationMethod,
-  printDeclarationMethod
+  printDeclarationMethod,
+  canSaveAndExit
 }: {
   duplicate: boolean | undefined
   section: IFormSection
@@ -266,7 +262,9 @@ function FormAppBar({
   modifyDeclarationMethod: (declration: IDeclaration) => void
   deleteDeclarationMethod: (declration: IDeclaration) => void
   printDeclarationMethod: (declarationId: string) => void
+  canSaveAndExit: boolean
 }) {
+  const navigate = useNavigate()
   const intl = useIntl()
   const dispatch = useDispatch()
   const [modal, openModal] = useModal()
@@ -347,14 +345,24 @@ function FormAppBar({
       declaration.localData = declaration.data
       // save declaration and exit
       dispatch(writeDeclaration(declaration))
-      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: getRedirectionTabOnSaveOrExit()
+        })
+      )
     }
   }
 
   const handleExit = async () => {
     const isDataAltered = isFormDataAltered()
     if (!isDataAltered) {
-      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: getRedirectionTabOnSaveOrExit()
+        })
+      )
+
       return
     }
     const [exitModalTitle, exitModalDescription] =
@@ -423,7 +431,11 @@ function FormAppBar({
           data: declaration.localData
         })
       }
-      dispatch(goToHomeTab(getRedirectionTabOnSaveOrExit()))
+      navigate(
+        generateGoToHomeTabUrl({
+          tabId: getRedirectionTabOnSaveOrExit()
+        })
+      )
     }
   }
 
@@ -549,6 +561,7 @@ function FormAppBar({
                     id="save-exit-btn"
                     type="primary"
                     size="small"
+                    disabled={!canSaveAndExit}
                     onClick={handleSaveAndExit}
                   >
                     <Icon name="DownloadSimple" />
@@ -607,7 +620,12 @@ function FormAppBar({
             mobileRight={
               <>
                 {!isCorrection(declaration) && (
-                  <Button type="icon" size="small" onClick={handleSaveAndExit}>
+                  <Button
+                    type="icon"
+                    size="small"
+                    disabled={!canSaveAndExit}
+                    onClick={handleSaveAndExit}
+                  >
                     <Icon name="DownloadSimple" />
                   </Button>
                 )}
@@ -705,8 +723,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   componentDidUpdate(prevProps: FullProps) {
-    const oldHash = prevProps.location && prevProps.location.hash
-    const newHash = this.props.location && this.props.location.hash
+    const oldHash = prevProps.router.location && prevProps.router.location.hash
+    const newHash =
+      this.props.router.location && this.props.router.location.hash
     const { declaration } = this.props
     const informantTypeChanged =
       prevProps.declaration?.data?.informant?.informantType !==
@@ -757,10 +776,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
     }
 
     if (newHash && oldHash !== newHash && !newHash.match('form-input')) {
-      this.props.history.replace({
-        pathname: this.props.history.location.pathname,
-        hash: newHash + '-form-input'
-      })
+      this.props.router.navigate(
+        {
+          pathname: this.props.router.location.pathname,
+          hash: newHash + '-form-input'
+        },
+        {
+          replace: true
+        }
+      )
     }
   }
 
@@ -814,7 +838,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
     }
     this.props.writeDeclaration(updatedDeclaration)
-    this.props.history.push(HOME)
+    this.props.router.navigate(HOME)
   }
 
   generateSectionListForReview = (
@@ -854,13 +878,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const eventType = this.props.declaration.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
-        return Event.Birth
+        return EventType.Birth
       case 'death':
-        return Event.Death
+        return EventType.Death
       case 'marriage':
-        return Event.Marriage
+        return EventType.Marriage
       default:
-        return Event.Birth
+        return EventType.Birth
     }
   }
 
@@ -881,7 +905,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   writeDeclarationAndGoToHome = () => {
     this.props.writeDeclaration(this.props.declaration)
-    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+    this.props.router.navigate(
+      generateGoToHomeTabUrl({
+        tabId: this.getRedirectionTabOnSaveOrExit()
+      })
+    )
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
@@ -889,7 +917,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onCloseDeclaration = () => {
-    this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
+    this.props.router.navigate(
+      generateGoToHomeTabUrl({
+        tabId: this.getRedirectionTabOnSaveOrExit()
+      })
+    )
   }
 
   continueButtonHandler = async (
@@ -929,7 +961,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
       this.props.declaration
     )
 
-    this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
+    this.props.router.navigate(
+      generateGoToPageGroupUrl({
+        pageRoute,
+        declarationId,
+        pageId,
+        groupId,
+        event
+      })
+    )
   }
 
   updateVisitedGroups = () => {
@@ -1001,7 +1041,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       activeSection,
       activeSectionGroup,
       reviewSummaryHeader,
-      userDetails
+      userDetails,
+      config
     } = this.props
 
     const nextSectionGroup = getNextSectionIds(
@@ -1014,9 +1055,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
-    const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
+    const isDocumentUploadPage =
+      this.props?.router.match?.params?.pageId === 'documents'
     const introSection =
       findFirstVisibleSection(registerForm.sections).id === activeSection.id
+    const canContinue =
+      'canContinue' in activeSection
+        ? evalExpressionInFieldDefinition(
+            activeSection.canContinue!,
+            declaration.data[activeSection.id],
+            config,
+            declaration.data,
+            userDetails
+          )
+        : true
+
     return (
       <>
         <TimeMounted
@@ -1032,7 +1085,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
               duplicate={duplicate}
               modifyDeclarationMethod={this.props.modifyDeclaration}
               deleteDeclarationMethod={this.onDeleteDeclaration}
-              printDeclarationMethod={this.props.goToPrintRecord}
+              printDeclarationMethod={(declarationId: string) =>
+                this.props.router.navigate(
+                  formatUrl(routes.PRINT_RECORD, {
+                    declarationId
+                  })
+                )
+              }
+              canSaveAndExit={canContinue}
             />
           }
           key={activeSection.id}
@@ -1078,9 +1138,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
                       reviewSummaryHeader={reviewSummaryHeader}
                       userDetails={userDetails}
                       onContinue={() => {
-                        this.props.goToCertificateCorrection(
-                          this.props.declaration.id,
-                          CorrectionSection.SupportingDocuments
+                        this.props.router.navigate(
+                          generateCertificateCorrectionUrl({
+                            declarationId: this.props.declaration.id,
+                            pageId: CorrectionSection.SupportingDocuments
+                          })
                         )
                       }}
                     />
@@ -1097,7 +1159,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
                           <Button
                             type="tertiary"
                             size="small"
-                            onClick={this.props.goBack}
+                            onClick={() => this.props.router.navigate(-1)}
+                            disabled={!canContinue}
                           >
                             <Icon name="ArrowLeft" size="medium" />
                             {intl.formatMessage(buttonMessages.back)}
@@ -1136,7 +1199,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     declaration.event.toLowerCase()
                                   )
                                 }}
-                                disabled={this.state.isFileUploading}
+                                disabled={
+                                  !canContinue || this.state.isFileUploading
+                                }
                               >
                                 {intl.formatMessage(
                                   buttonMessages.continueButton
@@ -1407,13 +1472,19 @@ function findFirstVisibleSection(sections: IFormSection[]) {
   return sections.filter(({ viewType }) => viewType !== 'hidden')[0]
 }
 
-function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
-  const { match, registerForm, declaration } = props
+function mapStateToProps(state: IStoreState, props: IFormProps) {
+  const { router, registerForm, declaration } = props
+  const params = {
+    ...(router.match?.params ?? {}),
+    // ReviewCorrection depends on additional params passed in as props.
+    ...(props?.match?.params ?? {})
+  }
+
   const sectionId =
-    match.params.pageId || findFirstVisibleSection(registerForm.sections).id
+    params.pageId || findFirstVisibleSection(registerForm.sections).id
   const user = getUserDetails(state)
   const config = getOfflineData(state)
-  const groupId = match.params.groupId
+  const groupId = params.groupId
   const { activeSection, activeSectionGroup } = getValidSectionGroup(
     registerForm.sections,
     declaration,
@@ -1423,9 +1494,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   )
 
   if (!activeSectionGroup) {
-    throw new Error(
-      `Configuration for group "${match.params.groupId}" missing!`
-    )
+    throw new Error(`Configuration for group "${params.groupId}" missing!`)
   }
 
   const setAllFieldsDirty =
@@ -1457,24 +1526,17 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state),
     config,
-    userDetails: user
+    userDetails: user,
+    location: router.location,
+    navigate: router.navigate
   }
 }
 
-export const RegisterForm = connect<
-  Props,
-  DispatchProps,
-  IFormProps & RouteProps,
-  IStoreState
->(mapStateToProps, {
-  writeDeclaration,
-  modifyDeclaration,
-  deleteDeclaration,
-  goToPageGroup: goToPageGroupAction,
-  goBack: goBackAction,
-  goToCertificateCorrection,
-  goToHome,
-  goToHomeTab,
-  toggleDraftSavedNotification,
-  goToPrintRecord: goToPrintRecordView
-})(injectIntl<'intl', FullProps>(RegisterFormView))
+export const RegisterForm = withRouter(
+  connect<Props, DispatchProps, IFormProps, IStoreState>(mapStateToProps, {
+    writeDeclaration,
+    modifyDeclaration,
+    deleteDeclaration,
+    toggleDraftSavedNotification
+  })(injectIntl(RegisterFormView))
+)

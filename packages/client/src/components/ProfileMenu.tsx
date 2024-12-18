@@ -28,9 +28,10 @@ import { UserDetails, getIndividualNameObj } from '@client/utils/userUtils'
 import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { goToSettings } from '@client/navigation'
 import { buttonMessages } from '@client/i18n/messages'
 import { getUserRole } from '@client/utils'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 const UserName = styled(Text)`
   margin-bottom: 6px;
@@ -44,7 +45,6 @@ interface IProps {
   language: string
   userDetails: UserDetails | null
   redirectToAuthentication: typeof redirectToAuthentication
-  goToSettings: typeof goToSettings
 }
 
 type FullProps = IProps & IntlShapeProps
@@ -53,15 +53,16 @@ const ProfileMenuComponent = ({
   intl,
   language,
   userDetails,
-  goToSettings,
   redirectToAuthentication
 }: FullProps) => {
+  const navigate = useNavigate()
+
   const getMenuItems = (intl: IntlShape): IToggleMenuItem[] => {
     const items = [] as IToggleMenuItem[]
     items.push({
       icon: <Icon name="Gear" size="small" />,
       label: intl.formatMessage(buttonMessages.settings),
-      handler: goToSettings
+      handler: () => navigate(routes.SETTINGS)
     })
     items.push({
       icon: <Icon name="SignOut" size="small" />,
@@ -130,6 +131,5 @@ const mapStateToProps = (store: IStoreState) => {
 }
 
 export const ProfileMenu = connect(mapStateToProps, {
-  redirectToAuthentication,
-  goToSettings
+  redirectToAuthentication
 })(injectIntl(ProfileMenuComponent))

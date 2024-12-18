@@ -59,10 +59,11 @@ describe('when user has a valid token in url but an expired one in localStorage'
   beforeEach(async () => {
     getItem.mockReturnValue(expiredToken)
     window.history.replaceState('', '', '?token=' + validToken)
-    await createTestApp()
   })
 
   it("doesn't redirect user to SSO", async () => {
+    await createTestApp()
+
     expect(assign.mock.calls).toHaveLength(0)
   })
 
@@ -72,7 +73,10 @@ describe('when user has a valid token in url but an expired one in localStorage'
 
     window.history.replaceState({}, '', '?token=' + token)
 
-    await createTestApp()
+    await createTestApp({ waitUntilOfflineCountryConfigLoaded: false }, [
+      '/?token=' + token
+    ])
+
     expect(assign.mock.calls).toHaveLength(0)
   })
 })
@@ -130,36 +134,36 @@ describe('when user has a valid token in local storage', () => {
 
 describe('it handles react errors', () => {
   it('displays react error page', async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     function Problem(): JSX.Element {
       throw new Error('Error thrown.')
     }
-    const testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      { store, history }
+      { store }
     )
 
-    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
+    expect(component.find('#GoToHomepage').hostNodes()).toHaveLength(1)
   })
 })
 
 describe('it handles react unauthorized errors', () => {
   it('displays react error page', async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     function Problem(): JSX.Element {
       throw new Error('401')
     }
-    const testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      { store, history }
+      { store }
     )
 
-    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
+    expect(component.find('#GoToHomepage').hostNodes()).toHaveLength(1)
 
-    testComponent.find('#GoToHomepage').hostNodes().simulate('click')
+    component.find('#GoToHomepage').hostNodes().simulate('click')
   })
 })

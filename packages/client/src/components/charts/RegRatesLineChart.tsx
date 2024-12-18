@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
-import { LineChart } from '@opencrvs/components/lib/LineChart'
+import { IDataPoint, LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import React, { useState, useEffect, useCallback } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -19,12 +19,14 @@ import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
 import type { LegendProps } from 'recharts'
 import { Text } from '@opencrvs/components'
+import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
+
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
-  eventType?: Event
+  eventType?: EventType
   completenessRateTime?: CompletenessRateTime
 }
 
@@ -274,7 +276,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
                     messages.performanceWithinTargetDaysLabel,
                     {
                       target:
-                        eventType === Event.Birth
+                        eventType === EventType.Birth
                           ? window.config.BIRTH.REGISTRATION_TARGET
                           : window.config.DEATH.REGISTRATION_TARGET,
                       withPrefix: false
@@ -291,8 +293,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const customizedTooltip = (dataPoint: any) => {
+  const customizedTooltip = (dataPoint: IDataPoint) => {
     const wrapperPayload = dataPoint.payload[0]
 
     return (
@@ -304,8 +305,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mouseMoveHandler = (data: any) => {
+  const mouseMoveHandler: CategoricalChartFunc = (data) => {
     if (data && data.activePayload) {
       setState({
         ...state,

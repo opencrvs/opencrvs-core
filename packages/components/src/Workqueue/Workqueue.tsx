@@ -184,7 +184,7 @@ const WorkqueueComp = ({
                 width={preference.width}
                 onClick={
                   preference.sortFunction
-                    ? () => preference.sortFunction!(preference.key)
+                    ? () => preference.sortFunction?.(preference.key)
                     : undefined
                 }
                 clickable={Boolean(preference.sortFunction)}

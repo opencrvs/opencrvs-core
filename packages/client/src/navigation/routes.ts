@@ -8,22 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 
-export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.Birth}`
-export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.Birth}/:pageId`
-export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Birth}/:pageId/group/:groupId`
-export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.Death}/registration/informantType`
-export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.Death}`
-export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.Death}/:pageId`
-export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Death}/:pageId/group/:groupId`
-export const SELECT_MARRIAGE_INFORMANT = `/drafts/:declarationId/events/${Event.Marriage}/registration/informantType`
-export const DRAFT_MARRIAGE_FORM = `/drafts/:declarationId/events/${Event.Marriage}`
-export const DRAFT_MARRIAGE_FORM_PAGE = `/drafts/:declarationId/events/${Event.Marriage}/:pageId`
-export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Marriage}/:pageId/group/:groupId`
+export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${EventType.Birth}`
+export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${EventType.Birth}/:pageId`
+export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${EventType.Birth}/:pageId/group/:groupId`
+export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${EventType.Death}/registration/informantType`
+export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${EventType.Death}`
+export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${EventType.Death}/:pageId`
+export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${EventType.Death}/:pageId/group/:groupId`
+export const SELECT_MARRIAGE_INFORMANT = `/drafts/:declarationId/events/${EventType.Marriage}/registration/informantType`
+export const DRAFT_MARRIAGE_FORM = `/drafts/:declarationId/events/${EventType.Marriage}`
+export const DRAFT_MARRIAGE_FORM_PAGE = `/drafts/:declarationId/events/${EventType.Marriage}/:pageId`
+export const DRAFT_MARRIAGE_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${EventType.Marriage}/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'
@@ -86,7 +86,6 @@ export const PERFORMANCE_STATISTICS = '/performance/statistics'
 export const TEAM_SEARCH = '/team/search'
 export const TEAM_USER_LIST = '/team/users'
 
-export const CREATE_USER = '/createUser'
 export const CREATE_USER_ON_LOCATION = '/createUserInLocation/:locationId'
 export const CREATE_USER_SECTION = '/createUser/:sectionId/:groupId'
 export const REVIEW_USER_FORM = '/user/:userId/:sectionId/:groupId'

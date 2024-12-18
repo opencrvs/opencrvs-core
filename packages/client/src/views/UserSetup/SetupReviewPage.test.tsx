@@ -8,14 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as React from 'react'
+import { createStore } from '@client/store'
 import { createTestComponent, userDetails } from '@client/tests/util'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
-import { createStore } from '@client/store'
+import * as React from 'react'
 import { UserSetupReview } from './SetupReviewPage'
 import { activateUserMutation } from './queries'
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 describe('SetupReviewPage page tests', () => {
   beforeEach(async () => {
@@ -38,7 +38,7 @@ describe('SetupReviewPage page tests', () => {
         })
       )
     )
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -50,14 +50,14 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      { store, history }
+      { store }
     )
 
     expect(testComponent.find('#UserSetupData')).toBeDefined()
   })
   it('render page without type', async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -69,13 +69,13 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      { store, history }
+      { store }
     )
     const role = testComponent.find('#Role_value').hostNodes().text()
     expect(role).toEqual('ENTREPENEUR')
   })
   it('clicks question to change', async () => {
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -87,7 +87,7 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent
@@ -113,7 +113,7 @@ describe('SetupReviewPage page tests', () => {
         }
       }
     ]
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -124,7 +124,7 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      { store, history, graphqlMocks: mock }
+      { store, graphqlMocks: mock }
     )
 
     testComponent.find('button#Confirm').simulate('click')
@@ -147,7 +147,7 @@ describe('SetupReviewPage page tests', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <UserSetupReview
         setupData={{
@@ -158,7 +158,7 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      { store, history, graphqlMocks: graphqlErrorMock }
+      { store, graphqlMocks: graphqlErrorMock }
     )
 
     testComponent.find('button#Confirm').simulate('click')

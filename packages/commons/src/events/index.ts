@@ -8,7 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Action'
-export * from './Event'
-export * from './Form'
+export * from './ActionConfig'
+export * from './EventConfig'
+export * from './FieldConfig'
+export * from './FormConfig'
+export * from './SummaryConfig'
+export * from './WorkqueueConfig'
+export * from './EventMetadata'
+export * from './EventInput'
+export * from './EventDocument'
+export * from './ActionInput'
+export * from './ActionDocument'
+export * from './EventIndex'
+export * from './TranslationConfig'
+export * from './state'
 export * from './utils'
+export * from './defineConfig'

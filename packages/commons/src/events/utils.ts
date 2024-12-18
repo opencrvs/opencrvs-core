@@ -8,46 +8,93 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GetValues } from '../types'
-import { z } from 'zod'
 
-export const Label = z.object({
-  defaultMessage: z.string(),
-  description: z.string(),
-  id: z.string()
-})
+import { TranslationConfig } from './TranslationConfig'
 
-// Ask whether these are always together
-export const Field = z.object({
-  label: Label
-})
+import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
+import { flattenDeep } from 'lodash'
+import { EventConfigInput } from './EventConfig'
+import { SummaryConfigInput } from './SummaryConfig'
+import { WorkqueueConfigInput } from './WorkqueueConfig'
 
-export const Summary = z.object({
-  title: Label,
-  fields: z.array(Field)
-})
+const isMetadataField = <T extends string>(
+  field: T | EventMetadataKeys
+): field is EventMetadataKeys => field in eventMetadataLabelMap
 
-// @TODO
-export const Query = z.object({
-  requester: z.object({
-    phone: z.object({
-      check: z.string()
-    }),
-    name: z.object({
-      check: z.string()
-    })
+/**
+ * @returns All the fields in the event configuration.
+ */
+export const findPageFields = (
+  config: EventConfigInput
+): Array<{ id: string; label: TranslationConfig }> => {
+  return flattenDeep(
+    config.actions.map(({ forms }) =>
+      forms.map(({ pages }) =>
+        pages.map(({ fields }) =>
+          fields.map((field) => ({
+            id: field.id,
+            label: field.label
+          }))
+        )
+      )
+    )
+  )
+}
+
+/**
+ *
+ * @param pageFields - All the fields in the event configuration
+ * @param refFields - The fields referencing values within the event configuration (e.g. summary fields) or within system provided metadata fields (e.g. createdAt, updatedBy)
+ * @returns referenced fields with populated labels
+ */
+export const resolveLabelsFromKnownFields = ({
+  pageFields,
+  refFields
+}: {
+  pageFields: { id: string; label: TranslationConfig }[]
+  refFields: {
+    // @TODO: To enforce type safety we might need to create types without using zod
+    id: EventMetadataKeys | string
+    label?: TranslationConfig
+  }[]
+}) => {
+  return refFields.map((field) => {
+    if (field.label) {
+      return field
+    }
+
+    if (isMetadataField(field.id)) {
+      return {
+        ...field,
+        label: eventMetadataLabelMap[field.id]
+      }
+    }
+
+    const pageLabel = pageFields.find((pageField) => pageField.id === field.id)
+
+    if (!pageLabel) {
+      throw new Error(`Referenced field ${field.id} does not have a label`)
+    }
+
+    return {
+      ...field,
+      label: pageLabel.label
+    }
   })
-})
+}
 
-export const SystemRoleType = {
-  FieldAgent: 'FIELD_AGENT',
-  LocalRegistrar: 'LOCAL_REGISTRAR',
-  LocalSystemAdmin: 'LOCAL_SYSTEM_ADMIN',
-  NationalRegistrar: 'NATIONAL_REGISTRAR',
-  NationalSystemAdmin: 'NATIONAL_SYSTEM_ADMIN',
-  PerformanceManagement: 'PERFORMANCE_MANAGEMENT',
-  RegistrationAgent: 'REGISTRATION_AGENT'
-} as const
-
-export type SystemRoleType = GetValues<typeof SystemRoleType>
-export const systemRoleTypes = Object.values(SystemRoleType)
+export const resolveFieldLabels = ({
+  config,
+  pageFields
+}: {
+  config: SummaryConfigInput | WorkqueueConfigInput
+  pageFields: { id: string; label: TranslationConfig }[]
+}) => {
+  return {
+    ...config,
+    fields: resolveLabelsFromKnownFields({
+      pageFields,
+      refFields: config.fields
+    })
+  }
+}

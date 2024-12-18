@@ -12,11 +12,9 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import styled, { withTheme } from 'styled-components'
 import * as React from 'react'
 import Bowser from 'bowser'
-import { goToDeclarationRecordAudit } from '@client/navigation'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { Query } from '@client/components/Query'
 import { GET_USER_AUDIT_LOG } from '@client/user/queries'
-import { connect } from 'react-redux'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import type {
   GQLUserAuditLogItemWithComposition,
@@ -47,6 +45,9 @@ import { Link } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
+import { formatUrl } from '@client/navigation'
 
 const DEFAULT_LIST_SIZE = 10
 
@@ -77,14 +78,9 @@ interface IBaseProp {
   loggedInUserRole: string | null | undefined
 }
 
-interface DispatchProps {
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
-
 type Props = WrappedComponentProps &
   IBaseProp &
-  IOnlineStatusProps &
-  DispatchProps & {
+  IOnlineStatusProps & {
     theme: ITheme
   }
 
@@ -116,6 +112,7 @@ const isUserAuditItemWithDeclarationDetials = (
 }
 
 function UserAuditHistoryComponent(props: Props) {
+  const navigate = useNavigate()
   window.__localeId__ = props.intl.locale
 
   const [state, setState] = useState<State>({
@@ -282,9 +279,11 @@ function UserAuditHistoryComponent(props: Props) {
             <Link
               font="bold14"
               onClick={() =>
-                props.goToDeclarationRecordAudit(
-                  'printTab',
-                  userAuditItem.data.compositionId as string
+                navigate(
+                  formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                    tab: 'printTab',
+                    declarationId: userAuditItem.data.compositionId as string
+                  })
                 )
               }
             >
@@ -389,7 +388,7 @@ function UserAuditHistoryComponent(props: Props) {
                       <Pagination
                         currentPage={state.currentPageNumber}
                         totalPages={Math.ceil(totalItems / DEFAULT_LIST_SIZE)}
-                        onPageChange={(page: any) =>
+                        onPageChange={(page: number) =>
                           setState((prevState) => ({
                             ...prevState,
                             currentPageNumber: page
@@ -432,6 +431,6 @@ function UserAuditHistoryComponent(props: Props) {
   )
 }
 
-export const UserAuditHistory = connect(null, {
-  goToDeclarationRecordAudit
-})(withTheme(injectIntl(withOnlineStatus(UserAuditHistoryComponent))))
+export const UserAuditHistory = withTheme(
+  injectIntl(withOnlineStatus(UserAuditHistoryComponent))
+)

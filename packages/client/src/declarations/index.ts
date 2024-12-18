@@ -21,18 +21,13 @@ import {
 } from '@client/forms'
 import {
   Attachment,
-  Event,
+  EventType,
   History,
   Query,
   RegStatus,
   SystemRoleType
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import {
-  Action as NavigationAction,
-  GO_TO_PAGE,
-  IDynamicValues
-} from '@client/navigation'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
@@ -91,6 +86,7 @@ import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
+import { IDynamicValues } from '@client/navigation'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -226,7 +222,7 @@ export interface IDeclaration {
   modifiedOn?: number
   eventType?: string
   review?: boolean
-  event: Event
+  event: EventType
   registrationStatus?: RegStatus
   submissionStatus?: string
   downloadStatus?: DOWNLOAD_STATUS
@@ -410,7 +406,7 @@ interface IDownloadDeclarationSuccess {
   payload: {
     queryData: any
     form: {
-      [key in Event]: IForm
+      [key in EventType]: IForm
     }
     client: ApolloClient<{}>
     offlineData?: IOfflineData
@@ -463,7 +459,6 @@ export type Action =
   | IWriteDeclarationAction
   | IWriteDeclarationSuccessAction
   | IWriteDeclarationFailedAction
-  | NavigationAction
   | IDeleteDeclarationAction
   | IDeleteDeclarationSuccessAction
   | IDeleteDeclarationFailedAction
@@ -504,15 +499,15 @@ const initialState: IDeclarationsState = {
 
 /* Need to add mappings for events here */
 const QueryMapper = {
-  [Event.Birth]: getBirthQueryMappings,
-  [Event.Death]: getDeathQueryMappings,
-  [Event.Marriage]: getMarriageQueryMappings
+  [EventType.Birth]: getBirthQueryMappings,
+  [EventType.Death]: getDeathQueryMappings,
+  [EventType.Marriage]: getMarriageQueryMappings
 }
-const getQueryMapping = (event: Event, action: DeclarationAction) => {
+const getQueryMapping = (event: EventType, action: DeclarationAction) => {
   return QueryMapper[event] && QueryMapper[event](action)
 }
 
-export function createDeclaration(event: Event, initialData?: IFormData) {
+export function createDeclaration(event: EventType, initialData?: IFormData) {
   return {
     id: uuid(),
     data: initialData || {},
@@ -522,7 +517,7 @@ export function createDeclaration(event: Event, initialData?: IFormData) {
 }
 
 export function makeDeclarationReadyToDownload(
-  event: Event,
+  event: EventType,
   compositionId: string,
   action: DeclarationAction
 ): IDeclaration {
@@ -538,7 +533,7 @@ export function makeDeclarationReadyToDownload(
 export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
-  event: Event,
+  event: EventType,
   status?: RegStatus,
   duplicates?: IDuplicates[]
 ): IDeclaration {
@@ -1029,7 +1024,7 @@ export async function deleteDeclarationByUser(
 }
 
 export function downloadDeclaration(
-  event: Event,
+  event: EventType,
   compositionId: string,
   action: DeclarationAction,
   client: ApolloClient<{}>
@@ -1284,28 +1279,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   action: Action
 ): IDeclarationsState | Loop<IDeclarationsState, Action> => {
   switch (action.type) {
-    case GO_TO_PAGE: {
-      const declaration = state.declarations.find(
-        ({ id }) => id === action.payload.declarationId
-      )
-
-      if (
-        !declaration ||
-        declaration.data[action.payload.pageId] ||
-        action.payload.pageId === 'preview' ||
-        action.payload.pageId === 'review'
-      ) {
-        return state
-      }
-      const modifiedDeclaration = {
-        ...declaration,
-        data: {
-          ...declaration.data,
-          [action.payload.pageId]: {}
-        }
-      }
-      return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
-    }
     case STORE_DECLARATION:
       return {
         ...state,

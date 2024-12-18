@@ -12,21 +12,27 @@ import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import * as routes from '@login/navigation/routes'
 import { createTestApp } from '@login/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('Test reset credentials success page', () => {
   let app: ReactWrapper
-  let history: History
+  let router: ReturnType<typeof createMemoryRouter>
 
   describe('Page content when username is chosen as forgotten item', () => {
     beforeEach(async () => {
-      const testApp = await createTestApp()
-      app = testApp.app
-      history = testApp.history
-
-      history.replace(routes.SUCCESS, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
+      const testApp = await createTestApp({
+        initialEntries: [
+          {
+            pathname: routes.SUCCESS,
+            state: {
+              forgottenItem: FORGOTTEN_ITEMS.USERNAME
+            }
+          }
+        ]
       })
+      app = testApp.app
+      router = testApp.router
+
       app.update()
     })
 
@@ -43,13 +49,19 @@ describe('Test reset credentials success page', () => {
 
   describe('Page content when password is chosen as forgotten item', () => {
     beforeEach(async () => {
-      const testApp = await createTestApp()
-      app = testApp.app
-      history = testApp.history
-
-      history.replace(routes.SUCCESS, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+      const testApp = await createTestApp({
+        initialEntries: [
+          {
+            pathname: routes.SUCCESS,
+            state: {
+              forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+            }
+          }
+        ]
       })
+      app = testApp.app
+      router = testApp.router
+
       app.update()
     })
 
@@ -64,19 +76,26 @@ describe('Test reset credentials success page', () => {
 
   describe('Login button', () => {
     beforeEach(async () => {
-      const testApp = await createTestApp()
-      app = testApp.app
-      history = testApp.history
-
-      history.replace(routes.SUCCESS, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
+      const testApp = await createTestApp({
+        initialEntries: [
+          {
+            pathname: routes.SUCCESS,
+            state: {
+              forgottenItem: FORGOTTEN_ITEMS.USERNAME
+            }
+          }
+        ]
       })
+
+      app = testApp.app
+      router = testApp.router
+
       app.update()
     })
 
     it('login button redirects to home page', () => {
       app.find('#login-button').hostNodes().simulate('click')
-      expect(window.location.pathname).toContain(routes.STEP_ONE)
+      expect(router.state.location.pathname).toContain(routes.STEP_ONE)
     })
   })
 })

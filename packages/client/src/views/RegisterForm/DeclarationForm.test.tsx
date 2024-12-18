@@ -9,41 +9,43 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  createDeclaration,
+  IDeclaration,
+  IUserData,
+  storeDeclaration
+} from '@client/declarations'
+import { formatUrl } from '@client/navigation'
+import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
+import { storage } from '@client/storage'
+import {
   createTestApp,
   flushPromises,
-  userDetails,
+  getFileFromBase64String,
+  goToChildSection,
   goToDocumentsSection,
   goToFatherSection,
   goToMotherSection,
-  setPageVisibility,
-  getFileFromBase64String,
-  validImageB64String,
+  goToSection,
   selectOption,
-  goToSection
+  setPageVisibility,
+  userDetails,
+  validImageB64String
 } from '@client/tests/util'
-import {
-  storeDeclaration,
-  createDeclaration,
-  IDeclaration,
-  IUserData
-} from '@client/declarations'
-import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
-import { Store } from 'redux'
-import { storage } from '@client/storage'
-import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { vi, Mock } from 'vitest'
-import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
+import { EventType } from '@client/utils/gateway'
+import { ReactWrapper } from 'enzyme'
+import { createMemoryRouter } from 'react-router-dom'
+import { Store } from 'redux'
+import { Mock, vi } from 'vitest'
 
-describe('when user has starts a new declaration', () => {
+describe('when user starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {
     let draft: IDeclaration
     let app: ReactWrapper
-    let history: History
     let store: Store
 
     beforeEach(async () => {
+      await flushPromises()
       const userData: IUserData[] = [
         {
           userID: userDetails.userMgntUserID,
@@ -61,38 +63,45 @@ describe('when user has starts a new declaration', () => {
       ;(storage.getItem as Mock).mockImplementation(
         (param: keyof typeof indexedDB) => Promise.resolve(indexedDB[param])
       )
-      const testApp = await createTestApp()
+
+      draft = createDeclaration(EventType.Birth)
+
+      const testApp = await createTestApp(
+        { waitUntilOfflineCountryConfigLoaded: true },
+        [
+          formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+            declarationId: draft.id.toString()
+          })
+        ]
+      )
       app = testApp.app
-      history = testApp.history
       store = testApp.store
 
-      draft = createDeclaration(Event.Birth)
       await store.dispatch(storeDeclaration(draft))
     })
 
     it('renders unlock screen', async () => {
-      history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
-      )
       await waitForElement(app, '#unlockPage')
     })
   })
 
   describe('when secured', () => {
     let app: ReactWrapper
-    let history: History
+
     let store: Store
+    let router: ReturnType<typeof createMemoryRouter>
 
     beforeEach(async () => {
       const testApp = await createTestApp()
       app = testApp.app
-      history = testApp.history
       store = testApp.store
+      router = testApp.router
     })
 
     describe('when user is in birth registration by parent informant view', () => {
       let draft: IDeclaration
       beforeEach(async () => {
+        await flushPromises()
         const data = {
           registration: {
             informantType: {
@@ -105,27 +114,30 @@ describe('when user has starts a new declaration', () => {
             }
           }
         }
-        draft = createDeclaration(Event.Birth, data)
+        draft = createDeclaration(EventType.Birth, data)
 
         /*
          * Needs to be done before storeDeclaration(draft)
          * so offline declarations wouldn't override the dispatched ones
          */
         store.dispatch(storeDeclaration(draft))
-        // TODO: SELECT_BIRTH_INFORMANT has been removed
-        history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
-        )
-        await waitForElement(app, '#content-name')
 
-        app.find('#next_section').hostNodes().simulate('click')
-        app.find('#next_section').hostNodes().simulate('click')
-        await waitForElement(app, '#form_section_id_child-view-group')
+        router.navigate(
+          formatUrl(DRAFT_BIRTH_PARENT_FORM, {
+            declarationId: draft.id.toString()
+          })
+        )
+
+        app.update()
+        await flushPromises()
+
+        await goToChildSection(app)
       })
 
       describe('when user types in something and press continue', () => {
         beforeEach(async () => {
-          // await waitForElement(app, '#informant_parent_view')
+          await flushPromises()
+
           app
             .find('#firstNamesEng')
             .hostNodes()
@@ -133,7 +145,12 @@ describe('when user has starts a new declaration', () => {
               target: { id: 'firstNamesEng', value: 'hello' }
             })
 
+          app.update()
+          await flushPromises()
+
           app.find('#next_section').hostNodes().simulate('click')
+          app.update()
+
           await flushPromises()
         })
         it('redirect to home when pressed save and exit button', async () => {
@@ -200,20 +217,11 @@ describe('when user has starts a new declaration', () => {
 
         describe('when user goes to documents page', () => {
           beforeEach(async () => {
-            app.find('#next_section').hostNodes().simulate('click')
             await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
-            app.find('#next_section').hostNodes().simulate('click')
-            await flushPromises()
-            app.update()
+            await goToDocumentsSection(app)
           })
           it('renders list of document upload field', async () => {
+            await flushPromises()
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
@@ -224,11 +232,14 @@ describe('when user has starts a new declaration', () => {
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
             await flushPromises()
+            app.update()
+            await flushPromises()
+
             const fileInputs = app
-              .update()
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
+
             expect(fileInputs).toEqual(5)
           })
           it('No error while uploading valid file', async () => {
@@ -279,6 +290,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
+          await flushPromises()
           await goToSection(app, 5)
           app
             .find('#btn_change_child_familyNameEng')
@@ -286,6 +298,7 @@ describe('when user has starts a new declaration', () => {
             .first()
             .simulate('click')
         })
+
         it('renders preview page', async () => {
           const button = await waitForElement(app, '#back-to-review-button')
 
@@ -297,6 +310,7 @@ describe('when user has starts a new declaration', () => {
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
+
         it('should go to input field when user press change button to edit information', async () => {
           const backToReviewButton = await waitForElement(
             app,
@@ -321,10 +335,17 @@ describe('when user has starts a new declaration', () => {
         })
       })
       describe('when user clicks the "mother" page', () => {
-        beforeEach(() => goToMotherSection(app))
-        it('changes to the mother details section', () => {
-          expect(window.location.href).toContain('mother')
+        beforeEach(async () => {
+          await flushPromises()
+          await goToMotherSection(app)
         })
+
+        it('changes to the mother details section', async () => {
+          await flushPromises()
+          app.update()
+          expect(router.state.location.pathname).toContain('mother')
+        })
+
         it('hides everything with pinpad if is page loses focus', async () => {
           setPageVisibility(false)
           await waitForElement(app, '#unlockPage')
@@ -332,8 +353,9 @@ describe('when user has starts a new declaration', () => {
       })
       describe('when user clicks the "father" page', () => {
         beforeEach(() => goToFatherSection(app))
+
         it('changes to the father details section', () => {
-          expect(window.location.href).toContain('father')
+          expect(router.state.location.pathname).toContain('father')
         })
       })
       describe('when user is in document page', () => {

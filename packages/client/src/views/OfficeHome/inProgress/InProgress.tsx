@@ -26,9 +26,9 @@ import {
   ITaskHistory
 } from '@client/declarations'
 import {
-  goToPage as goToPageAction,
-  goToHomeTab,
-  goToDeclarationRecordAudit
+  formatUrl,
+  generateGoToHomeTabUrl,
+  generateGoToPageUrl
 } from '@client/navigation'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE,
@@ -54,7 +54,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { DownloadAction } from '@client/forms'
-import { Event, RegStatus } from '@client/utils/gateway'
+import { EventType, RegStatus } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
@@ -86,6 +86,8 @@ import {
 } from '@client/search/transformer'
 import { useState } from 'react'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -94,9 +96,6 @@ interface IQueryData {
 
 interface IBaseRegistrarHomeProps {
   theme: ITheme
-  goToPage: typeof goToPageAction
-  goToHomeTab: typeof goToHomeTab
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
   drafts: IDeclaration[]
   outboxDeclarations: IDeclaration[]
@@ -126,6 +125,7 @@ export const SELECTOR_ID = {
 }
 
 function InProgressComponent(props: IRegistrarHomeProps) {
+  const navigate = useNavigate()
   const { width } = useWindowSize()
 
   const [sortedCol, setSortedCol] = useState<COLUMNS>(
@@ -214,11 +214,13 @@ function InProgressComponent(props: IRegistrarHomeProps) {
           label: intl.formatMessage(buttonMessages.update),
           handler: () => {
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              props.goToPage(
-                pageRoute,
-                regId,
-                'review',
-                (event && event.toLowerCase()) || ''
+              navigate(
+                generateGoToPageUrl({
+                  pageRoute,
+                  declarationId: regId,
+                  pageId: 'review',
+                  event: (event && event.toLowerCase()) || ''
+                })
               )
             }
           },
@@ -239,15 +241,19 @@ function InProgressComponent(props: IRegistrarHomeProps) {
           />
         )
       })
+
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            props.goToDeclarationRecordAudit(
-              props.selectorId === SELECTOR_ID.hospitalDrafts
-                ? 'notificationTab'
-                : 'inProgressTab',
-              regId
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab:
+                  props.selectorId === SELECTOR_ID.hospitalDrafts
+                    ? 'notificationTab'
+                    : 'inProgressTab',
+                declarationId: regId
+              })
             )
           }
         >
@@ -257,7 +263,12 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            props.goToDeclarationRecordAudit('inProgressTab', regId)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'inProgressTab',
+                declarationId: regId
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -340,12 +351,17 @@ function InProgressComponent(props: IRegistrarHomeProps) {
           handler: (
             e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
           ) => {
-            e && e.stopPropagation()
-            props.goToPage(
-              pageRoute,
-              draft.id,
-              'preview',
-              (draft.event && draft.event.toString()) || ''
+            if (e) {
+              e.stopPropagation()
+            }
+
+            navigate(
+              generateGoToPageUrl({
+                pageRoute,
+                declarationId: draft.id,
+                pageId: 'review',
+                event: (draft.event && draft.event.toString()) || ''
+              })
             )
           }
         })
@@ -361,9 +377,9 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         ''
 
       const eventTime =
-        draft.event === Event.Birth
+        draft.event === EventType.Birth
           ? draft.data.child?.childBirthDate || ''
-          : draft.event === Event.Death
+          : draft.event === EventType.Death
           ? draft.data.deathEvent?.deathDate || ''
           : draft.data.marriageEvent?.marriageDate || ''
 
@@ -374,7 +390,12 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         <NameContainer
           id={`name_${index}`}
           onClick={() =>
-            props.goToDeclarationRecordAudit('inProgressTab', draft.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'inProgressTab',
+                declarationId: draft.id
+              })
+            )
           }
         >
           {name}
@@ -383,7 +404,12 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            props.goToDeclarationRecordAudit('inProgressTab', draft.id)
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'inProgressTab',
+                declarationId: draft.id
+              })
+            )
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -503,8 +529,13 @@ function InProgressComponent(props: IRegistrarHomeProps) {
     }
     const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
-      onTabClick: (tabId: string) => {
-        props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
+      onTabClick: (selectorId: string) => {
+        navigate(
+          generateGoToHomeTabUrl({
+            tabId: WORKQUEUE_TABS.inProgress,
+            selectorId
+          })
+        )
       },
       sections: [
         {
@@ -675,8 +706,7 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const InProgress = connect(mapStateToProps, {
-  goToPage: goToPageAction,
-  goToHomeTab: goToHomeTab,
-  goToDeclarationRecordAudit
-})(injectIntl(withTheme(InProgressComponent)))
+export const InProgress = connect(
+  mapStateToProps,
+  {}
+)(injectIntl(withTheme(InProgressComponent)))

@@ -10,7 +10,7 @@
  */
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as messagesSearch } from '@client/i18n/messages/views/search'
-import { goToTeamUserList } from '@client/navigation'
+
 import { IOfflineData, ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -23,7 +23,6 @@ import {
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
@@ -35,14 +34,20 @@ interface BaseProps {
   goToTeamUserList: typeof goToTeamUserList
 }
 
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
+
 type IOnlineStatusProps = {
   isOnline: boolean
 }
 
-type Props = BaseProps &
-  WrappedComponentProps &
+type Props = WrappedComponentProps &
   IOnlineStatusProps &
-  Pick<RouteComponentProps, 'history'> & {
+  RouteComponentProps<IOnlineStatusProps> & {
     offlineCountryConfiguration: IOfflineData
   }
 
@@ -69,7 +74,7 @@ const Text = styled(StyledText)`
 class TeamSearchComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    const historyState = props.history.location.state as any
+    const historyState = props.router.location.state
     this.state = {
       selectedLocation:
         (historyState && historyState.selectedLocation) || undefined
@@ -83,8 +88,14 @@ class TeamSearchComponent extends React.Component<Props, State> {
   }
 
   searchButtonHandler = () => {
-    this.state.selectedLocation &&
-      this.props.goToTeamUserList(this.state.selectedLocation.id)
+    if (this.state.selectedLocation) {
+      this.props.router.navigate({
+        pathname: routes.TEAM_USER_LIST,
+        search: stringify({
+          locationId: this.state.selectedLocation.id
+        })
+      })
+    }
   }
 
   render() {
@@ -134,6 +145,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const TeamSearch = connect(mapStateToProps, {
-  goToTeamUserList
-})(injectIntl(withOnlineStatus(TeamSearchComponent)))
+export const TeamSearch = withRouter(
+  connect(mapStateToProps)(injectIntl(withOnlineStatus(TeamSearchComponent)))
+)
