@@ -244,7 +244,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
             onCompleted={this.passwordChangecompleted}
             onError={() => this.setState({ errorOccured: true })}
           >
-            {(changePassword: any) => {
+            {(changePassword: () => void) => {
               return (
                 <PrimaryButton
                   id="confirm-button"
