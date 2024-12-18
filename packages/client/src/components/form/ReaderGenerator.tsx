@@ -11,25 +11,53 @@
 import React from 'react'
 import { Scan } from '@opencrvs/components/src/IDReader/types'
 import { QRReader } from '@opencrvs/components/src/IDReader/readers/QRReader/QRReader'
-import { Ii18nReaderType } from '@client/forms'
+import {
+  IFormData,
+  IFormField,
+  IFormFieldValue,
+  IFormSectionData,
+  Ii18nReaderType
+} from '@client/forms'
+import { RedirectField } from './Redirect'
+import { isReaderQR, isReaderRedirect } from '@client/forms/utils'
 
 interface ReaderGeneratorProps extends Scan {
   readers: Ii18nReaderType[]
+  fields: IFormField[]
+  form: IFormSectionData
+  draft: IFormData
+  setFieldValue: (name: string, value: IFormFieldValue) => void
 }
 export const ReaderGenerator = ({
   readers,
   onScan,
-  onError
+  onError,
+  form,
+  draft,
+  fields,
+  setFieldValue
 }: ReaderGeneratorProps) => {
   return readers.map((reader) => {
-    const { type, ...readerProps } = reader
-    if (type === 'qr') {
+    const { type } = reader
+    if (isReaderQR(reader)) {
       return (
         <QRReader
           key={type}
-          {...readerProps}
+          labels={reader.labels}
           onScan={onScan}
           onError={onError}
+        />
+      )
+    } else if (isReaderRedirect(reader)) {
+      return (
+        <RedirectField
+          key={type}
+          form={form}
+          draft={draft}
+          fieldDefinition={reader}
+          fields={fields}
+          setFieldValue={setFieldValue}
+          isDisabled={false}
         />
       )
     } else return null

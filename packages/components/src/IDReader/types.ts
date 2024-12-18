@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export interface QRReaderType {
-  type: 'qr'
   labels: {
     button: string
     scannerDialogSupportingCopy: string
@@ -32,4 +31,4 @@ export interface Scan {
   onError: (error: 'mount' | 'parse') => void
 }
 
-export interface ScannableQRReader extends Omit<QRReaderType, 'type'>, Scan {}
+export interface ScannableQRReader extends QRReaderType, Scan {}

@@ -58,7 +58,9 @@ import {
   ID_READER,
   Ii18nIDReaderFormField,
   QRReaderType,
-  Ii18nQRReaderType
+  Ii18nQRReaderType,
+  Ii18nReaderType,
+  Ii18nRedirectFormField
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -231,8 +233,13 @@ export const internationaliseFieldObject = (
     )
     ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
       intl.formatMessage(field.manualInputInstructionLabel)
-    ;(base as Ii18nIDReaderFormField).readers[0] =
-      internationaliseQRReaderFieldObject(intl, field.readers[0])
+    ;(base as Ii18nIDReaderFormField).readers = field.readers.map((reader) => {
+      if (reader.type === 'QR') {
+        return internationaliseQRReaderFieldObject(intl, reader)
+      } else {
+        return internationaliseFieldObject(intl, reader)
+      }
+    }) as [Ii18nReaderType, ...Ii18nReaderType[]]
   }
 
   return base as Ii18nFormField
@@ -804,6 +811,18 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
 
 export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
+}
+
+export function isReaderQR(
+  reader: Ii18nReaderType
+): reader is Ii18nQRReaderType {
+  return reader.type === 'QR'
+}
+
+export function isReaderRedirect(
+  reader: Ii18nReaderType
+): reader is Ii18nRedirectFormField {
+  return reader.type === REDIRECT
 }
 
 export function isFieldHttp(field: IFormField): field is IHttpFormField {
