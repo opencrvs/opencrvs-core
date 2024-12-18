@@ -55,7 +55,7 @@ const NoRecord = styled(Text)<{ isFullPage?: boolean }>`
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   margin-top: 20px;
-
+`
 export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
