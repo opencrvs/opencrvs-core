@@ -9,15 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
 import { defineMessages, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
+import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import {
-  V2_DECLARE_ACTION_REVIEW_ROUTE,
-  V2_ROOT_ROUTE
-} from '@client/v2-events/routes'
-import { useHistory } from 'react-router-dom'
-import { formatUrl } from '@client/navigation'
+import { ROUTES } from '@client/v2-events/routes'
 
 const modalMessages = defineMessages({
   cancel: {
@@ -39,32 +35,28 @@ const modalMessages = defineMessages({
   }
 })
 
-export const useEventFormNavigation = () => {
+export function useEventFormNavigation() {
   const intl = useIntl()
+  const navigate = useNavigate()
   const [modal, openModal] = useModal()
-  const history = useHistory()
 
-  const goToHome = () => {
-    history.push(V2_ROOT_ROUTE)
+  function goToHome() {
+    navigate(ROUTES.V2.path)
   }
 
-  const goToReview = (eventId: string) => {
-    history.push(
-      formatUrl(V2_DECLARE_ACTION_REVIEW_ROUTE, { eventId: eventId })
-    )
+  function goToReview(eventId: string) {
+    navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
   }
 
-  const exit = async () => {
+  async function exit() {
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
-        responsive={false}
-        title={intl.formatMessage(modalMessages.exitWithoutSavingTitle)}
         actions={[
           <Button
-            type="tertiary"
-            id="cancel_save_without_exit"
             key="cancel_save_without_exit"
+            id="cancel_save_without_exit"
+            type="tertiary"
             onClick={() => {
               close(null)
             }}
@@ -72,9 +64,9 @@ export const useEventFormNavigation = () => {
             {intl.formatMessage(modalMessages.cancel)}
           </Button>,
           <Button
-            type="primary"
             key="confirm_save_without_exit"
             id="confirm_save_without_exit"
+            type="primary"
             onClick={() => {
               close(true)
             }}
@@ -82,11 +74,13 @@ export const useEventFormNavigation = () => {
             {intl.formatMessage(modalMessages.confirm)}
           </Button>
         ]}
-        show={true}
         handleClose={() => close(null)}
+        responsive={false}
+        show={true}
+        title={intl.formatMessage(modalMessages.exitWithoutSavingTitle)}
       >
         <Stack>
-          <Text variant="reg16" element="p" color="grey500">
+          <Text color="grey500" element="p" variant="reg16">
             {intl.formatMessage(modalMessages.exitWithoutSavingDescription)}
           </Text>
         </Stack>

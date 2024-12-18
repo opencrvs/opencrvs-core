@@ -14,6 +14,7 @@ import { createNamesMap } from './data-formatting'
 import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
+import { ITokenPayload } from './authUtils'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -51,6 +52,12 @@ export function getUserName(userDetails: UserDetails | null) {
       userDetails.name &&
       createNamesMap(userDetails.name)[LANG_EN]) ||
     ''
+  )
+}
+
+export function useAuthentication() {
+  return useSelector<IStoreState, ITokenPayload | null>(
+    (state) => state.profile.tokenPayload
   )
 }
 

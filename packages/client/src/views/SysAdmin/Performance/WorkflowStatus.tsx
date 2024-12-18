@@ -19,12 +19,7 @@ import {
   formMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import {
-  goToPerformanceHome,
-  goToWorkflowStatus,
-  goToSearchResult,
-  goToDeclarationRecordAudit
-} from '@client/navigation'
+import { formatUrl, generateWorkflowStatusUrl } from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
@@ -46,8 +41,6 @@ import { orderBy } from 'lodash'
 import { parse } from 'query-string'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
@@ -62,6 +55,8 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import * as routes from '@client/navigation/routes'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -184,29 +179,20 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
   return Object.keys(PrimaryContactLabelMapping).includes(contact)
 }
 
-interface DispatchProps {
-  goToPerformanceHome: typeof goToPerformanceHome
-  goToWorkflowStatus: typeof goToWorkflowStatus
-  goToSearchResult: typeof goToSearchResult
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-}
 interface ISearchParams {
   locationId: string
   status?: keyof IStatusMapping
   event?: EventType
 }
-export interface IHistoryStateProps {
-  timeStart: Date | string
-  timeEnd: Date | string
-}
-interface WorkflowStatusProps
-  extends RouteComponentProps<{}, {}, IHistoryStateProps>,
-    DispatchProps,
-    WrappedComponentProps {}
+
+interface WorkflowStatusProps extends WrappedComponentProps {}
 function WorkflowStatusComponent(props: WorkflowStatusProps) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const { intl } = props
   const { locationId, status, event } = parse(
-    props.location.search
+    location.search
   ) as unknown as ISearchParams
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
@@ -217,9 +203,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
-  const historyState = props.history.location.state
+  const historyState = location.state
 
-  if (props.location.state) {
+  if (historyState) {
     timeStart = historyState.timeStart
     timeEnd = historyState.timeEnd
   }
@@ -642,9 +628,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         id: (
           <LinkButton
             onClick={() =>
-              props.goToDeclarationRecordAudit(
-                'printTab',
-                row.compositionId as string
+              navigate(
+                formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                  tab: 'printTab',
+                  declarationId: row.compositionId as string
+                })
               )
             }
           >
@@ -711,12 +699,14 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               selectedLocationId={locationId}
               disabled={true}
               onChangeLocation={(newLocationId: string) => {
-                props.goToWorkflowStatus(
-                  newLocationId,
-                  new Date(timeStart),
-                  new Date(timeEnd),
-                  status,
-                  event
+                navigate(
+                  generateWorkflowStatusUrl({
+                    locationId: newLocationId,
+                    timeStart: new Date(timeStart),
+                    timeEnd: new Date(timeEnd),
+                    status,
+                    event
+                  })
                 )
               }}
               locationFilter={
@@ -733,12 +723,14 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             />
             <PerformanceSelect
               onChange={({ value }) => {
-                props.goToWorkflowStatus(
-                  locationId,
-                  new Date(timeStart),
-                  new Date(timeEnd),
-                  status,
-                  value as EventType
+                navigate(
+                  generateWorkflowStatusUrl({
+                    locationId,
+                    timeStart: new Date(timeStart),
+                    timeEnd: new Date(timeEnd),
+                    status,
+                    event: value as EventType
+                  })
                 )
               }}
               id="event-select"
@@ -761,12 +753,14 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             />
             <PerformanceSelect
               onChange={({ value }) => {
-                props.goToWorkflowStatus(
-                  locationId,
-                  new Date(timeStart),
-                  new Date(timeEnd),
-                  value as keyof IStatusMapping,
-                  event
+                navigate(
+                  generateWorkflowStatusUrl({
+                    locationId,
+                    timeStart: new Date(timeStart),
+                    timeEnd: new Date(timeEnd),
+                    status: value as keyof IStatusMapping,
+                    event
+                  })
                 )
               }}
               id="status-select"
@@ -845,9 +839,4 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   )
 }
 
-export const WorkflowStatus = connect(null, {
-  goToPerformanceHome,
-  goToSearchResult,
-  goToDeclarationRecordAudit,
-  goToWorkflowStatus
-})(injectIntl(WorkflowStatusComponent))
+export const WorkflowStatus = injectIntl(WorkflowStatusComponent)

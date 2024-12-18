@@ -31,7 +31,7 @@ describe('Field agent list tests', () => {
   })
 
   beforeEach(async () => {
-    const { history, location, match } = createRouterProps(
+    const { location } = createRouterProps(
       '/performance/field-agents',
       { isNavigatedInsideApp: false },
       {
@@ -110,9 +110,13 @@ describe('Field agent list tests', () => {
         }
       }
     ]
-    const testComponent = await createTestComponent(
-      <FieldAgentList history={history} location={location} match={match} />,
-      { store, history, graphqlMocks: graphqlMock }
+    const { component: testComponent } = await createTestComponent(
+      <FieldAgentList />,
+      {
+        store,
+        graphqlMocks: graphqlMock,
+        initialEntries: [location.pathname + '?' + location.search]
+      }
     )
     component = testComponent
   })
@@ -134,7 +138,7 @@ describe('Field agent list tests', () => {
   })
 
   it('For graphql errors it renders with error components', async () => {
-    const { history, location, match } = createRouterProps(
+    const { location } = createRouterProps(
       '/performance/field-agents',
       { isNavigatedInsideApp: false },
       {
@@ -146,10 +150,14 @@ describe('Field agent list tests', () => {
         }
       }
     )
-    const testErrorComponent = await createTestComponent(
-      <FieldAgentList history={history} location={location} match={match} />,
-      { store, history }
+
+    const testErrorComponent = await createTestComponent(<FieldAgentList />, {
+      store,
+      initialEntries: [location.pathname + '?' + location.search]
+    })
+    await waitForElement(
+      testErrorComponent.component,
+      '#field-agent-error-list'
     )
-    await waitForElement(testErrorComponent, '#field-agent-error-list')
   })
 })

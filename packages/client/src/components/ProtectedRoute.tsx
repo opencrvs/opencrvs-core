@@ -9,31 +9,29 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Redirect, Route, RouteProps } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getAuthenticated } from '@client/profile/profileSelectors'
+import { Navigate, RouteProps } from 'react-router-dom'
 import { HOME } from '@client/navigation/routes'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { Scope } from '@opencrvs/commons/client'
 
-interface IProps extends RouteProps {
+interface IProps {
   scopes?: Scope[]
 }
 
-export const ProtectedRoute: React.FC<IProps> = ({ scopes = [], ...rest }) => {
-  const authenticated = useSelector(getAuthenticated)
-  const userDetailsFetched = useSelector(
-    (state: IStoreState) => state.profile.userDetailsFetched
-  )
+/**
+ * Higher order component that wraps a route and checks if the user has access to it.
+ * If the user does not have access, they are redirected to the home page.
+ */
+export const ProtectedRoute: React.FC<IProps & RouteProps> = ({
+  scopes = [],
+  children,
+  ...rest
+}) => {
   const { hasAnyScope } = usePermissions()
 
-  if (!authenticated && !userDetailsFetched) {
-    return <div />
-  }
   if (!hasAnyScope(scopes)) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
 
-  return <Route {...rest} />
+  return <>{children}</>
 }

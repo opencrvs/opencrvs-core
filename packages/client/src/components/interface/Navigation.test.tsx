@@ -27,8 +27,11 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { vi } from 'vitest'
 import { scopes as allScopes, Scope, SCOPES } from '@opencrvs/commons/client'
+import { vi } from 'vitest'
+import { createMemoryRouter } from 'react-router-dom'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -67,7 +70,7 @@ const nameObjNatlSysAdmin = {
 storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
-let { store, history } = createStore()
+let { store } = createStore()
 let client = createClient(store)
 
 describe('Navigation for national system admin related tests', () => {
@@ -77,28 +80,15 @@ describe('Navigation for national system admin related tests', () => {
     merge(mockUserResponse, nameObjNatlSysAdmin)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
 
     setScopes(SYSTEM_ADMIN_DEFAULT_SCOPES, store)
     await flushPromises()
 
-    testComponent = await createTestComponent(
-      <OfficeHome
-        match={{
-          params: {
-            tabId: WORKQUEUE_TABS.inProgress
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
-      />,
-      { store, history }
-    )
+    const { component } = await createTestComponent(<OfficeHome />, { store })
+
+    testComponent = component
   })
 
   it('Tabs loaded successfully including config tab', async () => {
@@ -120,53 +110,33 @@ describe('Navigation for national system admin related tests', () => {
 
 describe('Navigation for Registration agent related tests', () => {
   let testComponent: ReactWrapper<{}, {}>
-
+  let router: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
 
     setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
 
     await flushPromises()
 
-    testComponent = await createTestComponent(
-      <OfficeHome
-        match={{
-          params: {
-            tabId: WORKQUEUE_TABS.inProgress
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
-      />,
-      { store, history }
+    const { component, router: testRouter } = await createTestComponent(
+      <OfficeHome />,
+      { store }
     )
+    router = testRouter
+    testComponent = component
   })
   it('renders page with team and performance tab for registration agent', async () => {
-    const testComponent = await createTestComponent(
-      <OfficeHome
-        match={{
-          params: { tabId: WORKQUEUE_TABS.inProgress },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-        staticContext={undefined}
-        history={history}
-        location={history.location}
-      />,
-      { store, history, apolloClient: client }
-    )
-    expect(testComponent.exists('#navigation_team')).toBeTruthy()
-    expect(testComponent.exists('#navigation_performance')).toBeTruthy()
-    expect(testComponent.exists('#navigation_config_main')).toBeFalsy()
+    const { component } = await createTestComponent(<OfficeHome />, {
+      store,
+      apolloClient: client
+    })
+    expect(component.exists('#navigation_team')).toBeTruthy()
+    expect(component.exists('#navigation_performance')).toBeTruthy()
+    expect(component.exists('#navigation_config_main')).toBeFalsy()
   })
 
   it('5 application tabs exists for registration agent', async () => {
@@ -185,18 +155,19 @@ describe('Navigation for Registration agent related tests', () => {
       .hostNodes()
       .simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('readyForReview')
+
+    expect(router.state.location.pathname).toContain('readyForReview')
 
     testComponent
       .find('#navigation_requiresUpdate')
       .hostNodes()
       .simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('requiresUpdate')
+    expect(router.state.location.pathname).toContain('requiresUpdate')
 
     testComponent.find('#navigation_approvals').hostNodes().simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('approvals')
+    expect(router.state.location.pathname).toContain('approvals')
   })
 })
 
@@ -207,13 +178,15 @@ describe('Navigation for District Registrar related tests', () => {
     merge(mockUserResponse, nameObj)
     mockFetchUserDetails.mockReturnValue(mockUserResponse)
     queries.fetchUserDetails = mockFetchUserDetails
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
 
-    testComponent = await createTestComponent(
+    const { component } = await createTestComponent(
       <Navigation menuCollapse={() => {}} />,
-      { store, history }
+      { store }
     )
+
+    testComponent = component
   })
   it('settings and logout exists on navigation mobile view', async () => {
     expect(testComponent.exists('#navigation_settings')).toBeTruthy()
@@ -226,25 +199,21 @@ describe('Given a user with scopes views Navigation', () => {
   let build: () => Promise<ReactWrapper<{}, {}>>
 
   beforeEach(async () => {
-    ;({ store, history } = createStore())
+    ;({ store } = createStore())
     client = createClient(store)
 
     build = async () =>
-      await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
-              tabId: WORKQUEUE_TABS.systems
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          history={history}
-          location={history.location}
-        />,
-        { store, history }
-      )
+      (
+        await createTestComponent(<OfficeHome />, {
+          store,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB, {
+              tabId: WORKQUEUE_TABS.inProgress
+            })
+          ],
+          path: REGISTRAR_HOME_TAB
+        })
+      )?.component
   })
 
   describe('In progress', async () => {

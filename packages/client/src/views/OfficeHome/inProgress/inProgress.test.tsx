@@ -45,7 +45,6 @@ import type {
 import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { vi } from 'vitest'
-import { History } from 'history'
 
 const mockFetchUserDetails = vi.fn()
 
@@ -73,7 +72,7 @@ queries.fetchUserDetails = mockFetchUserDetails
 storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
-const { store, history } = createStore()
+const { store } = createStore()
 
 beforeAll(async () => {
   setScopes(REGISTRAR_DEFAULT_SCOPES, store)
@@ -93,7 +92,7 @@ describe('In Progress tab', () => {
         data: {}
       }
     ]
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
@@ -111,7 +110,7 @@ describe('In Progress tab', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     // wait for mocked data to load mockedProvider
@@ -126,7 +125,7 @@ describe('In Progress tab', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    expect(history.location.pathname).toContain(
+    expect(router.state.location.pathname).toContain(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.inProgress,
         selectorId: SELECTOR_ID.ownDrafts
@@ -139,7 +138,7 @@ describe('In Progress tab', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    expect(history.location.pathname).toContain(
+    expect(router.state.location.pathname).toContain(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.inProgress,
         selectorId: SELECTOR_ID.fieldAgentDrafts
@@ -161,7 +160,7 @@ describe('In Progress tab', () => {
       }
     ]
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
@@ -177,7 +176,7 @@ describe('In Progress tab', () => {
         pageSize={10}
         onPageChange={(pageId: number) => {}}
       />,
-      { store, history }
+      { store }
     )
 
     // wait for mocked data to load mockedProvider
@@ -262,7 +261,7 @@ describe('In Progress tab', () => {
         }
       ]
       // @ts-ignore
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -278,7 +277,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -304,7 +303,7 @@ describe('In Progress tab', () => {
       for (let i = 0; i < 12; i++) {
         drafts.push(createDeclaration(EventType.Birth))
       }
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -320,7 +319,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -410,7 +409,7 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       store.dispatch(storeDeclaration(drafts))
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -426,7 +425,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -446,7 +445,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      expect(history.location.pathname).toContain(
+      expect(router.state.location.pathname).toContain(
         '/drafts/cc66d69c-7f0a-4047-9283-f066571830f4'
       )
     })
@@ -457,7 +456,7 @@ describe('In Progress tab', () => {
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -527,7 +526,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -549,7 +548,7 @@ describe('In Progress tab', () => {
       vi.clearAllMocks()
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -565,7 +564,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -590,7 +589,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
       // @ts-ignore
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
@@ -665,7 +664,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -678,14 +677,14 @@ describe('In Progress tab', () => {
       await flushPromises()
       testComponent.update()
 
-      expect(window.location.href).toContain(
+      expect(router.state.location.pathname).toContain(
         '/record-audit/notificationTab/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
 
     describe('handles download status', () => {
       let store: AppStore
-      let history: History
+
       const TIME_STAMP = '1562912635549'
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       const inprogressProps = {
@@ -729,7 +728,6 @@ describe('In Progress tab', () => {
       beforeEach(() => {
         const newStore = createStore()
         store = newStore.store
-        history = newStore.history
       })
 
       it('renders download button when not downloaded', async () => {
@@ -740,9 +738,9 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = undefined
         store.dispatch(storeDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
-          { store, history }
+          { store }
         )
 
         expect(
@@ -757,9 +755,9 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
         store.dispatch(storeDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
-          { store, history }
+          { store }
         )
 
         expect(
@@ -774,9 +772,9 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
         store.dispatch(storeDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent, router } = await createTestComponent(
           <InProgress {...inprogressProps} />,
-          { store, history }
+          { store }
         )
 
         expect(
@@ -793,7 +791,7 @@ describe('In Progress tab', () => {
         })
         testComponent.update()
 
-        expect(history.location.pathname).toContain(
+        expect(router.state.location.pathname).toContain(
           formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId,
             pageId: 'review',
@@ -809,9 +807,9 @@ describe('In Progress tab', () => {
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
         store.dispatch(storeDeclaration(downloadableDeclaration))
-        const testComponent = await createTestComponent(
+        const { component: testComponent } = await createTestComponent(
           <InProgress {...inprogressProps} />,
-          { store, history }
+          { store }
         )
         expect(
           testComponent.find('#ListItemAction-0-icon-failed').hostNodes()
@@ -826,7 +824,7 @@ describe('In Progress tab', () => {
       const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      const testComponent = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
@@ -897,7 +895,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -939,7 +937,7 @@ describe('In Progress tab', () => {
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
 
       // @ts-ignore
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -974,7 +972,7 @@ describe('In Progress tab', () => {
           pageSize={10}
           onPageChange={(pageId: number) => {}}
         />,
-        { store, history }
+        { store }
       )
 
       setScopes(REGISTRAR_DEFAULT_SCOPES, store)
@@ -991,7 +989,7 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
 
-      expect(window.location.href).toContain(
+      expect(router.state.location.pathname).toContain(
         '/record-audit/inProgressTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       )
     })

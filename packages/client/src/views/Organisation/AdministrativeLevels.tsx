@@ -26,21 +26,19 @@ import {
   Icon
 } from '@opencrvs/components/lib'
 import { IBreadCrumbData } from '@opencrvs/components/src/Breadcrumb'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ILocation } from '@client/offline/reducer'
-import { useParams } from 'react-router-dom'
-import {
-  goToOrganizationList,
-  goToPerformanceHome,
-  goToTeamUserList
-} from '@client/navigation'
+import { useParams, useNavigate } from 'react-router-dom'
+import { formatUrl, generatePerformanceHomeUrl } from '@client/navigation'
 import { Button } from '@opencrvs/components/lib/Button'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import styled from 'styled-components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'querystring'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 
@@ -64,11 +62,11 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
 export function AdministrativeLevels() {
   const intl = useIntl()
   const { locationId } = useParams<IRouteProps>()
-  const dispatch = useDispatch()
   const { canAccessOffice } = usePermissions()
-  //
+  const navigate = useNavigate()
+
   const getNewLevel =
-    (currentlySelectedLocation: string) =>
+    (currentlySelectedLocation?: string) =>
     (store: IStoreState): IGetNewLevel => {
       const location = currentlySelectedLocation ?? '0'
       const locations = store.offline.offlineData.locations as {
@@ -133,15 +131,16 @@ export function AdministrativeLevels() {
     id: string
   ) => {
     e.preventDefault()
-    dispatch(goToOrganizationList(id))
+    navigate(formatUrl(routes.ORGANISATIONS_INDEX, { locationId: id }))
   }
 
   const onClickBreadCrumb = (crumb: IBreadCrumbData) => {
     setCurrentPageNumber(1)
-    dispatch(goToOrganizationList(crumb.paramId))
+    navigate(
+      formatUrl(routes.ORGANISATIONS_INDEX, { locationId: crumb.paramId ?? '' })
+    )
   }
 
-  //
   return (
     <Frame
       header={
@@ -185,7 +184,14 @@ export function AdministrativeLevels() {
                       ) : level.type === 'CRVS_OFFICE' ? (
                         <Link
                           disabled={!canAccessOffice(level)}
-                          onClick={() => dispatch(goToTeamUserList(level.id))}
+                          onClick={() =>
+                            navigate({
+                              pathname: routes.TEAM_USER_LIST,
+                              search: stringify({
+                                locationId: level.id
+                              })
+                            })
+                          }
                         >
                           {getLocalizedLocationName(intl, level)}
                         </Link>
@@ -196,13 +202,14 @@ export function AdministrativeLevels() {
                         type="icon"
                         size="small"
                         onClick={() => {
-                          dispatch(
-                            goToPerformanceHome(
-                              startOfMonth(subMonths(new Date(Date.now()), 11)),
-                              new Date(Date.now()),
-                              undefined,
-                              level.id
-                            )
+                          navigate(
+                            generatePerformanceHomeUrl({
+                              timeStart: startOfMonth(
+                                subMonths(new Date(Date.now()), 11)
+                              ),
+                              timeEnd: new Date(Date.now()),
+                              locationId: level.id
+                            })
                           )
                         }}
                       >

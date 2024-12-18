@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { RouterAction } from 'connected-react-router'
 import { ApolloQueryResult } from '@apollo/client'
 import { FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
@@ -178,7 +177,6 @@ export type Action =
   | CheckAuthAction
   | SetUserDetailsAction
   | RedirectToAuthenticationAction
-  | RouterAction
   | ISetInitialUserDetails
   | IGetStorageUserDetailsSuccessAction
   | IGetStorageUserDetailsFailedAction

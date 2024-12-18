@@ -15,7 +15,6 @@ import {
 } from '@client/tests/util'
 import { DownloadButton } from './DownloadButton'
 import { AppStore } from '@client/store'
-import { History } from 'history'
 import * as React from 'react'
 import { DownloadAction } from '@client/forms'
 import * as declarationReducer from '@client/declarations'
@@ -27,20 +26,19 @@ const { DOWNLOAD_STATUS } = declarationReducer
 
 describe('download button', () => {
   let store: AppStore
-  let history: History<unknown>
   let client: ApolloClient<{}>
 
   describe('when there is no assignment', () => {
     beforeEach(async () => {
       const testStore = await createTestStore()
       store = testStore.store
-      history = testStore.history
+
       client = createClient(store)
     })
 
     it('if the record is actionable, download button should not be disabled', async () => {
       setScopes([SCOPES.RECORD_REGISTER], store)
-      const testComponent = await createTestComponent(
+      const { component } = await createTestComponent(
         <DownloadButton
           id="download"
           downloadConfigs={{
@@ -52,16 +50,17 @@ describe('download button', () => {
           status={DOWNLOAD_STATUS.DOWNLOADED}
           declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
         />,
-        { store, history, apolloClient: client }
+        { store, apolloClient: client }
       )
+
       expect(
-        testComponent.find('#download-icon').hostNodes().prop('disabled')
+        component.find('#download-icon').hostNodes().prop('disabled')
       ).toBeFalsy()
     })
 
     it('if the record is not actionable, download button should be disabled', async () => {
       setScopes([SCOPES.RECORD_SUBMIT_FOR_REVIEW], store)
-      const testComponent = await createTestComponent(
+      const { component } = await createTestComponent(
         <DownloadButton
           id="download"
           downloadConfigs={{
@@ -73,10 +72,10 @@ describe('download button', () => {
           status={DOWNLOAD_STATUS.DOWNLOADED}
           declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
         />,
-        { store, history, apolloClient: client }
+        { store, apolloClient: client }
       )
       expect(
-        testComponent.find('#download-icon').hostNodes().prop('disabled')
+        component.find('#download-icon').hostNodes().prop('disabled')
       ).toBeTruthy()
     })
   })
@@ -85,13 +84,12 @@ describe('download button', () => {
     beforeEach(async () => {
       const testStore = await createTestStore()
       store = testStore.store
-      history = testStore.history
       client = createClient(store)
     })
 
     it('if assigned to current user & not downloaded then should not show avatar', async () => {
       setScopes([SCOPES.RECORD_REGISTER], store)
-      const testComponent = await createTestComponent(
+      const { component } = await createTestComponent(
         <DownloadButton
           id="download"
           downloadConfigs={{
@@ -108,9 +106,9 @@ describe('download button', () => {
           }}
           declarationStatus={declarationReducer.SUBMISSION_STATUS.DECLARED}
         />,
-        { store, history, apolloClient: client }
+        { store, apolloClient: client }
       )
-      expect(testComponent.find('img').length).toBe(0)
+      expect(component.find('img').length).toBe(0)
     })
   })
 })

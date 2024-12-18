@@ -30,7 +30,7 @@ import { vi } from 'vitest'
 import { EventType, Status } from '@client/utils/gateway'
 import { storage } from '@client/storage'
 import { UserDetails } from '@client/utils/userUtils'
-
+import { formatUrl } from '@client/navigation'
 describe('when user logs in', () => {
   // Some mock data
   const draft1 = createDeclaration(EventType.Birth)
@@ -186,30 +186,29 @@ describe('when there is no user-data saved', () => {
 
 describe('when user is in the register form before initial draft load', () => {
   it('throws error when draft not found after initial drafts load', async () => {
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
 
-    const mock: any = vi.fn()
     const draft = createDeclaration(EventType.Birth)
     const form = await getRegisterFormFromStore(store, EventType.Birth)
 
     try {
       await createTestComponent(
-        // @ts-ignore
         <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
           registerForm={form}
           declaration={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-          match={{
-            params: { declarationId: '', pageId: '', groupId: '' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
         />,
-        { store, history }
+        {
+          store,
+          path: DRAFT_BIRTH_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE, {
+              declarationId: '',
+              pageId: '',
+              groupId: ''
+            })
+          ]
+        }
       )
     } catch (error) {
       expect(error).toBeInstanceOf(Error)

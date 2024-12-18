@@ -26,7 +26,7 @@ export function useEventConfigurations() {
  */
 export function useEventConfiguration(eventIdentifier: string) {
   const [config] = api.config.get.useSuspenseQuery()
-  const eventConfiguration = config?.find(
+  const eventConfiguration = config.find(
     (event) => event.id === eventIdentifier
   )
 

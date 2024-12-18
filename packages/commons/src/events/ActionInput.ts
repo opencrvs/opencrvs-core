@@ -25,7 +25,7 @@ const CreateActionInput = BaseActionInput.merge(
   })
 )
 
-const RegisterActionInput = BaseActionInput.merge(
+export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
     identifiers: z.object({
@@ -35,12 +35,26 @@ const RegisterActionInput = BaseActionInput.merge(
   })
 )
 
+export const ValidateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
+  })
+)
+
 export const NotifyActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
     createdAtLocation: z.string()
   })
 )
+
+export const DraftActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.DRAFT).default(ActionType.DRAFT)
+  })
+)
+
+export type DraftActionInput = z.infer<typeof DraftActionInput>
 
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({
@@ -64,6 +78,8 @@ const UnassignActionInput = BaseActionInput.merge(
 
 export const ActionInput = z.discriminatedUnion('type', [
   CreateActionInput,
+  ValidateActionInput,
+  DraftActionInput,
   RegisterActionInput,
   NotifyActionInput,
   DeclareActionInput,

@@ -10,13 +10,6 @@
  */
 
 import React from 'react'
-import {
-  goToPage,
-  goToPrintCertificate,
-  goToUserProfile,
-  goToTeamUserList,
-  goToIssueCertificate
-} from '@client/navigation'
 import { IntlShape } from 'react-intl'
 import {
   IDeclaration,
@@ -39,11 +32,6 @@ export type CMethodParams = {
   userDetails: UserDetails | null
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
-  goToPage?: typeof goToPage
-  goToPrintCertificate?: typeof goToPrintCertificate
-  goToIssueCertificate?: typeof goToIssueCertificate
-  goToUserProfile?: typeof goToUserProfile
-  goToTeamUserList?: typeof goToTeamUserList
 }
 
 export const ShowDownloadButton = ({
