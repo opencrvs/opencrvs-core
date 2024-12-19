@@ -10,12 +10,11 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IFileValue, IAttachmentValue } from '@client/forms'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { ISelectOption } from '@opencrvs/components/lib/Select'
-import { Link } from '@opencrvs/components/lib/Link/Link'
-import { Icon } from '@opencrvs/components/lib/Icon/Icon'
+import { FieldValue, FileFieldValue } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components/lib/Button/Button'
+import { Icon } from '@opencrvs/components/lib/Icon/Icon'
+import { Link } from '@opencrvs/components/lib/Link/Link'
+import { ISelectOption } from '@opencrvs/components/lib/Select'
 
 const Wrapper = styled.div`
   max-width: 100%;
@@ -35,10 +34,6 @@ const Container = styled.div`
   padding: 0px 10px;
 `
 
-const SpinnerContainer = styled(Spinner)`
-  margin-right: 6px;
-`
-
 const Label = styled.div`
   display: flex;
   align-items: center;
@@ -52,30 +47,24 @@ const Label = styled.div`
   }
 `
 
-type Props = {
+interface Props {
   id?: string
-  documents?: IFileValue[] | null
-  processingDocuments?: Array<{ label: string }>
-  attachment?: IAttachmentValue
+  attachment?: FileFieldValue
   label?: string
-  onSelect: (document: IFileValue | IAttachmentValue) => void
+  onSelect: (document: FieldValue | FileFieldValue) => void
   dropdownOptions?: ISelectOption[]
-  onDelete?: (image: IFileValue | IAttachmentValue) => void
-  inReviewSection?: boolean
+  onDelete?: (image: FieldValue | FileFieldValue) => void
 }
 
-export const DocumentListPreview = ({
+export function DocumentListPreview({
   id,
-  documents,
-  processingDocuments,
   attachment,
   label,
   onSelect,
   dropdownOptions,
-  onDelete,
-  inReviewSection
-}: Props) => {
-  const getFormattedLabelForDocType = (docType: string) => {
+  onDelete
+}: Props) {
+  function getFormattedLabelForDocType(docType: string) {
     const matchingOptionForDocType =
       dropdownOptions &&
       dropdownOptions.find((option) => option.value === docType)
@@ -83,56 +72,6 @@ export const DocumentListPreview = ({
   }
   return (
     <Wrapper id={`preview-list-${id}`}>
-      {documents &&
-        documents.map((document: IFileValue, key: number) => (
-          <Container key={`preview_${key}`}>
-            <Label>
-              <Icon color="grey600" name="Paperclip" size="large" />
-              <Link
-                id={`document_${(document.optionValues[1] as string).replace(
-                  /\s/g,
-                  ''
-                )}_link`}
-                key={key}
-                onClick={(_) => onSelect(document)}
-              >
-                <span>
-                  {(inReviewSection &&
-                    dropdownOptions &&
-                    dropdownOptions[key]?.label) ||
-                    getFormattedLabelForDocType(
-                      document.optionValues[1] as string
-                    ) ||
-                    (document.optionValues[1] as string)}
-                </span>
-              </Link>
-            </Label>
-            {onDelete && (
-              <Button
-                id="preview_delete"
-                type="icon"
-                size="small"
-                aria-label="Delete attachment"
-                onClick={() => onDelete(document)}
-              >
-                <Icon color="red" name="Trash" size="small" />
-              </Button>
-            )}
-          </Container>
-        ))}
-      {processingDocuments &&
-        processingDocuments.map(({ label }) => (
-          <Container key={label}>
-            <Label>
-              <Icon color="grey400" name="Paperclip" size="large" />
-              <Link disabled={true} key={label}>
-                <span>{getFormattedLabelForDocType(label) || label}</span>
-              </Link>
-            </Label>
-            <SpinnerContainer size={20} id={`document_${label}_processing`} />
-          </Container>
-        ))}
-
       {attachment && label && (
         <Container>
           <Label>
@@ -142,10 +81,10 @@ export const DocumentListPreview = ({
             </Link>
           </Label>
           <Button
-            id="preview_delete"
-            type="icon"
-            size="small"
             aria-label="Delete attachment"
+            id="preview_delete"
+            size="small"
+            type="icon"
             onClick={() => onDelete && onDelete(attachment)}
           >
             <Icon color="red" name="Trash" size="small" />

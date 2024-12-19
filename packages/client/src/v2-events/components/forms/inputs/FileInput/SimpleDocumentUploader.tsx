@@ -8,11 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { DocumentPreview } from '@client/components/form/DocumentUploadField/DocumentPreview'
-import { IAttachmentValue, IFormFieldValue } from '@client/forms'
-import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
-import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import React, { useState } from 'react'
 import {
   injectIntl,
@@ -20,6 +15,11 @@ import {
   MessageDescriptor
 } from 'react-intl'
 import styled from 'styled-components'
+import { FieldValue, FileFieldValue } from '@opencrvs/commons/client'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
+import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { DocumentPreview } from './DocumentPreview'
 import { DocumentListPreview } from './DocumentListPreview'
 
 const DocumentUploader = styled(ImageUploader)`
@@ -45,7 +45,7 @@ const FieldDescription = styled.div`
 type IFullProps = {
   name: string
   label: string
-  files?: IAttachmentValue
+  file?: FileFieldValue
   description?: string
   allowedDocType?: string[]
   error?: string
@@ -54,10 +54,10 @@ type IFullProps = {
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-  previewTransformer?: (files: IAttachmentValue) => IAttachmentValue
+  previewTransformer?: (files: FileFieldValue) => FileFieldValue
 } & IntlShapeProps
 
-const SimpleDocumentUploaderComponent = ({
+function SimpleDocumentUploaderComponent({
   allowedDocType,
   name,
   onUploadingStateChanged,
@@ -65,22 +65,20 @@ const SimpleDocumentUploaderComponent = ({
   previewTransformer,
   onComplete,
   label,
-  files,
+  file,
   description,
   error: errorProps,
   disableDeleteInPreview,
   requiredErrorMessage,
   touched
-}: IFullProps) => {
+}: IFullProps) {
   const [error, setError] = useState('')
-  const [previewImage, setPreviewImage] = useState<IAttachmentValue | null>(
-    null
-  )
+  const [previewImage, setPreviewImage] = useState<FileFieldValue | null>(null)
   const [filesBeingUploaded, setFilesBeingUploaded] = useState<
     { label: string }[]
   >([])
 
-  const handleFileChange = async (uploadedImage: File) => {
+  function handleFileChange(uploadedImage: File) {
     if (!uploadedImage) {
       return
     }
@@ -114,20 +112,20 @@ const SimpleDocumentUploaderComponent = ({
     }
   }
 
-  const selectForPreview = (previewImage: IFormFieldValue) => {
+  function selectForPreview(selectedPreviewImage: FieldValue) {
     if (previewTransformer) {
       return setPreviewImage(
-        previewTransformer(previewImage as IAttachmentValue)
+        previewTransformer(selectedPreviewImage as FileFieldValue)
       )
     }
-    setPreviewImage(previewImage as IAttachmentValue)
+    setPreviewImage(selectedPreviewImage as FileFieldValue)
   }
 
-  const closePreviewSection = () => {
+  function closePreviewSection() {
     setPreviewImage(null)
   }
 
-  const onDelete = (image: IFormFieldValue) => {
+  function onDelete(image: FieldValue) {
     onComplete(null)
     closePreviewSection()
   }
@@ -145,22 +143,21 @@ const SimpleDocumentUploaderComponent = ({
         <ErrorText id="field-error">{errorMessage}</ErrorText>
       )}
       <DocumentListPreview
-        attachment={files}
-        onSelect={selectForPreview}
+        attachment={file}
         label={label}
         onDelete={onDelete}
-        processingDocuments={filesBeingUploaded}
+        onSelect={selectForPreview}
       />
       {previewImage && (
         <DocumentPreview
-          previewImage={previewImage}
           disableDelete={disableDeleteInPreview}
-          title={intl.formatMessage(buttonMessages.preview)}
           goBack={closePreviewSection}
+          previewImage={previewImage}
+          title={intl.formatMessage(buttonMessages.preview)}
           onDelete={onDelete}
         />
       )}
-      {(!files || !files.data) && (
+      {!file && (
         <DocumentUploader
           id="upload_document"
           name={name}

@@ -39,8 +39,8 @@ export function Debug() {
 
   const { filename, uploadFiles, getFullURL } = useFileUpload('test')
 
-  const createEvents = () => {
-    createMutation.mutate(
+  function createEvents() {
+    return createMutation.mutate(
       {
         type: 'TENNIS_CLUB_MEMBERSHIP',
         transactionId: `tmp-${uuid()}`
@@ -62,10 +62,13 @@ export function Debug() {
     async function fetchEvents() {
       if (filename) {
         const res = await fetch(getFullURL(filename))
+        // eslint-disable-next-line no-console
         console.log(res)
+        // eslint-disable-next-line no-console
         console.log(await res.text())
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchEvents()
   }, [getFullURL, filename])
 

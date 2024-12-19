@@ -50,13 +50,12 @@ export function FileInput(
       allowedDocType={allowedDocType}
       description={description}
       error={''}
-      files={
+      file={
         value
           ? {
-              name: value.originalFilename,
+              originalFilename: value.originalFilename,
               type: value.type,
-              data: getFullURL(value.filename),
-              uri: getFullURL(value.filename)
+              filename: value.filename
             }
           : undefined
       }

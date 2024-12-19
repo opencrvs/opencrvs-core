@@ -47,7 +47,7 @@ const MUTATION_KEY = 'uploadFile'
 /* Must match the one defined src-sw.ts */
 const CACHE_NAME = 'workbox-runtime'
 
-function getFullURL(filename: string) {
+export function getFullURL(filename: string) {
   return `http://localhost:3535/ocrvs/${filename}`
 }
 
