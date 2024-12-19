@@ -19,16 +19,14 @@ export function FileInput(
     ComponentProps<typeof SimpleDocumentUploader>,
     'onComplete' | 'label' | 'error'
   > & {
-    value: FileFieldValue
+    value: FileFieldValue | undefined
     onChange: (value?: FileFieldValue) => void
     error?: boolean
   }
 ) {
   const { value, onChange, name, description, allowedDocType } = props
 
-  const [file, setFile] = React.useState<FileFieldValue | null>(
-    value ? value : null
-  )
+  const [file, setFile] = React.useState(value)
 
   const { uploadFiles } = useFileUpload(name, {
     onSuccess: ({ filename }) => {
@@ -67,7 +65,7 @@ export function FileInput(
           })
           uploadFiles(newFile)
         } else {
-          setFile(null)
+          setFile(undefined)
           onChange(undefined)
         }
       }}
