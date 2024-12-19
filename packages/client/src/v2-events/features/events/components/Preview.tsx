@@ -176,21 +176,7 @@ const FIELD_TYPE_FORMATTERS: Partial<
   FILE: FileOutput
 }
 
-function hasToStringMethod(value: unknown): value is Stringifiable {
-  return value != null && typeof value.toString === 'function'
-}
-
-function DefaultOutput<T extends Stringifiable>({
-  id,
-  value
-}: {
-  value: T
-  id: string
-}) {
-  if (!hasToStringMethod(value)) {
-    return <></>
-  }
-
+function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
   return <>{value.toString() || ''}</>
 }
 
@@ -295,12 +281,7 @@ function PreviewComponent({
                                   }
                                   id={field.id}
                                   label={intl.formatMessage(field.label)}
-                                  value={
-                                    <Output
-                                      id={field.id}
-                                      value={form[field.id]}
-                                    />
-                                  }
+                                  value={<Output value={form[field.id]} />}
                                 />
                               )
                             })}
