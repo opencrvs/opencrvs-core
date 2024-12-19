@@ -9,132 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IFormField } from '@client/forms'
-import { formatUrl } from '@client/navigation'
+import React, { useEffect } from 'react'
+import { useIntl } from 'react-intl'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { FormWizard, Frame, Spinner } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
-import {
-  V2_DECLARE_ACTION_ROUTE,
-  V2_DECLARE_ACTION_ROUTE_WITH_PAGE
-} from '@client/v2-events/routes'
-import {
-  AppBar,
-  Button,
-  FormWizard,
-  Frame,
-  Icon,
-  Spinner
-} from '@opencrvs/components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import React, { useEffect } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+
 import { useEventConfiguration } from '@client/v2-events//features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
-import type { TranslationConfig } from '@opencrvs/commons/events'
-import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
-
+import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
+import { ROUTES } from '@client/v2-events/routes'
 export function DeclareIndex() {
   return (
     <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
       <Declare />
     </React.Suspense>
-  )
-}
-
-const STATUSTOCOLOR: { [key: string]: string } = {
-  ARCHIVED: 'grey',
-  DRAFT: 'purple',
-  IN_PROGRESS: 'purple',
-  DECLARED: 'orange',
-  REJECTED: 'red',
-  VALIDATED: 'grey',
-  REGISTERED: 'green',
-  CERTIFIED: 'teal',
-  CORRECTION_REQUESTED: 'blue',
-  WAITING_VALIDATION: 'teal',
-  SUBMITTED: 'orange',
-  SUBMITTING: 'orange',
-  ISSUED: 'blue'
-}
-
-function getDeclarationIconColor(): string {
-  return Math.random() > 0.5
-    ? 'purple'
-    : Math.random() > 0.5
-    ? STATUSTOCOLOR.DRAFT
-    : 'orange'
-}
-
-const messages = defineMessages({
-  saveExitButton: {
-    id: 'buttons.saveExit',
-    defaultMessage: 'Save & Exit',
-    description: 'The label for the save and exit button'
-  },
-  exitButton: {
-    id: 'buttons.exit',
-    defaultMessage: 'Exit',
-    description: 'The label for the exit button'
-  },
-  newVitalEventRegistration: {
-    id: 'event.newVitalEventRegistration',
-    defaultMessage: 'New "{event}" registration',
-    description: 'The title for the new vital event registration page'
-  }
-})
-
-export const FormHeader = ({ label }: { label: TranslationConfig }) => {
-  const intl = useIntl()
-  const { exit } = useEventFormNavigation()
-
-  const TODO = () => {}
-  const IS_TODO = Math.random() > 0.5
-  return (
-    <AppBar
-      desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
-      desktopRight={
-        <>
-          {
-            <Button
-              id="save-exit-btn"
-              type="primary"
-              size="small"
-              disabled={!IS_TODO}
-              onClick={TODO}
-            >
-              <Icon name="DownloadSimple" />
-              {intl.formatMessage(messages.saveExitButton)}
-            </Button>
-          }
-
-          <Button type="secondary" size="small" onClick={exit}>
-            <Icon name="X" />
-            {intl.formatMessage(messages.exitButton)}
-          </Button>
-        </>
-      }
-      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
-      mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
-      mobileRight={
-        <>
-          {
-            <Button type="icon" size="small" disabled={!IS_TODO} onClick={TODO}>
-              <Icon name="DownloadSimple" />
-            </Button>
-          }
-          <Button type="icon" size="small" onClick={exit}>
-            <Icon name="X" />
-          </Button>
-        </>
-      }
-    />
   )
 }
 
@@ -154,8 +46,10 @@ function Declare() {
     throw new Error('Event ID is required')
   }
 
+  // @TODO: Fix types
   const [event] = events.getEvent(eventId)
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!event) {
     throw new Error('Event not found')
   }
@@ -166,7 +60,8 @@ function Declare() {
   if (!configuration) {
     throw new Error('Event configuration not found with type: ' + event.type)
   }
-  const formValues = useEventFormData((state) => state.formValues)
+  const getFormValues = useEventFormData((state) => state.getFormValues)
+  const formValues = getFormValues(eventId)
   const setFormValues = useEventFormData((state) => state.setFormValues)
 
   useEffect(() => {
@@ -174,7 +69,7 @@ function Declare() {
 
     if (eventId !== event.id && !hasTemporaryId) {
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE, {
+        ROUTES.V2.EVENTS.DECLARE.buildPath({
           eventId: event.id
         })
       )
@@ -195,7 +90,7 @@ function Declare() {
   useEffect(() => {
     if (!pageId) {
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath({
           eventId: event.id,
           pageId: pages[0].id
         })
@@ -210,7 +105,7 @@ function Declare() {
     const pageChanged = pages[currentPage].id !== pageId
     if (pageChanged) {
       navigate(
-        formatUrl(V2_DECLARE_ACTION_ROUTE_WITH_PAGE, {
+        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath({
           eventId: event.id,
           pageId: pages[currentPage].id
         })
@@ -224,45 +119,33 @@ function Declare() {
 
   const page = pages[currentPage]
 
-  const fields = !page
-    ? []
-    : page.fields.map(
-        (field) =>
-          ({
-            name: field.id,
-            type: field.type,
-            required: true,
-            validator: [],
-            label: field.label,
-            initialValue: ''
-          } as IFormField)
-      )
-
   return (
     <Frame
-      skipToContentText="Skip to form"
       header={<FormHeader label={configuration.label} />}
+      skipToContentText="Skip to form"
     >
       {modal}
       <FormWizard
         currentPage={currentPage}
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        pageTitle={page && intl.formatMessage(page.title)}
+        showReviewButton={fromPage === 'review'}
         totalPages={total}
+        onNextPage={next}
+        onPreviousPage={previous}
         onSubmit={() => {
           goToReview(event.id)
         }}
-        pageTitle={page && intl.formatMessage(page.title)}
-        onNextPage={next}
-        onPreviousPage={previous}
-        showReviewButton={fromPage === 'review'}
       >
         <FormFieldGenerator
+          fields={page.fields}
+          formData={formValues}
           id="locationForm"
+          initialValues={formValues}
           setAllFieldsDirty={false}
           onChange={(values) => {
-            setFormValues(values)
+            setFormValues(eventId, values)
           }}
-          formData={formValues}
-          fields={fields}
         />
       </FormWizard>
     </Frame>

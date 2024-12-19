@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import * as _ from 'lodash'
 
 /** @knipignore */
-export function noop() {}
+export function noop() {
+  return _.noop()
+}

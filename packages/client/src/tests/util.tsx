@@ -966,9 +966,10 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
+    await flushPromises()
     await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
-    await flushPromises()
+
     await component.update()
   }
 }

@@ -10,6 +10,64 @@
  */
 module.exports = {
   rules: {
+    '@typescript-eslint/await-thenable': 2,
+    '@typescript-eslint/no-empty-function': 'warn',
+    '@typescript-eslint/consistent-type-definitions': 1,
+    '@typescript-eslint/default-param-last': 2,
+    '@typescript-eslint/no-dynamic-delete': 2,
+    '@typescript-eslint/no-explicit-any': 1,
+    '@typescript-eslint/no-floating-promises': 2,
+    '@typescript-eslint/no-misused-promises': 2,
+    '@typescript-eslint/no-unnecessary-boolean-literal-compare': 2,
+    '@typescript-eslint/no-non-null-assertion': 2,
+    '@typescript-eslint/no-unnecessary-condition': 1,
+    '@typescript-eslint/no-unsafe-argument': 1,
+    '@typescript-eslint/no-unsafe-return': 1,
+    '@typescript-eslint/prefer-includes': 1,
+    '@typescript-eslint/promise-function-async': 2,
+    '@typescript-eslint/require-await': 2,
+    '@typescript-eslint/return-await': 2,
+    '@typescript-eslint/switch-exhaustiveness-check': 2,
+    'func-style': ['error', 'declaration'],
+    'no-shadow': 1,
+    'no-undef-init': 2,
+    'no-return-assign': 2,
+    'vars-on-top': 1,
+    'block-spacing': ['warn', 'always'],
+    curly: ['warn', 'all'],
+    'no-nested-ternary': 'warn',
+    'react/destructuring-assignment': 1,
+    'no-multiple-empty-lines': 1,
+    'prefer-const': 1,
+    'block-scoped-var': 1,
+    'import/order': [
+      'error',
+      {
+        pathGroups: [
+          {
+            pattern: '@opencrvs/**',
+            group: 'external',
+            position: 'after'
+          },
+          {
+            pattern: '@client/**',
+            group: 'external',
+            position: 'after'
+          }
+        ],
+        pathGroupsExcludedImportTypes: ['builtin']
+      }
+    ],
+    'import/no-cycle': 1,
+    'max-lines': ['warn', 600],
+    'react/jsx-sort-props': [
+      1,
+      {
+        reservedFirst: true,
+        callbacksLast: true,
+        shorthandFirst: true
+      }
+    ],
     'no-restricted-imports': [
       'error',
       {

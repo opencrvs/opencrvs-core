@@ -73,12 +73,10 @@ describe('when user has a valid token in url but an expired one in localStorage'
 
     window.history.replaceState({}, '', '?token=' + token)
 
-    const { app } = await createTestApp(
-      { waitUntilOfflineCountryConfigLoaded: false },
-      ['/?token=' + token]
-    )
+    await createTestApp({ waitUntilOfflineCountryConfigLoaded: false }, [
+      '/?token=' + token
+    ])
 
-    app.debug()
     expect(assign.mock.calls).toHaveLength(0)
   })
 })
