@@ -50,8 +50,8 @@ function getFieldDefinitionForActionDataField(
 
 function getFileNameAndSignature(url: string) {
   const { pathname, search } = new URL(url)
-  const filename = pathname.split('/').pop() // Extract the filename
-  return filename + search // Concatenate filename and query string
+  const filename = pathname.split('/').pop()
+  return filename + search
 }
 
 export async function presignFilesInEvent(event: EventDocument, token: string) {
