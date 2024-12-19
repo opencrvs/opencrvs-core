@@ -58,7 +58,10 @@ async function cacheFile(filename: string, file: File) {
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
   if (!cacheKey) {
-    throw new Error(`Cache ${CACHE_NAME} not found`)
+    console.error(
+      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
+    )
+    return
   }
 
   const cache = await caches.open(cacheKey)
@@ -73,7 +76,10 @@ async function removeCached(filename: string) {
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
   if (!cacheKey) {
-    throw new Error(`Cache ${CACHE_NAME} not found`)
+    console.error(
+      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
+    )
+    return
   }
 
   const cache = await caches.open(cacheKey)
@@ -86,32 +92,30 @@ queryClient.setMutationDefaults([MUTATION_KEY], {
   mutationFn: uploadFile
 })
 
-export function useFileUpload(fieldId: string) {
-  const [state, setState] = useState<{ filename: string } | { filename: null }>(
-    {
-      filename: null
-    }
-  )
+interface Options {
+  onSuccess?: (data: { filename: string }) => void
+}
 
+export function useFileUpload(fieldId: string, options: Options = {}) {
   const mutation = useMutation({
     mutationFn: uploadFile,
     mutationKey: [MUTATION_KEY, fieldId],
     onMutate: async ({ file, transactionId }) => {
       const extension = file.name.split('.').pop()
       const temporaryUrl = `${transactionId}.${extension}`
+
       await cacheFile(temporaryUrl, file)
-      setState({ filename: temporaryUrl })
+
+      options.onSuccess?.({ filename: temporaryUrl })
     },
-    onSuccess: (data, _, context) => {
+    onSuccess: (data) => {
       void removeCached(data.url)
     }
   })
 
   return {
-    filename: state.filename,
     getFullURL,
     uploadFiles: (file: File) => {
-      setState({ filename: null })
       return mutation.mutate({ file, transactionId: uuid() })
     }
   }

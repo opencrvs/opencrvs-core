@@ -11,7 +11,7 @@
 /* stylelint-disable */
 import { useQueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { v4 as uuid } from 'uuid'
 import { Text } from '@opencrvs/components'
@@ -37,7 +37,7 @@ export function Debug() {
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
-  const { filename, uploadFiles, getFullURL } = useFileUpload('test')
+  const { uploadFiles } = useFileUpload('test')
 
   function createEvents() {
     return createMutation.mutate(
@@ -57,20 +57,6 @@ export function Debug() {
       }
     )
   }
-
-  useEffect(() => {
-    async function fetchEvents() {
-      if (filename) {
-        const res = await fetch(getFullURL(filename))
-        // eslint-disable-next-line no-console
-        console.log(res)
-        // eslint-disable-next-line no-console
-        console.log(await res.text())
-      }
-    }
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchEvents()
-  }, [getFullURL, filename])
 
   const mutations = queryClient.getMutationCache().getAll()
   const storedEvents = events.events

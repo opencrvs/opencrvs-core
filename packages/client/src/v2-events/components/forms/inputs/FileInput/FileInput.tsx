@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { ComponentProps, useEffect } from 'react'
+import React, { ComponentProps } from 'react'
 import { FileFieldValue } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
@@ -26,23 +26,28 @@ export function FileInput(
 ) {
   const { value, onChange, name, description, allowedDocType } = props
 
-  const {
-    getFullURL,
-    uploadFiles,
-    filename: uploadedFileName
-  } = useFileUpload(name)
   const [file, setFile] = React.useState<FileFieldValue | null>(
     value ? value : null
   )
 
-  useEffect(() => {
-    if (file === null) {
-      return onChange()
+  const { uploadFiles } = useFileUpload(name, {
+    onSuccess: ({ filename }) => {
+      if (!file) {
+        throw new Error('File is not defined. This should never happen')
+      }
+      setFile({
+        filename,
+        originalFilename: file.originalFilename,
+        type: file.type
+      })
+
+      onChange({
+        filename,
+        originalFilename: file.originalFilename,
+        type: file.type
+      })
     }
-    if (uploadedFileName) {
-      return onChange({ ...file, filename: uploadedFileName })
-    }
-  }, [file, uploadedFileName, onChange])
+  })
 
   return (
     <SimpleDocumentUploader
@@ -50,15 +55,7 @@ export function FileInput(
       allowedDocType={allowedDocType}
       description={description}
       error={''}
-      file={
-        value
-          ? {
-              originalFilename: value.originalFilename,
-              type: value.type,
-              filename: value.filename
-            }
-          : undefined
-      }
+      file={file ? file : undefined}
       label={file ? file.originalFilename : ''}
       name={name}
       onComplete={(newFile) => {
@@ -69,6 +66,9 @@ export function FileInput(
             type: newFile.type
           })
           uploadFiles(newFile)
+        } else {
+          setFile(null)
+          onChange(undefined)
         }
       }}
     />

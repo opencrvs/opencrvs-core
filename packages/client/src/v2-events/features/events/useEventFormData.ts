@@ -23,6 +23,12 @@ interface EventFormData {
   eventId: string
 }
 
+function removeUndefinedKeys(data: ActionFormData) {
+  return Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  )
+}
+
 export const useEventFormData = create<EventFormData>()(
   persist(
     (set, get) => ({
@@ -30,8 +36,10 @@ export const useEventFormData = create<EventFormData>()(
       eventId: '',
       getFormValues: (eventId: string) =>
         get().eventId === eventId ? get().formValues : {},
-      setFormValues: (eventId: string, data: ActionFormData) =>
-        set(() => ({ eventId, formValues: data })),
+      setFormValues: (eventId: string, data: ActionFormData) => {
+        const formValues = removeUndefinedKeys(data)
+        return set(() => ({ eventId, formValues }))
+      },
       getTouchedFields: () =>
         Object.fromEntries(
           Object.entries(get().formValues).map(([key, value]) => [key, true])
