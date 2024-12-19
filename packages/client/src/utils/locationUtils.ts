@@ -92,7 +92,7 @@ export function generateLocationName(
   let name = getLocalizedLocationName(intl, location)
   location.jurisdictionType &&
     (name += ` ${
-      intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
+      intl.formatMessage(locationMessages(location.jurisdictionType)) || ''
     }`.trimEnd())
   return name
 }
