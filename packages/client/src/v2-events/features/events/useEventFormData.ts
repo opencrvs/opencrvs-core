@@ -10,16 +10,14 @@
  */
 
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import { ActionInput } from '@opencrvs/commons/client'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import { ActionFormData } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 
-type FormData = ActionInput['data']
-
 interface EventFormData {
-  formValues: FormData
-  setFormValues: (eventId: string, data: FormData) => void
-  getFormValues: (eventId: string) => FormData
+  formValues: ActionFormData
+  setFormValues: (eventId: string, data: ActionFormData) => void
+  getFormValues: (eventId: string) => ActionFormData
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
   eventId: string
@@ -32,7 +30,7 @@ export const useEventFormData = create<EventFormData>()(
       eventId: '',
       getFormValues: (eventId: string) =>
         get().eventId === eventId ? get().formValues : {},
-      setFormValues: (eventId: string, data: FormData) =>
+      setFormValues: (eventId: string, data: ActionFormData) =>
         set(() => ({ eventId, formValues: data })),
       getTouchedFields: () =>
         Object.fromEntries(

@@ -20,11 +20,11 @@ export function FileInput(
     'onComplete' | 'label' | 'error'
   > & {
     value: FileFieldValue
-    onChange: (value: FileFieldValue | null) => void
+    onChange: (value?: FileFieldValue) => void
     error?: boolean
   }
 ) {
-  const { value, onChange, name, description, allowedDocType, error } = props
+  const { value, onChange, name, description, allowedDocType } = props
 
   const {
     getFullURL,
@@ -37,7 +37,7 @@ export function FileInput(
 
   useEffect(() => {
     if (file === null) {
-      return onChange(file)
+      return onChange()
     }
     if (uploadedFileName) {
       return onChange({ ...file, filename: uploadedFileName })

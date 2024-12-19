@@ -11,13 +11,7 @@
 
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import {
-  DATE,
-  IFormFieldValue,
-  IFormSectionData,
-  PARAGRAPH,
-  TEXT
-} from '@client/forms'
+import { DATE, PARAGRAPH, TEXT } from '@client/forms'
 import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
@@ -37,6 +31,7 @@ import { Errors, getValidationErrorsForForm } from './validation'
 import {
   FieldConfig,
   FieldValue,
+  FieldValueByType,
   FileFieldValue
 } from '@opencrvs/commons/client'
 import {
@@ -54,6 +49,7 @@ import {
   useIntl
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
+import { ActionFormData } from '@opencrvs/commons'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -68,27 +64,27 @@ const FormItem = styled.div<{
     ignoreBottomMargin ? '0px' : '22px'};
 `
 
-interface GeneratedInputFieldProps {
-  fieldDefinition: FieldConfig
+interface GeneratedInputFieldProps<FieldType extends FieldConfig> {
+  fieldDefinition: FieldType
   fields: FieldConfig[]
-  values: IFormSectionData
-  setFieldValue: (name: string, value: FieldValue) => void
+  values: ActionFormData
+  setFieldValue: (name: string, value: FieldValue | undefined) => void
   onClick?: () => void
   onChange: (e: React.ChangeEvent) => void
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
-  value: IFormFieldValue
+  value: FieldValueByType[FieldType['type']]
   touched: boolean
   error: string
-  formData: IFormSectionData
+  formData: ActionFormData
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   setFieldTouched: (name: string, isTouched?: boolean) => void
 }
 
-const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
-  ({
+const GeneratedInputField = React.memo(
+  <FieldType extends FieldConfig>({
     fieldDefinition,
     onChange,
     onBlur,
@@ -103,7 +99,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     requiredErrorMessage,
     fields,
     values
-  }) => {
+  }: GeneratedInputFieldProps<FieldType>) => {
     const intl = useIntl()
 
     const inputFieldProps = {
@@ -138,7 +134,8 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
 
     const handleFileChange = React.useCallback(
-      (value: FileFieldValue) => setFieldValue(fieldDefinition.id, value),
+      (value: FileFieldValue | undefined) =>
+        setFieldValue(fieldDefinition.id, value),
       [fieldDefinition.id, setFieldValue]
     )
 
@@ -189,9 +186,14 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
     if (fieldDefinition.type === 'FILE') {
+      const value = formData[fieldDefinition.id] as FileFieldValue
       return (
         <InputField {...inputFieldProps}>
-          <FileInput {...inputProps} onChange={handleFileChange} />
+          <FileInput
+            {...inputProps}
+            value={value}
+            onChange={handleFileChange}
+          />
         </InputField>
       )
     }
@@ -201,7 +203,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
 GeneratedInputField.displayName = 'MemoizedGeneratedInputField'
 
-type FormData = Record<string, IFormFieldValue>
+type FormData = Record<string, FieldValue>
 
 const mapFieldsToValues = (fields: FieldConfig[], formData: FormData) =>
   fields.reduce((memo, field) => {
@@ -216,15 +218,15 @@ interface ExposedProps {
   id: string
   fieldsToShowValidationErrors?: FieldConfig[]
   setAllFieldsDirty: boolean
-  onChange: (values: IFormSectionData) => void
-  formData: Record<string, IFormFieldValue>
+  onChange: (values: ActionFormData) => void
+  formData: Record<string, FieldValue>
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
   initialValues?: IAdvancedSearchFormState
 }
 
-type AllProps = ExposedProps & IntlShapeProps & FormikProps<IFormSectionData>
+type AllProps = ExposedProps & IntlShapeProps & FormikProps<ActionFormData>
 
 class FormSectionComponent extends React.Component<AllProps> {
   componentDidUpdate(prevProps: AllProps) {
@@ -294,7 +296,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 
   setFieldValuesWithDependency = (
     fieldName: string,
-    value: IFormFieldValue
+    value: FieldValue | undefined
   ) => {
     const updatedValues = cloneDeep(this.props.values)
     set(updatedValues, fieldName, value)
@@ -365,7 +367,7 @@ class FormSectionComponent extends React.Component<AllProps> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            { ...formData, ...values }
+            { $form: values, $now: new Date().toISOString().split('T')[0] }
           )
 
           if (conditionalActions.includes('hide')) {
@@ -432,16 +434,16 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
 
   const nestedFormData = unflatten(props.formData)
 
-  const onChange = (values: IFormSectionData) => {
+  const onChange = (values: ActionFormData) => {
     props.onChange(flatten(values))
   }
 
-  const initialValues = unflatten<IFormFieldValue>(
+  const initialValues = unflatten<FieldValue>(
     props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
   )
 
   return (
-    <Formik<IFormSectionData>
+    <Formik<ActionFormData>
       initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(

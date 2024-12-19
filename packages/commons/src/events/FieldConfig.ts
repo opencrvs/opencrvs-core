@@ -11,6 +11,12 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from '../conditionals/conditionals'
+import {
+  DateFieldValue,
+  FileFieldValue,
+  ParagraphFieldValue,
+  TextFieldValue
+} from './FieldValue'
 
 export const ConditionalTypes = {
   SHOW: 'SHOW',
@@ -79,6 +85,14 @@ export const FieldType = {
 
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]
+
+export type FieldValueByType = {
+  [FieldType.TEXT]: TextFieldValue
+  [FieldType.DATE]: DateFieldValue
+  [FieldType.PARAGRAPH]: ParagraphFieldValue
+  [FieldType.RADIO_GROUP]: string
+  [FieldType.FILE]: FileFieldValue
+}
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),

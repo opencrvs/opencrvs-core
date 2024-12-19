@@ -11,16 +11,19 @@
 import { z } from 'zod'
 
 const TextFieldValue = z.string()
-const DateFieldValue = z.string()
-const ParagraphFieldValue = z.string()
+export type TextFieldValue = z.infer<typeof TextFieldValue>
 
-export const FileFieldValue = z
-  .object({
-    filename: z.string(),
-    originalFilename: z.string(),
-    type: z.string()
-  })
-  .or(z.null())
+const DateFieldValue = z.string()
+export type DateFieldValue = z.infer<typeof DateFieldValue>
+
+const ParagraphFieldValue = z.string()
+export type ParagraphFieldValue = z.infer<typeof ParagraphFieldValue>
+
+export const FileFieldValue = z.object({
+  filename: z.string(),
+  originalFilename: z.string(),
+  type: z.string()
+})
 
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 

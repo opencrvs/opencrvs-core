@@ -93,3 +93,5 @@ export const ActionDocument = z.discriminatedUnion('type', [
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 export type CreatedAction = z.infer<typeof CreatedAction>
+
+export type ActionFormData = ActionDocument['data']

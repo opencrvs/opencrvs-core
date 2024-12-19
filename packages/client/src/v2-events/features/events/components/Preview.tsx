@@ -13,7 +13,11 @@ import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
-import { FormConfig, FieldConfig } from '@opencrvs/commons/client'
+import {
+  FormConfig,
+  FieldConfig,
+  ActionFormData
+} from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
@@ -191,7 +195,7 @@ function PreviewComponent({
   children: React.ReactNode
   eventConfig: EventConfig
   formConfig: FormConfig
-  form: Record<string, string | React.ReactNode>
+  form: ActionFormData
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
 }) {

@@ -192,8 +192,8 @@ export function ReviewSection() {
         form={form}
         // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfigs[0].review.title, {
-          firstname: form['applicant.firstname'],
-          surname: form['applicant.surname']
+          firstname: form['applicant.firstname'] as string,
+          surname: form['applicant.surname'] as string
         })}
       >
         <Preview.Actions
