@@ -79,10 +79,6 @@ function SimpleDocumentUploaderComponent({
   >([])
 
   function handleFileChange(uploadedImage: File) {
-    if (!uploadedImage) {
-      return
-    }
-
     setFilesBeingUploaded([
       ...filesBeingUploaded,
       { label: uploadedImage.name }

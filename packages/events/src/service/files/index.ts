@@ -127,7 +127,8 @@ export async function fileExists(filename: string, token: string) {
 
   return res.ok
 }
-export async function presignFiles(
+
+async function presignFiles(
   filenames: string[],
   token: string
 ): Promise<string[]> {

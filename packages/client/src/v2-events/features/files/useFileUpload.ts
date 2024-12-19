@@ -10,8 +10,6 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
-
 import { v4 as uuid } from 'uuid'
 import { queryClient } from '@client/v2-events/trpc'
 import { getToken } from '@client/utils/authUtils'
@@ -47,14 +45,18 @@ const MUTATION_KEY = 'uploadFile'
 /* Must match the one defined src-sw.ts */
 const CACHE_NAME = 'workbox-runtime'
 
+function withPostfix(str: string, postfix: string) {
+  if (str.endsWith(postfix)) {
+    return str
+  }
+
+  return str + postfix
+}
+
 export function getFullURL(filename: string) {
-  if (window.config.MINIO_URL) {
-    return new URL(
-      filename,
-      window.config.MINIO_URL.endsWith('/')
-        ? window.config.MINIO_URL
-        : window.config.MINIO_URL + '/'
-    ).toString()
+  const minioURL = window.config.MINIO_URL
+  if (minioURL && typeof minioURL === 'string') {
+    return new URL(filename, withPostfix(minioURL, '/')).toString()
   }
 
   throw new Error('MINIO_URL is not defined')
@@ -67,6 +69,7 @@ async function cacheFile(filename: string, file: File) {
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
   if (!cacheKey) {
+    // eslint-disable-next-line no-console
     console.error(
       `Cache ${CACHE_NAME} not found. Is service worker running properly?`
     )
@@ -85,6 +88,7 @@ async function removeCached(filename: string) {
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
   if (!cacheKey) {
+    // eslint-disable-next-line no-console
     console.error(
       `Cache ${CACHE_NAME} not found. Is service worker running properly?`
     )

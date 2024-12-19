@@ -105,17 +105,6 @@ export function Debug() {
               Events in offline storage: {storedEvents.data.length}
             </Text>
           </li>
-          <li>
-            <br />
-            <Text element="span" variant="reg12">
-              Test file uploads
-            </Text>
-            <br />
-            <input
-              type="file"
-              onChange={(e) => e.target.files && uploadFiles(e.target.files[0])}
-            />
-          </li>
         </ul>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
