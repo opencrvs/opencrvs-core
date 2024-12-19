@@ -17,6 +17,10 @@ import { v4 as uuid } from 'uuid'
 import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+
+/* Debug file should be the only transient component which will not be present in near future. */
+/* eslint-disable react/jsx-no-literals */
+
 const Container = styled.div`
   background: #fff;
   position: fixed;
@@ -36,7 +40,7 @@ export function Debug() {
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
-  function createEvents() {
+  const createEvents = () => {
     createMutation.mutate(
       {
         type: 'TENNIS_CLUB_MEMBERSHIP',
