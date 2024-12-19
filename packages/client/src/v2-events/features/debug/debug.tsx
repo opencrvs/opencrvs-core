@@ -15,9 +15,12 @@ import React from 'react'
 import styled from 'styled-components'
 import { v4 as uuid } from 'uuid'
 import { Text } from '@opencrvs/components'
-import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useOnlineStatus } from '@client/utils'
+
+/* Debug file should be the only transient component which will not be present in near future. */
+/* eslint-disable react/jsx-no-literals */
+
 const Container = styled.div`
   background: #fff;
   position: fixed;
@@ -37,10 +40,8 @@ export function Debug() {
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
-  const { uploadFiles } = useFileUpload('test')
-
-  function createEvents() {
-    return createMutation.mutate(
+  const createEvents = () => {
+    createMutation.mutate(
       {
         type: 'TENNIS_CLUB_MEMBERSHIP',
         transactionId: `tmp-${uuid()}`
