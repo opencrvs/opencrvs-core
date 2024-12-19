@@ -12,7 +12,7 @@
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import { signFileUrl } from '@documents/minio/sign'
 import * as Hapi from '@hapi/hapi'
-import z from 'zod'
+import { z } from 'zod'
 
 export function createPreSignedUrl(
   request: Hapi.Request,
