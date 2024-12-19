@@ -348,11 +348,10 @@ class FormSectionComponent extends React.Component<AllProps> {
 
     const errors = this.props.errors as unknown as Errors
 
-    const fields = fieldsWithDotIds.map((field) => {
-      const newField = { ...field }
-      newField.id = field.id.replaceAll('.', FIELD_SEPARATOR)
-      return newField
-    })
+    const fields = fieldsWithDotIds.map((field) => ({
+      ...field,
+      id: field.id.replaceAll('.', FIELD_SEPARATOR)
+    }))
 
     return (
       <section>
@@ -393,7 +392,11 @@ class FormSectionComponent extends React.Component<AllProps> {
                       error={isFieldDisabled ? '' : error}
                       fields={fields}
                       formData={formData}
-                      touched={flatten(touched)[field.id] || false}
+                      touched={
+                        makeFormikFieldIdsOpenCRVSCompatible(touched)[
+                          field.id
+                        ] || false
+                      }
                       values={values}
                       onUploadingStateChanged={
                         this.props.onUploadingStateChanged
@@ -410,8 +413,13 @@ class FormSectionComponent extends React.Component<AllProps> {
   }
 }
 
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
 const FIELD_SEPARATOR = '____'
-function unflatten<T>(data: Record<string, T>) {
+function makeFormFieldIdsFormikCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       key.replaceAll('.', FIELD_SEPARATOR),
@@ -420,7 +428,7 @@ function unflatten<T>(data: Record<string, T>) {
   )
 }
 
-function flatten<T>(data: Record<string, T>) {
+function makeFormikFieldIdsOpenCRVSCompatible<T>(data: Record<string, T>) {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
       key.replaceAll(FIELD_SEPARATOR, '.'),
@@ -432,13 +440,13 @@ function flatten<T>(data: Record<string, T>) {
 export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
   const intl = useIntl()
 
-  const nestedFormData = unflatten(props.formData)
+  const nestedFormData = makeFormFieldIdsFormikCompatible(props.formData)
 
   const onChange = (values: ActionFormData) => {
-    props.onChange(flatten(values))
+    props.onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
   }
 
-  const initialValues = unflatten<FieldValue>(
+  const initialValues = makeFormFieldIdsFormikCompatible<FieldValue>(
     props.initialValues ?? mapFieldsToValues(props.fields, nestedFormData)
   )
 
@@ -448,7 +456,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
       validate={(values) =>
         getValidationErrorsForForm(
           props.fields,
-          flatten(values),
+          makeFormikFieldIdsOpenCRVSCompatible(values),
           props.requiredErrorMessage
         )
       }
