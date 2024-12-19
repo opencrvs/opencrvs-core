@@ -15,11 +15,6 @@ import { EventDocument, CreatedAction } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
 
-// @todo
-// export function preloadData() {
-//   utils.config.get.ensureData()
-// }
-
 function getCanonicalEventId(
   events: EventDocument[],
   eventIdOrTransactionId: string
@@ -70,10 +65,8 @@ queryClient.setQueryDefaults(EVENTS_PERSISTENT_STORE_STORAGE_KEY, {
 })
 
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
-  // This retry ensures on page reload if event have not yet synced,
-  // the action will be retried once
-  retry: 1,
-  retryDelay: 5000,
+  retry: true,
+  retryDelay: 10000,
   mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
   onMutate: async (actionInput) => {
     await queryClient.cancelQueries({
@@ -125,8 +118,8 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
 utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
   // This retry ensures on page reload if event have not yet synced,
   // the action will be retried once
-  retry: 1,
-  retryDelay: 5000,
+  retry: true,
+  retryDelay: 10000,
   mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
   onMutate: async (actionInput) => {
     await queryClient.cancelQueries({
@@ -178,8 +171,8 @@ utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
   // This retry ensures on page reload if event have not yet synced,
   // the action will be retried once
-  retry: 1,
-  retryDelay: 5000,
+  retry: true,
+  retryDelay: 10000,
   mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn),
   onMutate: async (actionInput) => {
     await queryClient.cancelQueries({

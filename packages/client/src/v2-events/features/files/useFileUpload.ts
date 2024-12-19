@@ -48,7 +48,16 @@ const MUTATION_KEY = 'uploadFile'
 const CACHE_NAME = 'workbox-runtime'
 
 export function getFullURL(filename: string) {
-  return `http://localhost:3535/ocrvs/${filename}`
+  if (window.config.MINIO_URL) {
+    return new URL(
+      filename,
+      window.config.MINIO_URL.endsWith('/')
+        ? window.config.MINIO_URL
+        : window.config.MINIO_URL + '/'
+    ).toString()
+  }
+
+  throw new Error('MINIO_URL is not defined')
 }
 
 async function cacheFile(filename: string, file: File) {

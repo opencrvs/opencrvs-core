@@ -10,8 +10,8 @@
  */
 
 import {
-  EventDocument,
   ActionInput,
+  EventDocument,
   EventInput,
   FileFieldValue
 } from '@opencrvs/commons/events'
@@ -19,10 +19,9 @@ import {
 import { getClient } from '@events/storage/mongodb'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
-import { indexEvent } from './indexing/indexing'
-import * as _ from 'lodash'
-import { getEventsConfig } from './config/config'
+import { getEventConfigurations } from './config/config'
 import { fileExists } from './files'
+import { indexEvent } from './indexing/indexing'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -53,6 +52,7 @@ export async function getEventById(id: string) {
   if (!event) {
     throw new EventNotFoundError(id)
   }
+
   return event
 }
 
@@ -114,7 +114,7 @@ export async function addAction(
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
 
-  const config = await getEventsConfig(token)
+  const config = await getEventConfigurations(token)
 
   const form = config
     .find((config) => config.id === event.type)

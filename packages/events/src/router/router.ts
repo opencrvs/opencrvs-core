@@ -21,7 +21,7 @@ import {
   DraftActionInput,
   RegisterActionInput
 } from '@opencrvs/commons/events'
-import { getEventsConfig } from '@events/service/config/config'
+import { getEventConfigurations } from '@events/service/config/config'
 import {
   addAction,
   createEvent,
@@ -31,6 +31,7 @@ import {
 } from '@events/service/events'
 import { EventConfig, getUUID } from '@opencrvs/commons'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
+import { presignFilesInEvent } from '@events/service/files'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -74,12 +75,12 @@ export type AppRouter = typeof appRouter
 export const appRouter = router({
   config: router({
     get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
-      return getEventsConfig(options.ctx.token)
+      return getEventConfigurations(options.ctx.token)
     })
   }),
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
-      const config = await getEventsConfig(options.ctx.token)
+      const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)
 
       validateEventType({
@@ -95,7 +96,7 @@ export const appRouter = router({
       })
     }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
-      const config = await getEventsConfig(options.ctx.token)
+      const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)
 
       validateEventType({
@@ -105,8 +106,10 @@ export const appRouter = router({
 
       return patchEvent(options.input)
     }),
-    get: publicProcedure.input(z.string()).query(async ({ input }) => {
-      return getEventById(input)
+    get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+      const event = await getEventById(input)
+      const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
+      return eventWithSignedFiles
     }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {

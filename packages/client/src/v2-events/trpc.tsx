@@ -89,7 +89,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: 1000 * 60 * 60 * 4,
+        maxAge: undefined,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
           shouldDehydrateMutation: (mut) => {
