@@ -53,8 +53,8 @@ export function FileInput(
       allowedDocType={allowedDocType}
       description={description}
       error={''}
-      file={file ? file : undefined}
-      label={file ? file.originalFilename : ''}
+      file={file}
+      label={file?.originalFilename}
       name={name}
       onComplete={(newFile) => {
         if (newFile) {

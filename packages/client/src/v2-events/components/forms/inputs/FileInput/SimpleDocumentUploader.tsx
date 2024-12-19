@@ -44,7 +44,7 @@ const FieldDescription = styled.div`
 
 type IFullProps = {
   name: string
-  label: string
+  label?: string
   file?: FileFieldValue
   description?: string
   allowedDocType?: string[]
