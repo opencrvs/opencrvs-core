@@ -10,7 +10,7 @@ Client for managing custom events.
 # Features used by routes
 /features
   /events
-    # Each action has 'preview' and 'pages' definitions
+    # Each action has 'review' and 'pages' definitions to match configuration
     /actions
       [Action]/
         Pages.tsx
