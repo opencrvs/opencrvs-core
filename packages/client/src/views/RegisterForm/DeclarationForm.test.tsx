@@ -361,6 +361,8 @@ describe('when user starts a new declaration', () => {
         })
 
         it('hides everything with pinpad if is page loses focus', async () => {
+          await flushPromises()
+          app.update()
           setPageVisibility(false)
           await waitForElement(app, '#unlockPage')
         })
