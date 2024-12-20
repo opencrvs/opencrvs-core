@@ -37,6 +37,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "lint-staged": "^15.0.0",
     "mongodb-memory-server": "^10.1.2",
+    "msw": "^2.7.0",
     "nodemon": "^3.0.0",
     "prettier": "2.8.8",
     "testcontainers": "^10.15.0",
