@@ -11,14 +11,12 @@
 
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import { DeclareIndex } from '@client/v2-events//features/events/actions/declare/Declare'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
-
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { ReviewSection } from '@client/v2-events/features/events/actions/declare/Review'
-import { RegisterIndex } from '@client/v2-events/features/events/actions/register/Register'
+import * as Declare from '@client/v2-events/features/events/actions/declare'
+import * as Register from '@client/v2-events/features/events/actions/register'
 import { WorkqueueLayout, FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from './routes'
 
@@ -73,15 +71,15 @@ export const routesConfig = {
       children: [
         {
           index: true,
-          element: <DeclareIndex />
+          element: <Declare.Pages />
         },
         {
-          path: ROUTES.V2.EVENTS.DECLARE.PAGE.path,
-          element: <DeclareIndex />
+          path: ROUTES.V2.EVENTS.DECLARE.PAGES.path,
+          element: <Declare.Pages />
         },
         {
           path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
-          element: <ReviewSection />
+          element: <Declare.Review />
         }
       ]
     },
@@ -95,7 +93,15 @@ export const routesConfig = {
       children: [
         {
           index: true,
-          element: <RegisterIndex />
+          element: <Register.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.REGISTER.PAGES.path,
+          element: <Register.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
+          element: <Register.Review />
         }
       ]
     }
