@@ -27,7 +27,7 @@ import { ROUTES } from '@client/v2-events/routes'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
-export function Workqueues({ children }: { children: React.ReactNode }) {
+export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
 
   return (
