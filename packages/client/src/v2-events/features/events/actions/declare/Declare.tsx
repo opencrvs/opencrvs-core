@@ -12,7 +12,7 @@
 import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { FormWizard, Frame, Spinner } from '@opencrvs/components'
+import { FormWizard, Spinner } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 
@@ -20,7 +20,6 @@ import { useEventConfiguration } from '@client/v2-events//features/events/useEve
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
-import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 import { ROUTES } from '@client/v2-events/routes'
 export function DeclareIndex() {
   return (
@@ -120,10 +119,7 @@ function Declare() {
   const page = pages[currentPage]
 
   return (
-    <Frame
-      header={<FormHeader label={configuration.label} />}
-      skipToContentText="Skip to form"
-    >
+    <>
       {modal}
       <FormWizard
         currentPage={currentPage}
@@ -148,6 +144,6 @@ function Declare() {
           }}
         />
       </FormWizard>
-    </Frame>
+    </>
   )
 }

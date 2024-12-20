@@ -360,9 +360,10 @@ describe('when user starts a new declaration', () => {
           expect(router.state.location.pathname).toContain('mother')
         })
 
-        it('hides everything with pinpad if is page loses focus', async () => {
+        it('hides everything with pinpad if page loses focus', async () => {
           await flushPromises()
           app.update()
+
           setPageVisibility(false)
           await waitForElement(app, '#unlockPage')
         })
