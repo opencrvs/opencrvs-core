@@ -19,6 +19,7 @@ import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ReviewSection } from '@client/v2-events/features/events/actions/declare/Review'
 import { RegisterIndex } from '@client/v2-events/features/events/actions/register/Register'
+import { Debug } from '@client/v2-events/features/debug/debug'
 import { ROUTES } from './routes'
 
 /**
@@ -31,6 +32,7 @@ export const routesConfig = {
   element: (
     <TRPCProvider>
       <Outlet />
+      <Debug />
     </TRPCProvider>
   ),
   children: [

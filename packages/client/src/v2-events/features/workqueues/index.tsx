@@ -11,8 +11,8 @@
 
 import React from 'react'
 
-import { useNavigate } from 'react-router-dom'
 import { noop } from 'lodash'
+import { useNavigate } from 'react-router-dom'
 import {
   AppBar,
   Button,
@@ -23,7 +23,6 @@ import {
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
-import { Debug } from '@client/v2-events/features/debug/debug'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -65,7 +64,6 @@ export function Workqueues({ children }: { children: React.ReactNode }) {
       skipToContentText="skip"
     >
       {children}
-      <Debug />
     </Frame>
   )
 }
