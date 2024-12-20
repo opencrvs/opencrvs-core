@@ -383,7 +383,9 @@ describe('when user starts a new declaration', () => {
           await flushPromises()
           await goToDocumentsSection(app)
         })
-        it('image upload field is rendered', () => {
+        it('image upload field is rendered', async () => {
+          await flushPromises()
+          app.update()
           expect(app.find('#upload_document').hostNodes()).toHaveLength(5)
         })
       })
