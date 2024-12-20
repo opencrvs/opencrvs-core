@@ -37,7 +37,7 @@ import { ActionMenu } from './components/ActionMenu'
  */
 
 export function EventOverviewIndex() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getEvents, getEventById } = useEvents()
   const user = useSelector(getUserDetails)
 
