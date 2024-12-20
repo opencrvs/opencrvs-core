@@ -92,6 +92,7 @@ describe('when user starts a new declaration', () => {
     let router: ReturnType<typeof createMemoryRouter>
 
     beforeEach(async () => {
+      await flushPromises()
       const testApp = await createTestApp()
       app = testApp.app
       store = testApp.store
