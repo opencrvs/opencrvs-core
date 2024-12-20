@@ -26,6 +26,9 @@ vi.mock('@events/service/config/config', () => ({
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
     ])
 }))
+vi.mock('@events/service/files', () => ({
+  presignFiles: (filenames: string[]) => Promise.resolve(filenames)
+}))
 
 beforeAll(() => Promise.all([setupESServer()]), 100000)
 afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
