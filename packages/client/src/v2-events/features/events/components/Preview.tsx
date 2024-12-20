@@ -254,12 +254,23 @@ function PreviewComponent({
                           {page.fields
                             .filter(
                               (field) =>
+                                // Formatters can explicitly define themselves to be null
+                                // this means a value display row in not rendered at all
                                 FIELD_TYPE_FORMATTERS[field.type] !== null
                             )
                             .map((field) => {
                               const Output =
                                 FIELD_TYPE_FORMATTERS[field.type] ||
                                 DefaultOutput
+
+                              const hasValue = form[field.id] !== undefined
+
+                              const valueDisplay = hasValue ? (
+                                <Output value={form[field.id]} />
+                              ) : (
+                                ''
+                              )
+
                               return (
                                 <ListReview.Row
                                   key={field.id}
@@ -281,7 +292,7 @@ function PreviewComponent({
                                   }
                                   id={field.id}
                                   label={intl.formatMessage(field.label)}
-                                  value={<Output value={form[field.id]} />}
+                                  value={valueDisplay}
                                 />
                               )
                             })}
