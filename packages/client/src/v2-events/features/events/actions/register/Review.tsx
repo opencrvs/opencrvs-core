@@ -88,10 +88,10 @@ export function Review() {
 
     if (confirmedEdit) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
+        ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'register'
+            from: 'review'
           },
           fieldId
         )
