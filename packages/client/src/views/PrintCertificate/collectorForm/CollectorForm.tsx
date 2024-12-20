@@ -74,11 +74,11 @@ import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 import { UserDetails } from '@client/utils/userUtils'
-import { FormikTouched, FormikValues } from 'formik'
 import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import { FormikTouched, FormikValues } from 'formik'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;

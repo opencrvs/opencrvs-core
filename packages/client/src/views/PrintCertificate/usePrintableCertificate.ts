@@ -47,7 +47,7 @@ import {
   getRegisteredDate,
   isCertificateForPrintInAdvance
 } from './utils'
-import { useParams } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
@@ -76,7 +76,6 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   }
   return recursiveTransform(template)
 }
-import { useNavigate } from 'react-router-dom'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -134,11 +133,11 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = (registrationId?: string) => {
+export const usePrintableCertificate = (declarationId?: string) => {
   const navigate = useNavigate()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
-  >(registrationId)
+  >(declarationId)
   const userDetails = useSelector(getUserDetails)
   const offlineData = useSelector(getOfflineData)
   const declaration = withEnhancedTemplateVariables(
@@ -256,7 +255,7 @@ export const usePrintableCertificate = (registrationId?: string) => {
       dispatch(writeDeclaration(updatedDeclaration))
     }
 
-    if (!registrationId) {
+    if (!declarationId) {
       // eslint-disable-next-line no-console
       console.error('No declaration id provided')
       return
@@ -264,7 +263,7 @@ export const usePrintableCertificate = (registrationId?: string) => {
 
     navigate(
       generateCertificateCorrectionUrl({
-        declarationId: registrationId,
+        declarationId,
         pageId: CorrectionSection.Corrector
       })
     )

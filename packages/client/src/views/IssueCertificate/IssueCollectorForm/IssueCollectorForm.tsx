@@ -78,6 +78,8 @@ export function IssueCollectorForm({
   function continueButtonHandler() {
     const relationship =
       declaration.data.registration.certificates[0].collector?.type
+    const event = declaration.event
+
     if (!relationship) return
     if (relationship === 'OTHER') {
       navigate(
@@ -90,7 +92,7 @@ export function IssueCollectorForm({
       navigate(
         generateVerifyIssueCollectorUrl({
           registrationId: declaration.id,
-          event: declaration.event,
+          event,
           collector: relationship
         })
       )

@@ -50,7 +50,6 @@ import { IForm } from '@client/forms'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { EventType } from '@client/utils/gateway'
 
 interface IStateProps {
   registerForm: IForm
