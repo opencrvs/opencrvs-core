@@ -17,17 +17,17 @@ import {
   SUBMISSION_STATUS
 } from '@client/declarations'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { IFormData } from '@client/forms'
-import { goBack } from '@client/navigation'
+
 import {
   EventType,
   FetchViewRecordByCompositionQuery,
   RegStatus
 } from '@client/utils/gateway'
 import styled from 'styled-components'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Button } from '@opencrvs/components/lib/Button'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -92,23 +92,21 @@ const getDeclarationIconColor = (declaration: IDeclaration): string => {
 
 const LoadingState = () => {
   const intl = useIntl()
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const goBack = () => navigate(-1)
+
   return (
     <Frame
       header={
         <AppBar
           desktopRight={
-            <Button
-              type="secondary"
-              size="small"
-              onClick={() => dispatch(goBack())}
-            >
+            <Button type="secondary" size="small" onClick={goBack}>
               <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
           }
           mobileRight={
-            <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+            <Button type="icon" size="small" onClick={goBack}>
               <Icon name="X" />
             </Button>
           }
@@ -131,11 +129,15 @@ const LoadingState = () => {
 }
 
 export const ViewRecord = () => {
+  const navigate = useNavigate()
+  const goBack = () => navigate(-1)
+
   const intl = useIntl()
-  const dispatch = useDispatch()
+
   const form = useSelector(getReviewForm)
   const userDetails = useSelector(getUserDetails)
   const offlineData = useSelector(getOfflineData)
+  // @todo: validate
   const { declarationId } = useParams<{ declarationId: string }>()
 
   const { loading, error, data } = useQuery<FetchViewRecordByCompositionQuery>(
@@ -168,7 +170,8 @@ export const ViewRecord = () => {
       eventData?.registration?.status[0]?.type) ||
     undefined
   const declaration = createReviewDeclaration(
-    declarationId,
+    // @TODO: CHECK
+    declarationId!,
     transData,
     eventType,
     downloadedAppStatus
@@ -192,11 +195,7 @@ export const ViewRecord = () => {
             isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
           }
           desktopRight={
-            <Button
-              type="secondary"
-              size="small"
-              onClick={() => dispatch(goBack())}
-            >
+            <Button type="secondary" size="small" onClick={goBack}>
               <Icon name="X" />
               {intl.formatMessage(buttonMessages.exitButton)}
             </Button>
@@ -206,7 +205,7 @@ export const ViewRecord = () => {
             isDuplicate ? <Duplicate /> : <DeclarationIcon color={iconColor} />
           }
           mobileRight={
-            <Button type="icon" size="small" onClick={() => dispatch(goBack())}>
+            <Button type="icon" size="small" onClick={goBack}>
               <Icon name="X" />
             </Button>
           }

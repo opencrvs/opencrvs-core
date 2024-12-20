@@ -14,7 +14,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
 export const RedirectField = ({
   to,
@@ -28,7 +28,7 @@ export const RedirectField = ({
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
   return (
-    <Redirect
+    <Navigate
       to={evalExpressionInFieldDefinition(
         '`' + to + '`',
         form,

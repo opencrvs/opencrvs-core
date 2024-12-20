@@ -9,15 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* stylelint-disable */
-import React, { useState } from 'react'
+import React from 'react'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import styled from 'styled-components'
+import { useQueryClient } from '@tanstack/react-query'
+import { v4 as uuid } from 'uuid'
 import { Text } from '@opencrvs/components'
 import { useOnlineStatus } from '@client/utils'
-import { useQueryClient } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+
+/* Debug file should be the only transient component which will not be present in near future. */
+/* eslint-disable react/jsx-no-literals */
 
 const Container = styled.div`
   background: #fff;
@@ -32,19 +34,17 @@ const Container = styled.div`
   }
 `
 
-export const Debug = () => {
+export function Debug() {
   const events = useEvents()
   const online = useOnlineStatus()
   const queryClient = useQueryClient()
   const createMutation = events.createEvent()
 
-  const [eventId, setEventId] = useState('')
-
   const createEvents = () => {
     createMutation.mutate(
       {
         type: 'TENNIS_CLUB_MEMBERSHIP',
-        transactionId: Math.random().toString(36).substring(2)
+        transactionId: `tmp-${uuid()}`
       },
       {
         onSuccess: (data) => {
@@ -66,7 +66,7 @@ export const Debug = () => {
       <Container>
         <ul>
           <li>
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               {online ? 'Online' : 'Offline'}
             </Text>
           </li>
@@ -74,7 +74,7 @@ export const Debug = () => {
             <button onClick={createEvents}>Create event</button>
           </li>
           <li>
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               Failed requests in cache{' '}
               {mutations
                 .filter((mutation) => mutation.state.isPaused)
@@ -82,7 +82,7 @@ export const Debug = () => {
             </Text>
           </li>
           <li>
-            <Text variant="reg12" element="span">
+            <Text element="span" variant="reg12">
               Paused requests in cache{' '}
               {mutations
                 .filter((mutation) => mutation.state.error)
@@ -94,22 +94,21 @@ export const Debug = () => {
               Clear React Query buffer
             </button>
           </li>
-        </ul>
-        <Text variant="h4" element="span">
-          Local records
-        </Text>
-        <ul>
           <li>
+            {/* eslint-disable-next-line no-console */}
             <button onClick={() => console.log(events.events.data)}>
               console.log stored events
             </button>
           </li>
           <li>
-            <Text variant="reg12" element="span">
-              Events in offline storage: {storedEvents.data?.length}
+            <Text element="span" variant="reg12">
+              Events in offline storage: {storedEvents.data.length}
             </Text>
           </li>
         </ul>
+        <Text element="span" variant="h4">
+          Local records
+        </Text>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
     </>

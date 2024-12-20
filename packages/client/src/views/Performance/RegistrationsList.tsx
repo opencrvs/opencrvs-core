@@ -17,11 +17,8 @@ import { SegmentedControl } from '@client/components/SegmentedControl'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
-  goToFieldAgentList,
-  goToPerformanceHome,
-  goToRegistrationsList,
-  goToUserProfile,
-  goToTeamUserList
+  formatUrl,
+  generateRegistrationsListUrlConfig
 } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import { ILocation } from '@client/offline/reducer'
@@ -54,12 +51,14 @@ import { parse } from 'query-string'
 import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Link } from '@opencrvs/components/lib/Link'
 import { useAuthorization } from '@client/hooks/useAuthorization'
 import formatDate from '@client/utils/date-formatting'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'querystring'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -109,17 +108,7 @@ interface IConnectProps {
   offlineLocations: { [key: string]: ILocation }
 }
 
-interface IDispatchProps {
-  goToPerformanceHome: typeof goToPerformanceHome
-  goToFieldAgentList: typeof goToFieldAgentList
-  goToRegistrationsList: typeof goToRegistrationsList
-  goToTeamUserList: typeof goToTeamUserList
-  goToUserProfile: typeof goToUserProfile
-}
-type IProps = RouteComponentProps &
-  WrappedComponentProps &
-  IConnectProps &
-  IDispatchProps
+type IProps = WrappedComponentProps & IConnectProps
 
 enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
@@ -150,10 +139,11 @@ function getPercentage(total: number | undefined, current: number | undefined) {
 }
 
 function RegistrationListComponent(props: IProps) {
-  const {
-    intl,
-    location: { search }
-  } = props
+  const { intl } = props
+
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const {
     locationId,
     timeStart,
@@ -161,7 +151,8 @@ function RegistrationListComponent(props: IProps) {
     event = EVENT_OPTIONS.BIRTH,
     filterBy = FILTER_BY_OPTIONS.BY_TIME,
     currentPageNumber = '1'
-  } = parse(search) as unknown as ISearchParams
+  } = parse(location.search) as unknown as ISearchParams
+
   const isOfficeSelected = isLocationOffice(locationId)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [columnToBeSort, setColumnToBeSort] =
@@ -417,7 +408,11 @@ function RegistrationListComponent(props: IProps) {
             <Link
               font="bold14"
               onClick={() => {
-                props.goToUserProfile(String(result.registrarPractitioner?.id))
+                navigate(
+                  formatUrl(routes.USER_PROFILE, {
+                    userId: String(result.registrarPractitioner?.id)
+                  })
+                )
               }}
             >
               {result.registrarPractitioner?.name
@@ -440,9 +435,13 @@ function RegistrationListComponent(props: IProps) {
           <Link
             font="bold14"
             onClick={() => {
-              props.goToTeamUserList(
-                result.registrarPractitioner?.primaryOffice?.id as string
-              )
+              navigate({
+                pathname: routes.TEAM_USER_LIST,
+                search: stringify({
+                  locationId: result.registrarPractitioner?.primaryOffice
+                    ?.id as string
+                })
+              })
             }}
           >
             {result.registrarPractitioner?.primaryOffice?.name}
@@ -609,13 +608,15 @@ function RegistrationListComponent(props: IProps) {
                   filterCriteria = FILTER_BY_OPTIONS.BY_TIME
                 }
 
-                props.goToRegistrationsList(
-                  timeStart,
-                  timeEnd,
-                  newLocation.id,
-                  event,
-                  filterCriteria,
-                  1
+                navigate(
+                  generateRegistrationsListUrlConfig({
+                    locationId: newLocation.id,
+                    timeStart,
+                    timeEnd,
+                    event,
+                    filterBy: filterCriteria,
+                    currentPageNumber: 1
+                  })
                 )
               }}
             />
@@ -625,13 +626,16 @@ function RegistrationListComponent(props: IProps) {
                   Object.values(EVENT_OPTIONS).find(
                     (val) => val === option.value
                   ) || EVENT_OPTIONS.BIRTH
-                props.goToRegistrationsList(
-                  timeStart,
-                  timeEnd,
-                  locationId,
-                  selectedEvent,
-                  filterBy,
-                  1
+
+                navigate(
+                  generateRegistrationsListUrlConfig({
+                    locationId,
+                    timeStart,
+                    timeEnd,
+                    event: selectedEvent,
+                    filterBy,
+                    currentPageNumber: 1
+                  })
                 )
               }}
               id="event-select"
@@ -653,13 +657,15 @@ function RegistrationListComponent(props: IProps) {
               startDate={dateStart}
               endDate={dateEnd}
               onDatesChange={({ startDate, endDate }) => {
-                props.goToRegistrationsList(
-                  startDate.toISOString(),
-                  endDate.toISOString(),
-                  locationId,
-                  event,
-                  filterBy,
-                  1
+                navigate(
+                  generateRegistrationsListUrlConfig({
+                    locationId,
+                    timeStart: startDate.toISOString(),
+                    timeEnd: endDate.toISOString(),
+                    event,
+                    filterBy,
+                    currentPageNumber: 1
+                  })
                 )
               }}
             />
@@ -669,13 +675,15 @@ function RegistrationListComponent(props: IProps) {
               value={filterBy}
               options={options}
               onChange={(option) =>
-                props.goToRegistrationsList(
-                  timeStart,
-                  timeEnd,
-                  locationId,
-                  event,
-                  option?.value,
-                  1
+                navigate(
+                  generateRegistrationsListUrlConfig({
+                    locationId,
+                    timeStart,
+                    timeEnd,
+                    event,
+                    filterBy: option.value,
+                    currentPageNumber: 1
+                  })
                 )
               }
             />
@@ -734,13 +742,15 @@ function RegistrationListComponent(props: IProps) {
                         registrationCount / DEFAULT_PAGE_SIZE
                       )}
                       onPageChange={(cp: number) => {
-                        props.goToRegistrationsList(
-                          timeStart,
-                          timeEnd,
-                          locationId,
-                          event,
-                          filterBy,
-                          cp
+                        navigate(
+                          generateRegistrationsListUrlConfig({
+                            locationId,
+                            timeStart,
+                            timeEnd,
+                            event,
+                            filterBy,
+                            currentPageNumber: cp
+                          })
                         )
                       }}
                     />
@@ -755,20 +765,11 @@ function RegistrationListComponent(props: IProps) {
   )
 }
 
-export const RegistrationList = connect(
-  (state: IStoreState) => {
-    const offlineOffices = getOfflineData(state).offices
-    const offlineLocations = getOfflineData(state).locations
-    return {
-      offlineOffices,
-      offlineLocations
-    }
-  },
-  {
-    goToPerformanceHome,
-    goToFieldAgentList,
-    goToRegistrationsList,
-    goToUserProfile,
-    goToTeamUserList
+export const RegistrationList = connect((state: IStoreState) => {
+  const offlineOffices = getOfflineData(state).offices
+  const offlineLocations = getOfflineData(state).locations
+  return {
+    offlineOffices,
+    offlineLocations
   }
-)(injectIntl(RegistrationListComponent))
+})(injectIntl(RegistrationListComponent))

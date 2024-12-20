@@ -17,11 +17,10 @@ import {
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   formatUrl,
-  goBack,
-  goToHomeTab,
-  goToIssueCertificatePayment,
-  goToPrintCertificatePayment,
-  goToReviewCertificate
+  generateGoToHomeTabUrl,
+  generateIssueCertificatePaymentUrl,
+  generatePrintCertificatePaymentUrl,
+  generateReviewCertificateUrl
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import {
@@ -31,7 +30,11 @@ import {
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { Redirect, RouteComponentProps } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { getEventDate, getRegisteredDate, isFreeOfCost } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -49,12 +52,6 @@ import { UserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { EventType } from '@client/utils/gateway'
 
-interface IMatchParams {
-  registrationId: string
-  eventType: EventType
-  collector: string
-}
-
 interface IStateProps {
   registerForm: IForm
   declaration?: IPrintableDeclaration
@@ -62,16 +59,11 @@ interface IStateProps {
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
-  goBack: typeof goBack
-  goToHomeTab: typeof goToHomeTab
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
-  goToReviewCertificate: typeof goToReviewCertificate
-  goToPrintCertificatePayment: typeof goToPrintCertificatePayment
-  goToIssueCertificatePayment: typeof goToIssueCertificatePayment
 }
 
-type IOwnProps = RouteComponentProps<IMatchParams> & IntlShapeProps
+type IOwnProps = RouteComponentProps<IntlShapeProps>
 
 type IFullProps = IStateProps & IDispatchProps & IOwnProps
 
@@ -90,6 +82,12 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         hasShowedVerifiedDocument
     }
 
+    if (!this.props.router.match.params.registrationId) {
+      // eslint-disable-next-line no-console
+      console.error('No registrationId in URL')
+      return
+    }
+
     this.props.modifyDeclaration(declaration)
     this.props.writeDeclaration(declaration)
 
@@ -102,26 +100,37 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
       )
     ) {
       if (!isIssueUrl) {
-        this.props.goToReviewCertificate(
-          this.props.match.params.registrationId,
-          event
+        this.props.router.navigate(
+          generateReviewCertificateUrl({
+            registrationId: this.props.router.match.params.registrationId,
+            event
+          }),
+          {
+            state: { isNavigatedInsideApp: true }
+          }
         )
       } else {
-        this.props.goToIssueCertificatePayment(
-          this.props.match.params.registrationId,
-          event
+        this.props.router.navigate(
+          generateIssueCertificatePaymentUrl({
+            registrationId: this.props.router.match.params.registrationId,
+            event
+          })
         )
       }
     } else {
       if (!isIssueUrl) {
-        this.props.goToPrintCertificatePayment(
-          this.props.match.params.registrationId,
-          event
+        this.props.router.navigate(
+          generatePrintCertificatePaymentUrl({
+            registrationId: this.props.router.match.params.registrationId,
+            event
+          })
         )
       } else {
-        this.props.goToIssueCertificatePayment(
-          this.props.match.params.registrationId,
-          event
+        this.props.router.navigate(
+          generateIssueCertificatePaymentUrl({
+            registrationId: this.props.router.match.params.registrationId,
+            event
+          })
         )
       }
     }
@@ -193,7 +202,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
   }
 
   render() {
-    const { collector } = this.props.match.params
+    const { collector } = this.props.router.params
     const { intl } = this.props
     const isIssueUrl = window.location.href.includes('issue')
     const titleMessage = isIssueUrl
@@ -202,7 +211,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
     if (!this.props.declaration) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToPrint,
             selectorId: ''
@@ -212,7 +221,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
     if (!this.props.declaration && isIssueUrl) {
       return (
-        <Redirect
+        <Navigate
           to={formatUrl(REGISTRAR_HOME_TAB, {
             tabId: WORKQUEUE_TABS.readyToIssue,
             selectorId: ''
@@ -222,19 +231,23 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     }
     return (
       <ActionPageLight
-        goBack={this.props.goBack}
+        goBack={() => this.props.router.navigate(-1)}
         hideBackground
         title={titleMessage}
         goHome={() =>
-          isIssueUrl
-            ? this.props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
-            : this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+          this.props.router.navigate(
+            generateGoToHomeTabUrl({
+              tabId: isIssueUrl
+                ? WORKQUEUE_TABS.readyToIssue
+                : WORKQUEUE_TABS.readyToPrint
+            })
+          )
         }
       >
         <IDVerifier
           id="idVerifier"
           title={intl.formatMessage(messages.idCheckTitle)}
-          collectorInformation={this.getGenericCollectorInfo(collector)}
+          collectorInformation={this.getGenericCollectorInfo(collector!)}
           actionProps={{
             positiveAction: {
               label: intl.formatMessage(messages.idCheckVerify),
@@ -253,9 +266,9 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
 const mapStateToProps = (
   state: IStoreState,
-  ownProps: IOwnProps
+  ownProps: RouteComponentProps
 ): IStateProps => {
-  const { registrationId } = ownProps.match.params
+  const { registrationId } = ownProps.router.match.params
 
   const declaration = state.declarationsState.declarations.find(
     (draft) => draft.id === registrationId
@@ -286,12 +299,9 @@ const mapStateToProps = (
   }
 }
 
-export const VerifyCollector = connect(mapStateToProps, {
-  goBack,
-  goToHomeTab,
-  modifyDeclaration,
-  writeDeclaration,
-  goToReviewCertificate,
-  goToPrintCertificatePayment,
-  goToIssueCertificatePayment
-})(injectIntl(VerifyCollectorComponent))
+export const VerifyCollector = withRouter(
+  connect(mapStateToProps, {
+    modifyDeclaration,
+    writeDeclaration
+  })(injectIntl(VerifyCollectorComponent))
+)

@@ -77,7 +77,7 @@ export interface WorkqueueState {
   pagination: Record<keyof IQueryData, number>
 }
 
-export const workqueueInitialState: WorkqueueState = {
+const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,

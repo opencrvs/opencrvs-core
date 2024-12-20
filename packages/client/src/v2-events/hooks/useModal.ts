@@ -17,7 +17,9 @@ type ModalFactory<ResultType> = (close: CloseModal<ResultType>) => ReactNode
 export function useModal() {
   const [modalNode, setModalNode] = useState<ReactNode>(null)
 
-  function openModal<ModalResult>(modalFactory: ModalFactory<ModalResult>) {
+  async function openModal<ModalResult>(
+    modalFactory: ModalFactory<ModalResult>
+  ) {
     return new Promise<ModalResult>((resolve) => {
       function close(value: ModalResult) {
         resolve(value)

@@ -21,7 +21,10 @@ import {
   IFormSectionData,
   SubmissionAction
 } from '@client/forms'
-import { goToCertificateCorrection, goToHomeTab } from '@client/navigation'
+import {
+  generateCertificateCorrectionUrl,
+  generateGoToHomeTabUrl
+} from '@client/navigation'
 import { AdminStructure, IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { printPDF } from '@client/pdfRenderer'
@@ -73,6 +76,7 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   }
   return recursiveTransform(template)
 }
+import { useNavigate } from 'react-router-dom'
 
 const withEnhancedTemplateVariables = (
   declaration: IPrintableDeclaration | undefined,
@@ -130,7 +134,8 @@ const withEnhancedTemplateVariables = (
   }
 }
 
-export const usePrintableCertificate = (registrationId: string) => {
+export const usePrintableCertificate = (registrationId?: string) => {
+  const navigate = useNavigate()
   const declarationWithoutAllTemplateVariables = useDeclaration<
     IPrintableDeclaration | undefined
   >(registrationId)
@@ -224,7 +229,12 @@ export const usePrintableCertificate = (registrationId: string) => {
 
     dispatch(modifyDeclaration(draft))
     dispatch(writeDeclaration(draft))
-    dispatch(goToHomeTab(WORKQUEUE_TABS.readyToPrint))
+
+    navigate(
+      generateGoToHomeTabUrl({
+        tabId: WORKQUEUE_TABS.readyToPrint
+      })
+    )
   }
 
   const handleEdit = () => {
@@ -246,8 +256,17 @@ export const usePrintableCertificate = (registrationId: string) => {
       dispatch(writeDeclaration(updatedDeclaration))
     }
 
-    dispatch(
-      goToCertificateCorrection(registrationId, CorrectionSection.Corrector)
+    if (!registrationId) {
+      // eslint-disable-next-line no-console
+      console.error('No declaration id provided')
+      return
+    }
+
+    navigate(
+      generateCertificateCorrectionUrl({
+        declarationId: registrationId,
+        pageId: CorrectionSection.Corrector
+      })
     )
   }
 

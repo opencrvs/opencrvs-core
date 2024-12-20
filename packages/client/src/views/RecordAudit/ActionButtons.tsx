@@ -11,11 +11,9 @@
 
 import React from 'react'
 import {
-  goToPage,
-  goToPrintCertificate,
-  goToUserProfile,
-  goToTeamUserList,
-  goToIssueCertificate
+  generatePrintCertificateUrl,
+  generateIssueCertificateUrl,
+  generateGoToPageUrl
 } from '@client/navigation'
 import { IntlShape } from 'react-intl'
 import {
@@ -44,6 +42,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
 import { useDispatch } from 'react-redux'
 import { Button } from '@client/../../components/src/Button'
+import { useNavigate } from 'react-router-dom'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -51,11 +50,6 @@ export type CMethodParams = {
   userDetails: UserDetails | null
   draft: IDeclaration | null
   clearCorrectionAndPrintChanges?: typeof clearCorrectionAndPrintChanges
-  goToPage?: typeof goToPage
-  goToPrintCertificate?: typeof goToPrintCertificate
-  goToIssueCertificate?: typeof goToIssueCertificate
-  goToUserProfile?: typeof goToUserProfile
-  goToTeamUserList?: typeof goToTeamUserList
 }
 
 export const ShowDownloadButton = ({
@@ -113,9 +107,9 @@ export const ShowUpdateButton = ({
   declaration,
   intl,
   userDetails,
-  draft,
-  goToPage
+  draft
 }: CMethodParams) => {
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
 
   const isDownloaded =
@@ -163,20 +157,20 @@ export const ShowUpdateButton = ({
       declaration?.status as string
     )
   ) {
-    let PAGE_ROUTE: string, PAGE_ID: string
+    let pageRoute: string, pageId: 'preview' | 'review'
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
-      PAGE_ID = 'preview'
+      pageId = 'preview'
       if (type.toString() === 'birth') {
-        PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+        pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
       } else if (type.toString() === 'death') {
-        PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+        pageRoute = DRAFT_DEATH_FORM_PAGE
       } else if (type.toString() === 'marriage') {
-        PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
+        pageRoute = DRAFT_MARRIAGE_FORM_PAGE
       }
     } else {
-      PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
-      PAGE_ID = 'review'
+      pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
+      pageId = 'review'
     }
     if (!isDownloaded) {
       return (
@@ -196,7 +190,14 @@ export const ShowUpdateButton = ({
         id={`update-application-${id}`}
         size={'medium'}
         onClick={() => {
-          goToPage && goToPage(PAGE_ROUTE, id, PAGE_ID, type)
+          navigate(
+            generateGoToPageUrl({
+              pageRoute,
+              declarationId: id,
+              pageId,
+              event: type
+            })
+          )
         }}
       >
         {intl.formatMessage(buttonMessages.update)}
@@ -212,9 +213,9 @@ export const ShowPrintButton = ({
   intl,
   userDetails,
   draft,
-  goToPrintCertificate,
   clearCorrectionAndPrintChanges
 }: CMethodParams) => {
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
   const systemRole = userDetails ? userDetails.systemRole : ''
   const showActionButton = systemRole
@@ -278,8 +279,13 @@ export const ShowPrintButton = ({
         onClick={() => {
           clearCorrectionAndPrintChanges &&
             clearCorrectionAndPrintChanges(declaration.id)
-          goToPrintCertificate &&
-            goToPrintCertificate(id, type.toLocaleLowerCase())
+
+          navigate(
+            generatePrintCertificateUrl({
+              registrationId: id,
+              event: type.toLocaleLowerCase()
+            })
+          )
         }}
       >
         {intl.formatMessage(buttonMessages.print)}
@@ -296,6 +302,7 @@ export const ShowIssueButton = ({
   draft
 }: CMethodParams) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
   const role = userDetails ? userDetails.systemRole : ''
   const showActionButton = role
@@ -353,7 +360,7 @@ export const ShowIssueButton = ({
         id={`issue-${id}`}
         onClick={() => {
           dispatch(clearCorrectionAndPrintChanges(id))
-          dispatch(goToIssueCertificate(id))
+          navigate(generateIssueCertificateUrl({ registrationId: id }))
         }}
         type={'primary'}
       >
@@ -368,9 +375,9 @@ export const ShowReviewButton = ({
   declaration,
   intl,
   userDetails,
-  draft,
-  goToPage
+  draft
 }: CMethodParams) => {
+  const navigate = useNavigate()
   const { id, type } = declaration || {}
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
@@ -428,14 +435,17 @@ export const ShowReviewButton = ({
         size={'medium'}
         id={`review-btn-${id}`}
         onClick={() => {
-          if (!goToPage) {
-            return
-          }
-          if (declaration.status === EVENT_STATUS.CORRECTION_REQUESTED) {
-            goToPage(REVIEW_CORRECTION, id, 'review', type)
-          } else {
-            goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
-          }
+          navigate(
+            generateGoToPageUrl({
+              pageRoute:
+                declaration.status === EVENT_STATUS.CORRECTION_REQUESTED
+                  ? REVIEW_CORRECTION
+                  : REVIEW_EVENT_PARENT_FORM_PAGE,
+              declarationId: id,
+              pageId: 'review',
+              event: type
+            })
+          )
         }}
       >
         {intl.formatMessage(constantsMessages.review)}

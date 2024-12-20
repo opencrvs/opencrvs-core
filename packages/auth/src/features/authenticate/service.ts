@@ -37,6 +37,7 @@ const sign = promisify<
   jwt.SignOptions,
   string
 >(jwt.sign)
+
 export interface IUserName {
   use: string
   family: string
@@ -213,6 +214,7 @@ export async function generateAndSendVerificationCode(
   } else {
     verificationCode = await generateVerificationCode(nonce)
   }
+
   if (!env.isProd || env.QA_ENV) {
     logger.info(
       `Sending a verification to,

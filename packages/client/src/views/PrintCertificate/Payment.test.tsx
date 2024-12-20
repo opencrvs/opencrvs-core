@@ -23,137 +23,126 @@ import { EventType } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import { queries } from '@client/profile/queries'
 import { checkAuth } from '@client/profile/profileActions'
-import { vi, Mock } from 'vitest'
+import { Mock } from 'vitest'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
+import {
+  PRINT_CERTIFICATE_PAYMENT,
+  REGISTRAR_HOME_TAB
+} from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-import { IFormSectionData } from '@client/forms'
 
-// Mock setup
 const getItem = window.localStorage.getItem as Mock
 ;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
 
-// Common mock data
-const birthDeclaration = {
-  id: 'mockBirth1234',
-  data: {
-    ...mockDeclarationData,
-    history: [
-      {
-        date: '2022-03-21T08:16:24.467+00:00',
-        regStatus: 'REGISTERED',
-        reinstated: false
-      }
-    ] as unknown as IFormSectionData
-  },
-  event: EventType.Birth
-}
-
-const deathDeclaration = {
-  id: 'mockDeath1234',
-  data: {
-    ...mockDeathDeclarationData,
-    history: [
-      {
-        date: '2022-03-21T08:16:24.467+00:00',
-        regStatus: 'REGISTERED',
-        reinstated: false
-      }
-    ] as unknown as IFormSectionData
-  },
-  event: EventType.Death
-}
-
-// Helper function to set up test
-async function setupPaymentTest({
-  registrationId,
-  eventType,
-  declaration,
-  store,
-  history,
-  mockLocation
-}: {
-  registrationId: string
-  eventType: string
-  declaration: any
-  store: any
-  history: any
-  mockLocation: any
-}) {
-  store.dispatch(storeDeclaration(declaration))
-  await flushPromises()
-
-  const testComponent = await createTestComponent(
-    <Payment
-      history={history}
-      location={mockLocation}
-      match={{
-        params: {
-          registrationId,
-          eventType
-        },
-        isExact: true,
-        path: '',
-        url: ''
-      }}
-    />,
-    { store, history }
-  )
-
-  return testComponent
-}
-
 describe('verify collector tests', () => {
-  const { store, history } = createStore()
-  const mockLocation: any = vi.fn()
+  const { store } = createStore()
+
+  const birthDeclaration = {
+    id: 'mockBirth1234',
+    data: {
+      ...mockDeclarationData,
+      history: [
+        {
+          date: '2022-03-21T08:16:24.467+00:00',
+          regStatus: 'REGISTERED',
+          reinstated: false
+        }
+      ]
+    },
+    event: EventType.Birth
+  }
+
+  const deathDeclaration = {
+    id: 'mockDeath1234',
+    data: {
+      ...mockDeathDeclarationData,
+      history: [
+        {
+          date: '2022-03-21T08:16:24.467+00:00',
+          regStatus: 'REGISTERED',
+          reinstated: false
+        }
+      ]
+    },
+    event: EventType.Death
+  }
 
   describe('in case of birth declaration', () => {
     beforeAll(async () => {
       getItem.mockReturnValue(validToken)
       await store.dispatch(checkAuth())
       await flushPromises()
+      // @ts-ignore
       store.dispatch(storeDeclaration(birthDeclaration))
     })
 
-    it('renders Payment component when mother is collector', async () => {
-      const testComponent = await setupPaymentTest({
-        registrationId: 'mockBirth1234',
-        eventType: 'birth',
-        declaration: birthDeclaration,
-        store,
-        history,
-        mockLocation
-      })
+    it('when mother is collector renders Payment component', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <Payment />,
+        {
+          store,
+          path: PRINT_CERTIFICATE_PAYMENT,
+          initialEntries: [
+            formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+              registrationId: 'mockBirth1234',
+              eventType: EventType.Birth
+            })
+          ]
+        }
+      )
 
       expect(testComponent.find('#service').hostNodes().text()).toContain(
         'Birth'
       )
+
       expect(testComponent.find('#amountDue').hostNodes().text()).toContain(
-        '15'
+        '20'
       )
 
       testComponent.find('#Continue').hostNodes().simulate('click')
     })
 
-    it('redirects to home on invalid declaration id', async () => {
-      await createTestComponent(
+    /*
+
+    // Commenting out this test because receipt templates are not currently configurable
+
+    it('print payment receipt', async () => {
+      const printMoneyReceiptSpy = vi.spyOn(PDFUtils, 'printMoneyReceipt')
+      const {router: testComponent} = await createTestComponent(
         <Payment
           location={mockLocation}
           history={history}
           match={{
             params: {
-              registrationId: 'mockBirth',
-              eventType: 'birth'
+              registrationId: 'mockBirth1234',
+              eventType: EventType.Birth
             },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        { store, history }
+        { store, initialEntries: [formatUrl('/', {
+         })] }
       )
 
-      expect(history.location.pathname).toEqual(
+      testComponent.find('#print-receipt').hostNodes().simulate('click')
+
+      expect(printMoneyReceiptSpy).toBeCalled()
+    })*/
+
+    it('invalid declaration id', async () => {
+      const { router } = await createTestComponent(<Payment />, {
+        store,
+        path: PRINT_CERTIFICATE_PAYMENT,
+        initialEntries: [
+          formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+            registrationId: 'mockBirth',
+            eventType: EventType.Birth
+          })
+        ]
+      })
+      expect(router.state.location.pathname).toEqual(
         formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToPrint,
           selectorId: ''
@@ -162,20 +151,26 @@ describe('verify collector tests', () => {
     })
   })
 
-  describe('in case of death declaration renders Payment component', () => {
+  describe('in case of death declaration renders payment component', () => {
     beforeAll(() => {
+      // @ts-ignore
       store.dispatch(storeDeclaration(deathDeclaration))
     })
 
-    it('renders Payment component when informant is collector', async () => {
-      const testComponent = await setupPaymentTest({
-        registrationId: 'mockDeath1234',
-        eventType: 'death',
-        declaration: deathDeclaration,
-        store,
-        history,
-        mockLocation
-      })
+    it('when informant is collector', async () => {
+      const { component: testComponent } = await createTestComponent(
+        <Payment />,
+        {
+          store,
+          path: PRINT_CERTIFICATE_PAYMENT,
+          initialEntries: [
+            formatUrl(PRINT_CERTIFICATE_PAYMENT, {
+              registrationId: 'mockDeath1234',
+              eventType: EventType.Death
+            })
+          ]
+        }
+      )
 
       expect(testComponent.find('#service').hostNodes().text()).toContain(
         'Death'
