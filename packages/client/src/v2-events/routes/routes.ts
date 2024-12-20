@@ -22,7 +22,7 @@ export const ROUTES = {
         'events',
         {},
         {
-          EVENT: route(':eventId', {
+          OVERVIEW: route('overview/:eventId', {
             params: { eventId: string().defined() }
           }),
           CREATE: route('create'),
@@ -33,7 +33,23 @@ export const ROUTES = {
             },
             {
               REVIEW: route('review'),
-              PAGE: route(':pageId', {
+              PAGE: route('page/:pageId', {
+                params: { pageId: string().defined() },
+                searchParams: {
+                  from: string()
+                },
+                hash: hashValues()
+              })
+            }
+          ),
+          REGISTER: route(
+            'register/:eventId',
+            {
+              params: { eventId: string().defined() }
+            },
+            {
+              REVIEW: route('review'),
+              PAGE: route('page/:pageId', {
                 params: { pageId: string().defined() },
                 searchParams: {
                   from: string()
@@ -43,9 +59,6 @@ export const ROUTES = {
             }
           ),
           VALIDATE: route('validate/:eventId', {
-            params: { eventId: string().defined() }
-          }),
-          REGISTER: route('register/:eventId', {
             params: { eventId: string().defined() }
           })
         }
