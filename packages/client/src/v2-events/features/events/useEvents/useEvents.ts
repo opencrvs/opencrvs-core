@@ -20,6 +20,11 @@ import { EventDocument, CreatedAction } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
 
+/*
+ * Local event storage
+ */
+const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
+
 function getCanonicalEventId(
   events: EventDocument[],
   eventIdOrTransactionId: string
@@ -124,19 +129,10 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     const events = queryClient.getQueryData<EventDocument[]>(
       EVENTS_PERSISTENT_STORE_STORAGE_KEY
     )
+
     if (!events) {
       return
     }
-
-    queryClient.setQueryData(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (state: EventDocument[]) => {
-        return [
-          ...state.filter((e) => e.transactionId !== response.transactionId),
-          response
-        ]
-      }
-    )
 
     queryClient
       .getMutationCache()
@@ -170,16 +166,21 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
     })
 
+    queryClient.setQueryData(
+      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
+      (state: EventDocument[]) => {
+        return [
+          ...state.filter((e) => e.transactionId !== response.transactionId),
+          response
+        ]
+      }
+    )
+
     await queryClient.cancelQueries({
       queryKey: getQueryKey(api.event.get, response.transactionId, 'query')
     })
   }
 }))
-
-/*
- * Local event storage
- */
-const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
 
 queryClient.setQueryDefaults(EVENTS_PERSISTENT_STORE_STORAGE_KEY, {
   queryFn: readEventsFromStorage
@@ -280,19 +281,20 @@ export function useEvents() {
   }
 
   function getDrafts() {
-    return events.data.filter(
+    return storedEvents.data.filter(
       (event) => !event.actions.some((a) => a.type === 'DECLARE')
     )
   }
 
   function getOutbox() {
     const eventFromCreateMutations = filterOutboxEventsWithMutation(
-      events.data,
+      storedEvents.data,
       api.event.create,
       (event, parameters) => event.transactionId === parameters.transactionId
     )
+
     const eventFromDeclareActions = filterOutboxEventsWithMutation(
-      events.data,
+      storedEvents.data,
       api.event.actions.declare,
       (event, parameters) => {
         return (
@@ -303,7 +305,7 @@ export function useEvents() {
     )
 
     const eventFromRegisterActions = filterOutboxEventsWithMutation(
-      events.data,
+      storedEvents.data,
       api.event.actions.register,
       (event, parameters) => {
         return (
@@ -354,13 +356,13 @@ export function useEvents() {
       })
   }
 
-  const events = useSuspenseQuery<EventDocument[]>({
+  const storedEvents = useSuspenseQuery<EventDocument[]>({
     queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
   })
 
   return {
     createEvent,
-    events,
+    events: storedEvents,
     getEvent,
     getEventById: api.event.get,
     getEvents: api.events.get,
