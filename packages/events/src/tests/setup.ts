@@ -20,7 +20,7 @@ import {
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
 vi.mock('@events/service/config/config', () => ({
-  getEventsConfig: () =>
+  getEventConfigurations: () =>
     Promise.all([
       tennisClubMembershipEvent,
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
