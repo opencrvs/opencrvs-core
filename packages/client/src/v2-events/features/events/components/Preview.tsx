@@ -17,7 +17,6 @@ import { FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
-  Frame,
   Icon,
   Link,
   ResponsiveModal,
@@ -26,7 +25,6 @@ import {
   Stack
 } from '@opencrvs/components'
 import { EventConfig } from '@opencrvs/commons'
-import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -179,91 +177,86 @@ function PreviewComponent({
   const intl = useIntl()
 
   return (
-    <Frame
-      header={<FormHeader label={eventConfig.label} />}
-      skipToContentText="Skip to form"
-    >
-      <Row>
-        <LeftColumn>
-          <Card>
-            <HeaderContainer>
-              <HeaderContent>
-                <Stack
-                  alignItems="flex-start"
-                  direction="column"
-                  gap={6}
-                  justify-content="flex-start"
-                >
-                  <TitleContainer id={`header_title`}>
-                    {eventConfig.label.defaultMessage}
-                  </TitleContainer>
-                  <SubjectContainer id={`header_subject`}>
-                    {title}
-                  </SubjectContainer>
-                </Stack>
-              </HeaderContent>
-            </HeaderContainer>
-            <FormData>
-              <ReviewContainter>
-                {formConfig.pages.map((page) => {
-                  return (
-                    <DeclarationDataContainer
-                      key={'Section_' + page.title.defaultMessage}
+    <Row>
+      <LeftColumn>
+        <Card>
+          <HeaderContainer>
+            <HeaderContent>
+              <Stack
+                alignItems="flex-start"
+                direction="column"
+                gap={6}
+                justify-content="flex-start"
+              >
+                <TitleContainer id={`header_title`}>
+                  {eventConfig.label.defaultMessage}
+                </TitleContainer>
+                <SubjectContainer id={`header_subject`}>
+                  {title}
+                </SubjectContainer>
+              </Stack>
+            </HeaderContent>
+          </HeaderContainer>
+          <FormData>
+            <ReviewContainter>
+              {formConfig.pages.map((page) => {
+                return (
+                  <DeclarationDataContainer
+                    key={'Section_' + page.title.defaultMessage}
+                  >
+                    <Accordion
+                      action={
+                        <Link
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit({ pageId: page.id })
+                          }}
+                        >
+                          {intl.formatMessage(previewMessages.changeButton)}
+                        </Link>
+                      }
+                      expand={true}
+                      label={intl.formatMessage(page.title)}
+                      labelForHideAction="Hide"
+                      labelForShowAction="Show"
+                      name={'Accordion_' + page.id}
                     >
-                      <Accordion
-                        action={
-                          <Link
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              onEdit({ pageId: page.id })
-                            }}
-                          >
-                            {intl.formatMessage(previewMessages.changeButton)}
-                          </Link>
-                        }
-                        expand={true}
-                        label={intl.formatMessage(page.title)}
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        name={'Accordion_' + page.id}
-                      >
-                        <ListReview id={'Section_' + page.id}>
-                          {page.fields.map((field) => (
-                            <ListReview.Row
-                              key={field.id}
-                              actions={
-                                <Link
-                                  onClick={(e) => {
-                                    e.stopPropagation()
+                      <ListReview id={'Section_' + page.id}>
+                        {page.fields.map((field) => (
+                          <ListReview.Row
+                            key={field.id}
+                            actions={
+                              <Link
+                                onClick={(e) => {
+                                  e.stopPropagation()
 
-                                    onEdit({
-                                      pageId: page.id,
-                                      fieldId: field.id
-                                    })
-                                  }}
-                                >
-                                  {intl.formatMessage(
-                                    previewMessages.changeButton
-                                  )}
-                                </Link>
-                              }
-                              id={field.id}
-                              label={intl.formatMessage(field.label)}
-                              value={form[field.id] || ''}
-                            />
-                          ))}
-                        </ListReview>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
-              </ReviewContainter>
-            </FormData>
-          </Card>
-          {children}
-        </LeftColumn>
-      </Row>
-    </Frame>
+                                  onEdit({
+                                    pageId: page.id,
+                                    fieldId: field.id
+                                  })
+                                }}
+                              >
+                                {intl.formatMessage(
+                                  previewMessages.changeButton
+                                )}
+                              </Link>
+                            }
+                            id={field.id}
+                            label={intl.formatMessage(field.label)}
+                            value={form[field.id] || ''}
+                          />
+                        ))}
+                      </ListReview>
+                    </Accordion>
+                  </DeclarationDataContainer>
+                )
+              })}
+            </ReviewContainter>
+          </FormData>
+        </Card>
+        {children}
+      </LeftColumn>
+    </Row>
   )
 }
 
