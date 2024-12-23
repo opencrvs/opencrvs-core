@@ -17,6 +17,9 @@ import {
   useFormContext
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
+import { IFormFieldValue } from '@client/forms'
+
+export const INITIAL_TEXT_VALUE = ''
 
 export function TextField({ id, label, required }: FieldProps<'TEXT'>) {
   const intl = useIntl()

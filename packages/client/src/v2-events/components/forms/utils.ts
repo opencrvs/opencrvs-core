@@ -14,12 +14,17 @@ import {
   validate,
   FieldType
 } from '@opencrvs/commons/client'
-import { INITIAL_TEXT_VALUE } from '@opencrvs/components'
+
 import {
   DependencyInfo,
   IFormFieldValue,
   IFormSectionData
 } from '@client/forms'
+import {
+  INITIAL_DATE_VALUE,
+  INITIAL_RADIO_GROUP_VALUE,
+  INITIAL_TEXT_VALUE
+} from '@client/v2-events/features/events/registered-fields'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -136,6 +141,15 @@ export function unflatten<T>(
   return result
 }
 
+const initialValueMapping: Record<FieldType, IFormFieldValue | null> = {
+  [FieldType.TEXT]: INITIAL_TEXT_VALUE,
+  [FieldType.DATE]: INITIAL_DATE_VALUE,
+  [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
+  [FieldType.PARAGRAPH]: null,
+  [FieldType.FILE]: null,
+  [FieldType.HIDDEN]: null
+}
+
 export function getInitialValues(
   fields: FieldConfig[],
   formValues: Record<string, IFormFieldValue>
@@ -144,8 +158,7 @@ export function getInitialValues(
 
   fields.forEach((field) => {
     if (!(field.id in formValues)) {
-      initialValues[field.id] =
-        field.type === FieldType.TEXT ? INITIAL_TEXT_VALUE : null
+      initialValues[field.id] = initialValueMapping[field.type]
     }
   })
   return initialValues

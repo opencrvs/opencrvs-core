@@ -16,6 +16,9 @@ import {
   DateField as DateFieldComponent
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
+import { IFormFieldValue } from '@client/forms'
+
+export const INITIAL_DATE_VALUE = null
 
 export function DateField({
   id,

@@ -15,6 +15,9 @@ import {
   RadioGroup as RadioGroupComponent
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
+import { IFormFieldValue } from '@client/forms'
+
+export const INITIAL_RADIO_GROUP_VALUE = ''
 
 export function RadioGroup({ id, options }: FieldProps<'RADIO_GROUP'>) {
   const { setValue, watch } = useFormContext()
