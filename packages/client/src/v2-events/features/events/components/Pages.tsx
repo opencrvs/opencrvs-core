@@ -16,6 +16,7 @@ import { FormPage } from '@opencrvs/commons'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { getInitialValues } from '@client/v2-events/components/forms/utils'
 
 /**
  *
@@ -52,6 +53,8 @@ export function Pages({
   } = usePagination(formPages.length, Math.max(pageIdx, 0))
   const page = formPages[currentPage]
 
+  const initialValues = getInitialValues(page.fields, formValues)
+
   useEffect(() => {
     const pageChanged = formPages[currentPage].id !== pageId
 
@@ -74,7 +77,7 @@ export function Pages({
         fields={page.fields}
         formData={formValues}
         id="locationForm"
-        initialValues={formValues}
+        initialValues={initialValues}
         setAllFieldsDirty={false}
         onChange={(values) => {
           setFormValues(eventId, values)

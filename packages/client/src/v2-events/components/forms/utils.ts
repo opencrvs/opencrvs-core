@@ -8,7 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { BaseField, FieldConfig, validate } from '@opencrvs/commons/client'
+import {
+  BaseField,
+  FieldConfig,
+  validate,
+  FieldType
+} from '@opencrvs/commons/client'
+import { INITIAL_TEXT_VALUE } from '@opencrvs/components'
 import {
   DependencyInfo,
   IFormFieldValue,
@@ -128,4 +134,19 @@ export function unflatten<T>(
   }
 
   return result
+}
+
+export function getInitialValues(
+  fields: FieldConfig[],
+  formValues: Record<string, IFormFieldValue>
+) {
+  const initialValues: Record<string, IFormFieldValue | null> = formValues
+
+  fields.forEach((field) => {
+    if (!(field.id in formValues)) {
+      initialValues[field.id] =
+        field.type === FieldType.TEXT ? INITIAL_TEXT_VALUE : null
+    }
+  })
+  return initialValues
 }

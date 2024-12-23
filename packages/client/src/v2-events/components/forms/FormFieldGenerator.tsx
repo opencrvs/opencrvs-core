@@ -216,7 +216,7 @@ interface ExposedProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IAdvancedSearchFormState
+  initialValues?: Record<string, IFormFieldValue | null>
 }
 
 type AllProps = ExposedProps & IntlShapeProps & FormikProps<IFormSectionData>
