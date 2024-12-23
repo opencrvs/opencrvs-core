@@ -35,26 +35,24 @@ function FormTabsComponent<T extends string | number = string>({
 }: IFormTabProps<T>) {
   return (
     <Tabs>
-      {sections.map(({ title, id, disabled, icon, color }) => {
-        return (
-          <Tab
-            id={`tab_${id}`}
-            color={color}
-            onClick={() => onTabClick(id)}
-            key={id}
-            active={activeTabId === id}
-            disabled={disabled}
-            activeColor={color}
-          >
-            <Stack>
-              {icon}
-              <Text variant="bold14" element="span" color={color ?? 'primary'}>
-                {title}
-              </Text>
-            </Stack>
-          </Tab>
-        )
-      })}
+      {sections.map(({ title, id, disabled, icon, color }) => (
+        <Tab
+          id={`tab_${id}`}
+          color={color}
+          onClick={() => onTabClick(id)}
+          key={id}
+          active={activeTabId === id}
+          disabled={disabled}
+          activeColor={color}
+        >
+          <Stack>
+            {icon}
+            <Text variant="bold14" element="span" color={color ?? 'primary'}>
+              {title}
+            </Text>
+          </Stack>
+        </Tab>
+      ))}
     </Tabs>
   )
 }

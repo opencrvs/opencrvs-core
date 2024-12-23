@@ -338,7 +338,7 @@ async function getWorkqueueData(
   const registrationLocationId =
     (userDetails && getUserLocation(userDetails).id) || ''
 
-  const scope = getScope(state)!
+  const scope = getScope(state)
   const reviewStatuses =
     scope && scope.includes(SCOPES.RECORD_REGISTER)
       ? [
