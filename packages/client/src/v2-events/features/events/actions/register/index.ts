@@ -9,22 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MongoMemoryServer } from 'mongodb-memory-server'
-export type { ProvidedContext } from 'vitest'
+import { Review } from './Review'
+import { Pages } from './Pages'
 
-declare module 'vitest' {
-  export interface ProvidedContext {
-    MONGO_URI: string
-  }
-}
-
-export default async function setup({ provide }: any) {
-  const mongod = await MongoMemoryServer.create()
-  const uri = mongod.getUri()
-
-  provide('MONGO_URI', uri)
-
-  return async () => {
-    await mongod.stop()
-  }
-}
+export { Review, Pages }
