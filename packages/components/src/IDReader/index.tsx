@@ -20,13 +20,22 @@ const StyledBox = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
 `
 
+const StyledStack = styled(Stack)`
+  width: 100%;
+
+  & > * {
+    flex: 1;
+  }
+`
 export const IDReader = (props: IDReaderProps) => {
   const { dividerLabel, manualInputInstructionLabel, children } = props
 
   return (
     <StyledBox>
       <Stack direction="column" alignItems="center" gap={0}>
-        {children}
+        <StyledStack direction="row" wrap>
+          {children}
+        </StyledStack>
         <Divider>
           <Text variant="reg18" element="p" align="center" color="grey500">
             {dividerLabel}

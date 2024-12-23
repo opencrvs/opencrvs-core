@@ -46,7 +46,6 @@ export const QRReader = (props: ScannableQRReader) => {
       <Button
         size="large"
         type="secondary"
-        fullWidth
         onClick={() => setScannerDialogOpen(true)}
       >
         <Icon name="QrCode" size="medium" />

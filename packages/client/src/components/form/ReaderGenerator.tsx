@@ -25,7 +25,6 @@ import {
   isReaderQR,
   isReaderRedirect
 } from '@client/forms/utils'
-import { Stack } from '@opencrvs/components'
 import {
   messages,
   tutorialMessages
@@ -50,7 +49,7 @@ export const ReaderGenerator = ({
 }: ReaderGeneratorProps) => {
   const intl = useIntl()
   return (
-    <Stack justifyContent="space-between">
+    <>
       {readers.map((reader) => {
         const { type } = reader
         if (isReaderQR(reader)) {
@@ -95,6 +94,6 @@ export const ReaderGenerator = ({
           )
         } else return null
       })}
-    </Stack>
+    </>
   )
 }
