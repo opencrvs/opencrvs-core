@@ -12,6 +12,8 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { FieldProps } from '@opencrvs/commons'
 
+export const INITIAL_PARAGRAPH_VALUE = ''
+
 export function Paragraph({ label }: FieldProps<'PARAGRAPH'>) {
   const intl = useIntl()
 
