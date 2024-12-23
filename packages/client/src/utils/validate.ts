@@ -10,11 +10,11 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-import {
-  IFormFieldValue,
-  IFormData,
-  IFormSectionData
-} from '@opencrvs/client/src/forms'
+// import {
+//   IFormFieldValue,
+//   IFormData,
+//   IFormSectionData
+// } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -24,10 +24,25 @@ import {
 import { validate as validateEmail } from 'email-validator'
 import XRegExp from 'xregexp'
 import { IOfflineData } from '@client/offline/reducer'
-import { getListOfLocations } from '@client/forms/utils'
 import _, { get } from 'lodash'
 import format, { convertAgeToDate } from '@client/utils/date-formatting'
 
+export function getListOfLocations(
+  resource: IOfflineData,
+  resourceType: Extract<
+    keyof IOfflineData,
+    'facilities' | 'locations' | 'offices'
+  >
+) {
+  return resource[resourceType]
+}
+
+// @TODO: Importing from forms breaks the tests. Basically the references are not resolved correctly
+// and @opencrvs/client/src/forms causes recursion in this branch.
+// https://github.com/vitest-dev/vitest/issues/546
+type IFormFieldValue = any
+type IFormData = any
+type IFormSectionData = any
 /**
  * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
  */

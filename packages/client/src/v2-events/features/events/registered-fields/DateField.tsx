@@ -9,20 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { useIntl } from 'react-intl'
+import { useController } from 'react-hook-form'
 import {
   InputField,
   DateField as DateFieldComponent
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
-import { useIntl } from 'react-intl'
-import { useController } from 'react-hook-form'
 
-export const DateField = ({
+export function DateField({
   id,
   label,
   options = {},
   required
-}: FieldProps<'DATE'>) => {
+}: FieldProps<'DATE'>) {
   const intl = useIntl()
   const {
     field,
@@ -34,17 +34,17 @@ export const DateField = ({
 
   return (
     <InputField
-      id={id}
-      touched={isTouched}
-      label={intl.formatMessage(label)}
       error={error?.message}
+      id={id}
+      label={intl.formatMessage(label)}
+      touched={isTouched}
     >
       <DateFieldComponent
         id={id}
         notice={options.notice && intl.formatMessage(options.notice)}
-        onChange={(val) => field.onChange(val)}
         value={field.value}
         onBlur={field.onBlur}
+        onChange={(val) => field.onChange(val)}
       />
     </InputField>
   )

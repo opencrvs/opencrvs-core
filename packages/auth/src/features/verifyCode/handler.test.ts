@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import {
   DEFAULT_ROLES_DEFINITION,
@@ -16,9 +17,10 @@ import {
 import * as fetchMock from 'jest-fetch-mock'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
 describe('authenticate handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createProductionEnvironmentServer()
@@ -51,25 +53,31 @@ describe('authenticate handler receives a request', () => {
         email: 'test@test.org'
       })
 
-      const authRes = await server.server.inject({
-        method: 'POST',
-        url: '/authenticate',
-        payload: {
-          username: '+345345343',
-          password: '2r23432'
-        }
-      })
+      const authRes: { result?: AuthenticateResponse } =
+        await server.server.inject({
+          method: 'POST',
+          url: '/authenticate',
+          payload: {
+            username: '+345345343',
+            password: '2r23432'
+          }
+        })
       const authCode = codeSpy.mock.calls[0][0]
-      const res = await server.server.inject({
+
+      expect(authRes.result).toBeDefined()
+
+      const res: { result?: { token: string } } = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
-          nonce: authRes.result.nonce,
+          nonce: authRes.result!.nonce,
           code: authCode
         }
       })
-      expect(res.result.token.split('.')).toHaveLength(3)
-      const [, payload] = res.result.token.split('.')
+
+      expect(res.result).toBeDefined()
+      expect(res.result!.token.split('.')).toHaveLength(3)
+      const [, payload] = res.result!.token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
       expect(body.scope).toEqual([
         SCOPES.SYSADMIN,
@@ -95,20 +103,24 @@ describe('authenticate handler receives a request', () => {
         status: 'active',
         mobile: '+345345343'
       })
-      const authRes = await server.server.inject({
-        method: 'POST',
-        url: '/authenticate',
-        payload: {
-          mobile: '+345345343',
-          password: '2r23432'
-        }
-      })
+      const authRes: { result?: AuthenticateResponse } =
+        await server.server.inject({
+          method: 'POST',
+          url: '/authenticate',
+          payload: {
+            mobile: '+345345343',
+            password: '2r23432'
+          }
+        })
       const badCode = '1'
+
+      expect(authRes.result).toBeDefined()
+
       const res = await server.server.inject({
         method: 'POST',
         url: '/verifyCode',
         payload: {
-          nonce: authRes.result.nonce,
+          nonce: authRes.result!.nonce,
           code: badCode
         }
       })

@@ -23,13 +23,13 @@ import {
   mockUserResponse,
   REGISTRAR_DEFAULT_SCOPES,
   resizeWindow,
-  setScopes
+  setScopes,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { ReadyToPrint } from './ReadyToPrint'
@@ -39,6 +39,8 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
@@ -234,7 +236,7 @@ storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
 describe('RegistrarHome ready to print tab related tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const client = createClient(store)
 
   beforeAll(async () => {
@@ -325,7 +327,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       ]
     }
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{
@@ -335,7 +337,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const element = await waitForElement(testComponent, Workqueue)
@@ -355,14 +357,14 @@ describe('RegistrarHome ready to print tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{
           data: { totalItems: 0, results: [] }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -373,7 +375,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
   it('should show pagination bar if items are more than 11 in ready for print tab', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ReadyToPrint
         queryData={{
           data: { totalItems: 24, results: [] }
@@ -384,7 +386,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         loading={false}
         error={false}
       />,
-      { store, history }
+      { store }
     )
 
     const element = await waitForElement(testComponent, '#pagination_container')
@@ -402,14 +404,14 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   describe('When a row is clicked', () => {
     it('renders expanded area for ready to print', async () => {
-      const testComponent = await createTestComponent(
+      const { component: testComponent, router } = await createTestComponent(
         // @ts-ignore
         <ReadyToPrint
           queryData={{
             data: mockPrintTabData
           }}
         />,
-        { store, history }
+        { store }
       )
 
       // wait for mocked data to load mockedProvider
@@ -422,15 +424,15 @@ describe('RegistrarHome ready to print tab related tests', () => {
       await waitForElement(testComponent, '#name_0')
       testComponent.update()
 
-      expect(window.location.href).toContain(
+      expect(router.state.location.pathname).toContain(
         '/record-audit/printTab/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
   })
 
   describe('handles download status', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: ReactWrapper<{}, {}>
+    let testComponent: TestComponentWithRouteMock
+
     beforeEach(async () => {
       Date.now = vi.fn(() => 1554055200000)
       mockListSyncController
@@ -700,39 +702,44 @@ describe('RegistrarHome ready to print tab related tests', () => {
         })
       client.query = mockListSyncController
 
-      createdTestComponent = await createTestComponent(
-        // @ts-ignore
-        <OfficeHome match={{ params: { tabId: 'print' } }} />,
-        { store, history, apolloClient: client }
-      )
-      testComponent = createdTestComponent
+      testComponent = await createTestComponent(<OfficeHome />, {
+        store,
+        apolloClient: client,
+        path: REGISTRAR_HOME_TAB,
+        initialEntries: [formatUrl(REGISTRAR_HOME_TAB, { tabId: 'print' })]
+      })
     })
 
     it('downloads declaration after clicking download button', async () => {
+      testComponent.component.update()
       const downloadButton = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
+      expect(
+        testComponent.component.find('#assignment').hostNodes()
+      ).toHaveLength(1)
 
-      testComponent.find('#assign').hostNodes().simulate('click')
+      testComponent.component.find('#assign').hostNodes().simulate('click')
 
       const action = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-Print'
       )
+
       action.hostNodes().simulate('click')
 
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
-      expect(history.location.pathname).toBe(
+
+      testComponent.component.update()
+      expect(testComponent.router.state.location.pathname).toBe(
         '/cert/collector/956281c9-1f47-4c26-948a-970dd23c4094/death/certCollector'
       )
     })
@@ -746,10 +753,10 @@ describe('RegistrarHome ready to print tab related tests', () => {
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
 
-      testComponent.update()
+      testComponent.component.update()
 
       const errorIcon = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-1-icon-failed'
       )
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -758,7 +765,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 })
 
 describe('Tablet tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
@@ -772,14 +779,14 @@ describe('Tablet tests', () => {
   it('redirects to recordAudit page if item is clicked', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       // @ts-ignore
       <ReadyToPrint
         queryData={{
           data: mockPrintTabData
         }}
       />,
-      { store, history }
+      { store }
     )
 
     testComponent.update()
@@ -791,7 +798,7 @@ describe('Tablet tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/printTab/956281c9-1f47-4c26-948a-970dd23c4094'
     )
   })

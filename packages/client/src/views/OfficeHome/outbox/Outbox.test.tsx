@@ -43,12 +43,16 @@ describe('outbox component tests', () => {
     React.Component<{}, {}, any>
   >
   let store: AppStore
-  let history
+
   beforeAll(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
-    testComponent = await createTestComponent(<Outbox />, { store, history })
+
+    const { component } = await createTestComponent(<Outbox />, {
+      store
+    })
+
+    testComponent = component
   })
 
   describe('when there is no data', () => {

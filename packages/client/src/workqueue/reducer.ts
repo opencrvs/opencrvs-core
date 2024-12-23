@@ -25,10 +25,7 @@ import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { getUserLocation, UserDetails } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import type {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet
-} from '@client/utils/gateway-deprecated-do-not-use'
+import type { GQLEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -41,20 +38,10 @@ import {
   getCurrentUserWorkqueueFailed,
   GET_WORKQUEUE_SUCCESS,
   UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
-  UPDATE_WORKQUEUE_PAGINATION
+  UPDATE_WORKQUEUE_PAGINATION,
+  IQueryData
 } from './actions'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
-
-export interface IQueryData {
-  inProgressTab: GQLEventSearchResultSet
-  notificationTab: GQLEventSearchResultSet
-  reviewTab: GQLEventSearchResultSet
-  rejectTab: GQLEventSearchResultSet
-  approvalTab: GQLEventSearchResultSet
-  printTab: GQLEventSearchResultSet
-  issueTab: GQLEventSearchResultSet
-  externalValidationTab: GQLEventSearchResultSet
-}
 
 export const EVENT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -78,7 +65,7 @@ export interface WorkqueueState {
   pagination: Record<keyof IQueryData, number>
 }
 
-export const workqueueInitialState: WorkqueueState = {
+const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,

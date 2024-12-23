@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  goToDeclarationRecordAudit,
-  goToPrintCertificate
-} from '@client/navigation'
+import { formatUrl, generatePrintCertificateUrl } from '@client/navigation'
 import { transformData } from '@client/search/transformer'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -62,11 +59,12 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { RegStatus } from '@client/utils/gateway'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { useState } from 'react'
+import * as routes from '@client/navigation/routes'
+import { useNavigate } from 'react-router-dom'
 
 interface IBasePrintTabProps {
   theme: ITheme
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
   outboxDeclarations: IDeclaration[]
   queryData: {
@@ -82,6 +80,7 @@ interface IBasePrintTabProps {
 type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
 
 function ReadyToPrintComponent(props: IPrintTabProps) {
+  const navigate = useNavigate()
   const { width } = useWindowSize()
   const [sortedCol, setSortedCol] = useState(COLUMNS.REGISTERED)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
@@ -175,9 +174,12 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
             e && e.stopPropagation()
             if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               props.clearCorrectionAndPrintChanges(reg.id)
-              props.goToPrintCertificate(
-                reg.id,
-                reg.event.toLocaleLowerCase() || ''
+
+              navigate(
+                generatePrintCertificateUrl({
+                  registrationId: reg.id,
+                  event: reg.event.toLocaleLowerCase() || ''
+                })
               )
             }
           }
@@ -217,14 +219,28 @@ function ReadyToPrintComponent(props: IPrintTabProps) {
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('printTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'printTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {reg.name}
         </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
-          onClick={() => props.goToDeclarationRecordAudit('printTab', reg.id)}
+          onClick={() =>
+            navigate(
+              formatUrl(routes.DECLARATION_RECORD_AUDIT, {
+                tab: 'printTab',
+                declarationId: reg.id
+              })
+            )
+          }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
@@ -302,7 +318,5 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const ReadyToPrint = connect(mapStateToProps, {
-  goToPrintCertificate,
-  goToDeclarationRecordAudit,
   clearCorrectionAndPrintChanges
 })(injectIntl(withTheme(ReadyToPrintComponent)))

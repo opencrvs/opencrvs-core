@@ -20,15 +20,8 @@ import {
   Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect, useDispatch } from 'react-redux'
-import { RouteComponentProps, Redirect, useParams } from 'react-router-dom'
-import {
-  goToHomeTab,
-  goToPage,
-  goToCertificateCorrection,
-  goToPrintCertificate,
-  goToUserProfile,
-  goToTeamUserList
-} from '@client/navigation'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import {
   injectIntl,
   IntlShape,
@@ -76,7 +69,6 @@ import {
 } from '@client/utils/gateway'
 import { get } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
-import { goBack } from 'connected-react-router'
 import {
   IDeclarationData,
   getGQLDeclaration,
@@ -105,6 +97,10 @@ import { client } from '@client/utils/apolloClient'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { ActionMenu } from './ActionMenu'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -142,9 +138,9 @@ interface IStateProps {
   language: string
   resources: IOfflineData
   scope: Scope[]
-  declarationId: string
+  declarationId?: string
   draft: IDeclaration | null
-  tab: IRecordAuditTabs
+  tab?: IRecordAuditTabs
   workqueueDeclaration: GQLEventSearchSet | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
@@ -154,21 +150,19 @@ interface IStateProps {
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
   clearCorrectionAndPrintChanges: typeof clearCorrectionAndPrintChanges
-  goToCertificateCorrection: typeof goToCertificateCorrection
-  goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToHomeTab: typeof goToHomeTab
-  goToUserProfile: typeof goToUserProfile
-  goToTeamUserList: typeof goToTeamUserList
-  goBack: typeof goBack
 }
 
-export type IRecordAuditTabs = keyof IQueryData | 'search'
+type IRecordAuditTabs = keyof IQueryData | 'search'
 
 type RouteProps = RouteComponentProps<{
-  tab: IRecordAuditTabs
-  declarationId: string
+  tab?: IRecordAuditTabs
+  declarationId?: string
 }>
+
+type ValidatedProps = Omit<IFullProps, 'declarationId' | 'tab'> & {
+  declarationId: string
+  tab: IRecordAuditTabs
+}
 
 type IFullProps = IDispatchProps & IStateProps & IntlShapeProps & RouteProps
 
@@ -201,7 +195,7 @@ function ReinstateButton({
   const declaration = useDeclaration(declarationId)
 
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
 
   /* TODO: handle error */
@@ -252,13 +246,9 @@ function RecordAuditBody({
   draft,
   duplicates,
   intl,
-  goToHomeTab,
   refetchDeclarationInfo,
   userDetails,
   registerForm,
-  goToUserProfile,
-  goToTeamUserList,
-  goBack,
   offlineData,
   reviewForm
 }: {
@@ -274,6 +264,7 @@ function RecordAuditBody({
   tab: IRecordAuditTabs
   reviewForm: IReviewFormState
 } & IDispatchProps) {
+  const navigate = useNavigate()
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
@@ -358,7 +349,7 @@ function RecordAuditBody({
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
     mobileLeft: [
       <BackButtonDiv key="go-back">
-        <BackButton onClick={() => goBack()}>
+        <BackButton onClick={() => navigate(-1)}>
           <BackArrow />
         </BackButton>
       </BackButtonDiv>
@@ -421,8 +412,6 @@ function RecordAuditBody({
           intl={intl}
           draft={draft}
           userDetails={userDetails}
-          goToUserProfile={goToUserProfile}
-          goToTeamUserList={goToTeamUserList}
           toggleActionDetails={toggleActionDetails}
         />
       </Content>
@@ -463,7 +452,12 @@ function RecordAuditBody({
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
-                goToHomeTab(WORKQUEUE_TABS.readyForReview)
+
+                navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.readyForReview
+                  })
+                )
               }}
             >
               {intl.formatMessage(buttonMessages.archive)}
@@ -493,9 +487,8 @@ const BodyContent = ({
   tab,
   userDetails,
   workqueueDeclaration,
-  goBack,
   ...actionProps
-}: IFullProps) => {
+}: ValidatedProps) => {
   const [isErrorDismissed, setIsErrorDismissed] = React.useState(false)
   if (
     tab === 'search' ||
@@ -566,7 +559,6 @@ const BodyContent = ({
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
-                goBack={goBack}
               />
             )
           }}
@@ -614,13 +606,16 @@ const BodyContent = ({
         intl={intl}
         scope={scope}
         userDetails={userDetails}
-        goBack={goBack}
       />
     )
   }
 }
 
 const RecordAuditComp = (props: IFullProps) => {
+  if (!props.declarationId || !props.tab) {
+    return null
+  }
+
   return (
     <Frame
       header={<DesktopHeader />}
@@ -631,15 +626,16 @@ const RecordAuditComp = (props: IFullProps) => {
         constantsMessages.skipToMainContent
       )}
     >
-      <BodyContent {...props} />
+      <BodyContent {...(props as ValidatedProps)} />
     </Frame>
   )
 }
 
 function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
-  const { declarationId, tab } = props.match.params
+  const { declarationId, tab } = props.router.match.params
+
   return {
-    declarationId,
+    declarationId: props.router.match.params.declarationId,
     draft:
       state.declarationsState.declarations.find(
         (declaration) => declaration.id === declarationId
@@ -647,33 +643,28 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     language: getLanguage(state),
     resources: getOfflineData(state),
     scope: getScope(state)!,
-    tab,
+    tab: tab as IRecordAuditTabs,
     userDetails: state.profile.userDetails,
     registerForm: state.registerForm,
     offlineData: state.offline.offlineData,
     workqueueDeclaration:
+      // @TODO: when taking typed routes into use, parse parameters and correct types
       (tab !== 'search' &&
+        // @ts-ignore
         state.workqueueState.workqueue.data[tab]?.results?.find(
-          (gqlSearchSet) => gqlSearchSet?.id === declarationId
+          (gqlSearchSet: any) => gqlSearchSet?.id === declarationId
         )) ||
       null,
     reviewForm: state.reviewForm
   }
 }
 
-export const RecordAudit = connect<
-  IStateProps,
-  IDispatchProps,
-  RouteProps,
-  IStoreState
->(mapStateToProps, {
-  archiveDeclaration,
-  clearCorrectionAndPrintChanges,
-  goToCertificateCorrection,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab,
-  goToUserProfile,
-  goToTeamUserList,
-  goBack
-})(injectIntl(RecordAuditComp))
+export const RecordAudit = withRouter(
+  connect<IStateProps, IDispatchProps, RouteProps, IStoreState>(
+    mapStateToProps,
+    {
+      archiveDeclaration,
+      clearCorrectionAndPrintChanges
+    }
+  )(injectIntl(RecordAuditComp))
+)

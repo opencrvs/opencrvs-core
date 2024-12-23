@@ -21,7 +21,8 @@ import {
   flushPromises,
   userDetails,
   mockOfflineData,
-  setScopes
+  setScopes,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
@@ -51,23 +52,22 @@ import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
 import { vi } from 'vitest'
 import { createClient } from '@client/utils/apolloClient'
 import { ApolloClient } from '@apollo/client'
+import { formatUrl } from '@client/navigation'
+import { createMemoryRouter } from 'react-router-dom'
 
 describe('when user is in the register form for birth event', () => {
-  let component: ReactWrapper<{}, {}>
+  let component: TestComponentWithRouteMock
 
   let store: AppStore
-  let history: History
   let client: ApolloClient<{}>
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
       const storeContext = await createTestStore()
       store = storeContext.store
-      history = storeContext.history
       client = createClient(store)
 
       const draft = createDeclaration(EventType.Birth)
@@ -75,29 +75,26 @@ describe('when user is in the register form for birth event', () => {
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(draft))
 
-      const mock: any = vi.fn()
       const form = await getRegisterFormFromStore(store, EventType.Birth)
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
           registerForm={form}
           declaration={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          apolloClient: client,
+          path: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
+          initialEntries: [
+            formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP, {
               declarationId: draft.id,
               pageId: 'mother',
               groupId: 'mother-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, apolloClient: client }
+            })
+          ]
+        }
       )
       component = testComponent
     })
@@ -106,27 +103,37 @@ describe('when user is in the register form for birth event', () => {
         () =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NjMyNTYyNDIsImV4cCI6MTU2Mzg2MTA0MiwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkMWM1YTJhNTgxNjM0MDBlZjFkMDEyOSJ9.hZu0em2JA0sl-5uzck4mn4HfYdzxSmgoERA8SbWRPXEmriSYjs4PEPk9StXF_Ed5kd53VlNF9xf39DDGWqyyn76gpcMPbHJAL8nqLV82hot8fgU1WtEk865U8-9oAxaVmxAsjpHayiuD6zfKuR-ixrLFdoRKP13LdORktFCQe5e7To2w7vXArjUb6SDpSHST4Fbkhg8vzOcykweSGiNlmoEVtLzkpamS6fcTGRHkNpb_Wk_AQW9TAdw6NqG5lDEAO10auNgJpKxO8X-DQKhvEfY5TbpblR51L_U8pUXpDCAvGegMLnwmfAIoH1hMj--Wd2JhqgUvj0YrlDKI99fntA'
       )
-      component.update()
+      component.component.update()
 
-      component.find('#save-exit-btn').hostNodes().simulate('click')
-      component.update()
-      component.find('#confirm_save_exit').hostNodes().simulate('click')
-      component.update()
+      component.component.find('#save-exit-btn').hostNodes().simulate('click')
+      component.component.update()
+      component.component
+        .find('#confirm_save_exit')
+        .hostNodes()
+        .simulate('click')
+      component.component.update()
       await flushPromises()
-      expect(history.location.pathname).toEqual('/registration-home/progress/')
+      expect(component.router.state.location.pathname).toEqual(
+        '/registration-home/progress/'
+      )
     })
     it('takes registrar to declaration submitted page when save button is clicked', async () => {
       localStorage.getItem = vi.fn(
         () =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzOTcyOTQ0LCJleHAiOjE1NjQ1Nzc3NDQsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.VrH31goeitKvLHQchy5HQJkQWjhK-cWisxSgQUXChK4MZQis9Ufzn7dWK3s2s0dSpnFqk-0Yj5cVlq7JgQVcniO26WhnSyXHYQk7DG-TSA5FXGYoKMhjMZCh5qOZTRaVI6yvnEsLKTYeNvkXKJ2wb6M9U5OWjUh1KGPexd9mSjUsUwZ5BDTvI0WjnBTgQ_a0-KhxjjypT8Y_VXiiY-KWLxuOpVGalv3P3nbH8dAUzEuzKsrq6q0MJsaJkgDliaz2pZd10JxnJE1VYUob2SNHFnmJnz8Llwe1lH4xa8rluIA6YBmxdkrU2VkhCBPD6VxGYRHrD3LKRa3Cgm1X0qNQTw'
       )
-      component.find('#save-exit-btn').hostNodes().simulate('click')
-      component.update()
-      component.find('#confirm_save_exit').hostNodes().simulate('click')
-      component.update()
+      component.component.find('#save-exit-btn').hostNodes().simulate('click')
+      component.component.update()
+      component.component
+        .find('#confirm_save_exit')
+        .hostNodes()
+        .simulate('click')
+      component.component.update()
       await flushPromises()
       expect(
-        history.location.pathname.includes('/registration-home/progress')
+        component.router.state.location.pathname.includes(
+          '/registration-home/progress'
+        )
       ).toBeTruthy()
     })
   })
@@ -137,13 +144,11 @@ describe('when user is in the register form for death event', () => {
 
   let form: IForm
   let store: AppStore
-  let history: History
   let draft: ReturnType<typeof createDeclaration>
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
 
     draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
@@ -157,28 +162,24 @@ describe('when user is in the register form for death event', () => {
       // TODO: need to check if causeOfDeathNotice is needed or not
       // clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      const mock: any = vi.fn()
-      const testComponent = await createTestComponent(
-        // @ts-ignore
+      // const mock: any = vi.fn()
+      const { component: testComponent } = await createTestComponent(
         <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
           registerForm={clonedForm}
           declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          path: DRAFT_DEATH_FORM_PAGE,
+          initialEntries: [
+            formatUrl(DRAFT_DEATH_FORM_PAGE, {
               declarationId: draft.id,
               pageId: 'deathEvent',
               groupId: 'death-event-details'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
       component = testComponent
     })
@@ -196,13 +197,12 @@ describe('when user is in the register form for marriage event', () => {
 
   let form: IForm
   let store: AppStore
-  let history: History
+
   let draft: ReturnType<typeof createDeclaration>
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
 
     draft = createDeclaration(EventType.Marriage)
     store.dispatch(setInitialDeclarations())
@@ -215,28 +215,24 @@ describe('when user is in the register form for marriage event', () => {
       const clonedForm = cloneDeep(form)
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      const mock: any = vi.fn()
-      const testComponent = await createTestComponent(
-        // @ts-ignore
+
+      const { component: testComponent } = await createTestComponent(
         <RegisterForm
-          location={mock}
-          history={history}
-          staticContext={mock}
           registerForm={clonedForm}
           declaration={draft}
           pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          path: DRAFT_MARRIAGE_FORM_PAGE,
+          initialEntries: [
+            formatUrl(DRAFT_MARRIAGE_FORM_PAGE, {
               declarationId: draft.id,
               pageId: 'marriageEvent',
               groupId: 'marriage-event-details'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
       component = testComponent
     })
@@ -250,16 +246,15 @@ describe('when user is in the register form for marriage event', () => {
 })
 
 describe('when user is in the register form preview section and has the submit complete scope', () => {
-  let component: ReactWrapper<{}, {}>
+  let component: TestComponentWithRouteMock
   let store: AppStore
-  let history: History
+
   const mock = vi.fn()
 
   beforeEach(async () => {
     mock.mockReset()
     const storeContext = await createTestStore()
     store = storeContext.store
-    history = storeContext.history
 
     const draft = createDeclaration(EventType.Birth)
     draft.data = {
@@ -289,38 +284,41 @@ describe('when user is in the register form preview section and has the submit c
 
     const form = await getRegisterFormFromStore(store, EventType.Birth)
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <RegisterForm
-        history={history}
         registerForm={form}
         declaration={draft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-        match={{
-          params: {
+      />,
+      {
+        store,
+        path: DRAFT_BIRTH_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE, {
             declarationId: draft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
     component = testComponent
   })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
     expect(
-      component.find('#submit_incomplete').hostNodes().prop('disabled')
+      component.component
+        .find('#submit_incomplete')
+        .hostNodes()
+        .prop('disabled')
     ).toBe(false)
   })
 
   it('Displays submit confirm modal when submit button is clicked', () => {
-    component.find('#submit_incomplete').hostNodes().simulate('click')
+    component.component.find('#submit_incomplete').hostNodes().simulate('click')
 
-    expect(component.find('#submit_confirm').hostNodes()).toHaveLength(1)
+    expect(
+      component.component.find('#submit_confirm').hostNodes()
+    ).toHaveLength(1)
   })
 
   describe('User in the Preview section for submitting the Form and has the submit for review scope', () => {
@@ -338,50 +336,59 @@ describe('when user is in the register form preview section and has the submit c
 
       const nform = getRegisterForm(store.getState())[EventType.Birth]
       const nTestComponent = await createTestComponent(
-        // @ts-ignore
         <RegisterForm
-          history={history}
           registerForm={nform}
           declaration={nDeclaration}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-          match={{
-            params: {
+        />,
+        {
+          store,
+          path: DRAFT_BIRTH_PARENT_FORM_PAGE,
+          initialEntries: [
+            formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE, {
               declarationId: nDeclaration.id,
               pageId: 'preview',
               groupId: 'preview-view-group'
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history }
+            })
+          ]
+        }
       )
       component = nTestComponent
     })
 
     it('should be able to submit the form', () => {
-      component.find('#submit_for_review').hostNodes().simulate('click')
-      component.update()
+      component.component
+        .find('#submit_for_review')
+        .hostNodes()
+        .simulate('click')
 
-      const cancelBtn = component.find('#cancel-btn').hostNodes()
+      component.component.update()
+
+      const cancelBtn = component.component.find('#cancel-btn').hostNodes()
       expect(cancelBtn.length).toEqual(1)
 
       cancelBtn.simulate('click')
-      component.update()
+      component.component.update()
 
-      expect(component.find('#submit_confirm').hostNodes().length).toEqual(0)
-      expect(component.find('#submit_for_review').hostNodes().length).toEqual(1)
+      expect(
+        component.component.find('#submit_confirm').hostNodes().length
+      ).toEqual(0)
+      expect(
+        component.component.find('#submit_for_review').hostNodes().length
+      ).toEqual(1)
 
-      component.find('#submit_for_review').hostNodes().simulate('click')
-      component.update()
+      component.component
+        .find('#submit_for_review')
+        .hostNodes()
+        .simulate('click')
+      component.component.update()
 
-      const confirmBtn = component.find('#submit_confirm').hostNodes()
+      const confirmBtn = component.component.find('#submit_confirm').hostNodes()
       expect(confirmBtn.length).toEqual(1)
 
       confirmBtn.simulate('click')
-      component.update()
-      expect(history.location.pathname).toBe(HOME)
+      component.component.update()
+      expect(component.router.state.location.pathname).toBe(HOME)
     })
   })
 })
@@ -389,7 +396,7 @@ describe('when user is in the register form preview section and has the submit c
 describe('when user is in the register form review section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
     // @ts-ignore
     const declaration = createReviewDeclaration(
       uuid(),
@@ -399,31 +406,26 @@ describe('when user is in the register form review section', () => {
     setScopes([SCOPES.RECORD_REGISTER, SCOPES.RECORD_SUBMIT_FOR_UPDATES], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
+    const { component: testComponent } = await createTestComponent(
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={form}
         declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
+      />,
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId: declaration.id,
             pageId: 'review',
             groupId: 'review-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
     component = testComponent
   })
@@ -440,8 +442,9 @@ describe('when user is in the register form review section', () => {
 
 describe('when user is in the register form from review edit', () => {
   let component: ReactWrapper<{}, {}>
+  let router: ReturnType<typeof createMemoryRouter>
   beforeEach(async () => {
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
     // @ts-ignore
     const declaration = createReviewDeclaration(
       uuid(),
@@ -451,33 +454,31 @@ describe('when user is in the register form from review edit', () => {
     setScopes([SCOPES.RECORD_REGISTER], store)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
-        registerForm={form}
-        declaration={declaration}
-        pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
-            declarationId: declaration.id,
-            pageId: 'mother',
-            groupId: 'mother-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
-    )
+    const { component: testComponent, router: testRouter } =
+      await createTestComponent(
+        <RegisterForm
+          registerForm={form}
+          declaration={declaration}
+          pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
+        />,
+        {
+          store,
+          path: REVIEW_EVENT_PARENT_FORM_PAGE,
+          initialEntries: [
+            '/',
+            formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
+              declarationId: declaration.id,
+              pageId: 'mother',
+              groupId: 'mother-view-group'
+            })
+          ]
+        }
+      )
     component = testComponent
+    router = testRouter
   })
 
   it('should redirect to review page when back button is clicked', async () => {
@@ -485,7 +486,7 @@ describe('when user is in the register form from review edit', () => {
     backButton.hostNodes().simulate('click')
     component.update()
     await flushPromises()
-    expect(window.location.href).toContain('/review')
+    expect(router.state.location.pathname).toContain('/review')
   })
 })
 
@@ -494,7 +495,7 @@ describe('when user is in the register form from sent for review edit', () => {
   let testAppStore: AppStore
   beforeEach(async () => {
     Date.now = vi.fn(() => 1582525224324)
-    const { store, history } = await createTestStore()
+    const { store } = await createTestStore()
     // @ts-ignore
     const declaration = createReviewDeclaration(
       uuid(),
@@ -505,31 +506,26 @@ describe('when user is in the register form from sent for review edit', () => {
 
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = vi.fn()
 
     const form = await getReviewFormFromStore(store, EventType.Birth)
 
-    const testComponent = await createTestComponent(
-      // @ts-ignore
+    const { component: testComponent } = await createTestComponent(
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={form}
         declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
-        match={{
-          params: {
+      />,
+      {
+        store,
+        path: REVIEW_EVENT_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(REVIEW_EVENT_PARENT_FORM_PAGE, {
             declarationId: declaration.id,
             pageId: 'mother',
             groupId: 'mother-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
     component = testComponent
     testAppStore = store
@@ -579,17 +575,13 @@ describe('when user is in the register form from sent for review edit', () => {
 
 describe('When user is in Preview section death event', () => {
   let store: AppStore
-  let history: History
-  let component: ReactWrapper<{}, {}>
+  let component: TestComponentWithRouteMock
   let deathDraft: IDeclaration
   let deathForm: IForm
-
-  const mock: any = vi.fn()
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
 
     const draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
@@ -609,26 +601,22 @@ describe('When user is in Preview section death event', () => {
 
     deathForm = await getRegisterFormFromStore(store, EventType.Death)
     const nTestComponent = await createTestComponent(
-      // @ts-ignore
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={deathForm}
         declaration={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-        match={{
-          params: {
+      />,
+      {
+        store,
+        path: DRAFT_BIRTH_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE, {
             declarationId: deathDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
     component = nTestComponent
   })
@@ -658,15 +646,15 @@ describe('When user is in Preview section death event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component.find('#submit_incomplete').hostNodes().simulate('click')
+    component.component.find('#submit_incomplete').hostNodes().simulate('click')
 
-    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    const confirmBtn = component.component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
 
     confirmBtn.simulate('click')
-    component.update()
+    component.component.update()
 
-    expect(history.location.pathname).toBe(HOME)
+    expect(component.router.state.location.pathname).toBe(HOME)
   })
 
   it('Check if death location as hospital is parsed properly', () => {
@@ -724,17 +712,14 @@ describe('When user is in Preview section death event', () => {
 })
 
 describe('When user is in Preview section death event in offline mode', () => {
-  let component: ReactWrapper<{}, {}>
+  let component: TestComponentWithRouteMock
   let deathDraft
   let deathForm: IForm
   let store: AppStore
-  let history: History
-
-  const mock: any = vi.fn()
 
   beforeEach(async () => {
     const testStore = await createTestStore()
-    history = testStore.history
+
     store = testStore.store
 
     const draft = createDeclaration(EventType.Death)
@@ -761,56 +746,49 @@ describe('When user is in Preview section death event in offline mode', () => {
 
     deathForm = await getRegisterFormFromStore(store, EventType.Death)
     const nTestComponent = await createTestComponent(
-      // @ts-ignore
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={deathForm}
         declaration={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
-        match={{
-          params: {
+      />,
+      {
+        store,
+        path: DRAFT_BIRTH_PARENT_FORM_PAGE,
+        initialEntries: [
+          formatUrl(DRAFT_BIRTH_PARENT_FORM_PAGE, {
             declarationId: deathDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
     component = nTestComponent
   })
 
   it('Should be able to submit the form', async () => {
-    component.find('#submit_incomplete').hostNodes().simulate('click')
+    component.component.find('#submit_incomplete').hostNodes().simulate('click')
 
-    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    const confirmBtn = component.component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
 
     confirmBtn.simulate('click')
-    component.update()
+    component.component.update()
 
-    expect(history.location.pathname).toBe(HOME)
+    expect(component.router.state.location.pathname).toBe(HOME)
   })
 })
 
 describe('When user is in Preview section marriage event', () => {
   let store: AppStore
-  let history: History
-  let component: ReactWrapper<{}, {}>
+
+  let component: TestComponentWithRouteMock
   let marriageDraft
   let marriageForm: IForm
-
-  const mock: any = vi.fn()
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
-    history = testStore.history
 
     const draft = createDeclaration(EventType.Death)
     store.dispatch(setInitialDeclarations())
@@ -834,24 +812,21 @@ describe('When user is in Preview section marriage event', () => {
     const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
-        location={mock}
-        history={history}
-        staticContext={mock}
         registerForm={marriageForm}
         declaration={marriageDraft}
         pageRoute={DRAFT_MARRIAGE_FORM_PAGE}
-        match={{
-          params: {
+      />,
+      {
+        store,
+        path: DRAFT_MARRIAGE_FORM_PAGE,
+        initialEntries: [
+          formatUrl(DRAFT_MARRIAGE_FORM_PAGE, {
             declarationId: marriageDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
     component = nTestComponent
   })
@@ -881,14 +856,14 @@ describe('When user is in Preview section marriage event', () => {
   })
 
   it('Should be able to submit the form', () => {
-    component.find('#submit_incomplete').hostNodes().simulate('click')
+    component.component.find('#submit_incomplete').hostNodes().simulate('click')
 
-    const confirmBtn = component.find('#submit_confirm').hostNodes()
+    const confirmBtn = component.component.find('#submit_confirm').hostNodes()
     expect(confirmBtn.length).toEqual(1)
 
     confirmBtn.simulate('click')
-    component.update()
+    component.component.update()
 
-    expect(history.location.pathname).toBe(HOME)
+    expect(component.router.state.location.pathname).toBe(HOME)
   })
 })

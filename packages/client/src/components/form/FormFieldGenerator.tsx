@@ -29,7 +29,6 @@ import {
   getFieldType,
   getQueryData,
   getVisibleOptions,
-  getListOfLocations,
   getFieldHelperText,
   getDependentFields,
   evalExpressionInFieldDefinition,
@@ -115,7 +114,7 @@ import {
   FormikValues,
   Formik
 } from 'formik'
-import { IOfflineData, LocationType } from '@client/offline/reducer'
+import { IOfflineData } from '@client/offline/reducer'
 import { isEqual, flatten, cloneDeep, set } from 'lodash'
 import { SimpleDocumentUploader } from './DocumentUploadField/SimpleDocumentUploader'
 import { getOfflineData } from '@client/offline/selectors'
@@ -135,6 +134,7 @@ import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { RedirectField } from '@client/components/form/Redirect'
+import { getListOfLocations } from '@client/utils/validate'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;

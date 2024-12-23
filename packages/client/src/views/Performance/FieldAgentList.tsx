@@ -15,7 +15,6 @@ import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToFieldAgentList, goToPerformanceHome } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -27,19 +26,20 @@ import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
-import { parse } from 'query-string'
+import { parse, stringify } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { Avatar, EventType } from '@client/utils/gateway'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -78,14 +78,7 @@ interface IConnectProps {
   offlineOffices: { [key: string]: ILocation }
 }
 
-interface IDispatchProps {
-  goToPerformanceHome: typeof goToPerformanceHome
-  goToFieldAgentList: typeof goToFieldAgentList
-}
-type IProps = RouteComponentProps &
-  WrappedComponentProps &
-  IConnectProps &
-  IDispatchProps
+type IProps = WrappedComponentProps & IConnectProps
 
 export enum EVENT_OPTIONS {
   BIRTH = 'BIRTH',
@@ -153,17 +146,17 @@ function getAverageCompletionTimeComponent(
 }
 
 function FieldAgentListComponent(props: IProps) {
-  const {
-    intl,
-    location: { search },
-    offlineOffices
-  } = props
+  const { intl, offlineOffices } = props
+
+  const navigate = useNavigate()
+  const location = useLocation()
   const {
     event = EventType.Birth,
     locationId,
     timeStart,
     timeEnd
-  } = parse(search) as unknown as ISearchParams
+  } = parse(location.search) as unknown as ISearchParams
+
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
@@ -403,7 +396,14 @@ function FieldAgentListComponent(props: IProps) {
               selectedLocationId={locationId}
               disabled={true}
               onChangeLocation={(newLocationId) => {
-                props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
+                navigate({
+                  pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                  search: stringify({
+                    locationId: newLocationId,
+                    timeStart,
+                    timeEnd
+                  })
+                })
               }}
               locationFilter={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
@@ -419,12 +419,15 @@ function FieldAgentListComponent(props: IProps) {
             />
             <PerformanceSelect
               onChange={(option) => {
-                props.goToFieldAgentList(
-                  timeStart,
-                  timeEnd,
-                  locationId,
-                  option.value
-                )
+                navigate({
+                  pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                  search: stringify({
+                    locationId,
+                    timeStart,
+                    timeEnd,
+                    event: option.value
+                  })
+                })
               }}
               id="event-select"
               withLightTheme={true}
@@ -445,11 +448,14 @@ function FieldAgentListComponent(props: IProps) {
               startDate={dateStart}
               endDate={dateEnd}
               onDatesChange={({ startDate, endDate }) =>
-                props.goToFieldAgentList(
-                  startDate.toISOString(),
-                  endDate.toISOString(),
-                  locationId
-                )
+                navigate({
+                  pathname: routes.PERFORMANCE_FIELD_AGENT_LIST,
+                  search: stringify({
+                    locationId,
+                    timeStart: startDate.toISOString(),
+                    timeEnd: endDate.toISOString()
+                  })
+                })
               }
             />
             <PerformanceSelect
@@ -560,12 +566,9 @@ function FieldAgentListComponent(props: IProps) {
   )
 }
 
-export const FieldAgentList = connect(
-  (state: IStoreState) => {
-    const offlineOffices = getOfflineData(state).offices
-    return {
-      offlineOffices
-    }
-  },
-  { goToPerformanceHome, goToFieldAgentList }
-)(injectIntl(FieldAgentListComponent))
+export const FieldAgentList = connect((state: IStoreState) => {
+  const offlineOffices = getOfflineData(state).offices
+  return {
+    offlineOffices
+  }
+})(injectIntl(FieldAgentListComponent))

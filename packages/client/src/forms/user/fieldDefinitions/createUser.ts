@@ -28,6 +28,7 @@ function userSectionFormType(): ISerializedFormSection {
     groups: [
       {
         id: 'registration-office',
+        preventContinueIfError: true,
         title: userFormMessages.assignedRegistrationOffice,
         conditionals: [
           {

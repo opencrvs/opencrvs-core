@@ -10,9 +10,8 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useHistory } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { goBack, goForward } from '@client/navigation'
+import { useNavigate, useNavigationType } from 'react-router-dom'
+
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { useHomePage } from '@client/hooks/useHomePage'
 
@@ -21,8 +20,9 @@ export function HistoryNavigator({
 }: {
   hideForward?: boolean
 }) {
-  const history = useHistory()
-  const dispatch = useDispatch()
+  const navigationType = useNavigationType()
+  const navigate = useNavigate()
+
   const { isCurrentPageHome } = useHomePage()
 
   return (
@@ -32,10 +32,10 @@ export function HistoryNavigator({
         type="icon"
         size="medium"
         disabled={
-          (history.action === 'POP' || history.action === 'REPLACE') &&
+          (navigationType === 'POP' || navigationType === 'REPLACE') &&
           isCurrentPageHome
         }
-        onClick={() => dispatch(goBack())}
+        onClick={() => navigate(-1)}
       >
         <Icon name="ArrowLeft" />
       </Button>
@@ -43,8 +43,8 @@ export function HistoryNavigator({
         <Button
           type="icon"
           size="medium"
-          disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
-          onClick={() => dispatch(goForward())}
+          disabled={navigationType === 'PUSH' || navigationType === 'REPLACE'}
+          onClick={() => navigate(1)}
         >
           <Icon name="ArrowRight" />
         </Button>

@@ -155,7 +155,7 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: |
           cd ${{ matrix.package }}
-          if [[ "${{ matrix.package }}" == "packages/client" || "${{ matrix.package }}" == "packages/login" ]]; then
+          if [[ "${{ matrix.package }}" == "packages/client" ]]; then
             yarn test --coverage
           else
             yarn test

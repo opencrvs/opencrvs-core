@@ -8,6 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { offlineDataReady } from '@client/offline/actions'
+import { queries } from '@client/profile/queries'
+import { AppStore } from '@client/store'
 import {
   createTestComponent,
   createTestStore,
@@ -17,18 +20,14 @@ import {
   REGISTRAR_DEFAULT_SCOPES,
   setScopes
 } from '@client/tests/util'
-import { queries } from '@client/profile/queries'
 import { StatusWiseDeclarationCountView } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { AppStore } from '@client/store'
 import * as React from 'react'
 import type { GQLRegistrationCountResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { ReactWrapper } from 'enzyme'
 import * as locationUtils from '@client/utils/locationUtils'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { StatusMapping } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { EventType } from '@client/utils/gateway'
-import { History } from 'history'
-import { offlineDataReady } from '@client/offline/actions'
+import { StatusMapping } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { vi } from 'vitest'
 
 const mockFetchUserDetails = vi.fn()
@@ -38,11 +37,11 @@ queries.fetchUserDetails = mockFetchUserDetails
 describe('Status wise registration count', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
-  let history: History
+
   beforeEach(async () => {
     const storeContext = await createTestStore()
     store = storeContext.store
-    history = storeContext.history
+
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
@@ -63,7 +62,7 @@ describe('Status wise registration count', () => {
         ],
         total: 15
       }
-      component = await createTestComponent(
+      const { component: testComponent } = await createTestComponent(
         <StatusWiseDeclarationCountView
           selectedEvent={EventType.Birth}
           data={data}
@@ -71,8 +70,9 @@ describe('Status wise registration count', () => {
           statusMapping={StatusMapping}
           onClickStatusDetails={onClickStatusDetailsMock}
         />,
-        { store, history }
+        { store }
       )
+      component = testComponent
     })
     it('renders status count view with progress bars', async () => {
       expect(component.find('#declaration-statuses').hostNodes()).toHaveLength(

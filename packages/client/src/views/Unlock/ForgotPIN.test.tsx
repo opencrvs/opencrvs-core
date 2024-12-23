@@ -20,20 +20,18 @@ import { userQueries } from '@client/user/queries'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { History } from 'history'
 import { vi, Mock } from 'vitest'
 import { Status } from '@client/utils/gateway'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
   let store: AppStore
-  let history: History
   const goBackMock: Mock = vi.fn()
   const onVerifyPasswordMock = vi.fn()
   userQueries.verifyPasswordById = vi.fn()
 
   beforeAll(async () => {
-    ;({ store, history } = await createStore())
+    ;({ store } = await createStore())
 
     store.dispatch(
       setUserDetails({
@@ -85,10 +83,11 @@ describe('ForgotPIN tests', () => {
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <ForgotPIN goBack={goBackMock} onVerifyPassword={onVerifyPasswordMock} />,
-      { store, history }
+      { store }
     )
+    component = testComponent
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {

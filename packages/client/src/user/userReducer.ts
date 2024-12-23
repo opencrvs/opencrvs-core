@@ -20,7 +20,6 @@ import { deserializeForm } from '@client/forms/deserializer/deserializer'
 import { getCreateUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import { roleQueries } from '@client/forms/user/query/queries'
 import { validators } from '@client/forms/validators'
-import { goToTeamUserList } from '@client/navigation'
 import {
   ShowCreateUserDuplicateEmailErrorToast,
   ShowCreateUserErrorToast,
@@ -101,6 +100,7 @@ interface IUserFormDataSubmitAction {
     variables: { [key: string]: any }
     isUpdate: boolean
     officeLocationId: string
+    onSuccess: () => void
   }
 }
 
@@ -109,7 +109,8 @@ export function submitUserFormData(
   mutation: any,
   variables: { [key: string]: any },
   officeLocationId: string,
-  isUpdate = false
+  isUpdate = false,
+  onSuccess: () => void
 ): IUserFormDataSubmitAction {
   return {
     type: SUBMIT_USER_FORM_DATA,
@@ -118,7 +119,8 @@ export function submitUserFormData(
       mutation,
       variables,
       officeLocationId,
-      isUpdate
+      isUpdate,
+      onSuccess
     }
   }
 }
@@ -132,20 +134,20 @@ export function clearUserFormData() {
 interface ISubmitSuccessAction {
   type: typeof SUBMIT_USER_FORM_DATA_SUCCESS
   payload: {
-    locationId: string
     isUpdate: boolean
+    onSuccess: () => void
   }
 }
 
 function submitSuccess(
-  locationId: string,
-  isUpdate = false
+  isUpdate: boolean,
+  onSuccess: () => void
 ): ISubmitSuccessAction {
   return {
     type: SUBMIT_USER_FORM_DATA_SUCCESS,
     payload: {
-      locationId,
-      isUpdate
+      isUpdate,
+      onSuccess
     }
   }
 }
@@ -295,7 +297,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       }
 
     case SUBMIT_USER_FORM_DATA:
-      const { client, mutation, variables, officeLocationId, isUpdate } = (
+      const { client, mutation, variables, isUpdate } = (
         action as IUserFormDataSubmitAction
       ).payload
       const token = getToken()
@@ -314,7 +316,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
             }),
           {
             successActionCreator: () =>
-              submitSuccess(officeLocationId, isUpdate),
+              submitSuccess(isUpdate, action.payload.onSuccess),
             failActionCreator: submitFail
           }
         )
@@ -332,19 +334,19 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case SUBMIT_USER_FORM_DATA_SUCCESS:
       const list = Cmd.list<
         | ReturnType<typeof clearUserFormData>
-        | ReturnType<typeof goToTeamUserList>
         | ReturnType<typeof showSubmitFormSuccessToast>
       >([
-        Cmd.action(clearUserFormData()),
-        Cmd.action(goToTeamUserList(action.payload.locationId)),
         Cmd.action(
           showSubmitFormSuccessToast(
             action.payload.isUpdate
               ? TOAST_MESSAGES.UPDATE_SUCCESS
               : TOAST_MESSAGES.SUCCESS
           )
-        )
+        ),
+        Cmd.run(action.payload.onSuccess),
+        Cmd.action(clearUserFormData())
       ])
+
       return loop({ ...state, submitting: false, submissionError: false }, list)
 
     case SUBMIT_USER_FORM_DATA_FAIL:

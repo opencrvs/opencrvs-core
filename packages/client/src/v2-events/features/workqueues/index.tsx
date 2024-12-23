@@ -8,83 +8,31 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { push } from 'connected-react-router'
 
 import React from 'react'
 
-import { Debug } from '@client/v2-events/features/debug/debug'
-import { V2_EVENTS_ROUTE } from '@client/v2-events/routes'
+import { useNavigate } from 'react-router-dom'
+import { noop } from 'lodash'
 import {
   AppBar,
   Button,
-  Content,
-  ContentSize,
   Frame,
   Icon,
-  LeftNavigation,
-  NavigationGroup,
-  NavigationItem,
   SearchTool,
-  Stack,
-  Text
+  Stack
 } from '@opencrvs/components'
-import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
 import { Plus } from '@opencrvs/components/src/icons'
-import { useDispatch } from 'react-redux'
+import { ROUTES } from '@client/v2-events/routes'
+import { Debug } from '@client/v2-events/features/debug/debug'
 
-export const Workqueues = () => {
-  const dispatch = useDispatch()
+/**
+ * Basic frame for the workqueues. Includes the left navigation and the app bar.
+ */
+export function Workqueues({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate()
 
   return (
     <Frame
-      navigation={
-        <LeftNavigation
-          applicationName="OpenCRVS-TS (Tennis club)"
-          applicationVersion="0.1-alpha"
-        >
-          <NavigationGroup>
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'purple'} />}
-              label="In progress"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'orange'} />}
-              label="Ready for review"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'red'} />}
-              label="Requires updates"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'grey'} />}
-              label="Sent for approval"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'green'} />}
-              label="Ready to print"
-            />
-            <NavigationItem
-              icon={() => <DeclarationIconSmall color={'blue'} />}
-              label="Ready to issue"
-            />
-          </NavigationGroup>
-          <NavigationGroup>
-            <NavigationItem
-              icon={() => <Icon name="Buildings" size="medium" />}
-              label="Organisation"
-            />
-            <NavigationItem
-              icon={() => <Icon name="Users" size="medium" />}
-              label="Team"
-            />
-            <NavigationItem
-              icon={() => <Icon name="Activity" size="medium" />}
-              label="Performance"
-            />
-          </NavigationGroup>
-        </LeftNavigation>
-      }
-      skipToContentText="skip"
       header={
         <AppBar
           desktopCenter={
@@ -92,7 +40,7 @@ export const Workqueues = () => {
               <Button
                 type="iconPrimary"
                 onClick={() => {
-                  dispatch(push(V2_EVENTS_ROUTE))
+                  navigate(ROUTES.V2.EVENTS.CREATE.path)
                 }}
               >
                 <Plus />
@@ -100,6 +48,7 @@ export const Workqueues = () => {
 
               <SearchTool
                 language="en"
+                searchHandler={noop}
                 searchTypeList={[
                   {
                     name: 'TRACKING_ID',
@@ -108,18 +57,14 @@ export const Workqueues = () => {
                     placeHolderText: 'Search'
                   }
                 ]}
-                searchHandler={() => {}}
               />
             </Stack>
           }
         />
       }
+      skipToContentText="skip"
     >
-      <Content size={ContentSize.LARGE} title="Welcome">
-        <Text variant="h2" element="p">
-          🚧🚧🚧🚧🚧🚧🚧🚧👷‍♂️👷👷🏻👷🏻‍♀️👷‍♂️👷‍♂️🚧🚧🚧🚧🚧🚧🚧🚧
-        </Text>
-      </Content>
+      {children}
       <Debug />
     </Frame>
   )

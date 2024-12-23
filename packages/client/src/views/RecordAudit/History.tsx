@@ -40,6 +40,10 @@ import {
 } from './utils'
 import { useSelector } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
+import { useNavigate } from 'react-router-dom'
+import { formatUrl } from '@client/navigation'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -155,14 +159,13 @@ const getIndexByAction = (histories: any, index: number): number => {
 export const GetHistory = ({
   intl,
   draft,
-  goToUserProfile,
-  goToTeamUserList,
   toggleActionDetails,
   userDetails
 }: CMethodParams & {
   toggleActionDetails: (actionItem: History, index?: number) => void
-  goToUserProfile: (user: string) => void
 }) => {
+  const navigate = useNavigate()
+
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
   const { canReadUser, canAccessOffice } = usePermissions()
@@ -268,7 +271,13 @@ export const GetHistory = ({
           <Link
             id="profile-link"
             font="bold14"
-            onClick={() => goToUserProfile(String(item?.user?.id))}
+            onClick={() =>
+              navigate(
+                formatUrl(routes.USER_PROFILE, {
+                  userId: String(item?.user?.id)
+                })
+              )
+            }
           >
             <GetNameWithAvatar
               id={item?.user?.id as string}
@@ -299,7 +308,12 @@ export const GetHistory = ({
         <Link
           font="bold14"
           onClick={() => {
-            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
+            navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId: item?.office?.id as string
+              })
+            })
           }}
         >
           {item.office

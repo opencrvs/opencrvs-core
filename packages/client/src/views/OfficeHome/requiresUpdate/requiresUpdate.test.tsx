@@ -24,13 +24,14 @@ import {
   resizeWindow,
   REGISTRATION_AGENT_DEFAULT_SCOPES,
   setScopes,
-  REGISTRAR_DEFAULT_SCOPES
+  REGISTRAR_DEFAULT_SCOPES,
+  TestComponentWithRouteMock,
+  flushPromises
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { RequiresUpdate } from './RequiresUpdate'
@@ -42,6 +43,8 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
 import { vi } from 'vitest'
+import { formatUrl } from '@client/navigation'
+import { REGISTRAR_HOME_TAB_PAGE } from '@client/navigation/routes'
 
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
@@ -156,7 +159,7 @@ storage.getItem = vi.fn()
 storage.setItem = vi.fn()
 
 describe('OfficeHome sent for update tab related tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   const client = createClient(store)
 
   beforeAll(async () => {
@@ -168,7 +171,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const birthEventRejectedDate = '2019-10-20T11:03:20.660Z'
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -277,7 +280,7 @@ describe('OfficeHome sent for update tab related tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const table = await waitForElement(testComponent, Workqueue)
@@ -297,7 +300,7 @@ describe('OfficeHome sent for update tab related tests', () => {
   it('returns an empty array incase of invalid graphql query response', async () => {
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -307,7 +310,7 @@ describe('OfficeHome sent for update tab related tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const table = await waitForElement(testComponent, Workqueue)
@@ -317,8 +320,8 @@ describe('OfficeHome sent for update tab related tests', () => {
   })
 
   describe('handles download status', () => {
-    let testComponent: ReactWrapper<{}, {}>
-    let createdTestComponent: ReactWrapper<{}, {}>
+    let testComponent: TestComponentWithRouteMock
+    let createdTestComponent: TestComponentWithRouteMock
     beforeEach(async () => {
       const TIME_STAMP = '1544188309380'
       Date.now = vi.fn(() => 1554055200000)
@@ -410,17 +413,17 @@ describe('OfficeHome sent for update tab related tests', () => {
 
       createdTestComponent = await createTestComponent(
         // @ts-ignore
-        <OfficeHome
-          match={{
-            params: {
+        <OfficeHome />,
+        {
+          store,
+          apolloClient: client,
+          path: REGISTRAR_HOME_TAB_PAGE,
+          initialEntries: [
+            formatUrl(REGISTRAR_HOME_TAB_PAGE, {
               tabId: WORKQUEUE_TABS.requiresUpdate
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-        />,
-        { store, history, apolloClient: client }
+            })
+          ]
+        }
       )
       testComponent = createdTestComponent
       setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
@@ -428,19 +431,27 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     it('downloads the declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
 
-      testComponent.update()
+      testComponent.component.update()
 
-      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
-      testComponent.find('#assign').hostNodes().simulate('click')
+      expect(
+        testComponent.component.find('#assignment').hostNodes()
+      ).toHaveLength(1)
+      testComponent.component.find('#assign').hostNodes().simulate('click')
+
+      expect(
+        testComponent.component
+          .find('#action-loading-ListItemAction-0')
+          .hostNodes()
+      )
 
       const action = await waitForElement(
-        testComponent,
+        testComponent.component,
         '#ListItemAction-0-Update'
       )
       action.hostNodes().simulate('click')
@@ -448,8 +459,9 @@ describe('OfficeHome sent for update tab related tests', () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      testComponent.update()
-      expect(history.location.pathname).toBe(
+      testComponent.component.update()
+
+      expect(testComponent.router.state.location.pathname).toBe(
         '/reviews/9a55d213-ad9f-4dcd-9418-340f3a7f6269/events/birth/parent/review'
       )
     })
@@ -462,16 +474,18 @@ describe('OfficeHome sent for update tab related tests', () => {
       )
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
-      testComponent.update()
+      testComponent.component.update()
       expect(
-        testComponent.find('#ListItemAction-1-icon-failed').hostNodes()
+        testComponent.component
+          .find('#ListItemAction-1-icon-failed')
+          .hostNodes()
       ).toHaveLength(1)
     })
   })
 })
 
 describe('Tablet tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
 
   beforeAll(async () => {
     setScopes(REGISTRAR_DEFAULT_SCOPES, store)
@@ -486,7 +500,7 @@ describe('Tablet tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = vi.fn(() => 1554055200000)
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
         queryData={{
@@ -553,7 +567,7 @@ describe('Tablet tests', () => {
           }
         }}
       />,
-      { store, history }
+      { store }
     )
 
     const element = await waitForElement(testComponent, '#name_0')
@@ -564,7 +578,7 @@ describe('Tablet tests', () => {
     })
     testComponent.update()
 
-    expect(window.location.href).toContain(
+    expect(router.state.location.pathname).toContain(
       '/record-audit/rejectTab/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
     )
   })
