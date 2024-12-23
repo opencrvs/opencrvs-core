@@ -58,9 +58,7 @@ import {
   ID_READER,
   Ii18nIDReaderFormField,
   QRReaderType,
-  Ii18nQRReaderType,
-  Ii18nReaderType,
-  Ii18nRedirectFormField
+  ReaderType
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -129,27 +127,6 @@ const internationaliseListFieldObject = (
   return options.map((opt) => intl.formatMessage(opt))
 }
 
-const internationaliseQRReaderFieldObject = (
-  intl: IntlShape,
-  field: QRReaderType
-): Ii18nQRReaderType => {
-  return {
-    ...field,
-    labels: {
-      button: intl.formatMessage(field.labels.button),
-      scannerDialogSupportingCopy: intl.formatMessage(
-        field.labels.scannerDialogSupportingCopy
-      ),
-      tutorial: {
-        cameraCleanliness: intl.formatMessage(
-          field.labels.tutorial.cameraCleanliness
-        ),
-        distance: intl.formatMessage(field.labels.tutorial.distance),
-        lightBalance: intl.formatMessage(field.labels.tutorial.lightBalance)
-      }
-    }
-  }
-}
 export const internationaliseFieldObject = (
   intl: IntlShape,
   field: IFormField
@@ -233,13 +210,6 @@ export const internationaliseFieldObject = (
     )
     ;(base as Ii18nIDReaderFormField).manualInputInstructionLabel =
       intl.formatMessage(field.manualInputInstructionLabel)
-    ;(base as Ii18nIDReaderFormField).readers = field.readers.map((reader) => {
-      if (reader.type === 'QR') {
-        return internationaliseQRReaderFieldObject(intl, reader)
-      } else {
-        return internationaliseFieldObject(intl, reader)
-      }
-    }) as [Ii18nReaderType, ...Ii18nReaderType[]]
   }
 
   return base as Ii18nFormField
@@ -813,15 +783,13 @@ export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
 }
 
-export function isReaderQR(
-  reader: Ii18nReaderType
-): reader is Ii18nQRReaderType {
+export function isReaderQR(reader: ReaderType): reader is QRReaderType {
   return reader.type === 'QR'
 }
 
 export function isReaderRedirect(
-  reader: Ii18nReaderType
-): reader is Ii18nRedirectFormField {
+  reader: ReaderType
+): reader is IRedirectFormField {
   return reader.type === REDIRECT
 }
 

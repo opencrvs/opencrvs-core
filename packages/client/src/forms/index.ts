@@ -741,18 +741,9 @@ export interface IRedirectFormField extends IFormFieldBase {
 
 export interface QRReaderType {
   type: 'QR'
-  labels: {
-    button: MessageDescriptor
-    scannerDialogSupportingCopy: MessageDescriptor
-    tutorial: {
-      cameraCleanliness: MessageDescriptor
-      distance: MessageDescriptor
-      lightBalance: MessageDescriptor
-    }
-  }
 }
 
-type ReaderType = QRReaderType | IRedirectFormField
+export type ReaderType = QRReaderType | IRedirectFormField
 export interface IDReaderFormField extends IFormFieldBase {
   type: typeof ID_READER
   dividerLabel: MessageDescriptor
@@ -1268,25 +1259,11 @@ export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   }
 }
 
-export interface Ii18nQRReaderType {
-  type: 'QR'
-  labels: {
-    button: string
-    scannerDialogSupportingCopy: string
-    tutorial: {
-      cameraCleanliness: string
-      distance: string
-      lightBalance: string
-    }
-  }
-}
-
-export type Ii18nReaderType = Ii18nQRReaderType | Ii18nRedirectFormField
 export interface Ii18nIDReaderFormField extends Ii18nFormFieldBase {
   type: typeof ID_READER
   dividerLabel: string
   manualInputInstructionLabel: string
-  readers: [Ii18nReaderType, ...Ii18nReaderType[]]
+  readers: [ReaderType, ...ReaderType[]]
 }
 
 export type Ii18nFormField =

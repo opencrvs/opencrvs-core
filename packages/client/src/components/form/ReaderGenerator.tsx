@@ -16,14 +16,24 @@ import {
   IFormField,
   IFormFieldValue,
   IFormSectionData,
-  Ii18nReaderType
+  Ii18nRedirectFormField,
+  ReaderType
 } from '@client/forms'
 import { RedirectField } from './Redirect'
-import { isReaderQR, isReaderRedirect } from '@client/forms/utils'
+import {
+  internationaliseFieldObject,
+  isReaderQR,
+  isReaderRedirect
+} from '@client/forms/utils'
 import { Stack } from '@opencrvs/components'
+import {
+  messages,
+  tutorialMessages
+} from '@client/i18n/messages/views/qr-reader'
+import { useIntl } from 'react-intl'
 
 interface ReaderGeneratorProps extends Scan {
-  readers: Ii18nReaderType[]
+  readers: ReaderType[]
   fields: IFormField[]
   form: IFormSectionData
   draft: IFormData
@@ -38,6 +48,7 @@ export const ReaderGenerator = ({
   fields,
   setFieldValue
 }: ReaderGeneratorProps) => {
+  const intl = useIntl()
   return (
     <Stack justifyContent="space-between">
       {readers.map((reader) => {
@@ -46,7 +57,21 @@ export const ReaderGenerator = ({
           return (
             <QRReader
               key={type}
-              labels={reader.labels}
+              labels={{
+                button: intl.formatMessage(messages.button),
+                scannerDialogSupportingCopy: intl.formatMessage(
+                  messages.scannerDialogSupportingCopy
+                ),
+                tutorial: {
+                  cameraCleanliness: intl.formatMessage(
+                    tutorialMessages.cameraCleanliness
+                  ),
+                  distance: intl.formatMessage(tutorialMessages.distance),
+                  lightBalance: intl.formatMessage(
+                    tutorialMessages.lightBalance
+                  )
+                }
+              }}
               onScan={onScan}
               onError={onError}
             />
@@ -57,7 +82,12 @@ export const ReaderGenerator = ({
               key={type}
               form={form}
               draft={draft}
-              fieldDefinition={reader}
+              fieldDefinition={
+                internationaliseFieldObject(
+                  intl,
+                  reader
+                ) as Ii18nRedirectFormField
+              }
               fields={fields}
               setFieldValue={setFieldValue}
               isDisabled={false}
