@@ -54,6 +54,7 @@ export function Pages({
   const page = formPages[currentPage]
 
   const initialValues = getInitialValues(page.fields, formValues)
+  setFormValues(eventId, initialValues)
 
   useEffect(() => {
     const pageChanged = formPages[currentPage].id !== pageId
