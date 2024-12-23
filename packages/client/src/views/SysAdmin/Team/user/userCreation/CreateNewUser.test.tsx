@@ -9,10 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FormFieldGenerator } from '@client/components/form'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
 import { roleQueries } from '@client/forms/user/query/queries'
+import { formatUrl } from '@client/navigation'
+import {
+  CREATE_USER_ON_LOCATION,
+  CREATE_USER_SECTION,
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM
+} from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
-import { userQueries, GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
@@ -20,22 +27,19 @@ import {
   mockCompleteFormData,
   mockDataWithRegistarRoleSelected,
   mockOfflineData,
+  mockOfflineDataDispatch,
   mockRoles,
-  mockOfflineDataDispatch
+  TestComponentWithRouteMock
 } from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { GET_USER, userQueries } from '@client/user/queries'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import {
-  REVIEW_USER_FORM,
-  REVIEW_USER_DETAILS
-} from '@client/navigation/routes'
-import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { History } from 'history'
-import { vi, Mock, describe, expect } from 'vitest'
+import { createMemoryRouter } from 'react-router-dom'
+import { Mock, describe, expect, vi } from 'vitest'
 
 const mockUsers = {
   data: {
@@ -186,36 +190,33 @@ const mockUsers = {
 
 describe('create new user tests', () => {
   let store: AppStore
-  let history: History
   let testComponent: ReactWrapper
+  let testRouter: TestComponentWithRouteMock['router']
 
   beforeEach(async () => {
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
-    history = s.history
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      testComponent = await createTestComponent(
-        <CreateNewUser
-          match={{
-            // @ts-ignore
-            params: {
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-              sectionId: mockOfflineData.userForms.sections[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+      const component = await createTestComponent(<CreateNewUser />, {
+        store,
+        path: CREATE_USER_ON_LOCATION,
+        initialEntries: [
+          formatUrl(CREATE_USER_ON_LOCATION, {
+            locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+            sectionId: mockOfflineData.userForms.sections[0].id
+          })
+        ]
+      })
+
+      testComponent = component.component
+      testRouter = component.router
 
       loginAsFieldAgent(store)
     })
@@ -241,7 +242,7 @@ describe('create new user tests', () => {
       await waitForElement(testComponent, '#confirm_form')
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toContain(
+      expect(testRouter.state.location.pathname).toContain(
         'preview/preview-registration-office'
       )
     })
@@ -252,7 +253,7 @@ describe('create new user tests', () => {
       testComponent.find('#confirm_form').hostNodes().simulate('click')
       await flushPromises()
 
-      expect(history.location.pathname).toContain(
+      expect(testRouter.state.location.pathname).toContain(
         '/createUser/user/signature-attachment'
       )
     })
@@ -260,24 +261,23 @@ describe('create new user tests', () => {
 
   describe('when user in review page', () => {
     beforeEach(async () => {
-      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       await flushPromises()
+
+      store.dispatch(offlineDataReady(mockOfflineDataDispatch))
       store.dispatch(modifyUserFormData(mockCompleteFormData))
-      testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
+
+      await flushPromises()
+      ;({ component: testComponent, router: testRouter } =
+        await createTestComponent(<CreateNewUser />, {
+          store,
+          path: CREATE_USER_SECTION,
+          initialEntries: [
+            formatUrl(CREATE_USER_SECTION, {
               sectionId: mockOfflineData.userForms.sections[1].id,
               groupId: mockOfflineData.userForms.sections[1].groups[0].id
-            },
-            isExact: true,
-            path: '/createUser',
-            url: ''
-          }}
-        />,
-        { store, history }
-      )
+            })
+          ]
+        }))
     })
 
     it('renders review header', () => {
@@ -293,8 +293,10 @@ describe('create new user tests', () => {
         .first()
         .simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#firstName')
+      expect(testRouter.state.location.pathname).toBe(
+        '/createUser/user/user-view-group'
+      )
+      expect(testRouter.state.location.hash).toBe('#firstName')
     })
 
     it('clicking submit button submits the form data', async () => {
@@ -308,8 +310,9 @@ describe('create new user tests', () => {
 })
 
 describe('edit user tests', () => {
-  const { store, history } = createStore()
+  const { store } = createStore()
   let component: ReactWrapper<{}, {}>
+  let router: ReturnType<typeof createMemoryRouter>
   const submitMock: Mock = vi.fn()
 
   const graphqlMocks = [
@@ -384,24 +387,22 @@ describe('edit user tests', () => {
 
   describe('when user is in update form page', () => {
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <CreateNewUser
-          match={{
-            params: {
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<CreateNewUser />, {
+          store,
+          graphqlMocks: graphqlMocks,
+          path: REVIEW_USER_FORM,
+          initialEntries: [
+            formatUrl(REVIEW_USER_FORM, {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.User,
               groupId: 'user-view-group'
-            },
-            isExact: true,
-            path: REVIEW_USER_FORM,
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks: graphqlMocks }
-      )
+            })
+          ]
+        })
 
       component = testComponent
+      router = testRouter
     })
 
     it('clicking on continue button takes user signature attachment page', async () => {
@@ -414,41 +415,30 @@ describe('edit user tests', () => {
       component.update()
       await flushPromises()
 
-      expect(history.location.pathname).toContain('signature-attachment')
+      expect(router.state.location.pathname).toContain('signature-attachment')
     })
   })
 
   describe('when user is in review page', () => {
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      ;({ component, router } = await createTestComponent(
         <CreateNewUser
-          location={{
-            pathname: REVIEW_USER_DETAILS,
-            state: {},
-            hash: '',
-            search: ''
-          }}
           // @ts-ignore
           submitForm={submitMock}
-          match={{
-            // @ts-ignore
-            params: {
+        />,
+        {
+          store,
+          graphqlMocks,
+          path: REVIEW_USER_DETAILS,
+          initialEntries: [
+            formatUrl(REVIEW_USER_DETAILS, {
               userId: '5e835e4d81fbf01e4dc554db',
               sectionId: UserSection.Preview
-            },
-            isExact: true,
-            path: REVIEW_USER_FORM,
-            url: ''
-          }}
-        />,
-        { store, history, graphqlMocks }
-      )
+            })
+          ]
+        }
+      ))
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      component = testComponent
       component.update()
     })
 
@@ -464,18 +454,17 @@ describe('edit user tests', () => {
       )
       changeButtonOfType.hostNodes().first().simulate('click')
       await flushPromises()
-      expect(history.location.hash).toBe('#device')
+      expect(router.state.location.hash).toBe('#device')
     })
 
     it('clicking confirm button starts submitting the form', async () => {
-      await waitForElement(component, '#submit-edit-user-form')
-      component.update()
-
       const submitButton = await waitForElement(
         component,
         '#submit-edit-user-form'
       )
+
       submitButton.hostNodes().simulate('click')
+
       expect(store.getState().userForm.submitting).toBe(true)
     })
   })

@@ -11,12 +11,12 @@
 import * as fetchAny from 'jest-fetch-mock'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
 import * as codeService from '@auth/features/verifyCode/service'
-import { createServer } from '@auth/server'
+import { AuthServer, createServer } from '@auth/server'
 
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('verifyUser handler receives a request', () => {
-  let server: any
+  let server: AuthServer
 
   beforeEach(async () => {
     server = await createServer()

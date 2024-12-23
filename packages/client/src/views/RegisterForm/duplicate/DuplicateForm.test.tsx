@@ -26,7 +26,7 @@ import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Mock, SpyInstance, vi } from 'vitest'
 
-const { store, history } = createStore()
+const { store } = createStore()
 const mockHandler = vi.fn()
 
 const draft = createDeclaration(EventType.Birth)
@@ -72,7 +72,7 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page', () => {
     let duplicateFormComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      const testComponent = await createTestComponent(
+      const { component } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           form={form}
@@ -82,9 +82,9 @@ describe('when in device of large viewport', () => {
           onChangeReviewForm={mockHandler}
           userDetails={userDetails}
         />,
-        { store, history }
+        { store }
       )
-      duplicateFormComponent = testComponent
+      duplicateFormComponent = component
       await waitForElement(duplicateFormComponent, '#review_header')
     })
 

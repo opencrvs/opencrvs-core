@@ -9,37 +9,26 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { appRouter, t } from '@events/router'
 import { indexAllEvents } from './indexing'
-const { createCallerFactory } = t
-
 import {
   getOrCreateClient,
   resetServer as resetESServer
 } from '@events/storage/__mocks__/elasticsearch'
+import { createTestClient } from '@events/tests/utils'
+import { payloadGenerator } from '@events/tests/generators'
 
-function createClient() {
-  const createCaller = createCallerFactory(appRouter)
-  const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' },
-    token: 'FAKE_TOKEN'
-  })
-
-  return caller
-}
-
-const client = createClient()
+const client = createTestClient()
+const generator = payloadGenerator()
 
 test('indexes all records from MongoDB with one function call', async () => {
-  await client.event.create({
-    transactionId: '1',
-    type: 'TENNIS_CLUB_MEMBERSHIP'
-  })
   await resetESServer()
-
   const esClient = getOrCreateClient()
 
   await indexAllEvents()
+
+  for (let i = 0; i < 2; i++) {
+    await client.event.create(generator.event.create())
+  }
 
   const body = await esClient.search({
     index: 'events',
@@ -50,14 +39,11 @@ test('indexes all records from MongoDB with one function call', async () => {
     }
   })
 
-  expect(body.hits.hits).toHaveLength(1)
+  expect(body.hits.hits).toHaveLength(2)
 })
 
-test('records are automatically indexed', async () => {
-  await client.event.create({
-    transactionId: '1',
-    type: 'TENNIS_CLUB_MEMBERSHIP'
-  })
+test('records are automatically indexed when they are created', async () => {
+  await client.event.create(generator.event.create())
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({

@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MongoMemoryServer } from 'mongodb-memory-server'
 
+import { MongoMemoryServer } from 'mongodb-memory-server'
 export type { ProvidedContext } from 'vitest'
 
 declare module 'vitest' {

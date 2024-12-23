@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   createTestComponent,
   mockDeclarationData,
-  createRouterProps,
   flushPromises,
   mockDeathDeclarationData,
   mockMarriageDeclarationData,
@@ -69,26 +68,22 @@ describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     store.dispatch(storeDeclaration(declaration))
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
+    const { component: testComponent } = await createTestComponent(
+      <RecordAudit />,
+      {
+        store,
+        path: DECLARATION_RECORD_AUDIT,
+        initialEntries: [
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
             declarationId: declaration.id
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              tab: 'inProgressTab',
-              declarationId: declaration.id
-            }
-          }
-        )}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
+    component = testComponent
   })
 
   it('Record Audit page loads properly', async () => {
@@ -113,31 +108,27 @@ describe('Record audit summary for a draft death declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const deathDeclaration = createDeclaration(
       EventType.Death,
       mockDeathDeclarationData
     )
 
     store.dispatch(storeDeclaration(deathDeclaration))
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
+    const { component: testComponent } = await createTestComponent(
+      <RecordAudit />,
+      {
+        store,
+        initialEntries: [
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
             declarationId: deathDeclaration.id
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              tab: 'inProgressTab',
-              declarationId: deathDeclaration.id
-            }
-          }
-        )}
-      />,
-      { store, history }
+          })
+        ],
+        path: DECLARATION_RECORD_AUDIT
+      }
     )
+    component = testComponent
   })
 
   it('Record Audit page loads properly', async () => {
@@ -162,31 +153,27 @@ describe('Record audit summary for a draft marriage declaration', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
     const marriageDeclaration = createDeclaration(
       EventType.Marriage,
       mockMarriageDeclarationData
     )
 
     store.dispatch(storeDeclaration(marriageDeclaration))
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
+    const { component: testComponent } = await createTestComponent(
+      <RecordAudit />,
+      {
+        store,
+        path: DECLARATION_RECORD_AUDIT,
+        initialEntries: [
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
             declarationId: marriageDeclaration.id
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              tab: 'inProgressTab',
-              declarationId: marriageDeclaration.id
-            }
-          }
-        )}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
+    component = testComponent
   })
 
   it('Record Audit page loads properly', async () => {
@@ -211,7 +198,7 @@ describe('Record audit summary for WorkQueue declarations', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
     store.getState().workqueueState.workqueue.data.inProgressTab.results = [
       {
@@ -260,24 +247,20 @@ describe('Record audit summary for WorkQueue declarations', () => {
       } as GQLBirthEventSearchSet
     ]
 
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
+    const { component: testComponent } = await createTestComponent(
+      <RecordAudit />,
+      {
+        store,
+        path: DECLARATION_RECORD_AUDIT,
+        initialEntries: [
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'inProgressTab',
             declarationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              tab: 'inProgressTab',
-              declarationId: 'db097901-feba-4f71-a1ae-d3d46289d2d5'
-            }
-          }
-        )}
-      />,
-      { store, history }
+          })
+        ]
+      }
     )
+    component = testComponent
   })
 
   it('Record Audit page loads properly', async () => {
@@ -317,7 +300,7 @@ describe('Record audit summary for GQLQuery', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
     const mocks = [
       {
@@ -355,24 +338,21 @@ describe('Record audit summary for GQLQuery', () => {
       }
     ]
 
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
+    const { component: testComponent } = await createTestComponent(
+      <RecordAudit />,
+      {
+        store,
+        path: DECLARATION_RECORD_AUDIT,
+        initialEntries: [
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'search',
             declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              tab: 'search',
-              declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
-            }
-          }
-        )}
-      />,
-      { store, history, graphqlMocks: mocks }
+          })
+        ],
+        graphqlMocks: mocks
+      }
     )
+    component = testComponent
 
     await flushPromises()
     component.update()
@@ -413,7 +393,7 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store, history } = createStore()
+    const { store } = createStore()
 
     const mocks = [
       {
@@ -426,24 +406,21 @@ describe('Record audit summary for unsuccesful GQLQuery', () => {
       }
     ]
 
-    component = await createTestComponent(
-      <RecordAudit
-        {...createRouterProps(
+    const { component: testComponent } = await createTestComponent(
+      <RecordAudit />,
+      {
+        store,
+        path: DECLARATION_RECORD_AUDIT,
+        initialEntries: [
           formatUrl(DECLARATION_RECORD_AUDIT, {
             tab: 'search',
             declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
-          }),
-          { isNavigatedInsideApp: false },
-          {
-            matchParams: {
-              tab: 'search',
-              declarationId: '956281c9-1f47-4c26-948a-970dd23c4094'
-            }
-          }
-        )}
-      />,
-      { store, history, graphqlMocks: mocks }
+          })
+        ],
+        graphqlMocks: mocks
+      }
     )
+    component = testComponent
 
     await flushPromises()
     component.update()

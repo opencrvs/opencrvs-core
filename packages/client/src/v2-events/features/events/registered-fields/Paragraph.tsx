@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { FieldProps } from '@opencrvs/commons'
 import React from 'react'
 import { useIntl } from 'react-intl'
+import { FieldProps } from '@opencrvs/commons'
 
-export const Paragraph = ({ label }: FieldProps<'PARAGRAPH'>) => {
+export function Paragraph({ label }: FieldProps<'PARAGRAPH'>) {
   const intl = useIntl()
 
   return <p>{intl.formatMessage(label)}</p>

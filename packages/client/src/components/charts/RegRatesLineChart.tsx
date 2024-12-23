@@ -10,7 +10,7 @@
  */
 import { EventType } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
-import { LineChart } from '@opencrvs/components/lib/LineChart'
+import { IDataPoint, LineChart } from '@opencrvs/components/lib/LineChart'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import React, { useState, useEffect, useCallback } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -18,6 +18,7 @@ import styled, { withTheme } from 'styled-components'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 import { messages } from '@client/i18n/messages/views/performance'
 import type { LegendProps } from 'recharts'
+import { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
@@ -294,8 +295,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const customizedTooltip = (dataPoint: any) => {
+  const customizedTooltip = (dataPoint: IDataPoint) => {
     const wrapperPayload = dataPoint.payload[0]
 
     return (
@@ -307,8 +307,7 @@ const RegRatesLineChartComponent = (props: IProps) => {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mouseMoveHandler = (data: any) => {
+  const mouseMoveHandler: CategoricalChartFunc = (data) => {
     if (data && data.activePayload) {
       setState({
         ...state,

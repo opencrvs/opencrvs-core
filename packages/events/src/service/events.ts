@@ -19,6 +19,7 @@ import { getClient } from '@events/storage/mongodb'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
 import { indexEvent } from './indexing/indexing'
+import * as _ from 'lodash'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -45,18 +46,24 @@ export async function getEventById(id: string) {
 
   const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
+
   if (!event) {
     throw new EventNotFoundError(id)
   }
   return event
 }
 
-export async function createEvent(
-  eventInput: z.infer<typeof EventInput>,
-  createdBy: string,
-  createdAtLocation: string,
+export async function createEvent({
+  eventInput,
+  createdAtLocation,
+  createdBy,
+  transactionId
+}: {
+  eventInput: z.infer<typeof EventInput>
+  createdBy: string
+  createdAtLocation: string
   transactionId: string
-) {
+}) {
   const existingEvent = await getEventByTransactionId(transactionId)
 
   if (existingEvent) {
@@ -66,7 +73,7 @@ export async function createEvent(
   const db = await getClient()
   const collection = db.collection<EventDocument>('events')
 
-  const now = new Date()
+  const now = new Date().toISOString()
   const id = getUUID()
 
   await collection.insertOne({
@@ -97,7 +104,7 @@ export async function addAction(
   { eventId, createdBy }: { eventId: string; createdBy: string }
 ) {
   const db = await getClient()
-  const now = new Date()
+  const now = new Date().toISOString()
 
   await db.collection<EventDocument>('events').updateOne(
     {
@@ -129,7 +136,7 @@ export async function patchEvent(eventInput: EventInputWithId) {
   const db = await getClient()
   const collection = db.collection<EventDocument>('events')
 
-  const now = new Date()
+  const now = new Date().toISOString()
 
   await collection.updateOne(
     {
@@ -145,5 +152,6 @@ export async function patchEvent(eventInput: EventInputWithId) {
 
   const event = await getEventById(existingEvent.id)
   await indexEvent(event)
+
   return event
 }

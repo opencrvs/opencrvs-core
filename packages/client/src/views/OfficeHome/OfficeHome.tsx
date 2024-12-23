@@ -20,12 +20,7 @@ import {
   selectWorkqueuePagination
 } from '@client/workqueue'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab
-} from '@client/navigation'
+import { generateGoToHomeTabUrl } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
@@ -37,7 +32,7 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { Link, RouteComponentProps } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
@@ -59,6 +54,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { EventType } from '@client/utils/gateway'
 import { SELECT_VITAL_EVENT } from '@client/navigation/routes'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -70,10 +69,6 @@ const FABContainer = styled.div`
 `
 
 interface IDispatchProps {
-  goToPage: typeof goToPage
-  goToPrintCertificate: typeof goToPrintCertificate
-  goToEvents: typeof goToEvents
-  goToHomeTab: typeof goToHomeTab
   getOfflineData: typeof getOfflineData
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   updateWorkqueuePagination: typeof updateWorkqueuePagination
@@ -89,7 +84,8 @@ interface IOfficeHomeState {
 
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
-  IBaseOfficeHomeStateProps
+  IBaseOfficeHomeStateProps &
+  RouteComponentProps
 
 const DECLARATION_WORKQUEUE_TABS = [
   WORKQUEUE_TABS.inProgress,
@@ -127,7 +123,7 @@ class OfficeHomeView extends React.Component<
 > {
   pageSize = 10
   showPaginated = false
-  interval: any = undefined
+  interval: NodeJS.Timeout | undefined = undefined
   role = this.props.userDetails && this.props.userDetails.systemRole
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)
@@ -237,16 +233,23 @@ class OfficeHomeView extends React.Component<
 
     if (isDeclarationWorkqueueTab(tabId)) {
       if (tabId === WORKQUEUE_TABS.inProgress) {
-        this.props.goToHomeTab(
-          WORKQUEUE_TABS.inProgress,
-          Object.values(SELECTOR_ID).includes(selectorId)
-            ? selectorId
-            : SELECTOR_ID.ownDrafts,
-          newPageNumber
+        this.props.router.navigate(
+          generateGoToHomeTabUrl({
+            tabId: WORKQUEUE_TABS.inProgress,
+            selectorId: Object.values(SELECTOR_ID).includes(selectorId)
+              ? selectorId
+              : SELECTOR_ID.ownDrafts,
+            pageId: newPageNumber
+          })
         )
-        return
       }
-      this.props.goToHomeTab(tabId, '', newPageNumber)
+
+      this.props.router.navigate(
+        generateGoToHomeTabUrl({
+          tabId,
+          pageId: newPageNumber
+        })
+      )
     }
   }
 
@@ -480,15 +483,8 @@ class OfficeHomeView extends React.Component<
   }
 }
 
-function mapStateToProps(
-  state: IStoreState,
-  props: RouteComponentProps<{
-    tabId: string
-    selectorId?: string
-    pageId?: string
-  }>
-) {
-  const { match } = props
+function mapStateToProps(state: IStoreState, props: RouteComponentProps) {
+  const match = props.router.match
   const userDetails = getUserDetails(state)
   const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
   const scope = getScope(state)
@@ -496,6 +492,7 @@ function mapStateToProps(
     (match.params.pageId && Number.parseInt(match.params.pageId)) ||
     (match.params.selectorId && Number.parseInt(match.params.selectorId)) ||
     1
+
   return {
     offlineResources: getOfflineData(state),
     declarations: state.declarationsState.declarations,
@@ -531,12 +528,15 @@ function mapStateToProps(
   }
 }
 
-export const OfficeHome = connect(mapStateToProps, {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToHomeTab,
-  getOfflineData,
-  updateRegistrarWorkqueue,
-  updateWorkqueuePagination
-})(injectIntl(OfficeHomeView))
+export const OfficeHome = withRouter(
+  connect<
+    IBaseOfficeHomeStateProps,
+    IDispatchProps,
+    RouteComponentProps,
+    IStoreState
+  >(mapStateToProps, {
+    getOfflineData,
+    updateRegistrarWorkqueue,
+    updateWorkqueuePagination
+  })(injectIntl(OfficeHomeView))
+)
