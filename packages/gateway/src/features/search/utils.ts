@@ -16,15 +16,10 @@ import {
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
 import fetch from '@gateway/fetch'
-import {
-  getTokenPayload,
-  Scope,
-  SCOPES
-} from '@opencrvs/commons/authentication'
-import { IUserModelData } from '@gateway/features/user/type-resolvers'
+import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 
 export interface ISearchCriteria {
-  parameters: SearchParamsType
+  parameters: AdvancedSearchParams
   sort?: string
   sortColumn?: string
   sortBy?: Array<Record<string, string>>
@@ -51,81 +46,69 @@ export const postAdvancedSearch = async (
     throw new Error(`Search request failed: ${error.message}`)
   }
 }
-type SearchParamsType = Omit<GQLAdvancedSearchParametersInput, 'event'> & {
+type AdvancedSearchParams = Omit<GQLAdvancedSearchParametersInput, 'event'> & {
   event?: {
     eventName: string
     jurisdictionId?: string
   }[]
 }
 
-const addSearchParamForScope = (
-  tokenScopes: Scope[],
-  advancedSearchParameters: Omit<GQLAdvancedSearchParametersInput, 'event'> & {
-    event?: {
-      eventName: string
-      jurisdictionId?: string
-    }[]
-  },
-  user: IUserModelData,
-  event: GQLEventType | undefined
-) => {
-  const { declarationJurisdictionId, declarationLocationId } =
-    advancedSearchParameters
-
-  const scopeMappings = {
-    [GQLEventType.birth]: {
-      jurisdictionScope: SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-      generalScope: SCOPES.SEARCH_BIRTH
-    },
-    [GQLEventType.death]: {
-      jurisdictionScope: SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-      generalScope: SCOPES.SEARCH_DEATH
-    },
-    [GQLEventType.marriage]: {
-      jurisdictionScope: SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
-      generalScope: SCOPES.SEARCH_MARRIAGE
-    }
-  }
-
+function scopeToEventParams(
+  userScopes: Scope[],
+  officeLocationId: string
+): NonNullable<AdvancedSearchParams['event']> {
+  const eventParams: NonNullable<AdvancedSearchParams['event']> = []
   if (
-    advancedSearchParameters.declarationLocationId ||
-    advancedSearchParameters.declarationJurisdictionId
+    userScopes.includes(SCOPES.SEARCH_BIRTH) ||
+    userScopes.includes(SCOPES.SEARCH_BIRTH_MY_JURISDICTION)
   ) {
-    if (
-      user.primaryOfficeId !== declarationLocationId &&
-      user.primaryOfficeId !== declarationJurisdictionId
-    ) {
-      throw new Error('Can not search this location')
-    }
+    eventParams.push({
+      eventName: GQLEventType.birth,
+      jurisdictionId: userScopes.includes(SCOPES.SEARCH_BIRTH_MY_JURISDICTION)
+        ? officeLocationId
+        : undefined
+    })
   }
-
-  if (event) {
-    const { jurisdictionScope, generalScope } = scopeMappings[event]
-
-    if (tokenScopes.includes(jurisdictionScope)) {
-      advancedSearchParameters.event ??= []
-      advancedSearchParameters.event.push({
-        eventName: event,
-        jurisdictionId: user.primaryOfficeId
-      })
-    } else if (tokenScopes.includes(generalScope)) {
-      advancedSearchParameters.event ??= []
-      advancedSearchParameters.event.push({ eventName: event })
-    } else throw new Error('Not enough scope to search')
+  if (
+    userScopes.includes(SCOPES.SEARCH_DEATH) ||
+    userScopes.includes(SCOPES.SEARCH_DEATH_MY_JURISDICTION)
+  ) {
+    eventParams.push({
+      eventName: GQLEventType.death,
+      jurisdictionId: userScopes.includes(SCOPES.SEARCH_DEATH_MY_JURISDICTION)
+        ? officeLocationId
+        : undefined
+    })
   }
-  // add event in search params
+  if (
+    userScopes.includes(SCOPES.SEARCH_MARRIAGE) ||
+    userScopes.includes(SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION)
+  ) {
+    eventParams.push({
+      eventName: GQLEventType.marriage,
+      jurisdictionId: userScopes.includes(
+        SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+      )
+        ? officeLocationId
+        : undefined
+    })
+  }
+  return eventParams
 }
 
-export const filterSearchParamsWithScope = (
-  token: string,
-  advancedSearchParameters: GQLAdvancedSearchParametersInput,
-  user: IUserModelData
-): SearchParamsType => {
-  const currentUserScopes = getTokenPayload(token).scope
-  const { event: eventType, ...restOfParams } = advancedSearchParameters
-  const newParams: SearchParamsType = restOfParams
+export const transformSearchParams = (
+  userScopes: Scope[],
+  inputParams: GQLAdvancedSearchParametersInput,
+  officeLocationId: string
+): AdvancedSearchParams => {
+  const { event: eventType, ...restOfParams } = inputParams
+  let eventParams = scopeToEventParams(userScopes, officeLocationId)
+  if (eventType) {
+    eventParams = eventParams.filter(({ eventName }) => eventName === eventType)
+  }
 
-  addSearchParamForScope(currentUserScopes, newParams, user, eventType)
-
-  return newParams
+  return {
+    ...restOfParams,
+    event: eventParams
+  }
 }

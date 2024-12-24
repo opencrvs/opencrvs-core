@@ -18,13 +18,14 @@ import {
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import {
-  filterSearchParamsWithScope,
+  transformSearchParams,
   ISearchCriteria,
   postAdvancedSearch
 } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { RateLimitError } from '@gateway/rate-limit'
+import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
 type ApiResponse<T> = {
   body: T
@@ -103,16 +104,26 @@ export const resolvers: GQLResolver = {
 
       const userIdentifier = getTokenPayload(authHeader.Authorization).sub
       const user = await dataSources.usersAPI.getUserById(userIdentifier!)
+      const office = await dataSources.locationsAPI.getLocation(
+        user.primaryOfficeId
+      )
+      const officeLocationId =
+        office.partOf?.reference &&
+        resourceIdentifierToUUID(office.partOf.reference)
 
-      const filteredSearchParamsWithScopes = filterSearchParamsWithScope(
-        authHeader.Authorization,
+      if (!officeLocationId) {
+        throw new Error('User office not found')
+      }
+
+      const transformedSearchParams = transformSearchParams(
+        getTokenPayload(authHeader.Authorization).scope,
         advancedSearchParameters,
-        user
+        officeLocationId
       )
 
       const searchCriteria: ISearchCriteria = {
         sort,
-        parameters: filteredSearchParamsWithScopes
+        parameters: transformedSearchParams
       }
 
       if (count) {
@@ -184,7 +195,7 @@ export const resolvers: GQLResolver = {
           throw new Error('There is no param to search ')
         }
 
-        searchCriteria.parameters = { ...filteredSearchParamsWithScopes }
+        searchCriteria.parameters = { ...transformedSearchParams }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
