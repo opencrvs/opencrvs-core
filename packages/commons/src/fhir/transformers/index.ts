@@ -768,6 +768,16 @@ function createEducationalAttainmentBuilder(
   })
 }
 
+function createScannedFieldsBuilder(resource: Patient, fieldValue: string) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  resource.extension = setExtension(resource.extension, {
+    url: `${OPENCRVS_SPECIFICATION_URL}extension/scanned-fields`,
+    valueString: fieldValue
+  })
+}
 function setExtension<T extends keyof KnownExtensionType>(
   extensions: Array<Extension>,
   newExtension: KnownExtensionType[T]
@@ -2146,7 +2156,11 @@ const builders: IFieldBuilders = {
     relationship: (fhirBundle, fieldValue, context) =>
       createInformantType(fhirBundle, fieldValue, context),
     otherRelationship: (fhirBundle, fieldValue, context) =>
-      createOtherInformantType(fhirBundle, fieldValue, context)
+      createOtherInformantType(fhirBundle, fieldValue, context),
+    scannedFields: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreateInformantResource(fhirBundle)
+      createScannedFieldsBuilder(person, fieldValue)
+    }
   },
   bride: {
     _fhirID: (fhirBundle, fieldValue) => {

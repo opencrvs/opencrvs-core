@@ -1216,6 +1216,7 @@ export interface GQLPersonInput {
   nationality?: Array<string | null>
   educationalAttainment?: string
   ageOfIndividualInYears?: number
+  scannedFields?: string
 }
 
 export interface GQLRelatedPersonInput {

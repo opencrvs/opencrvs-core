@@ -26,7 +26,9 @@ import {
   getVisibleSectionGroupsBasedOnConditions,
   isFieldButton,
   isFieldHttp,
+  isFieldIDReader,
   isFieldRedirect,
+  isInitialValueDependencyInfo,
   isRadioGroupWithNestedField,
   serializeFieldValue
 } from '@client/forms/utils'
@@ -242,6 +244,7 @@ export const draftToGqlTransformer = (
   const transformedData: TransformedData = { createdAt: new Date() }
   const inCompleteFieldList: string[] = []
   formDefinition.sections.forEach((section) => {
+    const scannedFields: string[] = []
     if (!draftData[section.id]) {
       draftData[section.id] = {}
     }
@@ -254,6 +257,9 @@ export const draftToGqlTransformer = (
       draftData,
       userDetails
     ).forEach((groupDef) => {
+      const idReaderField = groupDef.fields.find(isFieldIDReader)
+      const hasScanBeenCompleted =
+        idReaderField && Boolean(draftData[section.id][idReaderField.name])
       groupDef.fields.forEach((fieldDef) => {
         const conditionalActions: string[] = getConditionalActionsForField(
           fieldDef,
@@ -307,6 +313,14 @@ export const draftToGqlTransformer = (
             transformedData[section.id][fieldDef.name] =
               draftData[section.id][fieldDef.name]
           }
+          if (
+            hasScanBeenCompleted &&
+            fieldDef.initialValue &&
+            isInitialValueDependencyInfo(fieldDef.initialValue) &&
+            fieldDef.initialValue.dependsOn.includes(idReaderField.name)
+          ) {
+            scannedFields.push(fieldDef.name)
+          }
         }
       })
     })
@@ -321,6 +335,9 @@ export const draftToGqlTransformer = (
       Object.keys(transformedData[section.id]).length < 1
     ) {
       delete transformedData[section.id]
+    }
+    if (scannedFields.length > 0) {
+      transformedData[section.id].scannedFields = scannedFields.join(',')
     }
   })
   if (draftData._fhirIDMap) {
