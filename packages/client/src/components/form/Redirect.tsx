@@ -21,8 +21,9 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useHttp } from './http'
+import { Button } from '@opencrvs/components'
 
 export const RedirectField = ({
   fields,
@@ -78,7 +79,7 @@ export const RedirectField = ({
     }
   }, [call, params, form, trigger])
   return (
-    <Navigate
+    <Link
       to={evalExpressionInFieldDefinition(
         '`' + to + '`',
         form,
@@ -86,6 +87,16 @@ export const RedirectField = ({
         draft,
         user
       )}
-    />
+    >
+      <Button
+        type="secondary"
+        size="large"
+        element="a"
+        fullWidth
+        disabled={isDisabled}
+      >
+        {fieldDefinition.label}
+      </Button>
+    </Link>
   )
 }
