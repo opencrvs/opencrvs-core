@@ -14,7 +14,7 @@ import styled from 'styled-components'
 
 interface ScannerProps {
   onError: (error: 'mount') => void
-  onScan: (data: any) => void
+  onScan: (data: Record<string, unknown>) => void
 }
 
 const QRReader = styled.div`
@@ -33,10 +33,10 @@ const Video = styled.video`
   object-fit: cover;
 `
 
-const withValidation = (callback: (data: any) => void) => {
-  return (data: any) => {
-    if (Boolean(data)) {
-      callback(data)
+const withValidation = (callback: (res: Record<string, unknown>) => void) => {
+  return (res: { data: string }) => {
+    if (Boolean(res.data)) {
+      callback(JSON.parse(res.data))
     }
   }
 }
