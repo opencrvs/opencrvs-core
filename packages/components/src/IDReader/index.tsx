@@ -24,7 +24,15 @@ const StyledStack = styled(Stack)`
   width: 100%;
 
   & > * {
-    flex: 1;
+    flex-grow: 1;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-direction: column;
+
+    & > * {
+      width: 100%;
+    }
   }
 `
 export const IDReader = (props: IDReaderProps) => {
@@ -33,9 +41,7 @@ export const IDReader = (props: IDReaderProps) => {
   return (
     <StyledBox>
       <Stack direction="column" alignItems="center" gap={0}>
-        <StyledStack direction="row" wrap>
-          {children}
-        </StyledStack>
+        <StyledStack>{children}</StyledStack>
         <Divider>
           <Text variant="reg18" element="p" align="center" color="grey500">
             {dividerLabel}
