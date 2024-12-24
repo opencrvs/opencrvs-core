@@ -790,6 +790,7 @@ export async function advancedQueryBuilder(
     }
   } satisfies SearchRequest['query']
 }
+
 export const findPatientPrimaryIdentifier = (patient: Patient) =>
   findPatientIdentifier(
     patient,
