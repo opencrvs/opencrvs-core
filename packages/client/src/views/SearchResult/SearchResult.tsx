@@ -462,10 +462,6 @@ function SearchResultView(props: ISearchResultProps) {
           query={SEARCH_EVENTS}
           variables={{
             advancedSearchParameters: {
-              declarationLocationId:
-                !canSearchAnywhere() && userDetails
-                  ? getUserLocation(userDetails).id
-                  : '',
               trackingId:
                 searchType === SearchCriteria.TRACKING_ID ? searchText : '',
               nationalId:
