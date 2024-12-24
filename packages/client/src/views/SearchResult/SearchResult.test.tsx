@@ -85,7 +85,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '',
               trackingId: '',
               nationalId: '',
               registrationNumber: '',
@@ -328,7 +327,6 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '+8801622688232',
-              declarationLocationId: '',
               contactEmail: ''
             },
             sort: 'DESC'
@@ -400,7 +398,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -493,7 +490,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -594,7 +590,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -699,7 +694,6 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -795,7 +789,6 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',

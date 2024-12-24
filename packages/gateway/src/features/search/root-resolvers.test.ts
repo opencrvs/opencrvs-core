@@ -85,7 +85,17 @@ describe('Search root resolvers', () => {
             event: 'Birth'
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -110,7 +120,17 @@ describe('Search root resolvers', () => {
             registrationStatuses: ['DECLARED']
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -135,7 +155,17 @@ describe('Search root resolvers', () => {
             compositionType: ['birth-declaration', 'death-declaration']
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -160,7 +190,17 @@ describe('Search root resolvers', () => {
             eventLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -185,7 +225,19 @@ describe('Search root resolvers', () => {
           {
             advancedSearchParameters: {}
           },
-          { headers: authHeaderValidUserRegister }
+          {
+            headers: authHeaderValidUserRegister,
+            dataSources: {
+              usersAPI: {
+                getUserById: () => ({ primaryOffice: 'mock_office' })
+              },
+              locationsAPI: {
+                getLocation: () => ({
+                  partOf: { reference: 'Location/mock_location' }
+                })
+              }
+            }
+          }
         )
       ).rejects.toThrowError('There is no param to search')
     })
@@ -207,7 +259,17 @@ describe('Search root resolvers', () => {
             trackingId: 'B123456'
           }
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -233,7 +295,17 @@ describe('Search root resolvers', () => {
           },
           sortColumn: 'modifiedAt.keyword'
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -260,7 +332,17 @@ describe('Search root resolvers', () => {
           count: 10,
           skip: 2
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -281,7 +363,17 @@ describe('Search root resolvers', () => {
             declarationLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -306,7 +398,17 @@ describe('Search root resolvers', () => {
             name: 'Hasib'
           }
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()

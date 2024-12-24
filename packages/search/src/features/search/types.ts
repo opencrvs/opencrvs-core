@@ -13,8 +13,14 @@ export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc'
 }
+
+type EventPayload = {
+  eventName: string
+  jurisdictionId?: string
+}
+
 export interface IAdvancedSearchParam {
-  event?: string
+  event?: EventPayload[]
   name?: string
   registrationStatuses?: string[]
   dateOfEvent?: string

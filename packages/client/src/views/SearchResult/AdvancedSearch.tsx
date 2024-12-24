@@ -42,6 +42,7 @@ import {
 } from '@client/search/advancedSearch/utils'
 import styled from 'styled-components'
 import { advancedSearchInitialState } from '@client/search/advancedSearch/reducer'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 
@@ -486,20 +487,30 @@ const DeathSection = () => {
 
 const AdvancedSearch = () => {
   const intl = useIntl()
+  const { canSearchBirthRecords, canSearchDeathRecords } = usePermissions()
   const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
-  const activeTabId = advancedSearchParamState.event || TabId.BIRTH
+  const activeTabId =
+    advancedSearchParamState.event || canSearchBirthRecords
+      ? TabId.BIRTH
+      : TabId.DEATH
   const dispatch = useDispatch()
-
   const tabSections = [
     {
       id: TabId.BIRTH,
-      title: intl.formatMessage(messages.birthTabTitle)
+      title: intl.formatMessage(messages.birthTabTitle),
+      showTab: canSearchBirthRecords
     },
     {
       id: TabId.DEATH,
-      title: intl.formatMessage(messages.deathTabTitle)
+      title: intl.formatMessage(messages.deathTabTitle),
+      showTab: canSearchDeathRecords
     }
   ]
+
+  const filteredTabSections = tabSections
+    .filter((section) => section.showTab)
+    .map((sec) => ({ id: sec.id, title: sec.title }))
+
   return (
     <>
       <SysAdminContentWrapper
@@ -512,7 +523,7 @@ const AdvancedSearch = () => {
           size={ContentSize.SMALL}
           tabBarContent={
             <FormTabs
-              sections={tabSections}
+              sections={filteredTabSections}
               activeTabId={activeTabId}
               onTabClick={(id: TabId) => {
                 dispatch(
