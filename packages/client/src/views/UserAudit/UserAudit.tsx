@@ -16,7 +16,7 @@ import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { IntlShape, useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom'
 import { GET_USER } from '@client/user/queries'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { AvatarSmall } from '@client/components/Avatar'
@@ -28,8 +28,8 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { messages as userSetupMessages } from '@client/i18n/messages/views/userSetup'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { useDispatch, useSelector } from 'react-redux'
-import { goToReviewUserDetails, goToTeamUserList } from '@client/navigation'
+import { useSelector } from 'react-redux'
+import { formatUrl } from '@client/navigation'
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { IStoreState } from '@client/store'
@@ -53,16 +53,15 @@ import { AppBar, Link } from '@opencrvs/components/lib'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Scope } from '@client/utils/authUtils'
+import * as routes from '@client/navigation/routes'
+import { UserSection } from '@client/forms'
+import { stringify } from 'query-string'
 
 const UserAvatar = styled(AvatarSmall)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
-
-interface IRouteProps {
-  userId: string
-}
 
 const transformUserQueryResult = (
   userData: NonNullable<GetUserQuery['getUser']>,
@@ -132,8 +131,9 @@ function canEditUserDetails(
 
 export const UserAudit = () => {
   const intl = useIntl()
-  const { userId } = useParams<IRouteProps>()
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { userId } = useParams()
+
   const [showResendInviteSuccess, setShowResendInviteSuccess] =
     useState<boolean>(false)
   const [showResendInviteError, setShowResendInviteError] =
@@ -154,7 +154,10 @@ export const UserAudit = () => {
   const { data, loading, error } = useQuery<
     GetUserQuery,
     GetUserQueryVariables
-  >(GET_USER, { variables: { userId }, fetchPolicy: 'cache-and-network' })
+  >(GET_USER, {
+    variables: { userId: userId! },
+    fetchPolicy: 'cache-and-network'
+  })
   const user = data?.getUser && transformUserQueryResult(data.getUser, intl)
   const userRole =
     user && intl.formatMessage({ id: getUserRoleIntlKey(user.role._id) })
@@ -225,7 +228,13 @@ export const UserAudit = () => {
     const menuItems: { label: string; handler: () => void }[] = [
       {
         label: intl.formatMessage(sysMessages.editUserDetailsTitle),
-        handler: () => dispatch(goToReviewUserDetails(userId))
+        handler: () =>
+          navigate(
+            formatUrl(routes.REVIEW_USER_DETAILS, {
+              userId,
+              sectionId: UserSection.Preview
+            })
+          )
       }
     ]
 
@@ -355,7 +364,12 @@ export const UserAudit = () => {
                   <Link
                     id="office-link"
                     onClick={() =>
-                      dispatch(goToTeamUserList(user.primaryOffice!.id))
+                      navigate({
+                        pathname: routes.TEAM_USER_LIST,
+                        search: stringify({
+                          locationId: user.primaryOffice.id
+                        })
+                      })
                     }
                   >
                     {user.primaryOffice && user.primaryOffice.displayLabel}
@@ -414,7 +428,7 @@ export const UserAudit = () => {
                 id="username-reminder-send"
                 key="username-reminder-send"
                 onClick={() => {
-                  if (toggleUsernameReminder) {
+                  if (toggleUsernameReminder && userId) {
                     usernameReminder(userId)
                   }
                   toggleUsernameReminderModal()
@@ -453,7 +467,7 @@ export const UserAudit = () => {
                 id="reset-password-send"
                 key="reset-password-send"
                 onClick={() => {
-                  if (toggleResetPassword) {
+                  if (toggleResetPassword && userId) {
                     resetPassword(userId)
                   }
                   toggleUserResetPasswordModal()

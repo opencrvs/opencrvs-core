@@ -49,7 +49,8 @@ import {
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory,
-  RejectedRecord
+  RejectedRecord,
+  SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -60,7 +61,8 @@ import {
   invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  upsertPatientIdentifiers
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -321,6 +323,40 @@ export async function toViewed<T extends ValidRecord>(
   } as T
 
   return viewedRecord
+}
+
+export function toIdentifierUpserted<T extends ValidRecord>(
+  record: T,
+  identifiers: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
+): T {
+  const task = getTaskFromSavedBundle(record)
+  const event = getTaskEventType(task)
+  const composition = getComposition(record)
+  const patientWithUpsertedIdentifier = upsertPatientIdentifiers(
+    record,
+    composition,
+    SECTION_CODE[event],
+    identifiers
+  )
+  const filteredEntry = record.entry.filter(
+    (e) =>
+      !patientWithUpsertedIdentifier
+        .map((patient) => patient.id)
+        .includes(e.resource.id)
+  )
+  return {
+    ...record,
+    entry: [
+      ...filteredEntry,
+      ...patientWithUpsertedIdentifier.map((resource) => ({
+        ...record.entry.find((e) => e.resource.id === resource.id),
+        resource
+      }))
+    ]
+  }
 }
 
 export async function toDownloaded(
@@ -1020,8 +1056,14 @@ export async function toIssued(
   eventType: EVENT_TYPE,
   certificateDetails: IssueInput
 ): Promise<IssuedRecord> {
+  const [paymentReconciliation] = createPaymentResources(
+    certificateDetails.payment
+  )
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerExtensions = createIssuedTask(previousTask)
+  const taskWithoutPractitionerExtensions = createIssuedTask(
+    previousTask,
+    paymentReconciliation
+  )
 
   const [issuedTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
@@ -1035,15 +1077,13 @@ export async function toIssued(
     record
   )
 
-  const [paymentEntry] = createPaymentResources(certificateDetails.payment)
-
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
     undefined,
-    paymentEntry.fullUrl
+    paymentReconciliation.fullUrl
   )
 
   const certificateSection: CompositionSection = {
@@ -1096,7 +1136,7 @@ export async function toIssued(
       { resource: compositionWithCertificateSection },
       { resource: issuedTask },
       ...relatedPersonEntries,
-      paymentEntry,
+      paymentReconciliation,
       documentReferenceEntry
     ]
   }

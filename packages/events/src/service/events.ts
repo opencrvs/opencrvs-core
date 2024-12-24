@@ -9,86 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/mongodb'
-import { getUUID } from '@opencrvs/commons'
-import { z } from 'zod'
+import {
+  EventDocument,
+  ActionInput,
+  EventInput
+} from '@opencrvs/commons/events'
 
-export const EventInput = z.object({
-  type: z.string()
-})
+import { getClient } from '@events/storage/mongodb'
+import { ActionType, getUUID } from '@opencrvs/commons'
+import { z } from 'zod'
+import { indexEvent } from './indexing/indexing'
+import * as _ from 'lodash'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
 })
 
-const ActionInputBase = z.object({
-  type: z.enum([
-    'CREATED',
-    'ASSIGNMENT',
-    'UNASSIGNMENT',
-    'REGISTERED',
-    'VALIDATED',
-    'CORRECTION',
-    'DUPLICATES_DETECTED'
-  ]),
-  fields: z.array(
-    z.object({
-      id: z.string(),
-      value: z.union([
-        z.string(),
-        z.number(),
-        z.array(
-          z.object({
-            optionValues: z.array(z.string()),
-            type: z.string(),
-            data: z.string(),
-            fileSize: z.number()
-          })
-        )
-      ])
-    })
-  )
-})
-
-export const ActionInput = z.union([
-  ActionInputBase.extend({
-    type: z.enum(['CREATED'])
-  }),
-  ActionInputBase.extend({
-    type: z.enum(['REGISTERED']),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
-  })
-])
-
-const Action = ActionInput.and(
-  z.object({
-    createdAt: z.date(),
-    createdBy: z.string()
-  })
-)
-
-type ActionInput = z.infer<typeof ActionInput>
-
-export const Event = EventInput.extend({
-  id: z.string(),
-  type: z.string(), // Should be replaced by a reference to a form version
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  actions: z.array(Action)
-})
-export type Event = z.infer<typeof Event>
-
-const EventWithTransactionId = Event.extend({
-  transactionId: z.string()
-})
+export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
   const document = await collection.findOne({ transactionId })
 
@@ -103,28 +44,36 @@ class EventNotFoundError extends Error {
 export async function getEventById(id: string) {
   const db = await getClient()
 
-  const collection = db.collection<z.infer<typeof Event>>('events')
+  const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
+
   if (!event) {
     throw new EventNotFoundError(id)
   }
   return event
 }
 
-export async function createEvent(
-  eventInput: z.infer<typeof EventInput>,
+export async function createEvent({
+  eventInput,
+  createdAtLocation,
+  createdBy,
+  transactionId
+}: {
+  eventInput: z.infer<typeof EventInput>
+  createdBy: string
+  createdAtLocation: string
   transactionId: string
-): Promise<Event> {
+}) {
   const existingEvent = await getEventByTransactionId(transactionId)
+
   if (existingEvent) {
     return existingEvent
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
-  const now = new Date()
+  const now = new Date().toISOString()
   const id = getUUID()
 
   await collection.insertOne({
@@ -135,67 +84,74 @@ export async function createEvent(
     updatedAt: now,
     actions: [
       {
-        type: 'CREATED',
+        type: ActionType.CREATE,
         createdAt: now,
-        createdBy: '123-123-123',
-        fields: []
+        createdBy,
+        createdAtLocation,
+        data: {}
       }
     ]
-  })
+  } satisfies EventDocument)
 
-  return getEventById(id)
+  const event = await getEventById(id)
+  await indexEvent(event)
+
+  return event
 }
 
-export async function addAction(eventId: string, action: ActionInput) {
+export async function addAction(
+  input: ActionInput,
+  { eventId, createdBy }: { eventId: string; createdBy: string }
+) {
   const db = await getClient()
-  const collection = db.collection<z.infer<typeof Event>>('events')
+  const now = new Date().toISOString()
 
-  const now = new Date()
-
-  await collection.updateOne(
+  await db.collection<EventDocument>('events').updateOne(
     {
       id: eventId
     },
     {
       $push: {
         actions: {
-          ...action,
-          createdAt: now,
-          createdBy: '123-123-123'
+          ...input,
+          createdBy,
+          createdAt: now
         }
       }
     }
   )
 
-  return getEventById(eventId)
+  const event = await getEventById(eventId)
+  await indexEvent(event)
+  return event
 }
 
-export async function patchEvent(
-  event: z.infer<typeof EventInputWithId>
-): Promise<Event> {
-  const existingEvent = await getEventById(event.id)
+export async function patchEvent(eventInput: EventInputWithId) {
+  const existingEvent = await getEventById(eventInput.id)
 
   if (!existingEvent) {
-    throw new EventNotFoundError(event.id)
+    throw new EventNotFoundError(eventInput.id)
   }
 
   const db = await getClient()
-  const collection =
-    db.collection<z.infer<typeof EventWithTransactionId>>('events')
+  const collection = db.collection<EventDocument>('events')
 
-  const now = new Date()
+  const now = new Date().toISOString()
 
   await collection.updateOne(
     {
-      id: event.id
+      id: eventInput.id
     },
     {
       $set: {
-        ...event,
+        ...eventInput,
         updatedAt: now
       }
     }
   )
 
-  return getEventById(event.id)
+  const event = await getEventById(existingEvent.id)
+  await indexEvent(event)
+
+  return event
 }

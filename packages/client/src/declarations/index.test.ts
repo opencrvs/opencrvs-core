@@ -17,7 +17,7 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import { EventType, SystemRoleType, Status } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { storage } from '@client/storage'
@@ -277,13 +277,13 @@ describe('Utilty functions', () => {
       {
         id: '1',
         data: {},
-        event: Event.Birth,
+        event: EventType.Birth,
         compositionId: '1'
       },
       {
         id: '2',
         data: {},
-        event: Event.Death,
+        event: EventType.Death,
         compositionId: '2'
       }
     ]
@@ -304,7 +304,7 @@ describe('Utilty functions', () => {
 
 describe('archiveDeclaration tests', () => {
   let store: AppStore
-  const declaration = createDeclaration(Event.Birth, mockDeclarationData)
+  const declaration = createDeclaration(EventType.Birth, mockDeclarationData)
   let indexedDB: { USER_DATA: string; USER_DETAILS: string }
 
   beforeEach(() => {
@@ -342,23 +342,26 @@ describe('archiveDeclaration tests', () => {
     }
 
     // Mocking storage reading
-    storage.getItem = vi.fn((key: string) => {
-      switch (key) {
-        case 'USER_DATA':
-        case 'USER_DETAILS':
-          return Promise.resolve(indexedDB[key])
-        default:
-          return Promise.resolve(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    storage.getItem = vi.fn<[string], Promise<any | null>>(
+      <T = string>(key: string): Promise<T | null> => {
+        switch (key) {
+          case 'USER_DATA':
+          case 'USER_DETAILS':
+            return Promise.resolve(indexedDB[key] as T)
+          default:
+            return Promise.resolve(null)
+        }
       }
-    })
+    )
 
     // Mocking storage writing
-    storage.setItem = vi.fn((key: string, value: string) => {
+    storage.setItem = vi.fn(<T = string>(key: string, value: T): Promise<T> => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
-          indexedDB[key] = value
-          return Promise.resolve(indexedDB[key])
+          indexedDB[key] = value as string // Cast to string to match the logic
+          return Promise.resolve(value)
         default:
           return Promise.resolve(value)
       }

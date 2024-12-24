@@ -13,8 +13,7 @@ import * as Hapi from '@hapi/hapi'
 import { USER_MANAGEMENT_URL } from '@webhooks/constants'
 import {
   createRequestSignature,
-  transformBirthBundle,
-  transformDeathBundle
+  getPermissionsBundle
 } from '@webhooks/features/event/service'
 import { EventType, ISystem } from '@webhooks/features/manage/service'
 import { logger } from '@opencrvs/commons'
@@ -67,11 +66,13 @@ export async function birthRegisteredHandler(
           authHeader,
           EventType.Birth
         )
-        const transformedBundle = transformBirthBundle(
-          bundle,
-          webhookToNotify.createdBy.type,
-          permissions
-        )
+
+        let finalBundle: RegisteredRecord
+        if (webhookToNotify.createdBy.type === 'webhook') {
+          finalBundle = getPermissionsBundle(bundle, permissions)
+        } else {
+          finalBundle = bundle
+        }
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.BIRTH_REGISTERED]) {
           const payload = {
             timestamp: new Date().toISOString(),
@@ -80,7 +81,7 @@ export async function birthRegisteredHandler(
               hub: {
                 topic: TRIGGERS[TRIGGERS.BIRTH_REGISTERED]
               },
-              context: [transformedBundle]
+              context: [finalBundle]
             }
           }
           logger.info(
@@ -162,11 +163,13 @@ export async function deathRegisteredHandler(
           authHeader,
           EventType.Death
         )
-        const transformedBundle = transformDeathBundle(
-          bundle,
-          webhookToNotify.createdBy.type,
-          permissions
-        )
+
+        let finalBundle: RegisteredRecord
+        if (webhookToNotify.createdBy.type === 'webhook') {
+          finalBundle = getPermissionsBundle(bundle, permissions)
+        } else {
+          finalBundle = bundle
+        }
         if (webhookToNotify.trigger === TRIGGERS[TRIGGERS.DEATH_REGISTERED]) {
           const payload = {
             timestamp: new Date().toISOString(),
@@ -175,7 +178,7 @@ export async function deathRegisteredHandler(
               hub: {
                 topic: TRIGGERS[TRIGGERS.DEATH_REGISTERED]
               },
-              context: [transformedBundle]
+              context: [finalBundle]
             }
           }
           logger.info(

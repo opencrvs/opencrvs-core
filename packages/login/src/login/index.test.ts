@@ -11,6 +11,7 @@
 import * as actions from '@login/login/actions'
 import { initialState } from '@login/login/reducer'
 import { createStore, AppStore } from '@login/store'
+import { vi } from 'vitest'
 import { resolve } from 'url'
 import { client } from '@login/utils/authApi'
 
@@ -24,15 +25,20 @@ import { mockState } from '@login/tests/util'
 describe('actions', () => {
   describe('authenticate', () => {
     it('cleans mobile number by country and dispatch START_STEP_ONE action', () => {
+      const fn = vi.fn()
       const action = {
         type: actions.AUTHENTICATE,
         payload: {
           username: '+8801711111111',
-          password: 'test'
+          password: 'test',
+          inAppRedirect: fn
         }
       }
       expect(
-        actions.authenticate({ username: '+8801711111111', password: 'test' })
+        actions.authenticate(
+          { username: '+8801711111111', password: 'test' },
+          fn
+        )
       ).toEqual(action)
     })
   })
@@ -80,7 +86,8 @@ describe('reducer', () => {
     const action = {
       type: actions.AUTHENTICATION_COMPLETED,
       payload: {
-        nonce: '1234'
+        nonce: '1234',
+        inAppRedirect: () => {}
       }
     }
     store.dispatch(action)
@@ -157,9 +164,9 @@ describe('reducer', () => {
       type: actions.AUTHENTICATE_VALIDATE,
       payload: 500
     }
-    expect(actions.authenticate({ username: '', password: 'test' })).toEqual(
-      action
-    )
+    expect(
+      actions.authenticate({ username: '', password: 'test' }, () => {})
+    ).toEqual(action)
   })
   it('AUTHENTICATE_VALIDATE return errorCode', async () => {
     const expectedState = {

@@ -12,12 +12,10 @@ import * as React from 'react'
 import { mount, configure } from 'enzyme'
 import { Provider } from 'react-redux'
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-import { Router } from 'react-router'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
-
 import { getTheme } from '@opencrvs/components/lib/theme'
-
-import { App } from '@login/App'
+import { App, routesConfig } from '@login/App'
 import { IStoreState, createStore } from '@login/store'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
 
@@ -25,29 +23,58 @@ configure({ adapter: new Adapter() })
 
 export const mockState: IStoreState = createStore().store.getState()
 
-export async function createTestApp() {
-  const { store, history } = createStore()
-  const app = mount(<App store={store} history={history} />)
+type InitialEntry =
+  | string
+  | {
+      pathname: string
+      state: Record<
+        string,
+        string | boolean | number | Record<string, string | boolean | number>
+      >
+    }
 
-  return { history, app, store }
+export async function createTestApp({
+  initialEntries
+}: {
+  initialEntries?: InitialEntry[]
+} = {}) {
+  const { store } = createStore()
+  const router = createMemoryRouter(routesConfig, { initialEntries })
+
+  const app = mount(<App store={store} router={router} />)
+
+  return { router, app, store }
 }
 
 export function createTestComponent(
   node: React.ReactElement,
-  storeAndHistory?: ReturnType<typeof createStore>
+  {
+    store,
+    path,
+    initialEntries
+  }: { store?: any; initialEntries?: string[]; path?: string } | undefined = {}
 ) {
-  storeAndHistory = storeAndHistory || createStore()
-  const { store, history } = storeAndHistory
+  const router = createMemoryRouter(
+    [
+      {
+        path,
+        element: node
+      }
+    ],
+    { initialEntries }
+  )
 
-  return mount(
-    <Provider store={store}>
+  const component = mount(
+    <Provider store={store ?? createStore()?.store}>
       <IntlContainer>
         <ThemeProvider theme={getTheme()}>
-          <Router history={history}>{node}</Router>
+          <RouterProvider router={router} />
         </ThemeProvider>
       </IntlContainer>
     </Provider>
   )
+
+  return { component, router }
 }
 
 export const wait = () => new Promise((res) => process.nextTick(res))

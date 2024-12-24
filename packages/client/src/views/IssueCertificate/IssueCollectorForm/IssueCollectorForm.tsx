@@ -23,13 +23,13 @@ import { Button } from '@client/../../components/lib/Button'
 import { groupHasError } from '@client/views/CorrectionForm/utils'
 import {
   formatUrl,
-  goToIssueCertificate,
-  goToVerifyIssueCollector
+  generateIssueCertificateUrl,
+  generateVerifyIssueCollectorUrl
 } from '@client/navigation'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { getIssueCertCollectorGroupForEvent } from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { Redirect } from 'react-router'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'
@@ -41,6 +41,7 @@ export function IssueCollectorForm({
   declaration: IPrintableDeclaration
 }) {
   const intl = useIntl()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
@@ -79,15 +80,26 @@ export function IssueCollectorForm({
     const event = declaration.event
     if (!relationship) return
     if (relationship === 'OTHER') {
-      dispatch(goToIssueCertificate(declaration.id, 'otherCollector'))
+      navigate(
+        generateIssueCertificateUrl({
+          registrationId: declaration.id,
+          pageId: 'otherCollector'
+        })
+      )
     } else {
-      dispatch(goToVerifyIssueCollector(declaration.id, event, relationship))
+      navigate(
+        generateVerifyIssueCollectorUrl({
+          registrationId: declaration.id,
+          event,
+          collector: relationship
+        })
+      )
     }
   }
 
   if (!declaration) {
     return (
-      <Redirect
+      <Navigate
         to={formatUrl(REGISTRAR_HOME_TAB, {
           tabId: WORKQUEUE_TABS.readyToIssue,
           selectorId: ''

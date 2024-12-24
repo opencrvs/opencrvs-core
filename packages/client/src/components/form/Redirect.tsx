@@ -21,8 +21,8 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { Button } from '@opencrvs/components'
-import { useHttp } from '@client/components/form/http'
+import { Navigate } from 'react-router-dom'
+import { useHttp } from './http'
 
 export const RedirectField = ({
   fields,
@@ -47,13 +47,6 @@ export const RedirectField = ({
       callback: { params }
     }
   } = fieldDefinition
-  const evalPath = evalExpressionInFieldDefinition(
-    '`' + to + '`',
-    form,
-    config,
-    draft,
-    user
-  )
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.callback.trigger
   )!
@@ -84,10 +77,15 @@ export const RedirectField = ({
       call()
     }
   }, [call, params, form, trigger])
-
   return (
-    <Button type="secondary" size="large" disabled={isDisabled} fullWidth>
-      <a href={evalPath}>{fieldDefinition.label}</a>
-    </Button>
+    <Navigate
+      to={evalExpressionInFieldDefinition(
+        '`' + to + '`',
+        form,
+        config,
+        draft,
+        user
+      )}
+    />
   )
 }

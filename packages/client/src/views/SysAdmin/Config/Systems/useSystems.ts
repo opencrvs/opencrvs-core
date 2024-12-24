@@ -15,6 +15,9 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import {
   DeactivateSystemMutation,
   DeactivateSystemMutationVariables,
+  DeleteSystemMutation,
+  DeleteSystemMutationVariables,
+  EventType,
   ReactivateSystemMutation,
   ReactivateSystemMutationVariables,
   RefreshSystemSecretMutation,
@@ -25,11 +28,7 @@ import {
   SystemType,
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
-  WebhookPermission,
-  Event,
-  DeleteSystemMutation,
-  DeleteSystemMutationVariables,
-  IntegratingSystemType
+  WebhookPermission
 } from '@client/utils/gateway'
 
 import React, { useState } from 'react'
@@ -42,8 +41,6 @@ function useNewSystemDraft() {
   const [newSystemType, setNewSystemType] = useState<SystemType>(
     SystemType.Health
   )
-  const [newIntegratingSystemType, setNewIntegratingSystemType] =
-    useState<IntegratingSystemType>(IntegratingSystemType.Mosip)
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
@@ -60,8 +57,6 @@ function useNewSystemDraft() {
     setNewClientName,
     newSystemType,
     setNewSystemType,
-    newIntegratingSystemType,
-    setNewIntegratingSystemType,
     onChangeClientName,
     clearNewSystemDraft
   }
@@ -70,9 +65,6 @@ function useNewSystemDraft() {
 /** Handles communication with global state management */
 function useSystemsGlobalState() {
   const { systems: existingSystems } = useSelector(getOfflineData)
-  const doesNationalIdAlreadyExist = existingSystems.some(
-    (system) => system.type === SystemType.NationalId
-  )
   const dispatch = useDispatch()
 
   const dispatchSystemUpdate = (updatedSystem: System) => {
@@ -101,8 +93,7 @@ function useSystemsGlobalState() {
     dispatchSystemUpdate,
     dispatchNewSystem,
     existingSystems,
-    dispatchSystemRemove,
-    doesNationalIdAlreadyExist
+    dispatchSystemRemove
   }
 }
 
@@ -121,8 +112,6 @@ export function useSystems() {
     setNewClientName,
     newSystemType,
     setNewSystemType,
-    newIntegratingSystemType,
-    setNewIntegratingSystemType,
     onChangeClientName,
     clearNewSystemDraft
   } = useNewSystemDraft()
@@ -130,16 +119,15 @@ export function useSystems() {
     dispatchNewSystem,
     dispatchSystemUpdate,
     existingSystems,
-    doesNationalIdAlreadyExist,
     dispatchSystemRemove
   } = useSystemsGlobalState()
 
   const [birthPermissions, setBirthPermissions] = useState<WebhookPermission>(
-    initWebHook(Event.Birth)
+    initWebHook(EventType.Birth)
   )
 
   const [deathPermissions, setDeathPermissions] = useState<WebhookPermission>(
-    initWebHook(Event.Death)
+    initWebHook(EventType.Death)
   )
 
   const [systemToShowPermission, setSystemToShowPermission] = useState<System>()
@@ -301,10 +289,7 @@ export function useSystems() {
         system: {
           type: newSystemType,
           name: newClientName,
-          integratingSystemType:
-            newSystemType === SystemType.NationalId
-              ? newIntegratingSystemType
-              : undefined,
+          integratingSystemType: undefined,
           ...(newSystemType === SystemType.Webhook && {
             settings: {
               dailyQuota: 0,
@@ -329,8 +314,8 @@ export function useSystems() {
     resetActivateSystemData()
     resetDeactivateSystemData()
     resetRegisterSystemData()
-    setDeathPermissions(initWebHook(Event.Death))
-    setBirthPermissions(initWebHook(Event.Birth))
+    setDeathPermissions(initWebHook(EventType.Death))
+    setBirthPermissions(initWebHook(EventType.Birth))
     resetRefreshTokenData()
     updatePermissionsReset()
     systemToDeleteReset()
@@ -338,12 +323,9 @@ export function useSystems() {
 
   const closePermissionModal = () => {
     setSystemToShowPermission(undefined)
-    setDeathPermissions(initWebHook(Event.Death))
-    setBirthPermissions(initWebHook(Event.Birth))
+    setDeathPermissions(initWebHook(EventType.Death))
+    setBirthPermissions(initWebHook(EventType.Birth))
   }
-
-  const shouldWarnAboutNationalId =
-    newSystemType === SystemType.NationalId && doesNationalIdAlreadyExist
 
   return {
     closePermissionModal,
@@ -390,9 +372,6 @@ export function useSystems() {
     refreshTokenLoading,
     refreshTokenError,
     resetRefreshTokenData,
-    resetData,
-    shouldWarnAboutNationalId,
-    newIntegratingSystemType,
-    setNewIntegratingSystemType
+    resetData
   }
 }

@@ -127,12 +127,6 @@ const messagesToDefine = {
     description: 'Label for event notification'
   },
 
-  nationalID: {
-    id: 'integrations.type.nationalID',
-    defaultMessage: 'National ID',
-    description: 'Label for national ID system client'
-  },
-
   childDetails: {
     id: 'integrations.childDetails',
     defaultMessage: `Child's details`,
@@ -309,10 +303,6 @@ const messagesToDefine = {
     id: 'integrations.deactivatetext',
     defaultMessage: 'This will deactivate the client',
     description: 'This will deactivate the client'
-  },
-  onlyOneNationalIdError: {
-    id: 'integrations.onlyOneNationalId',
-    defaultMessage: 'Only one National ID integration is allowed.'
   },
   updatePermissionsMsg: {
     id: 'integrations.updatePermissionsMsg',

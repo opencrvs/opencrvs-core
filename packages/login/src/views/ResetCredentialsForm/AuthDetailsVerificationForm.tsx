@@ -8,12 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  FORGOTTEN_ITEMS,
-  goToForgottenItemForm,
-  goToRecoveryCodeEntryForm,
-  goToSecurityQuestionForm
-} from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { emailAddressFormat, phoneNumberFormat } from '@login/utils/validate'
 import { InputField } from '@opencrvs/components/lib/InputField'
@@ -24,15 +18,15 @@ import { AppBar } from '@opencrvs/components/lib/AppBar'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
-import * as React from 'react'
+import React, { useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
 import { messages as validationMessages } from '@login/i18n/messages/validations'
 import { constantsMessages } from '@login/i18n/messages/constants'
+import { useLocation, useNavigate } from 'react-router-dom'
+import * as routes from '@login/navigation/routes'
 
 const Actions = styled.div`
   & > div {
@@ -40,11 +34,6 @@ const Actions = styled.div`
   }
 `
 
-interface BaseProps {
-  goToForgottenItemForm: typeof goToForgottenItemForm
-  goToRecoveryCodeEntryForm: typeof goToRecoveryCodeEntryForm
-  goToSecurityQuestionForm: typeof goToSecurityQuestionForm
-}
 interface State {
   phone: string
   email: string
@@ -54,253 +43,227 @@ interface State {
   notificationMethod: string
 }
 
-type Props = BaseProps &
-  RouteComponentProps<{}, {}, { forgottenItem: FORGOTTEN_ITEMS }> &
-  WrappedComponentProps
+const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [touched, setTouched] = useState(false)
+  const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [notificationMethod] = useState(
+    window.config.USER_NOTIFICATION_DELIVERY_METHOD
+  )
 
-class AuthDetailsVerificationComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      phone: '',
-      email: '',
-      touched: false,
-      error: false,
-      errorMessage: '',
-      notificationMethod: window.config.USER_NOTIFICATION_DELIVERY_METHOD
-    }
+  // <{ forgottenItem: FORGOTTEN_ITEMS }>
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleMobileChange = (value: string) => {
+    setPhone(value)
+    setTouched(true)
+    setError(phoneNumberFormat(value) ? true : false)
   }
 
-  handleMobileChange = (value: string) => {
-    this.setState({
-      error: phoneNumberFormat(value) ? true : false,
-      phone: value,
-      touched: true
-    })
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    setTouched(true)
+    setError(emailAddressFormat(value) ? true : false)
   }
 
-  handleEmailChange = (value: string) => {
-    this.setState({
-      error: emailAddressFormat(value) ? true : false,
-      email: value,
-      touched: true
-    })
-  }
-
-  handleContinue = async (event: React.FormEvent) => {
+  const handleContinue = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (
-      this.state.notificationMethod === 'sms' &&
-      (!this.state.phone || this.state.error)
-    ) {
-      this.setState((prevState) => ({
-        touched: true,
-        error: true,
-        errorMessage: !prevState.phone
-          ? this.props.intl.formatMessage(validationMessages.phoneNumberFormat)
-          : this.props.intl.formatMessage(messages.errorPhoneNumberNotFound)
-      }))
-      return
-    } else if (
-      this.state.notificationMethod === 'email' &&
-      (!this.state.email || this.state.error)
-    ) {
-      this.setState((prevState) => ({
-        touched: true,
-        error: true,
-        errorMessage: !prevState.email
-          ? this.props.intl.formatMessage(validationMessages.emailAddressFormat)
-          : this.props.intl.formatMessage(messages.errorEmailAddressNotFound)
-      }))
+
+    if (notificationMethod === 'sms' && (!phone || error)) {
+      setError(true)
+      setTouched(true)
+      setErrorMessage(
+        !phone
+          ? intl.formatMessage(validationMessages.phoneNumberFormat)
+          : intl.formatMessage(messages.errorPhoneNumberNotFound)
+      )
       return
     }
+    if (notificationMethod === 'email' && (!email || error)) {
+      setError(true)
+      setTouched(true)
+      setErrorMessage(
+        !email
+          ? intl.formatMessage(validationMessages.emailAddressFormat)
+          : intl.formatMessage(messages.errorEmailAddressNotFound)
+      )
+      return
+    }
+
     try {
       const { nonce, securityQuestionKey } = await authApi.verifyUser({
         mobile:
-          this.state.notificationMethod === 'sms'
-            ? convertToMSISDN(this.state.phone, window.config.COUNTRY)
+          notificationMethod === 'sms'
+            ? convertToMSISDN(phone, window.config.COUNTRY)
             : undefined,
-        email:
-          this.state.notificationMethod === 'email'
-            ? this.state.email
-            : undefined,
-        retrieveFlow: this.props.location.state.forgottenItem
+        email: notificationMethod === 'email' ? email : undefined,
+        retrieveFlow: location.state.forgottenItem
       })
 
       if (securityQuestionKey) {
-        this.props.goToSecurityQuestionForm(
-          nonce,
-          securityQuestionKey,
-          this.props.location.state.forgottenItem
-        )
-      } else {
-        this.props.goToRecoveryCodeEntryForm(
-          nonce,
-          this.props.location.state.forgottenItem,
-          this.state.phone,
-          this.state.email
-        )
+        return navigate(routes.SECURITY_QUESTION, {
+          state: {
+            nonce,
+            securityQuestionKey,
+            forgottenItem: location.state.forgottenItem
+          }
+        })
       }
+
+      navigate(routes.RECOVERY_CODE_ENTRY, {
+        state: {
+          nonce,
+          mobile: phone,
+          email,
+          forgottenItem: location.state.forgottenItem
+        }
+      })
     } catch (err) {
-      this.setState({
-        error: true,
-        errorMessage: this.props.intl.formatMessage(
-          this.state.notificationMethod === 'sms'
+      setError(true)
+      setErrorMessage(
+        intl.formatMessage(
+          notificationMethod === 'sms'
             ? messages.errorPhoneNumberNotFound
             : messages.errorEmailAddressNotFound
         )
-      })
+      )
     }
   }
 
-  render() {
-    const {
-      error: responseError,
-      errorMessage,
-      notificationMethod
-    } = this.state
-    const { intl, goToForgottenItemForm } = this.props
-    const validationError =
-      this.state.error &&
-      (notificationMethod === 'sms'
-        ? phoneNumberFormat(this.state.phone)
-        : emailAddressFormat(this.state.email))
-    return (
-      <>
-        <Frame
-          header={
-            <AppBar
-              desktopLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={goToForgottenItemForm}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
+  const validationError =
+    error &&
+    (notificationMethod === 'sms'
+      ? phoneNumberFormat(phone)
+      : emailAddressFormat(email))
+  return (
+    <>
+      <Frame
+        header={
+          <AppBar
+            desktopLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => navigate(routes.FORGOTTEN_ITEM)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileLeft={
+              <Button
+                aria-label="Go back"
+                size="medium"
+                type="icon"
+                onClick={() => navigate(routes.FORGOTTEN_ITEM)}
+              >
+                <Icon name="ArrowLeft" />
+              </Button>
+            }
+            mobileTitle={intl.formatMessage(
+              messages.credentialsResetFormTitle,
+              {
+                forgottenItem: location.state.forgottenItem
               }
-              mobileLeft={
-                <Button
-                  aria-label="Go back"
-                  size="medium"
-                  type="icon"
-                  onClick={goToForgottenItemForm}
-                >
-                  <Icon name="ArrowLeft" />
-                </Button>
+            )}
+            desktopTitle={intl.formatMessage(
+              messages.credentialsResetFormTitle,
+              {
+                forgottenItem: location.state.forgottenItem
               }
-              mobileTitle={intl.formatMessage(
-                messages.credentialsResetFormTitle,
-                {
-                  forgottenItem: this.props.location.state.forgottenItem
-                }
-              )}
-              desktopTitle={intl.formatMessage(
-                messages.credentialsResetFormTitle,
-                {
-                  forgottenItem: this.props.location.state.forgottenItem
-                }
-              )}
-            />
-          }
-          skipToContentText={intl.formatMessage(
-            constantsMessages.skipToMainContent
-          )}
-        >
-          <form
-            id="phone-or-email-verification-form"
-            onSubmit={this.handleContinue}
+            )}
+          />
+        }
+        skipToContentText={intl.formatMessage(
+          constantsMessages.skipToMainContent
+        )}
+      >
+        <form id="phone-or-email-verification-form" onSubmit={handleContinue}>
+          <Content
+            size={ContentSize.SMALL}
+            title={
+              notificationMethod === 'sms'
+                ? intl.formatMessage(
+                    messages.phoneNumberConfirmationFormBodyHeader
+                  )
+                : intl.formatMessage(
+                    messages.emailAddressConfirmationFormBodyHeader
+                  )
+            }
+            bottomActionButtons={[
+              <Button
+                key="1"
+                id="continue"
+                onClick={handleContinue}
+                type="primary"
+                size="large"
+              >
+                {intl.formatMessage(messages.continueButtonLabel)}
+              </Button>
+            ]}
+            showTitleOnMobile
           >
-            <Content
-              size={ContentSize.SMALL}
-              title={
-                notificationMethod === 'sms'
-                  ? intl.formatMessage(
-                      messages.phoneNumberConfirmationFormBodyHeader
-                    )
-                  : intl.formatMessage(
-                      messages.emailAddressConfirmationFormBodyHeader
-                    )
-              }
-              bottomActionButtons={[
-                <Button
-                  key="1"
-                  id="continue"
-                  onClick={this.handleContinue}
-                  type="primary"
-                  size="large"
-                >
-                  {intl.formatMessage(messages.continueButtonLabel)}
-                </Button>
-              ]}
-              showTitleOnMobile
-            >
-              <Actions id="phone-or-email-verification">
-                <InputField
-                  id="phone-or-email-for-notification"
-                  key="phoneOrEmailFieldInputContainer"
-                  label={
-                    this.state.notificationMethod === 'sms'
-                      ? this.props.intl.formatMessage(
-                          messages.phoneNumberFieldLabel
-                        )
-                      : this.state.notificationMethod === 'email'
-                      ? this.props.intl.formatMessage(
-                          messages.emailAddressFieldLabel
-                        )
-                      : ''
-                  }
-                  touched={this.state.touched}
-                  error={
-                    validationError
-                      ? this.props.intl.formatMessage(
-                          validationError.message,
-                          validationError.props
-                        )
-                      : responseError
-                      ? errorMessage
-                      : ''
-                  }
-                  hideAsterisk={true}
-                >
-                  {notificationMethod === 'sms' && (
-                    <TextInput
-                      id="phone-number-input"
-                      type="tel"
-                      key="phoneNumberInputField"
-                      name="phoneNumberInput"
-                      isSmallSized={true}
-                      value={this.state.phone}
-                      onChange={(e) => this.handleMobileChange(e.target.value)}
-                      touched={this.state.touched}
-                      error={responseError}
-                    />
-                  )}
-                  {notificationMethod === 'email' && (
-                    <TextInput
-                      id="email-address-input"
-                      key="emailAddressInputField"
-                      name="emailAddressInput"
-                      isSmallSized={true}
-                      value={this.state.email}
-                      onChange={(e) => this.handleEmailChange(e.target.value)}
-                      touched={this.state.touched}
-                      error={responseError}
-                    />
-                  )}
-                </InputField>
-              </Actions>
-            </Content>
-          </form>
-        </Frame>
-      </>
-    )
-  }
+            <Actions id="phone-or-email-verification">
+              <InputField
+                id="phone-or-email-for-notification"
+                key="phoneOrEmailFieldInputContainer"
+                label={
+                  notificationMethod === 'sms'
+                    ? intl.formatMessage(messages.phoneNumberFieldLabel)
+                    : notificationMethod === 'email'
+                    ? intl.formatMessage(messages.emailAddressFieldLabel)
+                    : ''
+                }
+                touched={touched}
+                error={
+                  validationError
+                    ? intl.formatMessage(
+                        validationError.message,
+                        validationError.props
+                      )
+                    : error
+                    ? errorMessage
+                    : ''
+                }
+                hideAsterisk={true}
+              >
+                {notificationMethod === 'sms' && (
+                  <TextInput
+                    id="phone-number-input"
+                    type="tel"
+                    key="phoneNumberInputField"
+                    name="phoneNumberInput"
+                    isSmallSized={true}
+                    value={phone}
+                    onChange={(e) => handleMobileChange(e.target.value)}
+                    touched={touched}
+                    error={error}
+                  />
+                )}
+                {notificationMethod === 'email' && (
+                  <TextInput
+                    id="email-address-input"
+                    key="emailAddressInputField"
+                    name="emailAddressInput"
+                    isSmallSized={true}
+                    value={email}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    touched={touched}
+                    error={error}
+                  />
+                )}
+              </InputField>
+            </Actions>
+          </Content>
+        </form>
+      </Frame>
+    </>
+  )
 }
 
-export const AuthDetailsVerification = connect(null, {
-  goToForgottenItemForm,
-  goToRecoveryCodeEntryForm,
-  goToSecurityQuestionForm
-})(withRouter(injectIntl(AuthDetailsVerificationComponent)))
+export const AuthDetailsVerification = injectIntl(
+  AuthDetailsVerificationComponent
+)

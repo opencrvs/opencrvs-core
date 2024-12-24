@@ -126,7 +126,7 @@ export interface IDynamicOptions {
   options?: { [key: string]: ISelectOption[] }
 }
 
-export interface IDispatchOptions {
+interface IDispatchOptions {
   action: string
   payloadKey: string
 }
@@ -982,6 +982,14 @@ export interface IFormSection {
   optional?: boolean
   notice?: MessageDescriptor
   mapping?: IFormSectionMapping
+  /**
+   * used for disabling continue button conditionally on a loading value
+   * of a FETCH field
+   * example: canContinue: '!$form.fetch?.loading'
+   * above example blocks user when fetch is on loading state, preventing implications
+   * caused by the unresolved pending requests
+   */
+  canContinue?: string
 }
 
 export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {

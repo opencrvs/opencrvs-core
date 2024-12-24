@@ -23,7 +23,7 @@ import {
 import { useSelector } from 'react-redux'
 import { getOfflineData } from '@client/offline/selectors'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { Event, RegStatus, History } from '@client/utils/gateway'
+import { EventType, RegStatus, History } from '@client/utils/gateway'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { getLanguage } from '@client/i18n/selectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -629,7 +629,7 @@ export const DuplicateFormTabs = (props: IProps) => {
       const eventData =
         duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing
       const eventType =
-        duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as Event
+        duplicateDeclarationGQLData?.data?.fetchRegistrationForViewing?.registration.type.toLowerCase() as EventType
       const duplicateDeclarationData = gqlToDraftTransformer(
         form[eventType],
         eventData,

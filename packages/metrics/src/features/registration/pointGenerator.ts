@@ -353,15 +353,15 @@ export async function generatePaymentPoint(
   authHeader: IAuthHeader,
   paymentType: 'certification' | 'correction'
 ): Promise<IPaymentPoints> {
-  const reconciliation = getPaymentReconciliation(payload)
-  const composition = getComposition(payload)
   const task = getTask(payload)
   if (!task) {
     throw new Error('Task not found')
   }
+  const composition = getComposition(payload)
   if (!composition) {
     throw new Error('Composition not found')
   }
+  const reconciliation = getPaymentReconciliation(payload, task)
   if (!reconciliation) {
     throw new Error('Payment reconciliation not found')
   }

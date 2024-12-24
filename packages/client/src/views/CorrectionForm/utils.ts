@@ -632,6 +632,12 @@ function hasNestedDataChanged(
   return true
 }
 
+export type RenderableFieldType = {
+  item: string
+  original: IFormFieldValue | JSX.Element | undefined
+  changed: IFormFieldValue | JSX.Element | undefined
+}
+
 export function getRenderableField(
   section: IFormSection,
   {
@@ -644,7 +650,7 @@ export function getRenderableField(
   original: IFormFieldValue | JSX.Element | undefined,
   changed: IFormFieldValue | JSX.Element | undefined,
   intl: IntlShape
-) {
+): RenderableFieldType {
   let item = intl.formatMessage(fieldLabel, fieldLabelParams)
   if (section && section.name) {
     item = `${item} (${intl.formatMessage(section.name)})`

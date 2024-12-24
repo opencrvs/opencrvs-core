@@ -27,7 +27,8 @@ import {
   TextArea
 } from '@opencrvs/components/lib'
 import { buttonMessages } from '@client/i18n/messages'
-import { goToHome } from '@client/navigation'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 interface IProps {
   declaration: IDeclaration
@@ -49,11 +50,13 @@ const StyledTextArea = styled(TextArea)`
 
 export const DuplicateForm = (props: IProps) => {
   const intl = useIntl()
+  const navigate = useNavigate()
   const [showModal, setShowModal] = React.useState(false)
   const [selectedTrackingId, setSelectedTrackingId] = React.useState('')
   const [comment, setComment] = React.useState('')
-  const compositionId = props.declaration.id
+
   const dispatch = useDispatch()
+  const compositionId = props.declaration.id
   const { data } = props.declaration
   const { duplicates, ...withoutDuplicates } = props.declaration
   const trackingIds = duplicates
@@ -177,7 +180,7 @@ export const DuplicateForm = (props: IProps) => {
                     selectedTrackingId
                   )
                 )
-                dispatch(goToHome())
+                navigate(routes.HOME)
               }
             }}
             disabled={!(Boolean(selectedTrackingId) && Boolean(comment))}

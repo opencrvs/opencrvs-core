@@ -20,12 +20,11 @@ import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { useDispatch } from 'react-redux'
 import { Icon, ResponsiveModal } from '@opencrvs/components'
 import {
-  goToCertificateCorrection,
-  goToHome,
-  goToIssueCertificate,
-  goToPage,
-  goToPrintCertificate,
-  goToViewRecordPage
+  formatUrl,
+  generateCertificateCorrectionUrl,
+  generateGoToPageUrl,
+  generateIssueCertificateUrl,
+  generatePrintCertificateUrl
 } from '@client/navigation'
 import { useIntl } from 'react-intl'
 import { Scope } from '@sentry/react'
@@ -38,22 +37,6 @@ import {
   SUBMISSION_STATUS,
   unassignDeclaration
 } from '@client/declarations'
-import { CorrectionSection } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  DRAFT_MARRIAGE_FORM_PAGE,
-  REVIEW_CORRECTION,
-  REVIEW_EVENT_PARENT_FORM_PAGE
-} from '@client/navigation/routes'
-import { messages } from '@client/i18n/messages/views/action'
-import { useModal } from '@client/hooks/useModal'
-import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
-import { client } from '@client/utils/apolloClient'
-import { Event } from '@client/utils/gateway'
-import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
 import {
   canBeCorrected,
   isArchivable,
@@ -65,6 +48,24 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
+import { CorrectionSection } from '@client/forms'
+import { useModal } from '@client/hooks/useModal'
+import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/action'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import {
+  DRAFT_BIRTH_PARENT_FORM_PAGE,
+  DRAFT_DEATH_FORM_PAGE,
+  DRAFT_MARRIAGE_FORM_PAGE,
+  REVIEW_CORRECTION,
+  REVIEW_EVENT_PARENT_FORM_PAGE
+} from '@client/navigation/routes'
+import { client } from '@client/utils/apolloClient'
+import { EventType } from '@client/utils/gateway'
+import { GQLAssignmentData } from '@client/utils/gateway-deprecated-do-not-use'
+import { DeleteModal } from '@client/views/RegisterForm/RegisterForm'
+import { useNavigate } from 'react-router-dom'
+import * as routes from '@client/navigation/routes'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -74,6 +75,7 @@ export const ActionMenu: React.FC<{
   toggleDisplayDialog: () => void
 }> = ({ declaration, scope, draft, toggleDisplayDialog, duplicates }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [modal, openModal] = useModal()
 
   const intl = useIntl()
@@ -92,7 +94,7 @@ export const ActionMenu: React.FC<{
     ))
     if (deleteConfirm) {
       dispatch(deleteDeclaration(id, client))
-      dispatch(goToHome())
+      navigate(routes.HOME)
     }
     return
   }
@@ -215,13 +217,17 @@ const ViewAction: React.FC<{
   declarationStatus?: SUBMISSION_STATUS
   declarationId: string
 }> = ({ declarationStatus, declarationId }) => {
+  const navigate = useNavigate()
   const intl = useIntl()
-  const dispatch = useDispatch()
 
   return (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(goToViewRecordPage(declarationId))
+        navigate(
+          formatUrl(routes.VIEW_RECORD, {
+            declarationId
+          })
+        )
       }}
     >
       <Icon name="Eye" color="currentColor" size="large" />
@@ -235,11 +241,12 @@ const ViewAction: React.FC<{
 const CorrectRecordAction: React.FC<
   IActionItemCommonProps & IDeclarationProps
 > = ({ declarationId, declarationStatus, type, isDownloaded, scope }) => {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const intl = useIntl()
 
   const isBirthOrDeathEvent =
-    type && [Event.Birth, Event.Death].includes(type as Event)
+    type && [EventType.Birth, EventType.Death].includes(type as EventType)
 
   // @ToDo use: `record.registration-correct` after configurable role pr is merged
   const userHasRegisterScope =
@@ -259,11 +266,12 @@ const CorrectRecordAction: React.FC<
     <DropdownMenu.Item
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(
-          goToCertificateCorrection(
-            declarationId as string,
-            CorrectionSection.Corrector
-          )
+
+        navigate(
+          generateCertificateCorrectionUrl({
+            declarationId,
+            pageId: CorrectionSection.Corrector
+          })
         )
       }}
       disabled={!isDownloaded}
@@ -331,8 +339,8 @@ const ReviewAction: React.FC<
   isDownloaded,
   isDuplicate
 }) => {
+  const navigate = useNavigate()
   const intl = useIntl()
-  const dispatch = useDispatch()
 
   const userHasReviewScope =
     scope &&
@@ -344,8 +352,16 @@ const ReviewAction: React.FC<
   return isPendingCorrection(declarationStatus) ? (
     <DropdownMenu.Item
       onClick={() => {
-        type &&
-          dispatch(goToPage(REVIEW_CORRECTION, declarationId, 'review', type))
+        if (type) {
+          navigate(
+            generateGoToPageUrl({
+              pageRoute: REVIEW_CORRECTION,
+              declarationId,
+              pageId: 'review',
+              event: type
+            })
+          )
+        }
       }}
       disabled={!isDownloaded}
     >
@@ -355,13 +371,13 @@ const ReviewAction: React.FC<
   ) : isReviewableDeclaration(declarationStatus) ? (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(
-          goToPage(
-            REVIEW_EVENT_PARENT_FORM_PAGE,
-            declarationId as string,
-            'review',
-            type as string
-          )
+        navigate(
+          generateGoToPageUrl({
+            pageRoute: REVIEW_EVENT_PARENT_FORM_PAGE,
+            declarationId,
+            pageId: 'review',
+            event: type as string
+          })
         )
       }}
       disabled={!isDownloaded}
@@ -380,7 +396,7 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   isDownloaded
 }) => {
   const intl = useIntl()
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   // @ToDo use: appropriate scope after configurable role pr is merged
   const userHasUpdateScope =
@@ -390,20 +406,20 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
       ((scope as any as string[]).includes('validate') &&
         declarationStatus === SUBMISSION_STATUS.DRAFT))
 
-  let PAGE_ROUTE: string, PAGE_ID: string
+  let pageRoute: string, pageId: 'preview' | 'review'
 
   if (declarationStatus === SUBMISSION_STATUS.DRAFT) {
-    PAGE_ID = 'preview'
+    pageId = 'preview'
     if (type === 'birth') {
-      PAGE_ROUTE = DRAFT_BIRTH_PARENT_FORM_PAGE
+      pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
     } else if (type === 'death') {
-      PAGE_ROUTE = DRAFT_DEATH_FORM_PAGE
+      pageRoute = DRAFT_DEATH_FORM_PAGE
     } else if (type === 'marriage') {
-      PAGE_ROUTE = DRAFT_MARRIAGE_FORM_PAGE
+      pageRoute = DRAFT_MARRIAGE_FORM_PAGE
     }
   } else {
-    PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
-    PAGE_ID = 'review'
+    pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
+    pageId = 'review'
   }
 
   if (!isUpdatableDeclaration(declarationStatus) || !userHasUpdateScope)
@@ -412,8 +428,13 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
   return (
     <DropdownMenu.Item
       onClick={() => {
-        dispatch(
-          goToPage(PAGE_ROUTE, declarationId as string, PAGE_ID, type as string)
+        navigate(
+          generateGoToPageUrl({
+            pageRoute: pageRoute,
+            declarationId,
+            pageId,
+            event: type as string
+          })
         )
       }}
       disabled={!isDownloaded}
@@ -433,6 +454,7 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   // @ToDo use: `record.print-records` or other appropriate scope after configurable role pr is merged
   const userHasPrintScope =
@@ -446,11 +468,12 @@ const PrintAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     <DropdownMenu.Item
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(
-          goToPrintCertificate(
-            declarationId as string,
-            (type as string).toLocaleLowerCase()
-          )
+
+        navigate(
+          generatePrintCertificateUrl({
+            registrationId: declarationId,
+            event: (type as string)?.toLocaleLowerCase()
+          })
         )
       }}
       disabled={!isDownloaded}
@@ -469,6 +492,7 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 }) => {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   // @ToDo use: `record.print-issue-certified-copies` or other appropriate scope after configurable role pr is merged
   const userHasIssueScope =
@@ -482,7 +506,11 @@ const IssueAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     <DropdownMenu.Item
       onClick={() => {
         dispatch(clearCorrectionAndPrintChanges(declarationId as string))
-        dispatch(goToIssueCertificate(declarationId as string))
+        navigate(
+          generateIssueCertificateUrl({
+            registrationId: declarationId
+          })
+        )
       }}
       disabled={!isDownloaded}
     >

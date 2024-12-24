@@ -32,18 +32,15 @@ import {
 } from '@login/utils/authUtils'
 import { IAuthenticationData } from '@login/utils/authApi'
 import * as actions from '@login/login/actions'
-import {
-  goToForgottenItemForm,
-  resetSubmissionError
-} from '@login/login/actions'
+import { resetSubmissionError } from '@login/login/actions'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Toast } from '@opencrvs/components/lib/Toast/Toast'
 import { usePersistentCountryLogo } from '@login/common/LoginBackgroundWrapper'
 import { Container, FormWrapper, LogoContainer } from '@login/views/Common'
-import { LanguageSelect } from '@login/i18n/components/LanguageSelect'
 import { Text } from '@opencrvs/components/lib/Text/Text'
-import { Link } from '@opencrvs/components/lib/Link/Link'
 import { Stack } from '@opencrvs/components/lib/Stack/Stack'
+import { Link, useNavigate } from 'react-router-dom'
+import { FORGOTTEN_ITEM, STEP_TWO } from '@login/navigation/routes'
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
@@ -110,6 +107,10 @@ export function StepOneContainer() {
   const intl = useIntl()
   const isOffline: boolean = navigator.onLine ? false : true
 
+  const navigate = useNavigate()
+
+  const toStepTwo = () => navigate(STEP_TWO)
+
   const dispatch = useDispatch()
 
   const logo = usePersistentCountryLogo()
@@ -126,7 +127,7 @@ export function StepOneContainer() {
         </LogoContainer>
         <Form
           onSubmit={(values: IAuthenticationData) =>
-            dispatch(actions.authenticate(values))
+            dispatch(actions.authenticate(values, toStepTwo))
           }
         >
           {({ handleSubmit }) => (
@@ -148,14 +149,19 @@ export function StepOneContainer() {
                 >
                   {intl.formatMessage(messages.submit)}
                 </Button>
-                <Button
-                  size="small"
-                  type="tertiary"
+                <Link
+                  to={FORGOTTEN_ITEM}
                   id="login-forgot-password"
-                  onClick={() => dispatch(goToForgottenItemForm())}
+                  style={{
+                    textDecoration: 'none',
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }}
                 >
-                  {intl.formatMessage(messages.forgotPassword)}
-                </Button>
+                  <Button size="small" type="tertiary">
+                    {intl.formatMessage(messages.forgotPassword)}
+                  </Button>
+                </Link>
               </Stack>
             </FormWrapper>
           )}

@@ -19,17 +19,23 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
 import { ISearchCriteria, postAdvancedSearch } from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
-import { ApolloError } from 'apollo-server-hapi'
+import { GraphQLError } from 'graphql'
 
 type ApiResponse<T> = {
   body: T
   statusCode: number
 }
 
-export class RateLimitError extends ApolloError {
-  constructor(message: string) {
-    super(message, 'DAILY_QUOTA_EXCEEDED')
-    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
+class RateLimitError extends GraphQLError {
+  constructor(message = 'You are being rate limited') {
+    super(message, {
+      extensions: {
+        code: 'DAILY_QUOTA_EXCEEDED',
+        http: {
+          status: 429
+        }
+      }
+    })
   }
 }
 
@@ -102,10 +108,8 @@ export const resolvers: GQLResolver = {
           'recordsearch'
         ])
       ) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar, registration agent & field agent'
-          )
+        throw new Error(
+          'Advanced search is only allowed for registrar, registration agent & field agent'
         )
       }
 
@@ -146,7 +150,7 @@ export const resolvers: GQLResolver = {
 
         if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
-          return await Promise.reject(new Error(errMsg.message))
+          throw new Error(errMsg.message)
         }
 
         ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
@@ -175,7 +179,7 @@ export const resolvers: GQLResolver = {
         )
 
         if (!hasAtLeastOneParam) {
-          return await Promise.reject(new Error('There is no param to search '))
+          throw new Error('There is no param to search ')
         }
 
         searchCriteria.parameters = { ...advancedSearchParameters }
@@ -201,10 +205,8 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'User does not have a sysadmin or register or validate scope'
-          )
+        throw new Error(
+          'User does not have a sysadmin or register or validate scope'
         )
       }
 

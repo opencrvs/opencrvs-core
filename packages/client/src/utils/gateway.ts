@@ -35,10 +35,17 @@ export type Scalars = {
   Int: number
   Float: number
   Date: any
+  DateTime: any
   FieldValue: any
   Map: any
   PlainDate: PlainDate
 }
+
+export type Action =
+  | CreateAction
+  | DeclareAction
+  | NotifyAction
+  | RegisterAction
 
 export type AdditionalIdWithCompositionId = {
   __typename?: 'AdditionalIdWithCompositionId'
@@ -122,7 +129,7 @@ export type AdvancedSeachParameters = {
   deceasedIdentifier?: Maybe<Scalars['String']>
   declarationJurisdictionId?: Maybe<Scalars['String']>
   declarationLocationId?: Maybe<Scalars['String']>
-  event?: Maybe<Event>
+  event?: Maybe<EventType>
   eventCountry?: Maybe<Scalars['String']>
   eventLocationId?: Maybe<Scalars['String']>
   eventLocationLevel1?: Maybe<Scalars['String']>
@@ -189,7 +196,7 @@ export type AdvancedSearchParametersInput = {
   deceasedIdentifier?: InputMaybe<Scalars['String']>
   declarationJurisdictionId?: InputMaybe<Scalars['String']>
   declarationLocationId?: InputMaybe<Scalars['String']>
-  event?: InputMaybe<Event>
+  event?: InputMaybe<EventType>
   eventCountry?: InputMaybe<Scalars['String']>
   eventLocationId?: InputMaybe<Scalars['String']>
   eventLocationLevel1?: InputMaybe<Scalars['String']>
@@ -228,6 +235,10 @@ export type AdvancedSearchParametersInput = {
   registrationStatuses?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   timePeriodFrom?: InputMaybe<Scalars['String']>
   trackingId?: InputMaybe<Scalars['String']>
+}
+
+export type ApproveCorrectionActionInput = {
+  data: Array<FieldInput>
 }
 
 export type AssignmentData = {
@@ -403,6 +414,10 @@ export type CertificationMetric = {
   total: Scalars['Float']
 }
 
+export type CertifyActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Comment = {
   __typename?: 'Comment'
   comment?: Maybe<Scalars['String']>
@@ -426,6 +441,12 @@ export type ComparisonInput = {
   lte?: InputMaybe<Scalars['String']>
   ne?: InputMaybe<Scalars['String']>
   nin?: InputMaybe<Array<Scalars['String']>>
+}
+
+export type ConfirmRegistrationInput = {
+  error?: InputMaybe<Scalars['String']>
+  identifiers?: InputMaybe<Array<IdentifierInput>>
+  registrationNumber: Scalars['String']
 }
 
 export type ContactPoint = {
@@ -480,6 +501,14 @@ export type CorrectionValueInput = {
   newValue: Scalars['FieldValue']
   oldValue?: InputMaybe<Scalars['FieldValue']>
   section: Scalars['String']
+}
+
+export type CreateAction = {
+  __typename?: 'CreateAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  type: Scalars['String']
 }
 
 export type CreatedIds = {
@@ -565,6 +594,19 @@ export type DeclarationsStartedMetrics = {
   officeDeclarations: Scalars['Int']
 }
 
+export type DeclareAction = {
+  __typename?: 'DeclareAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  identifiers: Identifiers
+  type: Scalars['String']
+}
+
+export type DeclareActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Dummy = {
   __typename?: 'Dummy'
   dummy: Scalars['String']
@@ -585,10 +627,17 @@ export type Estimation = {
   totalEstimation: Scalars['Float']
 }
 
-export enum Event {
-  Birth = 'birth',
-  Death = 'death',
-  Marriage = 'marriage'
+export type Event = {
+  __typename?: 'Event'
+  actions: Array<Action>
+  createdAt: Scalars['DateTime']
+  id: Scalars['String']
+  type: Scalars['String']
+  updatedAt: Scalars['DateTime']
+}
+
+export type EventInput = {
+  type: Scalars['String']
 }
 
 export type EventMetrics = {
@@ -678,12 +727,29 @@ export type EventSearchSet = {
   type?: Maybe<Scalars['String']>
 }
 
+export enum EventType {
+  Birth = 'birth',
+  Death = 'death',
+  Marriage = 'marriage'
+}
+
 export type FhiridMap = {
   composition?: InputMaybe<Scalars['String']>
   encounter?: InputMaybe<Scalars['String']>
   eventLocation?: InputMaybe<Scalars['String']>
   observation?: InputMaybe<ObservationFhirids>
   questionnaireResponse?: InputMaybe<Scalars['String']>
+}
+
+export type Field = {
+  __typename?: 'Field'
+  id: Scalars['String']
+  value: Scalars['FieldValue']
+}
+
+export type FieldInput = {
+  id: Scalars['String']
+  value: Scalars['FieldValue']
 }
 
 export enum Gender {
@@ -746,6 +812,17 @@ export type Identifier = {
   value?: Maybe<Scalars['String']>
 }
 
+export type IdentifierInput = {
+  type: Scalars['String']
+  value: Scalars['String']
+}
+
+export type Identifiers = {
+  __typename?: 'Identifiers'
+  registrationNumber: Scalars['String']
+  trackingId: Scalars['String']
+}
+
 export type IdentityInput = {
   fieldsModifiedByIdentity?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   id?: InputMaybe<Scalars['ID']>
@@ -776,8 +853,11 @@ export type IntegratedSystem = {
 }
 
 export enum IntegratingSystemType {
-  Mosip = 'MOSIP',
   Other = 'OTHER'
+}
+
+export type IssueActionInput = {
+  data: Array<FieldInput>
 }
 
 export type LabelInput = {
@@ -926,10 +1006,12 @@ export type Mutation = {
   __typename?: 'Mutation'
   activateUser?: Maybe<Scalars['String']>
   approveBirthRegistrationCorrection: Scalars['ID']
+  approveCorrectionEvent: Event
   approveDeathRegistrationCorrection: Scalars['ID']
   approveMarriageRegistrationCorrection: Scalars['ID']
   auditUser?: Maybe<Scalars['String']>
   bookmarkAdvancedSearch?: Maybe<BookMarkedSearches>
+  certifyEvent: Event
   changeAvatar?: Maybe<Avatar>
   changeEmail?: Maybe<Scalars['String']>
   changePassword?: Maybe<Scalars['String']>
@@ -939,11 +1021,14 @@ export type Mutation = {
   createBirthRegistrationCorrection: Scalars['ID']
   createDeathRegistration: CreatedIds
   createDeathRegistrationCorrection: Scalars['ID']
+  createEvent: Event
   createMarriageRegistration: CreatedIds
   createMarriageRegistrationCorrection: Scalars['ID']
   createOrUpdateUser: User
   deactivateSystem?: Maybe<System>
+  declareEvent: Event
   deleteSystem?: Maybe<System>
+  issueEvent: Event
   markBirthAsCertified: Scalars['ID']
   markBirthAsIssued: Scalars['ID']
   markBirthAsRegistered: Scalars['ID']
@@ -964,14 +1049,22 @@ export type Mutation = {
   markMarriageAsIssued: Scalars['ID']
   markMarriageAsRegistered: Scalars['ID']
   markMarriageAsValidated?: Maybe<Scalars['ID']>
+  notifyEvent: Event
   reactivateSystem?: Maybe<System>
   refreshSystemSecret?: Maybe<SystemSecret>
+  registerEvent: Event
   registerSystem?: Maybe<SystemSecret>
+  reinstateEvent: Event
+  rejectCorrectionEvent: Event
+  rejectRegistration: Scalars['ID']
   rejectRegistrationCorrection: Scalars['ID']
   removeBookmarkedAdvancedSearch?: Maybe<BookMarkedSearches>
+  requestCorrectionEvent: Event
   requestRegistrationCorrection: Scalars['ID']
   resendInvite?: Maybe<Scalars['String']>
   resetPasswordInvite?: Maybe<Scalars['String']>
+  revokeCorrectionEvent: Event
+  revokeEvent: Event
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
   updateRole: Response
@@ -987,6 +1080,11 @@ export type MutationActivateUserArgs = {
 export type MutationApproveBirthRegistrationCorrectionArgs = {
   details: BirthRegistrationInput
   id: Scalars['ID']
+}
+
+export type MutationApproveCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: ApproveCorrectionActionInput
 }
 
 export type MutationApproveDeathRegistrationCorrectionArgs = {
@@ -1008,6 +1106,11 @@ export type MutationAuditUserArgs = {
 
 export type MutationBookmarkAdvancedSearchArgs = {
   bookmarkSearchInput: BookmarkSearchInput
+}
+
+export type MutationCertifyEventArgs = {
+  eventId: Scalars['ID']
+  input: CertifyActionInput
 }
 
 export type MutationChangeAvatarArgs = {
@@ -1036,6 +1139,7 @@ export type MutationChangePhoneArgs = {
 }
 
 export type MutationConfirmRegistrationArgs = {
+  details: ConfirmRegistrationInput
   id: Scalars['ID']
 }
 
@@ -1057,6 +1161,10 @@ export type MutationCreateDeathRegistrationCorrectionArgs = {
   id: Scalars['ID']
 }
 
+export type MutationCreateEventArgs = {
+  event: EventInput
+}
+
 export type MutationCreateMarriageRegistrationArgs = {
   details: MarriageRegistrationInput
 }
@@ -1074,8 +1182,18 @@ export type MutationDeactivateSystemArgs = {
   clientId: Scalars['ID']
 }
 
+export type MutationDeclareEventArgs = {
+  eventId: Scalars['ID']
+  input: DeclareActionInput
+}
+
 export type MutationDeleteSystemArgs = {
   clientId: Scalars['ID']
+}
+
+export type MutationIssueEventArgs = {
+  eventId: Scalars['ID']
+  input: IssueActionInput
 }
 
 export type MutationMarkBirthAsCertifiedArgs = {
@@ -1180,6 +1298,11 @@ export type MutationMarkMarriageAsValidatedArgs = {
   id: Scalars['ID']
 }
 
+export type MutationNotifyEventArgs = {
+  eventId: Scalars['ID']
+  input: NotifyActionInput
+}
+
 export type MutationReactivateSystemArgs = {
   clientId: Scalars['ID']
 }
@@ -1188,8 +1311,28 @@ export type MutationRefreshSystemSecretArgs = {
   clientId: Scalars['String']
 }
 
+export type MutationRegisterEventArgs = {
+  eventId: Scalars['ID']
+  input: RegisterActionInput
+}
+
 export type MutationRegisterSystemArgs = {
   system?: InputMaybe<SystemInput>
+}
+
+export type MutationReinstateEventArgs = {
+  eventId: Scalars['ID']
+  input: ReinstateActionInput
+}
+
+export type MutationRejectCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: RejectCorrectionActionInput
+}
+
+export type MutationRejectRegistrationArgs = {
+  details: RejectRegistrationInput
+  id: Scalars['ID']
 }
 
 export type MutationRejectRegistrationCorrectionArgs = {
@@ -1199,6 +1342,11 @@ export type MutationRejectRegistrationCorrectionArgs = {
 
 export type MutationRemoveBookmarkedAdvancedSearchArgs = {
   removeBookmarkedSearchInput: RemoveBookmarkedSeachInput
+}
+
+export type MutationRequestCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: RequestCorrectionActionInput
 }
 
 export type MutationRequestRegistrationCorrectionArgs = {
@@ -1212,6 +1360,16 @@ export type MutationResendInviteArgs = {
 
 export type MutationResetPasswordInviteArgs = {
   userId: Scalars['String']
+}
+
+export type MutationRevokeCorrectionEventArgs = {
+  eventId: Scalars['ID']
+  input: RevokeCorrectionActionInput
+}
+
+export type MutationRevokeEventArgs = {
+  eventId: Scalars['ID']
+  input: RevokeActionInput
 }
 
 export type MutationUpdateDeathRegistrationArgs = {
@@ -1239,6 +1397,18 @@ export type NotificationResult = {
 export enum NotificationType {
   Email = 'EMAIL',
   Sms = 'SMS'
+}
+
+export type NotifyAction = {
+  __typename?: 'NotifyAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  type: Scalars['String']
+}
+
+export type NotifyActionInput = {
+  data: Array<FieldInput>
 }
 
 export type ObservationFhirids = {
@@ -1368,6 +1538,7 @@ export type Query = {
   fetchRegistrationForViewing?: Maybe<EventRegistration>
   fetchSystem?: Maybe<System>
   getDeclarationsStartedMetrics?: Maybe<DeclarationsStartedMetrics>
+  getEvent: Event
   getEventsWithProgress?: Maybe<EventProgressResultSet>
   getLocationStatistics?: Maybe<LocationStatisticsResponse>
   getRegistrationsListByFilter?: Maybe<MixedTotalMetricsResult>
@@ -1453,6 +1624,10 @@ export type QueryGetDeclarationsStartedMetricsArgs = {
   timeStart: Scalars['String']
 }
 
+export type QueryGetEventArgs = {
+  eventId: Scalars['ID']
+}
+
 export type QueryGetEventsWithProgressArgs = {
   compositionType?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   count?: InputMaybe<Scalars['Int']>
@@ -1514,7 +1689,7 @@ export type QueryGetTotalPaymentsArgs = {
 }
 
 export type QueryGetUserArgs = {
-  userId?: InputMaybe<Scalars['String']>
+  userId: Scalars['String']
 }
 
 export type QueryGetUserAuditLogArgs = {
@@ -1526,11 +1701,11 @@ export type QueryGetUserAuditLogArgs = {
 }
 
 export type QueryGetUserByEmailArgs = {
-  email?: InputMaybe<Scalars['String']>
+  email: Scalars['String']
 }
 
 export type QueryGetUserByMobileArgs = {
-  mobile?: InputMaybe<Scalars['String']>
+  mobile: Scalars['String']
 }
 
 export type QueryIsLeafLevelLocationArgs = {
@@ -1685,6 +1860,19 @@ export type RegWorkflowInput = {
   user?: InputMaybe<UserInput>
 }
 
+export type RegisterAction = {
+  __typename?: 'RegisterAction'
+  createdAt: Scalars['DateTime']
+  createdBy: Scalars['String']
+  data: Array<Field>
+  identifiers: Identifiers
+  type: Scalars['String']
+}
+
+export type RegisterActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Registration = {
   __typename?: 'Registration'
   _fhirID?: Maybe<Scalars['ID']>
@@ -1773,10 +1961,23 @@ export enum RegistrationType {
   Marriage = 'MARRIAGE'
 }
 
+export type ReinstateActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Reinstated = {
   __typename?: 'Reinstated'
   registrationStatus?: Maybe<RegStatus>
   taskEntryResourceID: Scalars['ID']
+}
+
+export type RejectCorrectionActionInput = {
+  data: Array<FieldInput>
+}
+
+export type RejectRegistrationInput = {
+  comment?: InputMaybe<Scalars['String']>
+  reason: Scalars['String']
 }
 
 export type RelatedPerson = {
@@ -1841,9 +2042,21 @@ export type RemoveBookmarkedSeachInput = {
   userId: Scalars['String']
 }
 
+export type RequestCorrectionActionInput = {
+  data: Array<FieldInput>
+}
+
 export type Response = {
   __typename?: 'Response'
   roleIdMap: Scalars['Map']
+}
+
+export type RevokeActionInput = {
+  data: Array<FieldInput>
+}
+
+export type RevokeCorrectionActionInput = {
+  data: Array<FieldInput>
 }
 
 export type Role = {
@@ -2000,7 +2213,6 @@ export enum SystemStatus {
 
 export enum SystemType {
   Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Webhook = 'WEBHOOK'
 }
@@ -2324,7 +2536,7 @@ export type GetSystemRolesQuery = {
 
 export type AdvancedSeachParametersFragment = {
   __typename?: 'AdvancedSeachParameters'
-  event?: Event | null
+  event?: EventType | null
   name?: string | null
   registrationStatuses?: Array<string | null> | null
   dateOfEvent?: string | null
@@ -2395,7 +2607,7 @@ export type BookmarkAdvancedSearchMutation = {
       name: string
       parameters: {
         __typename?: 'AdvancedSeachParameters'
-        event?: Event | null
+        event?: EventType | null
         name?: string | null
         registrationStatuses?: Array<string | null> | null
         dateOfEvent?: string | null
@@ -2469,7 +2681,7 @@ export type RemoveBookmarkedAdvancedSearchMutation = {
       name: string
       parameters: {
         __typename?: 'AdvancedSeachParameters'
-        event?: Event | null
+        event?: EventType | null
         name?: string | null
         registrationStatuses?: Array<string | null> | null
         dateOfEvent?: string | null
@@ -2586,7 +2798,7 @@ export type FetchUserQuery = {
       name: string
       parameters: {
         __typename?: 'AdvancedSeachParameters'
-        event?: Event | null
+        event?: EventType | null
         name?: string | null
         registrationStatuses?: Array<string | null> | null
         dateOfEvent?: string | null
@@ -2885,7 +3097,7 @@ export type GetUserAuditLogQuery = {
 }
 
 export type GetUserQueryVariables = Exact<{
-  userId?: InputMaybe<Scalars['String']>
+  userId: Scalars['String']
 }>
 
 export type GetUserQuery = {
@@ -6937,7 +7149,7 @@ export type ChangeEmailMutation = {
 }
 
 export type GetUserByMobileQueryVariables = Exact<{
-  mobile?: InputMaybe<Scalars['String']>
+  mobile: Scalars['String']
 }>
 
 export type GetUserByMobileQuery = {
@@ -6955,7 +7167,7 @@ export type GetUserByMobileQuery = {
 }
 
 export type GetUserByEmailQueryVariables = Exact<{
-  email?: InputMaybe<Scalars['String']>
+  email: Scalars['String']
 }>
 
 export type GetUserByEmailQuery = {

@@ -14,8 +14,7 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
-  Event,
-  IntegratingSystemType,
+  EventType,
   System,
   SystemStatus,
   SystemType,
@@ -87,10 +86,10 @@ export function SystemList() {
     selectedClient: null
   })
 
-  const [selectedTab, setSelectedTab] = React.useState(Event.Birth)
+  const [selectedTab, setSelectedTab] = React.useState(EventType.Birth)
 
-  const checkboxHandler = (permissions: string[], event: Event) => {
-    event === Event.Birth
+  const checkboxHandler = (permissions: string[], event: EventType) => {
+    event === EventType.Birth
       ? setBirthPermissions({ event, permissions })
       : setDeathPermissions({ event, permissions })
   }
@@ -141,10 +140,7 @@ export function SystemList() {
     refreshTokenData,
     refreshTokenLoading,
     refreshTokenError,
-    resetData,
-    shouldWarnAboutNationalId,
-    newIntegratingSystemType,
-    setNewIntegratingSystemType
+    resetData
   } = useSystems()
 
   function changeActiveStatusIntl(status: SystemStatus) {
@@ -188,10 +184,10 @@ export function SystemList() {
         handler: () => {
           setSystemToShowPermission(system)
           setBirthPermissions(
-            populatePermissions(system.settings!.webhook!, Event.Birth)
+            populatePermissions(system.settings!.webhook!, EventType.Birth)
           )
           setDeathPermissions(
-            populatePermissions(system.settings!.webhook!, Event.Death)
+            populatePermissions(system.settings!.webhook!, EventType.Death)
           )
         },
         label: intl.formatMessage(buttonMessages.edit)
@@ -217,28 +213,12 @@ export function SystemList() {
 
   const systemTypeLabels = {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
-    NATIONAL_ID: intl.formatMessage(integrationMessages.nationalID),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     WEBHOOK: intl.formatMessage(integrationMessages.webhook)
   }
 
-  const nationalIdLabels = {
-    [IntegratingSystemType.Mosip]: intl.formatMessage(
-      integrationMessages.integratingSystemTypeMosip
-    ),
-    [IntegratingSystemType.Other]: intl.formatMessage(
-      integrationMessages.nationalID
-    )
-  }
-
   const systemToLabel = (system: System) => {
-    if (system.type === SystemType.NationalId) {
-      return nationalIdLabels[
-        system.integratingSystemType ?? IntegratingSystemType.Mosip
-      ]
-    } else {
-      return systemTypeLabels[system.type]
-    }
+    return systemTypeLabels[system.type]
   }
 
   return (
@@ -474,11 +454,7 @@ export function SystemList() {
                 <Button
                   key="submit-client-form"
                   id="submitClientForm"
-                  disabled={
-                    !newSystemType ||
-                    newClientName === EMPTY_STRING ||
-                    shouldWarnAboutNationalId
-                  }
+                  disabled={!newSystemType || newClientName === EMPTY_STRING}
                   onClick={() => {
                     registerSystem()
                   }}
@@ -516,11 +492,7 @@ export function SystemList() {
                 id="name_of_client"
                 touched={false}
                 required={true}
-                label={
-                  newSystemType === SystemType.NationalId
-                    ? intl.formatMessage(integrationMessages.nationalIDName)
-                    : intl.formatMessage(integrationMessages.name)
-                }
+                label={intl.formatMessage(integrationMessages.name)}
               >
                 <TextInput
                   id="client_name"
@@ -551,10 +523,6 @@ export function SystemList() {
                       value: SystemType.Health
                     },
                     {
-                      label: intl.formatMessage(integrationMessages.nationalID),
-                      value: SystemType.NationalId
-                    },
-                    {
                       label: intl.formatMessage(
                         integrationMessages.recordSearch
                       ),
@@ -570,75 +538,11 @@ export function SystemList() {
               </InputField>
             </Field>
 
-            {newSystemType === SystemType.NationalId && (
-              <Field>
-                <InputField
-                  id="integrating-system-type"
-                  touched={false}
-                  label={intl.formatMessage(
-                    integrationMessages.integratingSystemType
-                  )}
-                >
-                  <Select
-                    onChange={(val) => {
-                      setNewIntegratingSystemType(val as IntegratingSystemType)
-                    }}
-                    value={
-                      newIntegratingSystemType ?? IntegratingSystemType.Mosip
-                    }
-                    options={[
-                      {
-                        label: intl.formatMessage(
-                          integrationMessages.integratingSystemTypeMosip
-                        ),
-                        value: IntegratingSystemType.Mosip
-                      },
-                      {
-                        label: intl.formatMessage(
-                          integrationMessages.integratingSystemTypeOther
-                        ),
-                        value: IntegratingSystemType.Other,
-                        disabled: true
-                      }
-                    ]}
-                    id={'integrating-system-select'}
-                  />
-                </InputField>
-              </Field>
-            )}
-
-            {shouldWarnAboutNationalId && (
-              <PaddedAlert type="error">
-                {intl.formatMessage(integrationMessages.onlyOneNationalIdError)}
-              </PaddedAlert>
-            )}
-
             {newSystemType === SystemType.Health && (
               <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
                 )}
-                <Link
-                  onClick={() => {
-                    window.open('https://documentation.opencrvs.org/', '_blank')
-                  }}
-                  font="bold16"
-                >
-                  documentation.opencrvs.org
-                </Link>
-              </PaddedAlert>
-            )}
-
-            {newSystemType === SystemType.NationalId && (
-              <PaddedAlert type="info">
-                {newIntegratingSystemType === IntegratingSystemType.Mosip &&
-                  intl.formatMessage(
-                    integrationMessages.integratingSystemTypeAlertMosip
-                  )}
-                {newIntegratingSystemType === IntegratingSystemType.Other &&
-                  intl.formatMessage(
-                    integrationMessages.integratingSystemTypeAlertOther
-                  )}
                 <Link
                   onClick={() => {
                     window.open('https://documentation.opencrvs.org/', '_blank')
@@ -699,18 +603,18 @@ export function SystemList() {
                       <FormTabs
                         sections={[
                           {
-                            id: Event.Birth,
+                            id: EventType.Birth,
                             title: intl.formatMessage(integrationMessages.birth)
                           },
                           {
-                            id: Event.Death,
+                            id: EventType.Death,
                             title: intl.formatMessage(integrationMessages.death)
                           }
                         ]}
                         activeTabId={selectedTab}
-                        onTabClick={(tabId: Event) => setSelectedTab(tabId)}
+                        onTabClick={(tabId: EventType) => setSelectedTab(tabId)}
                       />
-                      {selectedTab === Event.Birth ? (
+                      {selectedTab === EventType.Birth ? (
                         <CheckboxGroup
                           id="birthCheckboxGroup"
                           options={[
@@ -748,7 +652,7 @@ export function SystemList() {
                           name="test-checkbox-group1"
                           value={birthPermissions.permissions ?? []}
                           onChange={(newValue) => {
-                            checkboxHandler(newValue, Event.Birth)
+                            checkboxHandler(newValue, EventType.Birth)
                           }}
                         />
                       ) : (
@@ -783,7 +687,7 @@ export function SystemList() {
                           name="test-checkbox-group1"
                           value={deathPermissions.permissions ?? []}
                           onChange={(newValue) => {
-                            checkboxHandler(newValue, Event.Death)
+                            checkboxHandler(newValue, EventType.Death)
                           }}
                         />
                       )}

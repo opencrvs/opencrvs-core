@@ -30,6 +30,7 @@ export const SIZE = 'size'
 export const WITHIN_1_YEAR = 'DAYS_0_TO_365'
 export const EVENT = 'event'
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
+
 export enum Events {
   INCOMPLETE = 'in-progress-declaration', // Field agent or DHIS2 in progress
   READY_FOR_REVIEW = 'new-declaration', // Field agent complete

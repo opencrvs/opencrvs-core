@@ -10,8 +10,8 @@
  */
 import React from 'react'
 import { Button } from '@opencrvs/components/lib/Button'
-import { useHistory } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux'
+import { useLocation, useNavigate, useNavigationType } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   FIELD_AGENT_ROLES,
@@ -24,7 +24,6 @@ import {
   PERFORMANCE_HOME,
   REGISTRAR_HOME
 } from '@client/navigation/routes'
-import { goBack, goForward } from '@client/navigation'
 import { Icon } from '@opencrvs/components/lib/Icon'
 
 export function HistoryNavigator({
@@ -32,20 +31,23 @@ export function HistoryNavigator({
 }: {
   hideForward?: boolean
 }) {
-  const history = useHistory()
-  const dispatch = useDispatch()
   const userDetails = useSelector(getUserDetails)
   const role = userDetails && userDetails.systemRole
-  const location = history.location.pathname
+  const location = useLocation()
+  const pathname = location.pathname
+  const navigate = useNavigate()
+
+  const navigationType = useNavigationType()
+
   const isLandingPage = () => {
     if (
-      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(location)) ||
+      (FIELD_AGENT_ROLES.includes(role as string) && HOME.includes(pathname)) ||
       (NATL_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
+        PERFORMANCE_HOME.includes(pathname)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        PERFORMANCE_HOME.includes(location)) ||
+        PERFORMANCE_HOME.includes(pathname)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
-        REGISTRAR_HOME.includes(location))
+        REGISTRAR_HOME.includes(pathname))
     ) {
       return true
     } else {
@@ -59,10 +61,10 @@ export function HistoryNavigator({
         type="icon"
         size="medium"
         disabled={
-          (history.action === 'POP' || history.action === 'REPLACE') &&
+          (navigationType === 'POP' || navigationType === 'REPLACE') &&
           isLandingPage()
         }
-        onClick={() => dispatch(goBack())}
+        onClick={() => navigate(-1)}
       >
         <Icon name="ArrowLeft" />
       </Button>
@@ -70,8 +72,8 @@ export function HistoryNavigator({
         <Button
           type="icon"
           size="medium"
-          disabled={history.action === 'PUSH' || history.action === 'REPLACE'}
-          onClick={() => dispatch(goForward())}
+          disabled={navigationType === 'PUSH' || navigationType === 'REPLACE'}
+          onClick={() => navigate(1)}
         >
           <Icon name="ArrowRight" />
         </Button>

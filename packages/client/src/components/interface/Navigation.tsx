@@ -17,18 +17,10 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
-  goToAdvancedSearchResult,
-  goToAllUserEmail,
-  goToDashboardView,
-  goToHomeTab,
-  goToLeaderBoardsView,
-  goToOrganisationView,
-  goToPerformanceStatistics,
-  goToPerformanceView,
-  goToSettings,
-  goToSystemList,
-  goToTeamView,
-  goToVSExport
+  formatUrl,
+  generateGoToHomeTabUrl,
+  generatePerformanceHomeUrl,
+  getDefaultPerformanceLocationId
 } from '@client/navigation'
 import { ADVANCED_SEARCH_RESULT } from '@client/navigation/routes'
 import { IOfflineData } from '@client/offline/reducer'
@@ -45,7 +37,7 @@ import {
   INPROGRESS_STATUS
 } from '@client/SubmissionController'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { IWorkqueue, updateRegistrarWorkqueue } from '@client/workqueue'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -62,8 +54,13 @@ import { omit } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps, withRouter } from 'react-router'
 import { IS_PROD_ENVIRONMENT } from '@client/utils/constants'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
+import * as routes from '@client/navigation/routes'
+import { stringify } from 'query-string'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -218,21 +215,9 @@ interface IProps {
 }
 
 interface IDispatchProps {
-  goToHomeTab: typeof goToHomeTab
-  goToVSExportsAction: typeof goToVSExport
-  goToAdvancedSearchResultAction: typeof goToAdvancedSearchResult
   redirectToAuthentication: typeof redirectToAuthentication
-  goToPerformanceViewAction: typeof goToPerformanceView
-  goToTeamViewAction: typeof goToTeamView
-  goToOrganisationViewAction: typeof goToOrganisationView
-  goToSystemViewAction: typeof goToSystemList
-  goToSettings: typeof goToSettings
-  goToLeaderBoardsView: typeof goToLeaderBoardsView
-  goToDashboardView: typeof goToDashboardView
-  goToPerformanceStatistics: typeof goToPerformanceStatistics
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
   setAdvancedSearchParam: typeof setAdvancedSearchParam
-  goToAllUserEmail: typeof goToAllUserEmail
 }
 
 interface IStateProps {
@@ -250,16 +235,10 @@ type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{ tabId: string }> & { className?: string }
+  RouteComponentProps<{ className?: string }>
 
 const getSettingsAndLogout = (props: IFullProps) => {
-  const {
-    intl,
-    menuCollapse,
-    activeMenuItem,
-    redirectToAuthentication,
-    goToSettings
-  } = props
+  const { intl, menuCollapse, activeMenuItem, redirectToAuthentication } = props
   return (
     <>
       <NavigationItem
@@ -267,7 +246,8 @@ const getSettingsAndLogout = (props: IFullProps) => {
         id={`navigation_${WORKQUEUE_TABS.settings}`}
         label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.settings])}
         onClick={() => {
-          goToSettings()
+          props.router.navigate(routes.SETTINGS)
+
           menuCollapse && menuCollapse()
         }}
         isSelected={activeMenuItem === WORKQUEUE_TABS.settings}
@@ -288,16 +268,13 @@ const getSettingsAndLogout = (props: IFullProps) => {
 const NavigationView = (props: IFullProps) => {
   const {
     intl,
-    match,
+    router,
     userDetails,
     advancedSearchParams,
     deselectAllTabs,
     enableMenuSelection = true,
     loadWorkqueueStatuses = true,
     activeMenuItem,
-    goToVSExportsAction,
-    goToSystemViewAction,
-    goToAdvancedSearchResultAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
@@ -307,16 +284,12 @@ const NavigationView = (props: IFullProps) => {
     offlineCountryConfiguration,
     updateRegistrarWorkqueue,
     setAdvancedSearchParam,
-    goToPerformanceStatistics,
-    goToDashboardView,
-    goToLeaderBoardsView,
-    goToAllUserEmail,
     className
   } = props
   const tabId = deselectAllTabs
     ? ''
-    : match.params.tabId
-    ? match.params.tabId
+    : router?.match?.params?.tabId
+    ? router.match.params.tabId
     : activeMenuItem
     ? activeMenuItem
     : 'review'
@@ -337,10 +310,12 @@ const NavigationView = (props: IFullProps) => {
   )
   const runningVer = String(localStorage.getItem('running-version'))
 
-  const isOnePrintInAdvanceOn = Object.values(Event).some((event: Event) => {
-    const upperCaseEvent = event.toUpperCase() as Uppercase<Event>
-    return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
-  })
+  const isOnePrintInAdvanceOn = Object.values(EventType).some(
+    (event: EventType) => {
+      const upperCaseEvent = event.toUpperCase() as Uppercase<EventType>
+      return offlineCountryConfiguration.config[upperCaseEvent].PRINT_IN_ADVANCE
+    }
+  )
   const showRegDashboard =
     !IS_PROD_ENVIRONMENT ||
     (IS_PROD_ENVIRONMENT && window.config.REGISTRATIONS_DASHBOARD_URL)
@@ -420,7 +395,12 @@ const NavigationView = (props: IFullProps) => {
               count={props.draftDeclarations.length}
               isSelected={tabId === WORKQUEUE_TABS.inProgress}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                props.router.navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.inProgress
+                  })
+                )
+
                 menuCollapse && menuCollapse()
               }}
             />
@@ -433,7 +413,12 @@ const NavigationView = (props: IFullProps) => {
               count={declarationCount.readyForReview}
               isSelected={tabId === WORKQUEUE_TABS.sentForReview}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
+                props.router.navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.sentForReview
+                  })
+                )
+
                 menuCollapse && menuCollapse()
               }}
             />
@@ -446,7 +431,12 @@ const NavigationView = (props: IFullProps) => {
               count={declarationCount.requiresUpdate}
               isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+                props.router.navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.requiresUpdate
+                  })
+                )
+
                 menuCollapse && menuCollapse()
               }}
             />
@@ -459,7 +449,12 @@ const NavigationView = (props: IFullProps) => {
               count={declarationCount.outbox}
               isSelected={tabId === WORKQUEUE_TABS.outbox}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.outbox)
+                props.router.navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.outbox
+                  })
+                )
+
                 menuCollapse && menuCollapse()
               }}
             />
@@ -485,7 +480,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.inProgress}
                       isSelected={tabId === WORKQUEUE_TABS.inProgress}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.inProgress)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.inProgress
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -503,7 +503,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyForReview}
                       isSelected={tabId === WORKQUEUE_TABS.readyForReview}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.readyForReview
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -521,7 +526,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.requiresUpdate}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.requiresUpdate
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -539,7 +549,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.sentForApproval}
                       isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.sentForApproval
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -554,7 +569,12 @@ const NavigationView = (props: IFullProps) => {
                     count={declarationCount.externalValidation}
                     isSelected={tabId === WORKQUEUE_TABS.externalValidation}
                     onClick={() => {
-                      props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
+                      props.router.navigate(
+                        generateGoToHomeTabUrl({
+                          tabId: WORKQUEUE_TABS.externalValidation
+                        })
+                      )
+
                       menuCollapse && menuCollapse()
                     }}
                   />
@@ -572,7 +592,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyToPrint}
                       isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.readyToPrint
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -592,7 +617,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyToIssue}
                       isSelected={tabId === WORKQUEUE_TABS.readyToIssue}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.readyToIssue)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.readyToIssue
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -611,7 +641,12 @@ const NavigationView = (props: IFullProps) => {
                       count={declarationCount.outbox}
                       isSelected={tabId === WORKQUEUE_TABS.outbox}
                       onClick={() => {
-                        props.goToHomeTab(WORKQUEUE_TABS.outbox)
+                        props.router.navigate(
+                          generateGoToHomeTabUrl({
+                            tabId: WORKQUEUE_TABS.outbox
+                          })
+                        )
+
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -632,7 +667,12 @@ const NavigationView = (props: IFullProps) => {
                         navigationMessages[WORKQUEUE_TABS.performance]
                       )}
                       onClick={() => {
-                        props.goToPerformanceViewAction(userDetails)
+                        props.router.navigate(
+                          generatePerformanceHomeUrl({
+                            locationId:
+                              getDefaultPerformanceLocationId(userDetails)
+                          })
+                        )
                       }}
                       isSelected={
                         enableMenuSelection &&
@@ -651,7 +691,11 @@ const NavigationView = (props: IFullProps) => {
                         navigationMessages[WORKQUEUE_TABS.organisation]
                       )}
                       onClick={() =>
-                        props.goToOrganisationViewAction(userDetails)
+                        router.navigate(
+                          formatUrl(routes.ORGANISATIONS_INDEX, {
+                            locationId: '' // NOTE: Empty string is required
+                          })
+                        )
                       }
                       isSelected={
                         enableMenuSelection &&
@@ -669,7 +713,20 @@ const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.team]
                       )}
-                      onClick={() => props.goToTeamViewAction(userDetails)}
+                      onClick={() => {
+                        if (
+                          userDetails &&
+                          userDetails.systemRole &&
+                          userDetails.primaryOffice
+                        ) {
+                          props.router.navigate({
+                            pathname: routes.TEAM_USER_LIST,
+                            search: stringify({
+                              locationId: userDetails.primaryOffice.id
+                            })
+                          })
+                        }
+                      }}
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === WORKQUEUE_TABS.team
@@ -710,7 +767,7 @@ const NavigationView = (props: IFullProps) => {
                             label={intl.formatMessage(
                               navigationMessages[WORKQUEUE_TABS.systems]
                             )}
-                            onClick={goToSystemViewAction}
+                            onClick={() => router.navigate(routes.SYSTEM_LIST)}
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === WORKQUEUE_TABS.systems
@@ -756,7 +813,9 @@ const NavigationView = (props: IFullProps) => {
                               navigationMessages[WORKQUEUE_TABS.emailAllUsers]
                             )}
                             id={`navigation_${WORKQUEUE_TABS.emailAllUsers}`}
-                            onClick={goToAllUserEmail}
+                            onClick={() =>
+                              router.navigate(routes.ALL_USER_EMAIL)
+                            }
                             isSelected={
                               enableMenuSelection &&
                               activeMenuItem === WORKQUEUE_TABS.emailAllUsers
@@ -782,7 +841,11 @@ const NavigationView = (props: IFullProps) => {
                           label={intl.formatMessage(
                             navigationMessages['dashboard']
                           )}
-                          onClick={goToDashboardView}
+                          onClick={() =>
+                            router.navigate(routes.PERFORMANCE_DASHBOARD, {
+                              state: { isNavigatedInsideApp: true }
+                            })
+                          }
                           id="navigation_dashboard"
                           isSelected={
                             enableMenuSelection &&
@@ -796,7 +859,11 @@ const NavigationView = (props: IFullProps) => {
                           label={intl.formatMessage(
                             navigationMessages['statistics']
                           )}
-                          onClick={goToPerformanceStatistics}
+                          onClick={() =>
+                            router.navigate(routes.PERFORMANCE_STATISTICS, {
+                              state: { isNavigatedInsideApp: true }
+                            })
+                          }
                           id="navigation_statistics"
                           isSelected={
                             enableMenuSelection &&
@@ -810,7 +877,11 @@ const NavigationView = (props: IFullProps) => {
                           label={intl.formatMessage(
                             navigationMessages['leaderboards']
                           )}
-                          onClick={goToLeaderBoardsView}
+                          onClick={() =>
+                            router.navigate(routes.PERFORMANCE_LEADER_BOARDS, {
+                              state: { isNavigatedInsideApp: true }
+                            })
+                          }
                           id="navigation_leaderboards"
                           isSelected={
                             enableMenuSelection &&
@@ -823,9 +894,14 @@ const NavigationView = (props: IFullProps) => {
                         label={intl.formatMessage(
                           navigationMessages['performance']
                         )}
-                        onClick={() =>
-                          props.goToPerformanceViewAction(userDetails)
-                        }
+                        onClick={() => {
+                          props.router.navigate(
+                            generatePerformanceHomeUrl({
+                              locationId:
+                                getDefaultPerformanceLocationId(userDetails)
+                            })
+                          )
+                        }}
                         id="navigation_report"
                         isSelected={
                           enableMenuSelection &&
@@ -844,7 +920,7 @@ const NavigationView = (props: IFullProps) => {
                       label={intl.formatMessage(
                         navigationMessages[WORKQUEUE_TABS.vsexports]
                       )}
-                      onClick={goToVSExportsAction}
+                      onClick={() => router.navigate(routes.VS_EXPORTS)}
                       isSelected={
                         enableMenuSelection &&
                         activeMenuItem === WORKQUEUE_TABS.vsexports
@@ -874,7 +950,7 @@ const NavigationView = (props: IFullProps) => {
                 label={bookmarkResult.name}
                 disabled={
                   advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
                 }
                 onClick={() => {
                   const filteredParam = omit(
@@ -886,11 +962,12 @@ const NavigationView = (props: IFullProps) => {
                     searchId: bookmarkResult?.searchId,
                     bookmarkName: bookmarkResult?.name
                   })
-                  goToAdvancedSearchResultAction()
+
+                  router.navigate(routes.ADVANCED_SEARCH_RESULT)
                 }}
                 isSelected={
                   advancedSearchParams.searchId === bookmarkResult.searchId &&
-                  props.location.pathname === ADVANCED_SEARCH_RESULT
+                  props.router.location.pathname === ADVANCED_SEARCH_RESULT
                 }
               />
             )
@@ -955,28 +1032,13 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
   }
 }
 
-export const Navigation = connect<
-  IStateProps,
-  IDispatchProps,
-  IProps,
-  IStoreState
->(mapStateToProps, {
-  goToHomeTab,
-  goToAdvancedSearchResultAction: goToAdvancedSearchResult,
-  goToVSExportsAction: goToVSExport,
-  goToPerformanceViewAction: goToPerformanceView,
-  goToOrganisationViewAction: goToOrganisationView,
-  goToTeamViewAction: goToTeamView,
-  goToSystemViewAction: goToSystemList,
-  redirectToAuthentication,
-  goToSettings,
-  updateRegistrarWorkqueue,
-  setAdvancedSearchParam,
-  goToPerformanceStatistics,
-  goToLeaderBoardsView,
-  goToDashboardView,
-  goToAllUserEmail
-})(injectIntl(withRouter(NavigationView)))
+export const Navigation = withRouter(
+  connect<IStateProps, IDispatchProps, IProps, IStoreState>(mapStateToProps, {
+    redirectToAuthentication,
+    updateRegistrarWorkqueue,
+    setAdvancedSearchParam
+  })(injectIntl(NavigationView))
+)
 
 /** @deprecated since the introduction of `<Frame>` */
 export const FixedNavigation = styled(Navigation)`

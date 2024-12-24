@@ -8,57 +8,57 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { App } from '@client/App'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
-import { UserDetails } from '@client/utils/userUtils'
-import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { getReviewForm } from '@client/forms/register/review-selectors'
-import { offlineDataReady, setOfflineData } from '@client/offline/actions'
-import { AppStore, createStore, IStoreState } from '@client/store'
-import { ThemeProvider } from 'styled-components'
-import { getSchema } from '@client/tests/graphql-schema-mock'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { join } from 'path'
 import {
-  configure,
-  mount,
-  ReactWrapper,
-  shallow,
-  MountRendererProps
-} from 'enzyme'
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-import { readFileSync } from 'fs'
-import { graphql, print } from 'graphql'
-import * as jwt from 'jsonwebtoken'
-import * as React from 'react'
-import {
-  ApolloProvider,
-  NetworkStatus,
   ApolloClient,
-  InMemoryCache,
   ApolloLink,
+  ApolloProvider,
+  InMemoryCache,
+  NetworkStatus,
   Observable
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
+import { App, routesConfig } from '@client/App'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { getReviewForm } from '@client/forms/register/review-selectors'
+import { offlineDataReady, setOfflineData } from '@client/offline/actions'
+import { setUserDetails } from '@client/profile/profileActions'
+import { AppStore, createStore, IStoreState } from '@client/store'
+import { getSchema } from '@client/tests/graphql-schema-mock'
+import { EventType, Status, SystemRoleType } from '@client/utils/gateway'
+import { UserDetails } from '@client/utils/userUtils'
+import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { getTheme } from '@opencrvs/components/lib/theme'
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import {
+  configure,
+  mount,
+  MountRendererProps,
+  ReactWrapper,
+  shallow
+} from 'enzyme'
+import { readFileSync } from 'fs'
+import { graphql, print } from 'graphql'
+import { createLocation, createMemoryHistory } from 'history'
+import * as jwt from 'jsonwebtoken'
+import { join } from 'path'
+import { stringify } from 'query-string'
+import * as React from 'react'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
+import { ThemeProvider } from 'styled-components'
 import { waitForElement } from './wait-for-element'
-import { setUserDetails } from '@client/profile/profileActions'
-import { createLocation, createMemoryHistory, History } from 'history'
-import { stringify } from 'query-string'
-import { match as Match } from 'react-router'
-import { ConnectedRouter } from 'connected-react-router'
-import { mockOfflineData } from './mock-offline-data'
-import { Section, SubmissionAction } from '@client/forms'
+
 import { SUBMISSION_STATUS } from '@client/declarations'
-import { vi } from 'vitest'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
-import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { draftToGqlTransformer } from '@client/transformer'
+import { Section, SubmissionAction } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
+import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
+import { getSystemRolesQuery } from '@client/forms/user/query/queries'
+import { draftToGqlTransformer } from '@client/transformer'
 import * as builtInValidators from '@client/utils/validate'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { vi } from 'vitest'
+import { mockOfflineData } from './mock-offline-data'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -144,17 +144,20 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilOfflineCountryConfigLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true },
+  initialEntries?: string[]
 ) {
-  const { store, history } = await createTestStore()
+  const { store } = await createTestStore()
+  const router = createMemoryRouter(routesConfig, { initialEntries })
+
   const app = mount(
-    <App store={store} history={history} client={createGraphQLClient()} />
+    <App store={store} router={router} client={createGraphQLClient()} />
   )
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
-  return { history, app, store }
+  return { app, store, router }
 }
 
 interface ITestView {
@@ -803,7 +806,7 @@ export const mockDeathRegistrationSectionData = {
 const mockFetchCertificatesTemplatesDefinition = [
   {
     id: '12313546',
-    event: Event.Birth,
+    event: EventType.Birth,
     status: 'ACTIVE',
     svgCode:
       '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
@@ -814,7 +817,7 @@ const mockFetchCertificatesTemplatesDefinition = [
   },
   {
     id: '25313546',
-    event: Event.Death,
+    event: EventType.Death,
     status: 'ACTIVE',
     svgCode:
       '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
@@ -847,24 +850,37 @@ export const mockOfflineDataDispatch = {
 }
 
 export async function createTestStore() {
-  const { store, history } = createStore()
+  const { store } = createStore()
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
-  return { store, history }
+  return { store }
 }
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {
     store,
-    history,
     graphqlMocks,
-    apolloClient
+    apolloClient,
+    initialEntries,
+    path = '*'
   }: {
     store: AppStore
-    history: History
     graphqlMocks?: MockedProvider['props']['mocks']
     apolloClient?: ApolloClient<any>
+    initialEntries?:
+      | string[]
+      | {
+          pathname: string
+          state: Record<
+            string,
+            | string
+            | boolean
+            | number
+            | Record<string, string | boolean | number>
+          >
+        }[]
+    path?: string
   },
   options?: MountRendererProps
 ) {
@@ -889,22 +905,38 @@ export async function createTestComponent(
       </MockedProvider>
     )
   }
+  const router = createMemoryRouter(
+    [
+      {
+        path,
+        element: node
+      }
+    ],
+    { initialEntries }
+  )
 
-  function PropProxy(props: Record<string, any>) {
+  function PropProxy() {
     return withGraphQL(
       <Provider store={store}>
-        <ConnectedRouter noInitialPop={true} history={history}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
-              <node.type {...node.props} {...props} />
-            </ThemeProvider>
-          </I18nContainer>
-        </ConnectedRouter>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </I18nContainer>
       </Provider>
     )
   }
 
-  return mount(<PropProxy {...node.props} />, options)
+  return { component: mount(<PropProxy />, options), router }
+}
+
+/**
+ * Create a test component with the given node and store.
+ * Returns component route
+ */
+export type TestComponentWithRouteMock = {
+  component: ReactWrapper<{}, {}>
+  router: Awaited<ReturnType<typeof createTestComponent>>['router']
 }
 
 export const getFileFromBase64String = (
@@ -934,9 +966,10 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
+    await flushPromises()
     await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
-    await flushPromises()
+
     await component.update()
   }
 }
@@ -961,9 +994,14 @@ export async function goToMotherSection(component: ReactWrapper) {
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 
+export async function goToChildSection(component: ReactWrapper) {
+  await goToSection(component, 1)
+  await waitForElement(component, '#form_section_id_child-view-group')
+}
+
 export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
-  event: Event
+  event: EventType
 ) {
   await store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
@@ -972,7 +1010,7 @@ export async function getRegisterFormFromStore(
 
 export async function getReviewFormFromStore(
   store: Store<IStoreState, AnyAction>,
-  event: Event
+  event: EventType
 ) {
   await store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
@@ -1065,7 +1103,7 @@ export function createRouterProps<
   if (search) {
     location.search = stringify(search)
   }
-  const match: Match<Params> = {
+  const match = {
     isExact: false,
     path,
     url: path,

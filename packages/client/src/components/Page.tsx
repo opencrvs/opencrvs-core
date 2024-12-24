@@ -10,7 +10,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
@@ -32,6 +31,7 @@ import { isRegisterFormReady } from '@client/forms/register/declaration-selector
 import { IOfflineData } from '@client/offline/reducer'
 import { isNavigatorOnline } from '@client/utils'
 import { LoadingBar } from '@opencrvs/components/src/LoadingBar/LoadingBar'
+import { RouteComponentProps, withRouter } from './WithRouterProps'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
@@ -51,15 +51,16 @@ const StyledPage = styled.div<IPageProps>`
     box-sizing: border-box;
   }
 `
-interface IPageProps {
+type IPageProps = RouteComponentProps<{ children?: React.ReactNode }>
+interface IStateToProps {
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
   loadingError: boolean
   offlineData: IOfflineData | undefined
-  children?: React.ReactNode
 }
 
+type IFullProps = IPageProps & IDispatchProps & IStateToProps
 interface IDispatchProps {
   setInitialDeclarations: () => void
   checkAuth: typeof checkAuth
@@ -68,14 +69,10 @@ interface IDispatchProps {
   changeLanguage: (values: Ii18n) => void
 }
 
-class Component extends React.Component<
-  RouteComponentProps<{}> & IPageProps & IDispatchProps
-> {
-  componentDidUpdate(
-    prevProps: RouteComponentProps<{}> & IPageProps & IDispatchProps
-  ) {
-    const { hash } = this.props.location
-    const hashChanged = hash && hash !== prevProps.location.hash
+class Component extends React.Component<IFullProps> {
+  componentDidUpdate(prevProps: IFullProps) {
+    const hash = this.props.router.location?.hash
+    const hashChanged = hash && hash !== prevProps.router.location.hash
     const appName = this.props.offlineData
       ? this.props.offlineData.config.APPLICATION_NAME
       : ''

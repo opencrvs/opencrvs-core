@@ -8,36 +8,34 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { ReactWrapper } from 'enzyme'
-import { createTestComponent, flushPromises } from '@client/tests/util'
-import { LocationPicker } from './LocationPicker'
 import { AppStore, createStore } from '@client/store'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { History } from 'history'
+import { ReactWrapper } from 'enzyme'
+import React from 'react'
 import { vi } from 'vitest'
+import { LocationPicker } from './LocationPicker'
 
 describe('location picker tests', () => {
   let store: AppStore
-  let history: History
   let component: ReactWrapper
   const onChangeLocationMock = vi.fn()
 
   beforeAll(async () => {
     const appStore = createStore()
     store = appStore.store
-    history = appStore.history
   })
 
   beforeEach(async () => {
-    component = await createTestComponent(
+    const { component: testComponent } = await createTestComponent(
       <LocationPicker
         selectedLocationId="bfe8306c-0910-48fe-8bf5-0db906cf3155"
         onChangeLocation={onChangeLocationMock}
       />,
-      { store, history },
+      { store },
       { attachTo: document.body }
     )
+    component = testComponent
   })
 
   afterEach(() => {
