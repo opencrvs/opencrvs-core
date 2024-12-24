@@ -44,6 +44,7 @@
 
 ### Bug fixes
 
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
@@ -51,6 +52,7 @@
 ### Bug fixes
 
 - Maximum upload file size limit is now based on the size of the uploaded files after compression and not before. [#7840](https://github.com/opencrvs/opencrvs-core/issues/7840)
+- Stops local sys admins creating national level users. [#7698](https://github.com/opencrvs/opencrvs-core/issues/7698)
 
 ### New features
 
@@ -119,6 +121,11 @@
 - **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. **_This is purely a DX improvement without affecting any functionality of the system_**
 - Fix `informantType` missing in template object which prevented rendering informant relationship data in the certificates [#5952](https://github.com/opencrvs/opencrvs-core/issues/5952)
 - Fix users hitting rate limit when multiple users authenticated the same time with different usernames [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
+- "Choose a new password" form now allows the user to submit the form using the "Enter/Return" key [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
+- Dropdown options now flow to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
+- Only render units/postfix when field has a value [#7055](https://github.com/opencrvs/opencrvs-core/issues/7055)
+- Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
+- Fix prefix text overlap issue in form text inputs
 
 ## 1.5.1
 
