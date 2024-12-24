@@ -23,7 +23,8 @@ import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useHttp } from './http'
-import { Button } from '@opencrvs/components'
+import { Button, Icon } from '@opencrvs/components'
+import { useWindowSize } from '@opencrvs/components/src/hooks'
 
 export const RedirectField = ({
   fields,
@@ -42,6 +43,7 @@ export const RedirectField = ({
 }) => {
   const config = useSelector(getOfflineData)
   const user = useSelector(getUserDetails)
+  const windowSize = useWindowSize()
   const {
     options: {
       url: to,
@@ -95,6 +97,12 @@ export const RedirectField = ({
         fullWidth
         disabled={isDisabled}
       >
+        {fieldDefinition.icon &&
+          (windowSize.width <= 1028 ? (
+            <Icon name={fieldDefinition.icon.mobile} size="medium" />
+          ) : (
+            <Icon name={fieldDefinition.icon.desktop} size="medium" />
+          ))}
         {fieldDefinition.label}
       </Button>
     </Link>

@@ -730,6 +730,10 @@ export interface IButtonFormField extends IFormFieldBase {
 
 export interface IRedirectFormField extends IFormFieldBase {
   type: typeof REDIRECT
+  icon?: {
+    desktop: IconProps['name']
+    mobile: IconProps['name']
+  }
   options: {
     url: string
     callback: {
@@ -1258,6 +1262,10 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
 
 export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
   type: typeof REDIRECT
+  icon?: {
+    desktop: IconProps['name']
+    mobile: IconProps['name']
+  }
   options: {
     url: string
     callback: {

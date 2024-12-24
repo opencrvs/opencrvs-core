@@ -78,6 +78,8 @@ export {
   QrCode,
   Webcam,
   Sun,
-  DeviceTabletCamera
+  DeviceTabletCamera,
+  Globe,
+  Fingerprint
 } from 'phosphor-react'
 export * from './custom-icons'
