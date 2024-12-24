@@ -21,9 +21,14 @@ import {
   IFormSectionData
 } from '@client/forms'
 import {
+  dateToString,
   INITIAL_DATE_VALUE,
+  INITIAL_PARAGRAPH_VALUE,
   INITIAL_RADIO_GROUP_VALUE,
-  INITIAL_TEXT_VALUE
+  INITIAL_TEXT_VALUE,
+  paragraphToString,
+  radioGroupToString,
+  textToString
 } from '@client/v2-events/features/events/registered-fields'
 
 export function handleInitialValue(
@@ -145,7 +150,7 @@ const initialValueMapping: Record<FieldType, IFormFieldValue | null> = {
   [FieldType.TEXT]: INITIAL_TEXT_VALUE,
   [FieldType.DATE]: INITIAL_DATE_VALUE,
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
-  [FieldType.PARAGRAPH]: null,
+  [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
   [FieldType.FILE]: null,
   [FieldType.HIDDEN]: null
 }
@@ -162,4 +167,19 @@ export function getInitialValues(
     }
   })
   return initialValues
+}
+
+export function fieldValueToString(field: FieldType, value: IFormFieldValue) {
+  switch (field) {
+    case FieldType.DATE:
+      return dateToString(value)
+    case FieldType.TEXT:
+      return textToString(value)
+    case FieldType.PARAGRAPH:
+      return paragraphToString(value)
+    case FieldType.RADIO_GROUP:
+      return radioGroupToString(value)
+    default:
+      return ''
+  }
 }

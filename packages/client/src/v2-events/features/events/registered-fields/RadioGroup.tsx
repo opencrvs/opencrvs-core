@@ -34,3 +34,6 @@ export function RadioGroup({ id, options }: FieldProps<'RADIO_GROUP'>) {
     </InputField>
   )
 }
+
+export const radioGroupToString = (value: IFormFieldValue | undefined | null) =>
+  (value as string) || ''

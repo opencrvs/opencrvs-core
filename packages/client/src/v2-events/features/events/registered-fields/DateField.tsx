@@ -52,3 +52,10 @@ export function DateField({
     </InputField>
   )
 }
+
+export const dateToString = (date: IFormFieldValue | undefined | null) => {
+  if (!date) {
+    return ''
+  }
+  return (date as Date).toISOString().split('T')[0]
+}

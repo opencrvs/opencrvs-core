@@ -48,3 +48,6 @@ export function TextField({ id, label, required }: FieldProps<'TEXT'>) {
     </InputField>
   )
 }
+
+export const textToString = (text: IFormFieldValue | undefined | null) =>
+  (text as string) || ''

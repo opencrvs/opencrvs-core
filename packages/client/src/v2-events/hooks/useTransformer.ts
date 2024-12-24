@@ -8,18 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
-import { FieldProps } from '@opencrvs/commons'
-import { IFormFieldValue } from '@client/forms'
 
-export const INITIAL_PARAGRAPH_VALUE = ''
+import { FlatFormData } from '@client/v2-events/components/forms/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
-export function Paragraph({ label }: FieldProps<'PARAGRAPH'>) {
-  const intl = useIntl()
+export const useTransformer = (eventType: string) => {
+  const { eventConfiguration } = useEventConfiguration(eventType)
+  console.log({ eventConfiguration })
 
-  return <p>{intl.formatMessage(label)}</p>
+  const toString = (values: FlatFormData) => {
+    return values
+  }
+  return { toString }
 }
-
-export const paragraphToString = (text: IFormFieldValue | undefined | null) =>
-  (text as string) || ''
