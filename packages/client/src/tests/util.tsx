@@ -541,7 +541,6 @@ export const mockDeclarationData = {
   },
   registration: {
     informantsSignature: 'data:image/png;base64,abcd',
-
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -550,7 +549,7 @@ export const mockDeclarationData = {
       officeAddressLevel3: 'Gazipur',
       officeAddressLevel4: 'Dhaka'
     },
-    certificates: [{}]
+    certificates: [{ certificateTemplateId: 'death-certificate' }]
   },
   documents: {}
 }
@@ -650,7 +649,8 @@ export const mockDeathDeclarationData = {
         collector: {
           type: 'MOTHER'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'death-certificate'
       }
     ]
   }

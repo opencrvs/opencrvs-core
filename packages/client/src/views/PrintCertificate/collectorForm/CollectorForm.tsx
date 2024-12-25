@@ -175,6 +175,7 @@ const getErrorsOnFieldsBySection = (
 interface IState {
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
+  showError: boolean
 }
 
 class CollectorFormComponent extends React.Component<IProps, IState> {
@@ -182,7 +183,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     super(props)
     this.state = {
       showModalForNoSignedAffidavit: false,
-      isFileUploading: false
+      isFileUploading: false,
+      showError: false
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -253,6 +255,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       )
 
       this.setAllFormFieldsTouched(formGroup)
+      this.setState({
+        showError: true
+      })
       return
     }
 
@@ -272,6 +277,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           (collector.noAffidavitAgreement as string[]).length > 0
         )
       ) {
+        this.setState({
+          showError: true
+        })
+
         return
       }
 
@@ -282,6 +291,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     }
 
     this.setState({
+      showError: false,
       showModalForNoSignedAffidavit: false
     })
     if (!nextGroup) {
@@ -364,7 +374,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { showModalForNoSignedAffidavit } = this.state
+    const { showError, showModalForNoSignedAffidavit } = this.state
     const props = this.props
     const { declaration } = props
 
@@ -393,7 +403,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           id="collector_form"
           hideBackground
           title={formSection.title && intl.formatMessage(formSection.title)}
-          goBack={() => this.props.router.navigate(-1)}
+          goBack={() => {
+            this.setState({ showError: false })
+            this.props.router.navigate(-1)
+          }}
           goHome={() =>
             this.props.router.navigate(
               generateGoToHomeTabUrl({
@@ -432,10 +445,23 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               </Button>
             ]}
           >
+            {showError && formGroup.error && (
+              <ErrorWrapper>
+                <ErrorText id="form_error">
+                  {(formGroup.error && intl.formatMessage(formGroup.error)) ||
+                    ''}
+                </ErrorText>
+              </ErrorWrapper>
+            )}
             <FormFieldGenerator
               id={formGroup.id}
               key={formGroup.id}
               onChange={(values) => {
+                if (values && values.affidavitFile) {
+                  this.setState({
+                    showError: false
+                  })
+                }
                 this.modifyDeclaration(values, declarationToBeCertified)
               }}
               setAllFieldsDirty={false}

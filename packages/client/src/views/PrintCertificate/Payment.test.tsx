@@ -73,7 +73,27 @@ describe('verify collector tests', () => {
       await store.dispatch(checkAuth())
       await flushPromises()
       // @ts-ignore
-      store.dispatch(storeDeclaration(birthDeclaration))
+      store.dispatch(
+        storeDeclaration({
+          ...birthDeclaration,
+          // @ts-ignore
+          data: {
+            ...birthDeclaration.data,
+            registration: {
+              ...birthDeclaration.data.registration,
+              certificates: [
+                {
+                  collector: {
+                    type: 'MOTHER'
+                  },
+                  hasShowedVerifiedDocument: true,
+                  certificateTemplateId: 'birth-certificate'
+                }
+              ]
+            }
+          }
+        })
+      )
     })
 
     it('when mother is collector renders Payment component', async () => {
@@ -96,7 +116,7 @@ describe('verify collector tests', () => {
       )
 
       expect(testComponent.find('#amountDue').hostNodes().text()).toContain(
-        '20'
+        '15'
       )
 
       testComponent.find('#Continue').hostNodes().simulate('click')

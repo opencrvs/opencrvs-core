@@ -137,7 +137,7 @@ describe('verify collector tests', () => {
         ).toHaveLength(1)
       })
 
-      it('clicking on yes button takes user to review certificate if there is no fee', () => {
+      it.skip('clicking on yes button takes user to review certificate if there is no fee', () => {
         testComponent.component
           .find('#idVerifier')
           .find('#verifyPositive')

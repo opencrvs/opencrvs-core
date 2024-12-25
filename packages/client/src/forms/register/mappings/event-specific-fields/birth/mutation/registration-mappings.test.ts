@@ -32,27 +32,14 @@ describe('Birth registration mutation mapping related tests', () => {
     expect(transformedData.registration.trackingId).toEqual('BDSS0SE')
     expect(transformedData.registration.certificates).toEqual([
       {
-        hasShowedVerifiedDocument: true,
         certificateTemplateId: 'birth-certificate',
-        payments: [
-          {
-            paymentId: '1234',
-            type: 'MANUAL',
-            amount: 50,
-            outcome: 'COMPLETED',
-            date: '2018-10-22'
-          }
-        ],
+        hasShowedVerifiedDocument: true,
         collector: {
-          otherRelationship: 'OTHER',
-          name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-          identifier: [{ id: '123456', type: 'PASSPORT' }],
-          affidavit: [
-            {
-              contentType: 'image/jpg',
-              data: 'data:image/png;base64,2324256'
-            }
-          ]
+          relationship: 'OTHER',
+          otherRelationship: 'Uncle',
+          name: [{ use: 'en', firstNames: 'Mushraful', familyName: 'Hoque' }],
+          identifier: [{ id: '123456789', type: 'PASSPORT' }],
+          affidavit: [{ contentType: 'abc', data: 'BASE64 data' }]
         }
       }
     ])
