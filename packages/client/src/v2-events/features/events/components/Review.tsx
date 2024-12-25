@@ -105,7 +105,7 @@ const ReviewContainter = styled.div`
 `
 const DeclarationDataContainer = styled.div``
 
-const previewMessages = defineMessages({
+const reviewMessages = defineMessages({
   changeButton: {
     id: 'buttons.change',
     defaultMessage: 'Change',
@@ -156,10 +156,10 @@ const previewMessages = defineMessages({
 })
 
 /**
- * Preview component, used to display the "read-only" version of the form.
+ * Review component, used to display the "read" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
  */
-function PreviewComponent({
+function ReviewComponent({
   eventConfig,
   formConfig,
   form,
@@ -212,7 +212,7 @@ function PreviewComponent({
                             onEdit({ pageId: page.id })
                           }}
                         >
-                          {intl.formatMessage(previewMessages.changeButton)}
+                          {intl.formatMessage(reviewMessages.changeButton)}
                         </Link>
                       }
                       expand={true}
@@ -237,7 +237,7 @@ function PreviewComponent({
                                 }}
                               >
                                 {intl.formatMessage(
-                                  previewMessages.changeButton
+                                  reviewMessages.changeButton
                                 )}
                               </Link>
                             }
@@ -366,7 +366,7 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(null)
           }}
         >
-          {intl.formatMessage(previewMessages.changeModalCancel)}
+          {intl.formatMessage(reviewMessages.changeModalCancel)}
         </Button>,
         <Button
           key="confirm_edit"
@@ -376,17 +376,17 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(true)
           }}
         >
-          {intl.formatMessage(previewMessages.changeModalContinue)}
+          {intl.formatMessage(reviewMessages.changeModalContinue)}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(previewMessages.changeModalTitle)}
+      title={intl.formatMessage(reviewMessages.changeModalTitle)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(previewMessages.changeModalDescription)}
+          {intl.formatMessage(reviewMessages.changeModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>
@@ -413,7 +413,7 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(previewMessages.actionModalCancel)}
+          {intl.formatMessage(reviewMessages.actionModalCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -423,7 +423,7 @@ function ActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(previewMessages.actionModalPrimaryAction, {
+          {intl.formatMessage(reviewMessages.actionModalPrimaryAction, {
             action
           })}
         </Button>
@@ -431,19 +431,19 @@ function ActionModal({
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(previewMessages.actionModalTitle, { action })}
+      title={intl.formatMessage(reviewMessages.actionModalTitle, { action })}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(previewMessages.actionModalDescription)}
+          {intl.formatMessage(reviewMessages.actionModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>
   )
 }
 
-export const Preview = {
-  Body: PreviewComponent,
+export const Review = {
+  Body: ReviewComponent,
   Actions: PreviewActionComponent,
   EditModal: EditModal,
   ActionModal: ActionModal
