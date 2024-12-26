@@ -14,6 +14,7 @@ import { z } from 'zod'
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
+  createdAtLocation: z.string(),
   data: z.record(z.string(), z.any())
 })
 
@@ -60,15 +61,13 @@ const DraftAction = ActionBase.merge(
 
 const CreatedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.CREATE),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.CREATE)
   })
 )
 
 const NotifiedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY)
   })
 )
 
