@@ -60,7 +60,6 @@ import {
   isObservation,
   isURLReference,
   urlReferenceToResourceIdentifier,
-  // BundleEntryWithFullUrl,
   findEntryFromBundle
 } from '..'
 

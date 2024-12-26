@@ -583,7 +583,7 @@ describe('Certificate collector test for a death registration', () => {
       expect(element.hostNodes()).toHaveLength(1)
     })
 
-    it.only('redirects to review certificate for print in advance option', async () => {
+    it('redirects to review certificate for print in advance option', async () => {
       const $printInAdvance = await waitForElement(
         component,
         '#type_PRINT_IN_ADVANCE'
@@ -644,7 +644,7 @@ describe('Certificate collector test for a marriage registration', () => {
       expect(element.hostNodes()).toHaveLength(1)
     })
 
-    it.only('redirects to review certificate for print in advance option', async () => {
+    it('redirects to review certificate for print in advance option', async () => {
       const $printInAdvance = await waitForElement(
         component,
         '#type_PRINT_IN_ADVANCE'
