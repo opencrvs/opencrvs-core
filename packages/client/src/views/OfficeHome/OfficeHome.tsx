@@ -58,6 +58,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import { MyDrafts } from './myDrafts/MyDrafts'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -272,6 +273,13 @@ class OfficeHomeView extends React.Component<
 
     return (
       <>
+        {tabId === WORKQUEUE_TABS.myDrafts && (
+          <MyDrafts
+            currentPage={draftCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+          />
+        )}
         {tabId === WORKQUEUE_TABS.inProgress && (
           <InProgress
             drafts={drafts}

@@ -36,6 +36,11 @@ interface INavigationMessages
 }
 
 const messagesToDefine: INavigationMessages = {
+  'my-drafts': {
+    defaultMessage: 'My Drafts',
+    description: 'My drafts label in navigation',
+    id: 'navigation.myDrafts'
+  },
   progress: {
     defaultMessage: 'In progress',
     description: 'In progress label in navigation',
