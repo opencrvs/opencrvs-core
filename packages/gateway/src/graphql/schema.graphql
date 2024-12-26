@@ -964,6 +964,7 @@ type History {
   requester: String
   requesterOther: String
   hasShowedVerifiedDocument: Boolean
+  certificateTemplateId: String
   noSupportingDocumentationRequired: Boolean
   otherReason: String
   system: IntegratedSystem
@@ -1439,7 +1440,7 @@ type Certificate {
   collector: RelatedPerson
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
-  data: String
+  certificateTemplateId: String
 }
 
 type DuplicatesInfo {
@@ -1791,7 +1792,7 @@ input CertificateInput {
   collector: RelatedPersonInput
   hasShowedVerifiedDocument: Boolean
   payments: [PaymentInput]
-  data: String
+  certificateTemplateId: String
 }
 
 input IdentityInput {

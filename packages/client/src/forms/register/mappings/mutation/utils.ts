@@ -10,19 +10,33 @@
  */
 
 import type { GQLRelatedPersonInput } from '@client/utils/gateway-deprecated-do-not-use'
-import { ICertificate, IFileValue, TransformedData } from '@client/forms'
+import { ICertificate, IFileValue } from '@client/forms'
 import { omit } from 'lodash'
 
-export function transformCertificateData(
-  transformedData: TransformedData,
-  certificateData: ICertificate,
-  sectionId: string
-) {
-  transformedData[sectionId].certificates = [
+export function stripTypename(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(stripTypename)
+  } else if (obj !== null && typeof obj === 'object') {
+    const newObj: any = {}
+    for (const key in obj) {
+      if (key !== '__typename' && Object.hasOwn(obj, key)) {
+        newObj[key] = stripTypename(obj[key])
+      }
+    }
+    return newObj
+  }
+  return obj
+}
+export function transformCertificateData(certificates: ICertificate[]) {
+  const certificateData = stripTypename(certificates[0])
+
+  // Prepare the base certificate data
+  const updatedCertificates: ICertificate[] = [
     {
       ...omit(certificateData, 'collector')
     }
   ]
+
   // for collector mapping
   if (certificateData && certificateData.collector) {
     let collector: GQLRelatedPersonInput = {}
@@ -58,6 +72,9 @@ export function transformCertificateData(
         }
       ]
     }
-    transformedData[sectionId].certificates[0].collector = collector
+    updatedCertificates[0].collector = collector as any
   }
+
+  // Return the processed certificates array
+  return updatedCertificates
 }

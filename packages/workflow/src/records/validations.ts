@@ -18,7 +18,7 @@ export const CertifyRequestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
   certificate: z.object({
     hasShowedVerifiedDocument: z.boolean(),
-    data: z.string(),
+    certificateTemplateId: z.string(),
     collector: z
       .object({
         relationship: z.string(),
@@ -63,9 +63,9 @@ const PaymentSchema = z.object({
 
 export const IssueRequestSchema = z.object({
   event: z.custom<EVENT_TYPE>(),
-  certificate: CertifyRequestSchema.shape.certificate
-    .omit({ data: true })
-    .and(z.object({ payment: PaymentSchema }))
+  certificate: CertifyRequestSchema.shape.certificate.and(
+    z.object({ payment: PaymentSchema })
+  )
 })
 
 export const ChangedValuesInput = z.array(
