@@ -747,10 +747,6 @@ export function setInformantReference<T extends CompositionSectionCode>(
     fhirBundle,
     personSectionEntry.reference
   )
-  // const personEntry =  fhirBundle.entry.find(
-  //   (entry): entry is BundleEntryWithFullUrl<Patient> =>
-  //     entry.fullUrl === personSectionEntry.reference
-  // )
   if (!personEntry) {
     return
   }

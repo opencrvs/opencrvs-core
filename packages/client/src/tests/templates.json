@@ -72,7 +72,7 @@
       "fee": {
         "onTime": 0,
         "late": 5.5,
-        "delayed": 15
+        "delayed": 0
       },
       "isDefault": true,
       "svgUrl": "/api/countryconfig/certificates/death-certificate.svg",

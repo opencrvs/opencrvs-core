@@ -6,13 +6,6 @@
 
 - **Dashboard:** Changes made to the dashboard configuration will reset after upgrading OpenCRVS.
 
-## Improvements
-
-- Fetch child identifier in view record
-- Auth token, ip address, remote address redacted from server log
-- **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
-- **Certificate Fetching**: Removed certificates from the database, allowing them to be fetched directly from the country configuration via a simplified API endpoint.
-
 ### New features
 
 - Misc new feature
@@ -36,6 +29,7 @@
 
 - Auth token, ip address, remote address redacted from server log
 - **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
+- **Certificate Fetching**: Removed certificates from the database, allowing them to be fetched directly from the country configuration via a simplified API endpoint.
 
 ### Deprecated
 
