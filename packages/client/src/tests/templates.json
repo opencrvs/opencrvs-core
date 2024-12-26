@@ -87,6 +87,32 @@
       }
     },
     {
+      "id": "death-certificate-copy",
+      "event": "death",
+      "label": {
+        "id": "certificates.death.certificate",
+        "defaultMessage": "Death Certificate Certified Copy",
+        "description": "The label for a death certificate"
+      },
+
+      "fee": {
+        "onTime": 0,
+        "late": 5.5,
+        "delayed": 15
+      },
+      "isDefault": true,
+      "svgUrl": "/api/countryconfig/certificates/death-certificate-copy.svg",
+      "svg": "<svg></svg>",
+      "fonts": {
+        "Noto Sans": {
+          "normal": "/api/countryconfig/fonts/NotoSans-Regular.ttf",
+          "bold": "/api/countryconfig/fonts/NotoSans-Bold.ttf",
+          "italics": "/api/countryconfig/fonts/NotoSans-Regular.ttf",
+          "bolditalics": "/api/countryconfig/fonts/NotoSans-Regular.ttf"
+        }
+      }
+    },
+    {
       "id": "marriage-certificate",
       "event": "marriage",
       "label": {

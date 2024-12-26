@@ -595,7 +595,7 @@ describe('Certificate collector test for a death registration', () => {
       await selectOption(
         component,
         '#certificateTemplateId',
-        'Death Certificate'
+        'Death Certificate Certified Copy'
       )
 
       const $confirm = await waitForElement(component, '#confirm_form')

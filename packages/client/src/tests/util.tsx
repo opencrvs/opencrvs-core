@@ -549,7 +549,7 @@ export const mockDeclarationData = {
       officeAddressLevel3: 'Gazipur',
       officeAddressLevel4: 'Dhaka'
     },
-    certificates: [{ certificateTemplateId: 'death-certificate' }]
+    certificates: [{ certificateTemplateId: 'birth-certificate' }]
   },
   documents: {}
 }

@@ -56,6 +56,14 @@ const deathDeclaration = {
   id: 'mockDeath1234',
   data: {
     ...mockDeathDeclarationData,
+    registration: {
+      ...mockDeathDeclarationData.registration,
+      certificates: [
+        {
+          certificateTemplateId: 'death-certificate-copy'
+        }
+      ]
+    },
     history: [
       {
         date: '2021-03-21T08:16:24.467+00:00',
@@ -123,7 +131,7 @@ describe('verify collector tests for issuance', () => {
   })
 })
 
-describe('in case of death declaration renders issue payment component', () => {
+describe('in case of birth declaration renders issue payment component', () => {
   const { store } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
