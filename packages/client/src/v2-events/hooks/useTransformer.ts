@@ -9,15 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FlatFormData } from '@client/v2-events/components/forms/utils'
+import { findPageFields } from '@opencrvs/commons/client'
+import {
+  fieldValueToString,
+  FlatFormData
+} from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 export const useTransformer = (eventType: string) => {
   const { eventConfiguration } = useEventConfiguration(eventType)
-  console.log({ eventConfiguration })
+
+  const fields = eventConfiguration ? findPageFields(eventConfiguration) : []
 
   const toString = (values: FlatFormData) => {
-    return values
+    const stringifiedValues = values
+    for (const [key, value] of Object.entries(values)) {
+      const fieldType = fields.find((field) => field.id === key)?.type
+      if (!fieldType) {
+        throw new Error(`Field not found for ${key}`)
+      }
+      stringifiedValues[key] = fieldValueToString(fieldType, value)
+    }
+    return stringifiedValues
   }
   return { toString }
 }
