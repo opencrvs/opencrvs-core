@@ -11,7 +11,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { FieldProps } from '@opencrvs/commons'
-import { IFormFieldValue } from '@client/forms'
+import { FormFieldValueToString } from './TextField'
 
 export const INITIAL_PARAGRAPH_VALUE = ''
 
@@ -21,5 +21,5 @@ export function Paragraph({ label }: FieldProps<'PARAGRAPH'>) {
   return <p>{intl.formatMessage(label)}</p>
 }
 
-export const paragraphToString = (text: IFormFieldValue | undefined | null) =>
+export const paragraphToString: FormFieldValueToString = (text) =>
   (text as string) || ''

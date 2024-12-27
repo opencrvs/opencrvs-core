@@ -49,5 +49,9 @@ export function TextField({ id, label, required }: FieldProps<'TEXT'>) {
   )
 }
 
-export const textToString = (text: IFormFieldValue | undefined | null) =>
+export type FormFieldValueToString = (
+  value: IFormFieldValue | undefined | null
+) => string
+
+export const textToString: FormFieldValueToString = (text) =>
   (text as string) || ''

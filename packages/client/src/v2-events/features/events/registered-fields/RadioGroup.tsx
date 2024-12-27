@@ -15,7 +15,7 @@ import {
   RadioGroup as RadioGroupComponent
 } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons'
-import { IFormFieldValue } from '@client/forms'
+import { FormFieldValueToString } from './TextField'
 
 export const INITIAL_RADIO_GROUP_VALUE = ''
 
@@ -35,5 +35,5 @@ export function RadioGroup({ id, options }: FieldProps<'RADIO_GROUP'>) {
   )
 }
 
-export const radioGroupToString = (value: IFormFieldValue | undefined | null) =>
+export const radioGroupToString: FormFieldValueToString = (value) =>
   (value as string) || ''
