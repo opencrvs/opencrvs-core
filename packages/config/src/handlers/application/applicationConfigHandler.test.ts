@@ -37,11 +37,6 @@ const mockConfig = {
   BIRTH: {
     REGISTRATION_TARGET: 45,
     LATE_REGISTRATION_TARGET: 365,
-    FEE: {
-      ON_TIME: 0,
-      LATE: 0,
-      DELAYED: 0
-    },
     PRINT_IN_ADVANCE: true
   },
   COUNTRY_LOGO: {
@@ -54,18 +49,10 @@ const mockConfig = {
   },
   DEATH: {
     REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    },
     PRINT_IN_ADVANCE: true
   },
   MARRIAGE: {
     REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    },
     PRINT_IN_ADVANCE: true
   },
   PHONE_NUMBER_PATTERN: '^0(7|9)[0-9]{8}$',

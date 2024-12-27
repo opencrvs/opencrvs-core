@@ -12,15 +12,18 @@ import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { StepOneContainer } from '@login/views/StepOne/StepOneContainer'
 import { createTestComponent, createTestApp } from '@login/tests/util'
-import { client } from '@login/utils/authApi'
 import { applicationConfigLoadedAction } from '@login/login/actions'
+import { STEP_ONE } from '@login/navigation/routes'
 
 describe('Login app step one', () => {
   describe('Step One Container', () => {
     let component: ReactWrapper
 
     beforeEach(() => {
-      component = createTestComponent(<StepOneContainer />)
+      ;({ component } = createTestComponent(<StepOneContainer />, {
+        initialEntries: [STEP_ONE],
+        path: STEP_ONE
+      }))
     })
     it('renders successfully', () => {
       expect(component.find('form#STEP_ONE')).toHaveLength(1)

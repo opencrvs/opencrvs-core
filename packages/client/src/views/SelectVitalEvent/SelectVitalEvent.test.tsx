@@ -45,7 +45,7 @@ describe('when user is selecting the vital event', () => {
         ],
         store
       )
-      await waitForReady(app)
+      await flushPromises()
       router.navigate(SELECT_VITAL_EVENT, { replace: true })
       await waitForElement(app, '#select_vital_event_view')
     })
@@ -54,7 +54,8 @@ describe('when user is selecting the vital event', () => {
     })
 
     describe('when selects "Birth"', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
+        await flushPromises()
         app.find('#select_birth_event').hostNodes().simulate('change')
         app.find('#continue').hostNodes().simulate('click')
         app.update()
@@ -67,7 +68,8 @@ describe('when user is selecting the vital event', () => {
     })
 
     describe('when selects "Death"', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
+        await flushPromises()
         app.find('#select_death_event').hostNodes().simulate('change')
         app.find('#continue').hostNodes().simulate('click')
       })
@@ -77,7 +79,8 @@ describe('when user is selecting the vital event', () => {
     })
 
     describe('when no event is selected', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
+        await flushPromises()
         app.find('#continue').hostNodes().simulate('click')
       })
       it('shows the required error to user', () => {

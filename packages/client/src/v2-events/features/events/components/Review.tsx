@@ -17,7 +17,6 @@ import { FormConfig } from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
-  Frame,
   Icon,
   Link,
   ResponsiveModal,
@@ -26,7 +25,6 @@ import {
   Stack
 } from '@opencrvs/components'
 import { EventConfig } from '@opencrvs/commons'
-import { FormHeader } from '@client/v2-events/features/events/components/FormHeader'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -107,7 +105,7 @@ const ReviewContainter = styled.div`
 `
 const DeclarationDataContainer = styled.div``
 
-const previewMessages = defineMessages({
+const reviewMessages = defineMessages({
   changeButton: {
     id: 'buttons.change',
     defaultMessage: 'Change',
@@ -158,10 +156,10 @@ const previewMessages = defineMessages({
 })
 
 /**
- * Preview component, used to display the "read-only" version of the form.
+ * Review component, used to display the "read" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
  */
-function PreviewComponent({
+function ReviewComponent({
   eventConfig,
   formConfig,
   form,
@@ -179,91 +177,86 @@ function PreviewComponent({
   const intl = useIntl()
 
   return (
-    <Frame
-      header={<FormHeader label={eventConfig.label} />}
-      skipToContentText="Skip to form"
-    >
-      <Row>
-        <LeftColumn>
-          <Card>
-            <HeaderContainer>
-              <HeaderContent>
-                <Stack
-                  alignItems="flex-start"
-                  direction="column"
-                  gap={6}
-                  justify-content="flex-start"
-                >
-                  <TitleContainer id={`header_title`}>
-                    {eventConfig.label.defaultMessage}
-                  </TitleContainer>
-                  <SubjectContainer id={`header_subject`}>
-                    {title}
-                  </SubjectContainer>
-                </Stack>
-              </HeaderContent>
-            </HeaderContainer>
-            <FormData>
-              <ReviewContainter>
-                {formConfig.pages.map((page) => {
-                  return (
-                    <DeclarationDataContainer
-                      key={'Section_' + page.title.defaultMessage}
+    <Row>
+      <LeftColumn>
+        <Card>
+          <HeaderContainer>
+            <HeaderContent>
+              <Stack
+                alignItems="flex-start"
+                direction="column"
+                gap={6}
+                justify-content="flex-start"
+              >
+                <TitleContainer id={`header_title`}>
+                  {eventConfig.label.defaultMessage}
+                </TitleContainer>
+                <SubjectContainer id={`header_subject`}>
+                  {title}
+                </SubjectContainer>
+              </Stack>
+            </HeaderContent>
+          </HeaderContainer>
+          <FormData>
+            <ReviewContainter>
+              {formConfig.pages.map((page) => {
+                return (
+                  <DeclarationDataContainer
+                    key={'Section_' + page.title.defaultMessage}
+                  >
+                    <Accordion
+                      action={
+                        <Link
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onEdit({ pageId: page.id })
+                          }}
+                        >
+                          {intl.formatMessage(reviewMessages.changeButton)}
+                        </Link>
+                      }
+                      expand={true}
+                      label={intl.formatMessage(page.title)}
+                      labelForHideAction="Hide"
+                      labelForShowAction="Show"
+                      name={'Accordion_' + page.id}
                     >
-                      <Accordion
-                        action={
-                          <Link
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              onEdit({ pageId: page.id })
-                            }}
-                          >
-                            {intl.formatMessage(previewMessages.changeButton)}
-                          </Link>
-                        }
-                        expand={true}
-                        label={intl.formatMessage(page.title)}
-                        labelForHideAction="Hide"
-                        labelForShowAction="Show"
-                        name={'Accordion_' + page.id}
-                      >
-                        <ListReview id={'Section_' + page.id}>
-                          {page.fields.map((field) => (
-                            <ListReview.Row
-                              key={field.id}
-                              actions={
-                                <Link
-                                  onClick={(e) => {
-                                    e.stopPropagation()
+                      <ListReview id={'Section_' + page.id}>
+                        {page.fields.map((field) => (
+                          <ListReview.Row
+                            key={field.id}
+                            actions={
+                              <Link
+                                onClick={(e) => {
+                                  e.stopPropagation()
 
-                                    onEdit({
-                                      pageId: page.id,
-                                      fieldId: field.id
-                                    })
-                                  }}
-                                >
-                                  {intl.formatMessage(
-                                    previewMessages.changeButton
-                                  )}
-                                </Link>
-                              }
-                              id={field.id}
-                              label={intl.formatMessage(field.label)}
-                              value={form[field.id] || ''}
-                            />
-                          ))}
-                        </ListReview>
-                      </Accordion>
-                    </DeclarationDataContainer>
-                  )
-                })}
-              </ReviewContainter>
-            </FormData>
-          </Card>
-          {children}
-        </LeftColumn>
-      </Row>
-    </Frame>
+                                  onEdit({
+                                    pageId: page.id,
+                                    fieldId: field.id
+                                  })
+                                }}
+                              >
+                                {intl.formatMessage(
+                                  reviewMessages.changeButton
+                                )}
+                              </Link>
+                            }
+                            id={field.id}
+                            label={intl.formatMessage(field.label)}
+                            value={form[field.id] || ''}
+                          />
+                        ))}
+                      </ListReview>
+                    </Accordion>
+                  </DeclarationDataContainer>
+                )
+              })}
+            </ReviewContainter>
+          </FormData>
+        </Card>
+        {children}
+      </LeftColumn>
+    </Row>
   )
 }
 
@@ -373,7 +366,7 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(null)
           }}
         >
-          {intl.formatMessage(previewMessages.changeModalCancel)}
+          {intl.formatMessage(reviewMessages.changeModalCancel)}
         </Button>,
         <Button
           key="confirm_edit"
@@ -383,17 +376,17 @@ function EditModal({ close }: { close: (result: boolean | null) => void }) {
             close(true)
           }}
         >
-          {intl.formatMessage(previewMessages.changeModalContinue)}
+          {intl.formatMessage(reviewMessages.changeModalContinue)}
         </Button>
       ]}
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(previewMessages.changeModalTitle)}
+      title={intl.formatMessage(reviewMessages.changeModalTitle)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(previewMessages.changeModalDescription)}
+          {intl.formatMessage(reviewMessages.changeModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>
@@ -420,7 +413,7 @@ function ActionModal({
             close(null)
           }}
         >
-          {intl.formatMessage(previewMessages.actionModalCancel)}
+          {intl.formatMessage(reviewMessages.actionModalCancel)}
         </Button>,
         <Button
           key={'confirm_' + action}
@@ -430,7 +423,7 @@ function ActionModal({
             close(true)
           }}
         >
-          {intl.formatMessage(previewMessages.actionModalPrimaryAction, {
+          {intl.formatMessage(reviewMessages.actionModalPrimaryAction, {
             action
           })}
         </Button>
@@ -438,19 +431,19 @@ function ActionModal({
       handleClose={() => close(null)}
       responsive={false}
       show={true}
-      title={intl.formatMessage(previewMessages.actionModalTitle, { action })}
+      title={intl.formatMessage(reviewMessages.actionModalTitle, { action })}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
-          {intl.formatMessage(previewMessages.actionModalDescription)}
+          {intl.formatMessage(reviewMessages.actionModalDescription)}
         </Text>
       </Stack>
     </ResponsiveModal>
   )
 }
 
-export const Preview = {
-  Body: PreviewComponent,
+export const Review = {
+  Body: ReviewComponent,
   Actions: PreviewActionComponent,
   EditModal: EditModal,
   ActionModal: ActionModal

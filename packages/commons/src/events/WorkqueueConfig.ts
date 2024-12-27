@@ -44,3 +44,4 @@ export const WorkqueueConfig = z
   .describe('Configuration for workqueue.')
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
+export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>

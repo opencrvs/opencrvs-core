@@ -101,6 +101,17 @@ export async function indexEvent(event: EventDocument) {
 export async function getIndexedEvents() {
   const esClient = getOrCreateClient()
 
+  const hasEventsIndex = await esClient.indices.exists({ index: EVENTS_INDEX })
+
+  if (!hasEventsIndex) {
+    // @TODO: We probably want to create the index on startup or as part of the deployment process.
+    // eslint-disable-next-line no-console
+    console.error('Events index does not exist. Creating one.')
+    await createIndex(EVENTS_INDEX)
+
+    return []
+  }
+
   const response = await esClient.search({
     index: EVENTS_INDEX,
     size: 10000,

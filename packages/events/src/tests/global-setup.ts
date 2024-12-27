@@ -10,7 +10,6 @@
  */
 
 import { MongoMemoryServer } from 'mongodb-memory-server'
-
 export type { ProvidedContext } from 'vitest'
 
 declare module 'vitest' {

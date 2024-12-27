@@ -113,6 +113,7 @@ describe('Issue record endpoint', () => {
           collector: {
             relationship: 'INFORMANT'
           },
+          certificateTemplateId: 'birth-certificate',
           payment: {
             type: 'MANUAL',
             amount: 100,

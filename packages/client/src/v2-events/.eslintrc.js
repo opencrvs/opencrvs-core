@@ -28,7 +28,22 @@ module.exports = {
     '@typescript-eslint/require-await': 2,
     '@typescript-eslint/return-await': 2,
     '@typescript-eslint/switch-exhaustiveness-check': 2,
-    'func-style': ['error', 'declaration'],
+    'func-style': [
+      'error',
+      'declaration',
+      {
+        allowArrowFunctions: true
+      }
+    ],
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          ':matches(Program > VariableDeclaration) > VariableDeclarator > ArrowFunctionExpression',
+        message: 'Top-level arrow functions are not allowed.'
+      }
+    ],
+    'react/jsx-no-literals': 1,
     'no-shadow': 1,
     'no-undef-init': 2,
     'no-return-assign': 2,

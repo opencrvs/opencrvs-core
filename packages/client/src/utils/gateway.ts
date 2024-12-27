@@ -397,16 +397,16 @@ export type BookmarkedSeachItem = {
 
 export type Certificate = {
   __typename?: 'Certificate'
+  certificateTemplateId?: Maybe<Scalars['String']>
   certifier?: Maybe<User>
   collector?: Maybe<RelatedPerson>
-  data?: Maybe<Scalars['String']>
   hasShowedVerifiedDocument?: Maybe<Scalars['Boolean']>
   payments?: Maybe<Array<Maybe<Payment>>>
 }
 
 export type CertificateInput = {
+  certificateTemplateId?: InputMaybe<Scalars['String']>
   collector?: InputMaybe<RelatedPersonInput>
-  data?: InputMaybe<Scalars['String']>
   hasShowedVerifiedDocument?: InputMaybe<Scalars['Boolean']>
   payments?: InputMaybe<Array<InputMaybe<PaymentInput>>>
 }
@@ -436,7 +436,6 @@ export type CommentInput = {
 }
 
 export type ConfirmRegistrationInput = {
-  error?: InputMaybe<Scalars['String']>
   identifiers?: InputMaybe<Array<IdentifierInput>>
   registrationNumber: Scalars['String']
 }
@@ -754,6 +753,7 @@ export enum Gender {
 export type History = {
   __typename?: 'History'
   action?: Maybe<RegAction>
+  certificateTemplateId?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
@@ -1061,6 +1061,7 @@ export type Mutation = {
   revokeEvent: Event
   updateDeathRegistration: Scalars['ID']
   updatePermissions?: Maybe<System>
+  upsertRegistrationIdentifier: Scalars['ID']
   usernameReminder?: Maybe<Scalars['String']>
 }
 
@@ -1372,6 +1373,12 @@ export type MutationUpdateDeathRegistrationArgs = {
 
 export type MutationUpdatePermissionsArgs = {
   setting: UpdatePermissionsInput
+}
+
+export type MutationUpsertRegistrationIdentifierArgs = {
+  id: Scalars['ID']
+  identifierType: Scalars['String']
+  identifierValue: Scalars['String']
 }
 
 export type MutationUsernameReminderArgs = {
@@ -2133,6 +2140,7 @@ export enum SystemStatus {
 
 export enum SystemType {
   Health = 'HEALTH',
+  NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
   Webhook = 'WEBHOOK'
 }
@@ -3381,6 +3389,28 @@ export type FetchBirthRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+      } | null> | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -3441,6 +3471,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       requesterOther?: string | null
       noSupportingDocumentationRequired?: boolean | null
       hasShowedVerifiedDocument?: boolean | null
+      certificateTemplateId?: string | null
       date?: any | null
       action?: RegAction | null
       regStatus?: RegStatus | null
@@ -3542,6 +3573,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
         collector?: {
           __typename?: 'RelatedPerson'
           relationship?: string | null
@@ -3879,6 +3911,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
         collector?: {
           __typename?: 'RelatedPerson'
           relationship?: string | null
@@ -4218,6 +4251,28 @@ export type FetchDeathRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+      } | null> | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -4278,6 +4333,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       requester?: string | null
       requesterOther?: string | null
       hasShowedVerifiedDocument?: boolean | null
+      certificateTemplateId?: string | null
       noSupportingDocumentationRequired?: boolean | null
       date?: any | null
       action?: RegAction | null
@@ -4380,6 +4436,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
         collector?: {
           __typename?: 'RelatedPerson'
           relationship?: string | null
@@ -4707,6 +4764,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       certificates?: Array<{
         __typename?: 'Certificate'
         hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
         collector?: {
           __typename?: 'RelatedPerson'
           relationship?: string | null
@@ -4982,6 +5040,28 @@ export type FetchMarriageRegistrationForReviewQuery = {
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
+      certificates?: Array<{
+        __typename?: 'Certificate'
+        hasShowedVerifiedDocument?: boolean | null
+        certificateTemplateId?: string | null
+        collector?: {
+          __typename?: 'RelatedPerson'
+          relationship?: string | null
+          otherRelationship?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+          telecom?: Array<{
+            __typename?: 'ContactPoint'
+            system?: string | null
+            value?: string | null
+            use?: string | null
+          } | null> | null
+        } | null
+      } | null> | null
       duplicates?: Array<{
         __typename?: 'DuplicatesInfo'
         compositionId?: string | null
@@ -5039,6 +5119,7 @@ export type FetchMarriageRegistrationForReviewQuery = {
       otherReason?: string | null
       requester?: string | null
       hasShowedVerifiedDocument?: boolean | null
+      certificateTemplateId?: string | null
       noSupportingDocumentationRequired?: boolean | null
       date?: any | null
       action?: RegAction | null

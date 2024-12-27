@@ -123,7 +123,7 @@ class OfficeHomeView extends React.Component<
 > {
   pageSize = 10
   showPaginated = false
-  interval: ReturnType<typeof setInterval> | undefined = undefined
+  interval: NodeJS.Timeout | undefined = undefined
 
   constructor(props: IOfficeHomeProps) {
     super(props)
