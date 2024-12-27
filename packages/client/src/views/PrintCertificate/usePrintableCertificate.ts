@@ -50,7 +50,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { isMinioUrl } from '@opencrvs/commons'
+import { isMinioUrl } from '@opencrvs/commons/client'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
