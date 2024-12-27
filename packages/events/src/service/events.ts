@@ -20,6 +20,7 @@ import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
 import { indexEvent } from './indexing/indexing'
 import * as _ from 'lodash'
+import { TRPCError } from '@trpc/server'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -51,6 +52,30 @@ export async function getEventById(id: string) {
     throw new EventNotFoundError(id)
   }
   return event
+}
+
+export async function deleteEvent(id: string) {
+  const db = await getClient()
+
+  const collection = db.collection<EventDocument>('events')
+  const event = await collection.findOne({ id: id })
+
+  if (!event) {
+    throw new EventNotFoundError(id)
+  }
+
+  const hasNonDeletableActions = event.actions.some(
+    ({ type }) => type !== ActionType.CREATE && type !== ActionType.DRAFT
+  )
+  if (hasNonDeletableActions) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Event has actions that cannot be deleted'
+    })
+  }
+
+  await collection.deleteOne({ id })
+  return 'Event deleted successfully with ID: ' + id
 }
 
 export async function createEvent({

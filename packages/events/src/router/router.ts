@@ -25,6 +25,7 @@ import { getEventsConfig } from '@events/service/config/config'
 import {
   addAction,
   createEvent,
+  deleteEvent,
   EventInputWithId,
   getEventById,
   patchEvent
@@ -107,6 +108,9 @@ export const appRouter = router({
     }),
     get: publicProcedure.input(z.string()).query(async ({ input }) => {
       return getEventById(input)
+    }),
+    delete: publicProcedure.input(z.string()).query(async ({ input }) => {
+      return deleteEvent(input)
     }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {

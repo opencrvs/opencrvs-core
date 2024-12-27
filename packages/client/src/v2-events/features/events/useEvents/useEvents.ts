@@ -368,6 +368,9 @@ export function useEvents() {
   function createEvent() {
     return api.event.create.useMutation({})
   }
+  function deleteEvent(id: string) {
+    return api.event.delete.useSuspenseQuery(id)
+  }
 
   function draft() {
     return api.event.actions.draft.useMutation({})
@@ -467,6 +470,7 @@ export function useEvents() {
 
   return {
     createEvent,
+    deleteEvent,
     events,
     getEvent,
     getEventById: api.event.get,
