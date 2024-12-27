@@ -15,8 +15,6 @@ import {
 import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { RECORD_DECLARE_SCOPES, usePermissions } from './useAuthorization'
 
-// TODO: Move useHomePage hook into this hook and figure out how to return the home for each role
-
 export interface Tab {
   name: string
   scopes?: Scope[]
