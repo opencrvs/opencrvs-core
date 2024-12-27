@@ -14,7 +14,7 @@ import { DOCUMENTS_URL } from '@gateway/constants'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
 export default class MinioAPI extends OpenCRVSRESTDataSource {
-  override baseURL = `${DOCUMENTS_URL}/presigned-url`
+  override baseURL = `${DOCUMENTS_URL}`
 
   override willSendRequest(
     _path: string,
@@ -25,6 +25,6 @@ export default class MinioAPI extends OpenCRVSRESTDataSource {
   }
 
   getStaticData(fileUri: string) {
-    return this.get(`${fileUri}`)
+    return this.get(`/presigned-url${fileUri}`)
   }
 }
