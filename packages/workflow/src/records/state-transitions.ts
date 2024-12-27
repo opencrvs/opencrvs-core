@@ -1093,7 +1093,6 @@ export async function toIssued(
     certificateDetails.hasShowedVerifiedDocument,
     collectorReference,
     certificateDetails.certificateTemplateId,
-    undefined,
     paymentReconciliation.fullUrl
   )
 

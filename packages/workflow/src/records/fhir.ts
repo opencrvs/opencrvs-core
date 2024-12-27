@@ -219,7 +219,6 @@ export function createDocumentReferenceEntryForCertificate(
   hasShowedVerifiedDocument: boolean,
   collectorReference: ResourceIdentifier | URNReference,
   certificateTemplateId?: string,
-  attachmentUrl?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
   return {
@@ -264,16 +263,7 @@ export function createDocumentReferenceEntryForCertificate(
           }
         ]
       },
-      content: attachmentUrl
-        ? [
-            {
-              attachment: {
-                contentType: 'application/pdf',
-                data: attachmentUrl
-              }
-            }
-          ]
-        : [],
+      content: [],
       status: 'current'
     }
   }
