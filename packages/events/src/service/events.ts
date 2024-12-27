@@ -101,7 +101,11 @@ export async function createEvent({
 
 export async function addAction(
   input: ActionInput,
-  { eventId, createdBy }: { eventId: string; createdBy: string }
+  {
+    eventId,
+    createdBy,
+    createdAtLocation
+  }: { eventId: string; createdBy: string; createdAtLocation: string }
 ) {
   const db = await getClient()
   const now = new Date().toISOString()
@@ -115,7 +119,8 @@ export async function addAction(
         actions: {
           ...input,
           createdBy,
-          createdAt: now
+          createdAt: now,
+          createdAtLocation
         }
       }
     }
