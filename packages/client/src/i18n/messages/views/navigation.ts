@@ -12,6 +12,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface INavigationMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  'my-drafts': MessageDescriptor
   progress: MessageDescriptor
   readyForReview: MessageDescriptor
   sentForReview: MessageDescriptor
@@ -37,7 +38,7 @@ interface INavigationMessages
 
 const messagesToDefine: INavigationMessages = {
   'my-drafts': {
-    defaultMessage: 'My Drafts',
+    defaultMessage: 'My drafts',
     description: 'My drafts label in navigation',
     id: 'navigation.myDrafts'
   },

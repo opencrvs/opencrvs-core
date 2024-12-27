@@ -284,7 +284,7 @@ export const MyDrafts: React.FC<{
 
   return (
     <WQContentWrapper
-      title={intl.formatMessage(navigationMessages.progress)}
+      title={intl.formatMessage(navigationMessages['my-drafts'])}
       isMobileSize={width < theme.grid.breakpoints.lg ? true : false}
       isShowPagination={showPagination}
       paginationId={props.currentPage}
