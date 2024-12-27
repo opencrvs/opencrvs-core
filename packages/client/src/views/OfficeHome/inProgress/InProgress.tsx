@@ -95,7 +95,6 @@ interface IBaseRegistrarHomeProps {
   queryData: IQueryData
   onPageChange: (newPageNumber: number) => void
   paginationId: {
-    draftId: number
     fieldAgentId: number
     healthSystemId: number
   }
