@@ -155,16 +155,11 @@ const initialValueMapping: Record<FieldType, IFormFieldValue | null> = {
   [FieldType.HIDDEN]: null
 }
 
-export function getInitialValues(
-  fields: FieldConfig[],
-  formValues: Record<string, IFormFieldValue>
-) {
-  const initialValues: Record<string, IFormFieldValue | null> = formValues
+export function getInitialValues(fields: FieldConfig[]) {
+  const initialValues: Record<string, IFormFieldValue | null> = {}
 
   fields.forEach((field) => {
-    if (!(field.id in formValues)) {
-      initialValues[field.id] = initialValueMapping[field.type]
-    }
+    initialValues[field.id] = initialValueMapping[field.type]
   })
   return initialValues
 }

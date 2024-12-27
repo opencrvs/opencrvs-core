@@ -40,7 +40,6 @@ export function Pages({
   const intl = useIntl()
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const formValues = getFormValues(eventId)
   const setFormValues = useEventFormData((state) => state.setFormValues)
 
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
@@ -52,9 +51,7 @@ export function Pages({
     total
   } = usePagination(formPages.length, Math.max(pageIdx, 0))
   const page = formPages[currentPage]
-
-  const initialValues = getInitialValues(page.fields, formValues)
-  setFormValues(eventId, initialValues)
+  const formValues = getFormValues(eventId, getInitialValues(page.fields))
 
   useEffect(() => {
     const pageChanged = formPages[currentPage].id !== pageId
@@ -78,7 +75,7 @@ export function Pages({
         fields={page.fields}
         formData={formValues}
         id="locationForm"
-        initialValues={initialValues}
+        initialValues={formValues}
         setAllFieldsDirty={false}
         onChange={(values) => {
           setFormValues(eventId, values)

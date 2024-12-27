@@ -19,7 +19,7 @@ type FormData = ActionInput['data']
 interface EventFormData {
   formValues: FormData
   setFormValues: (eventId: string, data: FormData) => void
-  getFormValues: (eventId: string) => FormData
+  getFormValues: (eventId: string, initialValues?: FormData) => FormData
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
   eventId: string
@@ -30,8 +30,8 @@ export const useEventFormData = create<EventFormData>()(
     (set, get) => ({
       formValues: {},
       eventId: '',
-      getFormValues: (eventId: string) =>
-        get().eventId === eventId ? get().formValues : {},
+      getFormValues: (eventId: string, initialValues?: FormData) =>
+        get().eventId === eventId ? get().formValues : initialValues ?? {},
       setFormValues: (eventId: string, data: FormData) =>
         set(() => ({ eventId, formValues: data })),
       getTouchedFields: () =>
