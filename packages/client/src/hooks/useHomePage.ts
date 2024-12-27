@@ -89,8 +89,6 @@ export const useHomePage = () => {
     case WORKQUEUE_TABS.performance:
       path = generatePerformanceHomeUrl({ locationId: '' })
       break
-    default:
-      throw new Error('No navigation entry available for user')
   }
 
   return {
