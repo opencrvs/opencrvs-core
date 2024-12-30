@@ -58,6 +58,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import { MyDrafts } from './myDrafts/MyDrafts'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -77,7 +78,6 @@ interface IDispatchProps {
 type IBaseOfficeHomeStateProps = ReturnType<typeof mapStateToProps>
 
 interface IOfficeHomeState {
-  draftCurrentPage: number
   showCertificateToast: boolean
   offlineResources: IOfflineData
 }
@@ -88,6 +88,7 @@ type IOfficeHomeProps = IntlShapeProps &
   RouteComponentProps
 
 const DECLARATION_WORKQUEUE_TABS = [
+  WORKQUEUE_TABS.myDrafts,
   WORKQUEUE_TABS.inProgress,
   WORKQUEUE_TABS.sentForApproval,
   WORKQUEUE_TABS.sentForReview,
@@ -128,7 +129,6 @@ class OfficeHomeView extends React.Component<
   constructor(props: IOfficeHomeProps) {
     super(props)
     this.state = {
-      draftCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.declarations.filter(
           (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
@@ -175,13 +175,11 @@ class OfficeHomeView extends React.Component<
             notificationTab: pageId
           })
           this.updateWorkqueue()
-        } else if (
-          selectorId === SELECTOR_ID.ownDrafts &&
-          pageId !== this.state.draftCurrentPage
-        ) {
-          this.setState({ draftCurrentPage: pageId })
         }
-      } else if (pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]) {
+      } else if (
+        tabId !== WORKQUEUE_TABS.myDrafts &&
+        pageId !== this.props[WORKQUEUE_TABS_PAGINATION[tabId]]
+      ) {
         this.props.updateWorkqueuePagination({
           [WORKQUEUE_TABS_PAGINATION[tabId]]: pageId
         })
@@ -223,7 +221,7 @@ class OfficeHomeView extends React.Component<
             tabId: WORKQUEUE_TABS.inProgress,
             selectorId: Object.values(SELECTOR_ID).includes(selectorId)
               ? selectorId
-              : SELECTOR_ID.ownDrafts,
+              : SELECTOR_ID.fieldAgentDrafts,
             pageId: newPageNumber
           })
         )
@@ -252,7 +250,6 @@ class OfficeHomeView extends React.Component<
     const {
       workqueue,
       tabId,
-      drafts,
       selectorId,
       storedDeclarations,
       offlineResources
@@ -272,16 +269,21 @@ class OfficeHomeView extends React.Component<
 
     return (
       <>
+        {tabId === WORKQUEUE_TABS.myDrafts && (
+          <MyDrafts
+            currentPage={draftCurrentPage}
+            pageSize={this.pageSize}
+            onPageChange={this.onPageChange}
+          />
+        )}
         {tabId === WORKQUEUE_TABS.inProgress && (
           <InProgress
-            drafts={drafts}
             selectorId={selectorId}
             queryData={{
               inProgressData: filteredData.inProgressTab,
               notificationData: filteredData.notificationTab
             }}
             paginationId={{
-              draftId: draftCurrentPage,
               fieldAgentId: progressCurrentPage,
               healthSystemId: healthSystemCurrentPage
             }}
@@ -383,9 +385,9 @@ class OfficeHomeView extends React.Component<
 
   render() {
     const { intl } = this.props
-    const { draftCurrentPage } = this.state
 
     const {
+      pageId,
       notificationTab,
       inProgressTab,
       reviewTab,
@@ -409,7 +411,7 @@ class OfficeHomeView extends React.Component<
         navigation={<Navigation loadWorkqueueStatuses={false} />}
       >
         {this.getData(
-          draftCurrentPage,
+          pageId,
           notificationTab,
           inProgressTab,
           reviewTab,

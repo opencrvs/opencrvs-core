@@ -215,9 +215,8 @@ describe('Given a user with scopes views Navigation', () => {
         })
       )?.component
   })
-
-  describe('In progress', async () => {
-    const id = `#navigation_${WORKQUEUE_TABS.inProgress}`
+  describe('My drafts', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.myDrafts}`
 
     const requiredScopes = [
       SCOPES.RECORD_DECLARE_BIRTH,
@@ -238,6 +237,34 @@ describe('Given a user with scopes views Navigation', () => {
       [[requiredScopes[3]], true],
       [[requiredScopes[4]], true],
       [[requiredScopes[5]], true],
+      [allOtherScopes, false]
+    ]
+
+    tests.forEach(([scopes, exists]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        testComponent = await build()
+        expect(testComponent.exists(id)).toBe(exists)
+      })
+    })
+  })
+
+  describe('In progress', async () => {
+    const id = `#navigation_${WORKQUEUE_TABS.inProgress}`
+
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REGISTER
+    ] as Scope[]
+
+    const allOtherScopes = allScopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [[requiredScopes[0]], true],
+      [[requiredScopes[1]], true],
+      [[requiredScopes[2]], true],
       [allOtherScopes, false]
     ]
 

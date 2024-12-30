@@ -114,7 +114,7 @@ describe('when user is in the register form for birth event', () => {
       component.component.update()
       await flushPromises()
       expect(component.router.state.location.pathname).toEqual(
-        '/registration-home/progress/'
+        '/registration-home/my-drafts/1'
       )
     })
     it('takes registrar to declaration submitted page when save button is clicked', async () => {
@@ -132,7 +132,7 @@ describe('when user is in the register form for birth event', () => {
       await flushPromises()
       expect(
         component.router.state.location.pathname.includes(
-          '/registration-home/progress'
+          '/registration-home/my-drafts/1'
         )
       ).toBeTruthy()
     })

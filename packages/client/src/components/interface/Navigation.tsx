@@ -219,14 +219,13 @@ const NavigationView = (props: IFullProps) => {
   }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
 
   const declarationCount = {
+    myDrafts: draftDeclarations.filter(
+      (draft) =>
+        draft.submissionStatus === SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+    ).length,
     inProgress: !initialSyncDone
       ? 0
-      : draftDeclarations.filter(
-          (draft) =>
-            draft.submissionStatus ===
-            SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        ).length +
-        (filteredData.inProgressTab?.totalItems || 0) +
+      : (filteredData.inProgressTab?.totalItems || 0) +
         (filteredData.notificationTab?.totalItems || 0),
     readyForReview: !initialSyncDone
       ? 0
@@ -272,6 +271,26 @@ const NavigationView = (props: IFullProps) => {
     >
       {hasAccess(TAB_GROUPS.declarations) && (
         <NavigationGroup>
+          {hasAccess(WORKQUEUE_TABS.myDrafts) && (
+            <NavigationItem
+              icon={() => <Icon name="FileDotted" />}
+              id={`navigation_${WORKQUEUE_TABS.myDrafts}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.myDrafts]
+              )}
+              count={declarationCount.myDrafts}
+              isSelected={tabId === WORKQUEUE_TABS.myDrafts}
+              onClick={() => {
+                props.router.navigate(
+                  generateGoToHomeTabUrl({
+                    tabId: WORKQUEUE_TABS.myDrafts
+                  })
+                )
+
+                menuCollapse && menuCollapse()
+              }}
+            />
+          )}
           {hasAccess(WORKQUEUE_TABS.inProgress) && (
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'purple'} />}

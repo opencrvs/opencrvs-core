@@ -13,9 +13,7 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/WorkQueueTabs'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
-import { usePermissions } from './useAuthorization'
-
-// TODO: Move useHomePage hook into this hook and figure out how to return the home for each role
+import { RECORD_DECLARE_SCOPES, usePermissions } from './useAuthorization'
 
 export interface Tab {
   name: string
@@ -41,14 +39,15 @@ const routeAccess: NavigationConfig[] = [
     name: TAB_GROUPS.declarations,
     tabs: [
       {
+        name: WORKQUEUE_TABS.myDrafts,
+        scopes: RECORD_DECLARE_SCOPES
+      },
+      {
         name: WORKQUEUE_TABS.inProgress,
         scopes: [
-          SCOPES.RECORD_DECLARE_BIRTH,
-          SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-          SCOPES.RECORD_DECLARE_DEATH,
-          SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-          SCOPES.RECORD_DECLARE_MARRIAGE,
-          SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+          SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+          SCOPES.RECORD_REGISTER
         ]
       },
       {
