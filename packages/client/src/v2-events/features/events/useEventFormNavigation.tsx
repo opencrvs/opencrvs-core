@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { useEvents } from './useEvents/useEvents'
+import { removeEventFromStorage, useEvents } from './useEvents/useEvents'
 
 const modalMessages = defineMessages({
   cancel: {
@@ -94,9 +94,8 @@ export function useEventFormNavigation() {
 
     if (exitConfirm) {
       deleteEvent.mutate(eventId, {
-        onSuccess: (data) => {
-          // eslint-disable-next-line no-console
-          console.log('Event deleted', data)
+        onSuccess: async (data: { id: string }) => {
+          await removeEventFromStorage(data.id)
           goToHome()
         },
         onError: (error) => {

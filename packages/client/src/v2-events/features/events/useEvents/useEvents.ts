@@ -327,6 +327,12 @@ async function writeEventsToStorage(events: EventDocument[]) {
   return storage.setItem('events', events)
 }
 
+export async function removeEventFromStorage(eventID: string) {
+  const events = await readEventsFromStorage()
+  const newEvents = events.filter((e) => e.id !== eventID)
+  return writeEventsToStorage(newEvents)
+}
+
 function getPendingMutations(
   mutationCreator: Parameters<typeof getQueryKey>[0]
 ) {

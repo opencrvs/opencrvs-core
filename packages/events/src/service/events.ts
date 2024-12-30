@@ -54,14 +54,14 @@ export async function getEventById(id: string) {
   return event
 }
 
-export async function deleteEvent(id: string) {
+export async function deleteEvent(eventId: string) {
   const db = await getClient()
 
   const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ transactionId: id })
+  const event = await collection.findOne({ transactionId: eventId })
 
   if (!event) {
-    throw new EventNotFoundError(id)
+    throw new EventNotFoundError(eventId)
   }
 
   const hasNonDeletableActions = event.actions.some(
@@ -74,9 +74,10 @@ export async function deleteEvent(id: string) {
     })
   }
 
-  await collection.deleteOne({ transactionId: id })
-  await deleteEventIndex(event.id)
-  return 'Event deleted successfully with ID: ' + id
+  const { id } = event
+  await collection.deleteOne({ id })
+  await deleteEventIndex(id)
+  return { id }
 }
 
 export async function createEvent({
