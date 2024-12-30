@@ -82,17 +82,21 @@ function EventSelector() {
     }
     const transactionId = `tmp-${uuid()}`
 
-    createEvent.mutate({
-      type: eventType,
-      transactionId
-    })
-
-    clearForm()
-
-    navigate(
-      ROUTES.V2.EVENTS.DECLARE.buildPath({
-        eventId: transactionId
-      })
+    createEvent.mutate(
+      {
+        type: eventType,
+        transactionId
+      },
+      {
+        onSuccess: ({ id }) => {
+          clearForm()
+          navigate(
+            ROUTES.V2.EVENTS.DECLARE.buildPath({
+              eventId: id
+            })
+          )
+        }
+      }
     )
   }
 
