@@ -58,7 +58,7 @@ export async function deleteEvent(eventId: string) {
   const db = await getClient()
 
   const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ transactionId: eventId })
+  const event = await collection.findOne({ id: eventId })
 
   if (!event) {
     throw new EventNotFoundError(eventId)
