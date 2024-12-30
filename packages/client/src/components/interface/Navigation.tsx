@@ -236,6 +236,9 @@ const NavigationView = (props: IFullProps) => {
     sentForApproval: !initialSyncDone
       ? 0
       : filteredData.approvalTab?.totalItems || 0,
+    sentForReview: !initialSyncDone
+      ? 0
+      : filteredData.sentForReviewTab?.totalItems || 0,
     externalValidation:
       window.config.FEATURES.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
         ? 0
@@ -318,7 +321,7 @@ const NavigationView = (props: IFullProps) => {
               label={intl.formatMessage(
                 navigationMessages[WORKQUEUE_TABS.sentForReview]
               )}
-              count={declarationCount.readyForReview}
+              count={declarationCount.sentForReview}
               isSelected={tabId === WORKQUEUE_TABS.sentForReview}
               onClick={() => {
                 props.router.navigate(

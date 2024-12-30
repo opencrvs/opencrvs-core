@@ -74,6 +74,7 @@ const workqueueInitialState: WorkqueueState = {
       notificationTab: { totalItems: 0, results: [] },
       reviewTab: { totalItems: 0, results: [] },
       rejectTab: { totalItems: 0, results: [] },
+      sentForReviewTab: { totalItems: 0, results: [] },
       approvalTab: { totalItems: 0, results: [] },
       printTab: { totalItems: 0, results: [] },
       issueTab: { totalItems: 0, results: [] },
@@ -86,6 +87,7 @@ const workqueueInitialState: WorkqueueState = {
     notificationTab: 1,
     reviewTab: 1,
     rejectTab: 1,
+    sentForReviewTab: 1,
     approvalTab: 1,
     externalValidationTab: 1,
     printTab: 1,
@@ -94,12 +96,12 @@ const workqueueInitialState: WorkqueueState = {
 }
 
 interface IWorkqueuePaginationParams {
-  userId?: string
   pageSize: number
   inProgressSkip: number
   healthSystemSkip: number
   reviewSkip: number
   rejectSkip: number
+  sentForReviewSkip: number
   approvalSkip: number
   externalValidationSkip: number
   printSkip: number
@@ -355,12 +357,14 @@ async function getWorkqueueData(
     reviewSkip,
     rejectSkip,
     approvalSkip,
+    sentForReviewSkip,
     externalValidationSkip,
     printSkip,
     issueSkip
   } = workqueuePaginationParams
 
   const result = await syncRegistrarWorkqueue(
+    userDetails.practitionerId,
     registrationLocationId,
     reviewStatuses,
     pageSize,
@@ -368,6 +372,7 @@ async function getWorkqueueData(
     healthSystemSkip,
     reviewSkip,
     rejectSkip,
+    sentForReviewSkip,
     approvalSkip,
     externalValidationSkip,
     printSkip,
@@ -449,6 +454,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
       const {
         printTab,
         reviewTab,
+        sentForReviewTab,
         approvalTab,
         inProgressTab,
         externalValidationTab,
@@ -465,6 +471,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         healthSystemSkip: Math.max(notificationTab - 1, 0) * pageSize,
         reviewSkip: Math.max(reviewTab - 1, 0) * pageSize,
         rejectSkip: Math.max(rejectTab - 1, 0) * pageSize,
+        sentForReviewSkip: Math.max(sentForReviewTab - 1, 0) * pageSize,
         approvalSkip: Math.max(approvalTab - 1, 0) * pageSize,
         externalValidationSkip:
           Math.max(externalValidationTab - 1, 0) * pageSize,

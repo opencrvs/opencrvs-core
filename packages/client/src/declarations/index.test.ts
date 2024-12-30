@@ -115,6 +115,16 @@ describe('query result filtering tests', () => {
           ],
           totalItems: 5
         },
+        sentForReviewTab: {
+          results: [
+            { id: 'READY_TO_SUBMIT' },
+            { id: 'SUBMITTING' },
+            { id: 'SUBMITED' },
+            { id: 'FAILED' },
+            { id: 'SUBMITTING' }
+          ],
+          totalItems: 5
+        },
         externalValidationTab: {
           results: [{ id: 'WAITING_FOR_VALIDATION' }],
           totalItems: 1
