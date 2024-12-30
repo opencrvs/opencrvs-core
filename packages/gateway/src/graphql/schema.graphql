@@ -1339,6 +1339,7 @@ input RelatedPersonInput {
   nationality: [String]
   educationalAttainment: String
   ageOfIndividualInYears: Int
+  scannedFields: String
 }
 
 input QuestionnaireQuestionInput {

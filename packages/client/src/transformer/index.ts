@@ -319,7 +319,12 @@ export const draftToGqlTransformer = (
             isInitialValueDependencyInfo(fieldDef.initialValue) &&
             fieldDef.initialValue.dependsOn.includes(idReaderField.name)
           ) {
-            scannedFields.push(fieldDef.name)
+            // push the scanned field ids to the scannedFields list
+            scannedFields.push(
+              `${String(draftData.registration.type).toLowerCase()}.${
+                section.id
+              }.${groupDef.id}.${fieldDef.name}`
+            )
           }
         }
       })
