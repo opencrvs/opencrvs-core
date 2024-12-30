@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEvents } from './useEvents/useEvents'
 
 const modalMessages = defineMessages({
   cancel: {
@@ -38,6 +39,10 @@ const modalMessages = defineMessages({
 export function useEventFormNavigation() {
   const intl = useIntl()
   const navigate = useNavigate()
+
+  const events = useEvents()
+  const deleteEvent = events.deleteEvent()
+
   const [modal, openModal] = useModal()
 
   function goToHome() {
@@ -48,7 +53,7 @@ export function useEventFormNavigation() {
     navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
   }
 
-  async function exit() {
+  async function exit(eventId: string) {
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -88,6 +93,16 @@ export function useEventFormNavigation() {
     ))
 
     if (exitConfirm) {
+      deleteEvent.mutate(eventId, {
+        onSuccess: (data) => {
+          // eslint-disable-next-line no-console
+          console.log('Event deleted', data)
+        },
+        onError: (error) => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to delete event', error)
+        }
+      })
       goToHome()
     }
   }

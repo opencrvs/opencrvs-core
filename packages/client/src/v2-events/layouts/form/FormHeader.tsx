@@ -63,8 +63,8 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
   }, [createDraft, eventId, formValues, goToHome])
 
   const onExit = useCallback(async () => {
-    await exit()
-  }, [exit])
+    await exit(eventId)
+  }, [eventId, exit])
 
   return (
     <AppBar
