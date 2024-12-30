@@ -18,7 +18,7 @@ import {
 import { getClient } from '@events/storage/mongodb'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
-import { indexEvent } from './indexing/indexing'
+import { deleteEventIndex, indexEvent } from './indexing/indexing'
 import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
 
@@ -75,6 +75,7 @@ export async function deleteEvent(id: string) {
   }
 
   await collection.deleteOne({ transactionId: id })
+  await deleteEventIndex(event.id)
   return 'Event deleted successfully with ID: ' + id
 }
 

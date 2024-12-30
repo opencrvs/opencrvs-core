@@ -97,13 +97,13 @@ export function useEventFormNavigation() {
         onSuccess: (data) => {
           // eslint-disable-next-line no-console
           console.log('Event deleted', data)
+          goToHome()
         },
         onError: (error) => {
           // eslint-disable-next-line no-console
           console.error('Failed to delete event', error)
         }
       })
-      goToHome()
     }
   }
 
