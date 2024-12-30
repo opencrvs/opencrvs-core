@@ -175,7 +175,6 @@ export const REGISTRATION_HOME_QUERY = gql`
       }
     }
     approvalTab: searchEvents(
-      userId: $userId
       advancedSearchParameters: {
         declarationLocationId: $declarationLocationId
         registrationStatuses: ["VALIDATED", "CORRECTION_REQUESTED"]
