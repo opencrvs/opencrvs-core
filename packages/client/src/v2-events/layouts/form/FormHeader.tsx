@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import { AppBar, Button, Icon } from '@opencrvs/components'
+import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
@@ -44,7 +44,7 @@ const messages = defineMessages({
 
 export function FormHeader({ label }: { label: TranslationConfig }) {
   const intl = useIntl()
-  const { modal, exit, goToHome } = useEventFormNavigation()
+  const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
   const events = useEvents()
   const formValues = useEventFormData((state) => state.formValues)
   const { eventId } = useParams<{
@@ -65,6 +65,10 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
   const onExit = useCallback(async () => {
     await exit(eventId)
   }, [eventId, exit])
+
+  const onDelete = useCallback(async () => {
+    await deleteDeclaration(eventId)
+  }, [eventId, deleteDeclaration])
 
   return (
     <AppBar
@@ -87,6 +91,19 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
           </Button>
+          <ToggleMenu
+            id={`event-menu`}
+            menuItems={[
+              {
+                label: 'Delete declaration',
+                icon: <Icon name="Trash" />,
+                handler: onDelete
+              }
+            ]}
+            toggleButton={
+              <Icon color="primary" name="DotsThreeVertical" size="large" />
+            }
+          />
           {modal}
         </>
       }
@@ -109,6 +126,20 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
           <Button size="small" type="icon" onClick={onExit}>
             <Icon name="X" />
           </Button>
+          <ToggleMenu
+            id={`event-menu`}
+            menuItems={[
+              {
+                label: 'Delete declaration',
+                icon: <Icon name="Trash" />,
+                handler: onDelete
+              }
+            ]}
+            toggleButton={
+              <Icon color="primary" name="DotsThreeVertical" size="large" />
+            }
+          />
+          {modal}
         </>
       }
       mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {

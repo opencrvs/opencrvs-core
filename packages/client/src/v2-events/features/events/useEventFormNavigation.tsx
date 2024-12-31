@@ -33,6 +33,16 @@ const modalMessages = defineMessages({
     id: 'exitModal.exitWithoutSavingDescription',
     defaultMessage:
       'You have unsaved changes on your declaration form. Are you sure you want to exit without saving?'
+  },
+  deleteDeclarationTitle: {
+    id: 'register.form.modal.title.deleteDeclarationConfirm',
+    defaultMessage: 'Delete draft?',
+    description: 'Title for delete declaration confirmation modal'
+  },
+  deleteDeclarationDescription: {
+    id: 'register.form.modal.desc.deleteDeclarationConfirm',
+    defaultMessage: `Are you certain you want to delete this draft declaration form? Please note, this action can't be undone.`,
+    description: 'Description for delete declaration confirmation modal'
   }
 })
 
@@ -106,5 +116,58 @@ export function useEventFormNavigation() {
     }
   }
 
-  return { exit, modal, goToHome, goToReview }
+  async function deleteDeclaration(eventId: string) {
+    const deleteConfirm = await openModal<boolean | null>((close) => (
+      <ResponsiveModal
+        autoHeight
+        actions={[
+          <Button
+            key="cancel_delete"
+            id="cancel_delete"
+            type="tertiary"
+            onClick={() => {
+              close(null)
+            }}
+          >
+            {intl.formatMessage(modalMessages.cancel)}
+          </Button>,
+          <Button
+            key="confirm_delete"
+            id="confirm_delete"
+            type="primary"
+            onClick={() => {
+              close(true)
+            }}
+          >
+            {intl.formatMessage(modalMessages.confirm)}
+          </Button>
+        ]}
+        handleClose={() => close(null)}
+        responsive={false}
+        show={true}
+        title={intl.formatMessage(modalMessages.deleteDeclarationTitle)}
+      >
+        <Stack>
+          <Text color="grey500" element="p" variant="reg16">
+            {intl.formatMessage(modalMessages.deleteDeclarationDescription)}
+          </Text>
+        </Stack>
+      </ResponsiveModal>
+    ))
+
+    if (deleteConfirm) {
+      deleteEvent.mutate(eventId, {
+        onSuccess: async (data: { id: string }) => {
+          await removeEventFromStorage(data.id)
+          goToHome()
+        },
+        onError: (error) => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to delete event', error)
+        }
+      })
+    }
+  }
+
+  return { exit, modal, goToHome, goToReview, deleteDeclaration }
 }
