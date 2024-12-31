@@ -13,6 +13,7 @@ import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
+import jwtDecode from 'jwt-decode'
 
 export interface IDocumentPayload {
   fileData: string
@@ -28,6 +29,13 @@ export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const userId = (jwtDecode(request.headers.authorization) as any).sub
+  if (!userId)
+    return Promise.reject(
+      new Error(
+        `request failed: Authorization token is missing or does not contain a valid user ID.`
+      )
+    )
   const payload = request.payload as IDocumentPayload
   const ref = uuid()
   try {
@@ -38,6 +46,7 @@ export async function documentUploadHandler(
 
     await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
       'content-type': fileType.mime,
+      uploader: userId,
       ...payload.metaData
     })
 
