@@ -41,10 +41,7 @@ export const resolvers: GQLResolver = {
       { headers: authHeader }
     ) {
       if (
-        inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-        ])
+        inScope(authHeader, [SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION])
       ) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
@@ -62,7 +59,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -78,7 +75,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -98,7 +95,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -118,7 +115,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -138,7 +135,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -158,7 +155,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
@@ -178,7 +175,7 @@ export const resolvers: GQLResolver = {
       { id, details },
       { headers: authHeader }
     ) {
-      if (inScope(authHeader, [SCOPES.RECORD_REGISTER])) {
+      if (inScope(authHeader, [SCOPES.RECORD_REGISTRATION_CORRECT])) {
         const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
         if (!hasAssignedToThisUser) {
           throw new UnassignError('User has been unassigned')
