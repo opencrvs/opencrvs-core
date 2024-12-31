@@ -119,7 +119,7 @@ describe('query result filtering tests', () => {
           results: [
             { id: 'READY_TO_SUBMIT' },
             { id: 'SUBMITTING' },
-            { id: 'SUBMITED' },
+            { id: 'SUBMITTED' },
             { id: 'FAILED' },
             { id: 'SUBMITTING' }
           ],
@@ -265,6 +265,10 @@ describe('query result filtering tests', () => {
         },
         printTab: {
           results: [{ id: 'CERTIFIED' }, { id: 'FAILED' }],
+          totalItems: 2
+        },
+        sentForReviewTab: {
+          results: [{ id: 'SUBMITTED' }, { id: 'FAILED' }],
           totalItems: 2
         },
         externalValidationTab: {
