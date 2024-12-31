@@ -13,6 +13,7 @@ import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/
 import { createPreSignedUrl } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { MINIO_BUCKET } from '@documents/minio/constants'
+import { deleteDocument } from '@documents/features/deleteDocument/hadnler'
 
 export const getRoutes = () => {
   const routes = [
@@ -61,6 +62,15 @@ export const getRoutes = () => {
       handler: vsExportUploaderHandler,
       config: {
         auth: false,
+        tags: ['api']
+      }
+    },
+    // delete a document
+    {
+      method: 'DELETE',
+      path: `/${MINIO_BUCKET}/{fileUri}`,
+      handler: deleteDocument,
+      config: {
         tags: ['api']
       }
     },
