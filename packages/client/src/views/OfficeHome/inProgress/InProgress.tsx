@@ -495,7 +495,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
       noResultText={noResultMessage}
       noContent={noContent}
     >
-      {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+      {(!selectorId || selectorId === SELECTOR_ID.fieldAgentDrafts) &&
         renderFieldAgentTable(inProgressData, isShowPagination)}
       {selectorId === SELECTOR_ID.hospitalDrafts &&
         renderHospitalTable(notificationData, isShowPagination)}
