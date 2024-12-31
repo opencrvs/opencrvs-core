@@ -490,9 +490,16 @@ const AdvancedSearch = () => {
   const { canSearchBirthRecords, canSearchDeathRecords } = usePermissions()
   const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
   const activeTabId =
-    advancedSearchParamState.event || canSearchBirthRecords
+    advancedSearchParamState.event === TabId.BIRTH && canSearchBirthRecords
       ? TabId.BIRTH
-      : TabId.DEATH
+      : advancedSearchParamState.event === TabId.DEATH && canSearchDeathRecords
+      ? TabId.DEATH
+      : canSearchBirthRecords
+      ? TabId.BIRTH
+      : canSearchDeathRecords
+      ? TabId.DEATH
+      : ''
+
   const dispatch = useDispatch()
   const tabSections = [
     {
