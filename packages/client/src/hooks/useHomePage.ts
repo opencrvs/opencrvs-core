@@ -53,7 +53,7 @@ export const useHomePage = () => {
     case WORKQUEUE_TABS.readyToIssue:
     case WORKQUEUE_TABS.outbox:
       path = generateGoToHomeTabUrl({
-        tabId: WORKQUEUE_TABS.myDrafts
+        tabId: firstNavItem
       })
       break
     case WORKQUEUE_TABS.organisation:
