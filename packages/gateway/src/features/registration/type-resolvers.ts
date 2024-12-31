@@ -1292,6 +1292,13 @@ export const typeResolvers: GQLResolver = {
       const role = allRoles.find((role) => role.id === roleId)?.id
 
       return { ...userResponse, role }
+    },
+    certificateTemplateId(docRef: DocumentReference, _) {
+      const certificateTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certificateTemplateId`,
+        docRef.extension as Extension[]
+      )
+      return certificateTemplateId?.valueString
     }
   },
   Identifier: {
@@ -1457,7 +1464,6 @@ export const typeResolvers: GQLResolver = {
         `${OPENCRVS_SPECIFICATION_URL}extension/hasShowedVerifiedDocument`,
         task.extension as Extension[]
       )
-
       if (hasShowedDocument?.valueString) {
         return Boolean(hasShowedDocument?.valueString)
       }
@@ -1468,7 +1474,13 @@ export const typeResolvers: GQLResolver = {
 
       return false
     },
-
+    certificateTemplateId: (task: Task) => {
+      const certificateTemplateId = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/certificateTemplateId`,
+        task.extension as Extension[]
+      )
+      return certificateTemplateId?.valueString
+    },
     noSupportingDocumentationRequired: (task: Task) => {
       const hasShowedDocument = findExtension(
         NO_SUPPORTING_DOCUMENTATION_REQUIRED,

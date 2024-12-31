@@ -32,46 +32,38 @@ describe('Birth registration mutation mapping related tests', () => {
     expect(transformedData.registration.trackingId).toEqual('BDSS0SE')
     expect(transformedData.registration.certificates).toEqual([
       {
+        certificateTemplateId: 'birth-certificate',
+        hasShowedVerifiedDocument: true,
         collector: {
           relationship: 'OTHER',
           otherRelationship: 'Uncle',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mushraful',
-              familyName: 'Hoque'
-            }
-          ],
-          identifier: [
-            {
-              id: '123456789',
-              type: 'PASSPORT'
-            }
-          ],
-          affidavit: [
-            {
-              contentType: 'abc',
-              data: 'BASE64 data'
-            }
-          ]
-        },
-        hasShowedVerifiedDocument: true
+          name: [{ use: 'en', firstNames: 'Mushraful', familyName: 'Hoque' }],
+          identifier: [{ id: '123456789', type: 'PASSPORT' }],
+          affidavit: [{ contentType: 'abc', data: 'BASE64 data' }]
+        }
       }
     ])
   })
-  it('Test certificate mapping without any data', () => {
+  it('Test certificate mapping template config data', () => {
     const transformedData: TransformedData = {
       registration: {}
     }
+    const mockBirthDeclaration = cloneDeep({
+      ...mockDeclarationData,
+      registration: {
+        ...mockDeclarationData.registration,
+        certificates: [{}]
+      }
+    })
     setBirthRegistrationSectionTransformer(
       transformedData,
-      mockDeclarationData,
+      mockBirthDeclaration,
       'registration'
     )
     expect(transformedData.registration).toBeDefined()
     expect(transformedData.registration.registrationNumber).toEqual(
       '201908122365BDSS0SE1'
     )
-    expect(transformedData.registration.certificates).toEqual([{}])
+    expect(transformedData.registration.certificates).toEqual([])
   })
 })

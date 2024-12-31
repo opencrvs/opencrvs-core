@@ -82,7 +82,7 @@ registerRoute(/http(.+)config$/, new NetworkFirst())
 registerRoute(
   import.meta.env.DEV
     ? /http(.+)localhost:3535\/ocrvs\/.+/
-    : /http(.+)minio\.(.+)\/ocrvs\/.+/,
+    : /http(.+)minio\.(.+)\/.*ocrvs.*\/.+/,
   new CacheFirst()
 )
 

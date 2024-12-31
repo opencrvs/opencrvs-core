@@ -121,7 +121,9 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(
+        `${REGISTRAR_HOME}/my-drafts/1`
+      )
     })
   })
 
@@ -179,7 +181,9 @@ describe('when user is previewing the form data', () => {
           })
           it('should redirect to home page', () => {
             app.find('#submit_confirm').hostNodes().simulate('click')
-            expect(router.state.location.pathname).toBe(REGISTRAR_HOME)
+            expect(router.state.location.pathname).toBe(
+              `${REGISTRAR_HOME}/my-drafts/1`
+            )
           })
         })
       })
@@ -225,7 +229,9 @@ describe('when user is previewing the form data', () => {
 
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(
+        `${REGISTRAR_HOME}/my-drafts/1`
+      )
     })
   })
 
@@ -274,7 +280,9 @@ describe('when user is previewing the form data', () => {
         })
       app.find('#submit_reject_form').hostNodes().simulate('click')
 
-      expect(router.state.location.pathname).toEqual(REGISTRAR_HOME)
+      expect(router.state.location.pathname).toEqual(
+        `${REGISTRAR_HOME}/my-drafts/1`
+      )
     })
   })
 

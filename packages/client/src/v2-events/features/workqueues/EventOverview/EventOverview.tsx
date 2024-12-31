@@ -37,11 +37,10 @@ import { ActionMenu } from './components/ActionMenu'
  */
 
 export function EventOverviewIndex() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.EVENT)
+  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getEvents, getEventById } = useEvents()
   const user = useSelector(getUserDetails)
 
-  // @TODO: double check whether this indeed returns always non falsy value
   const [config] = useEventConfigurations()
 
   const { data: fullEvent } = getEventById.useQuery(params.eventId)
@@ -49,8 +48,7 @@ export function EventOverviewIndex() {
   const { data: events } = getEvents.useQuery()
   const event = events?.find((e) => e.id === params.eventId)
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (!event || !config || !fullEvent?.actions) {
+  if (!event || !fullEvent?.actions) {
     return null
   }
 

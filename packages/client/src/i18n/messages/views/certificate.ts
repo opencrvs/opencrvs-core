@@ -14,6 +14,7 @@ interface ICertificateMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   certificateCollectionTitle: MessageDescriptor
   addAnotherSignature: MessageDescriptor
+  certificateTemplateSelectLabel: MessageDescriptor
   certificateConfirmationTxt: MessageDescriptor
   certificateIsCorrect: MessageDescriptor
   certificateReceiptHeader: MessageDescriptor
@@ -58,6 +59,7 @@ interface ICertificateMessages
   receiptPaidAmount: MessageDescriptor
   receiptService: MessageDescriptor
   selectSignature: MessageDescriptor
+  selectedCertificateTemplateLabel: MessageDescriptor
   service: MessageDescriptor
   amountDue: MessageDescriptor
   typeOfID: MessageDescriptor
@@ -72,6 +74,7 @@ interface ICertificateMessages
   toastMessage: MessageDescriptor
   otherCollectorFormTitle: MessageDescriptor
   certificateCollectorError: MessageDescriptor
+  certificateCollectorTemplateError: MessageDescriptor
   certificateOtherCollectorInfoError: MessageDescriptor
   certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
   certificateOtherCollectorAffidavitError: MessageDescriptor
@@ -94,6 +97,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Certify record',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
+  },
+  certificateTemplateSelectLabel: {
+    defaultMessage: 'Type',
+    description: 'The title of select certificate template action',
+    id: 'certificate.selectTemplate'
   },
   certificateConfirmationTxt: {
     defaultMessage: 'Edit',
@@ -330,6 +338,11 @@ const messagesToDefine: ICertificateMessages = {
     description: 'The label for choose signature select',
     id: 'print.certificate.selectSignature'
   },
+  selectedCertificateTemplateLabel: {
+    defaultMessage: 'Selected certificate template',
+    description: 'The title of selected certificate template label',
+    id: 'certificate.selectedTemplate'
+  },
   service: {
     defaultMessage:
       'Service: <strong>Birth registration after {service, plural, =0 {0 month} one {1 month} other{{service} months}} of D.o.B.</strong><br/>Amount Due:',
@@ -403,6 +416,11 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Please select who is collecting the certificate',
     description: 'Form level error for collector form',
     id: 'print.certificate.collector.form.error'
+  },
+  certificateCollectorTemplateError: {
+    defaultMessage: 'Please select certificate type',
+    description: 'Form level error for collector certificate template',
+    id: 'print.certificate.collector.form.error.template'
   },
   certificateOtherCollectorInfoError: {
     defaultMessage: 'Complete all the mandatory fields',

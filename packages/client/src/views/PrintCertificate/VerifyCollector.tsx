@@ -92,7 +92,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
 
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         eventDate,
         registeredDate,
         offlineCountryConfiguration

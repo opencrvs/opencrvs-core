@@ -61,12 +61,10 @@ import {
   isCertificateForPrintInAdvance,
   filterPrintInAdvancedOption
 } from '@client/views/PrintCertificate/utils'
-import { flatten } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { Navigate } from 'react-router-dom'
-import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getCertificateCollectorFormSection } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
@@ -80,6 +78,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import { FormikTouched, FormikValues } from 'formik'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -168,39 +167,27 @@ const getErrorsOnFieldsBySection = (
     user
   )
 
-  return {
-    [sectionId]: fields.reduce((fields, field) => {
-      const validationErrors: IValidationResult[] = (
-        errors[field.name as keyof typeof errors] as IFieldErrors
-      ).errors
-
-      const value = draft.data[sectionId]
-        ? draft.data[sectionId][field.name]
-        : null
-
-      const informationMissing =
-        validationErrors.length > 0 || value === null ? validationErrors : []
-
-      return { ...fields, [field.name]: informationMissing }
-    }, {})
-  }
+  return Object.values(errors)
+    .map((field) => field.errors[0]?.message)
+    .filter(Boolean)
 }
 
 interface IState {
-  showError: boolean
   showModalForNoSignedAffidavit: boolean
   isFileUploading: boolean
+  showError: boolean
 }
 
 class CollectorFormComponent extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
     this.state = {
-      showError: false,
       showModalForNoSignedAffidavit: false,
-      isFileUploading: false
+      isFileUploading: false,
+      showError: false
     }
   }
+  setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
 
   onUploadingStateChanged = (isUploading: boolean) => {
     this.setState({
@@ -216,7 +203,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     const certificates = declaration.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
     const collector = { ...(certificate.collector || {}), ...sectionData }
-
     this.props.modifyDeclaration({
       ...declaration,
       data: {
@@ -226,7 +212,8 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           certificates: [
             {
               collector: collector,
-              hasShowedVerifiedDocument: false
+              hasShowedVerifiedDocument: false,
+              certificateTemplateId: collector.certificateTemplateId
             }
           ]
         }
@@ -252,10 +239,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       this.props.offlineCountryConfiguration,
       this.props.userDetails
     )
-    const errorValues = Object.values(errors).map(Object.values)
-    const errLength = flatten(errorValues).filter(
-      (errs) => errs.length > 0
-    ).length
 
     const certificates = draft.data.registration.certificates
     const certificate = (certificates && certificates[0]) || {}
@@ -263,11 +246,18 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       sectionId as keyof typeof certificate
     ] as IFormSectionData
 
-    if (errLength > 0) {
+    if (errors.length > 0) {
+      const formGroup = (
+        this.props as PropsWhenDeclarationIsFound
+      ).formGroup.fields.reduce(
+        (acc, { name }) => ({ ...acc, [name]: true }),
+        {}
+      )
+
+      this.setAllFormFieldsTouched(formGroup)
       this.setState({
         showError: true
       })
-
       return
     }
 
@@ -346,7 +336,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       .props as PropsWhenDeclarationIsFound
     if (
       isFreeOfCost(
-        event,
+        declaration.data.registration.certificates[0],
         getEventDate(declaration.data, event),
         getRegisteredDate(declaration.data),
         offlineCountryConfiguration
@@ -413,7 +403,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           id="collector_form"
           hideBackground
           title={formSection.title && intl.formatMessage(formSection.title)}
-          goBack={() => this.props.router.navigate(-1)}
+          goBack={() => {
+            this.setState({ showError: false })
+            this.props.router.navigate(-1)
+          }}
           goHome={() =>
             this.props.router.navigate(
               generateGoToHomeTabUrl({
@@ -452,7 +445,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               </Button>
             ]}
           >
-            {showError && (
+            {showError && formGroup.error && (
               <ErrorWrapper>
                 <ErrorText id="form_error">
                   {(formGroup.error && intl.formatMessage(formGroup.error)) ||
@@ -475,6 +468,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
               fields={formGroup.fields}
               draftData={declarationToBeCertified.data}
               onUploadingStateChanged={this.onUploadingStateChanged}
+              onSetTouched={(setTouchedFunc) =>
+                (this.setAllFormFieldsTouched = setTouchedFunc)
+              }
             />
           </Content>
         </ActionPageLight>
@@ -544,7 +540,10 @@ const mapStateToProps = (
 
   const userOfficeId = userDetails?.primaryOffice?.id
   const registeringOfficeId = getRegisteringOfficeId(declaration)
-  const certFormSection = getCertificateCollectorFormSection(declaration)
+  const certFormSection = getCertificateCollectorFormSection(
+    declaration,
+    state.offline.offlineData.templates?.certificates || []
+  )
 
   const isAllowPrintInAdvance =
     event === EventType.Birth
@@ -582,7 +581,7 @@ const mapStateToProps = (
       declaration.data.registration.certificates &&
       declaration.data.registration.certificates[
         declaration.data.registration.certificates.length - 1
-      ].collector) ||
+      ]?.collector) ||
       {},
     declaration && declaration.data,
     offlineCountryConfiguration,

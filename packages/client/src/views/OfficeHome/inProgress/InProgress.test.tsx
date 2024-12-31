@@ -8,136 +8,68 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Workqueue } from '@opencrvs/components/lib/Workqueue'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   createDeclaration,
+  DOWNLOAD_STATUS,
   IDeclaration,
-  storeDeclaration,
-  SUBMISSION_STATUS,
   makeDeclarationReadyToDownload,
-  DOWNLOAD_STATUS
+  storeDeclaration
 } from '@client/declarations'
 import { DownloadAction } from '@client/forms'
-import { EventType } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import {
   REGISTRAR_HOME_TAB,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { queries } from '@client/profile/queries'
-import { storage } from '@client/storage'
 import { AppStore, createStore } from '@client/store'
-import {
-  createTestComponent,
-  mockUserResponse,
-  resizeWindow,
-  flushPromises,
-  setScopes,
-  REGISTRAR_DEFAULT_SCOPES
-} from '@client/tests/util'
-import { merge } from 'lodash'
-import * as React from 'react'
-import { InProgress, SELECTOR_ID } from './InProgress'
+import { createTestComponent, resizeWindow } from '@client/tests/util'
+import { formattedDuration } from '@client/utils/date-formatting'
+import { EventType } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
-import { formattedDuration } from '@client/utils/date-formatting'
-import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
-import { vi } from 'vitest'
-
-const mockFetchUserDetails = vi.fn()
-
-const nameObj = {
-  data: {
-    getUser: {
-      name: [
-        {
-          use: 'en',
-          firstNames: 'Mohammad',
-          familyName: 'Ashraful',
-          __typename: 'HumanName'
-        },
-        { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
-      ],
-      role: 'DISTRICT_REGISTRAR'
-    }
-  }
-}
-
-merge(mockUserResponse, nameObj)
-mockFetchUserDetails.mockReturnValue(mockUserResponse)
-queries.fetchUserDetails = mockFetchUserDetails
-
-storage.getItem = vi.fn()
-storage.setItem = vi.fn()
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
+import * as React from 'react'
+import { InProgress, SELECTOR_ID } from './InProgress'
 
 const { store } = createStore()
 
-beforeAll(async () => {
-  setScopes(REGISTRAR_DEFAULT_SCOPES, store)
-})
-
 describe('In Progress tab', () => {
   it('redirects to different route upon selection', async () => {
-    const localDrafts = [
-      {
-        id: '1',
-        event: EventType.Birth,
-        data: {}
-      },
-      {
-        id: '2',
-        event: EventType.Birth,
-        data: {}
-      }
-    ]
-    const { component: testComponent, router } = await createTestComponent(
+    const { component: app, router } = await createTestComponent(
       <InProgress
-        drafts={localDrafts}
-        selectorId={SELECTOR_ID.ownDrafts}
+        selectorId={SELECTOR_ID.fieldAgentDrafts}
         queryData={{
           inProgressData: {},
           notificationData: {}
         }}
         paginationId={{
-          draftId: 1,
           fieldAgentId: 1,
           healthSystemId: 1
         }}
         pageSize={10}
-        onPageChange={(pageId: number) => {}}
+        onPageChange={(_pageId: number) => {}}
         loading={false}
         error={false}
       />,
       { store }
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.update()
-    const app = testComponent
-
-    app.find(`#tab_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+    app.find(`#tab_${SELECTOR_ID.hospitalDrafts}`).hostNodes().simulate('click')
+    app.update()
     expect(router.state.location.pathname).toContain(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.inProgress,
-        selectorId: SELECTOR_ID.ownDrafts
+        selectorId: SELECTOR_ID.hospitalDrafts
       })
     )
     app
       .find(`#tab_${SELECTOR_ID.fieldAgentDrafts}`)
       .hostNodes()
       .simulate('click')
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
+    app.update()
     expect(router.state.location.pathname).toContain(
       formatUrl(REGISTRAR_HOME_TAB, {
         tabId: WORKQUEUE_TABS.inProgress,
@@ -147,308 +79,29 @@ describe('In Progress tab', () => {
   })
 
   it('renders two selectors with count for each', async () => {
-    const localDrafts = [
-      {
-        id: '1',
-        event: EventType.Birth,
-        data: {}
-      },
-      {
-        id: '2',
-        event: EventType.Birth,
-        data: {}
-      }
-    ]
-
-    const { component: testComponent } = await createTestComponent(
+    const { component: app } = await createTestComponent(
       <InProgress
-        drafts={localDrafts}
-        selectorId={SELECTOR_ID.ownDrafts}
+        selectorId={SELECTOR_ID.fieldAgentDrafts}
         queryData={{
           inProgressData: { totalItems: 5 },
           notificationData: { totalItems: 3 }
         }}
         paginationId={{
-          draftId: 1,
           fieldAgentId: 1,
           healthSystemId: 1
         }}
         pageSize={10}
-        onPageChange={(pageId: number) => {}}
+        onPageChange={(_pageId: number) => {}}
       />,
       { store }
     )
 
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.update()
-    const app = testComponent
-
-    expect(app.find('#tab_you').hostNodes().text()).toContain('Yours (2)')
     expect(app.find('#tab_field-agents').hostNodes().text()).toContain(
       'Field agents (5)'
     )
-  })
-
-  describe('When the local drafts selector is selected', () => {
-    it('renders all items returned from local storage in inProgress tab', async () => {
-      const { store } = createStore()
-      const TIME_STAMP = 1562912635549
-      const drafts: IDeclaration[] = [
-        {
-          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-          data: {
-            registration: {
-              informantType: 'MOTHER',
-              informant: 'MOTHER_ONLY',
-              registrationPhone: '01722222222',
-              whoseContactDetails: 'MOTHER'
-            },
-            child: {
-              firstNamesEng: 'Anik',
-              familyNameEng: 'Hoque'
-            }
-          },
-          event: EventType.Birth,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          modifiedOn: TIME_STAMP
-        },
-        {
-          id: 'e6605607-92e0-4625-87d8-c168205bdde7',
-          event: EventType.Birth,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            registration: {
-              informantType: 'MOTHER',
-              informant: 'MOTHER_ONLY',
-              registrationPhone: '01722222222',
-              whoseContactDetails: 'MOTHER'
-            },
-            child: {
-              firstNamesEng: 'Anik',
-              familyNameEng: 'Hoque'
-            }
-          }
-        },
-        {
-          id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-          data: {
-            deceased: {
-              firstNamesEng: 'Anik',
-              familyNameEng: 'Hoque'
-            }
-          },
-          event: EventType.Death,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          modifiedOn: TIME_STAMP
-        },
-
-        {
-          id: '607afa75-4fb0-4785-9388-724911d62809',
-          data: {
-            deceased: {
-              firstNamesEng: 'Anik',
-              familyNameEng: 'Hoque'
-            }
-          },
-          event: EventType.Death,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          modifiedOn: TIME_STAMP
-        }
-      ]
-      // @ts-ignore
-      const { component: testComponent } = await createTestComponent(
-        <InProgress
-          drafts={drafts}
-          selectorId={SELECTOR_ID.ownDrafts}
-          queryData={{
-            inProgressData: {},
-            notificationData: {}
-          }}
-          paginationId={{
-            draftId: 1,
-            fieldAgentId: 1,
-            healthSystemId: 1
-          }}
-          pageSize={10}
-          onPageChange={(pageId: number) => {}}
-        />,
-        { store }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      const data = testComponent
-        .find(Workqueue)
-        .prop<Array<Record<string, string>>>('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
-
-      expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-      expect(data[0].name).toBe('anik hoque')
-      expect(data[0].lastUpdated).toBe(EXPECTED_DATE_OF_REJECTION)
-      expect(data[0].event).toBe('Birth')
-      expect(data[0].actions).toBeDefined()
-    })
-
-    it('Should render pagination in progress tab if data is more than 10', async () => {
-      vi.clearAllMocks()
-      const drafts: IDeclaration[] = []
-      for (let i = 0; i < 12; i++) {
-        drafts.push(createDeclaration(EventType.Birth))
-      }
-      const { component: testComponent } = await createTestComponent(
-        <InProgress
-          drafts={drafts}
-          selectorId={SELECTOR_ID.ownDrafts}
-          queryData={{
-            inProgressData: {},
-            notificationData: {}
-          }}
-          paginationId={{
-            draftId: 1,
-            fieldAgentId: 1,
-            healthSystemId: 1
-          }}
-          pageSize={10}
-          onPageChange={(pageId: number) => {}}
-        />,
-        { store }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const pagiBtn = testComponent.find('#pagination_container')
-
-      expect(pagiBtn.hostNodes()).toHaveLength(1)
-      testComponent
-        .find('#pagination button')
-        .last()
-        .hostNodes()
-        .simulate('click')
-    })
-
-    it('redirects user to detail page on update click', async () => {
-      const TIME_STAMP = 1562912635549
-      const drafts: IDeclaration[] = [
-        {
-          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-          event: EventType.Birth,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            registration: {
-              contactPoint: {
-                value: 'MOTHER',
-                nestedFields: {
-                  registrationPhone: '01722222222'
-                }
-              }
-            },
-            child: {
-              firstNamesEng: 'Anik',
-              firstNames: 'অনিক',
-              familyNameEng: 'Hoque',
-              familyName: 'অনিক'
-            }
-          }
-        },
-        {
-          id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
-          event: EventType.Birth,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          modifiedOn: TIME_STAMP,
-          data: {
-            child: {
-              familyNameEng: 'Hoque'
-            }
-          }
-        },
-        {
-          id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-          event: EventType.Death,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            deceased: {
-              firstNamesEng: 'Anik',
-              familyNameEng: 'Hoque'
-            }
-          }
-        },
-        {
-          id: 'cc66d69c-7f0a-4047-9283-f066571830f2',
-          event: EventType.Death,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            deceased: {
-              familyNameEng: 'Hoque'
-            }
-          }
-        },
-        {
-          id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
-          event: EventType.Death,
-          modifiedOn: TIME_STAMP + 1,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            '': {}
-          }
-        }
-      ]
-      // @ts-ignore
-      store.dispatch(storeDeclaration(drafts))
-      const { component: testComponent, router } = await createTestComponent(
-        <InProgress
-          drafts={drafts}
-          selectorId={SELECTOR_ID.ownDrafts}
-          queryData={{
-            inProgressData: {},
-            notificationData: {}
-          }}
-          paginationId={{
-            draftId: 1,
-            fieldAgentId: 1,
-            healthSystemId: 1
-          }}
-          pageSize={10}
-          onPageChange={(pageId: number) => {}}
-        />,
-        { store }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      expect(
-        testComponent.find('#ListItemAction-0-Update').hostNodes()
-      ).toHaveLength(1)
-      testComponent
-        .find('#ListItemAction-0-Update')
-        .hostNodes()
-        .simulate('click')
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      expect(router.state.location.pathname).toContain(
-        '/drafts/cc66d69c-7f0a-4047-9283-f066571830f4'
-      )
-    })
+    expect(app.find('#tab_hospitals').hostNodes().text()).toContain(
+      'Hospitals (3)'
+    )
   })
 
   describe('When the remote drafts selector is selected', () => {
@@ -458,7 +111,6 @@ describe('In Progress tab', () => {
       drafts.push(createDeclaration(EventType.Birth))
       const { component: testComponent } = await createTestComponent(
         <InProgress
-          drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           queryData={{
             inProgressData: {
@@ -519,60 +171,47 @@ describe('In Progress tab', () => {
             notificationData: {}
           }}
           paginationId={{
-            draftId: 1,
             fieldAgentId: 1,
             healthSystemId: 1
           }}
           pageSize={10}
-          onPageChange={(pageId: number) => {}}
+          onPageChange={(_pageId: number) => {}}
         />,
         { store }
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       const data = testComponent
         .find(Workqueue)
         .prop<Array<Record<string, string>>>('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
+      const EXPECTED_NOTIFICATION_SENT_DATE = formattedDuration(
+        Number(TIME_STAMP)
+      )
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
       expect(data[0].name).toBe('k m abdullah al amin khan')
-      expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].notificationSent).toBe(EXPECTED_NOTIFICATION_SENT_DATE)
       expect(data[0].event).toBe('Death')
     })
 
     it('Should render pagination in progress tab if data is more than 10', async () => {
-      vi.clearAllMocks()
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
       const { component: testComponent } = await createTestComponent(
         <InProgress
-          drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           queryData={{
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
           }}
           paginationId={{
-            draftId: 1,
             fieldAgentId: 1,
             healthSystemId: 1
           }}
           pageSize={10}
-          onPageChange={(pageId: number) => {}}
+          onPageChange={(_pageId: number) => {}}
         />,
         { store }
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
       const pagiBtn = testComponent.find('#pagination_container')
 
       expect(pagiBtn.hostNodes()).toHaveLength(1)
@@ -584,14 +223,11 @@ describe('In Progress tab', () => {
     })
 
     it('redirects to recordAudit page when item is clicked', async () => {
-      vi.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(EventType.Birth))
-      // @ts-ignore
       const { component: testComponent, router } = await createTestComponent(
         <InProgress
-          drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
           queryData={{
             inProgressData: {},
@@ -657,24 +293,17 @@ describe('In Progress tab', () => {
             }
           }}
           paginationId={{
-            draftId: 1,
             fieldAgentId: 1,
             healthSystemId: 1
           }}
           pageSize={10}
-          onPageChange={(pageId: number) => {}}
+          onPageChange={(_pageId: number) => {}}
         />,
         { store }
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       testComponent.find('#name_0').hostNodes().simulate('click')
 
-      await flushPromises()
       testComponent.update()
 
       expect(router.state.location.pathname).toContain(
@@ -688,7 +317,6 @@ describe('In Progress tab', () => {
       const TIME_STAMP = '1562912635549'
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
       const inprogressProps = {
-        drafts: [],
         selectorId: SELECTOR_ID.fieldAgentDrafts,
         registrarLocationId: '0627c48a-c721-4ff9-bc6e-1fba59a2332a',
         queryData: {
@@ -717,12 +345,11 @@ describe('In Progress tab', () => {
         },
         isFieldAgent: false,
         paginationId: {
-          draftId: 1,
           fieldAgentId: 1,
           healthSystemId: 1
         },
         pageSize: 10,
-        onPageChange: (pageId: number) => {}
+        onPageChange: (_pageId: number) => {}
       }
 
       beforeEach(() => {
@@ -786,9 +413,6 @@ describe('In Progress tab', () => {
           .hostNodes()
           .simulate('click')
 
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
         testComponent.update()
 
         expect(router.state.location.pathname).toContain(
@@ -822,11 +446,8 @@ describe('In Progress tab', () => {
     it('Should render all items returned from graphQL', async () => {
       const TIME_STAMP = '1562912635549'
       const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
-      const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(EventType.Birth))
       const { component: testComponent } = await createTestComponent(
         <InProgress
-          drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
           queryData={{
             notificationData: {
@@ -888,32 +509,26 @@ describe('In Progress tab', () => {
             inProgressData: {}
           }}
           paginationId={{
-            draftId: 1,
             fieldAgentId: 1,
             healthSystemId: 1
           }}
           pageSize={10}
-          onPageChange={(pageId: number) => {}}
+          onPageChange={(_pageId: number) => {}}
         />,
         { store }
       )
 
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-        testComponent.update()
-        const data = testComponent
-          .find(Workqueue)
-          .prop<Array<Record<string, string>>>('content')
-        const EXPECTED_DATE_OF_REJECTION = formattedDuration(
-          new Date(birthNotificationSentDateStr)
-        )
+      const data = testComponent
+        .find(Workqueue)
+        .prop<Array<Record<string, string>>>('content')
+      const EXPECTED_NOTIFICATION_SENT_DATE = formattedDuration(
+        new Date(birthNotificationSentDateStr)
+      )
 
-        expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-        expect(data[0].name).toBe('anik hoque')
-        expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
-        expect(data[0].event).toBe('Birth')
-      })
+      expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
+      expect(data[0].name).toBe('anik hoque')
+      expect(data[0].notificationSent).toBe(EXPECTED_NOTIFICATION_SENT_DATE)
+      expect(data[0].event).toBe('Birth')
     })
   })
 
@@ -921,25 +536,19 @@ describe('In Progress tab', () => {
     const { store } = createStore()
 
     beforeAll(async () => {
-      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
       resizeWindow(800, 1280)
     })
 
-    afterEach(() => {
+    afterAll(() => {
       resizeWindow(1024, 768)
     })
 
     it('redirects to recordAudit page if item is clicked', async () => {
-      vi.clearAllMocks()
       const TIME_STAMP = '1562912635549'
-      const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(EventType.Birth))
       const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
 
-      // @ts-ignore
       const { component: testComponent, router } = await createTestComponent(
         <InProgress
-          drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           queryData={{
             inProgressData: {
@@ -965,28 +574,17 @@ describe('In Progress tab', () => {
             notificationData: {}
           }}
           paginationId={{
-            draftId: 1,
             fieldAgentId: 1,
             healthSystemId: 1
           }}
           pageSize={10}
-          onPageChange={(pageId: number) => {}}
+          onPageChange={(_pageId: number) => {}}
         />,
         { store }
       )
 
-      setScopes(REGISTRAR_DEFAULT_SCOPES, store)
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
       testComponent.find('#name_0').hostNodes().simulate('click')
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
       testComponent.update()
 
       expect(router.state.location.pathname).toContain(

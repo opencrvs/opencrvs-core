@@ -18,7 +18,7 @@ import {
 import styled from 'styled-components'
 import { useSearchQuery } from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { defineMessages, useIntl } from 'react-intl'
 
 const SelectContainer = styled.div`
@@ -38,7 +38,7 @@ const messages = defineMessages({
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLanguages = window.config.LANGUAGES.split(',')
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
@@ -53,10 +53,15 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
 
   const onChange = ({ value }: ISelect2Option) => {
     if (paramLanguage) {
-      history.replace({
-        pathname: location.pathname,
-        search: `lang=${value}`
-      })
+      navigate(
+        {
+          pathname: location.pathname,
+          search: `lang=${value}`
+        },
+        {
+          replace: true
+        }
+      )
     }
     dispatch(changeLanguage({ language: value }))
   }

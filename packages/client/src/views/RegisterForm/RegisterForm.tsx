@@ -288,7 +288,7 @@ function FormAppBar({
       case 'DECLARED':
         return WORKQUEUE_TABS.readyForReview
       case 'DRAFT':
-        return WORKQUEUE_TABS.inProgress
+        return WORKQUEUE_TABS.myDrafts
       case 'IN_PROGRESS':
         return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':
@@ -1009,7 +1009,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       case 'DECLARED':
         return WORKQUEUE_TABS.readyForReview
       case 'DRAFT':
-        return WORKQUEUE_TABS.inProgress
+        return WORKQUEUE_TABS.myDrafts
       case 'IN_PROGRESS':
         return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':

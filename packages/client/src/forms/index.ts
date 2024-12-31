@@ -1304,7 +1304,7 @@ export interface ICertificate {
   collector?: IFormSectionData
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
-  data?: string
+  certificateTemplateId?: string
 }
 
 export function modifyFormField(

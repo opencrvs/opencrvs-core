@@ -13,6 +13,7 @@ type Keys = keyof typeof WORKQUEUE_TABS
 export type IWORKQUEUE_TABS = (typeof WORKQUEUE_TABS)[Keys]
 
 export const WORKQUEUE_TABS = {
+  myDrafts: 'my-drafts',
   inProgress: 'progress',
   inProgressFieldAgent: 'progress/field-agents',
   sentForReview: 'sentForReview',

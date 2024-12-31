@@ -799,6 +799,7 @@ export interface GQLHistory {
   requester?: string
   requesterOther?: string
   hasShowedVerifiedDocument?: boolean
+  certificateTemplateId?: string
   noSupportingDocumentationRequired?: boolean
   otherReason?: string
   system?: GQLIntegratedSystem
@@ -1304,7 +1305,7 @@ export interface GQLCertificate {
   certifier?: GQLUser
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPayment | null>
-  data?: string
+  certificateTemplateId?: string
 }
 
 export interface GQLDuplicatesInfo {
@@ -1652,7 +1653,7 @@ export interface GQLCertificateInput {
   collector?: GQLRelatedPersonInput
   hasShowedVerifiedDocument?: boolean
   payments?: Array<GQLPaymentInput | null>
-  data?: string
+  certificateTemplateId?: string
 }
 
 export interface GQLIdentityInput {
@@ -6525,6 +6526,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   requester?: HistoryToRequesterResolver<TParent>
   requesterOther?: HistoryToRequesterOtherResolver<TParent>
   hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
+  certificateTemplateId?: HistoryToCertificateTemplateIdResolver<TParent>
   noSupportingDocumentationRequired?: HistoryToNoSupportingDocumentationRequiredResolver<TParent>
   otherReason?: HistoryToOtherReasonResolver<TParent>
   system?: HistoryToSystemResolver<TParent>
@@ -6633,6 +6635,18 @@ export interface HistoryToRequesterOtherResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToHasShowedVerifiedDocumentResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface HistoryToCertificateTemplateIdResolver<
   TParent = any,
   TResult = any
 > {
@@ -8249,7 +8263,7 @@ export interface GQLCertificateTypeResolver<TParent = any> {
   certifier?: CertificateToCertifierResolver<TParent>
   hasShowedVerifiedDocument?: CertificateToHasShowedVerifiedDocumentResolver<TParent>
   payments?: CertificateToPaymentsResolver<TParent>
-  data?: CertificateToDataResolver<TParent>
+  certificateTemplateId?: CertificateToCertificateTemplateIdResolver<TParent>
 }
 
 export interface CertificateToCollectorResolver<TParent = any, TResult = any> {
@@ -8291,7 +8305,10 @@ export interface CertificateToPaymentsResolver<TParent = any, TResult = any> {
   ): TResult
 }
 
-export interface CertificateToDataResolver<TParent = any, TResult = any> {
+export interface CertificateToCertificateTemplateIdResolver<
+  TParent = any,
+  TResult = any
+> {
   (
     parent: TParent,
     args: {},

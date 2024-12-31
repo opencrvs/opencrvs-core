@@ -112,7 +112,7 @@ describe('Certify record endpoint', () => {
         event: 'BIRTH',
         certificate: {
           hasShowedVerifiedDocument: true,
-          data: 'data:application/pdf;base64,AXDWYZ',
+          certificateTemplateId: 'birth-certificate',
           collector: {
             relationship: 'INFORMANT'
           }
@@ -216,7 +216,7 @@ describe('Certify record endpoint', () => {
         event: 'BIRTH',
         certificate: {
           hasShowedVerifiedDocument: true,
-          data: 'data:application/pdf;base64,AXDWYZ',
+          certificateTemplateId: 'birth-certificate',
           collector: {
             relationship: 'Other',
             otherRelationship: 'Uncle',

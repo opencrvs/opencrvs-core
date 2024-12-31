@@ -27,7 +27,8 @@ import {
   IPreviewGroup,
   REVIEW_OVERRIDE_POSITION,
   ReviewSection,
-  SubmissionAction
+  SubmissionAction,
+  IFormFieldValue
 } from '@client/forms'
 import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { correctionFeesPaymentSection } from '@client/forms/correction/payment'
@@ -80,7 +81,8 @@ import {
   isVisibleField,
   renderValue,
   sectionHasError,
-  updateDeclarationRegistrationWithCorrection
+  updateDeclarationRegistrationWithCorrection,
+  RenderableFieldType
 } from './utils'
 import {
   RouteComponentProps,
@@ -118,6 +120,7 @@ type IDispatchProps = {
 }
 
 type IFullProps = IProps & IStateProps & IDispatchProps & IntlShapeProps
+type NestedItemType = RenderableFieldType | undefined | IFormFieldValue
 
 class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
@@ -678,9 +681,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       language
     } = this.props
     const visitedTags: string[] = []
-    const nestedItems: any[] = []
+    const nestedItems: NestedItemType[] = []
     // parent field
-    let item: any
+    let item: NestedItemType
     item = this.getSinglePreviewField(section, group, field, true)
 
     item && nestedItems.push(item)
