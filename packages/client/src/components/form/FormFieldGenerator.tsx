@@ -192,7 +192,7 @@ type GeneratedInputFieldProps = {
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
-  setFieldTouched: (name: string, isTouched?: boolean) => void
+  setFieldTouched: FormikProps<IFormSectionData>['setFieldTouched']
 } & Omit<IDispatchProps, 'writeDeclaration'>
 
 const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
@@ -304,8 +304,18 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             extraValue={fieldDefinition.extraValue || ''}
             hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
             onComplete={(files: IFileValue[]) => {
+              /*
+               * calling both setFieldTouched and setFieldValue causes the validate
+               * function to be called twice, once with the stale values (due to
+               * setFieldTouched) and the other with the updated values (due to
+               * setFieldValue). So if setFieldTouched is called after
+               * setFieldValue then wrong validations are shown due to the stale
+               * values. We can prevent that by supplying shouldRevalidate =
+               * false to the setFieldTouch function or calling it before
+               * calling setFieldValue.
+               */
+              setFieldTouched(fieldDefinition.name, true, false)
               setFieldValue(fieldDefinition.name, files)
-              setFieldTouched && setFieldTouched(fieldDefinition.name, true)
             }}
             compressImagesToSizeMB={fieldDefinition.compressImagesToSizeMB}
             maxSizeMB={fieldDefinition.maxSizeMB}
@@ -326,7 +336,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           files={value as IAttachmentValue}
           error={error}
           onComplete={(file) => {
-            setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+            setFieldTouched(fieldDefinition.name, true, false)
             setFieldValue(fieldDefinition.name, file)
           }}
           onUploadingStateChanged={onUploadingStateChanged}

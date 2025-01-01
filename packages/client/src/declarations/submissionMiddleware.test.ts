@@ -14,6 +14,7 @@ import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
 import {
   ACTION_STATUS_MAP,
+  mockBirthRegistrationSectionData,
   mockDeclarationData,
   mockOfflineDataDispatch
 } from '@client/tests/util'
@@ -140,30 +141,7 @@ describe('Submission middleware', () => {
       }
 
       it(`should handle ${ACTION_STATUS_MAP[submissionAction]} ${event} declarations`, async () => {
-        mockDeclarationData.registration.certificates[0] = {
-          collector: {
-            relationship: 'OTHER',
-            affidavit: {
-              contentType: 'image/jpg',
-              data: 'data:image/png;base64,2324256'
-            },
-            individual: {
-              name: [{ firstNames: 'Doe', familyName: 'Jane', use: 'en' }],
-              identifier: [{ id: '123456', type: 'PASSPORT' }]
-            }
-          },
-          hasShowedVerifiedDocument: true,
-          payments: [
-            {
-              paymentId: '1234',
-              type: 'MANUAL',
-              amount: 50,
-              outcome: 'COMPLETED',
-              date: '2018-10-22'
-            }
-          ],
-          data: 'data:image/png;base64,2324256'
-        }
+        mockDeclarationData.registration = mockBirthRegistrationSectionData
         const action = declarationReadyForStatusChange({
           id: 'mockDeclaration',
           data: mockDeclarationData,

@@ -125,10 +125,11 @@ const ReviewCertificateFrame = ({
 }
 
 export const ReviewCertificate = () => {
-  const { registrationId } = useParams<{ registrationId: string }>()
-
+  const { registrationId } = useParams<{
+    registrationId: string
+  }>()
   const {
-    svg,
+    svgCode,
     handleCertify,
     isPrintInAdvance,
     canUserEditRecord,
@@ -138,7 +139,7 @@ export const ReviewCertificate = () => {
   const intl = useIntl()
   const [modal, openModal] = useModal()
 
-  if (!svg) {
+  if (!svgCode) {
     return (
       <ReviewCertificateFrame>
         <Frame.LayoutCentered>
@@ -199,7 +200,7 @@ export const ReviewCertificate = () => {
           <Box>
             <CertificateContainer
               id="print"
-              dangerouslySetInnerHTML={{ __html: svg }}
+              dangerouslySetInnerHTML={{ __html: svgCode }}
             />
           </Box>
           <Content
