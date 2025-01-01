@@ -16,6 +16,7 @@ export interface IQueryData {
   notificationTab: GQLEventSearchResultSet
   reviewTab: GQLEventSearchResultSet
   rejectTab: GQLEventSearchResultSet
+  sentForReviewTab: GQLEventSearchResultSet
   approvalTab: GQLEventSearchResultSet
   printTab: GQLEventSearchResultSet
   issueTab: GQLEventSearchResultSet

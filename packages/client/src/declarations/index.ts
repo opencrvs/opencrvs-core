@@ -1972,6 +1972,10 @@ export function filterProcessingDeclarationsFromQuery(
       queryData.rejectTab,
       processingDeclarationIds
     ),
+    sentForReviewTab: filterProcessingDeclarations(
+      queryData.sentForReviewTab,
+      processingDeclarationIds
+    ),
     approvalTab: filterProcessingDeclarations(
       queryData.approvalTab,
       processingDeclarationIds

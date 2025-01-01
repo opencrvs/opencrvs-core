@@ -241,6 +241,7 @@ class OfficeHomeView extends React.Component<
     healthSystemCurrentPage: number,
     progressCurrentPage: number,
     reviewCurrentPage: number,
+    sentForReviewCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
     issueCurrentPage: number,
@@ -357,9 +358,9 @@ class OfficeHomeView extends React.Component<
         {tabId === WORKQUEUE_TABS.sentForReview && (
           <SentForReview
             queryData={{
-              data: filteredData.reviewTab
+              data: filteredData.sentForReviewTab
             }}
-            paginationId={reviewCurrentPage}
+            paginationId={sentForReviewCurrentPage}
             pageSize={this.pageSize}
             onPageChange={this.onPageChange}
             loading={loading}
@@ -391,6 +392,7 @@ class OfficeHomeView extends React.Component<
       notificationTab,
       inProgressTab,
       reviewTab,
+      sentForReviewTab,
       approvalTab,
       printTab,
       issueTab,
@@ -415,6 +417,7 @@ class OfficeHomeView extends React.Component<
           notificationTab,
           inProgressTab,
           reviewTab,
+          sentForReviewTab,
           approvalTab,
           printTab,
           issueTab,

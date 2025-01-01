@@ -76,6 +76,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
 export const REGISTRATION_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query registrationHome(
+    $userId: String!
     $declarationLocationId: String!
     $pageSize: Int
     $inProgressSkip: Int
@@ -83,6 +84,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     $reviewStatuses: [String]
     $reviewSkip: Int
     $rejectSkip: Int
+    $sentForReviewSkip: Int
     $approvalSkip: Int
     $externalValidationSkip: Int
     $printSkip: Int
@@ -146,6 +148,26 @@ export const REGISTRATION_HOME_QUERY = gql`
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
       sort: "asc"
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+    sentForReviewTab: searchEvents(
+      userId: $userId
+      advancedSearchParameters: {
+        declarationLocationId: $declarationLocationId
+        registrationStatuses: [
+          "DECLARED"
+          "IN_PROGRESS"
+          "VALIDATED"
+          "WAITING_VALIDATION"
+          "REGISTERED"
+        ]
+      }
+      count: $pageSize
+      skip: $sentForReviewSkip
     ) {
       totalItems
       results {
