@@ -15,7 +15,9 @@ import { messages as advancedSearchForm } from '@client/i18n/messages/views/adva
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
 
-const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup = {
+const createDeathSearchRegistrationSection = (
+  hasDeathSearchJurisdictionScope?: boolean
+): IFormSectionGroup => ({
   id: 'DeathRegistrationDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -29,6 +31,9 @@ const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup = {
       initialValue: '',
       searchableResource: ['locations', 'offices'],
       searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
+      ...(hasDeathSearchJurisdictionScope && {
+        filterJurisdictionLocation: hasDeathSearchJurisdictionScope
+      }),
       validator: []
     },
     {
@@ -115,7 +120,7 @@ const advancedSearchDeathSectionRegistrationDetails: IFormSectionGroup = {
       ]
     }
   ]
-}
+})
 
 const advancedSearchDeathSectiondeceasedDetails: IFormSectionGroup = {
   id: 'DeathdeceasedDetails',
@@ -352,9 +357,13 @@ const advancedSearchDeathSectionInformantDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchDeathSections = {
-  deathSearchRegistrationSection: advancedSearchDeathSectionRegistrationDetails,
+export const createAdvancedSearchDeathSections = (
+  hasDeathSearchJurisdictionScope?: boolean
+) => ({
+  deathSearchRegistrationSection: createDeathSearchRegistrationSection(
+    hasDeathSearchJurisdictionScope
+  ),
   deathSearchDeceasedSection: advancedSearchDeathSectiondeceasedDetails,
   deathSearchEventSection: advancedSearchDeathSectionEventDetails,
   deathSearchInformantSection: advancedSearchDeathSectionInformantDetails
-}
+})

@@ -652,6 +652,7 @@ interface ILocationSearchInputFormField extends IFormFieldBase {
   locationList?: ISearchLocation[]
   searchableType: string[]
   dispatchOptions?: IDispatchOptions
+  filterJurisdictionLocation?: boolean
   dynamicOptions?: IDynamicOptions
 }
 

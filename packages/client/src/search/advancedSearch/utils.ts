@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
-import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
+import { createAdvancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
+import { createAdvancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { IDateRangePickerValue } from '@client/forms'
 import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import { constantsMessages, formMessages } from '@client/i18n/messages'
@@ -42,21 +42,6 @@ export type advancedSearchPillKey = Exclude<
 type pillKeyValueMap = {
   [key in advancedSearchPillKey]: string | undefined
 }
-
-const {
-  birthSearchRegistrationSection,
-  birthSearchChildSection,
-  birthSearchMotherSection,
-  birthSearchFatherSection,
-  birthSearchEventSection,
-  birthSearchInformantSection
-} = advancedSearchBirthSections
-const {
-  deathSearchRegistrationSection,
-  deathSearchDeceasedSection,
-  deathSearchEventSection,
-  deathSearchInformantSection
-} = advancedSearchDeathSections
 
 const baseKeysSameAsStore = [
   'event',
@@ -405,8 +390,32 @@ export const transformStoreDataToAdvancedSearchLocalState = (
 }
 
 export const getAccordionActiveStateMap = (
-  storeState: IAdvancedSearchParamState
+  storeState: IAdvancedSearchParamState,
+  hasBirthSearchJurisdictionScope?: boolean,
+  hasDeathSearchJurisdictionScope?: boolean
 ): Record<string, boolean> => {
+  const advancedSearchBirthSections = createAdvancedSearchBirthSections(
+    hasBirthSearchJurisdictionScope
+  )
+  const advancedSearchDeathSections = createAdvancedSearchDeathSections(
+    hasDeathSearchJurisdictionScope
+  )
+  const {
+    birthSearchRegistrationSection,
+    birthSearchChildSection,
+    birthSearchMotherSection,
+    birthSearchFatherSection,
+    birthSearchEventSection,
+    birthSearchInformantSection
+  } = advancedSearchBirthSections
+
+  const {
+    deathSearchRegistrationSection,
+    deathSearchDeceasedSection,
+    deathSearchEventSection,
+    deathSearchInformantSection
+  } = advancedSearchDeathSections
+
   return {
     [birthSearchRegistrationSection.id]: Boolean(
       storeState.declarationLocationId ||

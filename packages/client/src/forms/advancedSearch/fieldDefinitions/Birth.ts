@@ -15,7 +15,9 @@ import { messages as advancedSearchForm } from '@client/i18n/messages/views/adva
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
 
-const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
+const createBirthSearchRegistrationSection = (
+  hasBirthSearchJurisdictionScope?: boolean
+): IFormSectionGroup => ({
   id: 'BirthRegistrationDetails',
   title: advancedSearchForm.registrationDetails,
   fields: [
@@ -29,6 +31,9 @@ const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
       initialValue: '',
       searchableResource: ['locations', 'offices'],
       searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
+      ...(hasBirthSearchJurisdictionScope && {
+        filterJurisdictionLocation: hasBirthSearchJurisdictionScope
+      }),
       validator: []
     },
     {
@@ -115,7 +120,7 @@ const advancedSearchBirthSectionRegistrationDetails: IFormSectionGroup = {
       ]
     }
   ]
-}
+})
 
 const advancedSearchBirthSectionChildDetails: IFormSectionGroup = {
   id: 'BirthChildDetails',
@@ -420,11 +425,15 @@ const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
   ]
 }
 
-export const advancedSearchBirthSections = {
-  birthSearchRegistrationSection: advancedSearchBirthSectionRegistrationDetails,
+export const createAdvancedSearchBirthSections = (
+  hasBirthSearchJurisdictionScope?: boolean
+) => ({
+  birthSearchRegistrationSection: createBirthSearchRegistrationSection(
+    hasBirthSearchJurisdictionScope
+  ),
   birthSearchChildSection: advancedSearchBirthSectionChildDetails,
   birthSearchEventSection: advancedSearchBirthSectionEventDetails,
   birthSearchMotherSection: advancedSearchBirthSectionMotherDetails,
   birthSearchFatherSection: advancedSearchBirthSectionFatherDetails,
   birthSearchInformantSection: advancedSearchBirthSectionInformantDetails
-}
+})
