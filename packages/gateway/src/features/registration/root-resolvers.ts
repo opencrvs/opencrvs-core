@@ -537,11 +537,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsUnassigned(_, { id }, { headers: authHeader }) {
+      const assignedToSelf = await checkUserAssignment(id, authHeader)
       if (
-        !inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-        ])
+        !assignedToSelf ||
+        !inScope(authHeader, [SCOPES.RECORD_UNASSIGN_OTHERS])
       ) {
         throw new Error('User does not have enough scope')
       }
