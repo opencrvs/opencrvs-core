@@ -9,48 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Box } from '../Box'
-import styled from 'styled-components'
-import { Stack } from '../Stack'
+
 import { Divider } from '../Divider'
 import { Text } from '../Text'
 import { IDReaderProps } from './types'
+import { Stack } from '../Stack'
+import { MainContainer, ReadersContainer } from './components'
+import { MessageBox } from './MessageBox'
 
-const StyledBox = styled(Box)`
-  background: ${({ theme }) => theme.colors.background};
-`
-
-const StyledStack = styled(Stack)`
-  width: 100%;
-
-  & > * {
-    flex-grow: 1;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-direction: column;
-
-    & > * {
-      width: 100%;
-    }
-  }
-`
 export const IDReader = (props: IDReaderProps) => {
   const { dividerLabel, manualInputInstructionLabel, children } = props
 
-  return (
-    <StyledBox>
-      <Stack direction="column" alignItems="center" gap={0}>
-        <StyledStack>{children}</StyledStack>
-        <Divider>
-          <Text variant="reg18" element="p" align="center" color="grey500">
-            {dividerLabel}
+  const getStatusWiseView = (status: IDReaderProps['status']) => {
+    if (status === 'pending') {
+      return <MessageBox />
+    }
+    return (
+      <MainContainer>
+        <Stack direction="column" alignItems="center" gap={0}>
+          <ReadersContainer>{children}</ReadersContainer>
+          <Divider>
+            <Text variant="reg18" element="p" align="center" color="grey500">
+              {dividerLabel}
+            </Text>
+          </Divider>
+          <Text variant="reg16" element="span" align="center">
+            {manualInputInstructionLabel}
           </Text>
-        </Divider>
-        <Text variant="reg16" element="span" align="center">
-          {manualInputInstructionLabel}
-        </Text>
-      </Stack>
-    </StyledBox>
-  )
+        </Stack>
+      </MainContainer>
+    )
+  }
+  return getStatusWiseView(props.status)
 }

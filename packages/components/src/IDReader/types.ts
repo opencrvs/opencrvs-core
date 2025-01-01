@@ -24,6 +24,7 @@ export interface IDReaderProps {
   dividerLabel: string
   manualInputInstructionLabel: string
   children: React.ReactNode
+  status: 'ready-to-scan' | 'pending' | 'error' | 'success'
 }
 
 export interface Scan {

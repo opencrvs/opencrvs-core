@@ -22,10 +22,11 @@ export default meta
 
 type Story = StoryObj<typeof IDReader>
 
-const IDReaderWithAlertFeedback = () => (
+const IDReaderWithAlertFeedback = (args: any) => (
   <IDReader
     dividerLabel="Or"
     manualInputInstructionLabel="Complete fields below"
+    status={args.status}
   >
     <QRReader
       labels={{
@@ -47,5 +48,11 @@ const IDReaderWithAlertFeedback = () => (
 )
 
 export const IDReaderWithAlertFeedbackStory: Story = {
-  render: () => <IDReaderWithAlertFeedback />
+  argTypes: {
+    status: {
+      options: ['ready-to-scan', 'pending', 'error', 'success'],
+      control: { type: 'radio' }
+    }
+  },
+  render: (args) => <IDReaderWithAlertFeedback {...args} />
 }
