@@ -15,8 +15,12 @@ import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   Practitioner,
   PractitionerRole,
+  PractitionerRoleHistory,
   resourceIdentifierToUUID,
-  SavedPractitioner
+  Saved,
+  SavedBundle,
+  SavedPractitioner,
+  toHistoryResource
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
 
@@ -128,6 +132,22 @@ export const getPractitionerOfficeId = async (practitionerId: string) => {
   )
   const roleEntry = roleResponse.entry[0].resource as PractitionerRole
   return resourceIdentifierToUUID(roleEntry.location[0].reference)
+}
+
+export const getPractitionerRoleWithHistory = async (
+  practitionerId: string
+): Promise<(Saved<PractitionerRole> | Saved<PractitionerRoleHistory>)[]> => {
+  const roleBundle: SavedBundle<PractitionerRole> = await getFromFhir(
+    `/PractitionerRole?practitioner=${practitionerId}`
+  )
+  const role = roleBundle.entry[0].resource
+  const roleHistoryBundle: SavedBundle<PractitionerRole> = await getFromFhir(
+    `/PractitionerRole/${role.id}/_history`
+  )
+  const roleHistories = roleHistoryBundle.entry.map((e) =>
+    toHistoryResource(e.resource)
+  )
+  return [role, ...roleHistories]
 }
 
 export async function getLoggedInPractitionerResource(

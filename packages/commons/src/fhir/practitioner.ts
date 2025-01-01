@@ -13,7 +13,8 @@ import {
   Resource,
   WithStrictExtensions,
   WithUUID,
-  SavedReference
+  SavedReference,
+  Saved
 } from '.'
 
 export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
@@ -23,7 +24,12 @@ export type OpenCRVSPractitionerName = Omit<fhir3.HumanName, 'use'> & {
 export type PractitionerRole = Omit<fhir3.PractitionerRole, 'location'> & {
   location: [SavedReference]
 }
-export type PractitionerRoleHistory = PractitionerRole
+export type PractitionerRoleHistory = Omit<
+  Saved<PractitionerRole>,
+  'resourceType'
+> & {
+  resourceType: 'PractitionerRoleHistory'
+}
 
 export type Practitioner = WithStrictExtensions<
   Omit<fhir3.Practitioner, 'name' | 'telecom'> & {
@@ -85,7 +91,7 @@ export function getPractitionerContactDetails(practitioner: Practitioner) {
 }
 
 export const getUserRoleFromHistory = (
-  practitionerRoleHistory: PractitionerRoleHistory[],
+  practitionerRoleHistory: (PractitionerRole | PractitionerRoleHistory)[],
   lastModified: string
 ) => {
   const practitionerRoleHistorySorted = practitionerRoleHistory.sort((a, b) => {

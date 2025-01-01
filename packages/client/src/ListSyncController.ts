@@ -12,6 +12,7 @@ import { client } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 
 export async function syncRegistrarWorkqueue(
+  userId: string,
   locationId: string,
   reviewStatuses: string[],
   pageSize: number,
@@ -19,6 +20,7 @@ export async function syncRegistrarWorkqueue(
   healthSystemSkip: number,
   reviewSkip: number,
   rejectSkip: number,
+  sentForReviewSkip: number,
   approvalSkip: number,
   externalValidationSkip: number,
   printSkip: number,
@@ -28,6 +30,7 @@ export async function syncRegistrarWorkqueue(
     const queryResult = await client.query({
       query: REGISTRATION_HOME_QUERY,
       variables: {
+        userId,
         declarationLocationId: locationId,
         pageSize,
         reviewStatuses: reviewStatuses,
@@ -35,6 +38,7 @@ export async function syncRegistrarWorkqueue(
         healthSystemSkip: healthSystemSkip,
         reviewSkip: reviewSkip,
         rejectSkip: rejectSkip,
+        sentForReviewSkip,
         approvalSkip: approvalSkip,
         externalValidationSkip: externalValidationSkip,
         printSkip: printSkip,

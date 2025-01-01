@@ -52,7 +52,10 @@ import {
   getResourceFromBundleById,
   TransactionResponse,
   TaskIdentifierSystem,
-  Location
+  Location,
+  Saved,
+  PractitionerRole,
+  PractitionerRoleHistory
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
@@ -69,7 +72,8 @@ import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
-  getPractitionerOfficeId
+  getPractitionerOfficeId,
+  getPractitionerRoleWithHistory
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
 import { fetchLocationHierarchy } from '@workflow/utils/location'
@@ -93,7 +97,12 @@ function getFHIRValueField(value: unknown) {
 export async function mergeChangedResourcesIntoRecord(
   record: ValidRecord,
   unsavedChangedResources: Bundle,
-  practitionerResourcesBundle: SavedBundle<SavedLocation | SavedPractitioner>
+  practitionerResourcesBundle: SavedBundle<
+    | SavedLocation
+    | SavedPractitioner
+    | Saved<PractitionerRole>
+    | Saved<PractitionerRoleHistory>
+  >
 ) {
   const responseBundle = await sendBundleToHearth(unsavedChangedResources)
 
@@ -110,7 +119,17 @@ export async function mergeChangedResourcesIntoRecord(
 export async function withPractitionerDetails<T extends Task>(
   task: T,
   token: string
-): Promise<[T, SavedBundle<SavedLocation | SavedPractitioner>]> {
+): Promise<
+  [
+    T,
+    SavedBundle<
+      | SavedLocation
+      | SavedPractitioner
+      | Saved<PractitionerRole>
+      | Saved<PractitionerRoleHistory>
+    >
+  ]
+> {
   const userOrSystem = await getUserOrSystem(token)
   const newTask: T = {
     ...task,
@@ -143,6 +162,9 @@ export async function withPractitionerDetails<T extends Task>(
   }
   const user = userOrSystem
   const practitioner = await getLoggedInPractitionerResource(token)
+  const practitionerRoleHistory = await getPractitionerRoleWithHistory(
+    practitioner.id
+  )
   const practitionerOfficeId = await getPractitionerOfficeId(practitioner.id)
   const hierarchy = await fetchLocationHierarchy(practitionerOfficeId)
 
@@ -167,7 +189,7 @@ export async function withPractitionerDetails<T extends Task>(
     {
       type: 'document',
       resourceType: 'Bundle',
-      entry: [practitioner, ...hierarchy].map((r) =>
+      entry: [practitioner, ...hierarchy, ...practitionerRoleHistory].map((r) =>
         resourceToSavedBundleEntry(r)
       )
     }
@@ -666,17 +688,17 @@ export function createCorrectedTask(
 export async function createViewTask(
   previousTask: SavedTask,
   token: string
-): Promise<SavedTask> {
+): Promise<[SavedTask, Bundle]> {
   const taskWithoutPracitionerExtensions = createNewTaskResource(previousTask, [
     { url: 'http://opencrvs.org/specs/extension/regViewed' }
   ])
 
-  const [viewedTask] = await withPractitionerDetails(
+  const [viewedTask, bundle] = await withPractitionerDetails(
     taskWithoutPracitionerExtensions,
     token
   )
 
-  return viewedTask
+  return [viewedTask, bundle]
 }
 
 export function createDownloadTask(previousTask: SavedTask) {

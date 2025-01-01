@@ -20,7 +20,12 @@ import {
   SavedCompositionSection
 } from './composition'
 import { SavedTask, Task, TaskHistory } from './task'
-import { Practitioner, SavedPractitioner } from './practitioner'
+import {
+  Practitioner,
+  PractitionerRole,
+  PractitionerRoleHistory,
+  SavedPractitioner
+} from './practitioner'
 import { Location, SavedLocation, Office, SavedOffice } from './location'
 
 export * from './practitioner'
@@ -103,7 +108,7 @@ type SavedResource<T extends Resource> = T extends Encounter
   ? SavedRelatedPerson
   : T extends Composition
   ? SavedComposition
-  : T extends SavedCompositionHistory
+  : T extends CompositionHistory
   ? SavedCompositionHistory
   : T extends Reference
   ? SavedReference
@@ -202,7 +207,7 @@ type SavedQuestionnaireResponse = Omit<
   status: 'completed'
 }
 
-export type CompositionHistory = Saved<Composition> & {
+export type CompositionHistory = Omit<Saved<Composition>, 'resourceType'> & {
   resourceType: 'CompositionHistory'
 }
 
@@ -388,10 +393,12 @@ export function toHistoryResource<T extends Saved<Resource>>(resource: T) {
   return {
     ...resource,
     resourceType: `${resource.resourceType}History`
-  } as T extends Task
+  } as unknown as T extends Task
     ? TaskHistory
     : T extends Composition
     ? CompositionHistory
+    : T extends PractitionerRole
+    ? PractitionerRoleHistory
     : never
 }
 export { updateFHIRBundle, buildFHIRBundle } from './transformers'
