@@ -66,7 +66,8 @@ const routeAccess: NavigationConfig[] = [
         name: WORKQUEUE_TABS.readyForReview,
         scopes: [
           SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_SUBMIT_FOR_UPDATES
+          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+          SCOPES.RECORD_REGISTER
         ]
       },
       {
