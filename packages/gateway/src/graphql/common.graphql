@@ -78,7 +78,6 @@ input RelatedPersonInput {
   nationality: [String] # In BDRIS2 for father and mother only
   educationalAttainment: String # Not in BDRIS2
   ageOfIndividualInYears: Int
-  scannedFields: String
 }
 
 type RelatedPerson { # -> Related Person
