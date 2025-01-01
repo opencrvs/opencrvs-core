@@ -74,7 +74,8 @@ export const FieldType = {
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
   HIDDEN: 'HIDDEN',
-  BULLET_LIST: 'BULLET_LIST'
+  BULLET_LIST: 'BULLET_LIST',
+  SELECT: 'SELECT'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -134,6 +135,11 @@ const BulletList = BaseField.extend({
   font: z.enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
 }).describe('A list of bullet points')
 
+const Select = BaseField.extend({
+  type: z.literal(FieldType.SELECT),
+  options: z.array(TranslationConfig).describe('A list of items')
+}).describe('Select input')
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
@@ -141,6 +147,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   RadioGroup,
   Hidden,
   BulletList,
+  Select,
   File
 ])
 

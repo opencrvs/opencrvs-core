@@ -51,6 +51,7 @@ import {
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
+import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -193,6 +194,15 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     }
     if (fieldDefinition.type === 'BULLET_LIST') {
       return <BulletList {...fieldDefinition} />
+    }
+    if (fieldDefinition.type === 'SELECT') {
+      return (
+        <Select
+          {...fieldDefinition}
+          value={inputProps.value as string}
+          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+        />
+      )
     }
     return <div>Unsupported field type {fieldDefinition.type}</div>
   }
