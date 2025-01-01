@@ -270,7 +270,6 @@ interface RelatedPerson {
   nationality?: Array<string | null>
   educationalAttainment?: string
   ageOfIndividualInYears?: number
-  scannedFields?: string
 }
 interface CorrectionPayment {
   _fhirID?: string
@@ -344,7 +343,6 @@ interface Person {
   nationality?: Array<string | null>
   educationalAttainment?: string
   ageOfIndividualInYears?: number
-  scannedFields?: string
 }
 export interface IdentityType {
   id?: string

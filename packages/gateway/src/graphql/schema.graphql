@@ -1310,7 +1310,6 @@ input PersonInput {
   nationality: [String]
   educationalAttainment: String
   ageOfIndividualInYears: Int
-  scannedFields: String
 }
 
 input RelatedPersonInput {

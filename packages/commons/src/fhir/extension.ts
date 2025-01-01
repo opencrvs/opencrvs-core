@@ -236,10 +236,6 @@ export type KnownExtensionType = StringExtensionType & {
         }
     >
   }
-  'http://opencrvs.org/specs/extension/scanned-fields': {
-    url: 'http://opencrvs.org/specs/extension/scanned-fields'
-    valueString: string
-  }
 }
 export type Extension = KnownExtensionType[keyof KnownExtensionType]
 

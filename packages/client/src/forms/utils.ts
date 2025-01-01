@@ -803,7 +803,7 @@ export function isFieldRedirect(
   return field.type === REDIRECT
 }
 
-export function isInitialValueDependencyInfo(
+function isInitialValueDependencyInfo(
   value: InitialValue
 ): value is DependencyInfo {
   return typeof value === 'object' && value !== null && 'dependsOn' in value
