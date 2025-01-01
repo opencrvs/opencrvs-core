@@ -66,7 +66,8 @@ const routeAccess: NavigationConfig[] = [
         name: WORKQUEUE_TABS.readyForReview,
         scopes: [
           SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-          SCOPES.RECORD_SUBMIT_FOR_UPDATES
+          SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+          SCOPES.RECORD_REGISTER
         ]
       },
       {
@@ -84,12 +85,6 @@ const routeAccess: NavigationConfig[] = [
       {
         name: WORKQUEUE_TABS.outbox,
         scopes: [
-          SCOPES.RECORD_DECLARE_BIRTH,
-          SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-          SCOPES.RECORD_DECLARE_DEATH,
-          SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-          SCOPES.RECORD_DECLARE_MARRIAGE,
-          SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION,
           SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
           SCOPES.RECORD_SUBMIT_FOR_UPDATES,
           SCOPES.RECORD_REVIEW_DUPLICATES,

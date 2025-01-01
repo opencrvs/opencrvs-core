@@ -348,7 +348,8 @@ describe('Given a user with scopes views Navigation', () => {
 
     const requiredScopes = [
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
-      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+      SCOPES.RECORD_REGISTER
     ] as Scope[]
 
     const allOtherScopes = allScopes.filter(

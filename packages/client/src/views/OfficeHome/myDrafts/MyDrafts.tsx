@@ -156,7 +156,7 @@ export const MyDrafts: React.FC<{
           onClick={() =>
             navigate(
               formatUrl(routes.DECLARATION_RECORD_AUDIT, {
-                tab: 'inProgressTab',
+                tab: 'myDraftsTab',
                 declarationId: draft.id
               })
             )
@@ -170,7 +170,7 @@ export const MyDrafts: React.FC<{
           onClick={() =>
             navigate(
               formatUrl(routes.DECLARATION_RECORD_AUDIT, {
-                tab: 'inProgressTab',
+                tab: 'myDraftsTab',
                 declarationId: draft.id
               })
             )

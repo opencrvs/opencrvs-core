@@ -507,9 +507,7 @@ function UserListComponent(props: IProps) {
 
           return {
             image: (
-              <AvatarSmall
-                name={name}
-                avatar={avatar || undefined}
+              <Link
                 onClick={() =>
                   navigate(
                     formatUrl(routes.USER_PROFILE, {
@@ -517,7 +515,10 @@ function UserListComponent(props: IProps) {
                     })
                   )
                 }
-              />
+                disabled={!canReadUser(user)}
+              >
+                <AvatarSmall name={name} avatar={avatar || undefined} />
+              </Link>
             ),
             label: (
               <Link

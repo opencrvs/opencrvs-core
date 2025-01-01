@@ -52,7 +52,9 @@ export const resolvers: GQLResolver = {
           !inScope(authHeader, [
             SCOPES.USER_READ,
             SCOPES.USER_READ_MY_OFFICE,
-            SCOPES.USER_READ_MY_JURISDICTION
+            SCOPES.USER_READ_MY_JURISDICTION,
+            SCOPES.USER_UPDATE,
+            SCOPES.USER_UPDATE_MY_JURISDICTION
           ]) &&
           !isTokenOwner(authHeader, userId!)
         ) {
