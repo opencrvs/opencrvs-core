@@ -135,9 +135,14 @@ const BulletList = BaseField.extend({
   font: z.enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
 }).describe('A list of bullet points')
 
+const SelectOption = z.object({
+  value: z.string().describe('The value of the option'),
+  label: TranslationConfig.describe('The label of the option')
+})
+
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),
-  options: z.array(TranslationConfig).describe('A list of items')
+  options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
 export const FieldConfig = z.discriminatedUnion('type', [
@@ -153,3 +158,4 @@ export const FieldConfig = z.discriminatedUnion('type', [
 
 export type FieldConfig = z.infer<typeof FieldConfig>
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
+export type SelectOption = z.infer<typeof SelectOption>

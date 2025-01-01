@@ -12,6 +12,7 @@ import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import { FieldProps } from '@opencrvs/commons'
 import { Select as SelectComponent } from '@opencrvs/components'
+import { SelectOption } from '@opencrvs/commons/client'
 import { InputField } from '@client/components/form/InputField'
 
 export function Select({
@@ -26,10 +27,9 @@ export function Select({
   const intl = useIntl()
   const { options } = props
 
-  const formattedOptions = options.map((option: MessageDescriptor) => ({
-    label: intl.formatMessage(option),
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    value: option.id!
+  const formattedOptions = options.map((option: SelectOption) => ({
+    value: option.value,
+    label: intl.formatMessage(option.label as MessageDescriptor)
   }))
 
   return (
