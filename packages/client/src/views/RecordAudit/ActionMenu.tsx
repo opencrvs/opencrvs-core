@@ -94,9 +94,8 @@ export const ActionMenu: React.FC<{
     assignment && assignment?.practitionerId !== userDetails?.practitionerId
   )
 
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
+  const isDraft = draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   const isActionable = isDownloaded && assignedToSelf
 
@@ -175,7 +174,7 @@ export const ActionMenu: React.FC<{
               declarationId={id}
               declarationStatus={status}
               type={type}
-              isActionable={isActionable}
+              isActionable={isActionable || isDraft}
             />
           </ProtectedComponent>
           <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ARCHIVE}>
