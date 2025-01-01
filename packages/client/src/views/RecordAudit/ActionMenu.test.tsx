@@ -1372,7 +1372,6 @@ describe('Update action', () => {
   it('Requires update - Assigned', async () => {
     const { store } = createStore()
     setScopes([SCOPES.RECORD_REGISTER], store)
-    setScopes([SCOPES.RECORD_REGISTER], store)
     const { component, router } = await createTestComponent(
       <ActionMenu
         declaration={{
