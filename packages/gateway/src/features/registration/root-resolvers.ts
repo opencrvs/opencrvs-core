@@ -72,6 +72,18 @@ async function getAnonymousToken() {
   return token
 }
 
+const ACTIONABLE_SCOPES = [
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_DECLARATION_ARCHIVE
+]
+
 export const resolvers: GQLResolver = {
   RecordDetails: {
     __resolveType(obj): any {
@@ -82,11 +94,7 @@ export const resolvers: GQLResolver = {
   },
   Query: {
     async fetchBirthRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, SCOPES.RECORD_REGISTER) ||
-        hasScope(context.headers, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(context.headers, SCOPES.RECORD_DECLARE_BIRTH)
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -98,11 +106,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async fetchDeathRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, SCOPES.RECORD_REGISTER) ||
-        hasScope(context.headers, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(context.headers, SCOPES.RECORD_DECLARE_DEATH)
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -118,11 +122,7 @@ export const resolvers: GQLResolver = {
       { id },
       context
     ): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, SCOPES.RECORD_REGISTER) ||
-        hasScope(context.headers, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(context.headers, SCOPES.RECORD_DECLARE_MARRIAGE)
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
