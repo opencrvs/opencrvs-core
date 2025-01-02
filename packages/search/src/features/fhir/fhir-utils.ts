@@ -37,7 +37,7 @@ export function findTaskExtension<
   Task extends TaskHistory | SavedTask
 >(task: Task, extensionUrl: T) {
   return task.extension.find(
-    (ext): ext is KnownExtensionType[T] => ext.url === extensionUrl
+    (ext): ext is KnownExtensionType[T] => ext && ext.url === extensionUrl
   )
 }
 

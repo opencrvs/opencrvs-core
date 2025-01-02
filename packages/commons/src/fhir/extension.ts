@@ -258,6 +258,6 @@ export function findExtension<URL extends AllExtensions['url']>(
 ): Extract<AllExtensions, { url: URL }> | undefined {
   return listOfExtensions.find(
     (extension): extension is Extract<AllExtensions, { url: URL }> =>
-      extension.url === url
+      extension && extension.url === url
   )
 }
