@@ -15,15 +15,12 @@ import { Text } from '../Text'
 import { IDReaderProps } from './types'
 import { Stack } from '../Stack'
 import { MainContainer, ReadersContainer } from './components'
-import { MessageBox } from './MessageBox'
 
 export const IDReader = (props: IDReaderProps) => {
   const { dividerLabel, manualInputInstructionLabel, children } = props
 
   const getStatusWiseView = (status: IDReaderProps['status']) => {
-    if (status === 'pending') {
-      return <MessageBox />
-    }
+    // TODO: render different views based on the status (use banner component)
     return (
       <MainContainer>
         <Stack direction="column" alignItems="center" gap={0}>
