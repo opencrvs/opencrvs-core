@@ -209,8 +209,11 @@ describe('Certificate collector test for a birth registration without father det
 
     it('prompt error when no option is selected', async () => {
       component.find('#confirm_form').hostNodes().simulate('click')
-      await waitForElement(component, '#form_error')
-      expect(component.find('#form_error').hostNodes().text()).toBe(
+      await waitForElement(component, '#certificateTemplateId_error')
+      expect(
+        component.find('#certificateTemplateId_error').hostNodes().text()
+      ).toBe('Please select certificate type')
+      expect(component.find('#type_error').hostNodes().text()).toBe(
         'Please select who is collecting the certificate'
       )
     })
@@ -220,6 +223,11 @@ describe('Certificate collector test for a birth registration without father det
         .find('#type_FATHER')
         .hostNodes()
         .simulate('change', { target: { value: 'FATHER' } })
+      await selectOption(
+        component,
+        '#certificateTemplateId',
+        'Birth Certificate'
+      )
 
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
@@ -242,6 +250,11 @@ describe('Certificate collector test for a birth registration without father det
         .find('#type_FATHER')
         .hostNodes()
         .simulate('change', { target: { value: 'FATHER' } })
+      await selectOption(
+        component,
+        '#certificateTemplateId',
+        'Birth Certificate'
+      )
 
       component.update()
       component.find('#confirm_form').hostNodes().simulate('click')
@@ -260,6 +273,11 @@ describe('Certificate collector test for a birth registration without father det
         .find('#type_OTHER')
         .hostNodes()
         .simulate('change', { target: { value: 'OTHER' } })
+      await selectOption(
+        component,
+        '#certificateTemplateId',
+        'Birth Certificate'
+      )
 
       await new Promise((resolve) => {
         setTimeout(resolve, 500)
@@ -311,6 +329,11 @@ describe('Certificate collector test for a birth registration without father det
         .find('#type_OTHER')
         .hostNodes()
         .simulate('change', { target: { value: 'OTHER' } })
+      await selectOption(
+        component,
+        '#certificateTemplateId',
+        'Birth Certificate'
+      )
 
       // Continue
       form.find('#confirm_form').hostNodes().simulate('click')
@@ -569,6 +592,12 @@ describe('Certificate collector test for a death registration', () => {
         .hostNodes()
         .simulate('change', { target: { value: 'PRINT_IN_ADVANCE' } })
 
+      await selectOption(
+        component,
+        '#certificateTemplateId',
+        'Death Certificate Certified Copy'
+      )
+
       const $confirm = await waitForElement(component, '#confirm_form')
       $confirm.hostNodes().simulate('click')
 
@@ -624,6 +653,11 @@ describe('Certificate collector test for a marriage registration', () => {
         .hostNodes()
         .simulate('change', { target: { value: 'PRINT_IN_ADVANCE' } })
 
+      await selectOption(
+        component,
+        '#certificateTemplateId',
+        'Marriage Certificate'
+      )
       const $confirm = await waitForElement(component, '#confirm_form')
       $confirm.hostNodes().simulate('click')
 
