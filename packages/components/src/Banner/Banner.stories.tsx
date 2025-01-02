@@ -89,7 +89,7 @@ export const PendingAdvanced: StoryObj<IBannerProps> = {
           verification first.
         </Text>
       </Banner.Body>
-      <Banner.Footer>
+      <Banner.Footer justifyContent="flex-end">
         <Button type="secondary">Reset</Button>
       </Banner.Footer>
     </Banner.Container>

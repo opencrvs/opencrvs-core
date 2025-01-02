@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { Box } from '../Box'
-import { Stack } from '../Stack'
+import { IStackProps, Stack } from '../Stack'
 import styled from 'styled-components'
 
 const Wrapper = styled(Box)`
@@ -60,8 +60,11 @@ const Body: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ContentWrapper>{children}</ContentWrapper>
 )
 
-const Footer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ContentWrapper direction="row" justifyContent="flex-end">
+const Footer: React.FC<{ children: React.ReactNode } & IStackProps> = ({
+  children,
+  ...otherProps
+}) => (
+  <ContentWrapper direction="row" {...otherProps}>
     {children}
   </ContentWrapper>
 )
