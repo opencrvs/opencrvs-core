@@ -23,10 +23,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import {
-  isLocationUnderJurisdiction,
-  isOfficeUnderJurisdiction
-} from '@client/utils/locationUtils'
+import { isOfficeUnderJurisdiction } from '@client/utils/locationUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 
@@ -179,32 +176,6 @@ export function usePermissions() {
     return false
   }
 
-  const canSearchBirthLocation = () => {
-    if (!userPrimaryOffice?.id) {
-      return false
-    }
-
-    return isLocationUnderJurisdiction(userPrimaryOffice.id, locations, offices)
-  }
-
-  const canSearchDeathLocation = () => {
-    if (!userPrimaryOffice?.id) {
-      return false
-    }
-
-    return isLocationUnderJurisdiction(userPrimaryOffice.id, locations, offices)
-  }
-
-  const canSearchLocation = (event: 'birth' | 'death') => {
-    if (!userPrimaryOffice?.id) {
-      return false
-    }
-
-    if (hasScope(SCOPES.SEARCH_BIRTH_MY_JURISDICTION)) canSearchBirthLocation()
-
-    if (hasScope(SCOPES.SEARCH_DEATH_MY_JURISDICTION)) canSearchDeathLocation()
-  }
-
   const canAddOfficeUsers = (office: Pick<Location, 'id'>) => {
     if (!userPrimaryOffice?.id) {
       return false
@@ -279,7 +250,6 @@ export function usePermissions() {
     canEditUser,
     canCreateUser,
     canAccessOffice,
-    canSearchLocation,
     hasBirthSearchJurisdictionScope,
     hasDeathSearchJurisdictionScope,
     canAddOfficeUsers,

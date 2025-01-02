@@ -122,44 +122,37 @@ export function generateSearchableLocations(
   intl: IntlShape,
   officeId?: UUID
 ) {
-  // const currentUser = useSelector(getUserDetails)
-  // const userPrimaryOffice = currentUser?.primaryOffice
-  // const offices = useSelector(getOfflineData).offices
-  // const allLocations = useSelector(getOfflineData).locations
+  const filteredLocations = officeId
+    ? getAssociatedLocationsAndOffices(officeId, locations)
+    : locations
 
-  // const filteredLocations = filterJurisdiction
-  //   ? isLocationUnderJurisdiction(userPrimaryOffice!.id, allLocations, offices)
-  //   : locations
+  const generated: ISearchLocation[] = filteredLocations.map(
+    (location: ILocation) => {
+      let locationName = generateLocationName(location, intl)
 
-  // console.log({ filteredLocations })
-
-  console.log({ officeId }, { locations })
-
-  const generated: ISearchLocation[] = locations.map((location: ILocation) => {
-    let locationName = generateLocationName(location, intl)
-
-    if (
-      location.partOf &&
-      location.partOf !== 'Location/0' &&
-      location.type !== 'CRVS_OFFICE'
-    ) {
-      const locRef = location.partOf.split('/')[1]
-      let parent
       if (
-        (parent =
-          offlineLocations[locRef] &&
-          generateLocationName(offlineLocations[locRef], intl))
+        location.partOf &&
+        location.partOf !== 'Location/0' &&
+        location.type !== 'CRVS_OFFICE'
       ) {
-        locationName += `, ${parent}`
+        const locRef = location.partOf.split('/')[1]
+        let parent
+        if (
+          (parent =
+            offlineLocations[locRef] &&
+            generateLocationName(offlineLocations[locRef], intl))
+        ) {
+          locationName += `, ${parent}`
+        }
+      }
+
+      return {
+        id: location.id,
+        searchableText: getLocalizedLocationName(intl, location),
+        displayLabel: locationName
       }
     }
-
-    return {
-      id: location.id,
-      searchableText: getLocalizedLocationName(intl, location),
-      displayLabel: locationName
-    }
-  })
+  )
   return generated
 }
 
@@ -280,19 +273,35 @@ export function isOfficeUnderJurisdiction(
   return Object.values(hierarchy).includes(parentLocation.id)
 }
 
-export function isLocationUnderJurisdiction(
+function getAssociatedLocationsAndOffices(
   officeId: string,
-  locations: Record<string, AdminStructure | undefined>,
-  offices: Record<string, CRVSOffice | undefined>
-) {
-  const office = offices[officeId]
-  const officeLocationId = office?.partOf.split('/').at(1)
-  if (!officeLocationId) return false
-  const parentLocation = locations[officeLocationId]
-  if (!parentLocation) return false
+  locations: ILocation[]
+): ILocation[] {
+  const office = locations.find(
+    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
+  )
 
-  const hierarchy = getLocationHierarchy(officeLocationId, locations)
-  return Object.values(hierarchy).includes(parentLocation.id)
+  if (!office) {
+    return []
+  }
+
+  const associatedLocations: ILocation[] = locations.filter((location) => {
+    let currentLocationId = office.partOf.split('/').at(1)
+
+    while (currentLocationId) {
+      const targetLocationId = currentLocationId
+      if (location.id === currentLocationId) {
+        return true
+      }
+
+      const nextLocation = locations.find((loc) => loc.id === targetLocationId)
+      currentLocationId = nextLocation?.partOf.split('/').at(1)
+    }
+
+    return false
+  })
+
+  return [office, ...associatedLocations]
 }
 
 export function generateFullAddress(
