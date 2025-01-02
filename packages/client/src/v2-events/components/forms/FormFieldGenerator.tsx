@@ -183,7 +183,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       return (
         <InputField {...inputFieldProps}>
           <TextInput
-            type="text"
+            type={fieldDefinition.options?.type ?? 'text'}
             {...inputProps}
             isDisabled={disabled}
             maxLength={fieldDefinition.options?.maxLength}

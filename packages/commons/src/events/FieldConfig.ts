@@ -85,9 +85,10 @@ const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   options: z
     .object({
-      maxLength: z.number().optional().describe('Maximum length of the text')
+      maxLength: z.number().optional().describe('Maximum length of the text'),
+      type: z.enum(['text', 'email', 'password', 'number']).optional()
     })
-    .default({})
+    .default({ type: 'text' })
     .optional()
 }).describe('Text input')
 
