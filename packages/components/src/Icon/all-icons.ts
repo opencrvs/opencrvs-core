@@ -75,6 +75,7 @@ export {
   PencilCircle,
   Handshake,
   UserCircle,
-  Clock
+  Clock,
+  QrCode
 } from 'phosphor-react'
 export * from './custom-icons'

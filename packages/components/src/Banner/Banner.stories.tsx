@@ -69,7 +69,17 @@ export const PendingAdvanced: StoryObj<IBannerProps> = {
   render: () => (
     <Banner.Container>
       <Banner.Header type="pending">
-        <Pill type="pending" size="small" label="ID Pending Verification" />
+        <Pill
+          type="pending"
+          size="small"
+          pillTheme="dark"
+          label={
+            <>
+              <Icon name="QrCode" size="small" />
+              ID Pending Verification
+            </>
+          }
+        />
         <Icon name="Clock" size="large" />
       </Banner.Header>
       <Banner.Body>
