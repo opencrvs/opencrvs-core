@@ -24,6 +24,7 @@ import { countries } from '@client/utils/countries'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { camelCase } from 'lodash'
+import { UUID } from '@opencrvs/commons'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -118,8 +119,22 @@ export function generateFullLocation(
 export function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation },
-  intl: IntlShape
+  intl: IntlShape,
+  officeId?: UUID
 ) {
+  // const currentUser = useSelector(getUserDetails)
+  // const userPrimaryOffice = currentUser?.primaryOffice
+  // const offices = useSelector(getOfflineData).offices
+  // const allLocations = useSelector(getOfflineData).locations
+
+  // const filteredLocations = filterJurisdiction
+  //   ? isLocationUnderJurisdiction(userPrimaryOffice!.id, allLocations, offices)
+  //   : locations
+
+  // console.log({ filteredLocations })
+
+  console.log({ officeId }, { locations })
+
   const generated: ISearchLocation[] = locations.map((location: ILocation) => {
     let locationName = generateLocationName(location, intl)
 
@@ -151,7 +166,8 @@ export function generateSearchableLocations(
 export function generateLocations(
   locations: { [key: string]: ILocation },
   intl: IntlShape,
-  filter?: (location: ILocation) => boolean
+  filter?: (location: ILocation) => boolean,
+  officeId?: UUID
 ) {
   let locationArray = Object.values(locations)
 
@@ -159,7 +175,7 @@ export function generateLocations(
     locationArray = locationArray.filter(filter)
   }
 
-  return generateSearchableLocations(locationArray, locations, intl)
+  return generateSearchableLocations(locationArray, locations, intl, officeId)
 }
 
 export function getJurisidictionType(
@@ -243,7 +259,7 @@ export function getLocationHierarchy(
   })
 }
 
-export function isUnderJurisdiction(
+export function isOfficeUnderJurisdiction(
   officeId: string,
   otherOfficeId: string,
   locations: Record<string, AdminStructure | undefined>,
@@ -261,6 +277,21 @@ export function isUnderJurisdiction(
     return false
   }
   const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
+  return Object.values(hierarchy).includes(parentLocation.id)
+}
+
+export function isLocationUnderJurisdiction(
+  officeId: string,
+  locations: Record<string, AdminStructure | undefined>,
+  offices: Record<string, CRVSOffice | undefined>
+) {
+  const office = offices[officeId]
+  const officeLocationId = office?.partOf.split('/').at(1)
+  if (!officeLocationId) return false
+  const parentLocation = locations[officeLocationId]
+  if (!parentLocation) return false
+
+  const hierarchy = getLocationHierarchy(officeLocationId, locations)
   return Object.values(hierarchy).includes(parentLocation.id)
 }
 

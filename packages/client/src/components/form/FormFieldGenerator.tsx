@@ -1105,7 +1105,7 @@ class FormSectionComponent extends React.Component<Props> {
                     }, {}),
                     intl,
                     (location) => field.searchableType.includes(location.type),
-                    field.filterJurisdictionLocation
+                    field.userOfficeId
                   )
                 }
               : field

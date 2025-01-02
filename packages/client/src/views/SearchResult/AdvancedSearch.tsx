@@ -13,7 +13,7 @@ import React, { useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
@@ -45,6 +45,7 @@ import { advancedSearchInitialState } from '@client/search/advancedSearch/reduce
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
+import { UUID } from '@opencrvs/commons'
 
 enum TabId {
   BIRTH = 'birth',
@@ -94,17 +95,21 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
 
 interface BirthSectionProps {
   hasBirthSearchJurisdictionScope: boolean
+  userOfficeId: UUID
 }
 
 interface DeathSectionProps {
   hasDeathSearchJurisdictionScope: boolean
+  userOfficeId: UUID
 }
 
 const BirthSection: React.FC<BirthSectionProps> = ({
-  hasBirthSearchJurisdictionScope
+  hasBirthSearchJurisdictionScope,
+  userOfficeId
 }) => {
   const advancedSearchBirthSections = createAdvancedSearchBirthSections(
-    hasBirthSearchJurisdictionScope
+    hasBirthSearchJurisdictionScope,
+    userOfficeId
   )
 
   const {
@@ -331,7 +336,8 @@ const BirthSection: React.FC<BirthSectionProps> = ({
 }
 
 const DeathSection: React.FC<DeathSectionProps> = ({
-  hasDeathSearchJurisdictionScope
+  hasDeathSearchJurisdictionScope,
+  userOfficeId
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
@@ -358,7 +364,8 @@ const DeathSection: React.FC<DeathSectionProps> = ({
   )
 
   const advancedSearchDeathSections = createAdvancedSearchDeathSections(
-    hasDeathSearchJurisdictionScope
+    hasDeathSearchJurisdictionScope,
+    userOfficeId
   )
 
   const {
@@ -518,6 +525,14 @@ const AdvancedSearch = () => {
     hasDeathSearchJurisdictionScope
   } = usePermissions()
   const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
+  const currentUser = useSelector(getUserDetails)
+  const userPrimaryOffice = currentUser?.primaryOffice
+
+  if (!userPrimaryOffice)
+    throw new Error(
+      'Something went wrong. Could not find any office assigned to the user'
+    )
+
   const activeTabId =
     advancedSearchParamState.event === TabId.BIRTH && canSearchBirthRecords
       ? TabId.BIRTH
@@ -576,11 +591,13 @@ const AdvancedSearch = () => {
           {activeTabId === TabId.BIRTH && (
             <BirthSection
               hasBirthSearchJurisdictionScope={hasBirthSearchJurisdictionScope}
+              userOfficeId={userPrimaryOffice.id as UUID}
             />
           )}
           {activeTabId === TabId.DEATH && (
             <DeathSection
               hasDeathSearchJurisdictionScope={hasDeathSearchJurisdictionScope}
+              userOfficeId={userPrimaryOffice.id as UUID}
             />
           )}
         </Content>

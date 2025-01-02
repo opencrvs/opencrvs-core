@@ -14,9 +14,11 @@ import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
+import { UUID } from '@opencrvs/commons'
 
 const createBirthSearchRegistrationSection = (
-  hasBirthSearchJurisdictionScope?: boolean
+  hasBirthSearchJurisdictionScope?: boolean,
+  userOfficeId?: UUID
 ): IFormSectionGroup => ({
   id: 'BirthRegistrationDetails',
   title: advancedSearchForm.registrationDetails,
@@ -32,7 +34,7 @@ const createBirthSearchRegistrationSection = (
       searchableResource: ['locations', 'offices'],
       searchableType: ['CRVS_OFFICE', 'ADMIN_STRUCTURE'],
       ...(hasBirthSearchJurisdictionScope && {
-        filterJurisdictionLocation: hasBirthSearchJurisdictionScope
+        userOfficeId
       }),
       validator: []
     },
@@ -426,10 +428,12 @@ const advancedSearchBirthSectionInformantDetails: IFormSectionGroup = {
 }
 
 export const createAdvancedSearchBirthSections = (
-  hasBirthSearchJurisdictionScope?: boolean
+  hasBirthSearchJurisdictionScope?: boolean,
+  userOfficeId?: UUID
 ) => ({
   birthSearchRegistrationSection: createBirthSearchRegistrationSection(
-    hasBirthSearchJurisdictionScope
+    hasBirthSearchJurisdictionScope,
+    userOfficeId
   ),
   birthSearchChildSection: advancedSearchBirthSectionChildDetails,
   birthSearchEventSection: advancedSearchBirthSectionEventDetails,
