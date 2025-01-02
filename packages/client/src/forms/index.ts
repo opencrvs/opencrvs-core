@@ -653,7 +653,7 @@ interface ILocationSearchInputFormField extends IFormFieldBase {
   locationList?: ISearchLocation[]
   searchableType: string[]
   dispatchOptions?: IDispatchOptions
-  userOfficeId?: UUID
+  userOfficeId?: UUID // added to filter searchable location
   dynamicOptions?: IDynamicOptions
 }
 
