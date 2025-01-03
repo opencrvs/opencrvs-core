@@ -65,12 +65,50 @@ import {
 import { getRecordById } from '@gateway/records'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
+import { Context } from '@gateway/graphql/context'
+import { GraphQLResolveInfo } from 'graphql'
 
 async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', AUTH_URL).toString())
   const { token } = await res.json()
   return token
 }
+
+// This should take into account the status
+// of the record like so in useNavigation
+const ACTIONABLE_SCOPES = [
+  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+  SCOPES.RECORD_SUBMIT_INCOMPLETE,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_DECLARATION_ARCHIVE
+]
+
+const requireAssignment =
+  <P, A, R>(
+    fn: (
+      parent: P,
+      args: A & { id: string },
+      context: Context,
+      info: GraphQLResolveInfo
+    ) => R
+  ) =>
+  async (...args: Parameters<typeof fn>) => {
+    const assignedToSelf = await checkUserAssignment(
+      args[1].id,
+      args[2].headers
+    )
+    if (!assignedToSelf) {
+      throw new UnassignError('User is not assigned to the record')
+    }
+    return fn(...args)
+  }
 
 export const resolvers: GQLResolver = {
   RecordDetails: {
@@ -82,11 +120,7 @@ export const resolvers: GQLResolver = {
   },
   Query: {
     async fetchBirthRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, SCOPES.RECORD_REGISTER) ||
-        hasScope(context.headers, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(context.headers, SCOPES.RECORD_DECLARE_BIRTH)
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -98,11 +132,7 @@ export const resolvers: GQLResolver = {
       }
     },
     async fetchDeathRegistration(_, { id }, context): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, SCOPES.RECORD_REGISTER) ||
-        hasScope(context.headers, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(context.headers, SCOPES.RECORD_DECLARE_DEATH)
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -118,11 +148,7 @@ export const resolvers: GQLResolver = {
       { id },
       context
     ): Promise<Saved<Bundle>> {
-      if (
-        hasScope(context.headers, SCOPES.RECORD_REGISTER) ||
-        hasScope(context.headers, SCOPES.RECORD_SUBMIT_FOR_APPROVAL) ||
-        hasScope(context.headers, SCOPES.RECORD_DECLARE_MARRIAGE)
-      ) {
+      if (inScope(context.headers, ACTIONABLE_SCOPES)) {
         const record = await fetchRegistrationForDownloading(
           id,
           context.headers
@@ -484,42 +510,59 @@ export const resolvers: GQLResolver = {
         registrationStatus: prevRegStatus
       }
     },
-    async markBirthAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-        return Promise.reject(new Error('User does not have enough scope'))
+    markBirthAsCertified: requireAssignment(
+      async (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
       }
-      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
-    },
-    async markBirthAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-        return Promise.reject(new Error('User does not have enough scope'))
+    ),
+    markBirthAsIssued: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
       }
-      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
-    },
-    async markDeathAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-        return Promise.reject(new Error('User does not have enough scope'))
+    ),
+    markDeathAsCertified: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
       }
-      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
-    },
-    async markDeathAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-        return Promise.reject(new Error('User does not have enough scope'))
+    ),
+    markDeathAsIssued: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
       }
-      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
-    },
-    async markMarriageAsCertified(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-        return Promise.reject(new Error('User does not have enough scope'))
+    ),
+    markMarriageAsCertified: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsCertified(
+          id,
+          details,
+          authHeader,
+          EVENT_TYPE.MARRIAGE
+        )
       }
-      return markEventAsCertified(id, details, authHeader, EVENT_TYPE.MARRIAGE)
-    },
-    async markMarriageAsIssued(_, { id, details }, { headers: authHeader }) {
-      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-        return Promise.reject(new Error('User does not have enough scope'))
+    ),
+    markMarriageAsIssued: requireAssignment(
+      (_, { id, details }, { headers: authHeader }) => {
+        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+          throw new Error('User does not have enough scope')
+        }
+        return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
       }
-      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
-    },
+    ),
     async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
       const isAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!isAssignedToThisUser) {
@@ -537,11 +580,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsUnassigned(_, { id }, { headers: authHeader }) {
+      const assignedToSelf = await checkUserAssignment(id, authHeader)
       if (
-        !inScope(authHeader, [
-          SCOPES.RECORD_REGISTER,
-          SCOPES.RECORD_SUBMIT_FOR_APPROVAL
-        ])
+        !assignedToSelf ||
+        !inScope(authHeader, [SCOPES.RECORD_UNASSIGN_OTHERS])
       ) {
         throw new Error('User does not have enough scope')
       }
