@@ -180,6 +180,10 @@ jobs:
               json[pkg].workspaceDependencies.concat(
                 json[pkg].workspaceDependencies.flatMap(getDependencies)
               );
+
+            console.log(
+              getDependencies('packages/client').join(' ')
+            );
           ")
           echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
           echo "Found dependencies: $DEPENDENCIES"
