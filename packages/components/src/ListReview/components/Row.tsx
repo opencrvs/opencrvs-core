@@ -17,21 +17,21 @@ export const RowContainer = styled.tr`
   td {
     padding: 14px 0;
     vertical-align: top;
-    word-wrap: break-word;
+    word-wrap: anywhere;
     white-space: normal;
   }
 
   td:first-child {
     margin: 0;
     ${({ theme }) => theme.fonts.bold16}
-    max-width: 300px;
+    width: 300px;
     padding-right: 48px;
   }
 
   td:nth-child(2) {
     margin: 0;
     ${({ theme }) => theme.fonts.reg16}
-    max-width: 300px;
+    width: 300px;
     padding-right: 48px;
   }
 
@@ -64,7 +64,6 @@ export const RowContainer = styled.tr`
     /* Styles for small phones */
     td:first-child {
       width: 200px;
-      min-width: 200px;
       padding-right: 0px;
     }
     td:nth-child(2) {
