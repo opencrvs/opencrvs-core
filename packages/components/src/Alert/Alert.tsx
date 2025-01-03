@@ -22,17 +22,17 @@ const Container = styled.div<{
   $type?: AlertType
 }>`
   --color: ${({ $type, theme }) => `
-    ${$type === 'success' ? theme.colors.positiveDark : ''}
-    ${$type === 'loading' ? theme.colors.primaryDark : ''}
-    ${$type === 'info' ? theme.colors.tealDark : ''}
-    ${$type === 'error' ? theme.colors.negativeDark : ''}
-    ${$type === 'warning' ? theme.colors.orangeDark : ''}
-    ${$type === undefined ? theme.colors.positiveDark : ''}
+    ${$type === 'success' ? theme.colors.positive : ''}
+    ${$type === 'loading' ? theme.colors.primary : ''}
+    ${$type === 'info' ? theme.colors.teal : ''}
+    ${$type === 'error' ? theme.colors.negative : ''}
+    ${$type === 'warning' ? theme.colors.orange : ''}
+    ${$type === undefined ? theme.colors.positive : ''}
   `};
 
   display: flex;
   border-radius: 4px;
-  border: 2px solid var(--color);
+  border: 1.5px solid var(--color);
   border-left-width: 0px;
   background: linear-gradient(
     to right,

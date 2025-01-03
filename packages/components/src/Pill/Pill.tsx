@@ -34,10 +34,10 @@ const fontMap: Record<IPillSize, IFont> = {
 
 const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   --background-color: ${({ type, theme }) => `
-    ${type === 'active' ? theme.colors.greenLighter : ''}
-    ${type === 'inactive' ? theme.colors.redLighter : ''}
-    ${type === 'pending' ? theme.colors.orangeLighter : ''}
-    ${type === 'default' ? theme.colors.primaryLighter : ''}
+    ${type === 'active' ? theme.colors.greenLight : ''}
+    ${type === 'inactive' ? theme.colors.redLight : ''}
+    ${type === 'pending' ? theme.colors.orangeLight : ''}
+    ${type === 'default' ? theme.colors.primaryLight : ''}
   `};
 
   --color: ${({ type, theme }) => `
