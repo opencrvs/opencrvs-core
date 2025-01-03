@@ -299,13 +299,7 @@ jobs:
         run: CI="" yarn install --frozen-lockfile
 
       - name: Run Unit Test
-        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }} --coverage.enabled true
-
-      - name: Report coverage
-        uses: davelosert/vitest-coverage-report-action@v2
-        with:
-          working-directory: packages/client
-        if: always()
+        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip
