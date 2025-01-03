@@ -12,6 +12,7 @@
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import { signFileUrl } from '@documents/minio/sign'
 import * as Hapi from '@hapi/hapi'
+import { z } from 'zod'
 
 export function createPreSignedUrl(
   request: Hapi.Request,
@@ -30,4 +31,25 @@ export function createPreSignedUrl(
   } catch (error) {
     return h.response(error).code(400)
   }
+}
+
+const BulkPayload = z.object({
+  filenames: z.array(z.string())
+})
+
+export function createPresignedUrlsInBulk(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = BulkPayload.safeParse(request.payload)
+
+  if (!payload.success) {
+    return h.response(payload.error).code(400)
+  }
+
+  const response = payload.data.filenames.map((filename) =>
+    signFileUrl(`/${MINIO_BUCKET}/${filename}`)
+  )
+
+  return h.response(response).code(200)
 }
