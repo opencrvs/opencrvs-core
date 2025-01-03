@@ -40,11 +40,7 @@ const config = {
   BIRTH: {
     REGISTRATION_TARGET: 45,
     LATE_REGISTRATION_TARGET: 365,
-    FEE: {
-      ON_TIME: 0,
-      LATE: 0,
-      DELAYED: 0
-    }
+    PRINT_IN_ADVANCE: true
   },
   COUNTRY: 'BGD',
   CURRENCY: {
@@ -53,10 +49,7 @@ const config = {
   },
   DEATH: {
     REGISTRATION_TARGET: 45,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 0
-    }
+    PRINT_IN_ADVANCE: true
   },
   FEATURES: {
     DEATH_REGISTRATION: true,
@@ -201,7 +194,6 @@ vi.doMock(
           languages: mockOfflineData.languages
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
-      loadCertificateConfiguration: () => Promise.resolve({}),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
       loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
       importConditionals: () => Promise.resolve({}),

@@ -11,7 +11,7 @@
 
 import { JSONSchemaType } from 'ajv'
 import { z } from 'zod'
-import { EventDocument } from '../events'
+import { ActionFormData, EventDocument } from '../events'
 
 export function Conditional() {
   return z.any() as z.ZodType<JSONSchema>
@@ -23,10 +23,10 @@ export type ConditionalParameters = { $now: string } & (
     }
   | {
       $event: EventDocument
-      $form: Record<string, any>
+      $form: ActionFormData
     }
   | {
-      $form: Record<string, any>
+      $form: ActionFormData
     }
 )
 

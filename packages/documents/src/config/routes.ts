@@ -8,9 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { documentUploadHandler } from '@documents/features/uploadDocument/handler'
+import {
+  fileUploadHandler,
+  documentUploadHandler,
+  fileExistsHandler
+} from '@documents/features/uploadDocument/handler'
 import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/handler'
-import { createPreSignedUrl } from '@documents/features/getDocument/handler'
+import {
+  createPreSignedUrl,
+  createPresignedUrlsInBulk
+} from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 
@@ -25,12 +32,44 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
+    // get presigned URLs in bulk
+    {
+      method: 'POST',
+      path: `/presigned-urls`,
+      handler: createPresignedUrlsInBulk,
+      config: {
+        tags: ['api']
+      }
+    },
     {
       method: 'POST',
       path: '/presigned-url',
       handler: createPreSignedUrl,
       config: {
         tags: ['api']
+      }
+    },
+    // check if file exists
+    {
+      method: 'GET',
+      path: '/files/{filename}',
+      handler: fileExistsHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    // upload a file to minio
+    {
+      method: 'POST',
+      path: '/files',
+      handler: fileUploadHandler,
+      config: {
+        tags: ['api'],
+        payload: {
+          allow: ['multipart/form-data'],
+          multipart: true,
+          output: 'stream'
+        }
       }
     },
     // upload a document

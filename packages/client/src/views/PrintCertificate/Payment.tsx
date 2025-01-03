@@ -135,7 +135,8 @@ const PaymentComponent = ({
     event,
     eventDate,
     registeredDate,
-    offlineCountryConfig
+    offlineCountryConfig,
+    declaration.data.registration.certificates[0]
   )
 
   const serviceMessage = getServiceMessage(
