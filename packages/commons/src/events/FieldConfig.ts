@@ -75,6 +75,7 @@ export const FieldType = {
   FILE: 'FILE',
   HIDDEN: 'HIDDEN',
   BULLET_LIST: 'BULLET_LIST',
+  CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT'
 } as const
 
@@ -146,6 +147,10 @@ const Select = BaseField.extend({
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
+const CheckBox = BaseField.extend({
+  type: z.literal(FieldType.CHECKBOX)
+}).describe('Check Box')
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
@@ -154,6 +159,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Hidden,
   BulletList,
   Select,
+  CheckBox,
   File
 ])
 

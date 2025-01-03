@@ -52,6 +52,7 @@ import {
 import { Errors, getValidationErrorsForForm } from './validation'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
+import { Checkbox } from '@client/v2-events/features/events/registered-fields/CheckBox'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -201,6 +202,23 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           {...fieldDefinition}
           value={inputProps.value as string}
           onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'CHECKBOX') {
+      console.log({ fieldDefinition })
+      console.log({ value, inputProps })
+
+      return (
+        <Checkbox
+          {...fieldDefinition}
+          value={value as string}
+          onChange={(val: any) =>
+            setFieldValue(
+              fieldDefinition.id,
+              value === 'true' ? 'false' : 'true'
+            )
+          }
         />
       )
     }
