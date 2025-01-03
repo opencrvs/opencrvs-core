@@ -14,7 +14,7 @@ import { EventConfig } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { array } from 'zod'
 
-export async function getEventsConfig(token: string) {
+export async function getEventConfigurations(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',

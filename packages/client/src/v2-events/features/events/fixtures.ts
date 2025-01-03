@@ -8,7 +8,119 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig } from '@opencrvs/commons/client'
+import { EventConfig, FormConfig } from '@opencrvs/commons/client'
+
+export const DEFAULT_FORM = {
+  label: {
+    id: 'event.tennis-club-membership.action.declare.form.label',
+    defaultMessage: 'Tennis club membership application',
+    description: 'This is what this form is referred as in the system'
+  },
+  active: true,
+  version: {
+    id: '1.0.0',
+    label: {
+      id: 'event.tennis-club-membership.action.declare.form.version.1',
+      defaultMessage: 'Version 1',
+      description: 'This is the first version of the form'
+    }
+  },
+  review: {
+    title: {
+      id: 'event.tennis-club-membership.action.declare.form.review.title',
+      defaultMessage: 'Member declaration for {firstname} {surname}',
+      description: 'Title of the form to show in review page'
+    }
+  },
+  pages: [
+    {
+      id: 'applicant',
+      title: {
+        id: 'event.tennis-club-membership.action.declare.form.section.who.title',
+        defaultMessage: 'Who is applying for the membership?',
+        description: 'This is the title of the section'
+      },
+      fields: [
+        {
+          id: 'applicant.firstname',
+          type: 'TEXT',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Applicant's first name",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
+          }
+        },
+        {
+          id: 'applicant.surname',
+          type: 'TEXT',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Applicant's surname",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.surname.label'
+          }
+        },
+        {
+          id: 'applicant.dob',
+          type: 'DATE',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Applicant's date of birth",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
+          }
+        }
+      ]
+    },
+    {
+      id: 'recommender',
+      title: {
+        id: 'event.tennis-club-membership.action.declare.form.section.recommender.title',
+        defaultMessage: 'Who is recommending the applicant?',
+        description: 'This is the title of the section'
+      },
+      fields: [
+        {
+          id: 'recommender.firstname',
+          type: 'TEXT',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Recommender's first name",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
+          }
+        },
+        {
+          id: 'recommender.surname',
+          type: 'TEXT',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Recommender's surname",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label'
+          }
+        },
+        {
+          id: 'recommender.id',
+          type: 'TEXT',
+          required: true,
+          conditionals: [],
+          label: {
+            defaultMessage: "Recommender's membership ID",
+            description: 'This is the label for the field',
+            id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
+          }
+        }
+      ]
+    }
+  ]
+} satisfies FormConfig
 
 /** @knipignore */
 export const tennisClubMembershipEvent = {
@@ -127,119 +239,7 @@ export const tennisClubMembershipEvent = {
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
       },
-      forms: [
-        {
-          label: {
-            id: 'event.tennis-club-membership.action.declare.form.label',
-            defaultMessage: 'Tennis club membership application',
-            description: 'This is what this form is referred as in the system'
-          },
-          active: true,
-          version: {
-            id: '1.0.0',
-            label: {
-              id: 'event.tennis-club-membership.action.declare.form.version.1',
-              defaultMessage: 'Version 1',
-              description: 'This is the first version of the form'
-            }
-          },
-          review: {
-            title: {
-              id: 'event.tennis-club-membership.action.declare.form.review.title',
-              defaultMessage: 'Member declaration for {firstname} {surname}',
-              description: 'Title of the form to show in review page'
-            }
-          },
-          pages: [
-            {
-              id: 'applicant',
-              title: {
-                id: 'event.tennis-club-membership.action.declare.form.section.who.title',
-                defaultMessage: 'Who is applying for the membership?',
-                description: 'This is the title of the section'
-              },
-              fields: [
-                {
-                  id: 'applicant.firstname',
-                  type: 'TEXT',
-                  required: true,
-                  conditionals: [],
-                  label: {
-                    defaultMessage: "Applicant's first name",
-                    description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
-                  }
-                },
-                {
-                  id: 'applicant.surname',
-                  type: 'TEXT',
-                  required: true,
-                  conditionals: [],
-                  label: {
-                    defaultMessage: "Applicant's surname",
-                    description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.declare.form.section.who.field.surname.label'
-                  }
-                },
-                {
-                  id: 'applicant.dob',
-                  type: 'DATE',
-                  required: true,
-                  conditionals: [],
-                  label: {
-                    defaultMessage: "Applicant's date of birth",
-                    description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.declare.form.section.who.field.dob.label'
-                  }
-                }
-              ]
-            },
-            {
-              id: 'recommender',
-              title: {
-                id: 'event.tennis-club-membership.action.declare.form.section.recommender.title',
-                defaultMessage: 'Who is recommending the applicant?',
-                description: 'This is the title of the section'
-              },
-              fields: [
-                {
-                  id: 'recommender.firstname',
-                  type: 'TEXT',
-                  required: true,
-                  conditionals: [],
-                  label: {
-                    defaultMessage: "Recommender's first name",
-                    description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
-                  }
-                },
-                {
-                  id: 'recommender.surname',
-                  type: 'TEXT',
-                  required: true,
-                  conditionals: [],
-                  label: {
-                    defaultMessage: "Recommender's surname",
-                    description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label'
-                  }
-                },
-                {
-                  id: 'recommender.id',
-                  type: 'TEXT',
-                  required: true,
-                  conditionals: [],
-                  label: {
-                    defaultMessage: "Recommender's membership ID",
-                    description: 'This is the label for the field',
-                    id: 'event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      forms: [DEFAULT_FORM]
     }
   ]
 } satisfies EventConfig
