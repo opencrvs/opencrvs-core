@@ -152,8 +152,79 @@ jobs:
         run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
-        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        if: matrix.package != 'client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
+
+  test-client:
+    needs: test
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [0, 1, 2, 3, 4, 5]
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Extract dependencies for client
+        id: extract-dependencies
+        run: |
+          DEPENDENCIES=$(node -e "
+            const { execSync } = require('child_process');
+            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
+            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+
+            const getDependencies = (pkg) =>
+              json[pkg].workspaceDependencies.concat(
+                json[pkg].workspaceDependencies.flatMap(getDependencies)
+              );
+
+            console.log(
+              getDependencies('client').join(' ')
+            );
+          ")
+          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
+          echo "Found dependencies: $DEPENDENCIES"
+
+      - name: Remove other package directories
+        run: |
+          for dir in packages/*; do
+            if echo "client $DEPENDENCIES" | grep -q -w "$dir"; then
+              echo "Skipping $dir"
+            else
+              echo "Removing $dir"
+              rm -rf "$dir"
+            fi
+          done
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}', 'client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Runs dependency installation
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Build common package
+        run: cd packages/commons && yarn build
+
+      - name: Build components
+        run: |
+          cd packages/components && yarn build
+
+      - name: Run Unit Test
+        run: cd client && yarn test -- --shard ${{ strategy.job-index }}/${{ strategy.job-total }}
 
   lint-knip:
     runs-on: ubuntu-22.04
