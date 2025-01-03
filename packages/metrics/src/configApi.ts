@@ -21,28 +21,15 @@ import {
 interface IBirth {
   REGISTRATION_TARGET: number
   LATE_REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    LATE: number
-    DELAYED: number
-  }
   PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    DELAYED: number
-  }
   PRINT_IN_ADVANCE: boolean
 }
 
 interface IMarriage {
   REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    DELAYED: number
-  }
   PRINT_IN_ADVANCE: boolean
 }
 export interface ICountryLogo {

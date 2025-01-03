@@ -116,6 +116,7 @@ export const appRouter = router({
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token
         })
       }),
@@ -123,6 +124,7 @@ export const appRouter = router({
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token
         })
       }),
@@ -130,6 +132,7 @@ export const appRouter = router({
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
           token: options.ctx.token
         })
       }),
@@ -147,6 +150,7 @@ export const appRouter = router({
             {
               eventId: options.input.eventId,
               createdBy: options.ctx.user.id,
+              createdAtLocation: options.ctx.user.primaryOfficeId,
               token: options.ctx.token
             }
           )

@@ -85,9 +85,11 @@ describe('back button behavior tests of review certificate action', () => {
     ]
   }
   mockBirthDeclarationData.registration.certificates[0] = {
+    //@ts-ignore
     collector: {
       type: 'PRINT_IN_ADVANCE'
-    }
+    },
+    certificateTemplateId: 'death-certificate'
   }
 
   it('takes user history back when navigated from inside app', async () => {
@@ -177,9 +179,11 @@ describe('when user wants to review birth certificate', () => {
 
     const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
     mockBirthDeclarationData.registration.certificates[0] = {
+      //@ts-ignore
       collector: {
         type: 'PRINT_IN_ADVANCE'
-      }
+      },
+      certificateTemplateId: 'birth-certificate'
     }
     loginAsFieldAgent(store)
     await flushPromises()

@@ -33,8 +33,8 @@ export const ROUTES = {
             },
             {
               REVIEW: route('review'),
-              PAGE: route('page/:pageId', {
-                params: { pageId: string().defined() },
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
                 searchParams: {
                   from: string()
                 },
@@ -49,8 +49,8 @@ export const ROUTES = {
             },
             {
               REVIEW: route('review'),
-              PAGE: route('page/:pageId', {
-                params: { pageId: string().defined() },
+              PAGES: route('pages/:pageId', {
+                params: { pageId: string() },
                 searchParams: {
                   from: string()
                 },

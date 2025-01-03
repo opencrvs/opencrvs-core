@@ -15,7 +15,8 @@ import { FieldValue } from './FieldValue'
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), FieldValue)
+  data: z.record(z.string(), FieldValue),
+  createdAtLocation: z.string()
 })
 
 const AssignedAction = ActionBase.merge(
@@ -61,15 +62,13 @@ const DraftAction = ActionBase.merge(
 
 const CreatedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.CREATE),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.CREATE)
   })
 )
 
 const NotifiedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY)
   })
 )
 

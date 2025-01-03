@@ -107,8 +107,14 @@ export async function addAction(
   {
     eventId,
     createdBy,
-    token
-  }: { eventId: string; createdBy: string; token: string }
+    token,
+    createdAtLocation
+  }: {
+    eventId: string
+    createdBy: string
+    createdAtLocation: string
+    token: string
+  }
 ) {
   const db = await getClient()
   const now = new Date().toISOString()
@@ -147,7 +153,8 @@ export async function addAction(
         actions: {
           ...input,
           createdBy,
-          createdAt: now
+          createdAt: now,
+          createdAtLocation
         }
       }
     }
