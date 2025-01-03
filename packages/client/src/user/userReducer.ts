@@ -392,6 +392,16 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const roleScopes = (role: string) =>
         userRoles.find(({ id }) => id === role)?.scopes ?? []
 
+      const canCreateOrUpdateAll = [
+        SCOPES.USER_CREATE,
+        SCOPES.USER_UPDATE
+      ].some((scope) => loggedInUserScopes.includes(scope))
+
+      const canCreateOrUpdateJurisdiction = [
+        SCOPES.USER_CREATE_MY_JURISDICTION,
+        SCOPES.USER_UPDATE_MY_JURISDICTION
+      ].some((scope) => loggedInUserScopes.includes(scope))
+
       const form = deserializeForm(getCreateUserForm(), validators)
 
       const modifiedForm = modifyFormField(
@@ -406,11 +416,13 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
               options: userRoles
                 .filter(
                   ({ id }) =>
-                    loggedInUserScopes.includes(SCOPES.USER_CREATE) ||
-                    (loggedInUserScopes.includes(
-                      SCOPES.USER_CREATE_MY_JURISDICTION
-                    ) &&
-                      !roleScopes(id).includes(SCOPES.USER_CREATE))
+                    canCreateOrUpdateAll ||
+                    (canCreateOrUpdateJurisdiction &&
+                      !roleScopes(id).some((scope) =>
+                        (
+                          [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] as string[]
+                        ).includes(scope)
+                      ))
                 )
                 .map((role) => ({
                   value: role.id,
