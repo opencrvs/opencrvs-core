@@ -118,7 +118,8 @@ export default defineConfig(({ mode }) => {
       hookTimeout: 60000,
       globals: true,
       coverage: {
-        reporter: ['text', 'json', 'html']
+        reporter: ['text', 'json-summary', 'json'],
+        reportOnFailure: true
       }
     },
     server: {
