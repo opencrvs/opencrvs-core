@@ -32,7 +32,7 @@ test('actions can be added to created events', async () => {
 test('Action data can be retrieved', async () => {
   const originalEvent = await client.event.create(generator.event.create())
 
-  const data = { name: 'John Doe', age: 42 }
+  const data = { name: 'John Doe', favouriteFruit: 'Banana' }
   await client.event.actions.declare(
     generator.event.actions.declare(originalEvent.id, {
       data

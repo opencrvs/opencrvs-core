@@ -8,12 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { http, HttpResponse, PathParams } from 'msw'
+import { env } from '@events/environment'
+import { setupServer } from 'msw/node'
 
-import { cleanEnv, url } from 'envalid'
+const handlers = [
+  http.post<PathParams<never>, { filenames: string[] }>(
+    `${env.DOCUMENTS_URL}/presigned-urls`,
+    async (info) => {
+      const request = await info.request.json()
+      return HttpResponse.json(request.filenames)
+    }
+  )
+]
 
-export const env = cleanEnv(process.env, {
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
-  ES_HOST: url({ devDefault: 'http://localhost:9200' }),
-  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
-  DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' })
-})
+export const mswServer = setupServer(...handlers)

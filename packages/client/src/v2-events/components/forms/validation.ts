@@ -14,8 +14,9 @@ import {
   FieldConfig,
   validate
 } from '@opencrvs/commons/client'
+import { ActionFormData } from '@opencrvs/commons'
 import { IValidationResult } from '@client/utils/validate'
-import { FlatFormData, getConditionalActionsForField } from './utils'
+import { getConditionalActionsForField } from './utils'
 
 interface IFieldErrors {
   errors: IValidationResult[]
@@ -45,7 +46,7 @@ function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
 
 function getValidationErrors(
   field: FieldConfig,
-  values: FlatFormData,
+  values: ActionFormData,
   requiredErrorMessage?: MessageDescriptor,
   checkValidationErrorsOnly?: boolean
 ) {
@@ -90,7 +91,7 @@ function getValidationErrors(
 }
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: FlatFormData,
+  values: ActionFormData,
   requiredErrorMessage?: MessageDescriptor,
   checkValidationErrorsOnly?: boolean
 ) {
