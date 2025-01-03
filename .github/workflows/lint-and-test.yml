@@ -13,6 +13,7 @@ on: [pull_request]
 
 jobs:
   setup:
+    name: Setup tests
     permissions:
       contents: read
       pull-requests: write
@@ -44,6 +45,7 @@ jobs:
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
   test:
+    name: Test
     needs: setup
     runs-on: ubuntu-22.04
     strategy:
@@ -147,7 +149,7 @@ jobs:
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
-        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
@@ -155,6 +157,7 @@ jobs:
         run: cd ${{ matrix.package }} && yarn test
 
   prepare-client-tests:
+    name: Prepare client tests
     runs-on: ubuntu-22.04
     steps:
       - name: Checking out git repo
@@ -195,77 +198,6 @@ jobs:
               rm -rf "$dir"
             fi
           done
-
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}', 'packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Runs dependency installation
-        run: CI="" yarn install --frozen-lockfile
-
-  test-client:
-    needs: prepare-client-tests
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        shards: [0, 1, 2, 3, 4, 5]
-
-    steps:
-      - name: Checking out git repo
-        uses: actions/checkout@v4
-
-      - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Extract dependencies for client
-        id: extract-dependencies
-        run: |
-          DEPENDENCIES=$(node -e "
-            const { execSync } = require('child_process');
-            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
-            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
-
-            const getDependencies = (pkg) =>
-              json[pkg].workspaceDependencies.concat(
-                json[pkg].workspaceDependencies.flatMap(getDependencies)
-              );
-
-            console.log(
-              getDependencies('packages/client').join(' ')
-            );
-          ")
-          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
-          echo "Found dependencies: $DEPENDENCIES"
-
-      - name: Remove other package directories
-        run: |
-          for dir in packages/*; do
-            if echo "packages/client $DEPENDENCIES" | grep -q -w "$dir"; then
-              echo "Skipping $dir"
-            else
-              echo "Removing $dir"
-              rm -rf "$dir"
-            fi
-          done
-
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}', 'packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Runs dependency installation
         run: CI="" yarn install --frozen-lockfile
@@ -277,10 +209,42 @@ jobs:
         run: |
           cd packages/components && yarn build
 
+      - name: Run linting
+        run: cd packages/client && yarn lint
+
+      - name: Upload filesystem as artifact
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: client
+          path: .
+          include-hidden-files: true
+
+  test-client:
+    name: Test client
+    needs: prepare-client-tests
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [0, 1, 2, 3, 4, 5]
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
       - name: Run Unit Test
         run: cd packages/client && yarn test -- --shard ${{ strategy.job-index }}/${{ strategy.job-total }}
 
   lint-knip:
+    name: Lint unused exports with Knip
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout base branch
