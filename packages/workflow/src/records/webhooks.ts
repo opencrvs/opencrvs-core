@@ -9,7 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { EVENT_TYPE, RegisteredRecord } from '@opencrvs/commons/types'
+import {
+  CorrectionRequestedRecord,
+  EVENT_TYPE,
+  getTrackingId,
+  InProgressRecord,
+  ReadyForReviewRecord,
+  RegisteredRecord,
+  ValidatedRecord
+} from '@opencrvs/commons/types'
 import { WEBHOOKS_URL } from '@workflow/constants'
 
 const WEBHOOK_URLS = {
@@ -24,15 +32,33 @@ const WEBHOOK_URLS = {
 export const invokeWebhooks = async ({
   bundle,
   token,
-  event
+  event,
+  isNotRegistred,
+  statusType
 }: {
-  bundle: RegisteredRecord
+  bundle:
+    | RegisteredRecord
+    | CorrectionRequestedRecord
+    | InProgressRecord
+    | ReadyForReviewRecord
+    | ValidatedRecord
   token: string
   event: EVENT_TYPE
+  isNotRegistred?: boolean
+  statusType?: 'rejected' | 'approved'
 }) => {
-  const request = await fetch(WEBHOOK_URLS[event], {
+  const trackingId = getTrackingId(bundle)
+
+  const url = isNotRegistred
+    ? new URL(`/events/${event}/status/${statusType}`, WEBHOOKS_URL)
+    : WEBHOOK_URLS[event]
+  const body = isNotRegistred
+    ? `{"trackingId": "${trackingId}"}`
+    : JSON.stringify(bundle)
+
+  const request = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify(bundle),
+    body: body,
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`

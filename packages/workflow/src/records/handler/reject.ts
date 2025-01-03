@@ -17,6 +17,8 @@ import { toRejected } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { auditEvent } from '@workflow/records/audit'
 import { sendNotification } from '@workflow/records/notification'
+import { getEventType } from '@workflow/features/registration/utils'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 
 const requestSchema = z.object({
   comment: z.string(),
@@ -47,6 +49,14 @@ export const rejectRoute = createRoute({
     await indexBundle(rejectedRecord, token)
     await auditEvent('sent-for-updates', rejectedRecord, token)
     await sendNotification('sent-for-updates', rejectedRecord, token)
+
+    await invokeWebhooks({
+      bundle: record,
+      token,
+      event: getEventType(record),
+      isNotRegistred: true,
+      statusType: 'rejected'
+    })
 
     return rejectedRecord
   }

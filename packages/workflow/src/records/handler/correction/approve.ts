@@ -36,6 +36,7 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, sendNotification } from './utils'
+import { invokeWebhooks } from '@workflow/records/webhooks'
 
 export const approveCorrectionRoute = createRoute({
   method: 'POST',
@@ -147,6 +148,14 @@ export const approveCorrectionRoute = createRoute({
         userFullName: requestingPractitioner.name
       }
     )
+
+    await invokeWebhooks({
+      bundle: record,
+      token,
+      event: getEventType(record),
+      isNotRegistred: true,
+      statusType: 'approved'
+    })
 
     return recordWithUpdatedValues
   }
