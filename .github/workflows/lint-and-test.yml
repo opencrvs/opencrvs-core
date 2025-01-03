@@ -199,7 +199,17 @@ jobs:
             fi
           done
 
-      - name: Runs dependency installation
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
       - name: Build common package
@@ -213,17 +223,15 @@ jobs:
         uses: actions/upload-artifact@v4.5.0
         with:
           name: client
-          path: .
           include-hidden-files: true
+          path: |
+            .
+            !**/node_modules
 
   lint-client:
     name: Lint client
     needs: prepare-client-tests
     runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        shards: [0, 1, 2, 3, 4, 5]
 
     steps:
       - name: Download filesystem artifact
@@ -236,6 +244,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
 
       - name: Compile
         run: cd packages/client && yarn test:compilation
@@ -250,7 +271,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shards: [0, 1, 2, 3, 4, 5]
+        shards: [1, 2, 3, 4, 5]
 
     steps:
       - name: Download filesystem artifact
@@ -259,13 +280,29 @@ jobs:
           name: client
           path: .
 
+      - name: Debug
+        run: ls -la
+
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
       - name: Run Unit Test
-        run: cd packages/client && yarn test -- --shard ${{ strategy.job-index }}/${{ strategy.job-total }}
+        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
 
   lint-knip:
     name: Lint unused exports with Knip
