@@ -15,14 +15,9 @@ import { EventSelection } from '@client/v2-events/features/events/EventSelection
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { TRPCProvider } from '@client/v2-events/trpc'
-<<<<<<< HEAD
-import { ReviewSection } from '@client/v2-events/features/events/actions/declare/Review'
-import { RegisterIndex } from '@client/v2-events/features/events/actions/register/Register'
 import { Debug } from '@client/v2-events/features/debug/debug'
-=======
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import * as Register from '@client/v2-events/features/events/actions/register'
->>>>>>> 2a80871bfdcb513d0c14e7716b37deea9ebcb088
 import { WorkqueueLayout, FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from './routes'
 
