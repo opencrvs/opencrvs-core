@@ -74,7 +74,11 @@ async function getAnonymousToken() {
   return token
 }
 
+// This should take into account the status
+// of the record like so in useNavigation
 const ACTIONABLE_SCOPES = [
+  SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+  SCOPES.RECORD_SUBMIT_INCOMPLETE,
   SCOPES.RECORD_REGISTER,
   SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
   SCOPES.RECORD_DECLARE_BIRTH,
