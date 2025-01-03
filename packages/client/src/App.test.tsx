@@ -114,6 +114,7 @@ describe('when user has a valid token in local storage', () => {
   })
 
   it("doesn't redirect user to SSO", async () => {
+    throw new Error('Not implemented')
     createTestApp()
     await flushPromises()
     expect(assign.mock.calls).toHaveLength(0)
