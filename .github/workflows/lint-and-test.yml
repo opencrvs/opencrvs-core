@@ -280,9 +280,6 @@ jobs:
           name: client
           path: .
 
-      - name: Debug
-        run: ls -la
-
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
