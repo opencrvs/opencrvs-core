@@ -1267,6 +1267,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
@@ -1299,6 +1301,10 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have a certify scope", async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
+      )
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       await expect(
         resolvers.Mutation!.markBirthAsCertified(
@@ -1307,6 +1313,21 @@ describe('Registration root resolvers', () => {
           { headers: authHeaderNotRegCert }
         )
       ).rejects.toThrowError('User does not have enough scope')
+    })
+
+    it('throws an error when the user is not assigned to record', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121331' }), { status: 200 }]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation!.markBirthAsCertified(
+          {},
+          { id, details },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User is not assigned to the record')
     })
   })
   describe('markDeathAsCertified()', () => {
@@ -1333,6 +1354,8 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
         [JSON.stringify(mockUserDetails), { status: 200 }],
         [
           JSON.stringify({
@@ -1367,16 +1390,30 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the user doesn't have a certify scope", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle), { status: 200 }],
-        [JSON.stringify(mockUserDetails), { status: 200 }]
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }]
       )
       await expect(
         resolvers.Mutation!.markDeathAsCertified(
           {},
           { details },
-          authHeaderNotRegCert
+          { headers: authHeaderNotRegCert }
         )
       ).rejects.toThrowError('User does not have enough scope')
+    })
+
+    it('throws an error when the user is not assigned to the record', async () => {
+      fetch.mockResponses(
+        [JSON.stringify({ practitionerId: '121221' }), { status: 200 }],
+        [JSON.stringify({ practitionerId: '121331' }), { status: 200 }]
+      )
+      await expect(
+        resolvers.Mutation!.markDeathAsCertified(
+          {},
+          { details },
+          { headers: authHeaderNotRegCert }
+        )
+      ).rejects.toThrowError('User is not assigned to the record')
     })
   })
   describe('markEventAsNotDuplicate()', () => {
