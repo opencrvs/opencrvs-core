@@ -302,7 +302,10 @@ describe('Given a user with scopes views Navigation', () => {
   describe('Sent for approval', async () => {
     const id = `#navigation_${WORKQUEUE_TABS.sentForApproval}`
 
-    const requiredScopes = [SCOPES.RECORD_SUBMIT_FOR_APPROVAL] as Scope[]
+    const requiredScopes = [
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION
+    ] as Scope[]
 
     const allOtherScopes = allScopes.filter(
       (scope) => !requiredScopes.includes(scope)
@@ -447,12 +450,8 @@ describe('Given a user with scopes views Navigation', () => {
     const id = `#navigation_${WORKQUEUE_TABS.outbox}`
 
     const requiredScopes = [
-      SCOPES.RECORD_DECLARE_BIRTH,
-      SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-      SCOPES.RECORD_DECLARE_DEATH,
-      SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-      SCOPES.RECORD_DECLARE_MARRIAGE,
-      SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION,
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_SUBMIT_FOR_REVIEW,
       SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
       SCOPES.RECORD_SUBMIT_FOR_UPDATES,
       SCOPES.RECORD_REVIEW_DUPLICATES,
