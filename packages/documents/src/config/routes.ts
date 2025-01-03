@@ -13,7 +13,7 @@ import { vsExportUploaderHandler } from '@documents/features/uploadVSExportFile/
 import { createPreSignedUrl } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { MINIO_BUCKET } from '@documents/minio/constants'
-import { deleteDocument } from '@documents/features/deleteDocument/hadnler'
+import { deleteDocument } from '@documents/features/deleteDocument/handler'
 
 export const getRoutes = () => {
   const routes = [
