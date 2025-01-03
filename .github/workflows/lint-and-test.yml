@@ -180,6 +180,10 @@ jobs:
               json[pkg].workspaceDependencies.concat(
                 json[pkg].workspaceDependencies.flatMap(getDependencies)
               );
+
+            console.log(
+              getDependencies('packages/client').join(' ')
+            );
           ")
           echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
           echo "Found dependencies: $DEPENDENCIES"
@@ -275,6 +279,9 @@ jobs:
         with:
           name: client
           path: .
+
+      - name: Debug
+        run: ls -la
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
