@@ -297,10 +297,7 @@ export async function toViewed<T extends ValidRecord>(
   token: string
 ): Promise<T> {
   const previousTask: SavedTask = getTaskFromSavedBundle(record)
-  const [viewedTask, bundleWithRelatedResources] = await createViewTask(
-    previousTask,
-    token
-  )
+  const viewedTask = await createViewTask(previousTask, token)
 
   const taskHistoryEntry = resourceToBundleEntry(
     toHistoryResource(previousTask)
@@ -325,7 +322,7 @@ export async function toViewed<T extends ValidRecord>(
     ]
   } as T
 
-  return mergeBundles(viewedRecord, bundleWithRelatedResources)
+  return viewedRecord
 }
 
 export function toIdentifierUpserted<T extends ValidRecord>(
