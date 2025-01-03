@@ -16,7 +16,7 @@ import styled from 'styled-components'
 const Wrapper = styled(Box)`
   padding: 0;
 `
-export const HeaderWrapper = styled(Stack)<{
+const HeaderWrapper = styled(Stack)<{
   type: 'active' | 'inactive' | 'pending' | 'default'
 }>`
   padding: 8px 16px;
