@@ -18,12 +18,19 @@
 - Reoder the sytem user add/edit field for surname to be first, also change labels from `Last name` to `User's surname` and lastly remove the NID question from the form [#6830](https://github.com/opencrvs/opencrvs-core/issues/6830)
 - Corrected the total amount displayed for _certification_ and _correction_ fees on the Performance Page, ensuring accurate fee tracking across certification and correction sequences. [#7793](https://github.com/opencrvs/opencrvs-core/issues/7793)
 - Auth now allows registrar's token to be exchanged for a new token that strictly allows confirming or rejecting a specific record. Core now passes this token to country configuration instead of the registrar's token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728) [#7849](https://github.com/opencrvs/opencrvs-core/issues/7849)
+- **Template Selection for Certified Copies**: Added support for multiple certificate templates for each event (birth, death, marriage). Users can now select a template during the certificate issuance process.
+- **Template-based Payment Configuration**: Implemented payment differentiation based on the selected certificate template, ensuring the correct amount is charged.
+- **Template Action Tracking**: Each template printed is tracked in the history table, showing which specific template was used.
+- **Template Selection Dropdown**: Updated print workflow to include a dropdown menu for template selection when issuing a certificate.
+- Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
 - A new GraphQL mutation `upsertRegistrationIdentifier` is added to allow updating the patient identifiers of a registration record such as NID [#8034](https://github.com/opencrvs/opencrvs-core/pull/8034)
+- Introduced a new customisable UI component: Banner [#8276](https://github.com/opencrvs/opencrvs-core/issues/8276)
 
 ### Improvements
 
 - Auth token, ip address, remote address redacted from server log
 - **Align Patient data model with FHIR**: Previously we were using `string[]` for `Patient.name.family` field instead of `string` as mentioned in the FHIR standard. We've now aligned the field with the standard.
+- **Certificate Fetching**: Removed certificates from the database, allowing them to be fetched directly from the country configuration via a simplified API endpoint.
 
 ### Deprecated
 
@@ -40,11 +47,19 @@
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 
-## 1.6.1 Release candidate
+## 1.6.2 Release candidate
+
+### Bug fixes
+
+- Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
+- Fix stale validations showing for document uploader with options form field
+
+## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 
 ### Bug fixes
 
 - Maximum upload file size limit is now based on the size of the uploaded files after compression and not before. [#7840](https://github.com/opencrvs/opencrvs-core/issues/7840)
+- Stops local sys admins creating national level users. [#7698](https://github.com/opencrvs/opencrvs-core/issues/7698)
 
 ### New features
 
@@ -113,6 +128,11 @@
 - **Staged files getting reset on precommit hook failure** We were running lint-staged separately on each package using lerna which potentially created a race condition causing staged changes to get lost on failure. Now we are running lint-staged directly without depending on lerna. **_This is purely a DX improvement without affecting any functionality of the system_**
 - Fix `informantType` missing in template object which prevented rendering informant relationship data in the certificates [#5952](https://github.com/opencrvs/opencrvs-core/issues/5952)
 - Fix users hitting rate limit when multiple users authenticated the same time with different usernames [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
+- "Choose a new password" form now allows the user to submit the form using the "Enter/Return" key [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
+- Dropdown options now flow to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
+- Only render units/postfix when field has a value [#7055](https://github.com/opencrvs/opencrvs-core/issues/7055)
+- Only show items with values in review [#5192](https://github.com/opencrvs/opencrvs-core/pull/5192)
+- Fix prefix text overlap issue in form text inputs
 
 ## 1.5.1
 

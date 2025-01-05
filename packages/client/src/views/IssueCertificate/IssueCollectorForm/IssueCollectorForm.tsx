@@ -64,7 +64,8 @@ export function IssueCollectorForm({
             certificates: [
               {
                 collector: collector,
-                hasShowedVerifiedDocument: false
+                hasShowedVerifiedDocument: false,
+                certificateTemplateId: certificate.certificateTemplateId
               }
             ]
           }
@@ -78,6 +79,7 @@ export function IssueCollectorForm({
     const relationship =
       declaration.data.registration.certificates[0].collector?.type
     const event = declaration.event
+
     if (!relationship) return
     if (relationship === 'OTHER') {
       navigate(

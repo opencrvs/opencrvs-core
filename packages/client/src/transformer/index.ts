@@ -287,7 +287,8 @@ export const draftToGqlTransformer = (
           draftData[section.id][fieldDef.name] !== null &&
           draftData[section.id][fieldDef.name] !== undefined &&
           draftData[section.id][fieldDef.name] !== '' &&
-          !conditionalActions.includes('hide')
+          (!conditionalActions.includes('hide') ||
+            fieldDef.name === 'detailsExist') // https://github.com/opencrvs/opencrvs-core/issues/7821#issuecomment-2514398986
         ) {
           if (fieldDef.mapping && fieldDef.mapping.mutation) {
             fieldDef.mapping.mutation(
@@ -433,7 +434,14 @@ export const gqlToDraftTransformer = (
       transformedData[section.id]._fhirID = queryData[section.id].id
     }
     if (section.mapping && section.mapping.query) {
-      section.mapping.query(transformedData, queryData, section.id)
+      section.mapping.query(
+        transformedData,
+        queryData,
+        section.id,
+        undefined,
+        undefined,
+        offlineData
+      )
     }
     if (section.mapping?.template) {
       if (!transformedData.template) {
