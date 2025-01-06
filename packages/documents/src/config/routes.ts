@@ -107,7 +107,7 @@ export const getRoutes = () => {
     // delete a document
     {
       method: 'DELETE',
-      path: `/${MINIO_BUCKET}/{fileUri}`,
+      path: `/files/{filename}`,
       handler: deleteDocument,
       config: {
         tags: ['api']
