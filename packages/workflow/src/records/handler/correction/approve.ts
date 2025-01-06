@@ -153,7 +153,7 @@ export const approveCorrectionRoute = createRoute({
       bundle: record,
       token,
       event: getEventType(record),
-      isNotRegistred: true,
+      isNotRegistered: true,
       statusType: 'approved'
     })
 

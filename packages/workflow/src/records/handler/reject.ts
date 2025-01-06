@@ -54,7 +54,7 @@ export const rejectRoute = createRoute({
       bundle: record,
       token,
       event: getEventType(record),
-      isNotRegistred: true,
+      isNotRegistered: true,
       statusType: 'rejected'
     })
 

@@ -129,7 +129,7 @@ export const rejectCorrectionRoute = createRoute({
       bundle: record,
       token: getToken(request),
       event: getEventType(record),
-      isNotRegistred: true,
+      isNotRegistered: true,
       statusType: 'rejected'
     })
 

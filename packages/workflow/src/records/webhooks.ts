@@ -33,7 +33,7 @@ export const invokeWebhooks = async ({
   bundle,
   token,
   event,
-  isNotRegistred,
+  isNotRegistered,
   statusType
 }: {
   bundle:
@@ -44,15 +44,15 @@ export const invokeWebhooks = async ({
     | ValidatedRecord
   token: string
   event: EVENT_TYPE
-  isNotRegistred?: boolean
+  isNotRegistered?: boolean
   statusType?: 'rejected' | 'approved'
 }) => {
   const trackingId = getTrackingId(bundle)
 
-  const url = isNotRegistred
+  const url = isNotRegistered
     ? new URL(`/events/${event}/status/${statusType}`, WEBHOOKS_URL)
     : WEBHOOK_URLS[event]
-  const body = isNotRegistred
+  const body = isNotRegistered
     ? `{"trackingId": "${trackingId}"}`
     : JSON.stringify(bundle)
 
