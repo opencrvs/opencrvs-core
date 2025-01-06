@@ -9,7 +9,11 @@
 
 name: Lint and run unit tests
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
 
 jobs:
   setup:
