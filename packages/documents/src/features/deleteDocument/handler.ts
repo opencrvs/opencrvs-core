@@ -12,7 +12,7 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import { getUserId } from '@opencrvs/commons/build/dist/common/authentication'
+import { getUserId } from '@opencrvs/commons'
 
 export async function deleteDocument(
   request: Hapi.Request,
