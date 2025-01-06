@@ -14,7 +14,7 @@ import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import isSvg from 'is-svg'
 import { badRequest } from '@hapi/boom'
-import jwtDecode from 'jwt-decode'
+import { getUserId } from '@opencrvs/commons'
 
 export interface IDocumentPayload {
   fileData: string
@@ -25,7 +25,7 @@ export async function svgUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = (jwtDecode(request.headers.authorization) as any).sub
+  const userId = getUserId(request.headers.authorization)
   if (!userId)
     return Promise.reject(
       new Error(

@@ -13,12 +13,11 @@ import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
-import jwtDecode from 'jwt-decode'
+import { getUserId, logger } from '@opencrvs/commons'
 
 import { z } from 'zod'
 import { Readable } from 'stream'
 import { badRequest, notFound } from '@hapi/boom'
-import { logger } from '@opencrvs/commons'
 export interface IDocumentPayload {
   fileData: string
   metaData?: Record<string, string>
@@ -53,7 +52,7 @@ export async function fileUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = jwtDecode<{ sub: string }>(request.headers.authorization).sub
+  const userId = getUserId(request.headers.authorization)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
     throw badRequest('Invalid payload')
@@ -95,7 +94,7 @@ export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = jwtDecode<{ sub: string }>(request.headers.authorization).sub
+  const userId = getUserId(request.headers.authorization)
   if (!userId)
     return Promise.reject(
       new Error(
