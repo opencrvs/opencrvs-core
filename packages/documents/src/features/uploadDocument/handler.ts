@@ -88,7 +88,7 @@ export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const userId = (jwtDecode(request.headers.authorization) as any).sub
+  const userId = jwtDecode<{ sub: string }>(request.headers.authorization).sub
   if (!userId)
     return Promise.reject(
       new Error(
@@ -104,9 +104,9 @@ export async function documentUploadHandler(
     const generateFileName = `${ref}.${fileType.ext}`
 
     await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
+      ...payload.metaData,
       'content-type': fileType.mime,
-      uploader: userId,
-      ...payload.metaData
+      createdBy: userId
     })
 
     return h

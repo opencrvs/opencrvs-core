@@ -30,8 +30,8 @@ export async function deleteDocument(
 
   try {
     const stat = await minioClient.statObject(MINIO_BUCKET, fileUri)
-    const uploader = stat.metaData.uploader
-    if (uploader !== userId)
+    const createdBy = stat.metaData.createdBy
+    if (createdBy !== userId)
       return h
         .response(
           `request failed: user with id ${userId} does not have permission to delete this document`
