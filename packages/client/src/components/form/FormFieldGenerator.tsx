@@ -94,7 +94,8 @@ import {
   Ii18nButtonFormField,
   REDIRECT,
   IDocumentUploaderWithOptionsFormField,
-  ID_READER
+  ID_READER,
+  ID_VERIFICATION_BANNER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -143,6 +144,7 @@ import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
 import { RedirectField } from '@client/components/form/Redirect'
 import { ReaderGenerator } from './ReaderGenerator'
+import { IDVerificationBanner } from './IDVerificationBanner'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -290,6 +292,15 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
             onError={(error) => console.error(error)}
           />
         </IDReader>
+      )
+    }
+    if (fieldDefinition.type === ID_VERIFICATION_BANNER) {
+      return (
+        <IDVerificationBanner
+          type={fieldDefinition.bannerType}
+          idFieldName={fieldDefinition.idFieldName}
+          setFieldValue={setFieldValue}
+        />
       )
     }
 

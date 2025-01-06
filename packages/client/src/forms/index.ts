@@ -76,6 +76,7 @@ export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
 export const REDIRECT = 'REDIRECT'
 export const ID_READER = 'ID_READER'
+export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
 
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
@@ -755,6 +756,13 @@ export interface IDReaderFormField extends IFormFieldBase {
   readers: [ReaderType, ...ReaderType[]]
 }
 
+export type BannerType = 'pending' | 'verified' | 'failed'
+export interface IBannerFormField extends IFormFieldBase {
+  type: typeof ID_VERIFICATION_BANNER
+  bannerType: BannerType
+  idFieldName: string
+}
+
 export type IFormField =
   | ITextFormField
   | ITelFormField
@@ -792,6 +800,7 @@ export type IFormField =
   | IButtonFormField
   | IRedirectFormField
   | IDReaderFormField
+  | IBannerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -1282,6 +1291,11 @@ export interface Ii18nIDReaderFormField extends Ii18nFormFieldBase {
   readers: [ReaderType, ...ReaderType[]]
 }
 
+export interface Ii18nBannerFormField extends Ii18nFormFieldBase {
+  type: typeof ID_VERIFICATION_BANNER
+  bannerType: BannerType
+  idFieldName: string
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1317,6 +1331,7 @@ export type Ii18nFormField =
   | Ii18nButtonFormField
   | Ii18nRedirectFormField
   | Ii18nIDReaderFormField
+  | Ii18nBannerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
