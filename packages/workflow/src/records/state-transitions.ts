@@ -58,7 +58,6 @@ import {
   SECTION_CODE
 } from '@workflow/features/events/utils'
 import {
-  invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
   updatePatientIdentifierWithRN,
@@ -109,6 +108,7 @@ import {
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 import { tokenExchangeHandler } from './token-exchange-handler'
+import { invokeRegistrationValidation } from '@workflow/utils/country-config-api'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
