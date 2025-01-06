@@ -105,6 +105,21 @@ export function field(fieldId: string) {
         }
       },
       required: ['$form', '$now']
+    }),
+    isEqualTo: (value: string) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              const: value
+            }
+          },
+          required: [fieldId]
+        }
+      },
+      required: ['$form']
     })
   }
 }

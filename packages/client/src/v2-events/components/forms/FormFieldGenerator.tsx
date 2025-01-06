@@ -213,9 +213,6 @@ const GeneratedInputField = React.memo(
       )
     }
     if (fieldDefinition.type === 'CHECKBOX') {
-      console.log({ fieldDefinition })
-      console.log({ value, inputProps })
-
       return (
         <Checkbox
           {...fieldDefinition}
@@ -401,7 +398,7 @@ class FormSectionComponent extends React.Component<AllProps> {
             { $form: values, $now: new Date().toISOString().split('T')[0] }
           )
 
-          if (conditionalActions.includes('hide')) {
+          if (conditionalActions.includes('HIDE')) {
             return null
           }
 

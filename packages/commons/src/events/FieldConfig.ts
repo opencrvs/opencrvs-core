@@ -20,6 +20,7 @@ import {
 
 export const ConditionalTypes = {
   SHOW: 'SHOW',
+  HIDE: 'HIDE',
   ENABLE: 'ENABLE'
 } as const
 
@@ -33,6 +34,11 @@ const ShowConditional = z.object({
   conditional: Conditional()
 })
 
+const HideConditional = z.object({
+  type: z.literal(ConditionalTypes.HIDE),
+  conditional: Conditional()
+})
+
 const EnableConditional = z.object({
   type: z.literal(ConditionalTypes.ENABLE),
   conditional: Conditional()
@@ -40,6 +46,7 @@ const EnableConditional = z.object({
 
 const FieldConditional = z.discriminatedUnion('type', [
   ShowConditional,
+  HideConditional,
   EnableConditional
 ])
 
