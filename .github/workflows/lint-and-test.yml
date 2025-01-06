@@ -33,6 +33,7 @@ jobs:
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
         # to fail
         continue-on-error: true
+        if: github.event_name == 'pull_request'
         with:
           message: >
             Oops! Looks like you forgot to update the changelog.
@@ -308,6 +309,7 @@ jobs:
   lint-knip:
     name: Lint unused exports with Knip
     runs-on: ubuntu-22.04
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
