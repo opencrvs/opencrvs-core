@@ -11,7 +11,7 @@
 
 import { hashKey } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventDocument } from '@opencrvs/commons/client'
+import { EventDocument, getCurrentEventState } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { useEventAction } from './procedures/action'
 import { createEvent } from './procedures/create'
@@ -22,6 +22,9 @@ const observer = createObserver()
 
 observer.subscribe((observerEvent) => {
   observerEvent.data?.forEach((event) => {
+    /*
+     * Update items data in "event by id" queries
+     */
     queryClient.setQueryData(
       getQueryKey(api.event.get, event.id, 'query'),
       event
@@ -30,6 +33,15 @@ observer.subscribe((observerEvent) => {
     queryClient.setQueryData(
       getQueryKey(api.event.get, event.transactionId, 'query'),
       event
+    )
+
+    /*
+     * Update item in workqueues
+     */
+    utils.events.get.setData(undefined, (events) =>
+      events?.map((ev) =>
+        ev.id !== event.id ? ev : getCurrentEventState(event)
+      )
     )
   })
 })

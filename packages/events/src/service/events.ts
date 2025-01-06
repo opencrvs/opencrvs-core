@@ -23,7 +23,7 @@ import { deleteEventIndex, indexEvent } from './indexing/indexing'
 import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
 import { getEventConfigurations } from './config/config'
-import { fileExists } from './files'
+import { deleteFile, fileExists } from './files'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -110,7 +110,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
         continue
       }
 
-      await fileExists(fileValue.data!.filename, token)
+      await deleteFile(fileValue.data.filename, token)
     }
   }
 }

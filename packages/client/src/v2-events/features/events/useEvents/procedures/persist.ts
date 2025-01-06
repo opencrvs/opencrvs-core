@@ -32,7 +32,7 @@ export async function removeEventFromStorage(eventID: string) {
 export function persistEvents(
   updater: (events: EventDocument[]) => EventDocument[]
 ) {
-  return queryClient.setQueryData(EVENTS_PERSISTENT_STORE_STORAGE_KEY, updater)
+  queryClient.setQueryData(EVENTS_PERSISTENT_STORE_STORAGE_KEY, updater)
 }
 
 export function getCanonicalEventId(
