@@ -228,6 +228,7 @@ describe('when user starts a new declaration', () => {
 
           it('renders list of document upload field', async () => {
             await flushPromises()
+            await waitForElement(app, '#form_section_id_documents-view-group')
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
