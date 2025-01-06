@@ -12,9 +12,9 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
-import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { removeEventFromStorage, useEvents } from './useEvents/useEvents'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { useEvents } from './useEvents/useEvents'
 
 const modalMessages = defineMessages({
   cancel: {
@@ -51,7 +51,7 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const deleteEvent = events.deleteEvent()
+  const deleteEvent = events.deleteEvent
 
   const [modal, openModal] = useModal()
 

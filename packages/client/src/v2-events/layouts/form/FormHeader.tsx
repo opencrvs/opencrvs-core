@@ -55,7 +55,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
     throw new Error('Event id is required')
   }
 
-  const createDraft = events.actions.draft()
+  const createDraft = events.actions.draft
 
   const saveAndExit = useCallback(() => {
     createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })

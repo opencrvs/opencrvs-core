@@ -9,229 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  hashKey,
-  MutationKey,
-  QueryObserver,
-  useSuspenseQuery
-} from '@tanstack/react-query'
+import { hashKey } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventDocument, CreatedAction } from '@opencrvs/commons/client'
+import { EventDocument } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { storage } from '@client/storage'
+import { useEventAction } from './procedures/action'
+import { createEvent } from './procedures/create'
+import { useDeleteEventMutation } from './procedures/delete'
+import { createObserver, useEventsSuspenseQuery } from './procedures/persist'
 
-/*
- * Local event storage
- */
-const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
-
-function getCanonicalEventId(
-  events: EventDocument[],
-  eventIdOrTransactionId: string
-) {
-  const event = events.find(
-    (e) =>
-      e.id === eventIdOrTransactionId ||
-      e.transactionId === eventIdOrTransactionId
-  )
-
-  return event?.id
-}
-
-/**
- * Wraps a canonical mutation function to handle outdated temporary IDs.
- *
- * When an event is created offline and actions referring to that event
- * are also created offline, there may be cases where a request in the
- * buffer still uses a temporary ID to reference the event. This wrapper
- * ensures that the `eventId` parameter is updated to its canonical value
- * before the mutation function is called.
- *
- * @param {function(params: T): Promise<R>} canonicalMutationFn - The mutation function to wrap.
- * @returns {function(params: T): Promise<R>} - A wrapped mutation function that resolves the canonical `eventId` before invocation.
- */
-function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params: T) => {
-    const events = queryClient.getQueryData<EventDocument[]>(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    )
-
-    if (!events) {
-      return canonicalMutationFn(params)
-    }
-
-    const id = getCanonicalEventId(events, params.eventId)
-    if (!id) {
-      return canonicalMutationFn(params)
-    }
-
-    const modifiedParams: T = {
-      ...params,
-      eventId: id
-    }
-    return canonicalMutationFn(modifiedParams)
-  }
-}
-
-utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
-}))
-
-utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
-}))
-
-utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
-}))
-
-utils.event.delete.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  onSuccess: ({ id }) => {
-    queryClient.setQueryData(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (old: EventDocument[]) => {
-        return old.filter((e) => e.id !== id)
-      }
-    )
-  },
-  /*
-   * This ensures that when the application is reloaded with pending mutations in IndexedDB, the
-   * temporary event IDs in the requests get properly replaced with canonical IDs.
-   * Also check utils.event.create.onSuccess for the same logic but for when even is created.
-   */
-  mutationFn: async (params) => {
-    const events = queryClient.getQueryData<EventDocument[]>(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    )
-
-    if (!events) {
-      return canonicalMutationFn(params)
-    }
-
-    const id = getCanonicalEventId(events, params.eventId)
-    if (!id) {
-      return canonicalMutationFn(params)
-    }
-
-    const modifiedParams = {
-      ...params,
-      eventId: id
-    }
-    return canonicalMutationFn(modifiedParams)
-  }
-}))
-
-utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn,
-  retry: true,
-  onMutate: (newEvent) => {
-    const optimisticEvent = {
-      id: newEvent.transactionId,
-      type: newEvent.type,
-      transactionId: newEvent.transactionId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      actions: [
-        {
-          type: 'CREATE',
-          createdAt: new Date().toISOString(),
-          createdBy: 'offline',
-          createdAtLocation: 'TODO',
-          data: {}
-        } satisfies CreatedAction
-      ]
-    }
-
-    // Do this as very first synchronous operation so UI can trust
-    // that the event is created when changing view for instance
-    queryClient.setQueryData(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (events: EventDocument[]) => {
-        return [...events, optimisticEvent]
-      }
-    )
-
-    return optimisticEvent
-  },
-  onSuccess: async (response) => {
-    queryClient
-      .getMutationCache()
-      .getAll()
-      .forEach((mutation) => {
-        /*
-         * Update ongoing mutations with the new event ID so that transaction id is not used for querying
-         */
-        const hashQueryKey = (
-          key: MutationKey | ReturnType<typeof getQueryKey> | undefined
-        ) => key?.flat().join('.')
-
-        if (
-          hashQueryKey(mutation.options.mutationKey) ===
-          hashQueryKey(getQueryKey(api.event.actions.declare))
-        ) {
-          const variables = mutation.state.variables as Exclude<
-            ReturnType<
-              typeof api.event.actions.declare.useMutation
-            >['variables'],
-            undefined
-          >
-
-          if (variables.eventId === response.transactionId) {
-            variables.eventId = response.id
-          }
-        }
-        if (
-          hashQueryKey(mutation.options.mutationKey) ===
-          hashQueryKey(getQueryKey(api.event.delete))
-        ) {
-          const variables = mutation.state.variables as Exclude<
-            ReturnType<typeof api.event.delete.useMutation>['variables'],
-            undefined
-          >
-
-          if (variables.eventId === response.transactionId) {
-            variables.eventId = response.id
-          }
-        }
-      })
-
-    await queryClient.invalidateQueries({
-      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    })
-
-    queryClient.setQueryData(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (state: EventDocument[]) => {
-        return [
-          ...state.filter((e) => e.transactionId !== response.transactionId),
-          response
-        ]
-      }
-    )
-
-    await queryClient.cancelQueries({
-      queryKey: getQueryKey(api.event.get, response.transactionId, 'query')
-    })
-  }
-}))
-
-queryClient.setQueryDefaults(EVENTS_PERSISTENT_STORE_STORAGE_KEY, {
-  queryFn: readEventsFromStorage
-})
-
-const observer = new QueryObserver<EventDocument[]>(queryClient, {
-  queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-})
+const observer = createObserver()
 
 observer.subscribe((observerEvent) => {
   observerEvent.data?.forEach((event) => {
@@ -245,32 +32,7 @@ observer.subscribe((observerEvent) => {
       event
     )
   })
-
-  /*
-   * Persist events to browser storage
-   */
-  if (observerEvent.data) {
-    void writeEventsToStorage(observerEvent.data)
-  }
 })
-
-async function readEventsFromStorage() {
-  const data = await storage
-    .getItem<EventDocument[]>('events')
-    .then((e) => e || [])
-
-  return data
-}
-
-async function writeEventsToStorage(events: EventDocument[]) {
-  return storage.setItem('events', events)
-}
-
-export async function removeEventFromStorage(eventID: string) {
-  const events = await readEventsFromStorage()
-  const newEvents = events.filter((e) => e.id !== eventID)
-  return writeEventsToStorage(newEvents)
-}
 
 function getPendingMutations(
   mutationCreator: Parameters<typeof getQueryKey>[0]
@@ -310,25 +72,6 @@ function filterOutboxEventsWithMutation<
 }
 
 export function useEvents() {
-  function createEvent() {
-    return api.event.create.useMutation({})
-  }
-  function deleteEvent() {
-    return api.event.delete.useMutation({})
-  }
-
-  function draft() {
-    return api.event.actions.draft.useMutation({})
-  }
-
-  function declare() {
-    return api.event.actions.declare.useMutation({})
-  }
-
-  function register() {
-    return api.event.actions.register.useMutation({})
-  }
-
   function getEvent(id: string) {
     return api.event.get.useSuspenseQuery(id)
   }
@@ -409,9 +152,7 @@ export function useEvents() {
       })
   }
 
-  const storedEvents = useSuspenseQuery<EventDocument[]>({
-    queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-  })
+  const storedEvents = useEventsSuspenseQuery()
 
   return {
     createEvent,
@@ -420,12 +161,22 @@ export function useEvents() {
     getEventById: api.event.get,
     getEvents: api.events.get,
     getDrafts,
-    deleteEvent,
+    deleteEvent: useDeleteEventMutation(),
     getOutbox,
     actions: {
-      draft,
-      declare,
-      register
+      draft: useEventAction(utils.event.actions.draft, api.event.actions.draft),
+      notify: useEventAction(
+        utils.event.actions.notify,
+        api.event.actions.notify
+      ),
+      declare: useEventAction(
+        utils.event.actions.declare,
+        api.event.actions.declare
+      ),
+      register: useEventAction(
+        utils.event.actions.register,
+        api.event.actions.register
+      )
     }
   }
 }

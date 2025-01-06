@@ -98,7 +98,7 @@ interface TestContext {
     {}
   >
   declareHook: RenderHookResult<
-    ReturnType<ReturnType<typeof useEvents>['actions']['declare']>,
+    ReturnType<typeof useEvents>['actions']['declare'],
     {}
   >
 }
@@ -122,7 +122,7 @@ beforeEach<TestContext>(async (testContext) => {
   })
 
   const declareHookHook = renderHook(
-    () => eventsHook.result.current.actions.declare(),
+    () => eventsHook.result.current.actions.declare,
     {
       wrapper
     }
