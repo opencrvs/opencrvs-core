@@ -75,6 +75,7 @@ export {
   PencilCircle,
   Handshake,
   UserCircle,
+  Clock,
   QrCode,
   Webcam,
   Sun,

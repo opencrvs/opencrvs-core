@@ -92,6 +92,7 @@ describe('when user starts a new declaration', () => {
     let router: ReturnType<typeof createMemoryRouter>
 
     beforeEach(async () => {
+      await flushPromises()
       const testApp = await createTestApp()
       app = testApp.app
       store = testApp.store
@@ -227,6 +228,7 @@ describe('when user starts a new declaration', () => {
 
           it('renders list of document upload field', async () => {
             await flushPromises()
+            await waitForElement(app, '#form_section_id_documents-view-group')
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
@@ -383,7 +385,9 @@ describe('when user starts a new declaration', () => {
           await flushPromises()
           await goToDocumentsSection(app)
         })
-        it('image upload field is rendered', () => {
+        it('image upload field is rendered', async () => {
+          await flushPromises()
+          app.update()
           expect(app.find('#upload_document').hostNodes()).toHaveLength(5)
         })
       })
