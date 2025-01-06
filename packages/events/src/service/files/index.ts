@@ -117,6 +117,16 @@ export async function presignFilesInEvent(event: EventDocument, token: string) {
   }
 }
 
+export async function deleteFile(filename: string, token: string) {
+  const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  return res.ok
+}
 export async function fileExists(filename: string, token: string) {
   const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
     method: 'HEAD',
