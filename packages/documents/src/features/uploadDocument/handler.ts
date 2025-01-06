@@ -53,6 +53,7 @@ export async function fileUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const userId = jwtDecode<{ sub: string }>(request.headers.authorization).sub
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
     throw badRequest('Invalid payload')
@@ -62,14 +63,17 @@ export async function fileUploadHandler(
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
-  try {
-    await minioClient.putObject(MINIO_BUCKET, filename, file)
-  } catch (error) {
-    logger.error(error)
-    throw error
-  }
 
-  return filename
+  await minioClient.putObject(
+    MINIO_BUCKET,
+    'event-attachments/' + filename,
+    file,
+    {
+      'created-by': userId
+    }
+  )
+
+  return 'event-attachments/' + filename
 }
 
 export async function fileExistsHandler(
@@ -77,7 +81,10 @@ export async function fileExistsHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { filename } = request.params
-  const exists = await minioClient.statObject(MINIO_BUCKET, filename)
+  const exists = await minioClient.statObject(
+    MINIO_BUCKET,
+    'event-attachments/' + filename
+  )
   if (!exists) {
     return notFound('File not found')
   }
@@ -106,7 +113,7 @@ export async function documentUploadHandler(
     await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
       ...payload.metaData,
       'content-type': fileType.mime,
-      createdBy: userId
+      'created-by': userId
     })
 
     return h

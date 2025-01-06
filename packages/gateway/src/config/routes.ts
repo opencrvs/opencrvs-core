@@ -82,11 +82,6 @@ export const getRoutes = () => {
       method: 'POST',
       path: '/upload',
       handler: async (req, h) => {
-        if (process.env.NODE_ENV !== 'production') {
-          await new Promise((resolve) =>
-            setTimeout(resolve, Math.random() * 30000)
-          )
-        }
         return h.proxy({
           uri: `${DOCUMENTS_URL}/files`,
           passThrough: true
@@ -99,7 +94,22 @@ export const getRoutes = () => {
         }
       }
     },
-
+    {
+      method: 'DELETE',
+      path: '/files/{filename}',
+      handler: async (req, h) => {
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files/${req.params.filename}`,
+          passThrough: true
+        })
+      },
+      options: {
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
     catchAllProxy.locations,
     catchAllProxy.locationsSuffix,
 

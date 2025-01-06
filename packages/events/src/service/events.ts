@@ -58,7 +58,10 @@ export async function getEventById(id: string) {
   return event
 }
 
-export async function deleteEvent(eventId: string) {
+export async function deleteEvent(
+  eventId: string,
+  { token }: { token: string }
+) {
   const db = await getClient()
 
   const collection = db.collection<EventDocument>('events')
@@ -78,10 +81,38 @@ export async function deleteEvent(eventId: string) {
     })
   }
 
+  await deleteEventAttachments(token, event)
+
   const { id } = event
   await collection.deleteOne({ id })
   await deleteEventIndex(id)
   return { id }
+}
+
+async function deleteEventAttachments(token: string, event: EventDocument) {
+  const config = await getEventConfigurations(token)
+
+  const form = config
+    .find((config) => config.id === event.type)
+    ?.actions.find((action) => action.type === event.type)
+    ?.forms.find((form) => form.active)
+
+  const fieldTypes = form?.pages.flatMap((page) => page.fields)
+
+  for (const action of event.actions) {
+    for (const [key, value] of Object.entries(action.data)) {
+      const isFile =
+        fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
+
+      const fileValue = FileFieldValue.safeParse(value)
+
+      if (!isFile || !fileValue.success) {
+        continue
+      }
+
+      await fileExists(fileValue.data!.filename, token)
+    }
+  }
 }
 
 export async function createEvent({
@@ -167,8 +198,8 @@ export async function addAction(
       continue
     }
 
-    if (!(await fileExists(fileValue.data!.filename, token))) {
-      throw new Error(`File not found: ${value}`)
+    if (!(await fileExists(fileValue.data.filename, token))) {
+      throw new Error(`File not found: ${fileValue.data.filename}`)
     }
   }
 

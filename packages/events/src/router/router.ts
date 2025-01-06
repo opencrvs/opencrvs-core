@@ -114,8 +114,8 @@ export const appRouter = router({
     }),
     delete: publicProcedure
       .input(z.object({ eventId: z.string() }))
-      .mutation(async ({ input }) => {
-        return deleteEvent(input.eventId)
+      .mutation(async ({ input, ctx }) => {
+        return deleteEvent(input.eventId, { token: ctx.token })
       }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
