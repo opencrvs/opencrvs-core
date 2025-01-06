@@ -103,16 +103,8 @@ export function useEventFormNavigation() {
     ))
 
     if (exitConfirm) {
-      deleteEvent.mutate(eventId, {
-        onSuccess: async (data: { id: string }) => {
-          await removeEventFromStorage(data.id)
-          goToHome()
-        },
-        onError: (error) => {
-          // eslint-disable-next-line no-console
-          console.error('Failed to delete event', error)
-        }
-      })
+      deleteEvent.mutate({ eventId })
+      goToHome()
     }
   }
 
@@ -156,16 +148,7 @@ export function useEventFormNavigation() {
     ))
 
     if (deleteConfirm) {
-      deleteEvent.mutate(eventId, {
-        onSuccess: async (data: { id: string }) => {
-          await removeEventFromStorage(data.id)
-          goToHome()
-        },
-        onError: (error) => {
-          // eslint-disable-next-line no-console
-          console.error('Failed to delete event', error)
-        }
-      })
+      deleteEvent.mutate({ eventId })
     }
   }
 

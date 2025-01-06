@@ -23,11 +23,10 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { ROUTES } from '@client/v2-events/routes'
-import { Debug } from '@client/v2-events/features/debug/debug'
-import { useEvents } from './useEvents/useEvents'
-import { useEventFormNavigation } from './useEventFormNavigation'
-import { useEventFormData } from './useEventFormData'
 import { useEventConfigurations } from './useEventConfiguration'
+import { useEventFormData } from './useEventFormData'
+import { useEventFormNavigation } from './useEventFormNavigation'
+import { useEvents } from './useEvents/useEvents'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -82,21 +81,17 @@ function EventSelector() {
     }
     const transactionId = `tmp-${uuid()}`
 
-    createEvent.mutate(
-      {
-        type: eventType,
-        transactionId
-      },
-      {
-        onSuccess: ({ id }) => {
-          clearForm()
-          navigate(
-            ROUTES.V2.EVENTS.DECLARE.buildPath({
-              eventId: id
-            })
-          )
-        }
-      }
+    createEvent.mutate({
+      type: eventType,
+      transactionId
+    })
+
+    clearForm()
+
+    navigate(
+      ROUTES.V2.EVENTS.DECLARE.buildPath({
+        eventId: transactionId
+      })
     )
   }
 
@@ -186,7 +181,6 @@ export function EventSelection() {
           <EventSelector />
         </React.Suspense>
       </Content>
-      <Debug />
     </Frame>
   )
 }

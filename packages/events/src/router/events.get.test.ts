@@ -32,7 +32,7 @@ test('Returns multiple events', async () => {
 })
 
 test('Returns aggregated event with updated status and values', async () => {
-  const initialData = { name: 'John Doe', age: 42 }
+  const initialData = { name: 'John Doe', favouriteFruit: 'Banana' }
   const event = await client.event.create(generator.event.create())
   await client.event.actions.declare(
     generator.event.actions.declare(event.id, {
@@ -46,7 +46,7 @@ test('Returns aggregated event with updated status and values', async () => {
   expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
   expect(initialEvents[0].data).toEqual(initialData)
 
-  const updatedData = { name: 'John Doe', age: 43 }
+  const updatedData = { name: 'John Doe', favouriteFruit: 'Strawberry' }
   await client.event.actions.declare(
     generator.event.actions.declare(event.id, {
       data: updatedData

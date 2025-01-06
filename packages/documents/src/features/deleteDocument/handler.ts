@@ -18,9 +18,10 @@ export async function deleteDocument(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const fileUri = request.params.fileUri
+  const filename = request.params.filename
 
   const userId = (jwtDecode(request.headers.authorization) as any).sub
+
   if (!userId)
     return Promise.reject(
       new Error(
@@ -28,19 +29,19 @@ export async function deleteDocument(
       )
     )
 
-  try {
-    const stat = await minioClient.statObject(MINIO_BUCKET, fileUri)
-    const uploader = stat.metaData.uploader
-    if (uploader !== userId)
-      return h
-        .response(
-          `request failed: user with id ${userId} does not have permission to delete this document`
-        )
-        .code(403)
-    await minioClient.removeObject(MINIO_BUCKET, fileUri)
+  const stat = await minioClient.statObject(
+    MINIO_BUCKET,
+    'event-attachments/' + filename
+  )
+  const createdBy = stat.metaData['created-by']
 
-    return h.response().code(204)
-  } catch (error) {
-    return h.response(error).code(400)
-  }
+  if (createdBy !== userId)
+    return h
+      .response(
+        `request failed: user with id ${userId} does not have permission to delete this document`
+      )
+      .code(403)
+  await minioClient.removeObject(MINIO_BUCKET, 'event-attachments/' + filename)
+
+  return h.response().code(204)
 }
