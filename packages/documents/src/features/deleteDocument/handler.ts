@@ -12,7 +12,7 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import jwtDecode from 'jwt-decode'
+import { getUserId } from '@opencrvs/commons/build/dist/common/authentication'
 
 export async function deleteDocument(
   request: Hapi.Request,
@@ -20,7 +20,7 @@ export async function deleteDocument(
 ) {
   const filename = request.params.filename
 
-  const userId = (jwtDecode(request.headers.authorization) as any).sub
+  const userId = getUserId(request.headers.authorization)
 
   if (!userId)
     return Promise.reject(
