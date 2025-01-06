@@ -34,12 +34,6 @@ async function writeEventsToStorage(events: EventDocument[]) {
   return storage.setItem('events', events)
 }
 
-export async function removeEventFromStorage(eventID: string) {
-  const events = await readEventsFromStorage()
-  const newEvents = events.filter((e) => e.id !== eventID)
-  return writeEventsToStorage(newEvents)
-}
-
 export function persistEvents(
   updater: (events: EventDocument[]) => EventDocument[]
 ) {
