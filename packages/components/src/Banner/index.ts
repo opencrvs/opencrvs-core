@@ -9,11 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, url } from 'envalid'
-
-export const env = cleanEnv(process.env, {
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
-  ES_HOST: url({ devDefault: 'http://localhost:9200' }),
-  COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
-  DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' })
-})
+export * from './Banner'

@@ -9,17 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionFormData,
   BaseField,
+  ConditionalParameters,
   FieldConfig,
+  FieldValue,
   validate,
   FieldType
 } from '@opencrvs/commons/client'
-
-import {
-  DependencyInfo,
-  IFormFieldValue,
-  IFormSectionData
-} from '@client/forms'
+import { DependencyInfo, IFormFieldValue } from '@client/forms'
 import {
   dateToString,
   INITIAL_DATE_VALUE,
@@ -30,10 +28,13 @@ import {
   radioGroupToString,
   textToString
 } from '@client/v2-events/features/events/registered-fields'
+function isRecord<V>(value: unknown): value is Record<string, V> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
 export function handleInitialValue(
   field: FieldConfig,
-  formData: IFormSectionData
+  formData: ActionFormData
 ) {
   const initialValue = field.initialValue
 
@@ -46,23 +47,16 @@ export function handleInitialValue(
   return initialValue
 }
 
-export type FlatFormData = Record<string, IFormFieldValue>
-
 export function getConditionalActionsForField(
   field: FieldConfig,
-  values: FlatFormData
+  values: ConditionalParameters
 ) {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!field.conditionals) {
     return []
   }
   return field.conditionals
-    .filter((conditional) =>
-      validate(conditional.conditional, {
-        $form: values,
-        $now: new Date().toISOString().split('T')[0]
-      })
-    )
+    .filter((conditional) => validate(conditional.conditional, values))
     .map((conditional) => conditional.type)
 }
 
@@ -71,14 +65,10 @@ export function evalExpressionInFieldDefinition(
   /*
    * These are used in the eval expression
    */
-  { $form }: { $form: FlatFormData }
+  { $form }: { $form: ActionFormData }
 ) {
   // eslint-disable-next-line no-eval
-  return eval(expression) as IFormFieldValue
-}
-
-function isRecord<V>(value: unknown): value is Record<string, V> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return eval(expression) as FieldValue
 }
 
 export function hasInitialValueDependencyInfo(

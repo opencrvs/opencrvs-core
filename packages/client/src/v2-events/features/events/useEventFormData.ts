@@ -10,19 +10,26 @@
  */
 
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import { ActionInput } from '@opencrvs/commons/client'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import { ActionFormData } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 
-type FormData = ActionInput['data']
-
 interface EventFormData {
-  formValues: FormData
-  setFormValues: (eventId: string, data: FormData) => void
-  getFormValues: (eventId: string, initialValues?: FormData) => FormData
+  formValues: ActionFormData
+  setFormValues: (eventId: string, data: ActionFormData) => void
+  getFormValues: (
+    eventId: string,
+    initialValues?: ActionFormData
+  ) => ActionFormData
   getTouchedFields: () => Record<string, boolean>
   clear: () => void
   eventId: string
+}
+
+function removeUndefinedKeys(data: ActionFormData) {
+  return Object.fromEntries(
+    Object.entries(data).filter(([_, value]) => value !== undefined)
+  )
 }
 
 export const useEventFormData = create<EventFormData>()(
@@ -30,10 +37,12 @@ export const useEventFormData = create<EventFormData>()(
     (set, get) => ({
       formValues: {},
       eventId: '',
-      getFormValues: (eventId: string, initialValues?: FormData) =>
+      getFormValues: (eventId: string, initialValues?: ActionFormData) =>
         get().eventId === eventId ? get().formValues : initialValues ?? {},
-      setFormValues: (eventId: string, data: FormData) =>
-        set(() => ({ eventId, formValues: data })),
+      setFormValues: (eventId: string, data: ActionFormData) => {
+        const formValues = removeUndefinedKeys(data)
+        return set(() => ({ eventId, formValues }))
+      },
       getTouchedFields: () =>
         Object.fromEntries(
           Object.entries(get().formValues).map(([key, value]) => [key, true])
