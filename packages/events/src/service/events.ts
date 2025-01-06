@@ -10,9 +10,10 @@
  */
 
 import {
-  EventDocument,
   ActionInput,
-  EventInput
+  EventDocument,
+  EventInput,
+  FileFieldValue
 } from '@opencrvs/commons/events'
 
 import { getClient } from '@events/storage/mongodb'
@@ -21,6 +22,8 @@ import { z } from 'zod'
 import { deleteEventIndex, indexEvent } from './indexing/indexing'
 import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
+import { getEventConfigurations } from './config/config'
+import { fileExists } from './files'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -51,6 +54,7 @@ export async function getEventById(id: string) {
   if (!event) {
     throw new EventNotFoundError(id)
   }
+
   return event
 }
 
@@ -131,11 +135,42 @@ export async function addAction(
   {
     eventId,
     createdBy,
+    token,
     createdAtLocation
-  }: { eventId: string; createdBy: string; createdAtLocation: string }
+  }: {
+    eventId: string
+    createdBy: string
+    createdAtLocation: string
+    token: string
+  }
 ) {
   const db = await getClient()
   const now = new Date().toISOString()
+  const event = await getEventById(eventId)
+
+  const config = await getEventConfigurations(token)
+
+  const form = config
+    .find((config) => config.id === event.type)
+    ?.actions.find((action) => action.type === input.type)
+    ?.forms.find((form) => form.active)
+
+  const fieldTypes = form?.pages.flatMap((page) => page.fields)
+
+  for (const [key, value] of Object.entries(input.data)) {
+    const isFile =
+      fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
+
+    const fileValue = FileFieldValue.safeParse(value)
+
+    if (!isFile || !fileValue.success) {
+      continue
+    }
+
+    if (!(await fileExists(fileValue.data!.filename, token))) {
+      throw new Error(`File not found: ${value}`)
+    }
+  }
 
   await db.collection<EventDocument>('events').updateOne(
     {
@@ -153,9 +188,9 @@ export async function addAction(
     }
   )
 
-  const event = await getEventById(eventId)
-  await indexEvent(event)
-  return event
+  const updatedEvent = await getEventById(eventId)
+  await indexEvent(updatedEvent)
+  return updatedEvent
 }
 
 export async function patchEvent(eventInput: EventInputWithId) {

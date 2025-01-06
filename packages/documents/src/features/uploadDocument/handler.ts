@@ -15,6 +15,10 @@ import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
 import jwtDecode from 'jwt-decode'
 
+import { z } from 'zod'
+import { Readable } from 'stream'
+import { badRequest, notFound } from '@hapi/boom'
+import { logger } from '@opencrvs/commons'
 export interface IDocumentPayload {
   fileData: string
   metaData?: Record<string, string>
@@ -23,6 +27,61 @@ export interface IDocumentPayload {
 export type IFileInfo = {
   ext: string
   mime: string
+}
+
+const HapiSchema = z.object({
+  filename: z.string().min(1, 'Filename is required'),
+  headers: z.record(z.string()),
+  bytes: z.number().optional()
+})
+
+const FileSchema = z
+  .custom<Readable & { hapi: z.infer<typeof HapiSchema> }>((val) => {
+    return '_readableState' in val && 'hapi' in val
+  }, 'Not a readable stream or missing hapi field')
+  .refine(
+    (val) => HapiSchema.safeParse(val.hapi).success,
+    'hapi does not match the required structure'
+  )
+
+const Payload = z.object({
+  file: FileSchema,
+  transactionId: z.string()
+})
+
+export async function fileUploadHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const payload = await Payload.parseAsync(request.payload).catch((error) => {
+    logger.error(error)
+    throw badRequest('Invalid payload')
+  })
+
+  const { file, transactionId } = payload
+
+  const extension = file.hapi.filename.split('.').pop()
+  const filename = `${transactionId}.${extension}`
+  try {
+    await minioClient.putObject(MINIO_BUCKET, filename, file)
+  } catch (error) {
+    logger.error(error)
+    throw error
+  }
+
+  return filename
+}
+
+export async function fileExistsHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { filename } = request.params
+  const exists = await minioClient.statObject(MINIO_BUCKET, filename)
+  if (!exists) {
+    return notFound('File not found')
+  }
+  return h.response().code(200)
 }
 
 export async function documentUploadHandler(
