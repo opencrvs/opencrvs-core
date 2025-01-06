@@ -18,24 +18,19 @@ import { MainContainer, ReadersContainer } from './components'
 
 export const IDReader = (props: IDReaderProps) => {
   const { dividerLabel, manualInputInstructionLabel, children } = props
-
-  const getStatusWiseView = (status: IDReaderProps['status']) => {
-    // TODO: render different views based on the status (use banner component)
-    return (
-      <MainContainer>
-        <Stack direction="column" alignItems="center" gap={0}>
-          <ReadersContainer>{children}</ReadersContainer>
-          <Divider>
-            <Text variant="reg18" element="p" align="center" color="grey500">
-              {dividerLabel}
-            </Text>
-          </Divider>
-          <Text variant="reg16" element="span" align="center">
-            {manualInputInstructionLabel}
+  return (
+    <MainContainer>
+      <Stack direction="column" alignItems="center" gap={0}>
+        <ReadersContainer>{children}</ReadersContainer>
+        <Divider>
+          <Text variant="reg18" element="p" align="center" color="grey500">
+            {dividerLabel}
           </Text>
-        </Stack>
-      </MainContainer>
-    )
-  }
-  return getStatusWiseView(props.status)
+        </Divider>
+        <Text variant="reg16" element="span" align="center">
+          {manualInputInstructionLabel}
+        </Text>
+      </Stack>
+    </MainContainer>
+  )
 }
