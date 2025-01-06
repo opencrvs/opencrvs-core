@@ -9,13 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { Scan } from '@opencrvs/components/src/IDReader/types'
 import { QRReader } from '@opencrvs/components/src/IDReader/readers/QRReader/QRReader'
 import {
   IFormData,
   IFormField,
   IFormFieldValue,
   IFormSectionData,
+  Ii18nIDReaderFormField,
   Ii18nRedirectFormField,
   ReaderType
 } from '@client/forms'
@@ -31,17 +31,17 @@ import {
 } from '@client/i18n/messages/views/qr-reader'
 import { useIntl } from 'react-intl'
 
-interface ReaderGeneratorProps extends Scan {
+interface ReaderGeneratorProps {
   readers: ReaderType[]
   fields: IFormField[]
+  field: Ii18nIDReaderFormField
   form: IFormSectionData
   draft: IFormData
   setFieldValue: (name: string, value: IFormFieldValue) => void
 }
 export const ReaderGenerator = ({
   readers,
-  onScan,
-  onError,
+  field,
   form,
   draft,
   fields,
@@ -71,8 +71,11 @@ export const ReaderGenerator = ({
                   )
                 }
               }}
-              onScan={onScan}
-              onError={onError}
+              onScan={(data) => {
+                setFieldValue(field.name, data)
+                setFieldValue('verified', 'pending')
+              }}
+              onError={(error) => console.error(error)}
             />
           )
         } else if (isReaderRedirect(reader)) {

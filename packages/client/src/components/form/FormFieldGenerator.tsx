@@ -285,11 +285,10 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           <ReaderGenerator
             readers={fieldDefinition.readers}
             form={values}
+            field={fieldDefinition}
             draft={draftData}
             fields={fields}
             setFieldValue={setFieldValue}
-            onScan={(data) => setFieldValue(fieldDefinition.name, data)}
-            onError={(error) => console.error(error)}
           />
         </IDReader>
       )
