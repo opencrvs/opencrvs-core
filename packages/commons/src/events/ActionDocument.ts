@@ -10,12 +10,13 @@
  */
 import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { FieldValue } from './FieldValue'
 
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  createdAtLocation: z.string(),
-  data: z.record(z.string(), z.any())
+  data: z.record(z.string(), FieldValue),
+  createdAtLocation: z.string()
 })
 
 const AssignedAction = ActionBase.merge(
@@ -91,3 +92,5 @@ export const ActionDocument = z.discriminatedUnion('type', [
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 export type CreatedAction = z.infer<typeof CreatedAction>
+
+export type ActionFormData = ActionDocument['data']
