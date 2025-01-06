@@ -69,7 +69,7 @@ function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
 
     const modifiedParams: T = {
       ...params,
-      eventId: getCanonicalEventId(events, params.eventId)
+      eventId: id
     }
     return canonicalMutationFn(modifiedParams)
   }
@@ -91,6 +91,44 @@ utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
+}))
+
+utils.event.delete.setMutationDefaults(({ canonicalMutationFn }) => ({
+  retry: true,
+  retryDelay: 10000,
+  onSuccess: ({ id }) => {
+    queryClient.setQueryData(
+      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
+      (old: EventDocument[]) => {
+        return old.filter((e) => e.id !== id)
+      }
+    )
+  },
+  /*
+   * This ensures that when the application is reloaded with pending mutations in IndexedDB, the
+   * temporary event IDs in the requests get properly replaced with canonical IDs.
+   * Also check utils.event.create.onSuccess for the same logic but for when even is created.
+   */
+  mutationFn: async (params) => {
+    const events = queryClient.getQueryData<EventDocument[]>(
+      EVENTS_PERSISTENT_STORE_STORAGE_KEY
+    )
+
+    if (!events) {
+      return canonicalMutationFn(params)
+    }
+
+    const id = getCanonicalEventId(events, params.eventId)
+    if (!id) {
+      return canonicalMutationFn(params)
+    }
+
+    const modifiedParams = {
+      ...params,
+      eventId: id
+    }
+    return canonicalMutationFn(modifiedParams)
+  }
 }))
 
 utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
@@ -126,14 +164,6 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     return optimisticEvent
   },
   onSuccess: async (response) => {
-    const events = queryClient.getQueryData<EventDocument[]>(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    )
-
-    if (!events) {
-      return
-    }
-
     queryClient
       .getMutationCache()
       .getAll()
@@ -153,6 +183,19 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
             ReturnType<
               typeof api.event.actions.declare.useMutation
             >['variables'],
+            undefined
+          >
+
+          if (variables.eventId === response.transactionId) {
+            variables.eventId = response.id
+          }
+        }
+        if (
+          hashQueryKey(mutation.options.mutationKey) ===
+          hashQueryKey(getQueryKey(api.event.delete))
+        ) {
+          const variables = mutation.state.variables as Exclude<
+            ReturnType<typeof api.event.delete.useMutation>['variables'],
             undefined
           >
 
@@ -202,6 +245,7 @@ observer.subscribe((observerEvent) => {
       event
     )
   })
+
   /*
    * Persist events to browser storage
    */
@@ -376,6 +420,7 @@ export function useEvents() {
     getEventById: api.event.get,
     getEvents: api.events.get,
     getDrafts,
+    deleteEvent,
     getOutbox,
     actions: {
       draft,

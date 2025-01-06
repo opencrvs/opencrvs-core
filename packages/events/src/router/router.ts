@@ -112,9 +112,11 @@ export const appRouter = router({
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
       return eventWithSignedFiles
     }),
-    delete: publicProcedure.input(z.string()).mutation(async ({ input }) => {
-      return deleteEvent(input)
-    }),
+    delete: publicProcedure
+      .input(z.object({ eventId: z.string() }))
+      .mutation(async ({ input }) => {
+        return deleteEvent(input.eventId)
+      }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
         return addAction(options.input, {
