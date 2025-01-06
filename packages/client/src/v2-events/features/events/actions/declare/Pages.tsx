@@ -61,6 +61,23 @@ export function Pages() {
     }
   }, [pageId, currentPageId, navigate, eventId])
 
+  /*
+   * If the event had a temporary ID and the record got persisted while the user
+   * was on the declare page, we need to navigate to the event with the canonical
+   * ID.
+   */
+  useEffect(() => {
+    const hasTemporaryId = event.id === event.transactionId
+
+    if (eventId !== event.id && !hasTemporaryId) {
+      navigate(
+        ROUTES.V2.EVENTS.DECLARE.buildPath({
+          eventId: event.id
+        })
+      )
+    }
+  }, [event.id, event.transactionId, eventId, navigate])
+
   return (
     <>
       {modal}
