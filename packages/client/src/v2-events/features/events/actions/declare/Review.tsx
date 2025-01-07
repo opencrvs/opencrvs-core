@@ -105,9 +105,9 @@ export function Review() {
   const intl = useIntl()
 
   const { goToHome } = useEventFormNavigation()
-  const declareMutation = events.actions.declare()
+  const declareMutation = events.actions.declare
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 

@@ -13,10 +13,23 @@ import {
   BaseField,
   ConditionalParameters,
   FieldConfig,
+  FieldType,
   FieldValue,
+  FieldTypeToFieldValue,
   validate
 } from '@opencrvs/commons/client'
+
 import { DependencyInfo } from '@client/forms'
+import {
+  dateToString,
+  INITIAL_DATE_VALUE,
+  INITIAL_PARAGRAPH_VALUE,
+  INITIAL_RADIO_GROUP_VALUE,
+  INITIAL_TEXT_VALUE,
+  paragraphToString,
+  radioGroupToString,
+  textToString
+} from '@client/v2-events/features/events/registered-fields'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -76,4 +89,37 @@ export function getDependentFields(
     }
     return field.initialValue.dependsOn.includes(fieldName)
   })
+}
+
+const initialValueMapping: Record<FieldType, FieldValue | null> = {
+  [FieldType.TEXT]: INITIAL_TEXT_VALUE,
+  [FieldType.DATE]: INITIAL_DATE_VALUE,
+  [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
+  [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
+  [FieldType.FILE]: null,
+  [FieldType.HIDDEN]: null
+}
+
+export function getInitialValues(fields: FieldConfig[]) {
+  return fields.reduce((initialValues, field) => {
+    return { ...initialValues, [field.id]: initialValueMapping[field.type] }
+  }, {})
+}
+
+export function fieldValueToString<T extends FieldType>(
+  field: T,
+  value: FieldTypeToFieldValue<T>
+) {
+  switch (field) {
+    case FieldType.DATE:
+      return dateToString(value as FieldTypeToFieldValue<'DATE'>)
+    case FieldType.TEXT:
+      return textToString(value as FieldTypeToFieldValue<'TEXT'>)
+    case FieldType.PARAGRAPH:
+      return paragraphToString(value as FieldTypeToFieldValue<'PARAGRAPH'>)
+    case FieldType.RADIO_GROUP:
+      return radioGroupToString(value as FieldTypeToFieldValue<'RADIO_GROUP'>)
+    default:
+      return ''
+  }
 }

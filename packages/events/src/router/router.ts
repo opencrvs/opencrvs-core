@@ -25,6 +25,7 @@ import { getEventConfigurations } from '@events/service/config/config'
 import {
   addAction,
   createEvent,
+  deleteEvent,
   EventInputWithId,
   getEventById,
   patchEvent
@@ -111,6 +112,11 @@ export const appRouter = router({
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
       return eventWithSignedFiles
     }),
+    delete: publicProcedure
+      .input(z.object({ eventId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        return deleteEvent(input.eventId, { token: ctx.token })
+      }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
         return addAction(options.input, {
