@@ -10,6 +10,8 @@
  */
 import fetch from 'node-fetch'
 import {
+  ArchivedRecord,
+  CertifiedRecord,
   CorrectionRequestedRecord,
   EVENT_TYPE,
   getTrackingId,
@@ -42,10 +44,18 @@ export const invokeWebhooks = async ({
     | InProgressRecord
     | ReadyForReviewRecord
     | ValidatedRecord
+    | CertifiedRecord
+    | ArchivedRecord
   token: string
   event: EVENT_TYPE
   isNotRegistered?: boolean
-  statusType?: 'rejected' | 'approved'
+  statusType?:
+    | 'rejected'
+    | 'approved'
+    | 'validated'
+    | 'archived'
+    | 'certified'
+    | 'issued'
 }) => {
   const trackingId = getTrackingId(bundle)
 
