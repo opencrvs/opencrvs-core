@@ -53,7 +53,7 @@ import {
   BUTTON,
   Ii18nButtonFormField,
   IRedirectFormField,
-  REDIRECT,
+  LINK_BUTTON,
   IDReaderFormField,
   ID_READER,
   Ii18nIDReaderFormField,
@@ -787,20 +787,20 @@ export function isReaderQR(reader: ReaderType): reader is QRReaderType {
   return reader.type === 'QR'
 }
 
-export function isReaderRedirect(
+export function isReaderLinkButton(
   reader: ReaderType
 ): reader is IRedirectFormField {
-  return reader.type === REDIRECT
+  return reader.type === LINK_BUTTON
 }
 
 export function isFieldHttp(field: IFormField): field is IHttpFormField {
   return field.type === HTTP
 }
 
-export function isFieldRedirect(
+export function isFieldLinkButton(
   field: IFormField
 ): field is IRedirectFormField {
-  return field.type === REDIRECT
+  return field.type === LINK_BUTTON
 }
 
 function isInitialValueDependencyInfo(

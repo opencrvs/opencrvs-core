@@ -92,7 +92,7 @@ import {
   InitialValue,
   DependencyInfo,
   Ii18nButtonFormField,
-  REDIRECT,
+  LINK_BUTTON,
   IDocumentUploaderWithOptionsFormField,
   ID_READER,
   ID_VERIFICATION_BANNER
@@ -142,7 +142,7 @@ import {
 import { Heading2, Heading3 } from '@opencrvs/components/lib/Headings/Headings'
 import { SignatureUploader } from './SignatureField/SignatureUploader'
 import { ButtonField } from '@client/components/form/Button'
-import { RedirectField } from '@client/components/form/Redirect'
+import { LinkButtonField } from '@client/components/form/LinkButton'
 import { ReaderGenerator } from './ReaderGenerator'
 import { IDVerificationBanner } from './IDVerificationBanner'
 
@@ -659,9 +659,9 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
       )
     }
 
-    if (fieldDefinition.type === REDIRECT) {
+    if (fieldDefinition.type === LINK_BUTTON) {
       return (
-        <RedirectField
+        <LinkButtonField
           form={values}
           draft={draftData}
           fieldDefinition={fieldDefinition}

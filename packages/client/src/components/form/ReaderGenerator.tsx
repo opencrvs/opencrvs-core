@@ -19,11 +19,11 @@ import {
   Ii18nRedirectFormField,
   ReaderType
 } from '@client/forms'
-import { RedirectField } from './Redirect'
+import { LinkButtonField } from './LinkButton'
 import {
   internationaliseFieldObject,
   isReaderQR,
-  isReaderRedirect
+  isReaderLinkButton
 } from '@client/forms/utils'
 import {
   messages,
@@ -77,9 +77,9 @@ export const ReaderGenerator = ({
               onError={(error) => console.error(error)}
             />
           )
-        } else if (isReaderRedirect(reader)) {
+        } else if (isReaderLinkButton(reader)) {
           return (
-            <RedirectField
+            <LinkButtonField
               key={type}
               form={form}
               draft={draft}

@@ -74,7 +74,7 @@ export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
-export const REDIRECT = 'REDIRECT'
+export const LINK_BUTTON = 'LINK_BUTTON'
 export const ID_READER = 'ID_READER'
 export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
 
@@ -730,7 +730,7 @@ export interface IButtonFormField extends IFormFieldBase {
 }
 
 export interface IRedirectFormField extends IFormFieldBase {
-  type: typeof REDIRECT
+  type: typeof LINK_BUTTON
   icon?: {
     desktop: IconProps['name']
     mobile: IconProps['name']
@@ -1270,7 +1270,7 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
 }
 
 export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
-  type: typeof REDIRECT
+  type: typeof LINK_BUTTON
   icon?: {
     desktop: IconProps['name']
     mobile: IconProps['name']

@@ -26,7 +26,7 @@ import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 
-export const RedirectField = ({
+export const LinkButtonField = ({
   fields,
   form,
   draft,
