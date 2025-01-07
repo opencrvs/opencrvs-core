@@ -39,7 +39,7 @@ async function getEventByTransactionId(transactionId: string) {
 
   return document
 }
-export class EventNotFoundError extends TRPCError {
+class EventNotFoundError extends TRPCError {
   constructor(id: string) {
     super({
       code: 'NOT_FOUND',
