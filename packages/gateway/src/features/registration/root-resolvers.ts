@@ -582,17 +582,17 @@ export const resolvers: GQLResolver = {
     async markEventAsUnassigned(_, { id }, { headers: authHeader }) {
       const assignedToSelf = await checkUserAssignment(id, authHeader)
       if (
-        !assignedToSelf ||
-        !inScope(authHeader, [SCOPES.RECORD_UNASSIGN_OTHERS])
+        assignedToSelf ||
+        inScope(authHeader, [SCOPES.RECORD_UNASSIGN_OTHERS])
       ) {
-        throw new Error('User does not have enough scope')
-      }
-      const task = getTaskFromSavedBundle(
-        await unassignRegistration(id, authHeader)
-      )
+        const task = getTaskFromSavedBundle(
+          await unassignRegistration(id, authHeader)
+        )
 
-      // return the taskId
-      return task.id
+        // return the taskId
+        return task.id
+      }
+      throw new Error('User does not have enough scope')
     },
     async markEventAsDuplicate(
       _,
