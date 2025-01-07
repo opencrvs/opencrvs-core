@@ -11,12 +11,8 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
-import {
-  ActionDocument,
-  EventDocument,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
 import { ActionFormData } from '@opencrvs/commons'
+import { EventDocument, getCurrentEventState } from '@opencrvs/commons/client'
 import { api, utils } from '@client/v2-events/trpc'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
