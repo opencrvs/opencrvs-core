@@ -45,7 +45,8 @@ export const enum RouteScope {
   PERFORMANCE = 'performance',
   SYSADMIN = 'sysadmin',
   VALIDATE = 'validate',
-  NATLSYSADMIN = 'natlsysadmin'
+  NATLSYSADMIN = 'natlsysadmin',
+  SELF_SERVICE_PORTAL = 'self-service-portal'
 }
 
 export default function getRoutes(): ServerRoute[] {
@@ -80,6 +81,7 @@ export default function getRoutes(): ServerRoute[] {
             RouteScope.PERFORMANCE,
             RouteScope.SYSADMIN,
             RouteScope.VALIDATE,
+            RouteScope.SELF_SERVICE_PORTAL,
             // @TODO: Refer to an enum / constant
             'record.confirm-registration'
           ]

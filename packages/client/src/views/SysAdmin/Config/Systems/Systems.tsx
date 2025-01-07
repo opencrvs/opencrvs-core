@@ -214,7 +214,10 @@ export function SystemList() {
   const systemTypeLabels = {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
+    SELF_SERVICE_PORTAL: intl.formatMessage(
+      integrationMessages.selfServicePortal
+    )
   }
 
   const systemToLabel = (system: System) => {
@@ -531,6 +534,12 @@ export function SystemList() {
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
                       value: SystemType.Webhook
+                    },
+                    {
+                      label: intl.formatMessage(
+                        integrationMessages.selfServicePortal
+                      ),
+                      value: SystemType.SelfServicePortal
                     }
                   ]}
                   id={'permissions-selectors'}

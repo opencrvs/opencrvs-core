@@ -63,14 +63,16 @@ const systemScopes = {
   declare: 'declare',
   notificationApi: 'notification-api',
   webhook: 'webhook',
-  nationalId: 'nationalId'
+  nationalId: 'nationalId',
+  selfServicePortal: 'self-service-portal'
 } as const
 
 export const systemRoleScopes = {
   HEALTH: [systemScopes.declare, systemScopes.notificationApi],
   NATIONAL_ID: [systemScopes.nationalId],
   RECORD_SEARCH: [systemScopes.recordsearch],
-  WEBHOOK: [systemScopes.webhook]
+  WEBHOOK: [systemScopes.webhook],
+  SELF_SERVICE_PORTAL: [systemScopes.selfServicePortal]
 }
 
 export type UserRole = keyof typeof userRoleScopes
