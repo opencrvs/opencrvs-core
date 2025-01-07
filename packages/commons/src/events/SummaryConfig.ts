@@ -13,7 +13,6 @@ import { TranslationConfig } from './TranslationConfig'
 
 const Field = z.object({
   id: z.string().describe('Id of a field defined under form.'),
-  // label is enforced during runtime.
   label: TranslationConfig,
   emptyValueMessage: TranslationConfig.optional()
 })
