@@ -13,11 +13,11 @@ import {
   BaseField,
   ConditionalParameters,
   FieldConfig,
+  FieldType,
   FieldValue,
-  validate,
-  FieldType
+  validate
 } from '@opencrvs/commons/client'
-import { DependencyInfo, IFormFieldValue } from '@client/forms'
+import { DependencyInfo } from '@client/forms'
 import {
   dateToString,
   INITIAL_DATE_VALUE,
@@ -136,7 +136,7 @@ export function unflatten<T>(
   return result
 }
 
-const initialValueMapping: Record<FieldType, IFormFieldValue | null> = {
+const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.TEXT]: INITIAL_TEXT_VALUE,
   [FieldType.DATE]: INITIAL_DATE_VALUE,
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
@@ -146,15 +146,12 @@ const initialValueMapping: Record<FieldType, IFormFieldValue | null> = {
 }
 
 export function getInitialValues(fields: FieldConfig[]) {
-  const initialValues: Record<string, IFormFieldValue | null> = {}
-
-  fields.forEach((field) => {
-    initialValues[field.id] = initialValueMapping[field.type]
-  })
-  return initialValues
+  return fields.reduce((initialValues, field) => {
+    return { ...initialValues, [field.id]: initialValueMapping[field.type] }
+  }, {})
 }
 
-export function fieldValueToString(field: FieldType, value: IFormFieldValue) {
+export function fieldValueToString(field: FieldType, value: FieldValue) {
   switch (field) {
     case FieldType.DATE:
       return dateToString(value)

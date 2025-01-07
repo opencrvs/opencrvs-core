@@ -452,6 +452,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
 
   return (
     <Formik<ActionFormData>
+      enableReinitialize={true}
       initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(
