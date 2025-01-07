@@ -10,7 +10,6 @@
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
 import { QueryClient } from '@tanstack/react-query'
-import { Mutation } from '@tanstack/query-core'
 import {
   PersistQueryClientProvider,
   type PersistedClient,
@@ -21,8 +20,8 @@ import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
 import React from 'react'
 import superjson from 'superjson'
 
-import { getToken } from '@client/utils/authUtils'
 import { storage } from '@client/storage'
+import { getToken } from '@client/utils/authUtils'
 
 export const api = createTRPCReact<AppRouter>()
 
@@ -82,30 +81,6 @@ export const queryClient = getQueryClient()
 
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
 
-function wantsToRetry(mutation: Mutation<unknown, Error, unknown, unknown>) {
-  if (!mutation.state.error) {
-    return false
-  }
-  if (typeof mutation.options.retry === 'function') {
-    return mutation.options.retry(
-      mutation.state.failureCount,
-      mutation.state.error
-    )
-  }
-
-  if (
-    typeof mutation.options.retry === 'number' &&
-    mutation.state.failureCount >= mutation.options.retry
-  ) {
-    return false
-  }
-
-  if (!mutation.options.retry) {
-    return false
-  }
-
-  return true
-}
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider
