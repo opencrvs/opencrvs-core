@@ -26,7 +26,6 @@ export const IDVerificationBanner = ({
   const intl = useIntl()
   const handleReset = () => {
     setFieldValue(idFieldName, '')
-    setFieldValue('verified', '')
   }
   if (type === 'pending') {
     return (

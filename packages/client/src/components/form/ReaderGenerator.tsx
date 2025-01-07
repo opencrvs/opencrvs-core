@@ -73,7 +73,6 @@ export const ReaderGenerator = ({
               }}
               onScan={(data) => {
                 setFieldValue(field.name, data)
-                setFieldValue('verified', 'pending')
               }}
               onError={(error) => console.error(error)}
             />
