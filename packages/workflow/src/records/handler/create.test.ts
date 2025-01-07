@@ -150,6 +150,14 @@ describe('Create record endpoint', () => {
       })
     )
 
+    // mock country config event hook not being implemented (404)
+    mswServer.use(
+      rest.post(
+        'http://localhost:3040/event/birth/action/sent-notification-for-review',
+        (_, res, ctx) => res(ctx.status(404))
+      )
+    )
+
     const res = await server.server.inject({
       method: 'POST',
       url: '/create-record',
