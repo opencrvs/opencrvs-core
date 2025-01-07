@@ -12,7 +12,6 @@
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
 import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
-import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -29,9 +28,9 @@ import {
 import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
+  ActionFormData,
   FieldConfig,
   FieldValue,
-  FieldValueByType,
   FileFieldValue
 } from '@opencrvs/commons/client'
 import {
@@ -49,10 +48,10 @@ import {
   useIntl
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
-import { ActionFormData } from '@opencrvs/commons'
+
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
-import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { Checkbox } from '@client/v2-events/features/events/registered-fields/CheckBox'
+import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -252,7 +251,7 @@ interface ExposedProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IAdvancedSearchFormState
+  initialValues?: ActionFormData
 }
 
 type AllProps = ExposedProps & IntlShapeProps & FormikProps<ActionFormData>
@@ -481,6 +480,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
 
   return (
     <Formik<ActionFormData>
+      enableReinitialize={true}
       initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(

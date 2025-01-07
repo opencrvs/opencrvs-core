@@ -52,9 +52,9 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
-  const registerMutation = events.actions.register()
+  const registerMutation = events.actions.register
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
