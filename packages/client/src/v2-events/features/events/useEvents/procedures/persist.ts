@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
+import { hashKey, QueryObserver, useSuspenseQuery } from '@tanstack/react-query'
+import { getQueryKey } from '@trpc/react-query'
 import { EventDocument } from '@opencrvs/commons'
-import { queryClient } from '@client/v2-events/trpc'
+import { api, queryClient } from '@client/v2-events/trpc'
 import { storage } from '@client/storage'
+
 /*
  * Local event storage
  */
+
 const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
 
 queryClient.setQueryDefaults(EVENTS_PERSISTENT_STORE_STORAGE_KEY, {
@@ -34,10 +37,12 @@ async function writeEventsToStorage(events: EventDocument[]) {
   return storage.setItem('events', events)
 }
 
-export function persistEvents(
+export async function persistEvents(
   updater: (events: EventDocument[]) => EventDocument[]
 ) {
-  queryClient.setQueryData(EVENTS_PERSISTENT_STORE_STORAGE_KEY, updater)
+  const events = getEvents()
+  await writeEventsToStorage(updater(events))
+  await invalidateQueries()
 }
 
 export function getCanonicalEventId(
@@ -78,14 +83,34 @@ export function createObserver() {
   })
 }
 
-createObserver().subscribe((observerEvent) => {
-  /*
-   * Persist events to browser storage
-   */
-  if (!observerEvent.data) {
-    return
+queryClient.getQueryCache().subscribe((event) => {
+  if (
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    hashKey(event.query.queryKey[0]) === hashKey(getQueryKey(api.event.get)[0])
+  ) {
+    if (event.query.state.status === 'success') {
+      const data: EventDocument = event.query.state.data
+
+      const allEvents = getEvents()
+
+      const existing = allEvents.find((ev) => ev.id === data.id)
+
+      if (!existing) {
+        return void persistEvents((events) => {
+          return events.concat(data)
+        })
+      }
+
+      const remoteIsNewer =
+        new Date(data.updatedAt) > new Date(existing.updatedAt)
+
+      if (remoteIsNewer) {
+        void persistEvents((events) => {
+          return events.filter((ev) => ev.id !== data.id).concat(data)
+        })
+      }
+    }
   }
-  void writeEventsToStorage(observerEvent.data)
 })
 
 export function useEventsSuspenseQuery() {
@@ -97,5 +122,13 @@ export function useEventsSuspenseQuery() {
 export async function invalidateQueries() {
   return queryClient.invalidateQueries({
     queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
+  })
+}
+
+export async function updateLocalEvent(updatedEvent: EventDocument) {
+  return persistEvents((events) => {
+    return events.map((event) =>
+      event.id === updatedEvent.id ? updatedEvent : event
+    )
   })
 }

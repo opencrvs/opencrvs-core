@@ -84,10 +84,6 @@ function filterOutboxEventsWithMutation<
 }
 
 export function useEvents() {
-  function getEvent(id: string) {
-    return api.event.get.useSuspenseQuery(id)
-  }
-
   function getDrafts() {
     return storedEvents.data.filter(
       (event) => !event.actions.some((a) => a.type === 'DECLARE')
@@ -142,7 +138,7 @@ export function useEvents() {
       }
     )
 
-    return eventFromCreateMutations
+    const events = eventFromCreateMutations
       .concat(eventFromDeclareActions)
       .concat(eventFromRegisterActions)
       .filter(
@@ -162,6 +158,8 @@ export function useEvents() {
           )
         }
       })
+
+    return events
   }
 
   const storedEvents = useEventsSuspenseQuery()
@@ -169,8 +167,7 @@ export function useEvents() {
   return {
     createEvent,
     events: storedEvents,
-    getEvent,
-    getEventById: api.event.get,
+    getEvent: api.event.get,
     getEvents: api.events.get,
     getDrafts,
     deleteEvent: useDeleteEventMutation(),

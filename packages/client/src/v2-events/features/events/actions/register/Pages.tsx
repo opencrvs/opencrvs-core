@@ -30,12 +30,12 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration?.actions
+  const formPages = configuration.actions
     .find((action) => action.type === ActionType.REGISTER)
     ?.forms.find((form) => form.active)?.pages
 

@@ -32,14 +32,14 @@ export function EventSummary({
     <>
       <Summary id="summary">
         {summary.fields.map((field) => {
-          const message = 'message'
           return (
             <Summary.Row
               key={field.id}
               data-testid={field.id}
               label={field.label?.defaultMessage ?? ''}
-              placeholder={message}
-              // @ts-ignore
+              placeholder={
+                '@todo: These placeholder values need to be configurable like "No place of birth"'
+              }
               value={data[field.id]}
             />
           )

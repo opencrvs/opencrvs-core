@@ -12,12 +12,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
 import { api, utils } from '@client/v2-events/trpc'
-import {
-  getEvent,
-  getEvents,
-  invalidateQueries,
-  persistEvents
-} from './persist'
+import { getEvent, getEvents, updateLocalEvent } from './persist'
 
 function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>
@@ -55,33 +50,29 @@ type Procedure =
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn)
+  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+  onSuccess: updateLocalEvent
 }))
 
 utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: async (updatedEvent) => {
-    persistEvents((events) =>
-      events.map((event) =>
-        event.id === updatedEvent.id ? updatedEvent : event
-      )
-    )
-    return invalidateQueries()
-  }
+  onSuccess: updateLocalEvent
 }))
 
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn)
+  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+  onSuccess: updateLocalEvent
 }))
 
 utils.event.actions.notify.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn)
+  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+  onSuccess: updateLocalEvent
 }))
 
 export function useEventAction<P extends Procedure, M extends Mutation>(

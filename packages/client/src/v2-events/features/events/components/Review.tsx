@@ -256,7 +256,7 @@ function ReviewComponent({
                             const Output =
                               FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
 
-                            const hasValue = form[field.id] !== undefined
+                            const hasValue = form[field.id] != null
 
                             const valueDisplay = hasValue ? (
                               <Output value={form[field.id]} />
