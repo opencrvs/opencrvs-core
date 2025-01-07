@@ -10,15 +10,17 @@
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
 import { QueryClient } from '@tanstack/react-query'
+import { Mutation } from '@tanstack/query-core'
 import {
   PersistQueryClientProvider,
   type PersistedClient,
   type Persister
 } from '@tanstack/react-query-persist-client'
-import { httpLink, loggerLink } from '@trpc/client'
+import { httpLink, loggerLink, TRPCClientError } from '@trpc/client'
 import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
 import React from 'react'
 import superjson from 'superjson'
+
 import { getToken } from '@client/utils/authUtils'
 import { storage } from '@client/storage'
 
@@ -80,6 +82,30 @@ export const queryClient = getQueryClient()
 
 export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
 
+function wantsToRetry(mutation: Mutation<unknown, Error, unknown, unknown>) {
+  if (!mutation.state.error) {
+    return false
+  }
+  if (typeof mutation.options.retry === 'function') {
+    return mutation.options.retry(
+      mutation.state.failureCount,
+      mutation.state.error
+    )
+  }
+
+  if (
+    typeof mutation.options.retry === 'number' &&
+    mutation.state.failureCount >= mutation.options.retry
+  ) {
+    return false
+  }
+
+  if (!mutation.options.retry) {
+    return false
+  }
+
+  return true
+}
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider
@@ -89,8 +115,16 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         maxAge: undefined,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
-          shouldDehydrateMutation: (mut) => {
-            return mut.state.status !== 'success'
+          shouldDehydrateMutation: (mutation) => {
+            if (mutation.state.status === 'error') {
+              const error = mutation.state.error
+              if (error instanceof TRPCClientError && error.data?.httpStatus) {
+                return !error.data.httpStatus.toString().startsWith('4')
+              }
+              return true
+            }
+
+            return mutation.state.status !== 'success'
           }
         }
       }}

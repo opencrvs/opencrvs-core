@@ -57,21 +57,23 @@ export function ActionMenu({ eventId }: { eventId: string }) {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {configuration.actions.filter(isActionVisible).map((action) => (
-            <DropdownMenu.Item
-              key={action.type}
-              onClick={() => {
-                if (action.type === 'CREATE' || action.type === 'CUSTOM') {
-                  alert(`Action ${action.type} is not implemented yet.`)
-                  return
-                }
+          {configuration.actions.filter(isActionVisible).map((action) => {
+            return (
+              <DropdownMenu.Item
+                key={action.type}
+                onClick={() => {
+                  if (action.type === 'CREATE' || action.type === 'CUSTOM') {
+                    alert(`Action ${action.type} is not implemented yet.`)
+                    return
+                  }
 
-                navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
-              }}
-            >
-              {intl.formatMessage(action.label)}
-            </DropdownMenu.Item>
-          ))}
+                  navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+                }}
+              >
+                {intl.formatMessage(action.label)}
+              </DropdownMenu.Item>
+            )
+          })}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
