@@ -8,9 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionDocument,
   EventIndex,
@@ -20,13 +20,19 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  getAllFields,
+  useEventConfiguration,
+  useEventConfigurations
+} from '@client/v2-events/features/events/useEventConfiguration'
 // eslint-disable-next-line no-restricted-imports
 import { getUserDetails } from '@client/profile/profileSelectors'
 // eslint-disable-next-line no-restricted-imports
 import { ProfileState } from '@client/profile/profileReducer'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { getInitialValues } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { utils } from '@client/v2-events/trpc'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -38,14 +44,15 @@ import { ActionMenu } from './components/ActionMenu'
 
 export function EventOverviewIndex() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents, getEventById } = useEvents()
+  const { getEvents, getEvent } = useEvents()
   const user = useSelector(getUserDetails)
 
   const [config] = useEventConfigurations()
 
-  const { data: fullEvent } = getEventById.useQuery(params.eventId)
+  const { data: fullEvent } = getEvent.useQuery(params.eventId)
 
   const { data: events } = getEvents.useQuery()
+
   const event = events?.find((e) => e.id === params.eventId)
 
   if (!event || !fullEvent?.actions) {
@@ -76,13 +83,17 @@ function EventOverview({
   history: ActionDocument[]
   user: ProfileState['userDetails']
 }) {
+  const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
-
+  const initialValues = getInitialValues(getAllFields(eventConfiguration))
   return (
     <Content
       icon={() => <IconWithName name={''} status={'orange'} />}
       size={ContentSize.LARGE}
-      title={intl.formatMessage(summary.title, event.data)}
+      title={intl.formatMessage(summary.title, {
+        ...initialValues,
+        ...event.data
+      })}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >

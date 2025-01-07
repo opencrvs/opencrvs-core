@@ -106,7 +106,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
       const fileValue = FileFieldValue.safeParse(value)
 
-      if (!isFile || !fileValue.success) {
+      if (!isFile || !fileValue.success || !fileValue.data) {
         continue
       }
 
@@ -198,7 +198,7 @@ export async function addAction(
       continue
     }
 
-    if (!(await fileExists(fileValue.data.filename, token))) {
+    if (fileValue.data && !(await fileExists(fileValue.data.filename, token))) {
       throw new Error(`File not found: ${fileValue.data.filename}`)
     }
   }
@@ -215,6 +215,9 @@ export async function addAction(
           createdAt: now,
           createdAtLocation
         }
+      },
+      $set: {
+        updatedAt: now
       }
     }
   )

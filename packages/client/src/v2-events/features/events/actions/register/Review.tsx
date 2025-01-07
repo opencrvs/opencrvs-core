@@ -54,7 +54,7 @@ export function Review() {
   const { goToHome } = useEventFormNavigation()
   const registerMutation = events.actions.register
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 

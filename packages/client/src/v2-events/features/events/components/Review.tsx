@@ -256,10 +256,13 @@ function ReviewComponent({
                             const Output =
                               FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
 
-                            const hasValue = form[field.id] !== undefined
+                            const value = form[field.id]
+                            const hasValue =
+                              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                              value !== null && value !== undefined
 
                             const valueDisplay = hasValue ? (
-                              <Output value={form[field.id]} />
+                              <Output value={value} />
                             ) : (
                               ''
                             )

@@ -11,23 +11,24 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
+import { ActionFormData } from '@opencrvs/commons'
+import { EventDocument, getCurrentEventState } from '@opencrvs/commons/client'
 import { api, utils } from '@client/v2-events/trpc'
-import {
-  getEvent,
-  getEvents,
-  invalidateQueries,
-  persistEvents
-} from './persist'
+
+async function updateLocalEvent(updatedEvent: EventDocument) {
+  utils.event.get.setData(updatedEvent.id, updatedEvent)
+  return utils.events.get.invalidate()
+}
 
 function waitUntilEventIsCreated<T extends { eventId: string }, R>(
   canonicalMutationFn: (params: T) => Promise<R>
 ): (params: T) => Promise<R> {
   return async (params) => {
     const { eventId } = params
-    const events = getEvents()
-    const event = getEvent(events, eventId)
 
-    if (!event || event.id === event.transactionId) {
+    const localVersion = utils.event.get.getData(eventId)
+
+    if (!localVersion || localVersion.id === localVersion.transactionId) {
       console.error(
         'Event that has not been stored yet cannot be actioned upon'
       )
@@ -36,7 +37,7 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       )
     }
 
-    return canonicalMutationFn({ ...params, eventId: event.id })
+    return canonicalMutationFn({ ...params, eventId: localVersion.id })
   }
 }
 
@@ -52,36 +53,63 @@ type Procedure =
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
 
+function updateEventOptimistically<
+  T extends { eventId: string; data: ActionFormData }
+>(actionType: 'DECLARE' | 'DRAFT') {
+  return (variables: T) => {
+    const localEvent = utils.event.get.getData(variables.eventId)
+    if (!localEvent) {
+      return
+    }
+    const optimisticEvent: EventDocument = {
+      ...localEvent,
+      actions: [
+        ...localEvent.actions,
+        {
+          type: actionType,
+          data: variables.data,
+          createdAt: new Date().toISOString(),
+          createdBy: '@todo',
+          createdAtLocation: '@todo'
+        }
+      ]
+    }
+    utils.events.get.setData(undefined, (eventIndices) =>
+      eventIndices
+        ?.filter((ei) => ei.id !== optimisticEvent.id)
+        .concat(getCurrentEventState(optimisticEvent))
+    )
+  }
+}
+
 utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn)
+  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+  onSuccess: updateLocalEvent,
+  onMutate: updateEventOptimistically('DECLARE')
 }))
 
 utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onSuccess: async (updatedEvent) => {
-    persistEvents((events) =>
-      events.map((event) =>
-        event.id === updatedEvent.id ? updatedEvent : event
-      )
-    )
-    return invalidateQueries()
-  }
+  onMutate: updateEventOptimistically('DRAFT'),
+  onSuccess: updateLocalEvent
 }))
 
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn)
+  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+  onSuccess: updateLocalEvent
 }))
 
 utils.event.actions.notify.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn)
+  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+  onSuccess: updateLocalEvent
 }))
 
 export function useEventAction<P extends Procedure, M extends Mutation>(

@@ -11,23 +11,18 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
-import { EventDocument } from '@opencrvs/commons/client'
 import { api, utils } from '@client/v2-events/trpc'
-import { getCanonicalEventId, getEvents, persistEvents } from './persist'
 
 function waitUntilEventIsCreated<R>(
   canonicalMutationFn: (params: { eventId: string }) => Promise<R>
 ): (params: { eventId: string }) => Promise<R> {
   return async ({ eventId }) => {
-    const events = getEvents()
-
-    const id = getCanonicalEventId(events, eventId)
-
-    if (!id || id === eventId) {
+    const localVersion = utils.event.get.getData(eventId)
+    if (!localVersion || localVersion.id === localVersion.transactionId) {
       throw new Error('Event that has not been stored yet cannot be deleted')
     }
 
-    return canonicalMutationFn({ eventId: id })
+    return canonicalMutationFn({ eventId: localVersion.id })
   }
 }
 
@@ -35,7 +30,7 @@ utils.event.delete.setMutationDefaults(({ canonicalMutationFn }) => ({
   retry: true,
   retryDelay: 10000,
   onSuccess: ({ id }) => {
-    persistEvents((old: EventDocument[]) => old.filter((e) => e.id !== id))
+    void utils.events.get.invalidate()
   },
   /*
    * This ensures that when the application is reloaded with pending mutations in IndexedDB, the

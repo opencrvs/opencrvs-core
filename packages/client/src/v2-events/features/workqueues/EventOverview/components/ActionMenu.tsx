@@ -29,7 +29,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -57,7 +57,7 @@ export function ActionMenu({ eventId }: { eventId: string }) {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {configuration?.actions.filter(isActionVisible).map((action) => (
+          {configuration.actions.filter(isActionVisible).map((action) => (
             <DropdownMenu.Item
               key={action.type}
               onClick={() => {
