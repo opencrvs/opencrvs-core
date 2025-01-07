@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getQueryKey } from '@trpc/react-query'
-import { CreatedAction, EventDocument } from '@opencrvs/commons/client'
-import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { invalidateQueries, persistEvents } from './persist'
+import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
+import { api, utils } from '@client/v2-events/trpc'
 
 utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: canonicalMutationFn,
@@ -35,27 +33,16 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
       ]
     }
 
-    // Do this as very first synchronous operation so UI can trust
-    // that the event is created when changing view for instance
-    persistEvents((events: EventDocument[]) => {
-      return [...events, optimisticEvent]
-    })
-
+    utils.event.get.setData(newEvent.transactionId, optimisticEvent)
+    utils.events.get.setData(undefined, (eventIndices) =>
+      eventIndices?.concat(getCurrentEventState(optimisticEvent))
+    )
     return optimisticEvent
   },
   onSuccess: async (response) => {
-    await invalidateQueries()
-
-    persistEvents((state: EventDocument[]) => {
-      return [
-        ...state.filter((e) => e.transactionId !== response.transactionId),
-        response
-      ]
-    })
-
-    await queryClient.cancelQueries({
-      queryKey: getQueryKey(api.event.get, response.transactionId, 'query')
-    })
+    utils.event.get.setData(response.id, response)
+    utils.event.get.setData(response.transactionId, response)
+    await utils.events.get.invalidate()
   }
 }))
 

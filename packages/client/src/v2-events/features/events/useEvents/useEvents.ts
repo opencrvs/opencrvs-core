@@ -11,40 +11,11 @@
 
 import { hashKey } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventDocument, getCurrentEventState } from '@opencrvs/commons/client'
+import { EventIndex } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { useEventAction } from './procedures/action'
 import { createEvent } from './procedures/create'
 import { useDeleteEventMutation } from './procedures/delete'
-import { createObserver, useEventsSuspenseQuery } from './procedures/persist'
-
-const observer = createObserver()
-
-observer.subscribe((observerEvent) => {
-  observerEvent.data?.forEach((event) => {
-    /*
-     * Update items data in "event by id" queries
-     */
-    queryClient.setQueryData(
-      getQueryKey(api.event.get, event.id, 'query'),
-      event
-    )
-
-    queryClient.setQueryData(
-      getQueryKey(api.event.get, event.transactionId, 'query'),
-      event
-    )
-
-    /*
-     * Update item in workqueues
-     */
-    utils.events.get.setData(undefined, (events) =>
-      events?.map((ev) =>
-        ev.id !== event.id ? ev : getCurrentEventState(event)
-      )
-    )
-  })
-})
 
 function getPendingMutations(
   mutationCreator: Parameters<typeof getQueryKey>[0]
@@ -67,10 +38,10 @@ function filterOutboxEventsWithMutation<
     | typeof api.event.actions.declare
     | typeof api.event.actions.register
 >(
-  events: EventDocument[],
+  events: EventIndex[],
   mutation: T,
   filter: (
-    event: EventDocument,
+    event: EventIndex,
     parameters: Exclude<ReturnType<T['useMutation']>['variables'], undefined>
   ) => boolean
 ) {
@@ -84,89 +55,40 @@ function filterOutboxEventsWithMutation<
 }
 
 export function useEvents() {
+  const eventsList = api.events.get.useQuery().data ?? []
+
   function getDrafts() {
-    return storedEvents.data.filter(
-      (event) => !event.actions.some((a) => a.type === 'DECLARE')
-    )
+    return eventsList.filter((event) => event.status === 'DRAFT')
   }
 
   function getOutbox() {
-    const eventFromCreateMutations = filterOutboxEventsWithMutation(
-      storedEvents.data,
-      api.event.create,
-      (event, parameters) => event.transactionId === parameters.transactionId
-    )
-
     const eventFromDeclareActions = filterOutboxEventsWithMutation(
-      storedEvents.data,
+      eventsList,
       api.event.actions.declare,
       (event, parameters) => {
-        return (
-          event.id === parameters.eventId ||
-          event.transactionId === parameters.eventId
-        )
+        return event.id === parameters.eventId
       }
     )
 
     const eventFromRegisterActions = filterOutboxEventsWithMutation(
-      storedEvents.data,
+      eventsList,
       api.event.actions.register,
       (event, parameters) => {
-        return (
-          event.id === parameters.eventId ||
-          event.transactionId === parameters.eventId
-        )
+        return event.id === parameters.eventId
       }
     )
 
-    const pendingActions = getPendingMutations(api.event.actions.declare).map(
-      (mutation) => {
-        const variables = mutation.state.variables as Exclude<
-          ReturnType<typeof api.event.actions.declare.useMutation>['variables'],
-          undefined
-        >
-        return {
-          eventId: variables.eventId,
-          action: {
-            type: 'DECLARE' as const,
-            createdAt: new Date().toISOString(),
-            createdBy: 'offline',
-            createdAtLocation: 'TODO',
-            data: variables.data
-          }
-        }
-      }
-    )
-
-    const events = eventFromCreateMutations
+    return eventFromDeclareActions
       .concat(eventFromDeclareActions)
       .concat(eventFromRegisterActions)
       .filter(
         /* uniqueById */
         (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
       )
-      .map((event) => {
-        return {
-          ...event,
-          actions: event.actions.concat(
-            pendingActions
-              .filter(
-                (a) =>
-                  a.eventId === event.id || a.eventId === event.transactionId
-              )
-              .map((a) => a.action)
-          )
-        }
-      })
-
-    return events
   }
-
-  const storedEvents = useEventsSuspenseQuery()
 
   return {
     createEvent,
-    events: storedEvents,
     getEvent: api.event.get,
     getEvents: api.events.get,
     getDrafts,
