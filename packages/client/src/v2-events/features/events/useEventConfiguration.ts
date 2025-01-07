@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { EventConfig } from '@opencrvs/commons/client'
 import { api } from '@client/v2-events/trpc'
 
 /**
@@ -19,16 +20,26 @@ export function useEventConfigurations() {
   return config
 }
 
+export function getAllFields(configuration: EventConfig) {
+  return configuration.actions
+    .flatMap((action) => action.forms.filter((form) => form.active))
+    .flatMap((form) => form.pages.flatMap((page) => page.fields))
+}
+
 /**
  * Fetches configured events and finds a matching event
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event
  * @returns event configuration
  */
-export function useEventConfiguration(eventIdentifier: string) {
+export function useEventConfiguration(eventIdentifier: string): {
+  eventConfiguration: EventConfig
+} {
   const [config] = api.config.get.useSuspenseQuery()
   const eventConfiguration = config.find(
     (event) => event.id === eventIdentifier
   )
-
+  if (!eventConfiguration) {
+    throw new Error('Event configuration not found')
+  }
   return { eventConfiguration }
 }

@@ -60,7 +60,7 @@ export function Debug() {
   }
 
   const mutations = queryClient.getMutationCache().getAll()
-  const storedEvents = events.events
+
   return (
     <>
       <Container>
@@ -93,17 +93,6 @@ export function Debug() {
             <button onClick={() => queryClient.clear()}>
               Clear React Query buffer
             </button>
-          </li>
-          <li>
-            {/* eslint-disable-next-line no-console */}
-            <button onClick={() => console.log(events.events.data)}>
-              console.log stored events
-            </button>
-          </li>
-          <li>
-            <Text element="span" variant="reg12">
-              Events in offline storage: {storedEvents.data.length}
-            </Text>
           </li>
         </ul>
       </Container>

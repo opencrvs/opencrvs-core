@@ -85,7 +85,7 @@ export function WorkqueueIndex() {
   }
 
   const events = getEvents.useQuery()
-  const outbox = getOutbox().map(getCurrentEventState)
+  const outbox = getOutbox()
 
   const eventsWithoutOutbox =
     events.data?.filter(
