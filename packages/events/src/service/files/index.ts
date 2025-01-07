@@ -77,8 +77,11 @@ export async function presignFilesInEvent(event: EventDocument, token: string) {
             fieldId
           )?.type === 'FILE'
       )
-      .map<[string, string, FileFieldValue]>(([fieldId, value]) => {
-        return [action.type, fieldId, value as FileFieldValue]
+      .filter((value): value is [string, Exclude<FileFieldValue, null>] => {
+        return value[1] !== null
+      })
+      .map(([fieldId, value]) => {
+        return [action.type, fieldId, value] as const
       })
   )
 

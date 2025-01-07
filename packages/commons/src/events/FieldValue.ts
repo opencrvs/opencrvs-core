@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import { FieldType } from './FieldConfig'
 
 const TextFieldValue = z.string()
 export type TextFieldValue = z.infer<typeof TextFieldValue>
@@ -30,6 +31,19 @@ export const FileFieldValue = z
 export type FileFieldValue = z.infer<typeof FileFieldValue>
 
 const RadioGroupFieldValue = z.string()
+export type RadioGroupFieldValue = z.infer<typeof RadioGroupFieldValue>
+
+export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
+  ? TextFieldValue
+  : T extends 'PARAGRAPH'
+  ? ParagraphFieldValue
+  : T extends 'DATE'
+  ? DateFieldValue
+  : T extends 'FILE'
+  ? FileFieldValue
+  : T extends 'RADIO_GROUP'
+  ? RadioGroupFieldValue
+  : never
 
 export const FieldValue = z.union([
   TextFieldValue,

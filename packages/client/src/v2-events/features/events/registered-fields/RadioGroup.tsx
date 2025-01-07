@@ -8,32 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import {
-  InputField,
-  useFormContext,
-  RadioGroup as RadioGroupComponent
-} from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons'
-import { FormFieldValueToString } from './TextField'
+import { RadioGroupFieldValue } from '@opencrvs/commons/client'
 
 export const INITIAL_RADIO_GROUP_VALUE = ''
 
-export function RadioGroup({ id, options }: FieldProps<'RADIO_GROUP'>) {
-  const { setValue, watch } = useFormContext()
-  const value = watch(id)
-
-  return (
-    <InputField id={id} touched={false}>
-      <RadioGroupComponent
-        name={id}
-        options={options}
-        value={value}
-        onChange={(val) => setValue(id, val)}
-      />
-    </InputField>
-  )
-}
-
-export const radioGroupToString: FormFieldValueToString = (value) =>
-  (value as string) || ''
+export const radioGroupToString = (value: RadioGroupFieldValue) => value || ''

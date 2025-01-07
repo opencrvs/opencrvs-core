@@ -15,8 +15,10 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
+  FieldTypeToFieldValue,
   validate
 } from '@opencrvs/commons/client'
+
 import { DependencyInfo } from '@client/forms'
 import {
   dateToString,
@@ -28,9 +30,6 @@ import {
   radioGroupToString,
   textToString
 } from '@client/v2-events/features/events/registered-fields'
-function isRecord<V>(value: unknown): value is Record<string, V> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -92,50 +91,6 @@ export function getDependentFields(
   })
 }
 
-export function flatten<T>(
-  obj: Record<string, T>,
-  parentKey = '',
-  separator = '.'
-): Record<string, T> {
-  const result: Record<string, T> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    const newKey = parentKey ? `${parentKey}${separator}${key}` : key
-
-    if (isRecord(value)) {
-      Object.assign(
-        result,
-        flatten(value as Record<string, T>, newKey, separator)
-      )
-    } else {
-      result[newKey] = value
-    }
-  }
-
-  return result
-}
-
-export function unflatten<T>(
-  obj: Record<string, T>,
-  separator = '.'
-): Record<string, T | Record<string, T>> {
-  const result: Record<string, T | Record<string, T>> = {}
-
-  for (const [key, value] of Object.entries(obj)) {
-    const keys = key.split(separator)
-    let current: Record<string, T | Record<string, T>> = result
-
-    keys.forEach((part, index) => {
-      if (!current[part] || typeof current[part] !== 'object') {
-        current[part] = index === keys.length - 1 ? value : {}
-      }
-      current = current[part] as Record<string, T | Record<string, T>>
-    })
-  }
-
-  return result
-}
-
 const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.TEXT]: INITIAL_TEXT_VALUE,
   [FieldType.DATE]: INITIAL_DATE_VALUE,
@@ -151,16 +106,19 @@ export function getInitialValues(fields: FieldConfig[]) {
   }, {})
 }
 
-export function fieldValueToString(field: FieldType, value: FieldValue) {
+export function fieldValueToString<T extends FieldType>(
+  field: T,
+  value: FieldTypeToFieldValue<T>
+) {
   switch (field) {
     case FieldType.DATE:
-      return dateToString(value)
+      return dateToString(value as FieldTypeToFieldValue<'DATE'>)
     case FieldType.TEXT:
-      return textToString(value)
+      return textToString(value as FieldTypeToFieldValue<'TEXT'>)
     case FieldType.PARAGRAPH:
-      return paragraphToString(value)
+      return paragraphToString(value as FieldTypeToFieldValue<'PARAGRAPH'>)
     case FieldType.RADIO_GROUP:
-      return radioGroupToString(value)
+      return radioGroupToString(value as FieldTypeToFieldValue<'RADIO_GROUP'>)
     default:
       return ''
   }

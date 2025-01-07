@@ -12,7 +12,6 @@
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
 import { DATE, PARAGRAPH, TEXT } from '@client/forms'
-import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -28,6 +27,7 @@ import {
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
+import { ActionFormData } from '@opencrvs/commons'
 import {
   FieldConfig,
   FieldValue,
@@ -49,7 +49,6 @@ import {
   useIntl
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
-import { ActionFormData } from '@opencrvs/commons'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -223,7 +222,7 @@ interface ExposedProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: Record<string, ActionFormData | null>
+  initialValues?: ActionFormData
 }
 
 type AllProps = ExposedProps & IntlShapeProps & FormikProps<ActionFormData>
