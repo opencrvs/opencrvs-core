@@ -11,31 +11,27 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 
-export const SummaryConfigInput = z
+const Field = z.object({
+  id: z.string().describe('Id of a field defined under form.'),
+  // label is enforced during runtime.
+  label: TranslationConfig,
+  emptyValueMessage: TranslationConfig.optional()
+})
+
+const FieldInput = Field.extend({
+  // label is enforced during runtime.
+  label: TranslationConfig.optional()
+})
+
+export const SummaryConfig = z
   .object({
     title: TranslationConfig.describe('Header title of summary'),
-    fields: z
-      .array(
-        z.object({
-          id: z.string().describe('Id of a field defined under form.'),
-          // label is enforced during runtime.
-          label: TranslationConfig.optional(),
-          emptyValueMessage: TranslationConfig.optional()
-        })
-      )
-      .describe('Fields rendered in summary view.')
+    fields: z.array(Field).describe('Fields rendered in summary view.')
   })
   .describe('Configuration for summary in event.')
 
-export const SummaryConfig = SummaryConfigInput.extend({
-  fields: z.array(
-    z.object({
-      id: z.string().describe('Id of a field defined under form.'),
-      // label is enforced during runtime.
-      label: TranslationConfig,
-      emptyValueMessage: TranslationConfig.optional()
-    })
-  )
+export const SummaryConfigInput = SummaryConfig.extend({
+  fields: z.array(FieldInput)
 })
 
 export type SummaryConfig = z.infer<typeof SummaryConfig>
