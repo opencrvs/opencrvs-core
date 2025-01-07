@@ -19,7 +19,10 @@ import { findPageFields, resolveFieldLabels } from './utils'
 export const defineConfig = (config: EventConfigInput) => {
   const parsed = EventConfig.parse(config)
 
-  const pageFields = findPageFields(parsed)
+  const pageFields = findPageFields(parsed).map(({ id, label }) => ({
+    id,
+    label
+  }))
 
   return EventConfig.parse({
     ...parsed,

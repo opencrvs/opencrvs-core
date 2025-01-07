@@ -28,9 +28,7 @@ function getTrpcClient() {
   return api.createClient({
     links: [
       loggerLink({
-        enabled: (op) =>
-          process.env.NODE_ENV === 'development' ||
-          (op.direction === 'down' && op.result instanceof Error)
+        enabled: (op) => op.direction === 'down' && op.result instanceof Error
       }),
       httpLink({
         url: '/api/events',
@@ -63,11 +61,10 @@ function getQueryClient() {
 function createIDBPersister(idbValidKey = 'reactQuery') {
   return {
     persistClient: async (client: PersistedClient) => {
-      await storage.setItem(idbValidKey, JSON.stringify(client))
+      await storage.setItem(idbValidKey, client)
     },
     restoreClient: async () => {
       const client = await storage.getItem<PersistedClient>(idbValidKey)
-
       return client || undefined
     },
     removeClient: async () => {
@@ -89,7 +86,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: 1000 * 60 * 60 * 4,
+        maxAge: undefined,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
           shouldDehydrateMutation: (mut) => {

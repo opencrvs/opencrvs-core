@@ -11,6 +11,12 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from '../conditionals/conditionals'
+import {
+  DateFieldValue,
+  FileFieldValue,
+  ParagraphFieldValue,
+  TextFieldValue
+} from './FieldValue'
 
 export const ConditionalTypes = {
   SHOW: 'SHOW',
@@ -51,6 +57,7 @@ const BaseField = z.object({
     .optional(),
   required: z.boolean().default(false).optional(),
   disabled: z.boolean().default(false).optional(),
+  hidden: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z
     .array(
@@ -78,6 +85,14 @@ export const FieldType = {
 
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]
+
+export type FieldValueByType = {
+  [FieldType.TEXT]: TextFieldValue
+  [FieldType.DATE]: DateFieldValue
+  [FieldType.PARAGRAPH]: ParagraphFieldValue
+  [FieldType.RADIO_GROUP]: string
+  [FieldType.FILE]: FileFieldValue
+}
 
 const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
@@ -113,10 +128,6 @@ const File = BaseField.extend({
   type: z.literal(FieldType.FILE)
 }).describe('File upload')
 
-const Hidden = BaseField.extend({
-  type: z.literal(FieldType.HIDDEN)
-}).describe('Hidden field')
-
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
   options: z.array(
@@ -132,9 +143,9 @@ export const FieldConfig = z.discriminatedUnion('type', [
   DateField,
   Paragraph,
   RadioGroup,
-  Hidden,
   File
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>
+
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

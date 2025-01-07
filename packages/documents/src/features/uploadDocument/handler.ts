@@ -13,7 +13,11 @@ import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
+import { getUserId, logger } from '@opencrvs/commons'
 
+import { z } from 'zod'
+import { Readable } from 'stream'
+import { badRequest, notFound } from '@hapi/boom'
 export interface IDocumentPayload {
   fileData: string
   metaData?: Record<string, string>
@@ -24,10 +28,79 @@ export type IFileInfo = {
   mime: string
 }
 
+const HapiSchema = z.object({
+  filename: z.string().min(1, 'Filename is required'),
+  headers: z.record(z.string()),
+  bytes: z.number().optional()
+})
+
+const FileSchema = z
+  .custom<Readable & { hapi: z.infer<typeof HapiSchema> }>((val) => {
+    return '_readableState' in val && 'hapi' in val
+  }, 'Not a readable stream or missing hapi field')
+  .refine(
+    (val) => HapiSchema.safeParse(val.hapi).success,
+    'hapi does not match the required structure'
+  )
+
+const Payload = z.object({
+  file: FileSchema,
+  transactionId: z.string()
+})
+
+export async function fileUploadHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const userId = getUserId(request.headers.authorization)
+  const payload = await Payload.parseAsync(request.payload).catch((error) => {
+    logger.error(error)
+    throw badRequest('Invalid payload')
+  })
+
+  const { file, transactionId } = payload
+
+  const extension = file.hapi.filename.split('.').pop()
+  const filename = `${transactionId}.${extension}`
+
+  await minioClient.putObject(
+    MINIO_BUCKET,
+    'event-attachments/' + filename,
+    file,
+    {
+      'created-by': userId
+    }
+  )
+
+  return 'event-attachments/' + filename
+}
+
+export async function fileExistsHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const { filename } = request.params
+  const exists = await minioClient.statObject(
+    MINIO_BUCKET,
+    'event-attachments/' + filename
+  )
+  if (!exists) {
+    return notFound('File not found')
+  }
+  return h.response().code(200)
+}
+
 export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const userId = getUserId(request.headers.authorization)
+  if (!userId)
+    return Promise.reject(
+      new Error(
+        `request failed: Authorization token is missing or does not contain a valid user ID.`
+      )
+    )
   const payload = request.payload as IDocumentPayload
   const ref = uuid()
   try {
@@ -37,8 +110,9 @@ export async function documentUploadHandler(
     const generateFileName = `${ref}.${fileType.ext}`
 
     await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
+      ...payload.metaData,
       'content-type': fileType.mime,
-      ...payload.metaData
+      'created-by': userId
     })
 
     return h
