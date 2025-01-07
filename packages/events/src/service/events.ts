@@ -19,9 +19,11 @@ import {
 import { getClient } from '@events/storage/mongodb'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
+import { deleteEventIndex, indexEvent } from './indexing/indexing'
+import * as _ from 'lodash'
+import { TRPCError } from '@trpc/server'
 import { getEventConfigurations } from './config/config'
-import { fileExists } from './files'
-import { indexEvent } from './indexing/indexing'
+import { deleteFile, fileExists } from './files'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -54,6 +56,63 @@ export async function getEventById(id: string) {
   }
 
   return event
+}
+
+export async function deleteEvent(
+  eventId: string,
+  { token }: { token: string }
+) {
+  const db = await getClient()
+
+  const collection = db.collection<EventDocument>('events')
+  const event = await collection.findOne({ id: eventId })
+
+  if (!event) {
+    throw new EventNotFoundError(eventId)
+  }
+
+  const hasNonDeletableActions = event.actions.some(
+    ({ type }) => type !== ActionType.CREATE && type !== ActionType.DRAFT
+  )
+  if (hasNonDeletableActions) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'Event has actions that cannot be deleted'
+    })
+  }
+
+  await deleteEventAttachments(token, event)
+
+  const { id } = event
+  await collection.deleteOne({ id })
+  await deleteEventIndex(id)
+  return { id }
+}
+
+async function deleteEventAttachments(token: string, event: EventDocument) {
+  const config = await getEventConfigurations(token)
+
+  const form = config
+    .find((config) => config.id === event.type)
+    ?.actions.find((action) => action.type === event.type)
+    ?.forms.find((form) => form.active)
+
+  const fieldTypes = form?.pages.flatMap((page) => page.fields)
+
+  for (const action of event.actions) {
+    for (const [key, value] of Object.entries(action.data)) {
+      const isFile =
+        fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
+
+      const fileValue = FileFieldValue.safeParse(value)
+
+      if (!isFile || !fileValue.success || !fileValue.data) {
+        continue
+      }
+
+      await deleteFile(fileValue.data.filename, token)
+    }
+  }
 }
 
 export async function createEvent({
@@ -139,8 +198,8 @@ export async function addAction(
       continue
     }
 
-    if (!(await fileExists(fileValue.data!.filename, token))) {
-      throw new Error(`File not found: ${value}`)
+    if (fileValue.data && !(await fileExists(fileValue.data.filename, token))) {
+      throw new Error(`File not found: ${fileValue.data.filename}`)
     }
   }
 
@@ -156,6 +215,9 @@ export async function addAction(
           createdAt: now,
           createdAtLocation
         }
+      },
+      $set: {
+        updatedAt: now
       }
     }
   )

@@ -15,12 +15,13 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
+import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
+import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -29,12 +30,21 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const [event] = events.getEvent(eventId)
+  const formEventId = useEventFormData((state) => state.eventId)
+  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const currentState = getCurrentEventState(event)
+
+  useEffect(() => {
+    if (formEventId !== event.id) {
+      setFormValues(event.id, currentState.data)
+    }
+  }, [currentState.data, event.id, formEventId, setFormValues])
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration?.actions
+  const formPages = configuration.actions
     .find((action) => action.type === ActionType.DECLARE)
     ?.forms.find((form) => form.active)?.pages
 
@@ -60,6 +70,23 @@ export function Pages() {
       )
     }
   }, [pageId, currentPageId, navigate, eventId])
+
+  /*
+   * If the event had a temporary ID and the record got persisted while the user
+   * was on the declare page, we need to navigate to the event with the canonical
+   * ID.
+   */
+  useEffect(() => {
+    const hasTemporaryId = event.id === event.transactionId
+
+    if (eventId !== event.id && !hasTemporaryId) {
+      navigate(
+        ROUTES.V2.EVENTS.DECLARE.buildPath({
+          eventId: event.id
+        })
+      )
+    }
+  }, [event.id, event.transactionId, eventId, navigate])
 
   return (
     <>
