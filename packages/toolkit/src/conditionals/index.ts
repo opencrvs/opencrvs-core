@@ -120,6 +120,21 @@ export function field(fieldId: string) {
         }
       },
       required: ['$form']
+    }),
+    isInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              enum: values
+            }
+          },
+          required: [fieldId]
+        }
+      },
+      required: ['$form']
     })
   }
 }
