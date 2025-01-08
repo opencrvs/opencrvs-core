@@ -13,10 +13,18 @@ import { useMutation } from '@tanstack/react-query'
 import { getMutationKey } from '@trpc/react-query'
 import { api, utils } from '@client/v2-events/trpc'
 
+function isTemporaryId(id: string) {
+  return id.startsWith('tmp-')
+}
+
 function waitUntilEventIsCreated<R>(
   canonicalMutationFn: (params: { eventId: string }) => Promise<R>
 ): (params: { eventId: string }) => Promise<R> {
   return async ({ eventId }) => {
+    if (!isTemporaryId(eventId)) {
+      return canonicalMutationFn({ eventId: eventId })
+    }
+
     const localVersion = utils.event.get.getData(eventId)
     if (!localVersion || localVersion.id === localVersion.transactionId) {
       throw new Error('Event that has not been stored yet cannot be deleted')
@@ -27,7 +35,12 @@ function waitUntilEventIsCreated<R>(
 }
 
 utils.event.delete.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
+  retry: (_, error) => {
+    if (error.data?.httpStatus === 404 || error.data?.httpStatus === 400) {
+      return false
+    }
+    return true
+  },
   retryDelay: 10000,
   onSuccess: ({ id }) => {
     void utils.events.get.invalidate()

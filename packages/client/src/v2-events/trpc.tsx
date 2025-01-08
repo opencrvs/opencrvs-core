@@ -15,12 +15,13 @@ import {
   type PersistedClient,
   type Persister
 } from '@tanstack/react-query-persist-client'
-import { httpLink, loggerLink } from '@trpc/client'
+import { httpLink, loggerLink, TRPCClientError } from '@trpc/client'
 import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
 import React from 'react'
 import superjson from 'superjson'
-import { getToken } from '@client/utils/authUtils'
+
 import { storage } from '@client/storage'
+import { getToken } from '@client/utils/authUtils'
 
 export const api = createTRPCReact<AppRouter>()
 
@@ -89,8 +90,16 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         maxAge: undefined,
         buster: 'persisted-indexed-db',
         dehydrateOptions: {
-          shouldDehydrateMutation: (mut) => {
-            return mut.state.status !== 'success'
+          shouldDehydrateMutation: (mutation) => {
+            if (mutation.state.status === 'error') {
+              const error = mutation.state.error
+              if (error instanceof TRPCClientError && error.data?.httpStatus) {
+                return !error.data.httpStatus.toString().startsWith('4')
+              }
+              return true
+            }
+
+            return mutation.state.status !== 'success'
           }
         }
       }}
