@@ -56,7 +56,7 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
-export function isDraft(event: EventDocument): boolean {
+export function isUndeclaredDraft(event: EventDocument): boolean {
   return event.actions.every(
     ({ type }) => type === ActionType.CREATE || type === ActionType.DRAFT
   )

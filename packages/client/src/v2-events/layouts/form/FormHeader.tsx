@@ -16,7 +16,7 @@ import { v4 as uuid } from 'uuid'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
-import { isDraft } from '@opencrvs/commons/client'
+import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
@@ -95,7 +95,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
           <ToggleMenu
             id={`event-menu`}
             menuItems={
-              isDraft(event)
+              isUndeclaredDraft(event)
                 ? [
                     {
                       label: 'Delete declaration',

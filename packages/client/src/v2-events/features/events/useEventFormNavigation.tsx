@@ -13,7 +13,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
 import { EventDocument } from '@opencrvs/commons'
-import { isDraft } from '@opencrvs/commons/client'
+import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from './useEvents/useEvents'
@@ -107,7 +107,7 @@ export function useEventFormNavigation() {
     if (!exitConfirm) {
       return
     }
-    if (isDraft(event)) {
+    if (isUndeclaredDraft(event)) {
       deleteEvent.mutate({ eventId: event.id })
     }
     goToHome()
