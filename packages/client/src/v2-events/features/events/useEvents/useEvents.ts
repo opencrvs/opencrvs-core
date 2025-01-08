@@ -96,6 +96,10 @@ export function useEvents() {
     getOutbox,
     actions: {
       draft: useEventAction(utils.event.actions.draft, api.event.actions.draft),
+      validate: useEventAction(
+        utils.event.actions.validate,
+        api.event.actions.validate
+      ),
       notify: useEventAction(
         utils.event.actions.notify,
         api.event.actions.notify

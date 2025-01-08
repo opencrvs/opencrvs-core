@@ -26,6 +26,9 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.DRAFT) {
       return EventStatus.DRAFT
     }
+    if (action.type === ActionType.VALIDATE) {
+      return EventStatus.VALIDATED
+    }
     if (action.type === ActionType.REGISTER) {
       return EventStatus.REGISTERED
     }

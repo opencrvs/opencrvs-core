@@ -150,7 +150,7 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
           },
           { status: isInOutbox ? 'OUTBOX' : event.status }
         ),
