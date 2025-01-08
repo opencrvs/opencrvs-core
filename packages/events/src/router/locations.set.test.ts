@@ -16,14 +16,20 @@ const nationalSystemAdminClient = createTestClient([
   userScopes.nationalSystemAdmin
 ])
 
-const registarClient = createTestClient()
+const registrarClient = createTestClient()
 
 const generator = payloadGenerator()
 
-test('prevents unauthorized access', async () => {
+test('prevents unauthorized access from registrar', async () => {
   await expect(
-    registarClient.locations.set([])
+    registrarClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
+})
+
+test('Allows national system admin to set locations', async () => {
+  await expect(
+    nationalSystemAdminClient.locations.set(generator.locations.set(1))
+  ).resolves.toEqual(undefined)
 })
 
 test('Prevents sending empty payload', async () => {

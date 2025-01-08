@@ -13,7 +13,7 @@ import { appRouter, t } from '@events/router'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { Scope, userScopes } from '@opencrvs/commons'
+import { Scope, userRoleScopes } from '@opencrvs/commons'
 
 const { createCallerFactory } = t
 
@@ -30,7 +30,7 @@ export function createTestClient(scopes?: Scope[]) {
 
 const createTestToken = (scopes?: Scope[]) =>
   jwt.sign(
-    { scope: scopes ?? [userScopes.register, userScopes.declare] },
+    { scope: scopes ?? userRoleScopes.REGISTRATION_AGENT },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',

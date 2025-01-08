@@ -58,7 +58,7 @@ export async function setLocations(incomingLocations: Array<Location>) {
 }
 
 export const getLocations = async () => {
-  const { db } = await getClient()
+  const db = await getClient()
 
   return db.collection<Location>('locations').find().toArray()
 }
