@@ -19,6 +19,7 @@ import { Debug } from '@client/v2-events/features/debug/debug'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import * as Register from '@client/v2-events/features/events/actions/register'
 import { WorkqueueLayout, FormLayout } from '@client/v2-events/layouts'
+import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import { ROUTES } from './routes'
 
 /**
@@ -62,6 +63,10 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
       element: <EventSelection />
+    },
+    {
+      path: ROUTES.V2.EVENTS.DELETE.path,
+      element: <DeleteEvent />
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,

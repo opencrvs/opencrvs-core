@@ -149,6 +149,7 @@ export function useEventFormNavigation() {
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
+      goToHome()
     }
   }
 
