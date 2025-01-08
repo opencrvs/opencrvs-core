@@ -237,31 +237,7 @@ export async function approveRejectHandler(
   const { eventType, statusType } = request.params
   const bundle = request.payload as { trackingId: string }
 
-  let currentTrigger: TRIGGERS
-
-  if (eventType === 'BIRTH' && statusType === 'rejected') {
-    currentTrigger = TRIGGERS.BIRTH_REJECTED
-  } else if (eventType === 'BIRTH' && statusType === 'validated') {
-    currentTrigger = TRIGGERS.BIRTH_VALIDATED
-  } else if (eventType === 'BIRTH' && statusType === 'archived') {
-    currentTrigger = TRIGGERS.BIRTH_ARCHIVED
-  } else if (eventType === 'BIRTH' && statusType === 'certified') {
-    currentTrigger = TRIGGERS.BIRTH_CERTIFIED
-  } else if (eventType === 'BIRTH' && statusType === 'issued') {
-    currentTrigger = TRIGGERS.BIRTH_ISSUED
-  } else if (eventType === 'DEATH' && statusType === 'rejected') {
-    currentTrigger = TRIGGERS.DEATH_REJECTED
-  } else if (eventType === 'DEATH' && statusType === 'validated') {
-    currentTrigger = TRIGGERS.DEATH_VALIDATED
-  } else if (eventType === 'DEATH' && statusType === 'archived') {
-    currentTrigger = TRIGGERS.DEATH_ARCHIVED
-  } else if (eventType === 'DEATH' && statusType === 'certified') {
-    currentTrigger = TRIGGERS.DEATH_CERTIFIED
-  } else if (eventType === 'DEATH' && statusType === 'issued') {
-    currentTrigger = TRIGGERS.DEATH_ISSUED
-  } else {
-    throw new Error('Invalid eventType or statusType')
-  }
+  const currentTrigger = `${eventType}/${statusType}`
 
   const webhookQueue = getQueue()
 
@@ -271,16 +247,14 @@ export async function approveRejectHandler(
   }
   logger.info(`Subscribed webhooks: ${JSON.stringify(webhooks)}`)
   for (const webhookToNotify of webhooks) {
-    logger.info(
-      `Queueing webhook ${webhookToNotify.trigger} ${TRIGGERS[currentTrigger]}`
-    )
-    if (webhookToNotify.trigger === TRIGGERS[currentTrigger]) {
+    logger.info(`Queueing webhook ${webhookToNotify.trigger} ${currentTrigger}`)
+    if (webhookToNotify.trigger === currentTrigger) {
       const payload = {
         timestamp: new Date().toISOString(),
         id: webhookToNotify.webhookId,
         event: {
           hub: {
-            topic: TRIGGERS[currentTrigger]
+            topic: currentTrigger
           },
           context: {
             trackingId: bundle?.trackingId,
@@ -302,7 +276,7 @@ export async function approveRejectHandler(
         JSON.stringify(payload)
       )
       webhookQueue.add(
-        `${webhookToNotify.webhookId}_${TRIGGERS[currentTrigger]}`,
+        `${webhookToNotify.webhookId}_${currentTrigger}`,
         {
           payload,
           url: webhookToNotify.address,
