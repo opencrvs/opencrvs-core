@@ -135,6 +135,23 @@ export function field(fieldId: string) {
         }
       },
       required: ['$form']
+    }),
+    isNotInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              not: {
+                enum: values
+              }
+            }
+          },
+          required: [fieldId]
+        }
+      },
+      required: ['$form']
     })
   }
 }
