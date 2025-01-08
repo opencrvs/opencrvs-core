@@ -770,7 +770,7 @@ export function createRegisterTask(previousTask: SavedTask): Task {
 
   const registeredTask = createNewTaskResource(
     previousTask,
-    [timeLoggedMSExtension],
+    timeLoggedMSExtension ? [timeLoggedMSExtension] : [],
     'REGISTERED'
   )
 
