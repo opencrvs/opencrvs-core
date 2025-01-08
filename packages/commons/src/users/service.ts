@@ -10,7 +10,7 @@
  */
 
 import fetch from 'node-fetch'
-import { UserRole } from 'src/authentication'
+import { UserRole } from '../authentication'
 
 interface IUserName {
   use: string
