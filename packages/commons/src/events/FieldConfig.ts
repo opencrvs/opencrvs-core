@@ -184,3 +184,4 @@ export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
+export type FieldConditional = z.infer<typeof FieldConditional>
