@@ -19,6 +19,7 @@ import * as Declare from '@client/v2-events/features/events/actions/declare'
 import * as Register from '@client/v2-events/features/events/actions/register'
 import { WorkqueueLayout, FormLayout } from '@client/v2-events/layouts'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
+import { Debug } from '@client/v2-events/features/debug/debug'
 import { ROUTES } from './routes'
 
 /**
@@ -31,6 +32,7 @@ export const routesConfig = {
   element: (
     <TRPCProvider>
       <Outlet />
+      <Debug />
     </TRPCProvider>
   ),
   children: [
