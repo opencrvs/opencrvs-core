@@ -33,6 +33,7 @@ import {
 import { EventConfig, getUUID } from '@opencrvs/commons'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
 import { presignFilesInEvent } from '@events/service/files'
+import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -110,7 +111,11 @@ export const appRouter = router({
     get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-      return eventWithSignedFiles
+      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+        eventWithSignedFiles,
+        ctx.user.id
+      )
+      return eventWithUserSpecificDrafts
     }),
     delete: publicProcedure
       .input(z.object({ eventId: z.string() }))
