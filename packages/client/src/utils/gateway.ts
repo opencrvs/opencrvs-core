@@ -2228,7 +2228,8 @@ export enum SystemStatus {
 export enum SystemType {
   Health = 'HEALTH',
   RecordSearch = 'RECORD_SEARCH',
-  Webhook = 'WEBHOOK'
+  Webhook = 'WEBHOOK',
+  SelfServicePortal = 'SELF_SERVICE_PORTAL'
 }
 
 export enum TelecomSystem {
