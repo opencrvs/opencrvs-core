@@ -1,0 +1,89 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { createTestClient } from '@events/tests/utils'
+import { payloadGenerator } from '@events/tests/generators'
+import { userScopes } from '@opencrvs/commons'
+
+const nationalSystemAdminClient = createTestClient([
+  userScopes.nationalSystemAdmin
+])
+
+const registarClient = createTestClient()
+
+const generator = payloadGenerator()
+
+test('prevents unauthorized access', async () => {
+  await expect(
+    registarClient.locations.set([])
+  ).rejects.toThrowErrorMatchingSnapshot()
+})
+
+test('Prevents sending empty payload', async () => {
+  await expect(
+    nationalSystemAdminClient.locations.set([])
+  ).rejects.toThrowErrorMatchingSnapshot()
+})
+
+test('Creates single location', async () => {
+  const locationPayload = generator.locations.set([
+    { id: '123-456-789', partOf: null, name: 'Location foobar' }
+  ])
+
+  await nationalSystemAdminClient.locations.set(locationPayload)
+
+  const locations = await nationalSystemAdminClient.locations.get()
+
+  expect(locations).toHaveLength(1)
+  expect(locations).toMatchObject(locationPayload)
+})
+
+test('Creates multiple locations', async () => {
+  const parentId = 'parent-id'
+
+  await nationalSystemAdminClient.locations.set(
+    generator.locations.set([
+      { id: 'parentId' },
+      { partOf: parentId },
+      { partOf: parentId },
+      {}
+    ])
+  )
+
+  const locations = await nationalSystemAdminClient.locations.get()
+
+  expect(locations).toHaveLength(4)
+})
+
+test('Removes existing locations not in payload', async () => {
+  const initialPayload = generator.locations.set(5)
+
+  await nationalSystemAdminClient.locations.set(initialPayload)
+
+  const initialLocations = await nationalSystemAdminClient.locations.get()
+  expect(initialLocations).toHaveLength(initialPayload.length)
+
+  const [removedLocation, ...remainingLocationsPayload] = initialPayload
+
+  await nationalSystemAdminClient.locations.set(remainingLocationsPayload)
+
+  const remainingLocationsAfterDeletion =
+    await nationalSystemAdminClient.locations.get()
+
+  expect(remainingLocationsAfterDeletion).toHaveLength(
+    remainingLocationsPayload.length
+  )
+
+  expect(
+    remainingLocationsAfterDeletion.some(
+      (location) => location.id === removedLocation.id
+    )
+  ).toBe(false)
+})
