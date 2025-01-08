@@ -20,11 +20,13 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
     }
+    // The real status of the event can only be DRAFT if it hasn't been declared
+    if (status === EventStatus.CREATED && action.type === ActionType.DRAFT) {
+      return EventStatus.DRAFT
+    }
+
     if (action.type === ActionType.DECLARE) {
       return EventStatus.DECLARED
-    }
-    if (action.type === ActionType.DRAFT) {
-      return EventStatus.DRAFT
     }
     if (action.type === ActionType.REGISTER) {
       return EventStatus.REGISTERED
@@ -52,6 +54,12 @@ function getData(actions: Array<ActionDocument>) {
       ...action.data
     }
   }, {})
+}
+
+export function isDraft(event: EventDocument): boolean {
+  return event.actions.every(
+    ({ type }) => type === ActionType.CREATE || type === ActionType.DRAFT
+  )
 }
 
 export function getCurrentEventState(event: EventDocument): EventIndex {

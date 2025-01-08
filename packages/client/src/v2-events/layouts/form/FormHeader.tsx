@@ -16,6 +16,7 @@ import { v4 as uuid } from 'uuid'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
+import { isDraft } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
@@ -54,7 +55,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
   if (!eventId) {
     throw new Error('Event id is required')
   }
-
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
   const createDraft = events.actions.draft
 
   const saveAndExit = useCallback(() => {
@@ -63,8 +64,8 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
   }, [createDraft, eventId, formValues, goToHome])
 
   const onExit = useCallback(async () => {
-    await exit(eventId)
-  }, [eventId, exit])
+    await exit(event)
+  }, [event, exit])
 
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId)
@@ -93,13 +94,17 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
           </Button>
           <ToggleMenu
             id={`event-menu`}
-            menuItems={[
-              {
-                label: 'Delete declaration',
-                icon: <Icon name="Trash" />,
-                handler: onDelete
-              }
-            ]}
+            menuItems={
+              isDraft(event)
+                ? [
+                    {
+                      label: 'Delete declaration',
+                      icon: <Icon name="Trash" />,
+                      handler: onDelete
+                    }
+                  ]
+                : []
+            }
             toggleButton={
               <Icon color="primary" name="DotsThreeVertical" size="large" />
             }
