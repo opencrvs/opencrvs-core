@@ -85,7 +85,7 @@ export function WorkqueueIndex() {
   }
 
   const events = getEvents.useQuery()
-  const outbox = getOutbox().map(getCurrentEventState)
+  const outbox = getOutbox()
 
   const eventsWithoutOutbox =
     events.data?.filter(
@@ -101,12 +101,11 @@ export function WorkqueueIndex() {
   )
 }
 
+type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
+
 /**
  * A Workqueue that displays a table of events based on search criteria.
  */
-
-type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
-
 function Workqueue({
   events,
   config,
@@ -163,7 +162,7 @@ function Workqueue({
           />
         ) : (
           <NondecoratedLink
-            to={ROUTES.V2.EVENTS.EVENT.buildPath({
+            to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
               eventId: event.id
             })}
           >

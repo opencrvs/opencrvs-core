@@ -25,7 +25,8 @@ import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
-  error: string
+  error?: string
+  comment?: string
   identifiers?: {
     type: SupportedPatientIdentifierCode
     value: string
@@ -38,7 +39,7 @@ export async function markEventAsRegisteredCallbackHandler(
 ) {
   const token = getToken(request)
   const compositionId = request.params.id
-  const { registrationNumber, error, identifiers } =
+  const { registrationNumber, error, comment, identifiers } =
     request.payload as EventRegistrationPayload
 
   if (error) {
@@ -60,6 +61,7 @@ export async function markEventAsRegisteredCallbackHandler(
     savedRecord,
     registrationNumber,
     token,
+    comment,
     identifiers
   )
   const event = getEventType(bundle)

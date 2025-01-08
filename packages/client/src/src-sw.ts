@@ -18,6 +18,9 @@ import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 
+// eslint-disable-next-line @typescript-eslint/no-use-before-define
+self.__WB_DISABLE_DEV_LOGS = true
+
 declare let self: ServiceWorkerGlobalScope
 
 self.addEventListener('install', (event) => {
@@ -82,7 +85,7 @@ registerRoute(/http(.+)config$/, new NetworkFirst())
 registerRoute(
   import.meta.env.DEV
     ? /http(.+)localhost:3535\/ocrvs\/.+/
-    : /http(.+)minio\.(.+)\/ocrvs\/.+/,
+    : /http(.+)minio\.(.+)\/.*ocrvs.*\/.+/,
   new CacheFirst()
 )
 

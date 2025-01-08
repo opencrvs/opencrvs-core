@@ -92,6 +92,7 @@ describe('when user starts a new declaration', () => {
     let router: ReturnType<typeof createMemoryRouter>
 
     beforeEach(async () => {
+      await flushPromises()
       const testApp = await createTestApp()
       app = testApp.app
       store = testApp.store
@@ -193,6 +194,8 @@ describe('when user starts a new declaration', () => {
 
       describe('when user enters childBirthDate and clicks to documents page', () => {
         beforeEach(async () => {
+          await flushPromises()
+
           Date.now = vi.fn(() => 1549607679507) // 08-02-2019
           await waitForElement(app, '#childBirthDate-dd')
           app
@@ -213,6 +216,8 @@ describe('when user starts a new declaration', () => {
             .simulate('change', {
               target: { id: 'childBirthDate-yyyy', value: '2018' }
             })
+
+          app.update()
         })
 
         describe('when user goes to documents page', () => {
@@ -220,8 +225,10 @@ describe('when user starts a new declaration', () => {
             await flushPromises()
             await goToDocumentsSection(app)
           })
+
           it('renders list of document upload field', async () => {
             await flushPromises()
+            await waitForElement(app, '#form_section_id_documents-view-group')
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')
@@ -243,6 +250,9 @@ describe('when user starts a new declaration', () => {
             expect(fileInputs).toEqual(5)
           })
           it('No error while uploading valid file', async () => {
+            await flushPromises()
+            app.update()
+            await flushPromises()
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
             app
@@ -258,12 +268,16 @@ describe('when user starts a new declaration', () => {
                   ]
                 }
               })
+
             await flushPromises()
             app.update()
 
             expect(app.find('#upload-error').exists()).toBe(false)
           })
           it('Error while uploading invalid file', async () => {
+            await flushPromises()
+            app.update()
+
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
             app
@@ -300,6 +314,7 @@ describe('when user starts a new declaration', () => {
         })
 
         it('renders preview page', async () => {
+          await flushPromises()
           const button = await waitForElement(app, '#back-to-review-button')
 
           button.hostNodes().simulate('click')
@@ -312,6 +327,7 @@ describe('when user starts a new declaration', () => {
         })
 
         it('should go to input field when user press change button to edit information', async () => {
+          await flushPromises()
           const backToReviewButton = await waitForElement(
             app,
             '#back-to-review-button'
@@ -346,21 +362,32 @@ describe('when user starts a new declaration', () => {
           expect(router.state.location.pathname).toContain('mother')
         })
 
-        it('hides everything with pinpad if is page loses focus', async () => {
+        it('hides everything with pinpad if page loses focus', async () => {
+          await flushPromises()
+          app.update()
+
           setPageVisibility(false)
           await waitForElement(app, '#unlockPage')
         })
       })
       describe('when user clicks the "father" page', () => {
-        beforeEach(() => goToFatherSection(app))
+        beforeEach(async () => {
+          await flushPromises()
+          await goToFatherSection(app)
+        })
 
         it('changes to the father details section', () => {
           expect(router.state.location.pathname).toContain('father')
         })
       })
       describe('when user is in document page', () => {
-        beforeEach(() => goToDocumentsSection(app))
-        it('image upload field is rendered', () => {
+        beforeEach(async () => {
+          await flushPromises()
+          await goToDocumentsSection(app)
+        })
+        it('image upload field is rendered', async () => {
+          await flushPromises()
+          app.update()
           expect(app.find('#upload_document').hostNodes()).toHaveLength(5)
         })
       })

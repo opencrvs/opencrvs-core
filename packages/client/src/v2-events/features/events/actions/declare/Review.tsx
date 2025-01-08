@@ -28,7 +28,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { Preview } from '@client/v2-events/features/events/components/Preview'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -97,7 +97,7 @@ interface RejectionState {
   isDuplicate: boolean
 }
 
-export function ReviewSection() {
+export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
   const navigate = useNavigate()
@@ -105,9 +105,9 @@ export function ReviewSection() {
   const intl = useIntl()
 
   const { goToHome } = useEventFormNavigation()
-  const declareMutation = events.actions.declare()
+  const declareMutation = events.actions.declare
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -129,12 +129,12 @@ export function ReviewSection() {
     fieldId?: string
   }) {
     const confirmedEdit = await openModal<boolean | null>((close) => (
-      <Preview.EditModal close={close}></Preview.EditModal>
+      <ReviewComponent.EditModal close={close}></ReviewComponent.EditModal>
     ))
 
     if (confirmedEdit) {
       navigate(
-        ROUTES.V2.EVENTS.DECLARE.PAGE.buildPath(
+        ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
           { pageId, eventId },
           {
             from: 'review'
@@ -149,7 +149,7 @@ export function ReviewSection() {
 
   async function handleDeclaration() {
     const confirmedDeclaration = await openModal<boolean | null>((close) => (
-      <Preview.ActionModal action="Declare" close={close} />
+      <ReviewComponent.ActionModal action="Declare" close={close} />
     ))
     if (confirmedDeclaration) {
       declareMutation.mutate({
@@ -184,7 +184,7 @@ export function ReviewSection() {
 
   return (
     <>
-      <Preview.Body
+      <ReviewComponent.Body
         eventConfig={config}
         formConfig={formConfigs[0]}
         // eslint-disable-next-line
@@ -192,11 +192,11 @@ export function ReviewSection() {
         form={form}
         // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfigs[0].review.title, {
-          firstname: form['applicant.firstname'],
-          surname: form['applicant.surname']
+          firstname: form['applicant.firstname'] as string,
+          surname: form['applicant.surname'] as string
         })}
       >
-        <Preview.Actions
+        <ReviewComponent.Actions
           messages={{
             title: messages.reviewActionTitle,
             description: messages.reviewActionDescription,
@@ -205,7 +205,7 @@ export function ReviewSection() {
           onConfirm={handleDeclaration}
           onReject={handleReject}
         />
-      </Preview.Body>
+      </ReviewComponent.Body>
       {modal}
     </>
   )

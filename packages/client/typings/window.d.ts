@@ -16,11 +16,6 @@ interface Window {
     BIRTH: {
       REGISTRATION_TARGET: number
       LATE_REGISTRATION_TARGET: number
-      FEE: {
-        ON_TIME: number
-        LATE: number
-        DELAYED: number
-      }
       PRINT_IN_ADVANCE: boolean
     }
     CONFIG_API_URL: string
@@ -35,18 +30,10 @@ interface Window {
     }
     DEATH: {
       REGISTRATION_TARGET: number
-      FEE: {
-        ON_TIME: number
-        DELAYED: number
-      }
       PRINT_IN_ADVANCE: boolean
     }
     MARRIAGE: {
       REGISTRATION_TARGET: number
-      FEE: {
-        ON_TIME: number
-        DELAYED: number
-      }
       PRINT_IN_ADVANCE: boolean
     }
     FEATURES: {
@@ -61,6 +48,7 @@ interface Window {
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
+    MINIO_URL: string
     MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean

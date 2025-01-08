@@ -11,14 +11,15 @@
 
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import { DeclareIndex } from '@client/v2-events//features/events/actions/declare/Declare'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
-import { Workqueues } from '@client/v2-events/features/workqueues'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { ReviewSection } from '@client/v2-events/features/events/actions/declare/Review'
-import { RegisterIndex } from '@client/v2-events/features/events/actions/register/Register'
+import { Debug } from '@client/v2-events/features/debug/debug'
+import * as Declare from '@client/v2-events/features/events/actions/declare'
+import * as Register from '@client/v2-events/features/events/actions/register'
+import { WorkqueueLayout, FormLayout } from '@client/v2-events/layouts'
+import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import { ROUTES } from './routes'
 
 /**
@@ -31,6 +32,7 @@ export const routesConfig = {
   element: (
     <TRPCProvider>
       <Outlet />
+      <Debug />
     </TRPCProvider>
   ),
   children: [
@@ -38,9 +40,9 @@ export const routesConfig = {
       path: ROUTES.V2.path,
       // Alternative would be to create a navigation component that would be used here.
       element: (
-        <Workqueues>
+        <WorkqueueLayout>
           <WorkqueueIndex />
-        </Workqueues>
+        </WorkqueueLayout>
       ),
       children: [
         {
@@ -51,38 +53,64 @@ export const routesConfig = {
       ]
     },
     {
-      path: ROUTES.V2.EVENTS.path,
+      path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (
-        <Workqueues>
-          <Outlet />
-        </Workqueues>
-      ),
-      children: [
-        {
-          path: ROUTES.V2.EVENTS.EVENT.path,
-          element: <EventOverviewIndex />
-        }
-      ]
+        <WorkqueueLayout>
+          <EventOverviewIndex />
+        </WorkqueueLayout>
+      )
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
       element: <EventSelection />
     },
     {
-      path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
-      element: <ReviewSection />
+      path: ROUTES.V2.EVENTS.DELETE.path,
+      element: <DeleteEvent />
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
-      element: <DeclareIndex />
-    },
-    {
-      path: ROUTES.V2.EVENTS.DECLARE.PAGE.path,
-      element: <DeclareIndex />
+      element: (
+        <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
+          <Outlet />
+        </FormLayout>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Declare.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.DECLARE.PAGES.path,
+          element: <Declare.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
+          element: <Declare.Review />
+        }
+      ]
     },
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: <RegisterIndex />
+      element: (
+        <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+          <Outlet />
+        </FormLayout>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Register.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.REGISTER.PAGES.path,
+          element: <Register.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
+          element: <Register.Review />
+        }
+      ]
     }
   ]
 }

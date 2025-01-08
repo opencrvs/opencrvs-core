@@ -21,16 +21,18 @@ import {
   DraftActionInput,
   RegisterActionInput
 } from '@opencrvs/commons/events'
-import { getEventsConfig } from './service/config/config'
+import { getEventConfigurations } from '@events/service/config/config'
 import {
   addAction,
   createEvent,
+  deleteEvent,
   EventInputWithId,
   getEventById,
   patchEvent
-} from './service/events'
+} from '@events/service/events'
 import { EventConfig, getUUID } from '@opencrvs/commons'
-import { getIndexedEvents } from './service/indexing/indexing'
+import { getIndexedEvents } from '@events/service/indexing/indexing'
+import { presignFilesInEvent } from '@events/service/files'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -39,6 +41,23 @@ const ContextSchema = z.object({
   }),
   token: z.string()
 })
+
+const validateEventType = ({
+  eventTypes,
+  eventInputType
+}: {
+  eventTypes: string[]
+  eventInputType: string
+}) => {
+  if (!eventTypes.includes(eventInputType)) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: `Invalid event type ${eventInputType}. Valid event types are: ${eventTypes.join(
+        ', '
+      )}`
+    })
+  }
+}
 
 type Context = z.infer<typeof ContextSchema>
 
@@ -57,52 +76,70 @@ export type AppRouter = typeof appRouter
 export const appRouter = router({
   config: router({
     get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
-      return getEventsConfig(options.ctx.token)
+      return getEventConfigurations(options.ctx.token)
     })
   }),
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
-      const config = await getEventsConfig(options.ctx.token)
+      const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)
-      if (!eventIds.includes(options.input.type)) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `Invalid event type ${
-            options.input.type
-          }. Valid event types are: ${eventIds.join(', ')}`
-        })
-      }
 
-      return createEvent(
-        options.input,
-        options.ctx.user.id,
-        options.ctx.user.primaryOfficeId,
-        options.input.transactionId
-      )
+      validateEventType({
+        eventTypes: eventIds,
+        eventInputType: options.input.type
+      })
+
+      return createEvent({
+        eventInput: options.input,
+        createdBy: options.ctx.user.id,
+        createdAtLocation: options.ctx.user.primaryOfficeId,
+        transactionId: options.input.transactionId
+      })
     }),
     patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
+      const config = await getEventConfigurations(options.ctx.token)
+      const eventIds = config.map((c) => c.id)
+
+      validateEventType({
+        eventTypes: eventIds,
+        eventInputType: options.input.type
+      })
+
       return patchEvent(options.input)
     }),
-    get: publicProcedure.input(z.string()).query(async ({ input }) => {
-      return getEventById(input)
+    get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+      const event = await getEventById(input)
+      const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
+      return eventWithSignedFiles
     }),
+    delete: publicProcedure
+      .input(z.object({ eventId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        return deleteEvent(input.eventId, { token: ctx.token })
+      }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
-          createdBy: options.ctx.user.id
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
         })
       }),
       draft: publicProcedure.input(DraftActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
-          createdBy: options.ctx.user.id
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
         })
       }),
       declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
-          createdBy: options.ctx.user.id
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
         })
       }),
       register: publicProcedure
@@ -118,7 +155,9 @@ export const appRouter = router({
             },
             {
               eventId: options.input.eventId,
-              createdBy: options.ctx.user.id
+              createdBy: options.ctx.user.id,
+              createdAtLocation: options.ctx.user.primaryOfficeId,
+              token: options.ctx.token
             }
           )
         })
