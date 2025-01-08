@@ -21,6 +21,7 @@ import sendVerifyCodeHandler, {
   responseSchema
 } from '@gateway/routes/verifyCode/handler'
 import { trpcProxy } from '@gateway/v2-events/event-config/routes'
+import { DOCUMENTS_URL } from '@gateway/constants'
 
 export const getRoutes = () => {
   const routes: ServerRoute[] = [
@@ -77,7 +78,38 @@ export const getRoutes = () => {
         }
       }
     },
-
+    {
+      method: 'POST',
+      path: '/upload',
+      handler: async (req, h) => {
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files`,
+          passThrough: true
+        })
+      },
+      options: {
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/files/{filename}',
+      handler: async (req, h) => {
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files/${req.params.filename}`,
+          passThrough: true
+        })
+      },
+      options: {
+        payload: {
+          output: 'data',
+          parse: false
+        }
+      }
+    },
     catchAllProxy.locations,
     catchAllProxy.locationsSuffix,
 

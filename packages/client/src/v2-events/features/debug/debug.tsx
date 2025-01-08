@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* stylelint-disable */
-import React from 'react'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import styled from 'styled-components'
 import { useQueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import React from 'react'
+import styled from 'styled-components'
 import { v4 as uuid } from 'uuid'
 import { Text } from '@opencrvs/components'
-import { useOnlineStatus } from '@client/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useOnlineStatus } from '@client/utils'
 
 /* Debug file should be the only transient component which will not be present in near future. */
 /* eslint-disable react/jsx-no-literals */
@@ -60,7 +60,7 @@ export function Debug() {
   }
 
   const mutations = queryClient.getMutationCache().getAll()
-  const storedEvents = events.events
+
   return (
     <>
       <Container>
@@ -94,21 +94,7 @@ export function Debug() {
               Clear React Query buffer
             </button>
           </li>
-          <li>
-            {/* eslint-disable-next-line no-console */}
-            <button onClick={() => console.log(events.events.data)}>
-              console.log stored events
-            </button>
-          </li>
-          <li>
-            <Text element="span" variant="reg12">
-              Events in offline storage: {storedEvents.data.length}
-            </Text>
-          </li>
         </ul>
-        <Text element="span" variant="h4">
-          Local records
-        </Text>
       </Container>
       <ReactQueryDevtools initialIsOpen={false} />
     </>
