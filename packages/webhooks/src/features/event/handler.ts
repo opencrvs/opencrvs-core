@@ -239,9 +239,7 @@ export async function approveRejectHandler(
 
   let currentTrigger: TRIGGERS
 
-  if (eventType === 'BIRTH' && statusType === 'approved') {
-    currentTrigger = TRIGGERS.BIRTH_APPROVED
-  } else if (eventType === 'BIRTH' && statusType === 'rejected') {
+  if (eventType === 'BIRTH' && statusType === 'rejected') {
     currentTrigger = TRIGGERS.BIRTH_REJECTED
   } else if (eventType === 'BIRTH' && statusType === 'validated') {
     currentTrigger = TRIGGERS.BIRTH_VALIDATED
@@ -251,8 +249,6 @@ export async function approveRejectHandler(
     currentTrigger = TRIGGERS.BIRTH_CERTIFIED
   } else if (eventType === 'BIRTH' && statusType === 'issued') {
     currentTrigger = TRIGGERS.BIRTH_ISSUED
-  } else if (eventType === 'DEATH' && statusType === 'approved') {
-    currentTrigger = TRIGGERS.DEATH_APPROVED
   } else if (eventType === 'DEATH' && statusType === 'rejected') {
     currentTrigger = TRIGGERS.DEATH_REJECTED
   } else if (eventType === 'DEATH' && statusType === 'validated') {

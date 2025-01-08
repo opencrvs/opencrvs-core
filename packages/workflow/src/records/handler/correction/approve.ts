@@ -154,7 +154,7 @@ export const approveCorrectionRoute = createRoute({
       token,
       event: getEventType(record),
       isNotRegistered: true,
-      statusType: 'approved'
+      statusType: 'validated'
     })
 
     return recordWithUpdatedValues

@@ -49,13 +49,7 @@ export const invokeWebhooks = async ({
   token: string
   event: EVENT_TYPE
   isNotRegistered?: boolean
-  statusType?:
-    | 'rejected'
-    | 'approved'
-    | 'validated'
-    | 'archived'
-    | 'certified'
-    | 'issued'
+  statusType?: 'rejected' | 'validated' | 'archived' | 'certified' | 'issued'
 }) => {
   const trackingId = getTrackingId(bundle)
 
