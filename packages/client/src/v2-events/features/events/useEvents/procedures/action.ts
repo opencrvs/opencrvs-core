@@ -43,19 +43,17 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
 
 type Mutation =
   | typeof api.event.actions.declare
-  | typeof api.event.actions.draft
   | typeof api.event.actions.notify
   | typeof api.event.actions.register
 
 type Procedure =
   | typeof utils.event.actions.declare
-  | typeof utils.event.actions.draft
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
 
 function updateEventOptimistically<
   T extends { eventId: string; data: ActionFormData }
->(actionType: 'DECLARE' | 'DRAFT') {
+>(actionType: 'DECLARE') {
   return (variables: T) => {
     const localEvent = utils.event.get.getData(variables.eventId)
     if (!localEvent) {
@@ -68,6 +66,7 @@ function updateEventOptimistically<
         {
           type: actionType,
           data: variables.data,
+          draft: false,
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdAtLocation: '@todo'
@@ -88,14 +87,6 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
   onMutate: updateEventOptimistically('DECLARE')
-}))
-
-utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
-  onMutate: updateEventOptimistically('DRAFT'),
-  onSuccess: updateLocalEvent
 }))
 
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({

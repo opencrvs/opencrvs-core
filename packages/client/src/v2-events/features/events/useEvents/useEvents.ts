@@ -11,7 +11,7 @@
 
 import { hashKey } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventIndex } from '@opencrvs/commons/client'
+import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 import { useEventAction } from './procedures/action'
 import { createEvent } from './procedures/create'
@@ -58,7 +58,13 @@ export function useEvents() {
   const eventsList = api.events.get.useQuery().data ?? []
 
   function getDrafts() {
-    return eventsList.filter((event) => event.status === 'DRAFT')
+    const queries = queryClient.getQueriesData<EventDocument>({
+      queryKey: getQueryKey(api.event.get)
+    })
+
+    return queries
+      .map((query) => query[1])
+      .filter((event) => event && event.actions[event.actions.length - 1].draft)
   }
 
   function getOutbox() {
@@ -91,11 +97,10 @@ export function useEvents() {
     createEvent,
     getEvent: api.event.get,
     getEvents: api.events.get,
-    getDrafts,
     deleteEvent: useDeleteEventMutation(),
     getOutbox,
+    getDrafts,
     actions: {
-      draft: useEventAction(utils.event.actions.draft, api.event.actions.draft),
       notify: useEventAction(
         utils.event.actions.notify,
         api.event.actions.notify

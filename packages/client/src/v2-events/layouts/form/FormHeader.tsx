@@ -42,11 +42,16 @@ const messages = defineMessages({
   }
 })
 
-export function FormHeader({ label }: { label: TranslationConfig }) {
+export function FormHeader({
+  label,
+  onSaveAndExit
+}: {
+  label: TranslationConfig
+  onSaveAndExit: () => void
+}) {
   const intl = useIntl()
-  const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
-  const events = useEvents()
-  const formValues = useEventFormData((state) => state.formValues)
+  const { modal, exit, deleteDeclaration } = useEventFormNavigation()
+
   const { eventId } = useParams<{
     eventId: string
   }>()
@@ -54,13 +59,6 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
   if (!eventId) {
     throw new Error('Event id is required')
   }
-
-  const createDraft = events.actions.draft
-
-  const saveAndExit = useCallback(() => {
-    createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })
-    goToHome()
-  }, [createDraft, eventId, formValues, goToHome])
 
   const onExit = useCallback(async () => {
     await exit(eventId)
@@ -81,7 +79,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
               id="save-exit-btn"
               size="small"
               type="primary"
-              onClick={saveAndExit}
+              onClick={onSaveAndExit}
             >
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
@@ -118,7 +116,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
               disabled={false}
               size="small"
               type="icon"
-              onClick={saveAndExit}
+              onClick={onSaveAndExit}
             >
               <Icon name="DownloadSimple" />
             </Button>

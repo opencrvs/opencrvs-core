@@ -17,6 +17,8 @@ export function getEventWithOnlyUserSpecificDrafts(
 ): EventDocument {
   return {
     ...event,
-    actions: event.actions.filter((action) => action.data.createdBy === userId)
+    actions: event.actions.filter((action) => {
+      return !action.draft || action.createdBy === userId
+    })
   }
 }

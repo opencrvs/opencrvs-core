@@ -20,11 +20,11 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
     }
+    if (action.draft) {
+      return status
+    }
     if (action.type === ActionType.DECLARE) {
       return EventStatus.DECLARED
-    }
-    if (action.type === ActionType.DRAFT) {
-      return EventStatus.DRAFT
     }
     if (action.type === ActionType.REGISTER) {
       return EventStatus.REGISTERED
