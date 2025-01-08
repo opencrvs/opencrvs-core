@@ -18,7 +18,7 @@ import { orderBy, mapKeys, get } from 'lodash'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Link } from 'react-router-dom'
 
-import { EventIndex, getCurrentEventState } from '@opencrvs/commons/client'
+import { EventIndex } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { WorkqueueConfig } from '@opencrvs/commons'
 import {
