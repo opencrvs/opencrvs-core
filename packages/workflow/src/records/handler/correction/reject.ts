@@ -35,7 +35,6 @@ import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, sendNotification } from './utils'
 import { getEventType } from '@workflow/features/registration/utils'
-import { invokeWebhooks } from '@workflow/records/webhooks'
 
 export const rejectCorrectionRoute = createRoute({
   method: 'POST',
@@ -124,14 +123,6 @@ export const rejectCorrectionRoute = createRoute({
         reason: rejectionDetails.reason
       }
     )
-
-    await invokeWebhooks({
-      bundle: record,
-      token: getToken(request),
-      event: getEventType(record),
-      isNotRegistered: true,
-      statusType: 'rejected'
-    })
 
     return recordWithCorrectionRejectedTask
   }
