@@ -310,7 +310,7 @@ const HeaderComponent = (props: IFullProps) => {
       })
     }
 
-    const navigationList: INavigationType[] = [
+    const advancedSearchNavigationList: INavigationType[] = [
       {
         label: intl.formatMessage(messages.advancedSearch),
         id: ADVANCED_SEARCH_TEXT,
@@ -331,7 +331,7 @@ const HeaderComponent = (props: IFullProps) => {
         }
         searchTypeList={searchTypeList}
         // @TODO: How to hide the navigation list from field agents? Ask JPF
-        navigationList={canDoAdvanceSearch ? navigationList : []}
+        navigationList={canDoAdvanceSearch ? advancedSearchNavigationList : []}
         searchHandler={(text, type) =>
           props.router.navigate(
             {
