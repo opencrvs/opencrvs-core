@@ -16,6 +16,7 @@ import { TranslationConfig } from './TranslationConfig'
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
   allowedWhen: Conditional().optional(),
+  draft: z.boolean().optional(),
   forms: z.array(FormConfig)
 })
 
@@ -24,7 +25,6 @@ export const ActionConfigBase = z.object({
  */
 export const ActionType = {
   CREATE: 'CREATE',
-  DRAFT: 'DRAFT',
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN',
   REGISTER: 'REGISTER',

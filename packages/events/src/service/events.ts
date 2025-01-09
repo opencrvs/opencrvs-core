@@ -10,10 +10,11 @@
  */
 
 import {
-  ActionInput,
+  ActionInputWithType,
   EventDocument,
   EventInput,
-  FileFieldValue
+  FileFieldValue,
+  isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
 import { getClient } from '@events/storage/mongodb'
@@ -73,9 +74,8 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const hasNonDeletableActions = event.actions.some(
-    ({ type }) => type !== ActionType.CREATE && type !== ActionType.DRAFT
-  )
+  const hasNonDeletableActions = !isUndeclaredDraft(event)
+
   if (hasNonDeletableActions) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -152,6 +152,7 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdAtLocation,
+        draft: false,
         data: {}
       }
     ]
@@ -164,7 +165,7 @@ export async function createEvent({
 }
 
 export async function addAction(
-  input: ActionInput,
+  input: ActionInputWithType,
   {
     eventId,
     createdBy,
@@ -215,7 +216,8 @@ export async function addAction(
           ...input,
           createdBy,
           createdAt: now,
-          createdAtLocation
+          createdAtLocation,
+          draft: input.draft || false
         }
       },
       $set: {

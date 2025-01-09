@@ -8,14 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* stylelint-disable */
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import React from 'react'
 
-export function Debug() {
-  return (
-    <>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </>
-  )
+import { EventDocument } from '@opencrvs/commons/events'
+
+export function getEventWithOnlyUserSpecificDrafts(
+  event: EventDocument,
+  userId: string
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.filter((action) => {
+      return !action.draft || action.createdBy === userId
+    })
+  }
 }

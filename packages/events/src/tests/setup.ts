@@ -29,7 +29,7 @@ vi.mock('@events/service/config/config', () => ({
 }))
 
 beforeAll(() => Promise.all([setupESServer()]), 100000)
-afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
+beforeEach(() => Promise.all([resetMongoServer(), resetESServer()]))
 
 beforeAll(() =>
   mswServer.listen({

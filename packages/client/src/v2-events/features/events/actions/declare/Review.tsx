@@ -29,6 +29,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import { FormLayout } from '@client/v2-events/layouts/form'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -155,7 +156,7 @@ export function Review() {
       declareMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: `tmp-${uuid()}`
+        transactionId: uuid()
       })
 
       goToHome()
@@ -183,7 +184,18 @@ export function Review() {
   }
 
   return (
-    <>
+    <FormLayout
+      route={ROUTES.V2.EVENTS.DECLARE}
+      onSaveAndExit={() => {
+        events.actions.declare.mutate({
+          eventId: event.id,
+          data: form,
+          transactionId: uuid(),
+          draft: true
+        })
+        goToHome()
+      }}
+    >
       <ReviewComponent.Body
         eventConfig={config}
         formConfig={formConfigs[0]}
@@ -207,7 +219,7 @@ export function Review() {
         />
       </ReviewComponent.Body>
       {modal}
-    </>
+    </FormLayout>
   )
 }
 
