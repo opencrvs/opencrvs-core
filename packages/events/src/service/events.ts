@@ -39,12 +39,14 @@ async function getEventByTransactionId(transactionId: string) {
 
   return document
 }
-class EventNotFoundError extends Error {
+class EventNotFoundError extends TRPCError {
   constructor(id: string) {
-    super('Event not found with ID: ' + id)
+    super({
+      code: 'NOT_FOUND',
+      message: `Event not found with ID: ${id}`
+    })
   }
 }
-
 export async function getEventById(id: string) {
   const db = await getClient()
 

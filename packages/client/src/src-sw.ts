@@ -17,6 +17,7 @@ import {
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
+import { MINIO_REGEX } from '@opencrvs/commons/client'
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
 self.__WB_DISABLE_DEV_LOGS = true
@@ -82,12 +83,7 @@ registerRoute(/http(.+)conditionals\.js$/, new NetworkFirst())
 registerRoute(/http(.+)config$/, new NetworkFirst())
 
 // This caches the minio urls
-registerRoute(
-  import.meta.env.DEV
-    ? /http(.+)localhost:3535\/ocrvs\/.+/
-    : /http(.+)minio\.(.+)\/.*ocrvs.*\/.+/,
-  new CacheFirst()
-)
+registerRoute(MINIO_REGEX, new CacheFirst())
 
 /*
  *   Alternate for navigateFallback & navigateFallbackBlacklist
