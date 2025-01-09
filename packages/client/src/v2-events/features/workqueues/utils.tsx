@@ -11,6 +11,8 @@
 
 import { Dictionary, mapKeys } from 'lodash'
 import { MessageDescriptor, useIntl } from 'react-intl'
+import { ResolvedUser } from '@opencrvs/commons/client'
+import { HumanName } from '@client/utils/gateway'
 
 const INTERNAL_SEPARATOR = '___'
 function convertDotToTripleUnderscore<T extends {}>(
@@ -53,4 +55,20 @@ export function useIntlFormatMessageWithFlattenedParams() {
     ...intl,
     formatMessage
   }
+}
+
+export function getNameOfUser(names: ResolvedUser['name'], language: string) {
+  const match = names.find((name) => name.use === language) ?? names[0]
+
+  return joinValues([...match?.given, match?.family])
+}
+
+export function joinValues(
+  values: Array<string | undefined | null>,
+  separator = ' '
+) {
+  return values
+    .filter((value) => !!value)
+    .join(separator)
+    .trim()
 }

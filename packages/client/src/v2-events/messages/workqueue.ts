@@ -10,14 +10,14 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IWorkQueueMessages
+interface IWorkqueueMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   CREATED: MessageDescriptor
   DECLARED: MessageDescriptor
   REGISTERED: MessageDescriptor
 }
 
-const messagesToDefine: IWorkQueueMessages = {
+const messagesToDefine: IWorkqueueMessages = {
   CREATED: {
     id: 'wq.noRecords.CREATED',
     defaultMessage: 'No records in progress',
@@ -36,4 +36,4 @@ const messagesToDefine: IWorkQueueMessages = {
 }
 
 /** @knipignore */
-export const wqMessages: IWorkQueueMessages = defineMessages(messagesToDefine)
+export const wqMessages: IWorkqueueMessages = defineMessages(messagesToDefine)

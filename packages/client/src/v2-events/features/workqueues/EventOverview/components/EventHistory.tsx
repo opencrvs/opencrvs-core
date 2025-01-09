@@ -12,19 +12,21 @@ import React from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-
-import { Link } from '@opencrvs/components'
+import { stringify } from 'query-string'
+import { Button, Link, ResponsiveModal, Stack } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionDocument } from '@opencrvs/commons/client'
-// eslint-disable-next-line no-restricted-imports
-import { ProfileState } from '@client/profile/profileReducer'
+import { ResolvedActionDocument, ResolvedUser } from '@opencrvs/commons/client'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { Avatar, Maybe } from '@client/utils/gateway'
+import { AvatarSmall } from '@client/components/Avatar'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { getNameOfUser } from '@client/v2-events/features/workqueues/utils'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -42,26 +44,73 @@ const NameAvatar = styled.div`
   }
 `
 
-function GetNameWithAvatar() {
-  const userName = 'Unknown registar'
+function UserAvatar({
+  names,
+  avatar,
+  locale
+}: {
+  names: ResolvedUser['name']
+  avatar?: Maybe<Avatar>
+  locale: string
+}) {
+  const name = getNameOfUser(names, locale)
 
   return (
     <NameAvatar>
-      <span>{userName}</span>
+      <AvatarSmall avatar={avatar} name={name} />
+      <span>{name}</span>
     </NameAvatar>
   )
 }
 
-export function EventHistory({
+function DetailedHistoryModal({
   history,
-  user
+  close
 }: {
-  history: ActionDocument[]
-  user: ProfileState['userDetails']
+  history: ResolvedActionDocument
+  close: (result: boolean | null) => void
+}) {
+  const intl = useIntl()
+
+  const name = getNameOfUser(history.createdBy.name, intl.locale)
+  return (
+    <ResponsiveModal
+      autoHeight
+      actions={[]}
+      handleClose={() => close(null)}
+      responsive={false}
+      show={true}
+      title={history.type}
+      width={1024}
+    >
+      <Stack>
+        <Text color="grey500" element="p" variant="reg19">
+          {name} {'—'}{' '}
+          {formatLongDate(
+            history.createdAt.toLocaleString(),
+            intl.locale,
+            'MMMM dd, yyyy · hh.mm a'
+          )}
+        </Text>
+      </Stack>
+    </ResponsiveModal>
+  )
+}
+
+export function EventHistory({
+  history
+}: {
+  history: ResolvedActionDocument[]
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
+  const [modal, openModal] = useModal()
 
+  const onHistoryRowClick = (item: ResolvedActionDocument) => {
+    void openModal<boolean | null>((close) => (
+      <DetailedHistoryModal close={close} history={item} />
+    ))
+  }
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
   const historyRows = history.map((item) => ({
@@ -70,12 +119,11 @@ export function EventHistory({
       intl.locale,
       'MMMM dd, yyyy · hh.mm a'
     ),
-
     action: (
       <Link
         font="bold14"
         onClick={() => {
-          window.alert('not implemented')
+          onHistoryRowClick(item)
         }}
       >
         {item.type}
@@ -88,12 +136,32 @@ export function EventHistory({
         onClick={() =>
           navigate(
             formatUrl(routes.USER_PROFILE, {
-              userId: item.createdBy
+              userId: item.createdBy.id
             })
           )
         }
       >
-        <GetNameWithAvatar />
+        <UserAvatar
+          avatar={undefined}
+          locale={intl.locale}
+          names={item.createdBy.name}
+        />
+      </Link>
+    ),
+    role: item.createdBy.systemRole,
+    location: (
+      <Link
+        font="bold14"
+        onClick={() => {
+          navigate({
+            pathname: routes.TEAM_USER_LIST,
+            search: stringify({
+              locationId: item.createdAtLocation.id
+            })
+          })
+        }}
+      >
+        {item.createdAtLocation.name}
       </Link>
     )
   }))
@@ -144,6 +212,7 @@ export function EventHistory({
           pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
         />
       </TableDiv>
+      {modal}
     </>
   )
 }
