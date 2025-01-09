@@ -160,9 +160,7 @@ export const routesConfig = [
               SCOPES.SEARCH_BIRTH,
               SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
               SCOPES.SEARCH_DEATH,
-              SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-              SCOPES.SEARCH_MARRIAGE,
-              SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
+              SCOPES.SEARCH_DEATH_MY_JURISDICTION
             ]}
           >
             <AdvancedSearchConfig />

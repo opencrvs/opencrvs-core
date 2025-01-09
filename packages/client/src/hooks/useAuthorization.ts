@@ -23,7 +23,7 @@ import {
   isReviewableDeclaration,
   isUpdatableDeclaration
 } from '@client/declarations/utils'
-import { isUnderJurisdiction } from '@client/utils/locationUtils'
+import { isOfficeUnderJurisdiction } from '@client/utils/locationUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 
@@ -90,6 +90,14 @@ export function usePermissions() {
 
   const canSearchRecords = hasAnyScope(RECORD_SEARCH_SCOPES)
 
+  const hasBirthSearchJurisdictionScope = hasScope(
+    SCOPES.SEARCH_BIRTH_MY_JURISDICTION
+  )
+
+  const hasDeathSearchJurisdictionScope = hasScope(
+    SCOPES.SEARCH_DEATH_MY_JURISDICTION
+  )
+
   const canDeclareRecords = hasAnyScope(RECORD_DECLARE_SCOPES)
 
   const canReadUser = (user: Pick<User, 'id' | 'primaryOffice'>) => {
@@ -103,7 +111,7 @@ export function usePermissions() {
       return user.primaryOffice.id === userPrimaryOffice?.id
     }
     if (hasScope(SCOPES.USER_READ_MY_JURISDICTION)) {
-      return isUnderJurisdiction(
+      return isOfficeUnderJurisdiction(
         userPrimaryOffice.id,
         user.primaryOffice.id,
         locations,
@@ -130,7 +138,7 @@ export function usePermissions() {
       if (roleScopes(user.role.id).includes(SCOPES.USER_UPDATE)) {
         return false
       }
-      return isUnderJurisdiction(
+      return isOfficeUnderJurisdiction(
         userPrimaryOffice.id,
         user.primaryOffice.id,
         locations,
@@ -158,7 +166,7 @@ export function usePermissions() {
     }
 
     if (hasScope(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)) {
-      return isUnderJurisdiction(
+      return isOfficeUnderJurisdiction(
         userPrimaryOffice.id,
         office.id,
         locations,
@@ -176,7 +184,7 @@ export function usePermissions() {
       return true
     }
     if (hasScope(SCOPES.USER_CREATE_MY_JURISDICTION)) {
-      return isUnderJurisdiction(
+      return isOfficeUnderJurisdiction(
         userPrimaryOffice.id,
         office.id,
         locations,
@@ -242,6 +250,8 @@ export function usePermissions() {
     canEditUser,
     canCreateUser,
     canAccessOffice,
+    hasBirthSearchJurisdictionScope,
+    hasDeathSearchJurisdictionScope,
     canAddOfficeUsers,
     canUpdateRecord,
     canReviewRecord,

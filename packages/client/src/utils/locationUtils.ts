@@ -24,6 +24,7 @@ import { countries } from '@client/utils/countries'
 import { lookup } from 'country-data'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { camelCase } from 'lodash'
+import { UUID } from '@opencrvs/commons'
 
 export const countryAlpha3toAlpha2 = (isoCode: string): string | undefined => {
   const alpha2 =
@@ -118,40 +119,48 @@ export function generateFullLocation(
 export function generateSearchableLocations(
   locations: ILocation[],
   offlineLocations: { [key: string]: ILocation },
-  intl: IntlShape
+  intl: IntlShape,
+  officeId?: UUID
 ) {
-  const generated: ISearchLocation[] = locations.map((location: ILocation) => {
-    let locationName = generateLocationName(location, intl)
+  const filteredLocations = officeId
+    ? getAssociatedLocationsAndOffices(officeId, locations)
+    : locations
 
-    if (
-      location.partOf &&
-      location.partOf !== 'Location/0' &&
-      location.type !== 'CRVS_OFFICE'
-    ) {
-      const locRef = location.partOf.split('/')[1]
-      let parent
+  const generated: ISearchLocation[] = filteredLocations.map(
+    (location: ILocation) => {
+      let locationName = generateLocationName(location, intl)
+
       if (
-        (parent =
-          offlineLocations[locRef] &&
-          generateLocationName(offlineLocations[locRef], intl))
+        location.partOf &&
+        location.partOf !== 'Location/0' &&
+        location.type !== 'CRVS_OFFICE'
       ) {
-        locationName += `, ${parent}`
+        const locRef = location.partOf.split('/')[1]
+        let parent
+        if (
+          (parent =
+            offlineLocations[locRef] &&
+            generateLocationName(offlineLocations[locRef], intl))
+        ) {
+          locationName += `, ${parent}`
+        }
+      }
+
+      return {
+        id: location.id,
+        searchableText: getLocalizedLocationName(intl, location),
+        displayLabel: locationName
       }
     }
-
-    return {
-      id: location.id,
-      searchableText: getLocalizedLocationName(intl, location),
-      displayLabel: locationName
-    }
-  })
+  )
   return generated
 }
 
 export function generateLocations(
   locations: { [key: string]: ILocation },
   intl: IntlShape,
-  filter?: (location: ILocation) => boolean
+  filter?: (location: ILocation) => boolean,
+  officeId?: UUID
 ) {
   let locationArray = Object.values(locations)
 
@@ -159,7 +168,7 @@ export function generateLocations(
     locationArray = locationArray.filter(filter)
   }
 
-  return generateSearchableLocations(locationArray, locations, intl)
+  return generateSearchableLocations(locationArray, locations, intl, officeId)
 }
 
 export function getJurisidictionType(
@@ -243,7 +252,7 @@ export function getLocationHierarchy(
   })
 }
 
-export function isUnderJurisdiction(
+export function isOfficeUnderJurisdiction(
   officeId: string,
   otherOfficeId: string,
   locations: Record<string, AdminStructure | undefined>,
@@ -262,6 +271,37 @@ export function isUnderJurisdiction(
   }
   const hierarchy = getLocationHierarchy(otherOfficeLocationId, locations)
   return Object.values(hierarchy).includes(parentLocation.id)
+}
+
+function getAssociatedLocationsAndOffices(
+  officeId: string,
+  locations: ILocation[]
+): ILocation[] {
+  const office = locations.find(
+    (location) => location.id === officeId && location.type === 'CRVS_OFFICE'
+  )
+
+  if (!office) {
+    return []
+  }
+
+  const associatedLocations: ILocation[] = locations.filter((location) => {
+    let currentLocationId = office.partOf.split('/').at(1)
+
+    while (currentLocationId) {
+      const targetLocationId = currentLocationId
+      if (location.id === currentLocationId) {
+        return true
+      }
+
+      const nextLocation = locations.find((loc) => loc.id === targetLocationId)
+      currentLocationId = nextLocation?.partOf.split('/').at(1)
+    }
+
+    return false
+  })
+
+  return [office, ...associatedLocations]
 }
 
 export function generateFullAddress(
