@@ -18,10 +18,11 @@ const nationalSystemAdminClient = createTestClient([
 const generator = payloadGenerator()
 
 test('Returns empty list when no locations are set', async () => {
-  const fetchedEvents = await nationalSystemAdminClient.locations.get()
+  const locations = await nationalSystemAdminClient.locations.get()
 
-  expect(fetchedEvents).toEqual([])
+  expect(locations).toEqual([])
 })
+
 test('Returns single location in right format', async () => {
   const setLocationPayload = [
     { id: '123-456-789', partOf: null, name: 'Location foobar' }
@@ -38,7 +39,7 @@ test('Returns single location in right format', async () => {
 test('Returns multiple locations', async () => {
   await nationalSystemAdminClient.locations.set(generator.locations.set(5))
 
-  const events = await nationalSystemAdminClient.locations.get()
+  const locations = await nationalSystemAdminClient.locations.get()
 
-  expect(events).toHaveLength(5)
+  expect(locations).toHaveLength(5)
 })
