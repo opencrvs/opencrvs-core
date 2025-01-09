@@ -13,18 +13,24 @@ import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
-import { FormConfig } from '@opencrvs/commons/client'
+import {
+  ActionFormData,
+  FieldConfig,
+  FormConfig
+} from '@opencrvs/commons/client'
 import {
   Accordion,
   Button,
   Icon,
   Link,
-  ResponsiveModal,
-  Text,
   ListReview,
-  Stack
+  ResponsiveModal,
+  Stack,
+  Text
 } from '@opencrvs/components'
+
 import { EventConfig } from '@opencrvs/commons'
+import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -155,6 +161,23 @@ const reviewMessages = defineMessages({
   }
 })
 
+interface Stringifiable {
+  toString(): string
+}
+
+const FIELD_TYPE_FORMATTERS: Partial<
+  Record<
+    FieldConfig['type'],
+    null | ((props: { value: Stringifiable }) => JSX.Element)
+  >
+> = {
+  FILE: FileOutput
+}
+
+function DefaultOutput<T extends Stringifiable>({ value }: { value: T }) {
+  return <>{value.toString() || ''}</>
+}
+
 /**
  * Review component, used to display the "read" version of the form.
  * User can review the data and take actions like declare, reject or edit the data.
@@ -170,7 +193,7 @@ function ReviewComponent({
   children: React.ReactNode
   eventConfig: EventConfig
   formConfig: FormConfig
-  form: Record<string, string | React.ReactNode>
+  form: ActionFormData
   onEdit: ({ pageId, fieldId }: { pageId: string; fieldId?: string }) => void
   title: string
 }) {
@@ -222,30 +245,53 @@ function ReviewComponent({
                       name={'Accordion_' + page.id}
                     >
                       <ListReview id={'Section_' + page.id}>
-                        {page.fields.map((field) => (
-                          <ListReview.Row
-                            key={field.id}
-                            actions={
-                              <Link
-                                onClick={(e) => {
-                                  e.stopPropagation()
+                        {page.fields
+                          .filter(
+                            (field) =>
+                              // Formatters can explicitly define themselves to be null
+                              // this means a value display row in not rendered at all
+                              FIELD_TYPE_FORMATTERS[field.type] !== null
+                          )
+                          .map((field) => {
+                            const Output =
+                              FIELD_TYPE_FORMATTERS[field.type] || DefaultOutput
 
-                                  onEdit({
-                                    pageId: page.id,
-                                    fieldId: field.id
-                                  })
-                                }}
-                              >
-                                {intl.formatMessage(
-                                  reviewMessages.changeButton
-                                )}
-                              </Link>
-                            }
-                            id={field.id}
-                            label={intl.formatMessage(field.label)}
-                            value={form[field.id] || ''}
-                          />
-                        ))}
+                            const value = form[field.id]
+                            const hasValue =
+                              // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                              value !== null && value !== undefined
+
+                            const valueDisplay = hasValue ? (
+                              <Output value={value} />
+                            ) : (
+                              ''
+                            )
+
+                            return (
+                              <ListReview.Row
+                                key={field.id}
+                                actions={
+                                  <Link
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+
+                                      onEdit({
+                                        pageId: page.id,
+                                        fieldId: field.id
+                                      })
+                                    }}
+                                  >
+                                    {intl.formatMessage(
+                                      reviewMessages.changeButton
+                                    )}
+                                  </Link>
+                                }
+                                id={field.id}
+                                label={intl.formatMessage(field.label)}
+                                value={valueDisplay}
+                              />
+                            )
+                          })}
                       </ListReview>
                     </Accordion>
                   </DeclarationDataContainer>

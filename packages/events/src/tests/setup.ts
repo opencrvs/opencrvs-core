@@ -16,11 +16,12 @@ import {
   resetServer as resetESServer,
   setupServer as setupESServer
 } from '@events/storage/__mocks__/elasticsearch'
+import { mswServer } from './msw'
 
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
 vi.mock('@events/service/config/config', () => ({
-  getEventsConfig: () =>
+  getEventConfigurations: () =>
     Promise.all([
       tennisClubMembershipEvent,
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
@@ -28,4 +29,22 @@ vi.mock('@events/service/config/config', () => ({
 }))
 
 beforeAll(() => Promise.all([setupESServer()]), 100000)
-afterEach(() => Promise.all([resetMongoServer(), resetESServer()]))
+beforeEach(() => Promise.all([resetMongoServer(), resetESServer()]))
+
+beforeAll(() =>
+  mswServer.listen({
+    onUnhandledRequest: (req) => {
+      const elasticRegex = /http:\/\/localhost:551\d{2}\/.*/
+
+      const isElasticResetCall =
+        req.method === 'DELETE' && elasticRegex.test(req.url)
+
+      if (!isElasticResetCall) {
+        // eslint-disable-next-line no-console
+        console.warn(`Unmocked request: ${req.method} ${req.url}`)
+      }
+    }
+  })
+)
+afterEach(() => mswServer.resetHandlers())
+afterAll(() => mswServer.close())

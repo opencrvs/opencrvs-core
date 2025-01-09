@@ -10,11 +10,14 @@
  */
 import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { FieldValue } from './FieldValue'
 
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
-  data: z.record(z.string(), z.any())
+  data: z.record(z.string(), FieldValue),
+  draft: z.boolean().optional().default(false),
+  createdAtLocation: z.string()
 })
 
 const AssignedAction = ActionBase.merge(
@@ -52,23 +55,15 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
-const DraftAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.DRAFT)
-  })
-)
-
 const CreatedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.CREATE),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.CREATE)
   })
 )
 
 const NotifiedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.NOTIFY),
-    createdAtLocation: z.string()
+    type: z.literal(ActionType.NOTIFY)
   })
 )
 
@@ -80,7 +75,6 @@ const CustomAction = ActionBase.merge(
 
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
-  DraftAction,
   ValidateAction,
   NotifiedAction,
   RegisterAction,
@@ -92,3 +86,5 @@ export const ActionDocument = z.discriminatedUnion('type', [
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 export type CreatedAction = z.infer<typeof CreatedAction>
+
+export type ActionFormData = ActionDocument['data']

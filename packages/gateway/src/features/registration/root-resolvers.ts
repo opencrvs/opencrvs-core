@@ -632,10 +632,7 @@ export const resolvers: GQLResolver = {
       }
 
       try {
-        const taskEntry = await confirmRegistration(id, authHeader, {
-          registrationNumber: details.registrationNumber,
-          identifiers: details.identifiers
-        })
+        const taskEntry = await confirmRegistration(id, authHeader, details)
 
         return taskEntry.resource.id
       } catch (error) {

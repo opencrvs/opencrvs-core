@@ -13,7 +13,7 @@ import React, { useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
 
 import { injectIntl, useIntl } from 'react-intl'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { messages } from '@client/i18n/messages/views/config'
@@ -22,8 +22,8 @@ import { Content, ContentSize, FormTabs } from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
-import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
+import { createAdvancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
+import { createAdvancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
@@ -45,6 +45,7 @@ import { advancedSearchInitialState } from '@client/search/advancedSearch/reduce
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
+import { UUID } from '@opencrvs/commons'
 
 enum TabId {
   BIRTH = 'birth',
@@ -54,21 +55,6 @@ enum TabId {
 const SearchButton = styled(Button)`
   margin-top: 32px;
 `
-
-const {
-  birthSearchRegistrationSection,
-  birthSearchChildSection,
-  birthSearchMotherSection,
-  birthSearchFatherSection,
-  birthSearchEventSection,
-  birthSearchInformantSection
-} = advancedSearchBirthSections
-const {
-  deathSearchRegistrationSection,
-  deathSearchDeceasedSection,
-  deathSearchEventSection,
-  deathSearchInformantSection
-} = advancedSearchDeathSections
 
 export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
   const validNonDateFields = Object.keys(value).filter(
@@ -107,7 +93,34 @@ export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
   )
 }
 
-const BirthSection = () => {
+interface BirthSectionProps {
+  hasBirthSearchJurisdictionScope: boolean
+  userOfficeId: UUID
+}
+
+interface DeathSectionProps {
+  hasDeathSearchJurisdictionScope: boolean
+  userOfficeId: UUID
+}
+
+const BirthSection: React.FC<BirthSectionProps> = ({
+  hasBirthSearchJurisdictionScope,
+  userOfficeId
+}) => {
+  const advancedSearchBirthSections = createAdvancedSearchBirthSections(
+    hasBirthSearchJurisdictionScope,
+    userOfficeId
+  )
+
+  const {
+    birthSearchRegistrationSection,
+    birthSearchChildSection,
+    birthSearchMotherSection,
+    birthSearchFatherSection,
+    birthSearchEventSection,
+    birthSearchInformantSection
+  } = advancedSearchBirthSections
+
   const intl = useIntl()
   const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
@@ -120,7 +133,12 @@ const BirthSection = () => {
     )
   })
   const [accordionActiveStateMap] = useState(
-    getAccordionActiveStateMap(advancedSearchParamsState)
+    getAccordionActiveStateMap(
+      advancedSearchParamsState,
+      hasBirthSearchJurisdictionScope,
+      undefined,
+      userOfficeId
+    )
   )
 
   const isDisabled = !isAdvancedSearchFormValid(formState)
@@ -319,7 +337,10 @@ const BirthSection = () => {
   )
 }
 
-const DeathSection = () => {
+const DeathSection: React.FC<DeathSectionProps> = ({
+  hasDeathSearchJurisdictionScope,
+  userOfficeId
+}) => {
   const intl = useIntl()
   const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
@@ -332,7 +353,12 @@ const DeathSection = () => {
     )
   })
   const [accordionActiveStateMap] = useState(
-    getAccordionActiveStateMap(advancedSearchParamsState)
+    getAccordionActiveStateMap(
+      advancedSearchParamsState,
+      undefined,
+      hasDeathSearchJurisdictionScope,
+      userOfficeId
+    )
   )
 
   const isDisable = !isAdvancedSearchFormValid(formState)
@@ -343,6 +369,18 @@ const DeathSection = () => {
   const accordionHidingLabel = intl.formatMessage(
     advancedSearchFormMessages.hide
   )
+
+  const advancedSearchDeathSections = createAdvancedSearchDeathSections(
+    hasDeathSearchJurisdictionScope,
+    userOfficeId
+  )
+
+  const {
+    deathSearchRegistrationSection,
+    deathSearchDeceasedSection,
+    deathSearchEventSection,
+    deathSearchInformantSection
+  } = advancedSearchDeathSections
 
   return (
     <>
@@ -487,12 +525,32 @@ const DeathSection = () => {
 
 const AdvancedSearch = () => {
   const intl = useIntl()
-  const { canSearchBirthRecords, canSearchDeathRecords } = usePermissions()
+  const {
+    canSearchBirthRecords,
+    canSearchDeathRecords,
+    hasBirthSearchJurisdictionScope,
+    hasDeathSearchJurisdictionScope
+  } = usePermissions()
   const advancedSearchParamState = useSelector(AdvancedSearchParamsSelector)
+  const currentUser = useSelector(getUserDetails)
+  const userPrimaryOffice = currentUser?.primaryOffice
+
+  if (!userPrimaryOffice)
+    throw new Error(
+      'Something went wrong. Could not find any office assigned to the user'
+    )
+
   const activeTabId =
-    advancedSearchParamState.event || canSearchBirthRecords
+    advancedSearchParamState.event === TabId.BIRTH && canSearchBirthRecords
       ? TabId.BIRTH
-      : TabId.DEATH
+      : advancedSearchParamState.event === TabId.DEATH && canSearchDeathRecords
+      ? TabId.DEATH
+      : canSearchBirthRecords
+      ? TabId.BIRTH
+      : canSearchDeathRecords
+      ? TabId.DEATH
+      : ''
+
   const dispatch = useDispatch()
   const tabSections = [
     {
@@ -537,8 +595,18 @@ const AdvancedSearch = () => {
           }
           subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
         >
-          {activeTabId === TabId.BIRTH && <BirthSection />}
-          {activeTabId === TabId.DEATH && <DeathSection />}
+          {activeTabId === TabId.BIRTH && (
+            <BirthSection
+              hasBirthSearchJurisdictionScope={hasBirthSearchJurisdictionScope}
+              userOfficeId={userPrimaryOffice.id as UUID}
+            />
+          )}
+          {activeTabId === TabId.DEATH && (
+            <DeathSection
+              hasDeathSearchJurisdictionScope={hasDeathSearchJurisdictionScope}
+              userOfficeId={userPrimaryOffice.id as UUID}
+            />
+          )}
         </Content>
       </SysAdminContentWrapper>
     </>

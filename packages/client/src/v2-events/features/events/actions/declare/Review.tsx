@@ -29,6 +29,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import { FormLayout } from '@client/v2-events/layouts/form'
 
 const messages = defineMessages({
   reviewActionTitle: {
@@ -105,9 +106,9 @@ export function Review() {
   const intl = useIntl()
 
   const { goToHome } = useEventFormNavigation()
-  const declareMutation = events.actions.declare()
+  const declareMutation = events.actions.declare
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
@@ -155,7 +156,7 @@ export function Review() {
       declareMutation.mutate({
         eventId: event.id,
         data: form,
-        transactionId: `tmp-${uuid()}`
+        transactionId: uuid()
       })
 
       goToHome()
@@ -183,7 +184,18 @@ export function Review() {
   }
 
   return (
-    <>
+    <FormLayout
+      route={ROUTES.V2.EVENTS.DECLARE}
+      onSaveAndExit={() => {
+        events.actions.declare.mutate({
+          eventId: event.id,
+          data: form,
+          transactionId: uuid(),
+          draft: true
+        })
+        goToHome()
+      }}
+    >
       <ReviewComponent.Body
         eventConfig={config}
         formConfig={formConfigs[0]}
@@ -192,8 +204,8 @@ export function Review() {
         form={form}
         // @todo: Update to use dynamic title
         title={intl.formatMessage(formConfigs[0].review.title, {
-          firstname: form['applicant.firstname'],
-          surname: form['applicant.surname']
+          firstname: form['applicant.firstname'] as string,
+          surname: form['applicant.surname'] as string
         })}
       >
         <ReviewComponent.Actions
@@ -207,7 +219,7 @@ export function Review() {
         />
       </ReviewComponent.Body>
       {modal}
-    </>
+    </FormLayout>
   )
 }
 

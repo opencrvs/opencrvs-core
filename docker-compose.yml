@@ -92,6 +92,8 @@ services:
       - MONGO_URL=mongodb://mongo1/events
       - ES_HOST=elasticsearch:9200
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
+      - DOCUMENTS_URL=http://documents:9050
+      - USER_MANAGEMENT_URL=http://localhost:3030/
 
   # User facing services
   workflow:

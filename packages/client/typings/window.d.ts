@@ -48,6 +48,7 @@ interface Window {
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
+    MINIO_URL: string
     MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean

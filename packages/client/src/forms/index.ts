@@ -38,6 +38,7 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
+import { UUID } from '@opencrvs/commons'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -652,6 +653,7 @@ interface ILocationSearchInputFormField extends IFormFieldBase {
   locationList?: ISearchLocation[]
   searchableType: string[]
   dispatchOptions?: IDispatchOptions
+  userOfficeId?: UUID // added to filter searchable location
   dynamicOptions?: IDynamicOptions
 }
 
