@@ -22,6 +22,18 @@ test('Returns empty list when no locations are set', async () => {
 
   expect(fetchedEvents).toEqual([])
 })
+test('Returns single location in right format', async () => {
+  const setLocationPayload = [
+    { id: '123-456-789', partOf: null, name: 'Location foobar' }
+  ]
+
+  await nationalSystemAdminClient.locations.set(setLocationPayload)
+
+  const locations = await nationalSystemAdminClient.locations.get()
+
+  expect(locations).toHaveLength(1)
+  expect(locations).toMatchObject(setLocationPayload)
+})
 
 test('Returns multiple locations', async () => {
   await nationalSystemAdminClient.locations.set(generator.locations.set(5))

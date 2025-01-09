@@ -43,7 +43,6 @@ const setBearerForToken = (token: string) => {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 /**
- *
  * @param scopes scopes that are allowed to access the resource
  * @returns TRPC compatible middleware function
  */

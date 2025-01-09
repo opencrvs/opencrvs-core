@@ -39,9 +39,9 @@ test('Prevents sending empty payload', async () => {
 })
 
 test('Creates single location', async () => {
-  const locationPayload = generator.locations.set([
+  const locationPayload = [
     { id: '123-456-789', partOf: null, name: 'Location foobar' }
-  ])
+  ]
 
   await nationalSystemAdminClient.locations.set(locationPayload)
 
@@ -54,18 +54,18 @@ test('Creates single location', async () => {
 test('Creates multiple locations', async () => {
   const parentId = 'parent-id'
 
-  await nationalSystemAdminClient.locations.set(
-    generator.locations.set([
-      { id: 'parentId' },
-      { partOf: parentId },
-      { partOf: parentId },
-      {}
-    ])
-  )
+  const locationPayload = generator.locations.set([
+    { id: 'parentId' },
+    { partOf: parentId },
+    { partOf: parentId },
+    {}
+  ])
+
+  await nationalSystemAdminClient.locations.set(locationPayload)
 
   const locations = await nationalSystemAdminClient.locations.get()
 
-  expect(locations).toHaveLength(4)
+  expect(locations).toEqual(locationPayload)
 })
 
 test('Removes existing locations not in payload', async () => {

@@ -33,9 +33,7 @@ async function getToken(): Promise<string> {
   if (!res.ok) {
     raise('Could not login as the super user')
   }
-
   const body = await res.json()
-  console.log('body.token', body.token)
   return body.token
 }
 
