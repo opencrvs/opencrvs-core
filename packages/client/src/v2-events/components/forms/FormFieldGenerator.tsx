@@ -394,7 +394,10 @@ class FormSectionComponent extends React.Component<AllProps> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            { $form: values, $now: new Date().toISOString().split('T')[0] }
+            {
+              $form: makeFormikFieldIdsOpenCRVSCompatible(values),
+              $now: new Date().toISOString().split('T')[0]
+            }
           )
 
           if (conditionalActions.includes('HIDE')) {
