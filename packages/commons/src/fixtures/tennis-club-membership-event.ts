@@ -25,7 +25,12 @@ export const tennisClubMembershipEvent = defineConfig({
     },
     fields: [
       {
-        id: 'applicant.firstname'
+        id: 'applicant.firstname',
+        emptyValueMessage: {
+          defaultMessage: 'First name is not provided',
+          description: 'This is the message to show when the field is empty',
+          id: 'event.tennis-club-membership.summary.field.firstname.empty'
+        }
       }
     ]
   },

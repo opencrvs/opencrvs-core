@@ -13,7 +13,8 @@ import {
   ActionInput,
   EventDocument,
   EventInput,
-  FileFieldValue
+  FileFieldValue,
+  isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
 import { getClient } from '@events/storage/mongodb'
@@ -73,9 +74,8 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const hasNonDeletableActions = event.actions.some(
-    ({ type }) => type !== ActionType.CREATE && type !== ActionType.DRAFT
-  )
+  const hasNonDeletableActions = !isUndeclaredDraft(event)
+
   if (hasNonDeletableActions) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
