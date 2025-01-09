@@ -169,7 +169,10 @@ export const ActionMenu: React.FC<{
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
+          <ProtectedComponent
+            scopes={RECORD_ALLOWED_SCOPES.UPDATE}
+            conditional={isDraft}
+          >
             <UpdateAction
               declarationId={id}
               declarationStatus={status}

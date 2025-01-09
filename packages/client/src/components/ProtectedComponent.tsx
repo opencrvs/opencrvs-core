@@ -15,19 +15,23 @@ import { Scope } from '@opencrvs/commons/client'
 interface ScopeComponentProps {
   scopes?: Scope[]
   denyScopes?: Scope[]
+  conditional?: boolean
   children: React.ReactNode
 }
 
 const ProtectedComponent: React.FC<ScopeComponentProps> = ({
   scopes,
   denyScopes,
-  children
+  children,
+  conditional
 }) => {
   const { hasAnyScope } = usePermissions()
   const hasRequiredScope = !scopes || hasAnyScope(scopes)
   const hasDeniedScope = denyScopes && hasAnyScope(denyScopes)
 
-  return hasRequiredScope && !hasDeniedScope ? <>{children}</> : null
+  return (hasRequiredScope && !hasDeniedScope) || conditional ? (
+    <>{children}</>
+  ) : null
 }
 
 export default ProtectedComponent
