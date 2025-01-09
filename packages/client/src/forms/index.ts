@@ -716,6 +716,7 @@ export interface IHttpFormField extends IFormFieldBase {
   options: {
     headers: Record<string, string>
     body: Record<string, any>
+    params?: Record<string, any>
   } & Omit<Request, 'body' | 'headers'>
 }
 export interface IButtonFormField extends IFormFieldBase {
@@ -729,7 +730,7 @@ export interface IButtonFormField extends IFormFieldBase {
   }
 }
 
-export interface IRedirectFormField extends IFormFieldBase {
+export interface ILinkButtonFormField extends IFormFieldBase {
   type: typeof LINK_BUTTON
   icon?: {
     desktop: IconProps['name']
@@ -748,7 +749,7 @@ export interface QRReaderType {
   type: 'QR'
 }
 
-export type ReaderType = QRReaderType | IRedirectFormField
+export type ReaderType = QRReaderType | ILinkButtonFormField
 export interface IDReaderFormField extends IFormFieldBase {
   type: typeof ID_READER
   dividerLabel: MessageDescriptor
@@ -798,7 +799,7 @@ export type IFormField =
   | ISignatureFormField
   | IHttpFormField
   | IButtonFormField
-  | IRedirectFormField
+  | ILinkButtonFormField
   | IDReaderFormField
   | IBannerFormField
 
@@ -1269,7 +1270,7 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-export interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
+export interface Ii18nLinkButtonFormField extends Ii18nFormFieldBase {
   type: typeof LINK_BUTTON
   icon?: {
     desktop: IconProps['name']
@@ -1329,7 +1330,7 @@ export type Ii18nFormField =
   | Ii18nSignatureField
   | Ii18nHttpFormField
   | Ii18nButtonFormField
-  | Ii18nRedirectFormField
+  | Ii18nLinkButtonFormField
   | Ii18nIDReaderFormField
   | Ii18nBannerFormField
 

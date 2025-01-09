@@ -16,7 +16,7 @@ import {
   IFormFieldValue,
   IFormSectionData,
   Ii18nIDReaderFormField,
-  Ii18nRedirectFormField,
+  Ii18nLinkButtonFormField,
   ReaderType
 } from '@client/forms'
 import { LinkButtonField } from './LinkButton'
@@ -87,7 +87,7 @@ export const ReaderGenerator = ({
                 internationaliseFieldObject(
                   intl,
                   reader
-                ) as Ii18nRedirectFormField
+                ) as Ii18nLinkButtonFormField
               }
               fields={fields}
               setFieldValue={setFieldValue}

@@ -52,7 +52,7 @@ import {
   IButtonFormField,
   BUTTON,
   Ii18nButtonFormField,
-  IRedirectFormField,
+  ILinkButtonFormField,
   LINK_BUTTON,
   IDReaderFormField,
   ID_READER,
@@ -789,7 +789,7 @@ export function isReaderQR(reader: ReaderType): reader is QRReaderType {
 
 export function isReaderLinkButton(
   reader: ReaderType
-): reader is IRedirectFormField {
+): reader is ILinkButtonFormField {
   return reader.type === LINK_BUTTON
 }
 
@@ -799,7 +799,7 @@ export function isFieldHttp(field: IFormField): field is IHttpFormField {
 
 export function isFieldLinkButton(
   field: IFormField
-): field is IRedirectFormField {
+): field is ILinkButtonFormField {
   return field.type === LINK_BUTTON
 }
 
