@@ -576,7 +576,7 @@ const BodyContent = ({
         draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
-            assignment: workqueueDeclaration?.registration?.assignment
+            assignment: draft?.assignmentStatus
           }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
