@@ -74,7 +74,7 @@ export async function deleteEvent(
   }
 
   const hasNonDeletableActions = event.actions.some(
-    ({ type }) => type !== ActionType.CREATE && type !== ActionType.DRAFT
+    ({ type, draft }) => !draft && type !== ActionType.CREATE
   )
   if (hasNonDeletableActions) {
     throw new TRPCError({
@@ -152,6 +152,7 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdAtLocation,
+        draft: false,
         data: {}
       }
     ]
