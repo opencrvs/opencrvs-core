@@ -15,6 +15,7 @@ import { getClient } from '@events/storage'
 
 export const Location = z.object({
   id: z.string(),
+  externalId: z.string().nullable(),
   name: z.string(),
   partOf: z.string().nullable()
 })

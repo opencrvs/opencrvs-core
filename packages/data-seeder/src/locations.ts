@@ -183,26 +183,36 @@ async function getLocations() {
   return parsedLocations.data
 }
 
-function locationBundleToIdentifier(
-  bundle: fhir3.Bundle<fhir3.Location>
-): string[] {
-  return (bundle.entry ?? [])
+const bundleToLocationEntries = (bundle: fhir3.Bundle<fhir3.Location>) =>
+  (bundle.entry ?? [])
     .map((bundleEntry) => bundleEntry.resource)
     .filter((maybeLocation): maybeLocation is fhir3.Location =>
       Boolean(maybeLocation)
     )
-    .map((location) =>
-      location.identifier
-        ?.find(
-          ({ system }) =>
-            system === `${OPENCRVS_SPECIFICATION_URL}id/statistical-code` ||
-            system === `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-        )
-        ?.value?.split('_')
-        .pop()
-    )
+
+function locationBundleToIdentifier(
+  bundle: fhir3.Bundle<fhir3.Location>
+): string[] {
+  return bundleToLocationEntries(bundle)
+    .map((location) => getExternalIdFromIdentifier(location.identifier))
     .filter((maybeId): maybeId is string => Boolean(maybeId))
 }
+
+/**
+ * Get the external id* (*external to ocrvs)  for a location. Defined in country-config.
+ */
+const getExternalIdFromIdentifier = (
+  identifiers: fhir3.Location['identifier']
+) =>
+  identifiers
+    ?.find(({ system }) =>
+      [
+        `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
+        `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+      ].some((identifierSystem) => identifierSystem === system)
+    )
+    ?.value?.split('_')
+    .pop()
 
 export async function seedLocations(token: string) {
   const savedLocations = (
@@ -241,9 +251,11 @@ export async function seedLocations(token: string) {
         }))
     )
   })
+
   if (!res.ok) {
     raise(await res.json())
   }
+
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
   response.entry?.forEach((res, index) => {
     if (res.response?.status !== '201') {
@@ -254,7 +266,7 @@ export async function seedLocations(token: string) {
   })
 }
 
-function updateLocationPartOf(partOf: string) {
+export function updateLocationPartOf(partOf: string) {
   const locationPrefix = 'Location/'
 
   const parent = partOf.replace(locationPrefix, '')
@@ -267,12 +279,23 @@ function updateLocationPartOf(partOf: string) {
 }
 
 export async function seedLocationsForV2Events(token: string) {
-  const locations = await getLocations()
+  const result = await fetch(env.FHIR_URL + '/Location?_count=0', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/fhir+json'
+    }
+  })
 
-  const simplifiedLocations = locations.map((location) => ({
+  const bundle: fhir3.Bundle<fhir3.Location> = await result.json()
+
+  const locations = bundleToLocationEntries(bundle).map((location) => ({
     id: location.id,
+    externalId: getExternalIdFromIdentifier(location.identifier),
     name: location.name,
-    partOf: updateLocationPartOf(location.partOf)
+    partOf: location?.partOf?.reference
+      ? updateLocationPartOf(location?.partOf?.reference)
+      : null
   }))
 
   // NOTE: TRPC expects certain format, which may seem unconventional.
@@ -282,7 +305,7 @@ export async function seedLocationsForV2Events(token: string) {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ json: simplifiedLocations })
+    body: JSON.stringify({ json: locations })
   })
 
   if (!res.ok) {
