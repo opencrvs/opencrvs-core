@@ -763,7 +763,7 @@ export interface IDReaderFormField extends IFormFieldBase {
 }
 
 export type BannerType = 'pending' | 'verified' | 'failed'
-export interface IBannerFormField extends IFormFieldBase {
+export interface IIDVerificationBannerFormField extends IFormFieldBase {
   type: typeof ID_VERIFICATION_BANNER
   bannerType: BannerType
   idFieldName: string
@@ -806,7 +806,7 @@ export type IFormField =
   | IButtonFormField
   | ILinkButtonFormField
   | IDReaderFormField
-  | IBannerFormField
+  | IIDVerificationBannerFormField
 
 export interface IPreviewGroup {
   id: string
