@@ -9,28 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { get, mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
-import { orderBy, mapKeys, get } from 'lodash'
 
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Link } from 'react-router-dom'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+import { WorkqueueConfig } from '@opencrvs/commons'
 import { EventIndex } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
-import { WorkqueueConfig } from '@opencrvs/commons'
 import {
-  Workqueue as WorkqueueComponent,
+  ColumnContentAlignment,
   SORT_ORDER,
-  ColumnContentAlignment
+  Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
-import { ROUTES } from '@client/v2-events/routes'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/v2-events/messages'
+import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 /**
