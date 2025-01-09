@@ -50,10 +50,9 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { ICertificateData } from '@client/utils/referenceApi'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { isMinioUrl } from '@opencrvs/commons/client'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
-  const regex = /\/[^\/?]+\.(jpg|png|jpeg|svg)(?=\?|$)/i
-
   async function recursiveTransform(obj: any) {
     if (typeof obj !== 'object' || obj === null) {
       return obj
@@ -63,7 +62,7 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
 
     for (const key in obj) {
       const value = obj[key]
-      if (typeof value === 'string' && regex.test(value)) {
+      if (typeof value === 'string' && isMinioUrl(value)) {
         transformedObject[key] = await fetchImageAsBase64(value)
       } else if (typeof value === 'object') {
         transformedObject[key] = await recursiveTransform(value)
