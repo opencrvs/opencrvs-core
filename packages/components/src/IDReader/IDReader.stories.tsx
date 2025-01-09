@@ -26,7 +26,6 @@ const IDReaderWithAlertFeedback = (args: any) => (
   <IDReader
     dividerLabel="Or"
     manualInputInstructionLabel="Complete fields below"
-    status={args.status}
   >
     <QRReader
       labels={{
@@ -48,11 +47,5 @@ const IDReaderWithAlertFeedback = (args: any) => (
 )
 
 export const IDReaderWithAlertFeedbackStory: Story = {
-  argTypes: {
-    status: {
-      options: ['ready-to-scan', 'pending', 'error', 'success'],
-      control: { type: 'radio' }
-    }
-  },
   render: (args) => <IDReaderWithAlertFeedback {...args} />
 }

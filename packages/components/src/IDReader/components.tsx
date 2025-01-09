@@ -34,5 +34,5 @@ export const ReadersContainer = styled(Stack)`
 
 export const Header = styled(Stack)`
   background-color: ${({ theme }) => theme.colors.orangeLighter};
-  padding: 8x 16px;
+  padding: 8px 16px;
 `
