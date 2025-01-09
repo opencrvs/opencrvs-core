@@ -99,6 +99,7 @@ async function main() {
   console.log('Seeding locations for v2 system (events)')
   await seedLocationsForV2Events(token)
 
+  console.log('Seeding users')
   await seedUsers(token, roleIdMap)
   await deactivateSuperuser(token)
 }
