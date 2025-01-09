@@ -16,6 +16,7 @@ const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
+  draft: z.boolean().optional().default(false),
   createdAtLocation: z.string()
 })
 
@@ -54,12 +55,6 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
-const DraftAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.DRAFT)
-  })
-)
-
 const CreatedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE)
@@ -80,7 +75,6 @@ const CustomAction = ActionBase.merge(
 
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
-  DraftAction,
   ValidateAction,
   NotifiedAction,
   RegisterAction,
