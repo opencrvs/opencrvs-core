@@ -14,12 +14,12 @@ import {
   IFormFieldValue,
   IFormSectionData,
   IHttpFormField,
-  Ii18nRedirectFormField
+  Ii18nLinkButtonFormField
 } from '@client/forms'
 import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useHttp } from './http'
@@ -37,7 +37,7 @@ export const LinkButtonField = ({
   fields: IFormField[]
   form: IFormSectionData
   draft: IFormData
-  fieldDefinition: Ii18nRedirectFormField
+  fieldDefinition: Ii18nLinkButtonFormField
   setFieldValue: (name: string, value: IFormFieldValue) => void
   isDisabled?: boolean
 }) => {
@@ -68,8 +68,8 @@ export const LinkButtonField = ({
 
   useEffect(() => {
     const hasRequestBeenMade = Boolean(form[trigger.name])
+    const urlParams = new URLSearchParams(window.location.search)
     function checkParamsPresentInURL() {
-      const urlParams = new URLSearchParams(window.location.search)
       for (const [key, value] of Object.entries(params)) {
         if (urlParams.get(key) !== value) {
           return false
@@ -78,7 +78,10 @@ export const LinkButtonField = ({
       return true
     }
     if (checkParamsPresentInURL() && !hasRequestBeenMade) {
-      call()
+      call({
+        // forward params which are received after redirection to the callback request
+        params: urlParams
+      })
     }
   }, [call, params, form, trigger])
   return (

@@ -14,7 +14,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { UserDetails } from '@client/utils/userUtils'
 import { Validation } from '@client/utils/validate'
-import { get } from 'lodash'
+import { get, merge } from 'lodash'
 import { useState } from 'react'
 
 function transformRequestBody(
@@ -32,21 +32,27 @@ function transformHttpFieldIntoRequest(
   field: IHttpFormField,
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {
-  const { options: request } = field
+  const { options: requestOptions } = field
+  const url = new URL(requestOptions.url)
   const authHeader = {
     Authorization: `Bearer ${getToken()}`
   }
-
-  return fetch(request.url, {
+  if (requestOptions.params) {
+    Object.keys(requestOptions.params).forEach((key) => {
+      url.searchParams.append(key, requestOptions.params![key])
+    })
+  }
+  const request = new Request(url.toString(), {
     headers: {
-      ...request.headers,
+      ...requestOptions.headers,
       ...authHeader
     },
-    body: request.body
-      ? JSON.stringify(transformRequestBody(request.body, ...evalParams))
+    body: requestOptions.body
+      ? JSON.stringify(transformRequestBody(requestOptions.body, ...evalParams))
       : null,
-    method: request.method
+    method: requestOptions.method
   })
+  return fetch(request)
 }
 
 export function httpErrorResponseValidator(httpFieldName: string): Validation {
@@ -115,7 +121,7 @@ export function useHttp<T = any>(
     networkError: false,
     isCompleted: false
   })
-  const call = () => {
+  const call = (additionalOptions: Partial<IHttpFormField['options']> = {}) => {
     setRequestState((state) => {
       const updatedState = {
         ...state,
@@ -125,7 +131,13 @@ export function useHttp<T = any>(
       onChange(updatedState)
       return updatedState
     })
-    transformHttpFieldIntoRequest(field, ...evalParams)
+    transformHttpFieldIntoRequest(
+      {
+        ...field,
+        options: merge(field.options, additionalOptions)
+      },
+      ...evalParams
+    )
       .then((res) => {
         if (res.ok) {
           return res.json()
