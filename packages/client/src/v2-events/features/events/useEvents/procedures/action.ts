@@ -13,7 +13,7 @@ import { Mutation as TanstackMutation } from '@tanstack/query-core'
 import { hashKey, useMutation } from '@tanstack/react-query'
 import { getMutationKey, getQueryKey } from '@trpc/react-query'
 import {
-  DraftActionInput,
+  ActionInput,
   EventDocument,
   getCurrentEventState
 } from '@opencrvs/commons/client'
@@ -67,35 +67,46 @@ type Procedure =
  * The draft stage in the middle will be cancelled. This is to prevent race conditions
  * between when the backend receives the draft when it receives the declare action.
  */
-function cancelOngoingDraftRequests(eventId: string) {
+function cancelOngoingDraftRequests({ eventId, draft }: ActionInput) {
   const mutationCache = queryClient.getMutationCache()
 
   const isDraftMutation = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutation: TanstackMutation<unknown, Error, any, unknown>
-  ): mutation is TanstackMutation<unknown, Error, DraftActionInput, unknown> =>
-    mutation.options.mutationKey
-      ? hashKey(mutation.options.mutationKey) ===
-        hashKey(getQueryKey(api.event.actions.draft))
-      : false
+  ): mutation is TanstackMutation<unknown, Error, ActionInput, unknown> => {
+    const mutationKey = mutation.options.mutationKey
+    if (!mutationKey || !mutationKey[0]) {
+      return false
+    }
+    return ['event', 'actions'].every((key) => mutationKey.flat().includes(key))
+  }
 
-  mutationCache
+  const draftMutationsForThisEvent = mutationCache
     .getAll()
     .filter(
       (mutation) =>
         isDraftMutation(mutation) &&
-        mutation.state.variables?.eventId === eventId
+        mutation.state.variables?.eventId === eventId &&
+        mutation.state.variables.draft
     )
-    .forEach((mutation) => {
+
+  if (!draft) {
+    draftMutationsForThisEvent.forEach((mutation) => {
       mutationCache.remove(mutation)
     })
+  } else {
+    // Keep the last draft mutation as it's this current request
+    draftMutationsForThisEvent.slice(0, -1).forEach((mutation) => {
+      mutationCache.remove(mutation)
+    })
+  }
 }
 
-function updateEventOptimistically<
-  T extends { eventId: string; data: ActionFormData }
->(actionType: 'DECLARE') {
+function updateEventOptimistically<T extends ActionInput>(
+  actionType: 'DECLARE'
+) {
   return (variables: T) => {
-    cancelOngoingDraftRequests(variables.eventId)
+    cancelOngoingDraftRequests(variables)
 
     const localEvent = utils.event.get.getData(variables.eventId)
     if (!localEvent) {
@@ -129,7 +140,7 @@ utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
   retryDelay: 10000,
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent,
-  onMutate: updateEventOptimistically('DECLARE')
+  onMutate: (params) => updateEventOptimistically('DECLARE')(params)
 }))
 
 utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({

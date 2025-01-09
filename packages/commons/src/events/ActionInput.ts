@@ -88,4 +88,5 @@ export const ActionInput = z.discriminatedUnion('type', [
   UnassignActionInput
 ])
 
-export type ActionInput = z.infer<typeof ActionInput>
+export type ActionInput = z.input<typeof ActionInput>
+export type ActionInputWithType = z.infer<typeof ActionInput>

@@ -74,7 +74,7 @@ export function useEvents() {
       eventsList,
       api.event.actions.declare,
       (event, parameters) => {
-        return event.id === parameters.eventId
+        return event.id === parameters.eventId && !parameters.draft
       }
     )
 
@@ -82,7 +82,7 @@ export function useEvents() {
       eventsList,
       api.event.actions.register,
       (event, parameters) => {
-        return event.id === parameters.eventId
+        return event.id === parameters.eventId && !parameters.draft
       }
     )
 

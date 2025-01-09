@@ -10,7 +10,7 @@
  */
 
 import {
-  ActionInput,
+  ActionInputWithType,
   EventDocument,
   EventInput,
   FileFieldValue,
@@ -165,7 +165,7 @@ export async function createEvent({
 }
 
 export async function addAction(
-  input: ActionInput,
+  input: ActionInputWithType,
   {
     eventId,
     createdBy,
@@ -216,7 +216,8 @@ export async function addAction(
           ...input,
           createdBy,
           createdAt: now,
-          createdAtLocation
+          createdAtLocation,
+          draft: input.draft || false
         }
       },
       $set: {
