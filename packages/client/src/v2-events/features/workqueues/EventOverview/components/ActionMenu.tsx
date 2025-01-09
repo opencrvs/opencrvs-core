@@ -13,7 +13,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 
 import { useNavigate } from 'react-router-dom'
-import { validate } from '@opencrvs/commons/client'
+import { validate, ActionType } from '@opencrvs/commons/client'
 import { type ActionConfig } from '@opencrvs/commons'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -57,21 +57,26 @@ export function ActionMenu({ eventId }: { eventId: string }) {
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {configuration.actions.filter(isActionVisible).map((action) => (
-            <DropdownMenu.Item
-              key={action.type}
-              onClick={() => {
-                if (action.type === 'CREATE' || action.type === 'CUSTOM') {
-                  alert(`Action ${action.type} is not implemented yet.`)
-                  return
-                }
+          {configuration.actions.filter(isActionVisible).map((action) => {
+            return (
+              <DropdownMenu.Item
+                key={action.type}
+                onClick={() => {
+                  if (
+                    action.type === ActionType.CREATE ||
+                    action.type === ActionType.CUSTOM
+                  ) {
+                    alert(`Action ${action.type} is not implemented yet.`)
+                    return
+                  }
 
-                navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
-              }}
-            >
-              {intl.formatMessage(action.label)}
-            </DropdownMenu.Item>
-          ))}
+                  navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+                }}
+              >
+                {intl.formatMessage(action.label)}
+              </DropdownMenu.Item>
+            )
+          })}
         </DropdownMenu.Content>
       </DropdownMenu>
     </>
