@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/__mocks__/mongodb'
+import { getClient } from '@events/storage/mongodb/__mocks__/events'
 import { createTestClient } from '@events/tests/utils'
 import { payloadGenerator } from '@events/tests/generators'
 

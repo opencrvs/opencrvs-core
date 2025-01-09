@@ -9,4 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './mongodb'
+import { env } from '@events/environment'
+import { MongoClient } from 'mongodb'
+
+const url = env.USER_MGNT_MONGO_URL
+const client = new MongoClient(url)
+
+export async function getClient() {
+  await client.connect()
+
+  const db = client.db('user-mgnt')
+  return db
+}

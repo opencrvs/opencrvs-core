@@ -8,13 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { bool, cleanEnv, str, url } from 'envalid'
 
-export const env = cleanEnv(process.env, {
-  FHIR_URL: url({ devDefault: 'http://localhost:3447/fhir' }),
-  AUTH_HOST: url({ devDefault: 'http://localhost:4040' }),
-  COUNTRY_CONFIG_HOST: url({ devDefault: 'http://localhost:3040' }),
-  GATEWAY_HOST: url({ devDefault: 'http://localhost:7070' }),
-  SUPER_USER_PASSWORD: str({ devDefault: 'password' }),
-  ACTIVATE_USERS: bool({ devDefault: true })
-})
+import { env } from '@events/environment'
+import { MongoClient } from 'mongodb'
+
+const url = env.EVENTS_MONGO_URL
+const client = new MongoClient(url)
+
+export async function getClient() {
+  await client.connect()
+
+  const db = client.db('events')
+  return db
+}

@@ -16,9 +16,8 @@ import {
   EventIndex,
   getCurrentEventState
 } from '@opencrvs/commons/events'
-
 import { type estypes } from '@elastic/elasticsearch'
-import { getClient } from '@events/storage'
+import * as eventsDb from '@events/storage/mongodb/events'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { Transform } from 'stream'
 import { z } from 'zod'
@@ -56,7 +55,7 @@ function createIndex(indexName: string) {
 }
 
 export async function indexAllEvents() {
-  const mongoClient = await getClient()
+  const mongoClient = await eventsDb.getClient()
   const esClient = getOrCreateClient()
   await createIndex(EVENTS_INDEX)
 

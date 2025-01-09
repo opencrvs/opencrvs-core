@@ -12,15 +12,15 @@ import { MongoClient } from 'mongodb'
 import { inject } from 'vitest'
 
 let client: MongoClient
-let databaseName = 'events_' + Date.now()
+let databaseName = 'user-mgnt_' + Date.now()
 
 export async function resetServer() {
-  databaseName = 'events_' + Date.now()
+  databaseName = 'user-mgnt_' + Date.now()
 }
 
 export async function getClient() {
   if (!client) {
-    client = new MongoClient(inject('MONGO_URI'))
+    client = new MongoClient(inject('USER_MGNT_MONGO_URI'))
   }
 
   await client.connect()

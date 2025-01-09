@@ -12,7 +12,8 @@
 import { cleanEnv, url } from 'envalid'
 
 export const env = cleanEnv(process.env, {
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
+  EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
+  USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
   ES_HOST: url({ devDefault: 'http://localhost:9200' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),

@@ -12,7 +12,6 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
-
 import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
 import { getEventConfigurations } from '@events/service/config/config'
 import {
@@ -21,8 +20,9 @@ import {
   deleteEvent,
   EventInputWithId,
   getEventById,
-  patchEvent
-} from '@events/service/events'
+  patchEvent,
+  resolveDocumentReferences
+} from '@events/service/events/events'
 import { presignFilesInEvent } from '@events/service/files'
 import {
   getLocations,
@@ -38,6 +38,7 @@ import {
   EventInput,
   NotifyActionInput,
   RegisterActionInput,
+  ResolvedEventDocument,
   ValidateActionInput
 } from '@opencrvs/commons/events'
 
@@ -104,15 +105,23 @@ export const appRouter = router({
 
       return patchEvent(options.input)
     }),
-    get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-      const event = await getEventById(input)
-      const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
-        eventWithSignedFiles,
-        ctx.user.id
-      )
-      return eventWithUserSpecificDrafts
-    }),
+    get: publicProcedure
+      .input(z.string())
+      .output(ResolvedEventDocument)
+      .query(async ({ input, ctx }) => {
+        const event = await getEventById(input)
+
+        const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
+        const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+          eventWithSignedFiles,
+          ctx.user.id
+        )
+        const resolvedEventDocument = await resolveDocumentReferences(
+          eventWithUserSpecificDrafts
+        )
+
+        return resolvedEventDocument
+      }),
     delete: publicProcedure
       .input(z.object({ eventId: z.string() }))
       .mutation(async ({ input, ctx }) => {

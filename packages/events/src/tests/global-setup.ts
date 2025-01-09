@@ -14,17 +14,22 @@ export type { ProvidedContext } from 'vitest'
 
 declare module 'vitest' {
   export interface ProvidedContext {
-    MONGO_URI: string
+    EVENTS_MONGO_URI: string
+    USER_MGNT_MONGO_URI: string
   }
 }
 
 export default async function setup({ provide }: any) {
-  const mongod = await MongoMemoryServer.create()
-  const uri = mongod.getUri()
+  const eventsMongod = await MongoMemoryServer.create()
+  const userMgntMongod = await MongoMemoryServer.create()
+  const eventsURI = eventsMongod.getUri()
+  const userMgntURI = userMgntMongod.getUri()
 
-  provide('MONGO_URI', uri)
+  provide('EVENTS_MONGO_URI', eventsURI)
+  provide('USER_MGNT_MONGO_URI', userMgntURI)
 
   return async () => {
-    await mongod.stop()
+    await eventsMongod.stop()
+    await userMgntMongod.stop()
   }
 }
