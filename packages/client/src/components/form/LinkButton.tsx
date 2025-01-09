@@ -21,7 +21,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -56,6 +55,8 @@ export const LinkButtonField = ({
   )!
   const onChange: Parameters<typeof useHttp>[1] = ({ data, error, loading }) =>
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
+  const [hasCallbackRequestBeenMade, setCallbackRequestBeenMade] =
+    useState(false)
 
   const { call } = useHttp<string>(
     trigger as IHttpFormField,
@@ -67,7 +68,6 @@ export const LinkButtonField = ({
   )
 
   useEffect(() => {
-    const hasRequestBeenMade = Boolean(form[trigger.name])
     const urlParams = new URLSearchParams(window.location.search)
     function checkParamsPresentInURL() {
       for (const [key, value] of Object.entries(params)) {
@@ -77,38 +77,38 @@ export const LinkButtonField = ({
       }
       return true
     }
-    if (checkParamsPresentInURL() && !hasRequestBeenMade) {
+    if (checkParamsPresentInURL() && !hasCallbackRequestBeenMade) {
       call({
         // forward params which are received after redirection to the callback request
-        params: urlParams
+        params: Object.fromEntries(urlParams)
       })
+      setCallbackRequestBeenMade(true)
     }
-  }, [call, params, form, trigger])
+  }, [call, params, form, trigger, hasCallbackRequestBeenMade])
   return (
-    <Link
-      to={evalExpressionInFieldDefinition(
-        '`' + to + '`',
-        form,
-        config,
-        draft,
-        user
-      )}
+    <Button
+      type="secondary"
+      size="large"
+      element="a"
+      fullWidth
+      disabled={isDisabled}
+      onClick={() => {
+        window.location.href = evalExpressionInFieldDefinition(
+          '`' + to + '`',
+          form,
+          config,
+          draft,
+          user
+        )
+      }}
     >
-      <Button
-        type="secondary"
-        size="large"
-        element="a"
-        fullWidth
-        disabled={isDisabled}
-      >
-        {fieldDefinition.icon &&
-          (windowSize.width <= theme.grid.breakpoints.md ? (
-            <Icon name={fieldDefinition.icon.mobile} size="medium" />
-          ) : (
-            <Icon name={fieldDefinition.icon.desktop} size="medium" />
-          ))}
-        {fieldDefinition.label}
-      </Button>
-    </Link>
+      {fieldDefinition.icon &&
+        (windowSize.width <= theme.grid.breakpoints.md ? (
+          <Icon name={fieldDefinition.icon.mobile} size="medium" />
+        ) : (
+          <Icon name={fieldDefinition.icon.desktop} size="medium" />
+        ))}
+      {fieldDefinition.label}
+    </Button>
   )
 }

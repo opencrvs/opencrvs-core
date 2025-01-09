@@ -33,7 +33,8 @@ function transformHttpFieldIntoRequest(
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {
   const { options: requestOptions } = field
-  const url = new URL(requestOptions.url)
+  const baseUrl = window.location.origin
+  const url = new URL(requestOptions.url, baseUrl)
   const authHeader = {
     Authorization: `Bearer ${getToken()}`
   }

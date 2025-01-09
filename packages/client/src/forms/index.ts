@@ -740,6 +740,11 @@ export interface ILinkButtonFormField extends IFormFieldBase {
     url: string
     callback: {
       trigger: string
+      /**
+       * If the redirection url has the exact same param keys
+       * with exact same values sepecified in the below `params`
+       * field, only then the callback will be triggered
+       */
       params: Record<string, string>
     }
   }
