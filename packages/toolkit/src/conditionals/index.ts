@@ -152,6 +152,48 @@ export function field(fieldId: string) {
         }
       },
       required: ['$form']
+    }),
+    isUndefinedOrInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          anyOf: [
+            {
+              required: [fieldId],
+              properties: {
+                [fieldId]: {
+                  enum: values
+                }
+              }
+            },
+            { not: { required: [fieldId] } }
+          ]
+        }
+      },
+      required: ['$form']
+    }),
+    isUndefinedOrNotInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          anyOf: [
+            {
+              required: [fieldId],
+              properties: {
+                [fieldId]: {
+                  not: {
+                    enum: values
+                  }
+                }
+              }
+            },
+            { not: { required: [fieldId] } }
+          ]
+        }
+      },
+      required: ['$form']
     })
   }
 }
