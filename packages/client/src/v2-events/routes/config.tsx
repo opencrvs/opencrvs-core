@@ -15,6 +15,7 @@ import { Debug } from '@client/v2-events/features/debug/debug'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
+import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
@@ -67,6 +68,10 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DELETE.path,
       element: <DeleteEvent />
+    },
+    {
+      path: ROUTES.V2.EVENTS.VALIDATE.path,
+      element: <ValidateEvent />
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,

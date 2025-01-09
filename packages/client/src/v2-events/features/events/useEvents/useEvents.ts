@@ -103,6 +103,10 @@ export function useEvents() {
     getOutbox,
     getDrafts,
     actions: {
+      validate: useEventAction(
+        utils.event.actions.validate,
+        api.event.actions.validate
+      ),
       notify: useEventAction(
         utils.event.actions.notify,
         api.event.actions.notify

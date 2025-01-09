@@ -31,7 +31,8 @@ import {
   EventIndex,
   EventInput,
   NotifyActionInput,
-  RegisterActionInput
+  RegisterActionInput,
+  ValidateActionInput
 } from '@opencrvs/commons/events'
 
 const ContextSchema = z.object({
@@ -138,6 +139,16 @@ export const appRouter = router({
           token: options.ctx.token
         })
       }),
+      validate: publicProcedure
+        .input(ValidateActionInput)
+        .mutation((options) => {
+          return addAction(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token
+          })
+        }),
       register: publicProcedure
         .input(RegisterActionInput.omit({ identifiers: true }))
         .mutation((options) => {
