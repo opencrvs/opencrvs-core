@@ -16,6 +16,7 @@ import { TranslationConfig } from './TranslationConfig'
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
   allowedWhen: Conditional().optional(),
+  draft: z.boolean().optional(),
   forms: z.array(FormConfig)
 })
 
@@ -24,7 +25,6 @@ export const ActionConfigBase = z.object({
  */
 export const ActionType = {
   CREATE: 'CREATE',
-  DRAFT: 'DRAFT',
   ASSIGN: 'ASSIGN',
   UNASSIGN: 'UNASSIGN',
   REGISTER: 'REGISTER',
@@ -33,6 +33,7 @@ export const ActionType = {
   DETECT_DUPLICATE: 'DETECT_DUPLICATE',
   NOTIFY: 'NOTIFY',
   DECLARE: 'DECLARE',
+  DELETE: 'DELETE',
   CUSTOM: 'CUSTOM'
 } as const
 
@@ -60,6 +61,12 @@ const RegisterConfig = ActionConfigBase.merge(
   })
 )
 
+const DeleteConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.DELETE)
+  })
+)
+
 const CustomConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM)
@@ -71,6 +78,7 @@ export const ActionConfig = z.discriminatedUnion('type', [
   DeclareConfig,
   ValidateConfig,
   RegisterConfig,
+  DeleteConfig,
   CustomConfig
 ])
 

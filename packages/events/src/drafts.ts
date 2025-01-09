@@ -9,14 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export const MINIO_REGEX = /\/[^\/?]+\.(jpg|png|jpeg|svg)(?=\?|$)/i
+import { EventDocument } from '@opencrvs/commons/events'
 
-export function isBase64FileString(str: string) {
-  if (str === '' || str.trim() === '') {
-    return false
+export function getEventWithOnlyUserSpecificDrafts(
+  event: EventDocument,
+  userId: string
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.filter((action) => {
+      return !action.draft || action.createdBy === userId
+    })
   }
-  const strSplit = str.split(':')
-  return strSplit.length > 0 && strSplit[0] === 'data'
 }
-
-export const isMinioUrl = (url: string) => MINIO_REGEX.test(url)

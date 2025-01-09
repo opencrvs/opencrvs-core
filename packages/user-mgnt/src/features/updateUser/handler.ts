@@ -18,7 +18,7 @@ import {
   postFhir,
   uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@opencrvs/commons'
+import { isBase64FileString, logger } from '@opencrvs/commons'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import { QA_ENV } from '@user-mgnt/constants'
@@ -26,7 +26,11 @@ import * as Hapi from '@hapi/hapi'
 import * as _ from 'lodash'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import { userRoleScopes } from '@opencrvs/commons/authentication'
-import { Practitioner } from '@opencrvs/commons/types'
+import {
+  findExtension,
+  OPENCRVS_SPECIFICATION_URL,
+  Practitioner
+} from '@opencrvs/commons/types'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -93,11 +97,20 @@ export default async function updateUser(
       throw new Error('Location can be changed only by National System Admin')
     }
   }
-  const signatureAttachment = user.signature && {
-    contentType: user.signature.type,
-    url: await uploadSignatureToMinio(token, user.signature),
-    creation: new Date().getTime().toString()
-  }
+
+  const existingSignatureAttachment = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
+    existingPractitioner.extension || []
+  )?.valueAttachment
+
+  const signatureAttachment =
+    (user.signature &&
+      isBase64FileString(user.signature.data) && {
+        contentType: user.signature.type,
+        url: await uploadSignatureToMinio(token, user.signature),
+        creation: new Date().getTime().toString()
+      }) ||
+    existingSignatureAttachment
 
   const practitioner = createFhirPractitioner(
     existingUser,

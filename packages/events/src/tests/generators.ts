@@ -11,7 +11,6 @@
 
 import {
   DeclareActionInput,
-  DraftActionInput,
   EventInput,
   getUUID,
   ActionType
@@ -38,15 +37,6 @@ export function payloadGenerator() {
         input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
       ) => ({
         type: ActionType.DECLARE,
-        transactionId: input?.transactionId ?? getUUID(),
-        data: input?.data ?? {},
-        eventId
-      }),
-      draft: (
-        eventId: string,
-        input: Partial<Pick<DraftActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.DRAFT,
         transactionId: input?.transactionId ?? getUUID(),
         data: input?.data ?? {},
         eventId
