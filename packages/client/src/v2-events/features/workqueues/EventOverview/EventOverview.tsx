@@ -62,7 +62,7 @@ export function EventOverviewIndex() {
   return (
     <EventOverview
       event={event}
-      history={fullEvent.actions}
+      history={fullEvent.actions.filter((action) => !action.draft)}
       summary={config.summary}
       user={user}
     />

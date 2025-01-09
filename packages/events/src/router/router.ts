@@ -13,15 +13,7 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
 
-import {
-  DeclareActionInput,
-  EventIndex,
-  EventInput,
-  NotifyActionInput,
-  DraftActionInput,
-  RegisterActionInput,
-  ValidateActionInput
-} from '@opencrvs/commons/events'
+import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
 import { getEventConfigurations } from '@events/service/config/config'
 import {
   addAction,
@@ -31,9 +23,17 @@ import {
   getEventById,
   patchEvent
 } from '@events/service/events'
-import { EventConfig, getUUID } from '@opencrvs/commons'
-import { getIndexedEvents } from '@events/service/indexing/indexing'
 import { presignFilesInEvent } from '@events/service/files'
+import { getIndexedEvents } from '@events/service/indexing/indexing'
+import { EventConfig, getUUID } from '@opencrvs/commons'
+import {
+  DeclareActionInput,
+  EventIndex,
+  EventInput,
+  NotifyActionInput,
+  RegisterActionInput,
+  ValidateActionInput
+} from '@opencrvs/commons/events'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -111,7 +111,11 @@ export const appRouter = router({
     get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-      return eventWithSignedFiles
+      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+        eventWithSignedFiles,
+        ctx.user.id
+      )
+      return eventWithUserSpecificDrafts
     }),
     delete: publicProcedure
       .input(z.object({ eventId: z.string() }))
@@ -120,14 +124,6 @@ export const appRouter = router({
       }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
-        })
-      }),
-      draft: publicProcedure.input(DraftActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,

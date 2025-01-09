@@ -101,8 +101,6 @@ export function WorkqueueIndex() {
   )
 }
 
-type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
-
 /**
  * A Workqueue that displays a table of events based on search criteria.
  */
@@ -112,16 +110,16 @@ function Workqueue({
   limit,
   offset
 }: {
-  events: EventWithSyncStatus[]
+  events: EventIndex[]
   config: WorkqueueConfig
   limit: number
   offset: number
 }) {
   const intl = useIntl()
   const theme = useTheme()
-  const { getOutbox } = useEvents()
+  const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
-
+  const drafts = getDrafts()
   const statuses = config.filters.flatMap((filter) => filter.status)
 
   const workqueue = events
@@ -138,6 +136,17 @@ function Workqueue({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+
+      const getEventStatus = () => {
+        if (isInOutbox) {
+          return 'OUTBOX'
+        }
+        if (isInDrafts) {
+          return 'DRAFT'
+        }
+        return event.status
+      }
 
       return {
         ...event,
@@ -152,7 +161,9 @@ function Workqueue({
             defaultMessage:
               '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
           },
-          { status: isInOutbox ? 'OUTBOX' : event.status }
+          {
+            status: getEventStatus()
+          }
         ),
 
         [config.fields[0].id]: isInOutbox ? (
