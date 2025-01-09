@@ -71,7 +71,7 @@ export async function waitForElement<T extends string | (() => void)>(
     throw new Error(
       `Couldn't find selector ${
         typeof selector === 'function' ? selector.name : selector
-      } from component in ${MAX_TIME}ms` + `\n\n${rootComponent.debug()}`
+      } from component in ${MAX_TIME}ms`
     )
   }
   return rootComponent.update().find(selector as string)
