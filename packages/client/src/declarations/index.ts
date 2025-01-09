@@ -1516,7 +1516,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         eventData.registration.status &&
         eventData.registration.status[0].type
       const updateWorkqueue = () =>
-        updateRegistrarWorkqueue(userDetails?.practitionerId, 10, queryData)
+        updateRegistrarWorkqueue(userDetails?.practitionerId, 10)
 
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
@@ -1829,9 +1829,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             Cmd.action(
               deleteDeclaration(action.payload.id, action.payload.client)
             ),
-            Cmd.action(
-              updateRegistrarWorkqueue(undefined, 10, action.payload.id)
-            ),
+            Cmd.action(updateRegistrarWorkqueue()),
             declarationNextToUnassign
               ? Cmd.action(
                   executeUnassignDeclaration(

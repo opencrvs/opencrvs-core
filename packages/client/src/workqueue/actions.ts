@@ -55,7 +55,6 @@ export interface UpdateRegistrarWorkqueueAction {
   payload: {
     pageSize: number
     userId?: string
-    queryData?: any
   }
 }
 

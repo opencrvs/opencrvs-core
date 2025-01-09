@@ -149,13 +149,6 @@ const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
-        assignment {
-          practitionerId
-          firstName
-          lastName
-          officeName
-          avatarURL
-        }
         certificates {
           hasShowedVerifiedDocument
           certificateTemplateId

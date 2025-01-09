@@ -539,13 +539,6 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           compositionId
           trackingId
         }
-        assignment {
-          practitionerId
-          firstName
-          lastName
-          officeName
-          avatarURL
-        }
         status {
           comments {
             comment

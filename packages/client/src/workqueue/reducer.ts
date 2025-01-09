@@ -42,7 +42,6 @@ import {
   IQueryData
 } from './actions'
 import { Scope, SCOPES } from '@opencrvs/commons/client'
-import cloneDeep from 'lodash/cloneDeep'
 
 export const EVENT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -111,15 +110,13 @@ interface IWorkqueuePaginationParams {
 
 export function updateRegistrarWorkqueue(
   userId?: string,
-  pageSize = 10,
-  queryData?: any
+  pageSize = 10
 ): UpdateRegistrarWorkqueueAction {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
       userId,
-      pageSize,
-      queryData
+      pageSize
     }
   }
 }
@@ -448,31 +445,6 @@ async function writeRegistrarWorkqueueByUser(
   ]).then(([_, currentUserWorkqueueData]) => currentUserWorkqueueData)
 }
 
-function updateAssignment(
-  workqueueState: WorkqueueState,
-  declarationId: string,
-  newAssignment: any
-): WorkqueueState {
-  const clonedState = cloneDeep(workqueueState)
-
-  const tabs = Object.keys(clonedState.workqueue.data) as (keyof IQueryData)[]
-  for (const tab of tabs) {
-    const results = clonedState.workqueue.data[tab]?.results
-
-    if (results) {
-      for (let i = 0; i < results.length; i++) {
-        const declaration = results[i]
-        if (declaration?.id === declarationId && declaration.registration) {
-          declaration.registration.assignment = newAssignment ?? null
-          return clonedState
-        }
-      }
-    }
-  }
-
-  return clonedState
-}
-
 export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
   state: WorkqueueState = workqueueInitialState,
   action: WorkqueueActions
@@ -491,23 +463,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         issueTab
       } = state.pagination
 
-      const { pageSize, queryData } = action.payload
-
-      if (queryData) {
-        const declarationId =
-          typeof queryData === 'string'
-            ? queryData
-            : queryData.data?.fetchBirthRegistration?.id
-
-        const declarationAssignment =
-          queryData?.data?.fetchBirthRegistration?.registration?.assignment
-
-        state = updateAssignment(
-          state,
-          declarationId,
-          typeof queryData === 'string' ? null : declarationAssignment
-        )
-      }
+      const { pageSize } = action.payload
 
       const paginationParams: IWorkqueuePaginationParams = {
         ...action.payload,
