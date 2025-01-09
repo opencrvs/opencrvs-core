@@ -54,6 +54,12 @@ function getData(actions: Array<ActionDocument>) {
   }, {})
 }
 
+export function isUndeclaredDraft(event: EventDocument): boolean {
+  return event.actions.every(
+    ({ type, draft }) => type === ActionType.CREATE || draft
+  )
+}
+
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
