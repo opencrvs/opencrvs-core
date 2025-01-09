@@ -135,7 +135,9 @@ const BirthSection: React.FC<BirthSectionProps> = ({
   const [accordionActiveStateMap] = useState(
     getAccordionActiveStateMap(
       advancedSearchParamsState,
-      hasBirthSearchJurisdictionScope
+      hasBirthSearchJurisdictionScope,
+      undefined,
+      userOfficeId
     )
   )
 
@@ -351,7 +353,12 @@ const DeathSection: React.FC<DeathSectionProps> = ({
     )
   })
   const [accordionActiveStateMap] = useState(
-    getAccordionActiveStateMap(advancedSearchParamsState, undefined, true)
+    getAccordionActiveStateMap(
+      advancedSearchParamsState,
+      undefined,
+      hasDeathSearchJurisdictionScope,
+      userOfficeId
+    )
   )
 
   const isDisable = !isAdvancedSearchFormValid(formState)

@@ -33,6 +33,7 @@ import {
   isInvalidDate,
   TIME_PERIOD
 } from '@client/forms/advancedSearch/fieldDefinitions/utils'
+import { UUID } from '@opencrvs/commons'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -392,13 +393,16 @@ export const transformStoreDataToAdvancedSearchLocalState = (
 export const getAccordionActiveStateMap = (
   storeState: IAdvancedSearchParamState,
   hasBirthSearchJurisdictionScope?: boolean,
-  hasDeathSearchJurisdictionScope?: boolean
+  hasDeathSearchJurisdictionScope?: boolean,
+  officeId?: UUID
 ): Record<string, boolean> => {
   const advancedSearchBirthSections = createAdvancedSearchBirthSections(
-    hasBirthSearchJurisdictionScope
+    hasBirthSearchJurisdictionScope,
+    officeId
   )
   const advancedSearchDeathSections = createAdvancedSearchDeathSections(
-    hasDeathSearchJurisdictionScope
+    hasDeathSearchJurisdictionScope,
+    officeId
   )
   const {
     birthSearchRegistrationSection,
