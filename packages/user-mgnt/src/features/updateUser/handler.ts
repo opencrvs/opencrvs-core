@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
-import { Practitioner } from '@opencrvs/commons/types'
+import { logger, isBase64FileString } from '@opencrvs/commons'
+import {
+  Practitioner,
+  findExtension,
+  OPENCRVS_SPECIFICATION_URL
+} from '@opencrvs/commons/types'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 import {
@@ -77,11 +81,20 @@ export default async function updateUser(
       throw new Error('Location can not be changed by this user')
     }
   }
-  const signatureAttachment = user.signature && {
-    contentType: user.signature.type,
-    url: await uploadSignatureToMinio(token, user.signature),
-    creation: new Date().getTime().toString()
-  }
+
+  const existingSignatureAttachment = findExtension(
+    `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
+    existingPractitioner.extension || []
+  )?.valueAttachment
+
+  const signatureAttachment =
+    (user.signature &&
+      isBase64FileString(user.signature.data) && {
+        contentType: user.signature.type,
+        url: await uploadSignatureToMinio(token, user.signature),
+        creation: new Date().getTime().toString()
+      }) ||
+    existingSignatureAttachment
 
   const practitioner = createFhirPractitioner(
     existingUser,

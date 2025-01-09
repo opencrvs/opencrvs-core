@@ -28,21 +28,17 @@ export function FileInput(
 
   const [file, setFile] = React.useState(value)
 
-  const { uploadFiles } = useFileUpload(name, {
-    onSuccess: ({ filename }) => {
-      if (!file) {
-        throw new Error('File is not defined. This should never happen')
-      }
+  const { uploadFiles, deleteFile } = useFileUpload(name, {
+    onSuccess: ({ type, originalFilename, filename }) => {
       setFile({
         filename,
-        originalFilename: file.originalFilename,
-        type: file.type
+        originalFilename: originalFilename,
+        type: type
       })
-
       onChange({
         filename,
-        originalFilename: file.originalFilename,
-        type: file.type
+        originalFilename: originalFilename,
+        type: type
       })
     }
   })
@@ -64,10 +60,12 @@ export function FileInput(
             type: newFile.type
           })
           uploadFiles(newFile)
-        } else {
-          setFile(undefined)
-          onChange(undefined)
         }
+        if (!newFile && file) {
+          deleteFile(file.filename)
+        }
+        setFile(undefined)
+        onChange(undefined)
       }}
     />
   )

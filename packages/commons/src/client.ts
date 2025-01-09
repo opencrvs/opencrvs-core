@@ -13,5 +13,6 @@ export * from './events'
 export * from './scopes'
 export * from './conditionals/conditionals'
 export * from './conditionals/validate'
+export * from './documents'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

@@ -503,11 +503,14 @@ export async function toRegistered(
   record: WaitingForValidationRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
+  comment?: string,
   identifiers?: EventRegistrationPayload['identifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const registeredTaskWithoutPractitionerExtensions =
-    createRegisterTask(previousTask)
+  const registeredTaskWithoutPractitionerExtensions = createRegisterTask(
+    previousTask,
+    comment
+  )
 
   const [registeredTask, practitionerResourcesBundle] =
     await withPractitionerDetails(
