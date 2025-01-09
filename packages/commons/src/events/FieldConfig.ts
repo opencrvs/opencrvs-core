@@ -90,7 +90,8 @@ export const FieldType = {
   HIDDEN: 'HIDDEN',
   BULLET_LIST: 'BULLET_LIST',
   CHECKBOX: 'CHECKBOX',
-  SELECT: 'SELECT'
+  SELECT: 'SELECT',
+  COUNTRY: 'COUNTRY'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -169,6 +170,10 @@ const CheckBox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX)
 }).describe('Check Box')
 
+const Country = BaseField.extend({
+  type: z.literal(FieldType.COUNTRY)
+}).describe('Country select field')
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
@@ -177,7 +182,8 @@ export const FieldConfig = z.discriminatedUnion('type', [
   BulletList,
   Select,
   CheckBox,
-  File
+  File,
+  Country
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>

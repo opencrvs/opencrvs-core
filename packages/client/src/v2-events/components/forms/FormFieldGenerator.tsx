@@ -52,6 +52,8 @@ import { FileInput } from './inputs/FileInput/FileInput'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
 import { Checkbox } from '@client/v2-events/features/events/registered-fields/CheckBox'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
+import { countries } from '@client/utils/countries'
+import { SelectOption } from '@opencrvs/commons'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -206,6 +208,17 @@ const GeneratedInputField = React.memo(
       return (
         <Select
           {...fieldDefinition}
+          value={inputProps.value as string}
+          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'COUNTRY') {
+      return (
+        <Select
+          {...fieldDefinition}
+          type="SELECT"
+          options={countries as SelectOption[]}
           value={inputProps.value as string}
           onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
         />
