@@ -138,6 +138,16 @@ function Workqueue({
       )
       const isInDrafts = drafts.some((draft) => draft.id === event.id)
 
+      const getEventStatus = () => {
+        if (isInOutbox) {
+          return 'OUTBOX'
+        }
+        if (isInDrafts) {
+          return 'DRAFT'
+        }
+        return event.status
+      }
+
       return {
         ...event,
         // eslint-disable-next-line
@@ -152,7 +162,7 @@ function Workqueue({
               '{status, select, OUTBOX {Syncing..} CREATED {Draft} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
           },
           {
-            status: getEventStatus(event, isInOutbox, isInDrafts)
+            status: getEventStatus()
           }
         ),
 
@@ -294,18 +304,4 @@ function Workqueue({
       />
     </WQContentWrapper>
   )
-}
-
-function getEventStatus(
-  event: EventIndex,
-  isInOutbox: boolean,
-  isInDrafts: boolean
-) {
-  if (isInOutbox) {
-    return 'OUTBOX'
-  }
-  if (isInDrafts) {
-    return 'DRAFT'
-  }
-  return event.status
 }

@@ -57,14 +57,16 @@ function filterOutboxEventsWithMutation<
 export function useEvents() {
   const eventsList = api.events.get.useQuery().data ?? []
 
-  function getDrafts() {
+  function getDrafts(): EventDocument[] {
     const queries = queryClient.getQueriesData<EventDocument>({
       queryKey: getQueryKey(api.event.get)
     })
 
     return queries
       .map((query) => query[1])
-      .filter((event) => event && event.actions[event.actions.length - 1].draft)
+      .filter((event): event is EventDocument =>
+        Boolean(event && event.actions[event.actions.length - 1].draft)
+      )
   }
 
   function getOutbox() {
