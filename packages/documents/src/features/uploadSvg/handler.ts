@@ -14,6 +14,7 @@ import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import isSvg from 'is-svg'
 import { badRequest } from '@hapi/boom'
+import { getUserId } from '@opencrvs/commons'
 
 export interface IDocumentPayload {
   fileData: string
@@ -24,6 +25,13 @@ export async function svgUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const userId = getUserId(request.headers.authorization)
+  if (!userId)
+    return Promise.reject(
+      new Error(
+        `request failed: Authorization token is missing or does not contain a valid user ID.`
+      )
+    )
   const ref = uuid()
   const bufferData = request.payload as Buffer
   if (!isSvg(bufferData)) {
@@ -32,7 +40,8 @@ export async function svgUploadHandler(
   const generateFileName = `${ref}.svg`
   try {
     await minioClient.putObject(MINIO_BUCKET, generateFileName, bufferData, {
-      'content-type': 'image/svg+xml'
+      'content-type': 'image/svg+xml',
+      'created-by': userId
     })
 
     return h

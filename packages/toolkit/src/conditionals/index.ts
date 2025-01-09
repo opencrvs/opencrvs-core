@@ -69,9 +69,19 @@ export function eventHasAction(type: ActionDocument['type']) {
               properties: {
                 type: {
                   const: type
+                },
+                draft: {
+                  type: 'boolean'
                 }
               },
-              required: ['type']
+              required: ['type'],
+              not: {
+                properties: {
+                  draft: {
+                    const: true
+                  }
+                }
+              }
             }
           }
         },

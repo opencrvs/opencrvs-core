@@ -8,12 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
-import { FieldProps } from '@opencrvs/commons'
+import { ParagraphFieldValue } from '@opencrvs/commons/client'
 
-export function Paragraph({ label }: FieldProps<'PARAGRAPH'>) {
-  const intl = useIntl()
+export const INITIAL_PARAGRAPH_VALUE = ''
 
-  return <p>{intl.formatMessage(label)}</p>
-}
+export const paragraphToString = (text: ParagraphFieldValue) => text || ''

@@ -49,7 +49,7 @@ const ViewerContainer = styled.div`
 `
 
 interface IProps {
-  previewImage: FileFieldValue
+  previewImage: Exclude<FileFieldValue, null>
   disableDelete?: boolean
   title?: string
   goBack: () => void

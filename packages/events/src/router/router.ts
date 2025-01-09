@@ -13,25 +13,27 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
 
+import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
+import { getEventConfigurations } from '@events/service/config/config'
+import {
+  addAction,
+  createEvent,
+  deleteEvent,
+  EventInputWithId,
+  getEventById,
+  patchEvent
+} from '@events/service/events'
+import { presignFilesInEvent } from '@events/service/files'
+import { getIndexedEvents } from '@events/service/indexing/indexing'
+import { EventConfig, getUUID } from '@opencrvs/commons'
 import {
   DeclareActionInput,
   EventIndex,
   EventInput,
   NotifyActionInput,
-  DraftActionInput,
-  RegisterActionInput
+  RegisterActionInput,
+  ValidateActionInput
 } from '@opencrvs/commons/events'
-import { getEventConfigurations } from '@events/service/config/config'
-import {
-  addAction,
-  createEvent,
-  EventInputWithId,
-  getEventById,
-  patchEvent
-} from '@events/service/events'
-import { EventConfig, getUUID } from '@opencrvs/commons'
-import { getIndexedEvents } from '@events/service/indexing/indexing'
-import { presignFilesInEvent } from '@events/service/files'
 
 const ContextSchema = z.object({
   user: z.object({
@@ -109,18 +111,19 @@ export const appRouter = router({
     get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-      return eventWithSignedFiles
+      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+        eventWithSignedFiles,
+        ctx.user.id
+      )
+      return eventWithUserSpecificDrafts
     }),
+    delete: publicProcedure
+      .input(z.object({ eventId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        return deleteEvent(input.eventId, { token: ctx.token })
+      }),
     actions: router({
       notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
-        })
-      }),
-      draft: publicProcedure.input(DraftActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
           createdBy: options.ctx.user.id,
@@ -136,6 +139,16 @@ export const appRouter = router({
           token: options.ctx.token
         })
       }),
+      validate: publicProcedure
+        .input(ValidateActionInput)
+        .mutation((options) => {
+          return addAction(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token
+          })
+        }),
       register: publicProcedure
         .input(RegisterActionInput.omit({ identifiers: true }))
         .mutation((options) => {
