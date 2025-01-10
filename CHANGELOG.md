@@ -48,6 +48,12 @@
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 
+## 1.6.3 Release candidate
+
+### Improvements
+
+- Refactored convertToLocal to handle optional country code, fallback region detection, and special handling for national prefixes (e.g., 0), with alphanumeric sanitization of phone numbers.
+
 ## 1.6.2 Release candidate
 
 ### Bug fixes
