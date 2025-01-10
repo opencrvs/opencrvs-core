@@ -30,9 +30,12 @@ export function Checkbox({
       name={props.id}
       selected={value === 'true'}
       value={value ?? 'false'}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        setFieldValue(props.id, event.target.value)
-      }
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+        setFieldValue(
+          props.id,
+          event.target.value === 'true' ? 'false' : 'true'
+        )
+      }}
     />
   )
 }
