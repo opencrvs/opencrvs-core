@@ -131,7 +131,9 @@ const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   options: z
     .object({
-      fontVariant: z.literal('reg16').optional()
+      fontVariant: z
+        .enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
+        .optional()
     })
     .default({})
 }).describe('A read-only HTML <p> paragraph')
