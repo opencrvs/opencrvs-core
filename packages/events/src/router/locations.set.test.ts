@@ -10,11 +10,9 @@
  */
 import { createTestClient } from '@events/tests/utils'
 import { payloadGenerator } from '@events/tests/generators'
-import { userScopes } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 
-const nationalSystemAdminClient = createTestClient([
-  userScopes.nationalSystemAdmin
-])
+const nationalSystemAdminClient = createTestClient([SCOPES.CONFIG_UPDATE_ALL])
 
 const registrarClient = createTestClient()
 
