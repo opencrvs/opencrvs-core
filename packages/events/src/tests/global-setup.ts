@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { ElasticsearchContainer } from '@testcontainers/elasticsearch'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 export type { ProvidedContext } from 'vitest'
 
@@ -16,20 +17,37 @@ declare module 'vitest' {
   export interface ProvidedContext {
     EVENTS_MONGO_URI: string
     USER_MGNT_MONGO_URI: string
+    ELASTICSEARCH_URI: string
   }
 }
 
-export default async function setup({ provide }: any) {
-  const eventsMongod = await MongoMemoryServer.create()
-  const userMgntMongod = await MongoMemoryServer.create()
-  const eventsURI = eventsMongod.getUri()
-  const userMgntURI = userMgntMongod.getUri()
+async function setupServer() {
+  return new ElasticsearchContainer('elasticsearch:8.14.3')
+    .withExposedPorts(9200)
+    .withStartupTimeout(120_000)
+    .withEnvironment({
+      'discovery.type': 'single-node',
+      'xpack.security.enabled': 'false',
+      'action.destructive_requires_name': 'false'
+    })
+    .start()
+}
 
+export default async function setup({ provide }: any) {
+  const eventsMongoD = await MongoMemoryServer.create()
+  const userMgntMongoD = await MongoMemoryServer.create()
+  const es = await setupServer()
+
+  const eventsURI = eventsMongoD.getUri()
+  const userMgntURI = userMgntMongoD.getUri()
+
+  provide('ELASTICSEARCH_URI', `${es.getHost()}:${es.getMappedPort(9200)}`)
   provide('EVENTS_MONGO_URI', eventsURI)
   provide('USER_MGNT_MONGO_URI', userMgntURI)
 
   return async () => {
-    await eventsMongod.stop()
-    await userMgntMongod.stop()
+    await es.stop()
+    await eventsMongoD.stop()
+    await userMgntMongoD.stop()
   }
 }

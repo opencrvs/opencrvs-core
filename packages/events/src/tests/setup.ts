@@ -8,15 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { vi } from 'vitest'
 import { resetServer as resetEventsMongoServer } from '@events/storage/mongodb/__mocks__/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
+import { inject, vi } from 'vitest'
 
+import { createIndex } from '@events/service/indexing/indexing'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import {
-  resetServer as resetESServer,
-  setupServer as setupESServer
-} from '@events/storage/__mocks__/elasticsearch'
 import { mswServer } from './msw'
 
 vi.mock('@events/storage/mongodb/events')
@@ -31,7 +28,14 @@ vi.mock('@events/service/config/config', () => ({
     ])
 }))
 
-beforeAll(() => Promise.all([setupESServer()]), 100000)
+async function resetESServer() {
+  // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+  const { getEventIndexName } = await import('@events/storage/elasticsearch')
+  const index = 'events' + Date.now() + Math.random()
+  getEventIndexName.mockReturnValue(index)
+  await createIndex(index)
+}
+
 beforeEach(() =>
   Promise.all([
     resetEventsMongoServer(),
@@ -43,10 +47,8 @@ beforeEach(() =>
 beforeAll(() =>
   mswServer.listen({
     onUnhandledRequest: (req) => {
-      const elasticRegex = /http:\/\/localhost:55\d{3}\/.*/
-
       const isElasticResetCall =
-        req.method === 'DELETE' && elasticRegex.test(req.url)
+        req.method === 'DELETE' && req.url.includes(inject('ELASTICSEARCH_URI'))
 
       if (!isElasticResetCall) {
         // eslint-disable-next-line no-console
