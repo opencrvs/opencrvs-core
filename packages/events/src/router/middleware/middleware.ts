@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope, userScopes } from '@opencrvs/commons'
+import { inScope, Scope, SCOPES } from '@opencrvs/commons'
 import { TRPCError, AnyTRPCMiddlewareFunction } from '@trpc/server'
 
 import { z } from 'zod'
@@ -56,7 +56,7 @@ const createScopeAuthMiddleware =
   }
 
 const isNationalSystemAdminUser = createScopeAuthMiddleware([
-  userScopes.nationalSystemAdmin
+  SCOPES.CONFIG_UPDATE_ALL
 ])
 
 export const middleware = {
