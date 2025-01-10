@@ -10,8 +10,7 @@
  */
 import { env } from './environment'
 import fetch from 'node-fetch'
-import { seedLocations } from './locations'
-
+import { seedLocations, seedLocationsForV2Events } from './locations'
 import { seedUsers } from './users'
 import { parseGQLResponse, raise } from './utils'
 import { print } from 'graphql'
@@ -89,14 +88,19 @@ async function deactivateSuperuser(token: string) {
       }
     })
   })
+
   parseGQLResponse(await res.json())
 }
 
 async function main() {
   const token = await getToken()
 
-  console.log('Seeding locations')
+  console.log('Seeding locations for v1 system')
   await seedLocations(token)
+
+  console.log('Seeding locations for v2 system (events)')
+  await seedLocationsForV2Events(token)
+
   console.log('Seeding users')
   await seedUsers(token)
   await deactivateSuperuser(token)
