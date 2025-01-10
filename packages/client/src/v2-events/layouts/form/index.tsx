@@ -21,6 +21,7 @@ import { FormHeader } from './FormHeader'
 type AllowedRoute =
   | typeof ROUTES.V2.EVENTS.REGISTER
   | typeof ROUTES.V2.EVENTS.DECLARE
+  | typeof ROUTES.V2.EVENTS.COLLECT_CERTIFICATE
 
 /**
  * Layout for form and review pages.
