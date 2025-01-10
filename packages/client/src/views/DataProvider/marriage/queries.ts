@@ -502,6 +502,13 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         brideSignature
         witnessOneSignature
         witnessTwoSignature
+        assignment {
+          practitionerId
+          firstName
+          lastName
+          officeName
+          avatarURL
+        }
         duplicates {
           compositionId
           trackingId

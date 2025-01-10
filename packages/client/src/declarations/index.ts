@@ -21,6 +21,7 @@ import {
 } from '@client/forms'
 import { SCOPES } from '@opencrvs/commons/client'
 import {
+  AssignmentData,
   Attachment,
   EventType,
   History,
@@ -230,6 +231,7 @@ export interface IDeclaration {
   writingDraft?: boolean
   operationHistories?: ITaskHistory[]
   isNotDuplicate?: boolean
+  assignmentStatus?: AssignmentData
 }
 
 type Relation =
@@ -1530,6 +1532,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
+
+      newDeclarationsAfterDownload[
+        downloadingDeclarationIndex
+      ].assignmentStatus = eventData?.registration?.assignment ?? null
 
       const newStateAfterDownload = {
         ...state,
