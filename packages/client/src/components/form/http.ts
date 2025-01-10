@@ -40,7 +40,13 @@ function transformHttpFieldIntoRequest(
   }
   if (requestOptions.params) {
     Object.keys(requestOptions.params).forEach((key) => {
-      url.searchParams.append(key, requestOptions.params![key])
+      url.searchParams.append(
+        key,
+        evalExpressionInFieldDefinition(
+          requestOptions.params![key],
+          ...evalParams
+        )
+      )
     })
   }
   const request = new Request(url.toString(), {
