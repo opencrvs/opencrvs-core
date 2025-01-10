@@ -26,23 +26,22 @@ const ActionDocumentKeyResolveMap = {
 } as const
 
 /**
- *
- * @param events
  * @returns unique ids of users and locations that are referenced in the ActionDocument array
  */
 export const getReferenceIds = (actions: ActionDocument[]) => {
   return Object.fromEntries(
-    _.toPairs(ActionDocumentKeyResolveMap).map(([category, keys]) => [
-      category,
-      _.uniq(
-        actions.flatMap((action) =>
-          keys.map((key) => _.get(action, key)).filter((v) => !_.isNil(v))
+    Object.entries(ActionDocumentKeyResolveMap).map(([category, keys]) => [
+      category as keyof typeof ActionDocumentKeyResolveMap, // .entries loses the type of the key
+      Array.from(
+        new Set(
+          actions.flatMap((action) =>
+            keys.map((key) => _.get(action, key)).filter(Boolean)
+          )
         )
-      )
+      ).filter(_.isString)
     ])
   )
 }
-
 /**
  *
  * @param action ActionDocument from Event which ids were resolved
@@ -74,13 +73,16 @@ export const replaceReferenceIdWithValue = (
       if (_.isNil(fieldReferenceId)) {
         return actionToResolve
       }
+      // @TODO: Update typescript to 5.xx in a separate PR
+      const value =
+        // @ts-ignore
+        resolvedRefsByType[mapping.type].find(
+          (ref: ResolvedUser | ResolvedLocation) => ref.id === fieldReferenceId
+        ) ?? null
 
       return {
         ...actionToResolve,
-        [mapping.key]:
-          resolvedRefsByType[mapping.type].find(
-            (ref) => ref.id === fieldReferenceId
-          ) ?? null
+        [mapping.key]: value
       }
     }, action)
   )
