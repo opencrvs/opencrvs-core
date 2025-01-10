@@ -43,12 +43,16 @@ export const ValidateActionInput = BaseActionInput.merge(
   })
 )
 
+export type ValidateActionInput = z.infer<typeof ValidateActionInput>
+
 export const NotifyActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY),
     createdAtLocation: z.string()
   })
 )
+
+export type NotifyActionInput = z.infer<typeof NotifyActionInput>
 
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({

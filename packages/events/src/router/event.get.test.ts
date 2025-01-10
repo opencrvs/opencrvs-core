@@ -34,3 +34,25 @@ test('Returns event', async () => {
 
   expect(sanitizeUnstableKeys(fetchedEvent)).toMatchSnapshot()
 })
+
+test('Returns event with all actions resolved', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare(
+    generator.event.actions.declare(event.id, { data: { name: 'John Doe' } })
+  )
+
+  await client.event.actions.validate(
+    generator.event.actions.validate(event.id, {
+      data: { favouritePlayer: 'Elena Rybakina' }
+    })
+  )
+
+  const fetchedEvent = await client.event.get(event.id)
+
+  expect(fetchedEvent.actions).toHaveLength(3)
+  expect(sanitizeUnstableKeys(fetchedEvent)).toMatchSnapshot()
+})

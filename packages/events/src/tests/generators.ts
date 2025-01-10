@@ -14,7 +14,8 @@ import {
   EventInput,
   getUUID,
   ActionType,
-  ResolvedLocation
+  ResolvedLocation,
+  ValidateActionInput
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
@@ -57,6 +58,15 @@ export function payloadGenerator() {
         input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
       ) => ({
         type: ActionType.DECLARE,
+        transactionId: input?.transactionId ?? getUUID(),
+        data: input?.data ?? {},
+        eventId
+      }),
+      validate: (
+        eventId: string,
+        input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.VALIDATE,
         transactionId: input?.transactionId ?? getUUID(),
         data: input?.data ?? {},
         eventId
