@@ -20,8 +20,6 @@ declare module 'vitest' {
   }
 }
 
-export async function teardown() {}
-
 async function setupServer() {
   return new ElasticsearchContainer('elasticsearch:8.14.3')
     .withExposedPorts(9200)
