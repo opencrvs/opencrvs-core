@@ -10,14 +10,13 @@
  */
 
 import { Mutation as TanstackMutation } from '@tanstack/query-core'
-import { hashKey, useMutation } from '@tanstack/react-query'
-import { getMutationKey, getQueryKey } from '@trpc/react-query'
+import { useMutation } from '@tanstack/react-query'
+import { getMutationKey } from '@trpc/react-query'
 import {
   ActionInput,
   EventDocument,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import { ActionFormData } from '@opencrvs/commons'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
