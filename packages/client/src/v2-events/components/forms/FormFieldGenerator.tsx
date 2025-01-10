@@ -55,6 +55,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { countries } from '@client/utils/countries'
 import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { Location } from '@client/v2-events/features/events/registered-fields/Location'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -229,6 +230,22 @@ const GeneratedInputField = React.memo(
           {...fieldDefinition}
           value={value as string}
           setFieldValue={setFieldValue}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'LOCATION') {
+      return (
+        <Location
+          {...fieldDefinition}
+          value={value as string}
+          setFieldValue={setFieldValue}
+          partOf={
+            (fieldDefinition.options?.partOf.$data &&
+              (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                fieldDefinition.options?.partOf.$data
+              ] as string | undefined | null)) ??
+            null
+          }
         />
       )
     }
