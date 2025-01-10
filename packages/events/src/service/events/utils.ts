@@ -9,11 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// Utility to get all keys from union
-type AllKeys<T> = T extends T ? keyof T : never
-
-import { ActionDocument, ResolvedActionDocument } from '@opencrvs/commons'
+import {
+  ActionDocument,
+  ResolvedActionDocument,
+  ResolvedLocation,
+  ResolvedUser
+} from '@opencrvs/commons'
 import * as _ from 'lodash'
+
+/** Utility to get all keys from union */
+type AllKeys<T> = T extends T ? keyof T : never
 
 const ActionDocumentKeyResolveMap = {
   user: ['createdBy', 'assignedTo'] satisfies AllKeys<ActionDocument>[],
@@ -38,32 +43,45 @@ export const getReferenceIds = (actions: ActionDocument[]) => {
   )
 }
 
+/**
+ *
+ * @param action ActionDocument from Event which ids were resolved
+ * @param resolvedRefsByType resolved user and locations
+ * @returns ResolvedActionDocument with resolved user and locations
+ */
 export const replaceReferenceIdWithValue = (
   action: ActionDocument,
-  resolvedRefs: { user: { id: string }[]; location: { id: string }[] }
+  resolvedRefsByType: {
+    user: ResolvedUser[]
+    location: { id: ResolvedLocation }[]
+  }
 ) => {
-  return ResolvedActionDocument.parse(
-    [
-      ...ActionDocumentKeyResolveMap.location.map((loc) => ({
-        type: 'location' as const,
-        key: loc
-      })),
-      ...ActionDocumentKeyResolveMap.user.map((usr) => ({
-        type: 'user' as const,
-        key: usr
-      }))
-    ].reduce((actionWithValues, mapping) => {
-      const value = _.get(action, mapping.key)
+  const keysToResolveWithType = [
+    ...ActionDocumentKeyResolveMap.location.map((loc) => ({
+      type: 'location' as const,
+      key: loc
+    })),
+    ...ActionDocumentKeyResolveMap.user.map((usr) => ({
+      type: 'user' as const,
+      key: usr
+    }))
+  ]
 
-      if (!_.isNil(value)) {
-        return {
-          ...actionWithValues,
-          [mapping.key]:
-            resolvedRefs[mapping.type].find((ref) => ref.id === value) ?? null
-        }
+  return ResolvedActionDocument.parse(
+    keysToResolveWithType.reduce((actionToResolve, mapping) => {
+      const fieldReferenceId = _.get(action, mapping.key)
+
+      if (_.isNil(fieldReferenceId)) {
+        return actionToResolve
       }
 
-      return actionWithValues
+      return {
+        ...actionToResolve,
+        [mapping.key]:
+          resolvedRefsByType[mapping.type].find(
+            (ref) => ref.id === fieldReferenceId
+          ) ?? null
+      }
     }, action)
   )
 }

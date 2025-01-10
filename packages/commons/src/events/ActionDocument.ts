@@ -12,6 +12,13 @@ import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 import { FieldValue } from './FieldValue'
 
+/**
+ * @type ActionDocument - Peristed action document schema
+ * @type ResolvedActionDocument - Transient action document schema where user and location ids are resolved to actual values
+ */
+
+/** ActionDocument START */
+
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
@@ -73,6 +80,21 @@ const CustomAction = ActionBase.merge(
   })
 )
 
+export const ActionDocument = z.discriminatedUnion('type', [
+  CreatedAction,
+  ValidateAction,
+  NotifiedAction,
+  RegisterAction,
+  DeclareAction,
+  AssignedAction,
+  UnassignedAction,
+  CustomAction
+])
+export type ActionDocument = z.infer<typeof ActionDocument>
+
+/** ActionDocument END */
+
+/**  ResolvedActionDocument START */
 export const ResolvedUser = z.object({
   id: z.string(),
   systemRole: z.string(),
@@ -154,19 +176,6 @@ const ResolvedCustomAction = ResolvedActionBase.merge(
   })
 )
 
-export const ActionDocument = z.discriminatedUnion('type', [
-  CreatedAction,
-  ValidateAction,
-  NotifiedAction,
-  RegisterAction,
-  DeclareAction,
-  AssignedAction,
-  UnassignedAction,
-  CustomAction
-])
-export type ActionDocument = z.infer<typeof ActionDocument>
-
-/** ResolvedActionDocument is used when full event is fetched. Each of the identifier fields (locations, users) will incude actual values over ids. */
 export const ResolvedActionDocument = z.discriminatedUnion('type', [
   ResolvedAssignedAction,
   ResolvedUnassignedAction,
@@ -179,6 +188,8 @@ export const ResolvedActionDocument = z.discriminatedUnion('type', [
 ])
 
 export type ResolvedActionDocument = z.infer<typeof ResolvedActionDocument>
+
+/**  ResolvedActionDocument END */
 
 export type CreatedAction = z.infer<typeof CreatedAction>
 

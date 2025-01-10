@@ -23,7 +23,7 @@ export const EventDocument = z.object({
 
 export type EventDocument = z.infer<typeof EventDocument>
 
-/** ResolvedEventDocument is used when full event is fetched. Each of the identifier fields (locations, users) will incude actual values over ids. */
+/** ResolvedEventDocument is used when full event is fetched. Each of the identifier fields (locations, users) will include actual values over ids. */
 export const ResolvedEventDocument = EventDocument.extend({
   actions: z.array(ResolvedActionDocument)
 })

@@ -43,7 +43,7 @@ beforeEach(() =>
 beforeAll(() =>
   mswServer.listen({
     onUnhandledRequest: (req) => {
-      const elasticRegex = /http:\/\/localhost:55\d{3}\/.*\/*/
+      const elasticRegex = /http:\/\/localhost:55\d{3}\/.*/
 
       const isElasticResetCall =
         req.method === 'DELETE' && elasticRegex.test(req.url)
