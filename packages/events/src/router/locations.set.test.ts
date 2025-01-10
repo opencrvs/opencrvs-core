@@ -40,7 +40,12 @@ test('Prevents sending empty payload', async () => {
 
 test('Creates single location', async () => {
   const locationPayload = [
-    { id: '123-456-789', partOf: null, name: 'Location foobar' }
+    {
+      id: '123-456-789',
+      partOf: null,
+      name: 'Location foobar',
+      externalId: 'foo-bar'
+    }
   ]
 
   await nationalSystemAdminClient.locations.set(locationPayload)

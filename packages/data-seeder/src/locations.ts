@@ -199,7 +199,7 @@ function locationBundleToIdentifier(
 }
 
 /**
- * Get the external id* (*external to ocrvs)  for a location. Defined in country-config.
+ * Get the externally defined id for location. Defined in country-config.
  */
 const getExternalIdFromIdentifier = (
   identifiers: fhir3.Location['identifier']

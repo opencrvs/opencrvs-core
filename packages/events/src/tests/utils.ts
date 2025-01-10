@@ -14,23 +14,58 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { Scope, userRoleScopes } from '@opencrvs/commons'
+import { CreatedUser, payloadGenerator } from './generators'
+import * as events from '@events/storage/mongodb/__mocks__/events'
+import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
+import { seeder } from '@events/tests/generators'
+
+/**
+ * Clean up unstable keys in payloads during snapshots
+ */
+export const sanitizeUnstableKeys = (obj: any): any => {
+  const keysToSanitize = [
+    'id',
+    'externalId',
+    'transactionId',
+    'createdAt',
+    'updatedAt'
+  ]
+
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeUnstableKeys)
+  } else if (obj !== null && typeof obj === 'object') {
+    const sanitizedObj: Record<string, any> = {}
+
+    for (const key in obj) {
+      if (keysToSanitize.includes(key)) {
+        sanitizedObj[key] = `<${key} />`
+      } else {
+        sanitizedObj[key] = sanitizeUnstableKeys(obj[key])
+      }
+    }
+
+    return sanitizedObj
+  }
+
+  return obj
+}
 
 const { createCallerFactory } = t
 
-export function createTestClient(scopes?: Scope[]) {
+export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(scopes)
+  const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
-    user: { id: '1', primaryOfficeId: '123' },
+    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
     token
   })
   return caller
 }
 
-const createTestToken = (scopes?: Scope[]) =>
+const createTestToken = (userId: string, scopes?: Scope[]) =>
   jwt.sign(
-    { scope: scopes ?? userRoleScopes.REGISTRATION_AGENT },
+    { scope: scopes ?? userRoleScopes.REGISTRATION_AGENT, sub: userId },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -38,3 +73,33 @@ const createTestToken = (scopes?: Scope[]) =>
       audience: 'opencrvs:events-user'
     }
   )
+
+/**
+ *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
+ */
+export const setupTestCase = async () => {
+  const generator = payloadGenerator()
+  const eventsDb = await events.getClient()
+  const userMgntDb = await userMgnt.getClient()
+
+  const seed = seeder()
+  const locationPayload = generator.locations.set(5)
+
+  const user = await seed.user(
+    userMgntDb,
+    generator.user.create({
+      primaryOfficeId: locationPayload[0].id
+    })
+  )
+
+  const locations = await seed.locations(eventsDb, locationPayload)
+
+  return {
+    locations,
+    user,
+    eventsDb,
+    userMgntDb,
+    seed,
+    generator
+  }
+}

@@ -13,10 +13,30 @@ import {
   DeclareActionInput,
   EventInput,
   getUUID,
-  ActionType
+  ActionType,
+  ResolvedLocation
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
+import { Db } from 'mongodb'
 
+type Name = {
+  use: string
+  given: string[]
+  family: string
+}
+
+export type CreatedUser = {
+  id: string
+  primaryOfficeId: string
+  systemRole: string
+  name: Array<Name>
+}
+
+type CreateUser = {
+  primaryOfficeId: string
+  systemRole?: string
+  name?: Array<Name>
+}
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
@@ -44,6 +64,14 @@ export function payloadGenerator() {
     }
   }
 
+  const user = {
+    create: (input: CreateUser) => ({
+      systemRole: input?.systemRole ?? 'REGISTRATION_AGENT',
+      name: input?.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
+      primaryOfficeId: input.primaryOfficeId
+    })
+  }
+
   const locations = {
     /** Create test data by providing count or desired locations */
     set: (input: Array<Partial<Location>> | number) => {
@@ -51,6 +79,7 @@ export function payloadGenerator() {
         return Array.from({ length: input }).map((_, i) => ({
           id: getUUID(),
           name: `Location name ${i}`,
+          externalId: getUUID(),
           partOf: null
         }))
       }
@@ -58,10 +87,29 @@ export function payloadGenerator() {
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
+        externalId: location.externalId ?? getUUID(),
         partOf: null
       }))
     }
   }
 
-  return { event, locations }
+  return { event, locations, user }
+}
+
+export function seeder() {
+  const seedUser = async (db: Db, user: Omit<CreatedUser, 'id'>) => {
+    const createdUser = await db.collection('users').insertOne(user)
+
+    return {
+      ...user,
+      id: createdUser.insertedId.toString()
+    }
+  }
+  const seedLocations = (db: Db, locations: ResolvedLocation[]) =>
+    db.collection('locations').insertMany(locations)
+
+  return {
+    user: seedUser,
+    locations: seedLocations
+  }
 }

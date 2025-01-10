@@ -8,22 +8,29 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
 
-const client = createTestClient()
-const generator = payloadGenerator()
+import {
+  createTestClient,
+  sanitizeUnstableKeys,
+  setupTestCase
+} from '@events/tests/utils'
 
 test('Returns 404 when not found', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+
   await expect(
     client.event.get('id-not-persisted')
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Returns event', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const event = await client.event.create(generator.event.create())
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent).toEqual(event)
+  expect(sanitizeUnstableKeys(fetchedEvent)).toMatchSnapshot()
 })

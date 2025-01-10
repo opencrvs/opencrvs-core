@@ -10,14 +10,13 @@
  */
 
 import { getOrCreateClient } from '@events/storage/__mocks__/elasticsearch'
-import { payloadGenerator } from '@events/tests/generators'
-import { createTestClient } from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { indexAllEvents } from './indexing'
 
-const client = createTestClient()
-const generator = payloadGenerator()
-
 test('indexes all records from MongoDB with one function call', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const esClient = getOrCreateClient()
 
   await indexAllEvents()
@@ -39,6 +38,9 @@ test('indexes all records from MongoDB with one function call', async () => {
 })
 
 test('records are automatically indexed when they are created', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   await client.event.create(generator.event.create())
 
   const esClient = getOrCreateClient()

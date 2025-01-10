@@ -8,20 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
-import { EventStatus } from '@opencrvs/commons'
 
-const client = createTestClient()
-const generator = payloadGenerator()
+import { EventStatus } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns empty list when no events', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+
   const fetchedEvents = await client.events.get()
 
   expect(fetchedEvents).toEqual([])
 })
 
 test('Returns multiple events', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   for (let i = 0; i < 10; i++) {
     await client.event.create(generator.event.create())
   }
@@ -32,6 +35,9 @@ test('Returns multiple events', async () => {
 })
 
 test('Returns aggregated event with updated status and values', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const initialData = { name: 'John Doe', favouriteFruit: 'Banana' }
   const event = await client.event.create(generator.event.create())
   await client.event.actions.declare(

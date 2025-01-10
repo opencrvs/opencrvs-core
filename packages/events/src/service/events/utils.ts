@@ -53,7 +53,7 @@ export const replaceReferenceIdWithValue = (
   action: ActionDocument,
   resolvedRefsByType: {
     user: ResolvedUser[]
-    location: { id: ResolvedLocation }[]
+    location: ResolvedLocation[]
   }
 ) => {
   const keysToResolveWithType = [
