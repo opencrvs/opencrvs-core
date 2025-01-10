@@ -9,24 +9,24 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { format } from 'date-fns'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
-import { Button, Link, ResponsiveModal, Stack } from '@opencrvs/components'
+import { Link } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ResolvedActionDocument, ResolvedUser } from '@opencrvs/commons/client'
+import { ResolvedActionDocument } from '@opencrvs/commons/client'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { Avatar, Maybe } from '@client/utils/gateway'
-import { AvatarSmall } from '@client/components/Avatar'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-import { formatLongDate } from '@client/utils/date-formatting'
-import { getNameOfUser } from '@client/v2-events/features/workqueues/utils'
+import { HUMAN_READABLE_FULL_DATE_TIME } from '@client/v2-events/utils'
+import { EventHistoryModal } from './EventHistoryModal'
+import { UserAvatar } from './UserAvatar'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -36,67 +36,11 @@ const TableDiv = styled.div`
   overflow: auto;
 `
 
-const NameAvatar = styled.div`
-  display: flex;
-  align-items: center;
-  img {
-    margin-right: 10px;
-  }
-`
+const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
-function UserAvatar({
-  names,
-  avatar,
-  locale
-}: {
-  names: ResolvedUser['name']
-  avatar?: Maybe<Avatar>
-  locale: string
-}) {
-  const name = getNameOfUser(names, locale)
-
-  return (
-    <NameAvatar>
-      <AvatarSmall avatar={avatar} name={name} />
-      <span>{name}</span>
-    </NameAvatar>
-  )
-}
-
-function DetailedHistoryModal({
-  history,
-  close
-}: {
-  history: ResolvedActionDocument
-  close: (result: boolean | null) => void
-}) {
-  const intl = useIntl()
-
-  const name = getNameOfUser(history.createdBy.name, intl.locale)
-  return (
-    <ResponsiveModal
-      autoHeight
-      actions={[]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
-      title={history.type}
-      width={1024}
-    >
-      <Stack>
-        <Text color="grey500" element="p" variant="reg19">
-          {name} {'—'}{' '}
-          {formatLongDate(
-            history.createdAt.toLocaleString(),
-            intl.locale,
-            'MMMM dd, yyyy · hh.mm a'
-          )}
-        </Text>
-      </Stack>
-    </ResponsiveModal>
-  )
-}
-
+/**
+ *  Renders the event history table. Used for audit trail.
+ */
 export function EventHistory({
   history
 }: {
@@ -108,17 +52,12 @@ export function EventHistory({
 
   const onHistoryRowClick = (item: ResolvedActionDocument) => {
     void openModal<boolean | null>((close) => (
-      <DetailedHistoryModal close={close} history={item} />
+      <EventHistoryModal close={close} history={item} />
     ))
   }
-  const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
   const historyRows = history.map((item) => ({
-    date: formatLongDate(
-      item.createdAt.toLocaleString(),
-      intl.locale,
-      'MMMM dd, yyyy · hh.mm a'
-    ),
+    date: format(new Date(item.createdAt), HUMAN_READABLE_FULL_DATE_TIME),
     action: (
       <Link
         font="bold14"
@@ -142,6 +81,7 @@ export function EventHistory({
         }
       >
         <UserAvatar
+          // @TODO: extend v2-events User to include avatar
           avatar={undefined}
           locale={intl.locale}
           names={item.createdBy.name}

@@ -56,19 +56,3 @@ export function useIntlFormatMessageWithFlattenedParams() {
     formatMessage
   }
 }
-
-export function getNameOfUser(names: ResolvedUser['name'], language: string) {
-  const match = names.find((name) => name.use === language) ?? names[0]
-
-  return joinValues([...match?.given, match?.family])
-}
-
-export function joinValues(
-  values: Array<string | undefined | null>,
-  separator = ' '
-) {
-  return values
-    .filter((value) => !!value)
-    .join(separator)
-    .trim()
-}
