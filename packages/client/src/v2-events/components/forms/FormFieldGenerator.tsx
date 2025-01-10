@@ -54,6 +54,7 @@ import { Checkbox } from '@client/v2-events/features/events/registered-fields/Ch
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { countries } from '@client/utils/countries'
 import { SelectOption } from '@opencrvs/commons'
+import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -215,12 +216,10 @@ const GeneratedInputField = React.memo(
     }
     if (fieldDefinition.type === 'COUNTRY') {
       return (
-        <Select
+        <SelectCountry
           {...fieldDefinition}
-          type="SELECT"
-          options={countries as SelectOption[]}
           value={inputProps.value as string}
-          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+          setFieldValue={setFieldValue}
         />
       )
     }
