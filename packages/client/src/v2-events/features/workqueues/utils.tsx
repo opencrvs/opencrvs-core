@@ -16,7 +16,7 @@ const INTERNAL_SEPARATOR = '___'
 
 /**
  * Replaces dots with triple underscores in the object keys.
- * This is needed to support dot notation in the message.
+ * This is needed to support dot notation in the message variables.
  */
 function convertDotToTripleUnderscore<T extends {}>(
   obj: T
@@ -30,7 +30,7 @@ function convertDotToTripleUnderscore<T extends {}>(
 
 /**
  * Replace dots with triple underscores within the curly braces.
- * This is needed to support dot notation in the message.
+ * This is needed to support dot notation in the message variables.
  */
 function convertDotInCurlyBraces(str: string): string {
   return str.replace(/{([^}]+)}/g, (match, content) => {

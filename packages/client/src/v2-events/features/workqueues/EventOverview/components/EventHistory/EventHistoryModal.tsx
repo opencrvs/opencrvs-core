@@ -24,14 +24,14 @@ import {
 /**
  * Detailed view of single Action, showing the history of the event.
  *
- * @TODO: Add more details to the modal and ability to diff changes when more events are specified.s
+ * @TODO: Add more details to the modal and ability to diff changes when more events are specified.
  */
 export function EventHistoryModal({
   history,
   close
 }: {
   history: ResolvedActionDocument
-  close: (result: boolean | null) => void
+  close: () => void
 }) {
   const intl = useIntl()
 
@@ -40,7 +40,7 @@ export function EventHistoryModal({
     <ResponsiveModal
       autoHeight
       actions={[]}
-      handleClose={() => close(null)}
+      handleClose={close}
       responsive={true}
       show={true}
       title={history.type}

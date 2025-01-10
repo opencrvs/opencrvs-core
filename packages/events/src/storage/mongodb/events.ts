@@ -18,6 +18,5 @@ const client = new MongoClient(url)
 export async function getClient() {
   await client.connect()
 
-  const db = client.db('events')
-  return db
+  return client.db('events')
 }

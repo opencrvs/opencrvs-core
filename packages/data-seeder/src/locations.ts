@@ -278,6 +278,10 @@ export function updateLocationPartOf(partOf: string) {
   return parent
 }
 
+/**
+ * NOTE: Seeding locations for v2 should be done after seeding the legacy locations.
+ * This is because the v2 locations are created based on the legacy location ids to ensure compatibility.
+ */
 export async function seedLocationsForV2Events(token: string) {
   const result = await fetch(env.FHIR_URL + '/Location?_count=0', {
     method: 'GET',

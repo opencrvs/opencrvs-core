@@ -106,6 +106,10 @@ export function payloadGenerator() {
   return { event, locations, user }
 }
 
+/**
+ * Helper utility to seed data into the database.
+ * Use with payloadGenerator for creating test data.
+ */
 export function seeder() {
   const seedUser = async (db: Db, user: Omit<CreatedUser, 'id'>) => {
     const createdUser = await db.collection('users').insertOne(user)
