@@ -229,12 +229,7 @@ const GeneratedInputField = React.memo(
         <Checkbox
           {...fieldDefinition}
           value={value as string}
-          onChange={(val: any) =>
-            setFieldValue(
-              fieldDefinition.id,
-              value === 'true' ? 'false' : 'true'
-            )
-          }
+          setFieldValue={setFieldValue}
         />
       )
     }
