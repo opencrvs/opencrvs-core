@@ -13,6 +13,8 @@ import { env } from '@events/environment'
 
 let client: elasticsearch.Client
 
+export const getEventIndexName = () => 'events'
+
 export const getOrCreateClient = () => {
   if (!client) {
     client = new elasticsearch.Client({
