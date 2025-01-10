@@ -67,6 +67,12 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+const CollectCertificateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.COLLECT_CERTIFICATE)
+  })
+)
+
 const CustomAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CUSTOM)
@@ -81,6 +87,7 @@ export const ActionDocument = z.discriminatedUnion('type', [
   DeclareAction,
   AssignedAction,
   UnassignedAction,
+  CollectCertificateAction,
   CustomAction
 ])
 
