@@ -55,10 +55,8 @@ const createScopeAuthMiddleware =
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 
-const isNationalSystemAdminUser = createScopeAuthMiddleware([
-  SCOPES.CONFIG_UPDATE_ALL
-])
+const isDataSeedingUser = createScopeAuthMiddleware([SCOPES.USER_DATA_SEEDING])
 
 export const middleware = {
-  isNationalSystemAdminUser
+  isDataSeedingUser
 }
