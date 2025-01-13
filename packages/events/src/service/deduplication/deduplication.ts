@@ -47,10 +47,12 @@ function generateESQuery(
       }
     }
   }
+  const truthyFormDataValue = eventIndex.data[configuration.fieldId]
+  if (!truthyFormDataValue) {
+    return null
+  }
+
   if (configuration.type === 'fuzzy') {
-    if (!eventIndex.data[configuration.fieldId]) {
-      return null
-    }
     return {
       match: {
         ['data.' + configuration.fieldId]: {
@@ -63,9 +65,6 @@ function generateESQuery(
   }
 
   if (configuration.type === 'strict') {
-    if (!eventIndex.data[configuration.fieldId]) {
-      return null
-    }
     return {
       match_phrase: {
         ['data.' + configuration.fieldId]:
@@ -75,10 +74,6 @@ function generateESQuery(
   }
 
   if (configuration.type === 'dateRange') {
-    if (!eventIndex.data[configuration.fieldId]) {
-      return null
-    }
-
     return {
       range: {
         ['data.' + configuration.fieldId]: {
@@ -96,9 +91,6 @@ function generateESQuery(
   }
 
   if (configuration.type === 'dateDistance') {
-    if (!eventIndex.data[configuration.fieldId]) {
-      return null
-    }
     return {
       distance_feature: {
         field: 'data.' + configuration.fieldId,
