@@ -8,9 +8,33 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FieldProps, FieldValue, SelectOption } from '@opencrvs/commons'
+import { storage } from '@client/storage'
 import { Select } from './Select'
+
+interface ILocation {
+  id: string
+  name: string
+  status: string
+  alias: string
+  physicalType: string
+  jurisdictionType?: string
+  statisticalId: string
+  type: string
+  partOf: string
+}
+type JurisdictionType =
+  | 'STATE'
+  | 'DISTRICT'
+  | 'LOCATION_LEVEL_3'
+  | 'LOCATION_LEVEL_4'
+  | 'LOCATION_LEVEL_5'
+interface AdminStructure extends ILocation {
+  type: 'ADMIN_STRUCTURE'
+  jurisdictionType: JurisdictionType
+  physicalType: 'Jurisdiction'
+}
 
 export function Location({
   setFieldValue,
@@ -22,7 +46,40 @@ export function Location({
   partOf: string | null
   value?: string
 }) {
-  const options: SelectOption[] = []
+  const [options, setOptions] = useState<SelectOption[]>([])
+
+  useEffect(() => {
+    const fetchOfflineData = async () => {
+      const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
+
+      switch (props.options.type) {
+        case 'ADMIN_STRUCTURE':
+          const locations = offlineData.locations as AdminStructure[]
+
+          const filteredLocations = Object.values(locations).filter(
+            (location) => location.partOf === 'Location/' + (partOf ?? '0')
+          )
+
+          setOptions(
+            filteredLocations.map((location) => ({
+              value: location.id,
+              label: {
+                id: 'location.' + location.id,
+                description: 'Label for location: ' + location.name,
+                defaultMessage: location.name
+              }
+            }))
+          )
+          break
+
+        default:
+          break
+      }
+    }
+    fetchOfflineData().catch((error) => {
+      console.error('Error fetching offline data:', error)
+    })
+  }, [partOf, props.options.type])
 
   return (
     <Select

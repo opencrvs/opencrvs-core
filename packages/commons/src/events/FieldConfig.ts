@@ -179,14 +179,15 @@ const Country = BaseField.extend({
 
 const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  options: z
-    .object({
-      partOf: z.object({
+  options: z.object({
+    partOf: z
+      .object({
         $data: z.string()
       })
-    })
-    .optional()
-    .describe('Parent location')
+      .optional()
+      .describe('Parent location'),
+    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+  })
 }).describe('Location input field')
 
 export const FieldConfig = z.discriminatedUnion('type', [
