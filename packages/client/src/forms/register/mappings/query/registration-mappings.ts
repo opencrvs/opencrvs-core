@@ -102,10 +102,6 @@ export const convertToLocal = (
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
-
-  if (!mobileWithCountryCode) {
-    return
-  }
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(mobileWithCountryCode)
   const countryCode = alpha3CountryCode
@@ -143,6 +139,9 @@ export const localPhoneTransformer =
   ) => {
     const fieldName = transformedFieldName || field.name
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
+    if (!msisdnPhone) {
+      return transformedData
+    }
     const localPhone = convertToLocal(msisdnPhone, window.config.COUNTRY)
 
     transformedData[sectionId][field.name] = localPhone

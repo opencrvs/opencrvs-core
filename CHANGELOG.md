@@ -52,7 +52,7 @@
 
 ### Improvements
 
-- Refactored convertToLocal to handle optional country code, fallback region detection, and special handling for national prefixes (e.g., 0), with alphanumeric sanitization of phone numbers.
+- For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
 
 ## 1.6.2 Release candidate
 
