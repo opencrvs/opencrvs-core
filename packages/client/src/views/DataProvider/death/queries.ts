@@ -213,6 +213,13 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        assignment {
+          practitionerId
+          firstName
+          lastName
+          officeName
+          avatarURL
+        }
         certificates {
           hasShowedVerifiedDocument
           certificateTemplateId
@@ -535,13 +542,6 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         contactEmail
         contactPhoneNumber
         informantsSignature
-        assignment {
-          practitionerId
-          firstName
-          lastName
-          officeName
-          avatarURL
-        }
         duplicates {
           compositionId
           trackingId

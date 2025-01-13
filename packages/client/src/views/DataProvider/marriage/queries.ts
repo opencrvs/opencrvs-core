@@ -158,6 +158,13 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         contactEmail
+        assignment {
+          practitionerId
+          firstName
+          lastName
+          officeName
+          avatarURL
+        }
         certificates {
           hasShowedVerifiedDocument
           certificateTemplateId
@@ -502,13 +509,6 @@ const GET_MARRIAGE_REGISTRATION_FOR_CERTIFICATE = gql`
         brideSignature
         witnessOneSignature
         witnessTwoSignature
-        assignment {
-          practitionerId
-          firstName
-          lastName
-          officeName
-          avatarURL
-        }
         duplicates {
           compositionId
           trackingId
