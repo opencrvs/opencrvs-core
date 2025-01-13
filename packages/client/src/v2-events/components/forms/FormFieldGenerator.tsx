@@ -57,6 +57,7 @@ import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
 import { Location } from '@client/v2-events/features/events/registered-fields/Location'
 import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -244,6 +245,14 @@ const GeneratedInputField = React.memo(
       )
     }
     if (fieldDefinition.type === 'LOCATION') {
+      if (fieldDefinition.options.type === 'HEALTH_FACILITY')
+        return (
+          <LocationSearch
+            {...fieldDefinition}
+            value={value as string}
+            setFieldValue={setFieldValue}
+          />
+        )
       return (
         <Location
           {...fieldDefinition}

@@ -13,7 +13,7 @@ import { FieldProps, FieldValue, SelectOption } from '@opencrvs/commons'
 import { storage } from '@client/storage'
 import { Select } from './Select'
 
-interface ILocation {
+export interface ILocation {
   id: string
   name: string
   status: string
@@ -52,34 +52,27 @@ export function Location({
     const fetchOfflineData = async () => {
       const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
 
-      switch (props.options.type) {
-        case 'ADMIN_STRUCTURE':
-          const locations = offlineData.locations as AdminStructure[]
+      const locations = offlineData.locations as AdminStructure[]
 
-          const filteredLocations = Object.values(locations).filter(
-            (location) => location.partOf === 'Location/' + (partOf ?? '0')
-          )
+      const filteredLocations = Object.values(locations).filter(
+        (location) => location.partOf === 'Location/' + (partOf ?? '0')
+      )
 
-          setOptions(
-            filteredLocations.map((location) => ({
-              value: location.id,
-              label: {
-                id: 'location.' + location.id,
-                description: 'Label for location: ' + location.name,
-                defaultMessage: location.name
-              }
-            }))
-          )
-          break
-
-        default:
-          break
-      }
+      setOptions(
+        filteredLocations.map((location) => ({
+          value: location.id,
+          label: {
+            id: 'location.' + location.id,
+            description: 'Label for location: ' + location.name,
+            defaultMessage: location.name
+          }
+        }))
+      )
     }
     fetchOfflineData().catch((error) => {
       console.error('Error fetching offline data:', error)
     })
-  }, [partOf, props.options.type])
+  }, [partOf])
 
   return (
     <Select
