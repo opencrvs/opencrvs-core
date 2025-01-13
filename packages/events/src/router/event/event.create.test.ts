@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  createTestClient,
-  sanitizeUnstableKeys,
-  setupTestCase
-} from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('event can be created and fetched', async () => {
   const { user, generator } = await setupTestCase()
@@ -22,7 +18,11 @@ test('event can be created and fetched', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(sanitizeUnstableKeys(fetchedEvent)).toMatchSnapshot()
+  expect(fetchedEvent).toEqual({
+    ...event,
+    locationIds: [user.primaryOfficeId],
+    userIds: [user.id]
+  })
 })
 
 test('creating an event is an idempotent operation', async () => {

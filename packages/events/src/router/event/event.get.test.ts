@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  createTestClient,
-  sanitizeUnstableKeys,
-  setupTestCase
-} from '@events/tests/utils'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns 404 when not found', async () => {
   const { user } = await setupTestCase()
@@ -32,10 +28,14 @@ test('Returns event', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(sanitizeUnstableKeys(fetchedEvent)).toMatchSnapshot()
+  expect(fetchedEvent).toEqual({
+    ...event,
+    locationIds: [user.primaryOfficeId],
+    userIds: [user.id]
+  })
 })
 
-test('Returns event with all actions resolved', async () => {
+test('Returns event with all actions', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -54,5 +54,4 @@ test('Returns event with all actions resolved', async () => {
   const fetchedEvent = await client.event.get(event.id)
 
   expect(fetchedEvent.actions).toHaveLength(3)
-  expect(sanitizeUnstableKeys(fetchedEvent)).toMatchSnapshot()
 })

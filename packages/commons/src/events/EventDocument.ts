@@ -21,12 +21,4 @@ export const EventDocument = z.object({
   actions: z.array(ActionDocument)
 })
 
-export const EventDocumentWithFieldIds = EventDocument.extend({
-  userIds: z.array(z.string()),
-  locationIds: z.array(z.string())
-})
-
-export type EventDocumentWithFieldIds = z.infer<
-  typeof EventDocumentWithFieldIds
->
 export type EventDocument = z.infer<typeof EventDocument>

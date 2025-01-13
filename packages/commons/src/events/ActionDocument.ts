@@ -100,15 +100,6 @@ export const ResolvedUser = z.object({
 
 export type ResolvedUser = z.infer<typeof ResolvedUser>
 
-export const ResolvedLocation = z.object({
-  id: z.string(),
-  externalId: z.string().nullable(),
-  name: z.string(),
-  partOf: z.string().nullable()
-})
-
-export type ResolvedLocation = z.infer<typeof ResolvedLocation>
-
 export type CreatedAction = z.infer<typeof CreatedAction>
 
 export type ActionFormData = ActionDocument['data']

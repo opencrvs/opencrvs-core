@@ -14,7 +14,6 @@ import {
   EventInput,
   getUUID,
   ActionType,
-  ResolvedLocation,
   ValidateActionInput
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
@@ -119,7 +118,7 @@ export function seeder() {
       id: createdUser.insertedId.toString()
     }
   }
-  const seedLocations = (db: Db, locations: ResolvedLocation[]) =>
+  const seedLocations = (db: Db, locations: Location[]) =>
     db.collection('locations').insertMany(locations)
 
   return {

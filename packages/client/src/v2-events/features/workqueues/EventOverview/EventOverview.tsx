@@ -33,7 +33,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 // eslint-disable-next-line no-restricted-imports
-import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
+import { ILocation } from '@client/offline/reducer'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -48,16 +48,13 @@ export function EventOverviewIndex() {
   const { getEvents, getEvent } = useEvents()
   const { getUsers } = useUsers()
 
-  useSelector(getLocations)
   const [config] = useEventConfigurations()
 
   const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-
   const [events] = getEvents.useSuspenseQuery()
-
   const event = events.find((e) => e.id === params.eventId)
-  const [users] = getUsers.useSuspenseQuery(fullEvent.userIds)
 
+  const [users] = getUsers.useSuspenseQuery(fullEvent.userIds)
   const locations = useSelector(getLocations)
 
   if (!event) {
@@ -86,7 +83,7 @@ function EventOverview({
   history
 }: {
   users: ResolvedUser[]
-  locations: { [locationId: string]: AdminStructure | Facility | CRVSOffice }
+  locations: { [locationId: string]: ILocation }
   event: EventIndex
   summary: SummaryConfig
   history: ActionDocument[]
