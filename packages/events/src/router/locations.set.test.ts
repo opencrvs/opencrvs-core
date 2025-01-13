@@ -12,7 +12,7 @@ import { createTestClient } from '@events/tests/utils'
 import { payloadGenerator } from '@events/tests/generators'
 import { SCOPES } from '@opencrvs/commons'
 
-const nationalSystemAdminClient = createTestClient([SCOPES.CONFIG_UPDATE_ALL])
+const dataSeedingClient = createTestClient([SCOPES.USER_DATA_SEEDING])
 
 const registrarClient = createTestClient()
 
@@ -24,15 +24,15 @@ test('prevents unauthorized access from registrar', async () => {
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
-test('Allows national system admin to set locations', async () => {
+test('Allows client to set locations', async () => {
   await expect(
-    nationalSystemAdminClient.locations.set(generator.locations.set(1))
+    dataSeedingClient.locations.set(generator.locations.set(1))
   ).resolves.toEqual(undefined)
 })
 
 test('Prevents sending empty payload', async () => {
   await expect(
-    nationalSystemAdminClient.locations.set([])
+    dataSeedingClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -41,9 +41,9 @@ test('Creates single location', async () => {
     { id: '123-456-789', partOf: null, name: 'Location foobar' }
   ]
 
-  await nationalSystemAdminClient.locations.set(locationPayload)
+  await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(locationPayload)
@@ -59,9 +59,9 @@ test('Creates multiple locations', async () => {
     {}
   ])
 
-  await nationalSystemAdminClient.locations.set(locationPayload)
+  await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toEqual(locationPayload)
 })
@@ -69,17 +69,17 @@ test('Creates multiple locations', async () => {
 test('Removes existing locations not in payload', async () => {
   const initialPayload = generator.locations.set(5)
 
-  await nationalSystemAdminClient.locations.set(initialPayload)
+  await dataSeedingClient.locations.set(initialPayload)
 
-  const initialLocations = await nationalSystemAdminClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.get()
   expect(initialLocations).toHaveLength(initialPayload.length)
 
   const [removedLocation, ...remainingLocationsPayload] = initialPayload
 
-  await nationalSystemAdminClient.locations.set(remainingLocationsPayload)
+  await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
-    await nationalSystemAdminClient.locations.get()
+    await dataSeedingClient.locations.get()
 
   expect(remainingLocationsAfterDeletion).toHaveLength(
     remainingLocationsPayload.length
