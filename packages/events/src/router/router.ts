@@ -21,7 +21,8 @@ import {
   deleteEvent,
   EventInputWithId,
   getEventById,
-  patchEvent
+  patchEvent,
+  validate
 } from '@events/service/events'
 import { presignFilesInEvent } from '@events/service/files'
 import {
@@ -136,9 +137,9 @@ export const appRouter = router({
         })
       }),
       validate: publicProcedure
-        .input(ValidateActionInput)
+        .input(ValidateActionInput.omit({ duplicates: true }))
         .mutation((options) => {
-          return addAction(options.input, {
+          return validate(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,

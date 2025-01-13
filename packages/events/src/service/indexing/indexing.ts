@@ -94,7 +94,7 @@ export async function indexAllEvents() {
 export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
 
-  return esClient.update({
+  return esClient.update<EventIndex>({
     index: getEventIndexName(),
     id: event.id,
     body: {

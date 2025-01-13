@@ -9,3 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from '@opencrvs/commons/events'
+export * from './deduplication'

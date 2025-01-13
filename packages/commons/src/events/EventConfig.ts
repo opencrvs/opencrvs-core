@@ -14,6 +14,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { FormConfig, FormConfigInput } from './FormConfig'
+import { DeduplicationConfig } from './DeduplicationConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -29,7 +30,8 @@ export const EventConfig = z.object({
   summary: SummaryConfig,
   label: TranslationConfig,
   actions: z.array(ActionConfig),
-  workqueues: z.array(WorkqueueConfig)
+  workqueues: z.array(WorkqueueConfig),
+  deduplication: DeduplicationConfig.optional()
 })
 
 export const EventConfigInput = EventConfig.extend({
