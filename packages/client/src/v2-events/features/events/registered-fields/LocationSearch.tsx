@@ -34,6 +34,12 @@ export function LocationSearch({
   value?: string
 }) {
   const [options, setOptions] = useState<SearchLocation[]>([])
+  const [loadingStatus, setLoadingStatus] = useState<
+    'loading' | 'success' | 'failed'
+  >('loading')
+  const [selectedLocation, setSelectedLocation] = useState<
+    SearchLocation | undefined
+  >(undefined)
 
   useEffect(() => {
     const fetchOfflineData = async () => {
@@ -41,25 +47,39 @@ export function LocationSearch({
 
       const facilities = offlineData.facilities as Facility[]
 
-      setOptions(
-        Object.values(facilities).map((facility) => ({
-          id: facility.id,
-          searchableText: facility.name,
-          displayLabel: facility.alias
-        }))
-      )
+      const locations = Object.values(facilities).map((facility) => ({
+        id: facility.id,
+        searchableText: facility.name,
+        displayLabel: facility.alias
+      }))
+      const initialLocation = locations.find((option) => option.id === value)
+
+      setSelectedLocation(initialLocation)
+      setOptions(locations)
+      setLoadingStatus('success')
     }
     fetchOfflineData().catch((error) => {
-      console.error('Error fetching offline data:', error)
+      setLoadingStatus('failed')
     })
-  }, [])
+  }, [value])
+
+  if (loadingStatus === 'failed') {
+    return 'Error occurred while fetching offline data'
+  }
+
+  if (loadingStatus === 'loading') {
+    return 'Loading...'
+  }
 
   return (
     <LocationSearchComponent
-      buttonLabel={''}
+      buttonLabel="Health facility"
+      selectedLocation={selectedLocation}
       {...props}
       locationList={options}
-      searchHandler={(val: any) => setFieldValue(props.id, val)}
+      searchHandler={(location: SearchLocation) =>
+        setFieldValue(props.id, location.id)
+      }
     />
   )
 }
