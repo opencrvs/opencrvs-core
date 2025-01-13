@@ -56,6 +56,7 @@ import { countries } from '@client/utils/countries'
 import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
 import { Location } from '@client/v2-events/features/events/registered-fields/Location'
+import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -233,6 +234,15 @@ const GeneratedInputField = React.memo(
         />
       )
     }
+    if (fieldDefinition.type === 'RADIO_GROUP') {
+      return (
+        <RadioGroup
+          {...fieldDefinition}
+          value={value as string}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
     if (fieldDefinition.type === 'LOCATION') {
       return (
         <Location
@@ -240,7 +250,7 @@ const GeneratedInputField = React.memo(
           value={value as string}
           setFieldValue={setFieldValue}
           partOf={
-            (fieldDefinition.options?.partOf.$data &&
+            (fieldDefinition.options?.partOf?.$data &&
               (makeFormikFieldIdsOpenCRVSCompatible(formData)[
                 fieldDefinition.options?.partOf.$data
               ] as string | undefined | null)) ??
@@ -249,7 +259,7 @@ const GeneratedInputField = React.memo(
         />
       )
     }
-    return <div>Unsupported field type {fieldDefinition.type}</div>
+    // return <div>Unsupported field type {fieldDefinition.type}</div>
   }
 )
 

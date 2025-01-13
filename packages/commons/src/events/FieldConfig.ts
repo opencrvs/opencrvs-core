@@ -143,14 +143,18 @@ const File = BaseField.extend({
   type: z.literal(FieldType.FILE)
 }).describe('File upload')
 
+const SelectOption = z.object({
+  value: z.string().describe('The value of the option'),
+  label: TranslationConfig.describe('The label of the option')
+})
+
 const RadioGroup = BaseField.extend({
   type: z.literal(FieldType.RADIO_GROUP),
-  options: z.array(
-    z.object({
-      value: z.string().describe('The value of the option'),
-      label: z.string().describe('The label of the option')
-    })
-  )
+  options: z.array(SelectOption),
+  flexDirection: z
+    .enum(['row', 'row-reverse', 'column', 'column-reverse'])
+    .optional()
+    .describe('Direction to stack the options')
 }).describe('Grouped radio options')
 
 const BulletList = BaseField.extend({
@@ -158,11 +162,6 @@ const BulletList = BaseField.extend({
   items: z.array(TranslationConfig).describe('A list of items'),
   font: z.enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
 }).describe('A list of bullet points')
-
-const SelectOption = z.object({
-  value: z.string().describe('The value of the option'),
-  label: TranslationConfig.describe('The label of the option')
-})
 
 const Select = BaseField.extend({
   type: z.literal(FieldType.SELECT),

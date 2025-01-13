@@ -8,8 +8,38 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { FieldProps, FieldValue } from '@opencrvs/commons'
 import { RadioGroupFieldValue } from '@opencrvs/commons/client'
+import { RadioGroup as RadioGroupComponent } from '@opencrvs/components'
 
 export const INITIAL_RADIO_GROUP_VALUE = ''
 
+export function RadioGroup({
+  setFieldValue,
+  value,
+  options,
+  ...props
+}: FieldProps<'RADIO_GROUP'> & {
+  setFieldValue: (name: string, val: FieldValue | undefined) => void
+  value?: string
+}) {
+  const intl = useIntl()
+
+  const radioOptions = options.map((option) => ({
+    ...option,
+    label: intl.formatMessage(option.label)
+  }))
+
+  return (
+    <RadioGroupComponent
+      name={props.id}
+      options={radioOptions}
+      value={value ?? INITIAL_RADIO_GROUP_VALUE}
+      onChange={(val: string) => setFieldValue(props.id, val)}
+      {...props}
+    />
+  )
+}
 export const radioGroupToString = (value: RadioGroupFieldValue) => value || ''
