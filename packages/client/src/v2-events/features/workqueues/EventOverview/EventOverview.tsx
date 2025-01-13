@@ -10,12 +10,14 @@
  */
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useSelector } from 'react-redux'
 import {
   EventIndex,
-  ResolvedActionDocument,
+  ActionDocument,
   SummaryConfig
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { ResolvedUser } from '@opencrvs/commons'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
@@ -27,6 +29,11 @@ import {
 import { getInitialValues } from '@client/v2-events/components/forms/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+// eslint-disable-next-line no-restricted-imports
+import { getLocations } from '@client/offline/selectors'
+// eslint-disable-next-line no-restricted-imports
+import { AdminStructure, CRVSOffice, Facility } from '@client/offline/reducer'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -39,16 +46,21 @@ import { ActionMenu } from './components/ActionMenu'
 export function EventOverviewIndex() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getEvents, getEvent } = useEvents()
+  const { getUsers } = useUsers()
 
+  useSelector(getLocations)
   const [config] = useEventConfigurations()
 
-  const { data: fullEvent } = getEvent.useQuery(params.eventId)
+  const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
 
-  const { data: events } = getEvents.useQuery()
+  const [events] = getEvents.useSuspenseQuery()
 
-  const event = events?.find((e) => e.id === params.eventId)
+  const event = events.find((e) => e.id === params.eventId)
+  const [users] = getUsers.useSuspenseQuery(fullEvent.userIds)
 
-  if (!event || !fullEvent?.actions) {
+  const locations = useSelector(getLocations)
+
+  if (!event) {
     return null
   }
 
@@ -56,7 +68,9 @@ export function EventOverviewIndex() {
     <EventOverview
       event={event}
       history={fullEvent.actions.filter((action) => !action.draft)}
+      locations={locations}
       summary={config.summary}
+      users={users}
     />
   )
 }
@@ -65,14 +79,44 @@ export function EventOverviewIndex() {
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverview({
+  users,
+  locations,
   event,
   summary,
   history
 }: {
+  users: ResolvedUser[]
+  locations: { [locationId: string]: AdminStructure | Facility | CRVSOffice }
   event: EventIndex
   summary: SummaryConfig
-  history: ResolvedActionDocument[]
+  history: ActionDocument[]
 }) {
+  const getUser = (id: string) => {
+    const user = users.find((u) => u.id === id)
+
+    if (!user) {
+      // eslint-disable-next-line no-console
+      console.error(`User with id ${id} not found.`)
+
+      return {
+        id: 'ID_MISSING',
+        name: [
+          {
+            use: 'en',
+            given: ['user'],
+            family: 'missing'
+          }
+        ],
+        systemRole: 'ROLE_MISSING'
+      }
+    }
+
+    return user
+  }
+  const getLocation = (id: string) => {
+    return locations[id]
+  }
+
   const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
   const initialValues = getInitialValues(getAllFields(eventConfiguration))
@@ -88,7 +132,11 @@ function EventOverview({
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
       <EventSummary event={event} summary={summary} />
-      <EventHistory history={history} />
+      <EventHistory
+        getLocation={getLocation}
+        getUser={getUser}
+        history={history}
+      />
     </Content>
   )
 }

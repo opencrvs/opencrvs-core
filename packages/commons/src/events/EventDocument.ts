@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { ActionDocument, ResolvedActionDocument } from './ActionDocument'
+import { ActionDocument } from './ActionDocument'
 
 export const EventDocument = z.object({
   id: z.string(),
@@ -21,11 +21,12 @@ export const EventDocument = z.object({
   actions: z.array(ActionDocument)
 })
 
-export type EventDocument = z.infer<typeof EventDocument>
-
-/** ResolvedEventDocument is used when full event is fetched. Each of the identifier fields (locations, users) will include actual values over ids. */
-export const ResolvedEventDocument = EventDocument.extend({
-  actions: z.array(ResolvedActionDocument)
+export const EventDocumentWithFieldIds = EventDocument.extend({
+  userIds: z.array(z.string()),
+  locationIds: z.array(z.string())
 })
 
-export type ResolvedEventDocument = z.infer<typeof ResolvedEventDocument>
+export type EventDocumentWithFieldIds = z.infer<
+  typeof EventDocumentWithFieldIds
+>
+export type EventDocument = z.infer<typeof EventDocument>

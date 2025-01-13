@@ -16,7 +16,7 @@ test('Returns empty list when no events', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
-  const fetchedEvents = await client.events.get()
+  const fetchedEvents = await client.event.list()
 
   expect(fetchedEvents).toEqual([])
 })
@@ -29,7 +29,7 @@ test('Returns multiple events', async () => {
     await client.event.create(generator.event.create())
   }
 
-  const events = await client.events.get()
+  const events = await client.event.list()
 
   expect(events).toHaveLength(10)
 })
@@ -46,7 +46,7 @@ test('Returns aggregated event with updated status and values', async () => {
     })
   )
 
-  const initialEvents = await client.events.get()
+  const initialEvents = await client.event.list()
 
   expect(initialEvents).toHaveLength(1)
   expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
@@ -59,7 +59,7 @@ test('Returns aggregated event with updated status and values', async () => {
     })
   )
 
-  const updatedEvents = await client.events.get()
+  const updatedEvents = await client.event.list()
 
   expect(updatedEvents).toHaveLength(1)
 

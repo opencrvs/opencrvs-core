@@ -13,8 +13,9 @@ import { useIntl } from 'react-intl'
 import format from 'date-fns/format'
 import { ResponsiveModal, Stack } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { ResolvedActionDocument } from '@opencrvs/commons/client'
+import { ActionDocument } from '@opencrvs/commons/client'
 
+import { ResolvedUser } from '@opencrvs/commons'
 import {
   getUsersFullName,
   HUMAN_READABLE_FULL_DATE_TIME,
@@ -28,14 +29,16 @@ import {
  */
 export function EventHistoryModal({
   history,
+  user,
   close
 }: {
-  history: ResolvedActionDocument
-  close: () => void
+  history: ActionDocument
+  user: ResolvedUser
+  close: any
 }) {
   const intl = useIntl()
 
-  const name = getUsersFullName(history.createdBy.name, intl.locale)
+  const name = getUsersFullName(user.name, intl.locale)
   return (
     <ResponsiveModal
       autoHeight

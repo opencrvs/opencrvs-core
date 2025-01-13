@@ -12,13 +12,6 @@ import { ActionType } from './ActionConfig'
 import { z } from 'zod'
 import { FieldValue } from './FieldValue'
 
-/**
- * @type ActionDocument - Peristed action document schema
- * @type ResolvedActionDocument - Transient action document schema where user and location ids are resolved to actual values
- */
-
-/** ActionDocument START */
-
 const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
@@ -90,11 +83,9 @@ export const ActionDocument = z.discriminatedUnion('type', [
   UnassignedAction,
   CustomAction
 ])
+
 export type ActionDocument = z.infer<typeof ActionDocument>
 
-/** ActionDocument END */
-
-/**  ResolvedActionDocument START */
 export const ResolvedUser = z.object({
   id: z.string(),
   systemRole: z.string(),
@@ -117,79 +108,6 @@ export const ResolvedLocation = z.object({
 })
 
 export type ResolvedLocation = z.infer<typeof ResolvedLocation>
-
-const ResolvedActionBase = ActionBase.extend({
-  createdBy: ResolvedUser,
-  createdAtLocation: ResolvedLocation
-})
-
-const ResolvedAssignedAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.ASSIGN),
-    assignedTo: ResolvedUser
-  })
-)
-
-const ResolvedUnassignedAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.UNASSIGN)
-  })
-)
-
-const ResolvedRegisterAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REGISTER),
-    identifiers: z.object({
-      trackingId: z.string(),
-      registrationNumber: z.string()
-    })
-  })
-)
-
-const ResolvedDeclareAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.DECLARE)
-  })
-)
-
-const ResolvedValidateAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  })
-)
-
-const ResolvedCreatedAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.CREATE)
-  })
-)
-
-const ResolvedNotifiedAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.NOTIFY)
-  })
-)
-
-const ResolvedCustomAction = ResolvedActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.CUSTOM)
-  })
-)
-
-export const ResolvedActionDocument = z.discriminatedUnion('type', [
-  ResolvedAssignedAction,
-  ResolvedUnassignedAction,
-  ResolvedRegisterAction,
-  ResolvedDeclareAction,
-  ResolvedValidateAction,
-  ResolvedCreatedAction,
-  ResolvedNotifiedAction,
-  ResolvedCustomAction
-])
-
-export type ResolvedActionDocument = z.infer<typeof ResolvedActionDocument>
-
-/**  ResolvedActionDocument END */
 
 export type CreatedAction = z.infer<typeof CreatedAction>
 

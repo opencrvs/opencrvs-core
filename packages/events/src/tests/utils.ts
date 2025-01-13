@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { appRouter, t } from '@events/router'
+import { appRouter } from '@events/router'
+import { t } from '@events/router/trpc'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
@@ -28,7 +29,12 @@ export const sanitizeUnstableKeys = (obj: any): any => {
     'externalId',
     'transactionId',
     'createdAt',
-    'updatedAt'
+    'updatedAt',
+    'userIds',
+    'locationIds',
+    'createdAtLocation',
+    'createdBy',
+    'eventId'
   ]
 
   if (Array.isArray(obj)) {

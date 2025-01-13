@@ -21,7 +21,7 @@ import { api, queryClient, utils } from '@client/v2-events/trpc'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
-  return utils.events.get.invalidate()
+  return utils.event.list.invalidate()
 }
 
 function waitUntilEventIsCreated<T extends { eventId: string }, R>(
@@ -126,7 +126,7 @@ function updateEventOptimistically<T extends ActionInput>(
       ]
     }
 
-    utils.events.get.setData(undefined, (eventIndices) =>
+    utils.event.list.setData(undefined, (eventIndices) =>
       eventIndices
         ?.filter((ei) => ei.id !== optimisticEvent.id)
         .concat(getCurrentEventState(optimisticEvent))

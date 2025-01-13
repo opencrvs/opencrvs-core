@@ -19,12 +19,15 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ResolvedActionDocument } from '@opencrvs/commons/client'
+import { ActionDocument } from '@opencrvs/commons/client'
+import { ResolvedUser } from '@opencrvs/commons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { HUMAN_READABLE_FULL_DATE_TIME } from '@client/v2-events/utils'
+// eslint-disable-next-line no-restricted-imports
+import { ILocation } from '@client/offline/reducer'
 import { EventHistoryModal } from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
 
@@ -42,69 +45,79 @@ const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
  *  Renders the event history table. Used for audit trail.
  */
 export function EventHistory({
-  history
+  history,
+  getUser,
+  getLocation
 }: {
-  history: ResolvedActionDocument[]
+  history: ActionDocument[]
+  getUser: (id: string) => ResolvedUser
+  getLocation: (id: string) => ILocation
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
 
-  const onHistoryRowClick = (item: ResolvedActionDocument) => {
+  const onHistoryRowClick = (item: ActionDocument, user: ResolvedUser) => {
     void openModal<boolean | null>((close) => (
-      <EventHistoryModal close={close} history={item} />
+      <EventHistoryModal close={close} history={item} user={user} />
     ))
   }
 
-  const historyRows = history.map((item) => ({
-    date: format(new Date(item.createdAt), HUMAN_READABLE_FULL_DATE_TIME),
-    action: (
-      <Link
-        font="bold14"
-        onClick={() => {
-          onHistoryRowClick(item)
-        }}
-      >
-        {item.type}
-      </Link>
-    ),
-    user: (
-      <Link
-        font="bold14"
-        id="profile-link"
-        onClick={() =>
-          navigate(
-            formatUrl(routes.USER_PROFILE, {
-              userId: item.createdBy.id
+  const historyRows = history.map((item) => {
+    const user = getUser(item.createdBy)
+
+    const location = getLocation(item.createdAtLocation)
+
+    return {
+      date: format(new Date(item.createdAt), HUMAN_READABLE_FULL_DATE_TIME),
+      action: (
+        <Link
+          font="bold14"
+          onClick={() => {
+            onHistoryRowClick(item, user)
+          }}
+        >
+          {item.type}
+        </Link>
+      ),
+      user: (
+        <Link
+          font="bold14"
+          id="profile-link"
+          onClick={() =>
+            navigate(
+              formatUrl(routes.USER_PROFILE, {
+                userId: item.createdBy
+              })
+            )
+          }
+        >
+          <UserAvatar
+            // @TODO: extend v2-events User to include avatar
+            avatar={undefined}
+            locale={intl.locale}
+            names={user.name}
+          />
+        </Link>
+      ),
+      role: user.systemRole,
+      location: (
+        <Link
+          font="bold14"
+          onClick={() => {
+            navigate({
+              pathname: routes.TEAM_USER_LIST,
+              search: stringify({
+                locationId: item.createdAtLocation
+              })
             })
-          )
-        }
-      >
-        <UserAvatar
-          // @TODO: extend v2-events User to include avatar
-          avatar={undefined}
-          locale={intl.locale}
-          names={item.createdBy.name}
-        />
-      </Link>
-    ),
-    role: item.createdBy.systemRole,
-    location: (
-      <Link
-        font="bold14"
-        onClick={() => {
-          navigate({
-            pathname: routes.TEAM_USER_LIST,
-            search: stringify({
-              locationId: item.createdAtLocation.id
-            })
-          })
-        }}
-      >
-        {item.createdAtLocation.name}
-      </Link>
-    )
-  }))
+          }}
+        >
+          {location.name}
+        </Link>
+      )
+    }
+  })
 
   const columns = [
     {

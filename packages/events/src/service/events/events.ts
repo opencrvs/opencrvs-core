@@ -25,9 +25,7 @@ import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
 import { getEventConfigurations } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
-import { getUsersById } from '@events/service/users/users'
-import { getReferenceIds, replaceReferenceIdWithValue } from './utils'
-import { getLocationsById } from '@events/service/locations/locations'
+import { getReferenceIds } from './utils'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -268,16 +266,8 @@ export async function patchEvent(eventInput: EventInputWithId) {
 export const resolveDocumentReferences = async (event: EventDocument) => {
   const referencesToResolve = getReferenceIds(event.actions)
 
-  const resolvedUsers = await getUsersById(referencesToResolve.user)
-  const resolvedLocations = await getLocationsById(referencesToResolve.location)
-
   return {
     ...event,
-    actions: event.actions.map((action) =>
-      replaceReferenceIdWithValue(action, {
-        user: resolvedUsers,
-        location: resolvedLocations
-      })
-    )
+    ...referencesToResolve
   }
 }

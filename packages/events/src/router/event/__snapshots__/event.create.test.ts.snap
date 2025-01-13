@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`event can be created and fetched 1`] = `
+{
+  "_id": {
+    "buffer": {
+      "data": [],
+      "type": "Buffer",
+    },
+  },
+  "actions": [
+    {
+      "createdAt": "<createdAt />",
+      "createdAtLocation": "<createdAtLocation />",
+      "createdBy": "<createdBy />",
+      "data": {},
+      "draft": false,
+      "type": "CREATE",
+    },
+  ],
+  "createdAt": "<createdAt />",
+  "id": "<id />",
+  "locationIds": "<locationIds />",
+  "transactionId": "<transactionId />",
+  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "updatedAt": "<updatedAt />",
+  "userIds": "<userIds />",
+}
+`;
+
+exports[`event with unknown type cannot be created 1`] = `[TRPCError: Invalid event type EVENT_TYPE_THAT_DOES_NOT_EXIST. Valid event types are: TENNIS_CLUB_MEMBERSHIP, TENNIS_CLUB_MEMBERSHIP_PREMIUM]`;

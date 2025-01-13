@@ -10,19 +10,12 @@
  */
 
 import { ActionType } from '../ActionConfig'
-import {
-  ActionDocument,
-  ResolvedActionDocument,
-  ResolvedLocation,
-  ResolvedUser
-} from '../ActionDocument'
-import { EventDocument, ResolvedEventDocument } from '../EventDocument'
+import { ActionDocument } from '../ActionDocument'
+import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus } from '../EventMetadata'
 
-function getStatusFromActions(
-  actions: Array<ActionDocument> | Array<ResolvedActionDocument>
-) {
+function getStatusFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<EventStatus>((status, action) => {
     if (action.type === ActionType.CREATE) {
       return EventStatus.CREATED
@@ -45,8 +38,8 @@ function getStatusFromActions(
   }, EventStatus.CREATED)
 }
 
-function getAssignedUserFromActions(actions: Array<ResolvedActionDocument>) {
-  return actions.reduce<null | ResolvedUser>((user, action) => {
+function getAssignedUserFromActions(actions: Array<ActionDocument>) {
+  return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.assignedTo
     }
@@ -57,7 +50,7 @@ function getAssignedUserFromActions(actions: Array<ResolvedActionDocument>) {
   }, null)
 }
 
-function getData(actions: Array<ResolvedActionDocument>) {
+function getData(actions: Array<ActionDocument>) {
   return actions.reduce((status, action) => {
     return {
       ...status,
@@ -66,24 +59,13 @@ function getData(actions: Array<ResolvedActionDocument>) {
   }, {})
 }
 
-export function isUndeclaredDraft(event: ResolvedEventDocument): boolean {
+export function isUndeclaredDraft(event: EventDocument): boolean {
   return event.actions.every(
     ({ type, draft }) => type === ActionType.CREATE || draft
   )
 }
 
-type ResolvedEventIndex = Omit<
-  EventIndex,
-  'createdBy' | 'updatedBy' | 'createdAtLocation' | 'assignedTo'
-> & {
-  createdBy: ResolvedUser
-  updatedBy: ResolvedUser
-  createdAtLocation: ResolvedLocation
-  assignedTo: ResolvedUser | null
-}
-export function getCurrentEventState(
-  event: ResolvedEventDocument
-): ResolvedEventIndex {
+export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )
