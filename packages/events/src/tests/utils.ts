@@ -89,16 +89,15 @@ export const setupTestCase = async () => {
   const userMgntDb = await userMgnt.getClient()
 
   const seed = seeder()
-  const locationPayload = generator.locations.set(5)
+  const locations = generator.locations.set(5)
+  await seed.locations(eventsDb, locations)
 
   const user = await seed.user(
     userMgntDb,
     generator.user.create({
-      primaryOfficeId: locationPayload[0].id
+      primaryOfficeId: locations[0].id
     })
   )
-
-  const locations = await seed.locations(eventsDb, locationPayload)
 
   return {
     locations,

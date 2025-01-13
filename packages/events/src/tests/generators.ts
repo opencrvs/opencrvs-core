@@ -114,7 +114,9 @@ export function seeder() {
     const createdUser = await db.collection('users').insertOne(user)
 
     return {
-      ...user,
+      primaryOfficeId: user.primaryOfficeId,
+      name: user.name,
+      systemRole: user.systemRole,
       id: createdUser.insertedId.toString()
     }
   }
