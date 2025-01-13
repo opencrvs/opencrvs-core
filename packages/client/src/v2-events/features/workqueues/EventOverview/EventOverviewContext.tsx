@@ -13,11 +13,11 @@ const MISSING_USER = {
   name: [
     {
       use: 'en',
-      given: ['user'],
-      family: 'missing'
+      given: ['Missing'],
+      family: 'user'
     }
   ],
-  systemRole: 'ROLE_MISSING'
+  systemRole: '-'
 }
 
 /**
@@ -30,7 +30,7 @@ export const EventOverviewProvider = ({
 }: {
   children: React.ReactNode
   users: ResolvedUser[]
-  locations: { [locationId: string]: ILocation }
+  locations: Record<string, ILocation>
 }) => {
   const getUser = (id: string) => {
     const user = users.find((u) => u.id === id)
@@ -46,7 +46,9 @@ export const EventOverviewProvider = ({
   }
 
   const getLocation = (id: string) => {
-    return locations[id]
+    // @TODO: Remove this fallback once  developers have had time to update their data.
+    // eslint-disable-next-line
+    return locations[id] ?? { id, name: 'Unknown location' }
   }
 
   return (

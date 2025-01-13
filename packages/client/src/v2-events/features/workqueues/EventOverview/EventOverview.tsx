@@ -31,6 +31,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/featu
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
+import { withSuspense } from '@client/v2-events/components/WithSuspense'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -41,7 +42,7 @@ import { EventOverviewProvider } from './EventOverviewContext'
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
  */
 
-export function EventOverviewIndex() {
+function EventOverviewContainer() {
   const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { getEvents, getEvent } = useEvents()
   const { getUsers } = useUsers()
@@ -101,3 +102,5 @@ function EventOverview({
     </Content>
   )
 }
+
+export const EventOverviewIndex = withSuspense(EventOverviewContainer)
