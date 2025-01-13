@@ -20,42 +20,6 @@ import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { seeder } from '@events/tests/generators'
 
-/**
- * Clean up unstable keys in payloads during snapshots
- */
-export const sanitizeUnstableKeys = (obj: any): any => {
-  const keysToSanitize = [
-    'id',
-    'externalId',
-    'transactionId',
-    'createdAt',
-    'updatedAt',
-    'userIds',
-    'locationIds',
-    'createdAtLocation',
-    'createdBy',
-    'eventId'
-  ]
-
-  if (Array.isArray(obj)) {
-    return obj.map(sanitizeUnstableKeys)
-  } else if (obj !== null && typeof obj === 'object') {
-    const sanitizedObj: Record<string, any> = {}
-
-    for (const key in obj) {
-      if (keysToSanitize.includes(key)) {
-        sanitizedObj[key] = `<${key} />`
-      } else {
-        sanitizedObj[key] = sanitizeUnstableKeys(obj[key])
-      }
-    }
-
-    return sanitizedObj
-  }
-
-  return obj
-}
-
 const { createCallerFactory } = t
 
 export function createTestClient(user: CreatedUser, scopes?: Scope[]) {

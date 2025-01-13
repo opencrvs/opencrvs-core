@@ -63,16 +63,3 @@ export const getLocations = async () => {
 
   return db.collection<Location>('locations').find().toArray()
 }
-
-export const getLocationsById = async (ids: string[]) => {
-  const db = await events.getClient()
-
-  if (ids.length === 0) {
-    return []
-  }
-
-  return db
-    .collection<Location>('locations')
-    .find({ id: { $in: ids } })
-    .toArray()
-}

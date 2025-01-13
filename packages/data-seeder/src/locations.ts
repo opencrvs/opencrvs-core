@@ -266,7 +266,7 @@ export async function seedLocations(token: string) {
   })
 }
 
-export function updateLocationPartOf(partOf: string) {
+function updateLocationPartOf(partOf: string) {
   const locationPrefix = 'Location/'
 
   const parent = partOf.replace(locationPrefix, '')

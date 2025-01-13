@@ -262,12 +262,3 @@ export async function patchEvent(eventInput: EventInputWithId) {
 
   return event
 }
-
-export const resolveDocumentReferences = async (event: EventDocument) => {
-  const referencesToResolve = getReferenceIds(event.actions)
-
-  return {
-    ...event,
-    ...referencesToResolve
-  }
-}
