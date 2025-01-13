@@ -17,7 +17,6 @@ import {
   SummaryConfig
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import { ResolvedUser } from '@opencrvs/commons'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
@@ -32,12 +31,11 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/featu
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
-// eslint-disable-next-line no-restricted-imports
-import { ILocation } from '@client/offline/reducer'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
 import { ActionMenu } from './components/ActionMenu'
+import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
  * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -62,13 +60,13 @@ export function EventOverviewIndex() {
   }
 
   return (
-    <EventOverview
-      event={event}
-      history={fullEvent.actions.filter((action) => !action.draft)}
-      locations={locations}
-      summary={config.summary}
-      users={users}
-    />
+    <EventOverviewProvider locations={locations} users={users}>
+      <EventOverview
+        event={event}
+        history={fullEvent.actions.filter((action) => !action.draft)}
+        summary={config.summary}
+      />
+    </EventOverviewProvider>
   )
 }
 
@@ -76,44 +74,14 @@ export function EventOverviewIndex() {
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverview({
-  users,
-  locations,
   event,
   summary,
   history
 }: {
-  users: ResolvedUser[]
-  locations: { [locationId: string]: ILocation }
   event: EventIndex
   summary: SummaryConfig
   history: ActionDocument[]
 }) {
-  const getUser = (id: string) => {
-    const user = users.find((u) => u.id === id)
-
-    if (!user) {
-      // eslint-disable-next-line no-console
-      console.error(`User with id ${id} not found.`)
-
-      return {
-        id: 'ID_MISSING',
-        name: [
-          {
-            use: 'en',
-            given: ['user'],
-            family: 'missing'
-          }
-        ],
-        systemRole: 'ROLE_MISSING'
-      }
-    }
-
-    return user
-  }
-  const getLocation = (id: string) => {
-    return locations[id]
-  }
-
   const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
   const initialValues = getInitialValues(getAllFields(eventConfiguration))
@@ -129,11 +97,7 @@ function EventOverview({
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
       <EventSummary event={event} summary={summary} />
-      <EventHistory
-        getLocation={getLocation}
-        getUser={getUser}
-        history={history}
-      />
+      <EventHistory history={history} />
     </Content>
   )
 }

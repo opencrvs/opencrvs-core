@@ -26,8 +26,7 @@ import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { HUMAN_READABLE_FULL_DATE_TIME } from '@client/v2-events/utils'
-// eslint-disable-next-line no-restricted-imports
-import { ILocation } from '@client/offline/reducer'
+import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { EventHistoryModal } from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
 
@@ -44,18 +43,11 @@ const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({
-  history,
-  getUser,
-  getLocation
-}: {
-  history: ActionDocument[]
-  getUser: (id: string) => ResolvedUser
-  getLocation: (id: string) => ILocation
-}) {
+export function EventHistory({ history }: { history: ActionDocument[] }) {
   const intl = useIntl()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
+  const { getUser, getLocation } = useEventOverviewContext()
 
   const onHistoryRowClick = (item: ActionDocument, user: ResolvedUser) => {
     void openModal<boolean | null>((close) => (
