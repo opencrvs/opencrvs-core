@@ -25,7 +25,6 @@ import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
 import { getEventConfigurations } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
-import { getReferenceIds } from './utils'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()

@@ -31,7 +31,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/featu
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
-import { withSuspense } from '@client/v2-events/components/WithSuspense'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 

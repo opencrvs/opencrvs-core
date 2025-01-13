@@ -95,6 +95,7 @@ export const eventRouter = router({
     )
 
     const referenceIds = getReferenceIds(eventWithUserSpecificDrafts.actions)
+
     return {
       ...eventWithUserSpecificDrafts,
       ...referenceIds
