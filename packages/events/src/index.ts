@@ -17,7 +17,7 @@ require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
 import { appRouter } from './router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId } from '@opencrvs/commons/authentication'
+import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
 import { getUser } from '@opencrvs/commons'
 import { env } from './environment'
@@ -25,7 +25,7 @@ import { env } from './environment'
 const server = createHTTPServer({
   router: appRouter,
   createContext: async function createContext(opts) {
-    const token = opts.req.headers.authorization
+    const token = TokenWithBearer.parse(opts.req.headers.authorization)
 
     if (!token) {
       throw new TRPCError({
