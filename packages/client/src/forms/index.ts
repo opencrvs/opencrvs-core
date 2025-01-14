@@ -38,6 +38,7 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
+import { UUID } from '@opencrvs/commons'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -652,6 +653,7 @@ interface ILocationSearchInputFormField extends IFormFieldBase {
   locationList?: ISearchLocation[]
   searchableType: string[]
   dispatchOptions?: IDispatchOptions
+  userOfficeId?: UUID // added to filter searchable location
   dynamicOptions?: IDynamicOptions
 }
 
@@ -1305,4 +1307,38 @@ export interface ICertificate {
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
   certificateTemplateId?: string
+}
+
+export function modifyFormField(
+  form: IForm,
+  sectionId: string,
+  groupId: string,
+  fieldName: string,
+  modifyFn: (field: IFormField) => IFormField
+) {
+  return {
+    ...form,
+    sections: form.sections.map((section) => {
+      if (section.id === sectionId) {
+        return {
+          ...section,
+          groups: section.groups.map((group) => {
+            if (group.id === groupId) {
+              return {
+                ...group,
+                fields: group.fields.map((field) => {
+                  if (field.name === fieldName) {
+                    return modifyFn(field)
+                  }
+                  return field
+                })
+              }
+            }
+            return group
+          })
+        }
+      }
+      return section
+    })
+  }
 }

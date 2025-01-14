@@ -13,6 +13,7 @@ import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
 import { logger } from '@opencrvs/commons'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import { SearchRequest } from '@elastic/elasticsearch/lib/api/types'
 
 export const DEFAULT_SIZE = 10
 
@@ -47,11 +48,9 @@ export async function formatSearchParams(
     index: OPENCRVS_INDEX_NAME,
     from,
     size,
-    body: {
-      query,
-      sort
-    }
-  }
+    query,
+    sort
+  } satisfies SearchRequest
 }
 
 export const advancedSearch = async (

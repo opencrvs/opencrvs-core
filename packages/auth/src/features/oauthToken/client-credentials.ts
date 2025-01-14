@@ -20,6 +20,7 @@ import {
   NOTIFICATION_API_USER_AUDIENCE
 } from '@auth/constants'
 import * as oauthResponse from './responses'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export async function clientCredentialsHandler(
   request: Hapi.Request,
@@ -43,7 +44,7 @@ export async function clientCredentialsHandler(
     return oauthResponse.invalidClient(h)
   }
 
-  const isNotificationAPIUser = result.scope.includes('notification-api')
+  const isNotificationAPIUser = result.scope.includes(SCOPES.NOTIFICATION_API)
 
   const token = await createToken(
     result.systemId,

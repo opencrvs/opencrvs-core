@@ -12,10 +12,13 @@ import {
   mockDeclarationData,
   createTestApp,
   flushPromises,
+  setScopes,
+  waitForReady,
   TestComponentWithRouteMock
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ReviewSection } from '@client/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
 import {
   IDeclaration,
@@ -26,10 +29,10 @@ import {
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-let wrapper: ReactWrapper<{}, {}>
+let wrapper: ReactWrapper
 let store: Store
 let router: TestComponentWithRouteMock['router']
 
@@ -73,6 +76,8 @@ describe('Review form for an declaration', () => {
     store = appBundle.store
     router = appBundle.router
 
+    setScopes([SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION], store)
+    await waitForReady(wrapper)
     store.dispatch(storeDeclaration(declaration))
 
     await flushPromises()

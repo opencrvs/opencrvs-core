@@ -10,7 +10,7 @@
  */
 import React from 'react'
 import { PrintRecordHeader as Header } from '@client/views/PrintRecord/Header'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { formatUrl } from '@client/navigation'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'

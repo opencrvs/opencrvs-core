@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IWORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { CorrectionSection } from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
@@ -30,21 +30,13 @@ import {
   VERIFY_CORRECTOR,
   WORKFLOW_STATUS
 } from '@client/navigation/routes'
-import {
-  NATIONAL_REGISTRAR_ROLES,
-  NATL_ADMIN_ROLES,
-  PERFORMANCE_MANAGEMENT_ROLES,
-  REGISTRAR_ROLES,
-  SYS_ADMIN_ROLES
-} from '@client/utils/constants'
+import { EventType } from '@client/utils/gateway'
+import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
 import { stringify } from 'query-string'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
-import { UserDetails } from '@client/utils/userUtils'
-import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { EventType } from '@client/utils/gateway'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -374,22 +366,3 @@ export const generateGoToPageUrl = ({
     pageId,
     event
   })
-
-export function getDefaultPerformanceLocationId(userDetails: UserDetails) {
-  const role = userDetails?.systemRole
-  const primaryOfficeId = userDetails.primaryOffice?.id
-  if (role) {
-    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
-      return primaryOfficeId
-    } else if (
-      NATL_ADMIN_ROLES.includes(role) ||
-      NATIONAL_REGISTRAR_ROLES.includes(role) ||
-      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
-    ) {
-      return // country wide
-    }
-  }
-  throw new Error(
-    `Performance view no default location selected for role: ${role}`
-  )
-}

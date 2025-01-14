@@ -42,7 +42,7 @@ import {
   IVerifyIDCertificateCollectorField,
   verifyIDOnDeclarationCertificateCollectorDefinition
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
 import { draftToGqlTransformer } from '@client/transformer'

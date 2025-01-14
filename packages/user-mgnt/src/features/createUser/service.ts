@@ -8,6 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { logger } from '@opencrvs/commons'
+import {
+  Extension,
+  findExtension,
+  OPENCRVS_SPECIFICATION_URL
+} from '@opencrvs/commons/types'
 import {
   DOCUMENTS_URL,
   FHIR_URL,
@@ -17,16 +23,9 @@ import User, {
   ISignature,
   ISignatureAttachment,
   IUser,
-  IUserName,
-  UserRole
+  IUserName
 } from '@user-mgnt/model/user'
 import fetch from 'node-fetch'
-import { logger } from '@opencrvs/commons'
-import {
-  Extension,
-  findExtension,
-  OPENCRVS_SPECIFICATION_URL
-} from '@opencrvs/commons/types'
 
 export const createFhirPractitioner = (
   user: IUser,
@@ -108,22 +107,11 @@ export const createFhirPractitionerRole = async (
               code: 'AUTOMATED'
             }
           ]
-        },
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/types`,
-              code: 'SYSTEM'
-            }
-          ]
         }
       ],
       location: [{ reference: `Location/${user.primaryOfficeId}` }]
     }
   } else {
-    const role = await UserRole.findOne({
-      _id: user.role
-    })
     return {
       resourceType: 'PractitionerRole',
       practitioner: {
@@ -134,15 +122,7 @@ export const createFhirPractitionerRole = async (
           coding: [
             {
               system: `http://opencrvs.org/specs/roles`,
-              code: user.systemRole
-            }
-          ]
-        },
-        {
-          coding: [
-            {
-              system: `http://opencrvs.org/specs/types`,
-              code: JSON.stringify(role?.labels)
+              code: user.role
             }
           ]
         }

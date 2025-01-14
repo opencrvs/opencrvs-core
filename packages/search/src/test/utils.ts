@@ -20,6 +20,7 @@ import { UUID } from '@opencrvs/commons'
 import { isNil } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -627,14 +628,6 @@ export const mockBirthFhirBundle: SavedBundle<
               {
                 system: 'http://opencrvs.org/specs/roles',
                 code: 'FIELD_AGENT'
-              }
-            ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Social Worker"},{"lang":"fr","label":"Travailleur social"}]'
               }
             ]
           }
@@ -2091,14 +2084,6 @@ export const mockDeathFhirBundle: SavedBundle<
               {
                 system: 'http://opencrvs.org/specs/roles',
                 code: 'REGISTRATION_AGENT'
-              }
-            ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Registration Agent"},{"lang":"fr","label":"Agent d\'enregistrement"}]'
               }
             ]
           }
@@ -4585,60 +4570,8 @@ export const mockMinimalMarriageFhirBundle = {
   ]
 }
 
-export const dummyUser = {
-  _id: '5d027bc403b93b17526323f6',
-  name: [
-    {
-      use: 'en',
-      given: ['Sakib Al'],
-      family: 'Hasan'
-    }
-  ],
-  username: 'sakibal.hasan',
-  mobile: '+8801711111111',
-  email: 'test@test.org',
-  identifiers: [],
-  passwordHash:
-    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
-  salt: '12345',
-  scope: ['register'],
-  systemRole: 'FIELD_AGENT',
-  role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'Field Agent'
-      }
-    ]
-  },
-  status: 'active',
-  avatar: {
-    type: 'image/jpg',
-    data: 'data:image/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-  },
-  practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
-  securityQuestionAnswers: [
-    {
-      questionKey: 'BIRTH_TOWN',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'MOTHER_NICK_NAME',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    },
-    {
-      questionKey: 'FAVORITE_MOVIE',
-      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
-    }
-  ],
-  creationDate: 1559054406433,
-  auditHistory: []
-}
-
 export const mockUserModelResponse = {
-  scope: ['register', 'performance', 'certify', 'demo'],
+  scope: [SCOPES.SEARCH_BIRTH],
   status: 'active',
   _id: '5ddfdfec61f7c0d1aafe1961',
   name: [
@@ -4653,7 +4586,6 @@ export const mockUserModelResponse = {
   mobile: '+8801733333333',
   passwordHash: 'hash',
   salt: '78e7e7a1-9e21-42d7-b535-ca3d982fcbaf',
-  systemRole: 'LOCAL_REGISTRAR',
   role: {
     _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
     labels: [

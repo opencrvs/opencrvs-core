@@ -10,12 +10,6 @@
  */
 import decode from 'jwt-decode'
 
-export enum USER_SCOPE {
-  DECLARE = 'declare',
-  REGISTER = 'register',
-  CERTIFY = 'certify'
-}
-
 export interface ITokenPayload {
   sub: string
   exp: string

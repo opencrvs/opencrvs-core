@@ -28,7 +28,7 @@ describe('Search service', () => {
         trackingId: 'dummy',
         contactNumber: 'dummy',
         registrationNumber: 'dummy',
-        event: 'birth',
+        event: [{ eventName: 'birth' }],
         registrationStatuses: ['DECLARED'],
         compositionType: ['birth-declaration', 'death-declaration'],
         declarationLocationId: '00000000-0000-0000-0000-000000000001' as UUID
@@ -47,7 +47,7 @@ describe('Search service', () => {
 
     await advancedSearch(false, {
       parameters: {
-        event: 'birth'
+        event: [{ eventName: 'birth' }]
       }
     })
 
@@ -65,7 +65,7 @@ describe('Search service', () => {
         trackingId: 'dummy',
         contactNumber: 'dummy',
         registrationNumber: 'dummy',
-        event: 'birth',
+        event: [{ eventName: 'birth' }],
         registrationStatuses: ['DECLARED'],
         compositionType: ['birth-declaration', 'death-declaration']
       },
@@ -84,7 +84,7 @@ describe('elasticsearch params formatter', () => {
           trackingId: 'myTrackingId',
           contactNumber: '07989898989',
           registrationNumber: 'BHGUGKJH',
-          event: 'birth',
+          event: [{ eventName: 'birth' }],
           registrationStatuses: ['DECLARED'],
           compositionType: ['birth-declaration'],
           declarationLocationId: '00000000-0000-0000-0000-000000000002' as UUID,
@@ -102,68 +102,70 @@ describe('elasticsearch params formatter', () => {
       from: 0,
       index: 'ocrvs',
       size: 10,
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                match: {
-                  event: 'birth'
-                }
-              },
-              {
-                query_string: {
-                  default_field: 'type',
-                  query: '(DECLARED)'
-                }
-              },
-              {
-                match: {
-                  declarationLocationId: {
-                    boost: 2,
-                    query: '00000000-0000-0000-0000-000000000002'
+      query: {
+        bool: {
+          filter: [
+            {
+              bool: {
+                should: [
+                  {
+                    term: { 'event.keyword': 'birth' }
                   }
-                }
-              },
-              {
-                match: {
-                  eventLocationId: '00000000-0000-0000-0000-000000000003'
-                }
-              },
-              {
-                match: {
-                  contactNumber: '07989898989'
-                }
-              },
-              {
-                match: {
-                  registrationNumber: 'BHGUGKJH'
-                }
-              },
-              {
-                match: {
-                  trackingId: 'myTrackingId'
-                }
-              },
-              {
-                term: {
-                  'createdBy.keyword': {
-                    value: 'EMPTY_STRING'
-                  }
-                }
-              },
-              {
-                terms: {
-                  'compositionType.keyword': ['birth-declaration']
+                ]
+              }
+            }
+          ],
+          must: [
+            {
+              query_string: {
+                default_field: 'type',
+                query: '(DECLARED)'
+              }
+            },
+            {
+              match: {
+                declarationLocationId: {
+                  boost: 2,
+                  query: '00000000-0000-0000-0000-000000000002'
                 }
               }
-            ]
-          }
-        },
-        sort: [
-          { dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }
-        ]
-      }
+            },
+            {
+              match: {
+                eventLocationId: '00000000-0000-0000-0000-000000000003'
+              }
+            },
+            {
+              match: {
+                contactNumber: '07989898989'
+              }
+            },
+            {
+              match: {
+                registrationNumber: 'BHGUGKJH'
+              }
+            },
+            {
+              match: {
+                trackingId: 'myTrackingId'
+              }
+            },
+            {
+              term: {
+                'createdBy.keyword': {
+                  value: 'EMPTY_STRING'
+                }
+              }
+            },
+            {
+              terms: {
+                'compositionType.keyword': ['birth-declaration']
+              }
+            }
+          ]
+        }
+      },
+      sort: [{ dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }]
     })
   })
 
@@ -185,45 +187,42 @@ describe('elasticsearch params formatter', () => {
       from: 0,
       index: 'ocrvs',
       size: 10,
-      body: {
-        query: {
-          bool: {
-            must: [
-              {
-                multi_match: {
-                  query: 'sadman anik',
-                  fields: [
-                    'childFirstNames',
-                    'childFamilyName',
-                    'motherFirstNames',
-                    'motherFamilyName',
-                    'fatherFirstNames',
-                    'fatherFamilyName',
-                    'informantFirstNames',
-                    'informantFamilyName',
-                    'deceasedFirstNames',
-                    'deceasedFamilyName',
-                    'spouseFirstNames',
-                    'spouseFamilyName',
-                    'brideFirstNames',
-                    'brideFamilyName',
-                    'groomFirstNames',
-                    'groomFamilyName',
-                    'witnessOneFirstNames',
-                    'witnessOneFamilyName',
-                    'witnessTwoFirstNames',
-                    'witnessTwoFamilyName'
-                  ],
-                  fuzziness: 'AUTO'
-                }
+      query: {
+        bool: {
+          filter: [],
+          must: [
+            {
+              multi_match: {
+                query: 'sadman anik',
+                fields: [
+                  'childFirstNames',
+                  'childFamilyName',
+                  'motherFirstNames',
+                  'motherFamilyName',
+                  'fatherFirstNames',
+                  'fatherFamilyName',
+                  'informantFirstNames',
+                  'informantFamilyName',
+                  'deceasedFirstNames',
+                  'deceasedFamilyName',
+                  'spouseFirstNames',
+                  'spouseFamilyName',
+                  'brideFirstNames',
+                  'brideFamilyName',
+                  'groomFirstNames',
+                  'groomFamilyName',
+                  'witnessOneFirstNames',
+                  'witnessOneFamilyName',
+                  'witnessTwoFirstNames',
+                  'witnessTwoFamilyName'
+                ],
+                fuzziness: 'AUTO'
               }
-            ]
-          }
-        },
-        sort: [
-          { dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }
-        ]
-      }
+            }
+          ]
+        }
+      },
+      sort: [{ dateOfDeclaration: { order: 'asc', unmapped_type: 'keyword' } }]
     })
   })
 })

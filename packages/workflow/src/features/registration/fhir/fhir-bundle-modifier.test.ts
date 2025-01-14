@@ -8,92 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import {
-  setupRegistrationWorkflow,
-  setupLastRegUser
-} from '@workflow/features/registration/fhir/fhir-bundle-modifier'
-import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir/constants'
+import { setupLastRegUser } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { testFhirBundle } from '@workflow/test/utils'
 import { Practitioner, Task } from '@opencrvs/commons/types'
 import { cloneDeep } from 'lodash'
 
 describe('Verify fhir bundle modifier functions', () => {
-  describe('SetupRegistrationWorkflow', () => {
-    it('Will push the registration status on fhirDoc', async () => {
-      const tokenPayload = {
-        iss: '',
-        iat: 1541576965,
-        exp: '1573112965',
-        sub: '',
-        algorithm: '',
-        aud: '',
-        subject: '1',
-        scope: ['declare']
-      }
-      const taskResource = await setupRegistrationWorkflow(
-        testFhirBundle.entry[1].resource as Task,
-        tokenPayload
-      )
-
-      if (
-        taskResource &&
-        taskResource.businessStatus &&
-        taskResource.businessStatus.coding &&
-        taskResource.businessStatus.coding[0] &&
-        taskResource.businessStatus.coding[0].code
-      ) {
-        expect(taskResource.businessStatus.coding[0].code).toBeDefined()
-        expect(taskResource.businessStatus.coding[0].code).toEqual('DECLARED')
-      }
-    })
-    it('Will update existing registration status on fhirDoc', async () => {
-      const tokenPayload = {
-        iss: '',
-        iat: 1541576965,
-        exp: '1573112965',
-        sub: '',
-        algorithm: '',
-        aud: '',
-        subject: '1',
-        scope: ['register']
-      }
-      const fhirBundle = cloneDeep(testFhirBundle)
-
-      if (
-        fhirBundle &&
-        fhirBundle.entry &&
-        fhirBundle.entry[1] &&
-        fhirBundle.entry[1].resource
-      ) {
-        fhirBundle.entry[1].resource['businessStatus'] = {
-          coding: [
-            {
-              system: `${OPENCRVS_SPECIFICATION_URL}reg-status`,
-              code: 'DECLARED'
-            }
-          ]
-        }
-
-        const taskResource = await setupRegistrationWorkflow(
-          fhirBundle.entry[1].resource as Task,
-          tokenPayload
-        )
-
-        if (
-          taskResource &&
-          taskResource.businessStatus &&
-          taskResource.businessStatus.coding &&
-          taskResource.businessStatus.coding[0] &&
-          taskResource.businessStatus.coding[0].code
-        ) {
-          expect(taskResource.businessStatus.coding.length).toBe(1)
-          expect(taskResource.businessStatus.coding[0].code).toEqual(
-            'REGISTERED'
-          )
-        }
-      }
-    })
-  })
   describe('SetupLastRegUser', () => {
     const practitioner: Practitioner = {
       resourceType: 'Practitioner',

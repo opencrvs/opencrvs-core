@@ -14,17 +14,17 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { Avatar } from '@client/components/Avatar'
-import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Button } from '@opencrvs/components/lib/Button'
+import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { Role } from '@client/utils/gateway'
-import { getUserRole } from '@client/utils'
+import { useIntl } from 'react-intl'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
+  const intl = useIntl()
   const toggleMenu = () => {
     setShowMenu((prevState) => !prevState)
   }
@@ -36,9 +36,8 @@ export function Hamburger() {
       : ''
   }
 
-  // let's remove this type assertion after #4458 merges in
   const role =
-    (userDetails?.role && getUserRole(language, userDetails.role as Role)) ?? ''
+    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
 
   const avatar = <Avatar name={name} avatar={userDetails?.avatar} />
 

@@ -29,7 +29,6 @@ const mockUser: Partial<IUser & { _id: string }> = {
   username: 'j.doe1',
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
   securityQuestionAnswers: [
@@ -55,7 +54,6 @@ const mockUser: Partial<IUser & { _id: string }> = {
       )
     }
   ],
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'

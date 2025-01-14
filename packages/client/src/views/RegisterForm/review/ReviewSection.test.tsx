@@ -28,7 +28,6 @@ import { formMessages } from '@client/i18n/messages'
 import { formatUrl } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
-import * as profileSelectors from '@client/profile/profileSelectors'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
@@ -37,11 +36,13 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch,
   resizeWindow,
+  setScopes,
   TestComponentWithRouteMock,
   userDetails
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
   EventType as DeclarationEvent,
   EventType,
@@ -242,7 +243,8 @@ describe('when in device of large viewport', () => {
   describe('when user is in the review page for rejected birth declaration', () => {
     let reviewSectionComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      setScopes([SCOPES.RECORD_REGISTER], store)
+
       const { component: testComponent } = await createTestComponent(
         <ReviewSection
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
@@ -320,7 +322,11 @@ describe('when in device of large viewport', () => {
     let reviewSectionRouter: TestComponentWithRouteMock['router']
 
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['validator'])
+      setScopes(
+        [SCOPES.RECORD_SUBMIT_FOR_APPROVAL, SCOPES.RECORD_SUBMIT_FOR_UPDATES],
+        store
+      )
+
       const { component: testComponent, router } = await createTestComponent(
         <ReviewSection
           form={form}
@@ -386,7 +392,7 @@ describe('when in device of large viewport', () => {
     })
 
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      setScopes([SCOPES.RECORD_REGISTER], store)
       const form = {
         sections: [
           {
@@ -508,7 +514,7 @@ describe('when in device of large viewport', () => {
     })
 
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      setScopes([SCOPES.RECORD_REGISTER], store)
       const form = {
         sections: [
           {
@@ -624,7 +630,7 @@ describe('when in device of large viewport', () => {
     })
 
     beforeEach(async () => {
-      vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+      setScopes([SCOPES.RECORD_REGISTER], store)
       const form = {
         sections: [
           {
@@ -788,7 +794,7 @@ describe('when in device of small viewport', () => {
   beforeEach(async () => {
     userAgentMock = vi.spyOn(window.navigator, 'userAgent', 'get')
     userAgentMock.mockReturnValue('Android')
-    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    setScopes([SCOPES.RECORD_REGISTER], store)
     const form = {
       sections: [
         {

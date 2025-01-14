@@ -31,6 +31,21 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
+      response: {
+        failAction: async (req, _2, err: Boom) => {
+          if (process.env.NODE_ENV === 'production') {
+            // In prod, log a limited error message and throw the default Bad Request error.
+            logger.error(`Response validationError: ${err.message}`)
+            throw badRequest(`Invalid response payload returned from handler`)
+          } else {
+            // During development, log and respond with the full error.
+            logger.error(
+              `${req.path} response has a validation error: ${err.message}`
+            )
+            throw err
+          }
+        }
+      },
       validate: {
         failAction: async (_, _2, err: Boom) => {
           if (process.env.NODE_ENV === 'production') {

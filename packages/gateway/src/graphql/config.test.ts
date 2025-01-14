@@ -198,6 +198,6 @@ describe('Test apollo server config', () => {
     expect(
       response.body.kind == 'single' &&
         response.body.singleResult.errors![0].message
-    ).toBe('User does not have a register or validate scope')
+    ).toBe('User does not have enough scope')
   })
 })

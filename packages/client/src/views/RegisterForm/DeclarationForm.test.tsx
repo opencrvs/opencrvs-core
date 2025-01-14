@@ -27,15 +27,19 @@ import {
   goToMotherSection,
   goToSection,
   selectOption,
+  setScopes,
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  waitForReady,
   setPageVisibility,
   userDetails,
   validImageB64String
 } from '@client/tests/util'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { EventType } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
-import { createMemoryRouter } from 'react-router-dom'
 import { Store } from 'redux'
+import { SCOPES } from '@opencrvs/commons/client'
+import { EventType } from '@client/utils/gateway'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { createMemoryRouter } from 'react-router-dom'
 import { Mock, vi } from 'vitest'
 
 describe('when user starts a new declaration', () => {
@@ -76,6 +80,9 @@ describe('when user starts a new declaration', () => {
       )
       app = testApp.app
       store = testApp.store
+      store.dispatch(storeDeclaration(draft))
+
+      setScopes([SCOPES.RECORD_DECLARE_BIRTH], store)
 
       await store.dispatch(storeDeclaration(draft))
     })
@@ -97,6 +104,9 @@ describe('when user starts a new declaration', () => {
       app = testApp.app
       store = testApp.store
       router = testApp.router
+
+      setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
+      await waitForReady(app)
     })
 
     describe('when user is in birth registration by parent informant view', () => {

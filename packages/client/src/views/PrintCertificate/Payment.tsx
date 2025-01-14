@@ -42,7 +42,7 @@ import {
 } from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { UserDetails } from '@client/utils/userUtils'

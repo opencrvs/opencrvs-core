@@ -112,11 +112,9 @@ export const getUserRoleFromHistory = (
   )
 
   const targetCode = result?.code?.find((element) => {
-    return element.coding?.[0].system === 'http://opencrvs.org/specs/types'
+    return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
   })
 
   const role = targetCode?.coding?.[0].code
-  const systemRole = result?.code?.[0].coding?.[0].code
-
-  return { role, systemRole }
+  return role
 }

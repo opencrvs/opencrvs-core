@@ -10,11 +10,6 @@
  */
 
 import React from 'react'
-import {
-  generatePrintCertificateUrl,
-  generateIssueCertificateUrl,
-  generateGoToPageUrl
-} from '@client/navigation'
 import { IntlShape } from 'react-intl'
 import {
   IDeclaration,
@@ -22,27 +17,14 @@ import {
   DOWNLOAD_STATUS,
   clearCorrectionAndPrintChanges
 } from '@client/declarations'
-import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { EVENT_STATUS } from '@client/workqueue'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import {
-  DRAFT_BIRTH_PARENT_FORM_PAGE,
-  DRAFT_DEATH_FORM_PAGE,
-  DRAFT_MARRIAGE_FORM_PAGE,
-  REVIEW_CORRECTION,
-  REVIEW_EVENT_PARENT_FORM_PAGE
-} from '@client/navigation/routes'
 import { DownloadAction } from '@client/forms'
-import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { SystemRoleType } from '@client/utils/gateway'
 import { IDeclarationData } from './utils'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { InternalRefetchQueriesInclude } from '@apollo/client'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { UserDetails } from '@client/utils/userUtils'
-import { useDispatch } from 'react-redux'
-import { Button } from '@client/../../components/src/Button'
-import { useNavigate } from 'react-router-dom'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { SCOPES } from '@opencrvs/commons/client'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -54,30 +36,26 @@ export type CMethodParams = {
 
 export const ShowDownloadButton = ({
   declaration,
-  draft,
-  userDetails
+  draft
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
   userDetails: UserDetails | null
 }) => {
   const { id, type } = declaration || {}
+  const { hasScope } = usePermissions()
 
   if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
   let refetchQueries: InternalRefetchQueriesInclude = []
   if (
-    userDetails?.systemRole === 'FIELD_AGENT' &&
+    !hasScope(SCOPES.RECORD_REGISTER) &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
 
-  if (
-    declaration.assignment &&
-    (userDetails?.systemRole === SystemRoleType.LocalRegistrar ||
-      userDetails?.systemRole === SystemRoleType.NationalRegistrar)
-  ) {
+  if (declaration.assignment && hasScope(SCOPES.RECORD_REGISTER)) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
     ]
@@ -88,7 +66,6 @@ export const ShowDownloadButton = ({
       compositionId: id,
       action: DownloadAction.LOAD_REVIEW_DECLARATION,
       assignment: declaration?.assignment,
-      declarationStatus: declaration.status,
       refetchQueries
     }
     return (
@@ -96,361 +73,10 @@ export const ShowDownloadButton = ({
         key={id}
         downloadConfigs={downLoadConfig}
         status={downloadStatus as DOWNLOAD_STATUS}
+        declarationStatus={declaration.status as SUBMISSION_STATUS}
       />
     )
   }
 
-  return <></>
-}
-
-export const ShowUpdateButton = ({
-  declaration,
-  intl,
-  userDetails,
-  draft
-}: CMethodParams) => {
-  const navigate = useNavigate()
-  const { id, type } = declaration || {}
-
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-  const systemRole = userDetails ? userDetails.systemRole : ''
-  const showActionButton = systemRole
-    ? FIELD_AGENT_ROLES.includes(systemRole)
-      ? false
-      : true
-    : false
-
-  if (!showActionButton && !isDownloaded) {
-    return <></>
-  }
-
-  const updateButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ],
-    NATIONAL_REGISTRAR: [
-      SUBMISSION_STATUS.DRAFT,
-      EVENT_STATUS.IN_PROGRESS,
-      EVENT_STATUS.REJECTED
-    ]
-  }
-
-  if (
-    systemRole &&
-    type &&
-    updateButtonRoleStatusMap[systemRole].includes(
-      declaration?.status as string
-    )
-  ) {
-    let pageRoute: string, pageId: 'preview' | 'review'
-
-    if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
-      pageId = 'preview'
-      if (type.toString() === 'birth') {
-        pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
-      } else if (type.toString() === 'death') {
-        pageRoute = DRAFT_DEATH_FORM_PAGE
-      } else if (type.toString() === 'marriage') {
-        pageRoute = DRAFT_MARRIAGE_FORM_PAGE
-      }
-    } else {
-      pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
-      pageId = 'review'
-    }
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          id={`update-application-${id}`}
-          size={'medium'}
-          disabled={true}
-        >
-          {intl.formatMessage(buttonMessages.update)}
-        </PrimaryButton>
-      )
-    }
-    return (
-      <PrimaryButton
-        key={id}
-        id={`update-application-${id}`}
-        size={'medium'}
-        onClick={() => {
-          navigate(
-            generateGoToPageUrl({
-              pageRoute,
-              declarationId: id,
-              pageId,
-              event: type
-            })
-          )
-        }}
-      >
-        {intl.formatMessage(buttonMessages.update)}
-      </PrimaryButton>
-    )
-  }
-
-  return <></>
-}
-
-export const ShowPrintButton = ({
-  declaration,
-  intl,
-  userDetails,
-  draft,
-  clearCorrectionAndPrintChanges
-}: CMethodParams) => {
-  const navigate = useNavigate()
-  const { id, type } = declaration || {}
-  const systemRole = userDetails ? userDetails.systemRole : ''
-  const showActionButton = systemRole
-    ? FIELD_AGENT_ROLES.includes(systemRole)
-      ? false
-      : true
-    : false
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-
-  const printButtonRoleStatusMap: { [key: string]: string[] } = {
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ],
-    NATIONAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED,
-      SUBMISSION_STATUS.ISSUED
-    ]
-  }
-
-  if (
-    systemRole &&
-    type &&
-    systemRole in printButtonRoleStatusMap &&
-    printButtonRoleStatusMap[systemRole].includes(
-      declaration?.status as string
-    ) &&
-    showActionButton
-  ) {
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          size={'medium'}
-          id={`print-${id}`}
-          disabled={true}
-        >
-          {intl.formatMessage(buttonMessages.print)}
-        </PrimaryButton>
-      )
-    }
-    return (
-      <PrimaryButton
-        key={id}
-        size={'medium'}
-        id={`print-${id}`}
-        onClick={() => {
-          clearCorrectionAndPrintChanges &&
-            clearCorrectionAndPrintChanges(declaration.id)
-
-          navigate(
-            generatePrintCertificateUrl({
-              registrationId: id,
-              event: type.toLocaleLowerCase()
-            })
-          )
-        }}
-      >
-        {intl.formatMessage(buttonMessages.print)}
-      </PrimaryButton>
-    )
-  }
-  return <></>
-}
-
-export const ShowIssueButton = ({
-  declaration,
-  intl,
-  userDetails,
-  draft
-}: CMethodParams) => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { id, type } = declaration || {}
-  const role = userDetails ? userDetails.systemRole : ''
-  const showActionButton = role
-    ? FIELD_AGENT_ROLES.includes(role)
-      ? false
-      : true
-    : false
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-
-  const issueButtonRoleStatusMap: { [key: string]: string[] } = {
-    REGISTRATION_AGENT: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ],
-    DISTRICT_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ],
-    LOCAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ],
-    NATIONAL_REGISTRAR: [
-      SUBMISSION_STATUS.REGISTERED,
-      SUBMISSION_STATUS.CERTIFIED
-    ]
-  }
-
-  if (
-    role &&
-    type &&
-    role in issueButtonRoleStatusMap &&
-    issueButtonRoleStatusMap[role].includes(declaration?.status as string) &&
-    showActionButton
-  ) {
-    if (!isDownloaded) {
-      return (
-        <Button
-          key={id}
-          size={'medium'}
-          id={`issue-${id}`}
-          disabled={true}
-          type={'primary'}
-        >
-          {intl.formatMessage(buttonMessages.issue)}
-        </Button>
-      )
-    }
-    return (
-      <Button
-        key={id}
-        size={'medium'}
-        id={`issue-${id}`}
-        onClick={() => {
-          dispatch(clearCorrectionAndPrintChanges(id))
-          navigate(generateIssueCertificateUrl({ registrationId: id }))
-        }}
-        type={'primary'}
-      >
-        {intl.formatMessage(buttonMessages.issue)}
-      </Button>
-    )
-  }
-  return <></>
-}
-
-export const ShowReviewButton = ({
-  declaration,
-  intl,
-  userDetails,
-  draft
-}: CMethodParams) => {
-  const navigate = useNavigate()
-  const { id, type } = declaration || {}
-
-  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-  const systemRole = userDetails ? userDetails.systemRole : ''
-  const showActionButton = systemRole
-    ? FIELD_AGENT_ROLES.includes(systemRole)
-      ? false
-      : true
-    : false
-
-  const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
-    FIELD_AGENT: [],
-    REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
-    DISTRICT_REGISTRAR: [
-      EVENT_STATUS.VALIDATED,
-      EVENT_STATUS.DECLARED,
-      EVENT_STATUS.CORRECTION_REQUESTED
-    ],
-    LOCAL_REGISTRAR: [
-      EVENT_STATUS.VALIDATED,
-      EVENT_STATUS.DECLARED,
-      EVENT_STATUS.CORRECTION_REQUESTED
-    ],
-    NATIONAL_REGISTRAR: [
-      EVENT_STATUS.VALIDATED,
-      EVENT_STATUS.DECLARED,
-      EVENT_STATUS.CORRECTION_REQUESTED
-    ]
-  }
-
-  if (
-    systemRole &&
-    type &&
-    systemRole in reviewButtonRoleStatusMap &&
-    reviewButtonRoleStatusMap[systemRole].includes(
-      declaration?.status as string
-    ) &&
-    showActionButton
-  ) {
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          size={'medium'}
-          id={`review-btn-${id}`}
-          disabled={true}
-        >
-          {intl.formatMessage(constantsMessages.review)}
-        </PrimaryButton>
-      )
-    }
-    return (
-      <PrimaryButton
-        key={id}
-        size={'medium'}
-        id={`review-btn-${id}`}
-        onClick={() => {
-          navigate(
-            generateGoToPageUrl({
-              pageRoute:
-                declaration.status === EVENT_STATUS.CORRECTION_REQUESTED
-                  ? REVIEW_CORRECTION
-                  : REVIEW_EVENT_PARENT_FORM_PAGE,
-              declarationId: id,
-              pageId: 'review',
-              event: type
-            })
-          )
-        }}
-      >
-        {intl.formatMessage(constantsMessages.review)}
-      </PrimaryButton>
-    )
-  }
   return <></>
 }

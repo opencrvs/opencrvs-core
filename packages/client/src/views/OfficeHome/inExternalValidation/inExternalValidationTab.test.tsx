@@ -31,7 +31,7 @@ const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (
 const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)
 
 const registerScopeToken = jwt.sign(
-  { scope: ['register'] },
+  { scope: ['record.register'] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',

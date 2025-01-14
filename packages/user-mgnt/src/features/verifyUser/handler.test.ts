@@ -31,26 +31,6 @@ test("verifyUserHandler should throw with 401 when user doesn't exist", async ()
   expect(spy).toBeCalled()
 })
 
-test('verifyUserHandler should return 200 and the user scope when the user exists', async () => {
-  const entry = {
-    mobile: '+8801711111111',
-    scope: ['test'],
-    status: 'active',
-    securityQuestionAnswers: [{ questionKey: 'sample', answerHash: '##' }],
-    id: '123',
-    username: 'user'
-  }
-  mockingoose(User).toReturn(entry, 'findOne')
-
-  const res = await server.server.inject({
-    method: 'POST',
-    url: '/verifyUser',
-    payload: { mobile: '+8801711111111' }
-  })
-
-  expect([...res.result.scope]).toMatchObject(['test'])
-})
-
 test('verifyUserHandler should respond with conflict when there are now security answers', async () => {
   const entry = {
     mobile: '+8801711111111',

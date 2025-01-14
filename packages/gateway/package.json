@@ -7,7 +7,7 @@
     "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ../../node_modules/graphql-schema-typescript/**/* || npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/* || true; fi",
     "start": "yarn gen:schema && yarn gen:types && concurrently \"cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "jest && yarn test:compilation",
+    "test": "yarn test:compilation && jest",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.graphql' build/dist",

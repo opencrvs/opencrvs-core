@@ -15,7 +15,7 @@ import { getUserId, hasScope } from '@gateway/features/user/utils'
 import { DISABLE_RATE_LIMIT } from './constants'
 import { Lifecycle, ReqRefDefaults } from '@hapi/hapi'
 import { get } from 'lodash'
-import { userScopes } from '@opencrvs/commons/authentication'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 /**
  * Custom RateLimitError. This is being caught in Apollo & Hapi (`onPreResponse` in createServer)
@@ -96,7 +96,7 @@ export const rateLimitedRoute =
     if (
       hasScope(
         { Authorization: args[0].headers.authorization },
-        userScopes.bypassRateLimit
+        SCOPES.BYPASSRATELIMIT
       )
     ) {
       return fn(...args)
@@ -133,7 +133,7 @@ export const rateLimitedResolver =
     fn: (...args: A) => R
   ) =>
   (...args: A) => {
-    if (hasScope(args[2].headers, userScopes.bypassRateLimit)) {
+    if (hasScope(args[2].headers, SCOPES.BYPASSRATELIMIT)) {
       return fn(...args)
     }
 

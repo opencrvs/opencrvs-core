@@ -475,7 +475,7 @@ export const gqlToDraftTransformer = (
   }
 
   if (queryData.user?.role) {
-    transformedData.user.role = queryData.user.role._id
+    transformedData.user.role = queryData.user.role.id
   }
 
   return transformedData

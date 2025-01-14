@@ -10,7 +10,7 @@
  */
 import { ProfileState } from '@client/profile/profileReducer'
 import { IStoreState } from '@client/store'
-import { Scope } from '@client/utils/authUtils'
+import { Scope } from '@opencrvs/commons/client'
 
 const getPartialState = (store: IStoreState): ProfileState => store.profile
 
@@ -26,7 +26,7 @@ export const getTokenPayload = (
   store: IStoreState
 ): ProfileState['tokenPayload'] => getKey(store, 'tokenPayload')
 
-export const getScope = (store: IStoreState): Scope | null => {
+export const getScope = (store: IStoreState): Scope[] | null => {
   const tokenPayload = getTokenPayload(store)
   return tokenPayload && tokenPayload.scope
 }

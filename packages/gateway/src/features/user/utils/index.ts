@@ -22,19 +22,10 @@ export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: string[]
+  scope: Scope[]
   /** The record ID that the token has access to */
   recordId?: UUID
 }
-
-export type scopeType =
-  | 'register'
-  | 'validate'
-  | 'recordsearch'
-  | 'certify'
-  | 'declare'
-  | 'sysadmin'
-  | 'performance'
 
 export async function getUser(
   body: { [key: string]: string | undefined },
@@ -84,11 +75,24 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   }
 }
 
+export function scopesInclude(
+  scopes:
+    | Scope[]
+    | undefined /* @todo remove undefined variant and make scope a required field for users */,
+  scope: Scope
+) {
+  if (!scopes) {
+    return false
+  }
+  return scopes.includes(scope)
+}
+
 export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 

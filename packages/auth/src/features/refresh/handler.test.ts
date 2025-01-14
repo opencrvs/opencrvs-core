@@ -10,6 +10,12 @@
  */
 import { AuthServer } from '@auth/server'
 import { createProductionEnvironmentServer } from '@auth/tests/util'
+import {
+  DEFAULT_ROLES_DEFINITION,
+  SCOPES
+} from '@opencrvs/commons/authentication'
+import * as fetchAny from 'jest-fetch-mock'
+const fetch = fetchAny as fetchAny.FetchMock
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
 describe('authenticate handler receives a request', () => {
@@ -21,15 +27,21 @@ describe('authenticate handler receives a request', () => {
 
   describe('refresh expiring token', () => {
     it('verifies a token and generates a new token', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const codeService = require('../verifyCode/service')
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       jest.spyOn(authService, 'authenticate').mockReturnValue({
         userId: '1',
-        scope: ['admin'],
+        role: 'NATIONAL_SYSTEM_ADMIN',
         mobile: '+345345343'
       })
 
@@ -75,18 +87,32 @@ describe('authenticate handler receives a request', () => {
 
       const [, payload] = token.split('.')
       const body = JSON.parse(Buffer.from(payload, 'base64').toString())
-      expect(body.scope).toEqual(['admin'])
+      expect(body.scope).toEqual([
+        SCOPES.SYSADMIN,
+        SCOPES.NATLSYSADMIN,
+        SCOPES.USER_CREATE,
+        SCOPES.USER_READ,
+        SCOPES.USER_UPDATE,
+        SCOPES.ORGANISATION_READ_LOCATIONS,
+        SCOPES.PERFORMANCE_READ,
+        SCOPES.PERFORMANCE_READ_DASHBOARDS,
+        SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+      ])
       expect(body.sub).toBe('1')
     })
     it('refreshError returns a 401 to the client if the token is bad', async () => {
+      fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
+        status: 200
+      })
       // eslint-disable-next-line
       const codeService = require('../verifyCode/service')
       // eslint-disable-next-line
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
-        userId: '1',
-        scope: ['admin'],
+        id: '1',
+        role: 'NATIONAL_SYSTEM_ADMIN',
+        scope: ['natlsysadmin'],
         username: '+345345343'
       })
 

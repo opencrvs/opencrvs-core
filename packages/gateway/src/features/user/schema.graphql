@@ -23,16 +23,6 @@ input SignatureInput {
   type: String
 }
 
-enum SystemRoleType {
-  FIELD_AGENT
-  REGISTRATION_AGENT
-  LOCAL_REGISTRAR
-  LOCAL_SYSTEM_ADMIN
-  NATIONAL_SYSTEM_ADMIN
-  PERFORMANCE_MANAGEMENT
-  NATIONAL_REGISTRAR
-}
-
 enum Status {
   active
   deactivated
@@ -49,7 +39,6 @@ input UserInput {
   mobile: String
   password: String
   status: Status
-  systemRole: SystemRoleType!
   role: String
   email: String
   primaryOffice: String
@@ -64,7 +53,7 @@ type Signature {
 
 type LocalRegistrar {
   name: [HumanName]!
-  role: SystemRoleType!
+  role: String
   signature: Signature
 }
 
@@ -78,7 +67,8 @@ type System {
   name: String!
 }
 
-# Fields type, underInvestigation, primaryOffice and localRegistrar
+# @TODO: Is it actually so that there are users without primaryOffice?
+# Fields type, underInvestigation and localRegistrar
 # are optional when a Local System Admin creates new user.
 type User {
   id: ID!
@@ -87,12 +77,11 @@ type User {
   name: [HumanName!]! # -> .name
   username: String
   mobile: String
-  systemRole: SystemRoleType!
-  role: Role!
+  role: UserRole!
   email: String
   status: Status!
   underInvestigation: Boolean
-  primaryOffice: Location
+  primaryOffice: Location!
   localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
@@ -120,7 +109,7 @@ type SearchFieldAgentResult {
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
-  role: Role
+  role: UserRole
   status: Status
   avatar: Avatar
   primaryOfficeId: String
@@ -153,7 +142,6 @@ type Query {
     mobile: String
     email: String
     status: String
-    systemRole: String
     primaryOfficeId: String
     locationId: String
     count: Int

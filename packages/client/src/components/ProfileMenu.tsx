@@ -28,7 +28,6 @@ import { getLanguage } from '@client/i18n/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { buttonMessages } from '@client/i18n/messages'
-import { getUserRole } from '@client/utils'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 
@@ -97,14 +96,13 @@ const ProfileMenuComponent = ({
     userDetails: UserDetails | null
   ): JSX.Element => {
     const userName = getUserName(language, userDetails)
-    // let's remove this type assertion after #4458 merges in
-    const userRole =
-      userDetails?.role && getUserRole(language, userDetails.role)
 
     return (
       <>
         <UserName>{userName}</UserName>
-        <UserRole>{userRole}</UserRole>
+        <UserRole>
+          {userDetails && intl.formatMessage(userDetails.role.label)}
+        </UserRole>
       </>
     )
   }

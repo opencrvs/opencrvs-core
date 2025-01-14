@@ -34,9 +34,9 @@ import { connect, useSelector } from 'react-redux'
 import { supportingDocumentsSection } from '@client/forms/correction/supportDocument'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { useNavigate } from 'react-router-dom'
 
 type IProps = {

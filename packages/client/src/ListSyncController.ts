@@ -9,65 +9,45 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { client } from '@client/utils/apolloClient'
-import {
-  REGISTRATION_HOME_QUERY,
-  FIELD_AGENT_HOME_QUERY
-} from '@client/views/OfficeHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 
 export async function syncRegistrarWorkqueue(
+  userId: string,
   locationId: string,
   reviewStatuses: string[],
   pageSize: number,
-  isFieldAgent: boolean,
   inProgressSkip: number,
   healthSystemSkip: number,
   reviewSkip: number,
   rejectSkip: number,
+  sentForReviewSkip: number,
   approvalSkip: number,
   externalValidationSkip: number,
   printSkip: number,
-  issueSkip: number,
-  userId?: string
+  issueSkip: number
 ) {
-  if (isFieldAgent && userId) {
-    try {
-      const queryResult = await client.query({
-        query: FIELD_AGENT_HOME_QUERY,
-        variables: {
-          userId: userId,
-          declarationLocationId: locationId,
-          pageSize,
-          reviewSkip: reviewSkip,
-          rejectSkip: rejectSkip
-        },
-        fetchPolicy: 'no-cache'
-      })
-      return queryResult.data
-    } catch (exception) {
-      return undefined
-    }
-  } else {
-    try {
-      const queryResult = await client.query({
-        query: REGISTRATION_HOME_QUERY,
-        variables: {
-          declarationLocationId: locationId,
-          pageSize,
-          reviewStatuses: reviewStatuses,
-          inProgressSkip: inProgressSkip,
-          healthSystemSkip: healthSystemSkip,
-          reviewSkip: reviewSkip,
-          rejectSkip: rejectSkip,
-          approvalSkip: approvalSkip,
-          externalValidationSkip: externalValidationSkip,
-          printSkip: printSkip,
-          issueSkip: issueSkip
-        },
-        fetchPolicy: 'no-cache'
-      })
-      return queryResult.data
-    } catch (exception) {
-      return undefined
-    }
+  try {
+    const queryResult = await client.query({
+      query: REGISTRATION_HOME_QUERY,
+      variables: {
+        userId,
+        declarationLocationId: locationId,
+        pageSize,
+        reviewStatuses: reviewStatuses,
+        inProgressSkip: inProgressSkip,
+        healthSystemSkip: healthSystemSkip,
+        reviewSkip: reviewSkip,
+        rejectSkip: rejectSkip,
+        sentForReviewSkip,
+        approvalSkip: approvalSkip,
+        externalValidationSkip: externalValidationSkip,
+        printSkip: printSkip,
+        issueSkip: issueSkip
+      },
+      fetchPolicy: 'no-cache'
+    })
+    return queryResult.data
+  } catch (exception) {
+    return undefined
   }
 }

@@ -13,6 +13,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { TestResolvers } from '@gateway/utils/testUtils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchAny as fetchAny.FetchMock
 const resolvers = typeResolvers as unknown as TestResolvers
@@ -23,7 +24,7 @@ let authHeaderRegister: { Authorization: string }
 beforeEach(() => {
   fetch.resetMocks()
   const sysAdminToken = jwt.sign(
-    { scope: ['natlsysadmin'] },
+    { scope: [SCOPES.CONFIG_UPDATE_ALL] },
     readFileSync('./test/cert.key'),
     {
       subject: 'ba7022f0ff4822',
@@ -113,7 +114,7 @@ describe('Integrations root resolvers', () => {
           },
           { headers: authHeaderRegister }
         )
-      ).rejects.toThrowError('Deactivate user is only allowed for natlsysadmin')
+      ).rejects.toThrowError('Deactivate user is not allowed for this user')
     })
   })
   it('should throw error for users other than the system admin who try to activate integration client', async () => {
@@ -134,7 +135,7 @@ describe('Integrations root resolvers', () => {
         },
         { headers: authHeaderRegister }
       )
-    ).rejects.toThrowError('Activate user is only allowed for natlsysadmin')
+    ).rejects.toThrowError('Activate user is only allowed for this user')
   })
 })
 
@@ -144,7 +145,7 @@ describe('generate refresh token', () => {
   beforeEach(() => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
-      { scope: ['natlsysadmin'] },
+      { scope: [SCOPES.CONFIG_UPDATE_ALL] },
       readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',
@@ -214,7 +215,7 @@ describe('delete system integration', () => {
   beforeEach(() => {
     fetch.resetMocks()
     const sysAdminToken = jwt.sign(
-      { scope: ['natlsysadmin'] },
+      { scope: [SCOPES.CONFIG_UPDATE_ALL] },
       readFileSync('./test/cert.key'),
       {
         subject: 'ba7022f0ff4822',

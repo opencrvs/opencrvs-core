@@ -45,6 +45,8 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
+import { useSelector } from 'react-redux'
+import { getScope } from '@client/profile/profileSelectors'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: History
@@ -406,7 +408,12 @@ const ActionDetailsModalListTable = ({
       return {}
     }
 
-    const name = certificate.collector?.name
+    const name = certificate.certifier?.name
+      ? getIndividualNameObj(
+          certificate.certifier.name,
+          window.config.LANGUAGES
+        )
+      : certificate.collector?.name
       ? getIndividualNameObj(
           certificate.collector.name,
           window.config.LANGUAGES
@@ -421,9 +428,15 @@ const ActionDetailsModalListTable = ({
       }`
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
-      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        return `${collectorName} (${certificate.collector?.otherRelationship})`
-      }
+
+      if (certificate.certifier?.role)
+        return `${collectorName} (${intl.formatMessage(
+          certificate.certifier.role.label
+        )})`
+
+      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE')
+        return `${collectorName} (${certificate.collector.otherRelationship})`
+
       return collectorName
     }
 
@@ -446,6 +459,7 @@ const ActionDetailsModalListTable = ({
     {
       key: 'collector',
       label:
+        !collectorData.relationship || // relationship should not be available if certifier is found for certificate
         collectorData.relationship === 'PRINT_IN_ADVANCE'
           ? intl.formatMessage(certificateMessages.printedOnAdvance)
           : intl.formatMessage(certificateMessages.printedOnCollection),
@@ -684,6 +698,7 @@ export const ActionDetailsModal = ({
   offlineData: Partial<IOfflineData>
   draft: IDeclaration | null
 }) => {
+  const scopes = useSelector(getScope)
   if (isEmpty(actionDetailsData)) return <></>
 
   const title = getStatusLabel(
@@ -691,7 +706,8 @@ export const ActionDetailsModal = ({
     actionDetailsData.regStatus,
     intl,
     actionDetailsData.user,
-    userDetails
+    userDetails,
+    scopes
   )
 
   let userName = ''

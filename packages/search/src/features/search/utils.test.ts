@@ -14,7 +14,7 @@ describe('elasticsearch db helper', () => {
   it('should create a query that searches child and mother name fields and event location', async () => {
     const newQuery = await advancedQueryBuilder(
       {
-        event: 'birth',
+        event: [{ eventName: 'birth' }],
         compositionType: ['birth-declaration', 'death-declaration']
       },
       '',
@@ -22,12 +22,18 @@ describe('elasticsearch db helper', () => {
     )
     expect(newQuery).toEqual({
       bool: {
-        must: [
+        filter: [
           {
-            match: {
-              event: 'birth'
+            bool: {
+              should: [
+                {
+                  term: { 'event.keyword': 'birth' }
+                }
+              ]
             }
-          },
+          }
+        ],
+        must: [
           {
             terms: {
               'compositionType.keyword': [

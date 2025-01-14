@@ -15,11 +15,12 @@ import * as fetchMock from 'jest-fetch-mock'
 import { sign } from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import * as service from '@webhooks/features/manage/service'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: [SCOPES.SEARCH_BIRTH] },
   readFileSync('./test/cert.key'),
   {
     subject: '123',

@@ -10,6 +10,7 @@
  */
 export * from './search'
 export * from './events'
+export * from './scopes'
 export * from './conditionals/conditionals'
 export * from './conditionals/validate'
 export * from './documents'

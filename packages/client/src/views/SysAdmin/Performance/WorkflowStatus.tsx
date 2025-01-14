@@ -39,9 +39,8 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
-import * as React from 'react'
+import React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { useSelector } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
@@ -56,8 +55,6 @@ import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getLanguage } from '@client/i18n/selectors'
-import { getUserRole } from '@client/utils'
 import * as routes from '@client/navigation/routes'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -203,7 +200,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const pageSize = 10
-  const language = useSelector(getLanguage)
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
@@ -497,7 +493,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           if (eventProgress.startedBy != null) {
             const user = eventProgress.startedBy
             starterPractitionerRole =
-              (user.role && getUserRole(language, user.role)) || ''
+              (user.role && intl.formatMessage(user.role.label)) || ''
           }
 
           const event =
@@ -713,8 +709,16 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   })
                 )
               }}
-              requiredJurisdictionTypes={
+              locationFilter={
                 window.config.DECLARATION_AUDIT_LOCATIONS
+                  ? ({ jurisdictionType }) =>
+                      Boolean(
+                        jurisdictionType &&
+                          window.config.DECLARATION_AUDIT_LOCATIONS.split(
+                            ','
+                          ).includes(jurisdictionType)
+                      )
+                  : undefined
               }
             />
             <PerformanceSelect

@@ -23,9 +23,9 @@ interface IVerifyResponse {
   name: IUserName[]
   mobile?: string
   email?: string
-  scope: string[]
   status: string
   id: string
+  role: string
   practitionerId: string
 }
 
@@ -54,13 +54,14 @@ export default async function verifyPassHandler(
   } else if (generateHash(password, user.salt) !== user.passwordHash) {
     throw unauthorized()
   }
+
   const response: IVerifyResponse = {
     name: user.name,
     mobile: user.mobile,
     email: user.emailForNotification,
-    scope: user.scope,
     status: user.status,
     id: user.id,
+    role: user.role,
     practitionerId: user.practitionerId
   }
   return response
@@ -81,8 +82,8 @@ export const responseSchema = Joi.object({
   ),
   mobile: Joi.string().optional(),
   email: Joi.string().allow(null, '').optional(),
-  scope: Joi.array().items(Joi.string()),
   status: Joi.string(),
+  role: Joi.string(),
   id: Joi.string(),
   practitionerId: Joi.string()
 })

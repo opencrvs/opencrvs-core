@@ -203,7 +203,6 @@ export const birthDeclarationForReview = {
       user: {
         id: '6241918dd6dc544f60d8f73a',
         role: 'CHAIRMAN',
-        systemRole: 'LOCAL_REGISTRAR',
         name: [
           {
             firstNames: 'Kennedy',
@@ -239,7 +238,6 @@ export const birthDeclarationForReview = {
       user: {
         id: '6241918dd6dc544f60d8f738',
         role: 'CHA',
-        systemRole: 'FIELD_AGENT',
         name: [
           {
             firstNames: 'Kalusha',

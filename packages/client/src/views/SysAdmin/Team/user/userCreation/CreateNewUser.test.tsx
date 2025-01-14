@@ -20,6 +20,7 @@ import {
 } from '@client/navigation/routes'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
+import { GET_USER } from '@client/user/queries'
 import {
   createTestComponent,
   flushPromises,
@@ -29,164 +30,19 @@ import {
   mockOfflineData,
   mockOfflineDataDispatch,
   mockRoles,
+  setScopes,
   TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { GET_USER, userQueries } from '@client/user/queries'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
+import { vi, Mock, describe, expect } from 'vitest'
+import { GetUserQuery, Status } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
 import { createMemoryRouter } from 'react-router-dom'
-import { Mock, describe, expect, vi } from 'vitest'
-
-const mockUsers = {
-  data: {
-    searchUsers: {
-      totalItems: 8,
-      results: [
-        {
-          id: '5db9f3fdd2ce28e4e2da1a7e',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'API',
-              familyName: 'User',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'api.user',
-          systemRole: 'NATIONAL_REGISTRAR',
-          role: {
-            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'API_USER'
-              }
-            ]
-          },
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7d',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Sahriar',
-              familyName: 'Nafis',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'shahriar.nafis',
-          systemRole: 'LOCAL_SYSTEM_ADMIN',
-          role: 'LOCAL_SYSTEM_ADMIN',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7c',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mohamed',
-              familyName: 'Abu Abdullah',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'mohamed.abu',
-          systemRole: 'NATIONAL_REGISTRAR',
-          role: 'SECRETARY',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7b',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Nasreen Pervin',
-              familyName: 'Huq',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'nasreen.pervin',
-          systemRole: 'STATE_REGISTRAR',
-          role: 'MAYOR',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a7a',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Muhammad Abdul Muid',
-              familyName: 'Khan',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'muid.khan',
-          systemRole: 'DISTRICT_REGISTRAR',
-          role: 'MAYOR',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a79',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Mohammad',
-              familyName: 'Ashraful',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'mohammad.ashraful',
-          systemRole: 'LOCAL_REGISTRAR',
-          role: 'CHAIRMAN',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a78',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Tamim',
-              familyName: 'Iqbal',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'tamim.iqbal',
-          systemRole: 'REGISTRATION_AGENT',
-          role: 'ENTREPENEUR',
-          status: 'active',
-          __typename: 'User'
-        },
-        {
-          id: '5db9f3fcd2ce28e4e2da1a77',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Shakib',
-              familyName: 'Al Hasan',
-              __typename: 'HumanName'
-            }
-          ],
-          username: 'sakibal.hasan',
-          systemRole: 'FIELD_AGENT',
-          role: 'CHA',
-          status: 'active',
-          __typename: 'User'
-        }
-      ],
-      __typename: 'SearchUserResult'
-    }
-  }
-}
 
 describe('create new user tests', () => {
   let store: AppStore
@@ -194,10 +50,11 @@ describe('create new user tests', () => {
   let testRouter: TestComponentWithRouteMock['router']
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
+
+    setScopes([SCOPES.USER_CREATE], store)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -278,6 +135,8 @@ describe('create new user tests', () => {
             })
           ]
         }))
+
+      await waitForElement(testComponent, '#content-name')
     })
 
     it('renders review header', () => {
@@ -325,6 +184,7 @@ describe('edit user tests', () => {
         data: {
           getUser: {
             id: '5e835e4d81fbf01e4dc554db',
+            userMgntUserID: '5e835e4d81fbf01e4dc554db',
             name: [
               {
                 use: 'bn',
@@ -342,9 +202,15 @@ describe('edit user tests', () => {
             username: 'shakib1',
             mobile: '+8801662132163',
             email: 'jeff@gmail.com',
-            systemRole: 'NATIONAL_REGISTRAR',
-            role: { _id: '63ef9466f708ea080777c27a' },
-            status: 'active',
+            role: {
+              id: '63ef9466f708ea080777c27a',
+              label: {
+                defaultMessage: 'State Registrar',
+                description: 'Name for user role State Registrar',
+                id: 'userRole.stateRegistrar'
+              }
+            },
+            status: Status.Active,
             underInvestigation: false,
             practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
             primaryOffice: {
@@ -359,15 +225,15 @@ describe('edit user tests', () => {
             }),
             creationDate: '2019-03-31T18:00:00.000Z',
             __typename: 'User'
-          }
+          } satisfies GetUserQuery['getUser']
         }
       }
     }
   ]
 
   beforeEach(async () => {
+    setScopes([SCOPES.USER_CREATE], store)
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
@@ -415,7 +281,10 @@ describe('edit user tests', () => {
       component.update()
       await flushPromises()
 
-      expect(router.state.location.pathname).toContain('signature-attachment')
+      // this will have to be updated after signature page is updated for new user roles structure
+      expect(router.state.location.pathname).toContain(
+        '/user/5e835e4d81fbf01e4dc554db/preview/preview-registration-office'
+      )
     })
   })
 

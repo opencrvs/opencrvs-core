@@ -10,15 +10,13 @@
  */
 import { createTestClient } from '@events/tests/utils'
 import { payloadGenerator } from '@events/tests/generators'
-import { userScopes } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 
-const nationalSystemAdminClient = createTestClient([
-  userScopes.nationalSystemAdmin
-])
+const dataSeedingClient = createTestClient([SCOPES.USER_DATA_SEEDING])
 const generator = payloadGenerator()
 
 test('Returns empty list when no locations are set', async () => {
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toEqual([])
 })
@@ -28,18 +26,18 @@ test('Returns single location in right format', async () => {
     { id: '123-456-789', partOf: null, name: 'Location foobar' }
   ]
 
-  await nationalSystemAdminClient.locations.set(setLocationPayload)
+  await dataSeedingClient.locations.set(setLocationPayload)
 
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(setLocationPayload)
 })
 
 test('Returns multiple locations', async () => {
-  await nationalSystemAdminClient.locations.set(generator.locations.set(5))
+  await dataSeedingClient.locations.set(generator.locations.set(5))
 
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toHaveLength(5)
 })

@@ -39,6 +39,19 @@ const practitionerRoleHandler = rest.get(
   }
 )
 
+const practitionerRoleHistoryHandler = rest.get(
+  'http://localhost:3447/fhir/PractitionerRole/:practitionerId/_history',
+  (_, res, ctx) => {
+    return res(
+      ctx.json({
+        resourceType: 'Bundle',
+        type: 'history',
+        entry: []
+      })
+    )
+  }
+)
+
 const hierarchyHandler = rest.get(
   'http://localhost:2021/locations/ce73938d-a188-4a78-9d19-35dfd4ca6957/hierarchy',
   (_req, res, ctx) => {
@@ -155,6 +168,7 @@ const handlers = [
   userHandler,
   practitionerHandler,
   practitionerRoleHandler,
+  practitionerRoleHistoryHandler,
   hierarchyHandler,
   locationHandler,
   notificationFlagsHandler,

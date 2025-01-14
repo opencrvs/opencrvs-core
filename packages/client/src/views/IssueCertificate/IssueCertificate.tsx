@@ -21,7 +21,7 @@ import { IssueCollectorForm } from './IssueCollectorForm/IssueCollectorForm'
 import { formatUrl, generateGoToHomeTabUrl } from '@client/navigation'
 import { IssueCollectorFormForOthers } from './IssueCollectorForm/IssueFormForOthers'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 
 export function IssueCertificate() {

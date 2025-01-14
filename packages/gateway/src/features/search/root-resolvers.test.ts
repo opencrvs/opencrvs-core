@@ -13,6 +13,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { TestResolvers } from '@gateway/utils/testUtils'
+import { SCOPES } from '@opencrvs/commons/authentication'
 const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 
@@ -28,7 +29,13 @@ describe('Search root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const validUserTokenRegister = jwt.sign(
-        { scope: ['register'] },
+        {
+          scope: [
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE
+          ]
+        },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -41,7 +48,13 @@ describe('Search root resolvers', () => {
         Authorization: `Bearer ${validUserTokenRegister}`
       }
       const validUserTokenDeclare = jwt.sign(
-        { scope: ['declare'] },
+        {
+          scope: [
+            SCOPES.SEARCH_BIRTH,
+            SCOPES.SEARCH_DEATH,
+            SCOPES.SEARCH_MARRIAGE
+          ]
+        },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -72,7 +85,17 @@ describe('Search root resolvers', () => {
             event: 'Birth'
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -97,7 +120,17 @@ describe('Search root resolvers', () => {
             registrationStatuses: ['DECLARED']
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -122,7 +155,17 @@ describe('Search root resolvers', () => {
             compositionType: ['birth-declaration', 'death-declaration']
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -147,7 +190,17 @@ describe('Search root resolvers', () => {
             eventLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
-        { headers: authHeaderValidUserDeclare }
+        {
+          headers: authHeaderValidUserDeclare,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -172,7 +225,19 @@ describe('Search root resolvers', () => {
           {
             advancedSearchParameters: {}
           },
-          { headers: authHeaderValidUserRegister }
+          {
+            headers: authHeaderValidUserRegister,
+            dataSources: {
+              usersAPI: {
+                getUserById: () => ({ primaryOffice: 'mock_office' })
+              },
+              locationsAPI: {
+                getLocation: () => ({
+                  partOf: { reference: 'Location/mock_location' }
+                })
+              }
+            }
+          }
         )
       ).rejects.toThrowError('There is no param to search')
     })
@@ -194,7 +259,17 @@ describe('Search root resolvers', () => {
             trackingId: 'B123456'
           }
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -220,7 +295,17 @@ describe('Search root resolvers', () => {
           },
           sortColumn: 'modifiedAt.keyword'
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -247,7 +332,17 @@ describe('Search root resolvers', () => {
           count: 10,
           skip: 2
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -268,7 +363,17 @@ describe('Search root resolvers', () => {
             declarationLocationId: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
           }
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -293,7 +398,17 @@ describe('Search root resolvers', () => {
             name: 'Hasib'
           }
         },
-        { headers: authHeaderValidUserRegister }
+        {
+          headers: authHeaderValidUserRegister,
+          dataSources: {
+            usersAPI: { getUserById: () => ({ primaryOffice: 'mock_office' }) },
+            locationsAPI: {
+              getLocation: () => ({
+                partOf: { reference: 'Location/mock_location' }
+              })
+            }
+          }
+        }
       )
 
       expect(result).toBeDefined()
@@ -308,8 +423,8 @@ describe('Search root resolvers', () => {
 
     beforeEach(() => {
       fetch.resetMocks()
-      const declareToken = jwt.sign(
-        { scope: ['declare'] },
+      const unauthorizedToken = jwt.sign(
+        { scope: [SCOPES.RECORD_DECLARE_BIRTH] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -319,10 +434,10 @@ describe('Search root resolvers', () => {
         }
       )
       unauthorizedUser = {
-        Authorization: `Bearer ${declareToken}`
+        Authorization: `Bearer ${unauthorizedToken}`
       }
       const sysadminUserToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.PERFORMANCE_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -369,9 +484,7 @@ describe('Search root resolvers', () => {
           {},
           { headers: unauthorizedUser }
         )
-      ).rejects.toThrowError(
-        'User does not have a sysadmin or register or validate scope'
-      )
+      ).rejects.toThrowError('User does not have enough scope')
     })
     it('returns empty result for invalid location id', async () => {
       fetch.mockResponseOnce(

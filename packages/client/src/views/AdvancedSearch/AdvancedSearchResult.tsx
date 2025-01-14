@@ -29,7 +29,7 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
-import { Scope } from '@client/utils/authUtils'
+
 import { EMPTY_STRING } from '@client/utils/constants'
 import {
   buttonMessages,
@@ -38,6 +38,7 @@ import {
   errorMessages
 } from '@client/i18n/messages'
 import { messages as advancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
@@ -87,6 +88,7 @@ import { BookmarkAdvancedSearchResult } from '@client/views/AdvancedSearch/Bookm
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import { UserDetails } from '@client/utils/userUtils'
 import { changeSortedColumn } from '@client/views/OfficeHome/utils'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 
 const SearchParamContainer = styled.div`
@@ -107,7 +109,7 @@ type QueryData = SearchEventsQuery['searchEvents']
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
-  scope: Scope | null
+  scope: Scope[] | null
   userDetails: UserDetails | null
   outboxDeclarations: IDeclaration[]
 }
@@ -211,15 +213,16 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
     }
   }
 
-  const userHasRegisterScope = () => {
-    return props.scope && props.scope.includes('register')
-  }
-  const userHasValidateScope = () => {
-    return props.scope && props.scope.includes('validate')
-  }
-  const userHasCertifyScope = () => {
-    return props.scope && props.scope.includes('certify')
-  }
+  const { hasAnyScope, hasScope, canIssueRecord, canPrintRecord } =
+    usePermissions()
+
+  const userHasRegisterScope = () => hasScope(SCOPES.RECORD_REGISTER)
+
+  const userHasValidateScope = () =>
+    hasAnyScope([
+      SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+      SCOPES.RECORD_SUBMIT_FOR_UPDATES
+    ])
 
   const transformSearchContent = (data: QueryData) => {
     if (!data || !data.results) {
@@ -273,7 +276,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
         if (windowWidth > props.theme.grid.breakpoints.lg) {
           if (
             (declarationIsRegistered || declarationIsIssued) &&
-            userHasCertifyScope()
+            canPrintRecord()
           ) {
             actions.push({
               label: intl.formatMessage(buttonMessages.print),
@@ -291,7 +294,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
               },
               disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
             })
-          } else if (declarationIsCertified && userHasCertifyScope()) {
+          } else if (declarationIsCertified && canIssueRecord()) {
             actions.push({
               label: intl.formatMessage(buttonMessages.issue),
               handler: (
@@ -351,6 +354,7 @@ const AdvancedSearchResultComp = (props: IFullProps) => {
                   DownloadAction.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
+              declarationStatus={reg.declarationStatus as SUBMISSION_STATUS}
             />
           )
         })

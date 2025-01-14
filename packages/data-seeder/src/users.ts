@@ -14,24 +14,36 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { inspect } from 'util'
+import { joinURL } from '@opencrvs/commons'
+import { Scope, scopes } from '@opencrvs/commons/authentication'
+import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
 const RETRY_DELAY_IN_MILLISECONDS = 5000
+
+const RoleSchema = z.array(
+  z.object({
+    id: z.string(),
+    label: z.object({
+      defaultMessage: z.string(),
+      description: z.string(),
+      id: z.string()
+    }),
+    scopes: z.array(
+      z.string().refine(
+        (scope) => scopes.includes(scope as Scope),
+        (invalidScope) => ({
+          message: `invalid scope "${invalidScope}" found\n`
+        })
+      )
+    )
+  })
+)
 
 const WithoutContact = z.object({
   primaryOfficeId: z.string(),
   givenNames: z.string(),
   familyName: z.string(),
-  systemRole: z.enum([
-    'FIELD_AGENT',
-    'REGISTRATION_AGENT',
-    'LOCAL_REGISTRAR',
-    'LOCAL_SYSTEM_ADMIN',
-    'NATIONAL_SYSTEM_ADMIN',
-    'PERFORMANCE_MANAGEMENT',
-    'NATIONAL_REGISTRAR'
-  ]),
   role: z.string(),
   username: z.string(),
   password: z.string()
@@ -77,22 +89,50 @@ async function getUsers(token: string) {
   if (!res.ok) {
     raise(`Expected to get the users from ${url}`)
   }
+
   const parsedUsers = UserSchema.safeParse(await res.json())
+
   if (!parsedUsers.success) {
     raise(
-      `Error when getting users metadata from country-config: ${inspect(
-        parsedUsers.error.issues
-      )}`
+      fromZodError(parsedUsers.error, {
+        prefix: `Error validating users metadata returned from ${url}`
+      })
     )
   }
-  if (
-    parsedUsers.data.every(
-      ({ systemRole }) => systemRole !== 'NATIONAL_SYSTEM_ADMIN'
-    )
-  ) {
+
+  const userRoles = parsedUsers.data.map((user) => user.role)
+
+  const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
+
+  const rolesResponse = await fetch(rolesUrl)
+
+  if (!rolesResponse.ok) raise(`Error fetching roles: ${rolesResponse.status}`)
+
+  const parsedRoles = RoleSchema.safeParse(await rolesResponse.json())
+
+  if (!parsedRoles.success) {
     raise(
-      `At least one user with "NATIONAL_SYSTEM_ADMIN" systemRole must be created`
+      fromZodError(parsedRoles.error, {
+        prefix: `Validation failed for roles returned from ${rolesUrl}`
+      }).message
     )
+  }
+
+  const allRoles = parsedRoles.data
+
+  let isConfigUpdateAllScopeAvailable = false
+  const configScope = 'config.update:all' as const
+
+  for (const userRole of userRoles) {
+    const currRole = allRoles.find((role) => role.id === userRole)
+    if (!currRole)
+      raise(`Role with id ${userRole} is not found in roles.ts file`)
+    if (currRole.scopes.includes(configScope))
+      isConfigUpdateAllScopeAvailable = true
+  }
+
+  if (!isConfigUpdateAllScopeAvailable) {
+    raise(`At least one user with ${configScope} scope must be created`)
   }
   return parsedUsers.data
 }
@@ -157,26 +197,25 @@ async function callCreateUserMutation(token: string, userPayload: unknown) {
   })
 }
 
-export async function seedUsers(
-  token: string,
-  roleIdMap: Record<string, string | undefined>
-) {
+export async function seedUsers(token: string) {
   const rawUsers = await getUsers(token)
+
   for (const userMetadata of rawUsers) {
     const {
       givenNames,
       familyName,
-      role,
       primaryOfficeId: officeIdentifier,
       username,
       ...user
     } = userMetadata
+
     if (await userAlreadyExists(token, username)) {
       console.log(
         `User with the username "${username}" already exists. Skipping user "${username}"`
       )
       continue
     }
+
     const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
     if (!primaryOffice) {
       console.log(
@@ -184,15 +223,9 @@ export async function seedUsers(
       )
       continue
     }
-    if (!roleIdMap[role]) {
-      console.log(
-        `Role "${role}" is not recognized by system. Skipping user "${username}"`
-      )
-      continue
-    }
+
     const userPayload = {
       ...user,
-      role: roleIdMap[role],
       name: [
         {
           use: 'en',
@@ -207,6 +240,7 @@ export async function seedUsers(
     let tryNumber = 0
     let jsonRes
     let res
+
     do {
       ++tryNumber
       if (tryNumber > 1) {
@@ -220,6 +254,7 @@ export async function seedUsers(
       'errors' in jsonRes &&
       jsonRes.errors[0].extensions?.code === 'INTERNAL_SERVER_ERROR'
     )
+
     parseGQLResponse(jsonRes)
   }
 }

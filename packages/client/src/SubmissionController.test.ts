@@ -132,7 +132,17 @@ describe('Submission Controller', () => {
             scope: ['declare']
           }
         },
-        offline: { userDetails: { systemRole: 'FIELD_AGENT' } },
+        offline: {
+          userDetails: {
+            role: {
+              label: {
+                defaultMessage: 'Field Agent',
+                description: 'Name for user role Field Agent',
+                id: 'userRole.fieldAgent'
+              }
+            }
+          }
+        },
         declarationsState: {
           declarations: [
             {

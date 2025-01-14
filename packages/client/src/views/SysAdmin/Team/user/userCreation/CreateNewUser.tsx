@@ -18,7 +18,6 @@ import { formMessages } from '@client/i18n/messages'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
-import { GET_USER } from '@client/user/queries'
 import {
   clearUserFormData,
   fetchAndStoreUserData
@@ -82,7 +81,6 @@ const SpinnerWrapper = styled.div`
   flex-direction: column;
   align-items: center;
 `
-
 const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   const {
     userId,
@@ -107,7 +105,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
         clearUserFormData()
       }
       if (userId) {
-        fetchAndStoreUserData(client as ApolloClient<any>, GET_USER, {
+        fetchAndStoreUserData(client as ApolloClient<any>, {
           userId
         })
       }

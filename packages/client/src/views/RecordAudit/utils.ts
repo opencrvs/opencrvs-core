@@ -18,14 +18,11 @@ import {
 } from '@client/i18n/messages/views/recordAudit'
 import { IDynamicValues } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
-import {
-  EMPTY_STRING,
-  FIELD_AGENT_ROLES,
-  LANG_EN
-} from '@client/utils/constants'
+import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { getDeclarationFullName } from '@client/utils/draftUtils'
 import {
+  AssignmentData,
   EventType,
   History,
   HumanName,
@@ -35,7 +32,6 @@ import {
   User
 } from '@client/utils/gateway'
 import type {
-  GQLAssignmentData,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
@@ -47,6 +43,7 @@ import {
   generateLocationName
 } from '@client/utils/locationUtils'
 import { UserDetails } from '@client/utils/userUtils'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import { get, has, PropertyPath } from 'lodash'
 import { IntlShape } from 'react-intl'
 
@@ -65,7 +62,7 @@ export interface IDeclarationData {
   informant?: IInformantInfo
   registrationNo?: string
   nid?: string
-  assignment?: GQLAssignmentData
+  assignment?: AssignmentData
 }
 
 interface IInformantInfo {
@@ -83,7 +80,7 @@ interface IGQLDeclaration {
     trackingId: string
     type: string
     status: { type: string }[]
-    assignment?: GQLAssignmentData
+    assignment?: AssignmentData
   }
 }
 
@@ -466,7 +463,8 @@ export function getStatusLabel(
   regStatus: Maybe<RegStatus> | undefined,
   intl: IntlShape,
   performedBy: Maybe<User> | undefined,
-  loggedInUser: UserDetails | null
+  loggedInUser: UserDetails | null,
+  scopes: Scope[] | null
 ) {
   if (action) {
     return intl.formatMessage(regActionMessages[action], {
@@ -476,8 +474,7 @@ export function getStatusLabel(
   if (
     regStatus === RegStatus.Declared &&
     performedBy?.id === loggedInUser?.userMgntUserID &&
-    loggedInUser?.systemRole &&
-    FIELD_AGENT_ROLES.includes(loggedInUser.systemRole)
+    scopes?.includes(SCOPES.RECORD_SUBMIT_INCOMPLETE)
   ) {
     return intl.formatMessage(recordAuditMessages.sentNotification)
   }

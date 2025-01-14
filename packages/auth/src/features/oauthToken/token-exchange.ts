@@ -17,8 +17,10 @@ import {
 import { pipe } from 'fp-ts/lib/function'
 import { UUID } from '@opencrvs/commons'
 
-const SUBJECT_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
-const RECORD_TOKEN_TYPE = 'urn:opencrvs:oauth:token-type:single_record_token'
+export const SUBJECT_TOKEN_TYPE =
+  'urn:ietf:params:oauth:token-type:access_token'
+export const RECORD_TOKEN_TYPE =
+  'urn:opencrvs:oauth:token-type:single_record_token'
 
 /**
  * Allows creating record-specific tokens for when a 3rd party system needs to confirm a registration

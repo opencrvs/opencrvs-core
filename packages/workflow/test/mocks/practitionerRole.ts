@@ -35,14 +35,6 @@ export const practitionerRoleBundle: SavedBundle<PractitionerRole> = {
                 code: 'FIELD_AGENT'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Social Worker"},{"lang":"fr","label":"Travailleur social"}]'
-              }
-            ]
           }
         ],
         location: [

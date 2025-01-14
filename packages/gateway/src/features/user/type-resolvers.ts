@@ -9,20 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IAuthHeader, UUID } from '@opencrvs/commons'
-
+import {
+  IAuthHeader,
+  Roles,
+  UUID,
+  fetchJSON,
+  joinURL,
+  logger
+} from '@opencrvs/commons'
+import { COUNTRY_CONFIG_URL } from '@gateway/constants'
+import { fetchFHIR } from '@gateway/features/fhir/service'
+import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
+
 import {
   Bundle,
   Extension,
   OPENCRVS_SPECIFICATION_URL,
-  findExtension,
   PractitionerRole,
   ResourceIdentifier,
+  findExtension,
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
-import { fetchFHIR } from '@gateway/features/fhir/service'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import { getTokenPayload, scopesInclude } from './utils'
+import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -36,14 +46,6 @@ interface IAvatar {
   data: string
 }
 
-type Label = {
-  lang: string
-  label: string
-}
-interface IUserRole {
-  labels: Label[]
-}
-
 export interface IUserModelData {
   _id: string
   username: string
@@ -52,13 +54,12 @@ export interface IUserModelData {
     family: string
     given: string[]
   }[]
-  scope?: string[]
+  scope?: Scope[]
   email: string
   emailForNotification?: string
   mobile?: string
   status: string
-  systemRole: string
-  role: IUserRole
+  role: string
   creationDate?: string
   practitionerId: string
   primaryOfficeId: string
@@ -94,7 +95,6 @@ export interface IUserPayload
     '_id' | 'status' | 'practitionerId' | 'username' | 'identifiers' | 'role'
   > {
   id?: string
-  systemRole: string
   status?: string
   username?: string
   password?: string
@@ -106,7 +106,6 @@ export interface IUserSearchPayload {
   username?: string
   mobile?: string
   status?: string
-  systemRole?: string
   primaryOfficeId?: string
   locationId?: string
   count: number
@@ -158,6 +157,14 @@ export const userTypeResolvers: GQLResolver = {
     id(userModel: IUserModelData) {
       return userModel._id
     },
+    role: async (userModel: IUserModelData) => {
+      const roles = await fetchJSON<Roles>(
+        joinURL(COUNTRY_CONFIG_URL, '/roles')
+      )
+
+      logger.info('Fetching roles from country config')
+      return roles.find((role) => role.id === userModel.role)
+    },
     userMgntUserID(userModel: IUserModelData) {
       return userModel._id
     },
@@ -182,19 +189,22 @@ export const userTypeResolvers: GQLResolver = {
       _,
       { headers: authHeader, dataSources }
     ) {
-      const scope = userModel.scope
+      const tokenPayload = getTokenPayload(authHeader.Authorization)
+      const scope = tokenPayload.scope
 
       if (!scope) {
         return null
       }
 
-      const { practitionerId, practitionerRole } = !scope.includes('register')
+      const { practitionerId, practitionerRole } = !scope.includes(
+        SCOPES.RECORD_REGISTER
+      )
         ? await getPractitionerByOfficeId(userModel.primaryOfficeId, authHeader)
         : {
             practitionerId: `Practitioner/${
               userModel.practitionerId as UUID
             }` as const,
-            practitionerRole: userModel.systemRole
+            practitionerRole: userModel.role
           }
 
       if (!practitionerId) {
@@ -211,14 +221,17 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const presignedUrl =
-        userModel.systemRole === 'FIELD_AGENT'
-          ? null
-          : signatureExtension &&
-            (await getPresignedUrlFromUri(
-              signatureExtension.valueAttachment.url,
-              authHeader
-            ))
+      const presignedUrl = !scopesInclude(
+        userModel.scope,
+        SCOPES.RECORD_SUBMIT_INCOMPLETE
+      )
+        ? signatureExtension &&
+          (await getPresignedUrlFromUri(
+            signatureExtension.valueAttachment.url,
+            authHeader
+          ))
+        : null
+
       return {
         role: practitionerRole,
         name: practitioner.name,

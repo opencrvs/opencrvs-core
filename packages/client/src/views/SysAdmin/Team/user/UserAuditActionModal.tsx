@@ -28,17 +28,21 @@ import styled from 'styled-components'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import { USER_AUDIT_ACTION } from '@client/user/queries'
+import { GET_USER, USER_AUDIT_ACTION } from '@client/user/queries'
 import { Dispatch } from 'redux'
 import {
   showUserAuditSuccessToast,
   showSubmitFormErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
-import { ApolloClient, InternalRefetchQueriesInclude } from '@apollo/client'
+import {
+  ApolloClient,
+  InternalRefetchQueriesInclude,
+  useQuery
+} from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
-import { UserDetails } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
+import { GetUserQuery, GetUserQueryVariables } from '@client/utils/gateway'
 
 const { useState, useEffect } = React
 
@@ -55,7 +59,7 @@ interface ToggleUserActivationModalProps
   extends WrappedComponentProps,
     ConnectProps,
     DispatchProps {
-  user: UserDetails | null
+  userId: string
   show: boolean
   onConfirmRefetchQueries?: InternalRefetchQueriesInclude
   onClose: () => void
@@ -95,11 +99,16 @@ let makeAllFieldsDirty: (touched: {}) => void
 function UserAuditActionModalComponent(
   props: WithApolloClient<ToggleUserActivationModalProps>
 ) {
-  const { intl, user, onClose, show, form } = props
+  const { intl, userId, onClose, show, form } = props
   const [formValues, setFormValues] = useState<IFormSectionData>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isErrorVisible, makeErrorVisible] = useState<boolean>(false)
   const config = useSelector(getOfflineData)
+  const { data } = useQuery<GetUserQuery, GetUserQueryVariables>(GET_USER, {
+    variables: { userId },
+    fetchPolicy: 'cache-first'
+  })
+  const user = data?.getUser ?? null
 
   let name = ''
   let modalTitle = ''
@@ -165,7 +174,7 @@ function UserAuditActionModalComponent(
     }
     makeErrorVisible(true)
     if (!formError) {
-      const userId = props?.user?.id ?? ''
+      const userId = user?.id ?? ''
 
       ;(props.client as ApolloClient<any>)
         .mutate({

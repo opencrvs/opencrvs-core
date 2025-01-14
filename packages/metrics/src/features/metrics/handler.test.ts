@@ -14,6 +14,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetchMock from 'jest-fetch-mock'
 import { influx } from '@metrics/influxdb/client'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
@@ -199,7 +200,7 @@ describe('verify metrics handler', () => {
 describe('delete metrics measurement handler', () => {
   let server: any
   const token = jwt.sign(
-    { scope: ['declare', 'natlsysadmin'] },
+    { scope: [SCOPES.CONFIG_UPDATE_ALL] },
     readFileSync('./test/cert.key'),
     {
       algorithm: 'RS256',

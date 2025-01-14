@@ -18,8 +18,23 @@ const resolvers = typeResolvers as unknown as TestResolvers
 const fetch = fetchAny as any
 import { startContainer, stopContainer } from '@gateway/utils/redis-test-utils'
 import { StartedTestContainer } from 'testcontainers'
+import {
+  DEFAULT_ROLES_DEFINITION,
+  SCOPES
+} from '@opencrvs/commons/authentication'
+import { fetchJSON } from '@opencrvs/commons'
 
 let container: StartedTestContainer
+
+jest.mock('@opencrvs/commons', () => {
+  const originalModule = jest.requireActual('@opencrvs/commons')
+  return {
+    ...originalModule,
+    fetchJSON: jest.fn()
+  }
+})
+
+const fetchJSONMock = fetchJSON as jest.MockedFunction<typeof fetchJSON>
 
 beforeAll(async () => {
   container = await startContainer()
@@ -39,7 +54,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.ORGANISATION_READ_LOCATIONS] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -80,7 +95,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -100,7 +114,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -120,7 +133,6 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'LOCAL_REGISTRAR',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -162,9 +174,7 @@ describe('User root resolvers', () => {
             fieldName: 'searchUsers'
           }
         )
-      ).rejects.toThrow(
-        'Search user is only allowed for sysadmin or registrar or registration agent'
-      )
+      ).rejects.toThrow('Searching other users is not allowed for this user')
     })
     it('returns filtered user list', async () => {
       fetch.mockResponseOnce(
@@ -180,7 +190,6 @@ describe('User root resolvers', () => {
           username: 'mohammad.ashraful',
           mobile: '+8801733333333',
           email: 'test@test.org',
-          systemRole: 'LOCAL_REGISTRAR',
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           locationId: '43ac3486-7df1-4bd9-9b5e-728054ccd6ba',
@@ -203,7 +212,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_READ] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -216,7 +225,7 @@ describe('User root resolvers', () => {
         Authorization: `Bearer ${sysAdminToken}`
       }
       const declareToken = jwt.sign(
-        { scope: ['declare'] },
+        { scope: ['record.declare-birth'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -244,8 +253,7 @@ describe('User root resolvers', () => {
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
-        role: 'HA',
+        role: 'FIELD_AGENT',
         status: 'active',
         practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -262,11 +270,10 @@ describe('User root resolvers', () => {
         username: 'mdariful.islam',
         mobile: '+8801740012994',
         email: 'test@test.org',
-        role: 'HA',
+        role: 'FIELD_AGENT',
         passwordHash:
           'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
         salt: '12345',
-        systemRole: 'FIELD_AGENT',
         status: 'pending',
         practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
         primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
@@ -299,7 +306,12 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin },
+        {
+          headers: authHeaderSysAdmin,
+          dataSources: {
+            countryConfigAPI: { getRoles: () => DEFAULT_ROLES_DEFINITION }
+          }
+        },
         { fieldName: 'searchFieldAgents' }
       )
 
@@ -308,7 +320,24 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE
+            ]
+          },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -320,7 +349,24 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE
+            ]
+          },
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -357,7 +403,12 @@ describe('User root resolvers', () => {
           timeStart: '2019-03-31T18:00:00.000Z',
           timeEnd: '2020-06-30T17:59:59.999Z'
         },
-        { headers: authHeaderSysAdmin },
+        {
+          headers: authHeaderSysAdmin,
+          dataSources: {
+            countryConfigAPI: { getRoles: () => DEFAULT_ROLES_DEFINITION }
+          }
+        },
         { fieldName: 'searchFieldAgents' }
       )
 
@@ -366,7 +417,24 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE
+            ]
+          },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -378,7 +446,24 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
           fullName: 'Md. Ariful Islam',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE
+            ]
+          },
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
@@ -408,9 +493,7 @@ describe('User root resolvers', () => {
           { headers: authHeaderFieldAgent },
           { fieldName: 'searchFieldAgents' }
         )
-      ).rejects.toThrow(
-        'Search field agents is only allowed for sysadmin or registrar or registration agent'
-      )
+      ).rejects.toThrow('Search field agents is not allowed for this user')
     })
     it('returns field agent list with active status only', async () => {
       fetch.mockResponseOnce(
@@ -439,7 +522,12 @@ describe('User root resolvers', () => {
           timeEnd: '2020-06-30T17:59:59.999Z',
           status: 'active'
         },
-        { headers: authHeaderSysAdmin },
+        {
+          headers: authHeaderSysAdmin,
+          dataSources: {
+            countryConfigAPI: { getRoles: () => DEFAULT_ROLES_DEFINITION }
+          }
+        },
         { fieldName: 'searchFieldAgents' }
       )
 
@@ -448,7 +536,24 @@ describe('User root resolvers', () => {
         {
           practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
           fullName: 'Sakib Al Hasan',
-          role: 'HA',
+          role: {
+            id: 'FIELD_AGENT',
+            label: {
+              defaultMessage: 'Field Agent',
+              description: 'Name for user role Field Agent',
+              id: 'userRole.fieldAgent'
+            },
+            scopes: [
+              SCOPES.RECORD_DECLARE_BIRTH,
+              SCOPES.RECORD_DECLARE_DEATH,
+              SCOPES.RECORD_DECLARE_MARRIAGE,
+              SCOPES.RECORD_SUBMIT_INCOMPLETE,
+              SCOPES.RECORD_SUBMIT_FOR_REVIEW,
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_MARRIAGE
+            ]
+          },
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
@@ -553,6 +658,19 @@ describe('User root resolvers', () => {
     })
   })
   describe('activateUser mutation', () => {
+    const regsiterToken = jwt.sign(
+      { scope: ['SCOPES.REGISTER'] },
+      readFileSync('./test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    const newUserHeaders = {
+      Authorization: `Bearer ${regsiterToken}`
+    }
     it('activates the pending user', async () => {
       fetch.mockResponses(
         [
@@ -572,7 +690,7 @@ describe('User root resolvers', () => {
           securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
         },
         {
-          headers: undefined
+          headers: newUserHeaders
         }
       )
 
@@ -594,12 +712,50 @@ describe('User root resolvers', () => {
             securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
           },
           {
-            headers: undefined
+            headers: newUserHeaders
           }
         )
       ).rejects.toThrowError(
         "Something went wrong on user-mgnt service. Couldn't activate given user"
       )
+    })
+    it('fails to activate user if user is not token owner', async () => {
+      const regsiterToken = jwt.sign(
+        { scope: ['SCOPES.REGISTER'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'abcdefgh',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      const newUserHeaders = {
+        Authorization: `Bearer ${regsiterToken}`
+      }
+      fetch.mockResponses(
+        [
+          JSON.stringify({
+            userId: 'abcdefgh'
+          }),
+          { status: 201 }
+        ],
+        [JSON.stringify({})]
+      )
+
+      return expect(
+        resolvers.Mutation!.activateUser(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            password: 'test',
+            securityQNAs: [{ questionKey: 'HOME_TOWN', answer: 'test' }]
+          },
+          {
+            headers: newUserHeaders
+          }
+        )
+      ).rejects.toThrowError('User can not be activated')
     })
   })
 
@@ -911,8 +1067,9 @@ describe('User root resolvers', () => {
     let authHeaderRegister: { Authorization: string }
     beforeEach(() => {
       fetch.resetMocks()
+      fetchJSONMock.mockReset()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.USER_CREATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -944,13 +1101,15 @@ describe('User root resolvers', () => {
       username: 'mohammad.ashraful',
       mobile: '+8801733333333',
       email: 'test@test.org',
-      systemRole: 'LOCAL_REGISTRAR',
-      role: 'HOSPITAL',
+      role: 'LOCAL_REGISTRAR',
       status: 'active',
       primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a'
     }
 
     it('creates user for sysadmin', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -970,6 +1129,9 @@ describe('User root resolvers', () => {
     })
 
     it('updates an user for sysadmin', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
       fetch.mockResponseOnce(
         JSON.stringify({
           username: 'someUser123'
@@ -997,10 +1159,15 @@ describe('User root resolvers', () => {
 
       expect(
         resolvers.Mutation!.createOrUpdateUser({}, { user }, authHeaderRegister)
-      ).rejects.toThrowError('Create user is only allowed for sysadmin')
+      ).rejects.toThrowError(
+        'Create or update user is not allowed for this user'
+      )
     })
 
     it('should throw error when /createUser sends anything but 201', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
       fetch.mockResponseOnce(
         JSON.stringify({
           statusCode: '201'
@@ -1015,7 +1182,7 @@ describe('User root resolvers', () => {
           { headers: authHeaderSysAdmin }
         )
       ).rejects.toThrowError(
-        "Something went wrong on user-mgnt service. Couldn't create user"
+        "Something went wrong on user-mgnt service. Couldn't perform createUser"
       )
     })
   })
@@ -1026,7 +1193,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1110,7 +1277,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1146,9 +1313,7 @@ describe('User root resolvers', () => {
           },
           authHeaderRegAgent
         )
-      ).rejects.toThrowError(
-        'SMS invite can only be resent by a user with sys admin scope'
-      )
+      ).rejects.toThrowError('SMS invite can not be resent by this user')
     })
 
     it('throws error when the user-mgnt response is not 200', async () => {
@@ -1188,7 +1353,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1224,9 +1389,7 @@ describe('User root resolvers', () => {
           },
           authHeaderRegAgent
         )
-      ).rejects.toThrowError(
-        'Username reminder can only be resent by a user with sys admin scope'
-      )
+      ).rejects.toThrowError('Username reminder can not be resent by this user')
     })
 
     it('throws error when the user-mgnt response is not 200', async () => {
@@ -1266,7 +1429,7 @@ describe('User root resolvers', () => {
     beforeEach(() => {
       fetch.resetMocks()
       const sysAdminToken = jwt.sign(
-        { scope: ['sysadmin'] },
+        { scope: [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1302,9 +1465,7 @@ describe('User root resolvers', () => {
           },
           authHeaderRegAgent
         )
-      ).rejects.toThrowError(
-        'Reset password can only be sent by a user with sys admin scope'
-      )
+      ).rejects.toThrowError('Reset password can not be sent by this user')
     })
 
     it('throws error when the user-mgnt response is not 200', async () => {

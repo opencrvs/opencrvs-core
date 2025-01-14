@@ -19,20 +19,21 @@ import {
   FieldValueMap,
   IAttachmentValue
 } from '@client/forms'
+import { SCOPES } from '@opencrvs/commons/client'
 import {
+  AssignmentData,
   Attachment,
   EventType,
   History,
   Query,
-  RegStatus,
-  SystemRoleType
+  RegStatus
 } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
 } from '@client/profile/profileActions'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import {
@@ -65,7 +66,6 @@ import {
   ShowUnassignedDeclarations,
   showUnassignedDeclarations
 } from '@client/notification/actions'
-import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import {
   UpdateRegistrarWorkqueueAction,
@@ -74,11 +74,7 @@ import {
   IWorkqueue
 } from '@client/workqueue'
 import { isBase64FileString } from '@client/utils/commonUtils'
-import {
-  EMPTY_STRING,
-  FIELD_AGENT_ROLES,
-  SIGNATURE_KEYS
-} from '@client/utils/constants'
+import { EMPTY_STRING, SIGNATURE_KEYS } from '@client/utils/constants'
 import { ViewRecordQueries } from '@client/views/ViewRecord/query'
 import { UserDetails } from '@client/utils/userUtils'
 import { clearUnusedViewRecordCacheEntries } from '@client/utils/persistence'
@@ -86,7 +82,6 @@ import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getBirthQueryMappings } from '@client/views/DataProvider/birth/queries'
 import { getDeathQueryMappings } from '@client/views/DataProvider/death/queries'
 import { getMarriageQueryMappings } from '@client/views/DataProvider/marriage/queries'
-import { IDynamicValues } from '@client/navigation'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -236,6 +231,7 @@ export interface IDeclaration {
   writingDraft?: boolean
   operationHistories?: ITaskHistory[]
   isNotDuplicate?: boolean
+  assignmentStatus?: AssignmentData
 }
 
 type Relation =
@@ -659,15 +655,6 @@ function writeDeclarationFailed(): IWriteDeclarationFailedAction {
   return { type: WRITE_DECLARATION_FAILED }
 }
 
-async function getCurrentUserSystemRole(): Promise<string> {
-  const userDetails = await storage.getItem('USER_DETAILS')
-
-  if (!userDetails) {
-    return ''
-  }
-  return (JSON.parse(userDetails) as UserDetails).systemRole || ''
-}
-
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
 
@@ -711,7 +698,6 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
-  const currentUserRole = await getCurrentUserSystemRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -729,33 +715,8 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     (uData) => uData.userID === currentUserID
   )
-  let currentUserDeclarations: IDeclaration[] =
+  const currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
-
-  if (SystemRoleType.FieldAgent.includes(currentUserRole) && currentUserData) {
-    currentUserDeclarations = currentUserData.declarations.filter((d) => {
-      if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-        const history = d.originalData?.history as unknown as IDynamicValues
-        const downloadedTime = (
-          history.filter((h: IDynamicValues) => {
-            return h.action === DOWNLOAD_STATUS.DOWNLOADED
-          }) as IDynamicValues[]
-        ).sort((fe, se) => {
-          return new Date(se.date).getTime() - new Date(fe.date).getTime()
-        })
-
-        return (
-          differenceInMinutes(new Date(), new Date(downloadedTime[0].date)) <
-          1500 // 25 hours, used munites for better accuracy
-        )
-      }
-      return true
-    })
-
-    // Storing the declarations again by excluding the 24 hours old downloaded declaration
-    currentUserData.declarations = currentUserDeclarations
-    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
-  }
 
   const payload: IUserData = {
     userID: currentUserID,
@@ -1077,10 +1038,8 @@ function requestWithStateWrapper(
   return new Promise(async (resolve, reject) => {
     try {
       const data = await mainRequest
-      const userDetails = getUserDetails(getState())
-      if (
-        !FIELD_AGENT_ROLES.includes(userDetails?.systemRole as SystemRoleType)
-      ) {
+      const scopes = getScope(getState())
+      if (scopes?.includes(SCOPES.RECORD_REVIEW_DUPLICATES)) {
         await fetchAllDuplicateDeclarations(data.data)
       }
       const duplicateDeclarations = await fetchAllDuplicateDeclarations(
@@ -1559,14 +1518,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         eventData.registration.status &&
         eventData.registration.status[0].type
       const updateWorkqueue = () =>
-        updateRegistrarWorkqueue(
-          userDetails?.practitionerId,
-          10,
-          Boolean(
-            userDetails?.systemRole &&
-              FIELD_AGENT_ROLES.includes(userDetails.systemRole)
-          )
-        )
+        updateRegistrarWorkqueue(userDetails?.practitionerId, 10)
 
       newDeclarationsAfterDownload[downloadingDeclarationIndex] =
         createReviewDeclaration(
@@ -1580,6 +1532,10 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
+
+      newDeclarationsAfterDownload[
+        downloadingDeclarationIndex
+      ].assignmentStatus = eventData?.registration?.assignment ?? null
 
       const newStateAfterDownload = {
         ...state,
@@ -2020,6 +1976,10 @@ export function filterProcessingDeclarationsFromQuery(
     ),
     rejectTab: filterProcessingDeclarations(
       queryData.rejectTab,
+      processingDeclarationIds
+    ),
+    sentForReviewTab: filterProcessingDeclarations(
+      queryData.sentForReviewTab,
       processingDeclarationIds
     ),
     approvalTab: filterProcessingDeclarations(

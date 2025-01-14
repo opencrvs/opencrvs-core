@@ -17,26 +17,19 @@ import {
 } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
-import { ISearchCriteria, postAdvancedSearch } from './utils'
+import {
+  transformSearchParams,
+  ISearchCriteria,
+  postAdvancedSearch
+} from './utils'
 import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
-import { GraphQLError } from 'graphql'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import { RateLimitError } from '@gateway/rate-limit'
+import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
 type ApiResponse<T> = {
   body: T
   statusCode: number
-}
-
-class RateLimitError extends GraphQLError {
-  constructor(message = 'You are being rate limited') {
-    super(message, {
-      extensions: {
-        code: 'DAILY_QUOTA_EXCEEDED',
-        http: {
-          status: 429
-        }
-      }
-    })
-  }
 }
 
 // Complete definition of the Search response
@@ -92,25 +85,45 @@ export const resolvers: GQLResolver = {
         sort = 'desc',
         sortBy
       },
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) {
-      const searchCriteria: ISearchCriteria = {
-        sort,
-        parameters: advancedSearchParameters
-      }
-      // Only registrar, registration agent & field agent should be able to search user
       if (
         !inScope(authHeader, [
-          'register',
-          'validate',
-          'certify',
-          'declare',
-          'recordsearch'
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
         ])
-      ) {
-        throw new Error(
-          'Advanced search is only allowed for registrar, registration agent & field agent'
-        )
+      )
+        return {
+          totalItems: 0,
+          results: []
+        }
+
+      const userIdentifier = getTokenPayload(authHeader.Authorization).sub
+      const user = await dataSources.usersAPI.getUserById(userIdentifier!)
+      const office = await dataSources.locationsAPI.getLocation(
+        user.primaryOfficeId
+      )
+      const officeLocationId =
+        office.partOf?.reference &&
+        resourceIdentifierToUUID(office.partOf.reference)
+
+      if (!officeLocationId) {
+        throw new Error('User office not found')
+      }
+
+      const transformedSearchParams = transformSearchParams(
+        getTokenPayload(authHeader.Authorization).scope,
+        advancedSearchParameters,
+        officeLocationId
+      )
+
+      const searchCriteria: ISearchCriteria = {
+        sort,
+        parameters: transformedSearchParams
       }
 
       if (count) {
@@ -131,7 +144,7 @@ export const resolvers: GQLResolver = {
         }))
       }
 
-      const isExternalAPI = hasScope(authHeader, 'recordsearch')
+      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
       if (isExternalAPI) {
         const payload = getTokenPayload(authHeader.Authorization)
         const system = await getSystem({ systemId: payload.sub }, authHeader)
@@ -182,7 +195,7 @@ export const resolvers: GQLResolver = {
           throw new Error('There is no param to search ')
         }
 
-        searchCriteria.parameters = { ...advancedSearchParameters }
+        searchCriteria.parameters = { ...transformedSearchParams }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
@@ -204,10 +217,8 @@ export const resolvers: GQLResolver = {
       },
       { headers: authHeader }
     ) {
-      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        throw new Error(
-          'User does not have a sysadmin or register or validate scope'
-        )
+      if (!inScope(authHeader, [SCOPES.PERFORMANCE_READ])) {
+        throw new Error('User does not have enough scope')
       }
 
       const searchCriteria: ISearchCriteria = {

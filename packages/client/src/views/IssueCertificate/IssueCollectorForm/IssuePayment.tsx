@@ -22,7 +22,7 @@ import { useIntl } from 'react-intl'
 import * as React from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
   calculatePrice,
   getEventDate,

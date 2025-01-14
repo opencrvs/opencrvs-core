@@ -215,11 +215,10 @@ export function createCorrectionProofOfLegalCorrectionDocument(
 
 export function createDocumentReferenceEntryForCertificate(
   temporaryDocumentReferenceId: UUID,
-  temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
+  collectorReference: ResourceIdentifier | URNReference,
   certificateTemplateId?: string,
-  attachmentUrl?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
   return {
@@ -234,7 +233,7 @@ export function createDocumentReferenceEntryForCertificate(
         {
           url: 'http://opencrvs.org/specs/extension/collector',
           valueReference: {
-            reference: `urn:uuid:${temporaryRelatedPersonId}`
+            reference: collectorReference
           }
         },
         {
@@ -264,16 +263,7 @@ export function createDocumentReferenceEntryForCertificate(
           }
         ]
       },
-      content: attachmentUrl
-        ? [
-            {
-              attachment: {
-                contentType: 'application/pdf',
-                data: attachmentUrl
-              }
-            }
-          ]
-        : [],
+      content: [],
       status: 'current'
     }
   }
@@ -293,7 +283,7 @@ export function createRelatedPersonEntries(
   collectorDetails: CertifyInput['collector'],
   temporaryRelatedPersonId: UUID,
   record: RegisteredRecord | CertifiedRecord
-): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] {
+): [BundleEntry<RelatedPerson>, ...BundleEntry<Patient>[]] | [] {
   const knownRelationships = z.enum([
     'MOTHER',
     'FATHER',
@@ -308,6 +298,7 @@ export function createRelatedPersonEntries(
     `${relationship.toLowerCase() as Lowercase<typeof relationship>}-details`
 
   if ('otherRelationship' in collectorDetails) {
+    if (collectorDetails.relationship === 'PRINT_IN_ADVANCE') return []
     const temporaryPatientId = getUUID()
     return [
       {
@@ -688,13 +679,10 @@ export async function createViewTask(
   return viewedTask
 }
 
-export function createDownloadTask(
-  previousTask: SavedTask,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
-) {
-  return createNewTaskResource(previousTask, [{ url: extensionUrl }])
+export function createDownloadTask(previousTask: SavedTask) {
+  return createNewTaskResource(previousTask, [
+    { url: 'http://opencrvs.org/specs/extension/regAssigned' }
+  ])
 }
 
 export function createRejectTask(

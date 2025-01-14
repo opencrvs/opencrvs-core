@@ -8,17 +8,18 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { checkAuth } from '@client/profile/profileActions'
+
 import { AppStore, createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
-  resizeWindow
+  REGISTRATION_AGENT_DEFAULT_SCOPES,
+  resizeWindow,
+  setScopes
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { readFileSync } from 'fs'
-import * as jwt from 'jsonwebtoken'
+
 import { merge } from 'lodash'
 import * as React from 'react'
 import { SentForReview } from './SentForReview'
@@ -27,18 +28,8 @@ import type {
   GQLDeathEventSearchSet
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { vi, Mock } from 'vitest'
+import { vi } from 'vitest'
 import { EventType } from '@client/utils/gateway'
-
-const validateScopeToken = jwt.sign(
-  { scope: ['validate'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
 
 const nameObj = {
   data: {
@@ -134,15 +125,12 @@ for (let i = 0; i < 14; i++) {
 }
 merge(mockUserResponse, nameObj)
 
-const getItem = window.localStorage.getItem as Mock
-
 describe('RegistrationHome sent for approval tab related tests', () => {
   let store: AppStore
 
   beforeEach(async () => {
     ;({ store } = createStore())
-    getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
@@ -461,8 +449,7 @@ describe('Tablet tests', () => {
   const { store } = createStore()
 
   beforeAll(async () => {
-    getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRATION_AGENT_DEFAULT_SCOPES, store)
     resizeWindow(800, 1280)
   })
 

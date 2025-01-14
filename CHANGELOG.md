@@ -5,6 +5,8 @@
 ### Breaking changes
 
 - **Dashboard:** Changes made to the dashboard configuration will reset after upgrading OpenCRVS.
+- Removed unused searchBirthRegistrations and searchDeathRegistrations queries, as they are no longer used by the client.
+- **Retrieve action deprecated:** Field agents & registration agents used to be able to retrieve records to view the audit history & PII. We are removing this in favor of audit capabilities that is planned for in a future release.
 
 ### New features
 

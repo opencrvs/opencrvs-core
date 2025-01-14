@@ -16,24 +16,11 @@ import {
   PERFORMANCE_STATS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
 import { Action, Middleware } from 'redux'
-import { getDefaultPerformanceLocationId } from '@client/navigation'
-import { UserDetails } from '@client/utils/userUtils'
-import {
-  FIELD_AGENT_ROLES,
-  NATIONAL_REGISTRAR_ROLES,
-  NATL_ADMIN_ROLES
-} from '@client/utils/constants'
+import { SCOPES } from '@opencrvs/commons/client'
 import { client } from '@client/utils/apolloClient'
 import startOfMonth from 'date-fns/startOfMonth'
 import subMonths from 'date-fns/subMonths'
 import { QueryOptions } from '@apollo/client/core'
-
-const isUserOfNationalScope = (userDetails: UserDetails) =>
-  [...NATIONAL_REGISTRAR_ROLES, ...NATL_ADMIN_ROLES].includes(
-    userDetails.systemRole
-  )
-const isFieldAgent = (userDetails: UserDetails) =>
-  FIELD_AGENT_ROLES.includes(userDetails.systemRole)
 
 function getQueriesToPrefetch(
   locationId: string,
@@ -87,22 +74,24 @@ function getQueriesToPrefetch(
     }
   ]
 }
+
 export const persistenceMiddleware: Middleware<{}, IStoreState> =
-  ({ dispatch, getState }) =>
+  ({ getState }) =>
   (next) =>
   (action: Action) => {
     next(action)
     if (import.meta.env.MODE === 'test') return
     if (action.type === USER_DETAILS_AVAILABLE) {
       const userDetails = getState().profile.userDetails
-      if (!isFieldAgent(userDetails!)) {
-        const defaultPerformanceLocationId = getDefaultPerformanceLocationId(
-          userDetails!
-        )
-        const officeSelected = !isUserOfNationalScope(userDetails!)
+      const scopes = getState().profile.tokenPayload!.scope!
+
+      if (
+        scopes.includes(SCOPES.PERFORMANCE_READ) &&
+        userDetails?.primaryOffice.id
+      ) {
         const queriesToPrefetch = getQueriesToPrefetch(
-          defaultPerformanceLocationId as string,
-          officeSelected
+          userDetails.primaryOffice.id,
+          true
         )
         for (const query of queriesToPrefetch) {
           client.query(query)

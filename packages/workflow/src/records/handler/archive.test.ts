@@ -21,6 +21,7 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 describe('archive record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -36,7 +37,7 @@ describe('archive record endpoint', () => {
 
   it('returns OK after archiving a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['declare'] },
+      { scope: [SCOPES.RECORD_DECLARATION_ARCHIVE] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',

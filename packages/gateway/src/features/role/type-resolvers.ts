@@ -8,29 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { GQLResolver, GQLRole } from '@gateway/graphql/schema'
-import { IMongoComparisonObject } from '@gateway/features/role/utils'
+import { GQLResolver } from '@gateway/graphql/schema'
 
-interface IRoleModelData {
-  _id: string
-  title: string
-  value: string
-  roles: GQLRole[]
-  active: boolean
-}
-
-export interface IRoleSearchPayload {
-  title?: string
-  value?: IMongoComparisonObject
-  role?: string
-  active?: boolean
-  sortBy?: string
-  sortOrder?: string
-}
-export const roleTypeResolvers: GQLResolver = {
-  SystemRole: {
-    id(roleModel: IRoleModelData) {
-      return roleModel._id
-    }
-  }
-}
+export const roleTypeResolvers: GQLResolver = {}

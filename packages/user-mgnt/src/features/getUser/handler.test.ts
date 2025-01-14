@@ -13,6 +13,7 @@ import { createServer } from '@user-mgnt/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as mockingoose from 'mockingoose'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 let server: any
 
@@ -21,7 +22,7 @@ beforeEach(async () => {
 })
 
 const token = jwt.sign(
-  { scope: ['declare'] },
+  { scope: [SCOPES.USER_READ] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -45,7 +46,6 @@ const dummyUser = {
   passwordHash:
     'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
   salt: '12345',
-  scope: ['register'],
   role: 'Field Agent',
   status: 'active',
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',

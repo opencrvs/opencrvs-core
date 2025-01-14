@@ -17,13 +17,14 @@ import {
   TestComponentWithRouteMock
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { EventType } from '@client/utils/gateway'
+import { GetEventsWithProgressQuery, EventType } from '@client/utils/gateway'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { ReactWrapper } from 'enzyme'
 import { GraphQLError } from 'graphql'
 import { parse, stringify } from 'query-string'
 import * as React from 'react'
 import { vi } from 'vitest'
+import { PlainDate } from '@client/utils/date-formatting'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 
 describe('Workflow status tests', () => {
@@ -71,7 +72,7 @@ describe('Workflow status tests', () => {
                       familyName: 'মায়ের পারিবারিক নাম '
                     }
                   ],
-                  dateOfEvent: '2020-05-17',
+                  dateOfEvent: '2020-05-17' as unknown as PlainDate,
                   registration: {
                     status: null,
                     contactNumber: null,
@@ -92,13 +93,12 @@ describe('Workflow status tests', () => {
                       }
                     ],
                     role: {
-                      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-                      labels: [
-                        {
-                          lang: 'en',
-                          label: 'LOCAL_REGISTRAR'
-                        }
-                      ]
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
                     }
                   },
                   startedByFacility: null,
@@ -126,7 +126,7 @@ describe('Workflow status tests', () => {
                       familyName: 'আমিনা'
                     }
                   ],
-                  dateOfEvent: '2020-02-15',
+                  dateOfEvent: '2020-02-15' as unknown as PlainDate,
                   registration: {
                     status: 'REGISTERED',
                     contactNumber: '+8801959595999',
@@ -147,13 +147,12 @@ describe('Workflow status tests', () => {
                       }
                     ],
                     role: {
-                      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-                      labels: [
-                        {
-                          lang: 'en',
-                          label: 'LOCAL_REGISTRAR'
-                        }
-                      ]
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
                     }
                   },
                   progressReport: {
@@ -180,7 +179,7 @@ describe('Workflow status tests', () => {
                       familyName: 'আমিনা'
                     }
                   ],
-                  dateOfEvent: '2020-03-15',
+                  dateOfEvent: '2020-03-15' as unknown as PlainDate,
                   registration: {
                     status: 'CERTIFIED',
                     contactNumber: '+8801656568682',
@@ -201,13 +200,12 @@ describe('Workflow status tests', () => {
                       }
                     ],
                     role: {
-                      _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-                      labels: [
-                        {
-                          lang: 'en',
-                          label: 'LOCAL_REGISTRAR'
-                        }
-                      ]
+                      id: 'LOCAL_REGISTRAR',
+                      label: {
+                        defaultMessage: 'Local Registrar',
+                        description: 'Name for user role Local Registrar',
+                        id: 'userRole.localRegistrar'
+                      }
                     }
                   },
                   progressReport: {
@@ -220,7 +218,7 @@ describe('Workflow status tests', () => {
                   }
                 }
               ]
-            }
+            } satisfies GetEventsWithProgressQuery['getEventsWithProgress']
           }
         }
       }

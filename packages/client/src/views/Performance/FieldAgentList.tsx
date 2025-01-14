@@ -8,38 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { formatTimeDuration } from '@client/DateUtils'
+import { AvatarSmall } from '@client/components/Avatar'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { GenericErrorToast } from '@client/components/GenericErrorToast'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
-import { formatTimeDuration } from '@client/DateUtils'
 import { messages } from '@client/i18n/messages/views/performance'
+import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
+import format from '@client/utils/date-formatting'
+import type { GQLSearchFieldAgentResult } from '@client/utils/gateway-deprecated-do-not-use'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { SortArrow } from '@opencrvs/components/lib/icons'
-import { AvatarSmall } from '@client/components/Avatar'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
-import type { GQLSearchFieldAgentResult } from '@client/utils/gateway-deprecated-do-not-use'
+import { SortArrow } from '@opencrvs/components/lib/icons'
 import { orderBy } from 'lodash'
 import { parse, stringify } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { ILocation } from '@client/offline/reducer'
-import format from '@client/utils/date-formatting'
-import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Avatar, EventType } from '@client/utils/gateway'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
-import { getLanguage } from '@client/i18n/selectors'
-import { getUserRole } from '@client/utils'
 import { useLocation, useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 
@@ -168,7 +166,6 @@ function FieldAgentListComponent(props: IProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
   const offices = generateLocations(offlineOffices, intl)
-  const language = useSelector(getLanguage)
 
   const isOfficeSelected = offices.some((office) => office.id === locationId)
 
@@ -316,7 +313,7 @@ function FieldAgentListComponent(props: IProps) {
     const content =
       data &&
       data.results &&
-      data.results.map((row, idx) => {
+      data.results.map((row) => {
         if (row === null) {
           return {
             name: '',
@@ -336,7 +333,7 @@ function FieldAgentListComponent(props: IProps) {
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          role: (row.role && getUserRole(language, row.role)) || '',
+          role: (row.role && intl.formatMessage(row.role.label)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),
@@ -408,8 +405,16 @@ function FieldAgentListComponent(props: IProps) {
                   })
                 })
               }}
-              requiredJurisdictionTypes={
+              locationFilter={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
+                  ? ({ jurisdictionType }) =>
+                      Boolean(
+                        jurisdictionType &&
+                          window.config.FIELD_AGENT_AUDIT_LOCATIONS.split(
+                            ','
+                          ).includes(jurisdictionType)
+                      )
+                  : undefined
               }
             />
             <PerformanceSelect

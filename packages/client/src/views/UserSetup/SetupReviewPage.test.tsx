@@ -27,13 +27,12 @@ describe('SetupReviewPage page tests', () => {
         JSON.stringify({
           ...userDetails,
           role: {
-            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'ENTREPENEUR'
-              }
-            ]
+            id: 'ENTREPRENEUR',
+            label: {
+              defaultMessage: 'Entrepreneur',
+              description: 'Name for user role Entrepreneur',
+              id: 'userRole.entrepreneur'
+            }
           }
         })
       )
@@ -72,7 +71,7 @@ describe('SetupReviewPage page tests', () => {
       { store }
     )
     const role = testComponent.find('#Role_value').hostNodes().text()
-    expect(role).toEqual('ENTREPENEUR')
+    expect(role).toEqual('Field Agent')
   })
   it('clicks question to change', async () => {
     const { component: testComponent } = await createTestComponent(

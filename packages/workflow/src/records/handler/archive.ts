@@ -15,6 +15,7 @@ import { toArchived } from '@workflow/records/state-transitions'
 import { indexBundle } from '@workflow/records/search'
 import { createRoute } from '@workflow/states'
 import { auditEvent } from '@workflow/records/audit'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const requestSchema = z.object({
   reason: z.string().optional(),
@@ -27,6 +28,7 @@ export const archiveRoute = createRoute({
   path: '/records/{recordId}/archive',
   allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
   action: 'ARCHIVE',
+  allowedScopes: [SCOPES.RECORD_DECLARATION_ARCHIVE],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

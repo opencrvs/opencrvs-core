@@ -84,6 +84,7 @@ export type StringExtensionType = {
     url: 'http://opencrvs.org/specs/extension/regVerified'
     valueString: string
   }
+  // @deprecated in 1.7, kept for backwards compatibility
   'http://opencrvs.org/specs/extension/regDownloaded': {
     url: 'http://opencrvs.org/specs/extension/regDownloaded'
     valueString?: string

@@ -361,19 +361,13 @@ export function toIdentifierUpserted<T extends ValidRecord>(
 
 export async function toDownloaded(
   record: ValidRecord,
-  token: string,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
+  token: string
 ): Promise<{
   downloadedRecord: ValidRecord
   downloadedRecordWithTaskOnly: Bundle<SavedTask>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerDetails = createDownloadTask(
-    previousTask,
-    extensionUrl
-  )
+  const taskWithoutPractitionerDetails = createDownloadTask(previousTask)
   const [downloadedTask, practitionerDetailsBundle] =
     await withPractitionerDetails(taskWithoutPractitionerDetails, token)
 
@@ -996,12 +990,23 @@ export async function toCertified(
     temporaryRelatedPersonId,
     record
   )
+  const practitionerReference = findExtension(
+    'http://opencrvs.org/specs/extension/regLastUser',
+    certifiedTask.extension
+  )!.valueReference.reference
+
+  /* For 'PRINT_IN_ADVANCE' records, there will be no related person entry to add. Thus the
+  related person id should not be referenced rather the regLastUser Practitioner is referenced.*/
+  const collectorReference =
+    certificateDetails.collector.relationship !== 'PRINT_IN_ADVANCE'
+      ? (`urn:uuid:${temporaryRelatedPersonId}` as const)
+      : practitionerReference
 
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
-    temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    collectorReference,
     certificateDetails.certificateTemplateId
   )
 
@@ -1083,13 +1088,14 @@ export async function toIssued(
     record
   )
 
+  const collectorReference = `urn:uuid:${temporaryRelatedPersonId}` as const
+
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
-    temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    collectorReference,
     certificateDetails.certificateTemplateId,
-    undefined,
     paymentReconciliation.fullUrl
   )
 

@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as commandLineArgs from 'command-line-args'
-import * as commandLineUsage from 'command-line-usage'
+import commandLineArgs from 'command-line-args'
+import commandLineUsage from 'command-line-usage'
 import { join } from 'path'
 
 const optionList = [

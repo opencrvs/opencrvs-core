@@ -36,7 +36,7 @@ import {
 import { Navigate, useNavigate } from 'react-router-dom'
 import { EventType } from '@client/utils/gateway'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 

@@ -16,6 +16,7 @@ import {
   filterLocations,
   generateLocationName,
   getJurisidictionType,
+  isOfficeUnderJurisdiction,
   getLocationNameMapOfFacility
 } from '@client/utils/locationUtils'
 import { createIntl } from 'react-intl'
@@ -177,5 +178,35 @@ describe('locationUtil tests', () => {
         facility: 'ARK Private Clinic'
       })
     })
+  })
+})
+
+describe('isOfficeUnderJurisdiction', () => {
+  it('returns true if the other office is under jurisdiction of the given office', () => {
+    const officeId = '213ec5f3-e306-4f95-8058-f37893dbfbb6' // office in Chittagong
+    const otherOfficeId = '0d8474da-0361-4d32-979e-af91f012340a' // office in Chittagong -> Chandpur
+
+    expect(
+      isOfficeUnderJurisdiction(
+        officeId,
+        otherOfficeId,
+        mockOfflineData.locations,
+        mockOfflineData.offices
+      )
+    ).toEqual(true)
+  })
+
+  it('returns false if the given other office is not under the jurisdiction of the given office', () => {
+    const officeId = '0d8474da-0361-4d32-979e-af91f012340a' // office in Chittagong
+    const otherOfficeId = '93259d69-71af-488f-8ada-32d06678df17' // office in Dhaka
+
+    expect(
+      isOfficeUnderJurisdiction(
+        officeId,
+        otherOfficeId,
+        mockOfflineData.locations,
+        mockOfflineData.offices
+      )
+    ).toEqual(false)
   })
 })

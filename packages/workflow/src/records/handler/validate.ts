@@ -15,12 +15,14 @@ import { toValidated } from '@workflow/records/state-transitions'
 import { auditEvent } from '@workflow/records/audit'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const validateRoute = createRoute({
   method: 'POST',
   path: '/records/{recordId}/validate',
   allowedStartStates: ['IN_PROGRESS', 'READY_FOR_REVIEW'],
   action: 'VALIDATE',
+  allowedScopes: [SCOPES.RECORD_SUBMIT_FOR_APPROVAL],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

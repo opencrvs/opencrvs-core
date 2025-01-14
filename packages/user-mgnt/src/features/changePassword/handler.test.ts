@@ -14,11 +14,12 @@ import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
 import User, { IUser } from '@user-mgnt/model/user'
 import * as mockingoose from 'mockingoose'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin'] },
+  { scope: [SCOPES.USER_UPDATE] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -39,10 +40,8 @@ const mockUser: Partial<IUser & { _id: string }> = {
   username: 'j.doe1',
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   status: 'pending',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
@@ -60,10 +59,8 @@ const mockExistingUser: Partial<IUser & { _id: string }> = {
   username: 'j.doe1',
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
-  systemRole: 'LOCAL_REGISTRAR',
   status: 'active',
   primaryOfficeId: '321',
-  scope: ['register'],
   device: 'D444',
   passwordHash: '$2a$10$fyVfYYctO8oqs9euSvtgVeNyezpOy486VHmvQJgSg/qD81xpr1f.i',
   salt: '$2a$10$fyVfYYctO8oqs9euSvtgVe'
