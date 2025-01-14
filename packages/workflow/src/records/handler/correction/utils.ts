@@ -10,11 +10,14 @@
  */
 import {
   Bundle,
+  BundleEntry,
   isCorrectionRequestedTask,
   isTask,
-  OpenCRVSPractitionerName
+  OpenCRVSPractitionerName,
+  TransactionResponse
 } from '@opencrvs/commons/types'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
+import _ from 'lodash'
 
 type Contacts =
   | { email: string }
@@ -67,4 +70,51 @@ export async function sendNotification<T extends keyof PayloadMap>(
   }
 
   return res
+}
+
+const replaceTmpURN = (resource: any, tmpURN: string, fullUrl: string) => {
+  if (Array.isArray(resource)) {
+    resource.forEach((item, index) => {
+      if (item === tmpURN) {
+        resource[index] = fullUrl
+      } else {
+        replaceTmpURN(item, tmpURN, fullUrl)
+      }
+    })
+  } else if (typeof resource === 'object' && resource !== null) {
+    for (const key in resource) {
+      if (resource[key] === tmpURN) {
+        resource[key] =
+          key === 'reference'
+            ? fullUrl.split('/').slice(2, 4).join('/') // /fhir/Patient/xyz/_history/abc => Patient/xyz
+            : fullUrl
+      } else {
+        replaceTmpURN(resource[key], tmpURN, fullUrl)
+      }
+    }
+  }
+}
+
+export const updateFullUrl = <T extends Bundle>(
+  transactionResponse: TransactionResponse,
+  bundle: T
+): T => {
+  const [history, others] = _.partition(bundle.entry, (entry: BundleEntry) =>
+    entry.resource.resourceType.endsWith('History')
+  )
+
+  transactionResponse.entry.forEach(
+    ({ response: { status, location } }, id) => {
+      if (status === '201') {
+        others[id].fullUrl &&
+          replaceTmpURN(bundle, others[id].fullUrl, location)
+        others[id].resource.id = location.split('/')[3]
+      }
+    }
+  )
+
+  return {
+    ...bundle,
+    entry: [...others, ...history]
+  }
 }
