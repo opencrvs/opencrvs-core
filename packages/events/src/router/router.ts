@@ -21,7 +21,8 @@ import {
   deleteEvent,
   EventInputWithId,
   getEventById,
-  patchEvent
+  patchEvent,
+  validate
 } from '@events/service/events'
 import { presignFilesInEvent } from '@events/service/files'
 import {
@@ -30,7 +31,10 @@ import {
   setLocations
 } from '@events/service/locations/locations'
 import { Context, middleware } from './middleware/middleware'
-import { getIndexedEvents } from '@events/service/indexing/indexing'
+import {
+  ensureIndexExists,
+  getIndexedEvents
+} from '@events/service/indexing/indexing'
 import { EventConfig, getUUID } from '@opencrvs/commons'
 import {
   DeclareActionInput,
@@ -78,13 +82,23 @@ export const appRouter = router({
   }),
   event: router({
     create: publicProcedure.input(EventInput).mutation(async (options) => {
-      const config = await getEventConfigurations(options.ctx.token)
-      const eventIds = config.map((c) => c.id)
+      const configurations = await getEventConfigurations(options.ctx.token)
+      const eventIds = configurations.map((c) => c.id)
 
       validateEventType({
         eventTypes: eventIds,
         eventInputType: options.input.type
       })
+
+      const configuration = configurations.find(
+        (c) => c.id === options.input.type
+      )
+
+      if (!configuration) {
+        throw new Error(`Event configuration not found ${options.input.type}`)
+      }
+
+      await ensureIndexExists(options.input.type, configuration)
 
       return createEvent({
         eventInput: options.input,
@@ -136,9 +150,9 @@ export const appRouter = router({
         })
       }),
       validate: publicProcedure
-        .input(ValidateActionInput)
+        .input(ValidateActionInput.omit({ duplicates: true }))
         .mutation((options) => {
-          return addAction(options.input, {
+          return validate(options.input, {
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdAtLocation: options.ctx.user.primaryOfficeId,

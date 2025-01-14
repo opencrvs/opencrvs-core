@@ -16,6 +16,7 @@ import {
 import { payloadGenerator } from '@events/tests/generators'
 import { createTestClient } from '@events/tests/utils'
 import { indexAllEvents } from './indexing'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 const client = createTestClient()
 const generator = payloadGenerator()
@@ -23,14 +24,14 @@ const generator = payloadGenerator()
 test('indexes all records from MongoDB with one function call', async () => {
   const esClient = getOrCreateClient()
 
-  await indexAllEvents()
+  await indexAllEvents(tennisClubMembershipEvent)
 
   for (let i = 0; i < 2; i++) {
     await client.event.create(generator.event.create())
   }
 
   const body = await esClient.search({
-    index: getEventIndexName(),
+    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
     body: {
       query: {
         match_all: {}
@@ -46,7 +47,7 @@ test('records are automatically indexed when they are created', async () => {
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: getEventIndexName(),
+    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
     body: {
       query: {
         match_all: {}

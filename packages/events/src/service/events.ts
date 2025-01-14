@@ -12,8 +12,10 @@
 import {
   ActionInputWithType,
   EventDocument,
+  EventIndex,
   EventInput,
   FileFieldValue,
+  getCurrentEventState,
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
@@ -25,6 +27,7 @@ import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
 import { getEventConfigurations } from './config/config'
 import { deleteFile, fileExists } from './files'
+import { searchForDuplicates } from './deduplication/deduplication'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -87,7 +90,7 @@ export async function deleteEvent(
 
   const { id } = event
   await collection.deleteOne({ id })
-  await deleteEventIndex(id)
+  await deleteEventIndex(event)
   return { id }
 }
 
@@ -229,6 +232,74 @@ export async function addAction(
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
   return updatedEvent
+}
+
+export async function validate(
+  input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
+  {
+    eventId,
+    createdBy,
+    token,
+    createdAtLocation
+  }: {
+    eventId: string
+    createdBy: string
+    createdAtLocation: string
+    token: string
+  }
+) {
+  const config = await getEventConfigurations(token)
+  const storedEvent = await getEventById(eventId)
+  const form = config.find((config) => config.id === storedEvent.type)
+
+  if (!form) {
+    throw new Error(`Form not found with event type: ${storedEvent.type}`)
+  }
+  let duplicates: EventIndex[] = []
+
+  if (form.deduplication) {
+    const futureEventState = getCurrentEventState({
+      ...storedEvent,
+      actions: [
+        ...storedEvent.actions,
+        {
+          ...input,
+          createdAt: new Date().toISOString(),
+          createdBy,
+          createdAtLocation
+        }
+      ]
+    })
+
+    const resultsFromAllRules = await Promise.all(
+      form.deduplication.map(async (deduplication) => {
+        const duplicates = await searchForDuplicates(
+          futureEventState,
+          deduplication
+        )
+        return duplicates
+      })
+    )
+
+    duplicates = resultsFromAllRules
+      .flat()
+      .sort((a, b) => b.score - a.score)
+      .map((hit) => hit.event)
+      .filter((event, index, self) => {
+        return self.findIndex((t) => t.id === event.id) === index
+      })
+  }
+
+  const event = await addAction(
+    { ...input, duplicates: duplicates.map((d) => d.id) },
+    {
+      eventId,
+      createdBy,
+      token,
+      createdAtLocation
+    }
+  )
+  return event
 }
 
 export async function patchEvent(eventInput: EventInputWithId) {

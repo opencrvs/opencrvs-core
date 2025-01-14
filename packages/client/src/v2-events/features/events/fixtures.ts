@@ -241,5 +241,25 @@ export const tennisClubMembershipEvent = {
       },
       forms: [DEFAULT_FORM]
     }
+  ],
+  deduplication: [
+    {
+      id: 'STANDARD CHECK',
+      label: {
+        defaultMessage: 'Standard check',
+        description:
+          'This could be shown to the user in a reason for duplicate detected',
+        id: '...'
+      },
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            fieldId: 'applicant.firstname',
+            type: 'strict'
+          }
+        ]
+      }
+    }
   ]
 } satisfies EventConfig
