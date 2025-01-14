@@ -42,7 +42,7 @@ test('indexes all records from MongoDB with one function call', async () => {
   expect(body.hits.hits).toHaveLength(2)
 })
 
-test.only('records are automatically indexed when they are created', async () => {
+test('records are automatically indexed when they are created', async () => {
   await client.event.create(generator.event.create())
 
   const esClient = getOrCreateClient()
