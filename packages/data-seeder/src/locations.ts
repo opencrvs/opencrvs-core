@@ -15,13 +15,19 @@ import { TypeOf, z } from 'zod'
 import { raise } from './utils'
 import { inspect } from 'util'
 
+const LOCATION_TYPES = [
+  'ADMIN_STRUCTURE',
+  'HEALTH_FACILITY',
+  'CRVS_OFFICE'
+] as const
+
 const LocationSchema = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
     alias: z.string().optional(),
     partOf: z.string(),
-    locationType: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE']),
+    locationType: z.enum(LOCATION_TYPES),
     jurisdictionType: z
       .enum([
         'STATE',
@@ -217,12 +223,8 @@ const getExternalIdFromIdentifier = (
 export async function seedLocations(token: string) {
   const savedLocations = (
     await Promise.all(
-      ['ADMIN_STRUCTURE', 'CRVS_OFFICE', 'HEALTH_FACILITY'].map((type) =>
-        fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
-          headers: {
-            'Content-Type': 'application/fhir+json'
-          }
-        })
+      LOCATION_TYPES.map((type) =>
+        getLocationsByType(type)
           .then((res) => res.json())
           .then((bundle: fhir3.Bundle<fhir3.Location>) =>
             locationBundleToIdentifier(bundle)
@@ -278,29 +280,37 @@ function updateLocationPartOf(partOf: string) {
   return parent
 }
 
+function getLocationsByType(type: string) {
+  return fetch(`${env.GATEWAY_HOST}/locations?type=${type}&_count=0`, {
+    headers: {
+      'Content-Type': 'application/fhir+json'
+    }
+  })
+}
+
 /**
  * NOTE: Seeding locations for v2 should be done after seeding the legacy locations.
  * This is because the v2 locations are created based on the legacy location ids to ensure compatibility.
  */
 export async function seedLocationsForV2Events(token: string) {
-  const result = await fetch(env.FHIR_URL + '/Location?_count=0', {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/fhir+json'
-    }
-  })
-
-  const bundle: fhir3.Bundle<fhir3.Location> = await result.json()
-
-  const locations = bundleToLocationEntries(bundle).map((location) => ({
-    id: location.id,
-    externalId: getExternalIdFromIdentifier(location.identifier),
-    name: location.name,
-    partOf: location?.partOf?.reference
-      ? updateLocationPartOf(location?.partOf?.reference)
-      : null
-  }))
+  const locations = (
+    await Promise.all(
+      LOCATION_TYPES.map((type) =>
+        getLocationsByType(type)
+          .then((res) => res.json())
+          .then((bundle: fhir3.Bundle<fhir3.Location>) =>
+            bundleToLocationEntries(bundle).map((location) => ({
+              id: location.id,
+              externalId: getExternalIdFromIdentifier(location.identifier),
+              name: location.name,
+              partOf: location?.partOf?.reference
+                ? updateLocationPartOf(location?.partOf?.reference)
+                : null
+            }))
+          )
+      )
+    )
+  ).flat()
 
   // NOTE: TRPC expects certain format, which may seem unconventional.
   const res = await fetch(`${env.GATEWAY_HOST}/events/locations.set`, {
