@@ -286,6 +286,8 @@ export async function seedLocationsForV2Events(token: string) {
   })
 
   if (!res.ok) {
-    raise(await res.json())
+    console.error(
+      'Unable to seed locations for v2 events. Ensure events service is running.'
+    )
   }
 }
