@@ -10,16 +10,20 @@
  */
 
 import {
+  EventConfig,
   EventDocument,
   EventIndex,
+  FieldConfig,
   getCurrentEventState
 } from '@opencrvs/commons/events'
 import { type estypes } from '@elastic/elasticsearch'
 import * as eventsDb from '@events/storage/mongodb/events'
 import {
+  getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { logger, getAllFields } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 
@@ -32,9 +36,13 @@ function eventToEventIndex(event: EventDocument): EventIndex {
  */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
-export function createIndex(indexName: string) {
+export async function createIndex(
+  indexName: string,
+  formFields: FieldConfig[]
+) {
   const client = getOrCreateClient()
-  return client.indices.create({
+
+  await client.indices.create({
     index: indexName,
     body: {
       mappings: {
@@ -48,25 +56,73 @@ export function createIndex(indexName: string) {
           modifiedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
-          data: { type: 'object', enabled: true }
+          data: {
+            type: 'object',
+            properties: formFieldsToDataMapping(formFields)
+          }
         } satisfies EventIndexMapping
       }
     }
   })
+  return client.indices.putAlias({
+    index: indexName,
+    name: getEventAliasName()
+  })
 }
 
-export async function indexAllEvents() {
+function getElasticsearchMappingForType(field: FieldConfig) {
+  if (field.type === 'DATE') {
+    return { type: 'date' }
+  }
+
+  if (field.type === 'TEXT' || field.type === 'PARAGRAPH') {
+    return { type: 'text' }
+  }
+
+  if (field.type === 'RADIO_GROUP') {
+    return { type: 'keyword' }
+  }
+
+  if (field.type === 'FILE') {
+    return {
+      type: 'object',
+      properties: {
+        filename: { type: 'keyword' },
+        originalFilename: { type: 'keyword' },
+        type: { type: 'keyword' }
+      }
+    }
+  }
+
+  return assertNever(field)
+}
+
+const assertNever = (n: never): never => {
+  throw new Error('Should never happen')
+}
+
+function formFieldsToDataMapping(fields: FieldConfig[]) {
+  return fields.reduce((acc, field) => {
+    return {
+      ...acc,
+      [field.id]: getElasticsearchMappingForType(field)
+    }
+  }, {})
+}
+
+export async function indexAllEvents(eventConfiguration: EventConfig) {
   const mongoClient = await eventsDb.getClient()
   const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
   const hasEventsIndex = await esClient.indices.exists({
-    index: getEventIndexName()
+    index: indexName
   })
 
   if (!hasEventsIndex) {
-    await createIndex(getEventIndexName())
+    await createIndex(indexName, getAllFields(eventConfiguration))
   }
 
-  const stream = mongoClient.collection(getEventIndexName()).find().stream()
+  const stream = mongoClient.collection(indexName).find().stream()
 
   const transformedStreamData = new Transform({
     readableObjectMode: true,
@@ -82,7 +138,7 @@ export async function indexAllEvents() {
     datasource: stream.pipe(transformedStreamData),
     onDocument: (doc: EventIndex) => ({
       index: {
-        _index: getEventIndexName(),
+        _index: indexName,
         _id: doc.id
       }
     }),
@@ -92,9 +148,10 @@ export async function indexAllEvents() {
 
 export async function indexEvent(event: EventDocument) {
   const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(event.type)
 
-  return esClient.update({
-    index: getEventIndexName(),
+  return esClient.update<EventIndex>({
+    index: indexName,
     id: event.id,
     body: {
       doc: eventToEventIndex(event),
@@ -104,12 +161,28 @@ export async function indexEvent(event: EventDocument) {
   })
 }
 
-export async function deleteEventIndex(eventId: string) {
+export async function ensureIndexExists(
+  eventType: string,
+  configuration: EventConfig
+) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventType)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+
+  if (!hasEventsIndex) {
+    logger.error(`Events index ${indexName} does not exist. Creating one.`)
+    await createIndex(indexName, getAllFields(configuration))
+  }
+}
+
+export async function deleteEventIndex(event: EventDocument) {
   const esClient = getOrCreateClient()
 
   const response = await esClient.delete({
-    index: getEventIndexName(),
-    id: eventId,
+    index: getEventIndexName(event.type),
+    id: event.id,
     refresh: 'wait_for'
   })
 
@@ -120,20 +193,15 @@ export async function getIndexedEvents() {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.exists({
-    index: getEventIndexName()
+    index: getEventAliasName()
   })
 
   if (!hasEventsIndex) {
-    // @TODO: We probably want to create the index on startup or as part of the deployment process.
-    // eslint-disable-next-line no-console
-    console.error('Events index does not exist. Creating one.')
-    await createIndex(getEventIndexName())
-
     return []
   }
 
   const response = await esClient.search({
-    index: getEventIndexName(),
+    index: getEventAliasName(),
     size: 10000,
     request_cache: false
   })

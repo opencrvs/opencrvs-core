@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux'
 import {
   EventIndex,
   ActionDocument,
+  getAllFields,
   SummaryConfig
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -21,7 +22,6 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
 import {
-  getAllFields,
   useEventConfiguration,
   useEventConfigurations
 } from '@client/v2-events/features/events/useEventConfiguration'
