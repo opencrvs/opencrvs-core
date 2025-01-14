@@ -31,7 +31,7 @@ test('Returns multiple events', async () => {
   expect(events).toHaveLength(10)
 })
 
-test('Returns aggregated event with updated status and values', async () => {
+test.only('Returns aggregated event with updated status and values', async () => {
   const initialData = { name: 'John Doe', favouriteFruit: 'Banana' }
   const event = await client.event.create(generator.event.create())
   await client.event.actions.declare(

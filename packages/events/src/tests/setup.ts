@@ -14,6 +14,7 @@ import { inject, vi } from 'vitest'
 import { createIndex } from '@events/service/indexing/indexing'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
+import { getAllFields } from '@opencrvs/commons'
 
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
@@ -26,11 +27,14 @@ vi.mock('@events/service/config/config', () => ({
 }))
 
 async function resetServer() {
-  // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
-  const { getEventIndexName } = await import('@events/storage/elasticsearch')
-  const index = 'events' + Date.now() + Math.random()
+  const { getEventIndexName, getEventAliasName } = await import(
+    // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
+    '@events/storage/elasticsearch'
+  )
+  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
   getEventIndexName.mockReturnValue(index)
-  await createIndex(index)
+  getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
+  await createIndex(index, getAllFields(tennisClubMembershipEvent))
 }
 
 beforeEach(async () => {

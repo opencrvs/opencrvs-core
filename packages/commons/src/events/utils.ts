@@ -13,7 +13,7 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { flattenDeep } from 'lodash'
-import { EventConfigInput } from './EventConfig'
+import { EventConfig, EventConfigInput } from './EventConfig'
 import { SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldType } from './FieldConfig'
@@ -99,4 +99,10 @@ export const resolveFieldLabels = ({
       refFields: config.fields
     })
   }
+}
+
+export function getAllFields(configuration: EventConfig) {
+  return configuration.actions
+    .flatMap((action) => action.forms.filter((form) => form.active))
+    .flatMap((form) => form.pages.flatMap((page) => page.fields))
 }

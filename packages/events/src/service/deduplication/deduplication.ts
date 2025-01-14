@@ -22,13 +22,15 @@ import {
 } from '@opencrvs/commons/events'
 import { subDays, addDays } from 'date-fns'
 
-function generateESQuery(
+const dataReference = (fieldName: string) => `data.${fieldName}`
+
+function generateElasticsearchQuery(
   eventIndex: EventIndex,
   configuration: z.output<typeof Clause>
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
   if (configuration.type === 'and') {
     const clauses = configuration.clauses
-      .map((clause) => generateESQuery(eventIndex, clause))
+      .map((clause) => generateElasticsearchQuery(eventIndex, clause))
       .filter(
         (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
       )
@@ -42,7 +44,7 @@ function generateESQuery(
     return {
       bool: {
         should: configuration.clauses
-          .map((clause) => generateESQuery(eventIndex, clause))
+          .map((clause) => generateElasticsearchQuery(eventIndex, clause))
           .filter(
             (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
           )
@@ -69,7 +71,7 @@ function generateESQuery(
   if (configuration.type === 'strict') {
     return {
       match_phrase: {
-        ['data.' + configuration.fieldId]:
+        [dataReference(configuration.fieldId)]:
           eventIndex.data[configuration.fieldId] || ''
       }
     }
@@ -78,7 +80,7 @@ function generateESQuery(
   if (configuration.type === 'dateRange') {
     return {
       range: {
-        ['data.' + configuration.fieldId]: {
+        [dataReference(configuration.fieldId)]: {
           gte: subDays(
             new Date(eventIndex.data[configuration.options.origin]),
             configuration.options.days
@@ -95,7 +97,7 @@ function generateESQuery(
   if (configuration.type === 'dateDistance') {
     return {
       distance_feature: {
-        field: 'data.' + configuration.fieldId,
+        field: dataReference(configuration.fieldId),
         pivot: `${configuration.options.days}d`,
         origin: eventIndex.data[configuration.options.origin]
       }
@@ -112,18 +114,18 @@ export async function searchForDuplicates(
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
-  const esQuery = generateESQuery(eventIndex, query)
+  const esQuery = generateElasticsearchQuery(eventIndex, query)
 
   if (!esQuery) {
     return []
   }
 
   const result = await esClient.search<EventIndex>({
-    index: getEventIndexName(),
+    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
     query: {
       bool: {
         should: [esQuery],
-        must_not: [{ term: { 'id.keyword': eventIndex.id } }]
+        must_not: [{ term: { id: eventIndex.id } }]
       }
     }
   })

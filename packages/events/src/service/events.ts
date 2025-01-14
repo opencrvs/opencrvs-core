@@ -90,7 +90,7 @@ export async function deleteEvent(
 
   const { id } = event
   await collection.deleteOne({ id })
-  await deleteEventIndex(id)
+  await deleteEventIndex(event)
   return { id }
 }
 
@@ -253,7 +253,7 @@ export async function validate(
   const form = config.find((config) => config.id === storedEvent.type)
 
   if (!form) {
-    throw new Error('Form not found')
+    throw new Error(`Form not found with event type: ${storedEvent.type}`)
   }
   let duplicates: EventIndex[] = []
 
@@ -265,8 +265,8 @@ export async function validate(
         {
           ...input,
           createdAt: new Date().toISOString(),
-          createdBy: '-',
-          createdAtLocation: '-'
+          createdBy,
+          createdAtLocation
         }
       ]
     })

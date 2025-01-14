@@ -27,9 +27,11 @@ const FuzzyMatcher = Matcher.extend({
   type: z.literal('fuzzy'),
   options: z
     .object({
-      // Names of length of 3 or less characters = 0 edits allowed
-      // Names of length of 4 - 6 characters = 1 edit allowed
-      // Names of length of >7 characters = 2 edits allowed
+      /**
+       * Names of length 3 or less characters = 0 edits allowed
+       * Names of length 4 - 6 characters = 1 edit allowed
+       * Names of length >7 characters = 2 edits allowed
+       */
       fuzziness: z
         .union([z.string(), z.number()])
         .optional()
