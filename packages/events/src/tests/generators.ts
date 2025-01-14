@@ -68,6 +68,7 @@ export function payloadGenerator() {
         type: ActionType.VALIDATE,
         transactionId: input?.transactionId ?? getUUID(),
         data: input?.data ?? {},
+        duplicates: [],
         eventId
       })
     }
