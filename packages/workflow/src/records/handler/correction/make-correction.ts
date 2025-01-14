@@ -33,7 +33,10 @@ import { createRoute } from '@workflow/states'
 import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, updateFullUrl } from './utils'
+<<<<<<< HEAD
 import { SCOPES } from '@opencrvs/commons/authentication'
+=======
+>>>>>>> f0917d9e9 (fix: replace temporary url with actual ones in correct record flow)
 
 export const makeCorrectionRoute = createRoute({
   method: 'POST',
