@@ -51,13 +51,13 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.Birth,
+              event: EventType.Birth,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
             intlEngish
           )
-        ).toBe('Hoque Mushraful')
+        ).toBe('Mushraful Hoque')
       })
       it('Returns child English name properly even though localed is Bangla', () => {
         expect(
@@ -77,7 +77,7 @@ describe('draftUtils tests', () => {
             },
             intlBangla
           )
-        ).toBe('Hoque Mushraful')
+        ).toBe('Mushraful Hoque')
       })
     })
     describe('Death event', () => {
@@ -93,7 +93,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.Death,
+              event: EventType.Death,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
@@ -120,7 +120,7 @@ describe('draftUtils tests', () => {
             },
             intlEngish
           )
-        ).toBe('Hoque Mushraful')
+        ).toBe('Mushraful Hoque')
       })
     })
   })
