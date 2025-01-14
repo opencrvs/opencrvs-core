@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import uniq from 'lodash-es/uniq'
-import isString from 'lodash-es/isString'
-import get from 'lodash-es/get'
+import { uniq, isString, get } from 'lodash'
 import { ResolvedUser, ActionDocument } from '@opencrvs/commons/client'
 
 /**
