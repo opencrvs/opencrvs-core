@@ -14,12 +14,11 @@ import { cleanEnv, url, str } from 'envalid'
 /**
  * When defining variables aim to be consistent with existing values.
  * Define URLs without trailing slashes.
- * @TODO: Ensure that cleanEnv throws on production mode.
  */
 export const env = cleanEnv(process.env, {
   EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
   USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
-  // NOTE: E2E TEST ENVIRONMENT GENERATES STRINGS THAT ARE NOT VALID URLS
+  // @TODO: Check if str is needed is needed due e2e environment urls
   ES_HOST: str({ devDefault: 'http://localhost:9200' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
