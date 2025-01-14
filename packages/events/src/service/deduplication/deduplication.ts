@@ -9,8 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getOrCreateClient } from '@events/storage/__mocks__/elasticsearch'
-import { getEventIndexName } from '@events/storage/elasticsearch'
+import {
+  getOrCreateClient,
+  getEventIndexName
+} from '@events/storage/elasticsearch'
 import * as elasticsearch from '@elastic/elasticsearch'
 import { z } from 'zod'
 import {
@@ -121,7 +123,7 @@ export async function searchForDuplicates(
     query: {
       bool: {
         should: [esQuery],
-        must_not: [{ term: { id: eventIndex.id } }]
+        must_not: [{ term: { 'id.keyword': eventIndex.id } }]
       }
     }
   })
@@ -129,7 +131,7 @@ export async function searchForDuplicates(
   return result.hits.hits
     .filter((hit) => hit._source)
     .map((hit) => ({
-      score: hit._score,
+      score: hit._score || 0,
       event: hit._source!
     }))
 }

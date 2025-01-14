@@ -250,7 +250,7 @@ export async function validate(
 ) {
   const config = await getEventConfigurations(token)
   const storedEvent = await getEventById(eventId)
-  const form = config.find((config) => config.id === event.type)
+  const form = config.find((config) => config.id === storedEvent.type)
 
   if (!form) {
     throw new Error('Form not found')
@@ -265,15 +265,29 @@ export async function validate(
         {
           ...input,
           createdAt: new Date().toISOString(),
-          createdBy: '234',
-          createdAtLocation: '234'
+          createdBy: '-',
+          createdAtLocation: '-'
         }
       ]
     })
 
-    duplicates = (
-      await searchForDuplicates(futureEventState, form.deduplication)
-    ).map((hit) => hit.event)
+    const resultsFromAllRules = await Promise.all(
+      form.deduplication.map(async (deduplication) => {
+        const duplicates = await searchForDuplicates(
+          futureEventState,
+          deduplication
+        )
+        return duplicates
+      })
+    )
+
+    duplicates = resultsFromAllRules
+      .flat()
+      .sort((a, b) => b.score - a.score)
+      .map((hit) => hit.event)
+      .filter((event, index, self) => {
+        return self.findIndex((t) => t.id === event.id) === index
+      })
   }
 
   const event = await addAction(

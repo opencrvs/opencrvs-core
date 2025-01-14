@@ -31,7 +31,7 @@ export const EventConfig = z.object({
   label: TranslationConfig,
   actions: z.array(ActionConfig),
   workqueues: z.array(WorkqueueConfig),
-  deduplication: DeduplicationConfig.optional()
+  deduplication: z.array(DeduplicationConfig).optional().default([])
 })
 
 export const EventConfigInput = EventConfig.extend({

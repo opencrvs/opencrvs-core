@@ -12,11 +12,6 @@ import * as elasticsearch from '@elastic/elasticsearch'
 import { inject, vi } from 'vitest'
 
 export const getEventIndexName = vi.fn()
-declare module 'vitest' {
-  export interface ProvidedContext {
-    ELASTICSEARCH_URI: string
-  }
-}
 
 export function getOrCreateClient() {
   return new elasticsearch.Client({
