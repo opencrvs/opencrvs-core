@@ -92,10 +92,9 @@ services:
       - EVENTS_MONGO_URL=mongodb://mongo1/events
       - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - ES_HOST=elasticsearch:9200
-      - COUNTRY_CONFIG_URL=http://countryconfig:3040/
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
-      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
-
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION}
