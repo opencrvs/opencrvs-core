@@ -11,6 +11,8 @@
 import { JSONSchema } from '@opencrvs/commons/conditionals'
 import { ActionDocument } from '@opencrvs/commons/events'
 
+export * as deduplication from './deduplication'
+
 export function defineConditional(conditional: JSONSchema): JSONSchema {
   return conditional
 }

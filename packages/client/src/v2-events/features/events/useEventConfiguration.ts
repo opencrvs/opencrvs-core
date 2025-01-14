@@ -20,12 +20,6 @@ export function useEventConfigurations() {
   return config
 }
 
-export function getAllFields(configuration: EventConfig) {
-  return configuration.actions
-    .flatMap((action) => action.forms.filter((form) => form.active))
-    .flatMap((form) => form.pages.flatMap((page) => page.fields))
-}
-
 /**
  * Fetches configured events and finds a matching event
  * @param eventIdentifier e.g. 'birth', 'death', 'marriage' or any configured event

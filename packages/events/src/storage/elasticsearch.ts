@@ -23,3 +23,11 @@ export const getOrCreateClient = () => {
 
   return client
 }
+
+export function getEventAliasName() {
+  return `events`
+}
+
+export function getEventIndexName(eventType: string) {
+  return `events_${eventType}`.toLowerCase()
+}
