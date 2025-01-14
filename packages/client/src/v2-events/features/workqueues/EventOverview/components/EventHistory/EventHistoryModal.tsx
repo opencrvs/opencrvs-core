@@ -14,13 +14,9 @@ import format from 'date-fns/format'
 import { ResponsiveModal, Stack } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
 import { ActionDocument } from '@opencrvs/commons/client'
-
 import { ResolvedUser } from '@opencrvs/commons'
-import {
-  getUsersFullName,
-  HUMAN_READABLE_FULL_DATE_TIME,
-  joinValues
-} from '@client/v2-events/utils'
+import { getUsersFullName, joinValues } from '@client/v2-events/utils'
+import { messages } from './messages'
 
 /**
  * Detailed view of single Action, showing the history of the event.
@@ -34,7 +30,7 @@ export function EventHistoryModal({
 }: {
   history: ActionDocument
   user: ResolvedUser
-  close: any
+  close: () => void
 }) {
   const intl = useIntl()
 
@@ -54,7 +50,10 @@ export function EventHistoryModal({
           {joinValues(
             [
               name,
-              format(new Date(history.createdAt), HUMAN_READABLE_FULL_DATE_TIME)
+              format(
+                new Date(history.createdAt),
+                intl.formatMessage(messages['event.history.timeFormat'])
+              )
             ],
             ' — '
           )}

@@ -25,10 +25,10 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
-import { HUMAN_READABLE_FULL_DATE_TIME } from '@client/v2-events/utils'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { EventHistoryModal } from './EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
+import { messages } from './messages'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
@@ -50,7 +50,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
   const { getUser, getLocation } = useEventOverviewContext()
 
   const onHistoryRowClick = (item: ActionDocument, user: ResolvedUser) => {
-    void openModal<boolean | null>((close) => (
+    void openModal<void>((close) => (
       <EventHistoryModal close={close} history={item} user={user} />
     ))
   }
@@ -61,7 +61,10 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     const location = getLocation(item.createdAtLocation)
 
     return {
-      date: format(new Date(item.createdAt), HUMAN_READABLE_FULL_DATE_TIME),
+      date: format(
+        new Date(item.createdAt),
+        intl.formatMessage(messages['event.history.timeFormat'])
+      ),
       action: (
         <Link
           font="bold14"

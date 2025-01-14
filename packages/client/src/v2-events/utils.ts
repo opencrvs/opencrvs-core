@@ -13,11 +13,6 @@ import { uniq, isString, get } from 'lodash'
 import { ResolvedUser, ActionDocument } from '@opencrvs/commons/client'
 
 /**
- *  Human readable date format for full date and time (e.g. January 09, 2025 · 01.24 PM)
- */
-export const HUMAN_READABLE_FULL_DATE_TIME = 'MMMM dd, yyyy · hh.mm a'
-
-/**
  *
  * Joins defined values using a separator and trims the result
  */
