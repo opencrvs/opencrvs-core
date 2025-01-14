@@ -24,6 +24,12 @@ import {
   patchEvent
 } from '@events/service/events'
 import { presignFilesInEvent } from '@events/service/files'
+import {
+  getLocations,
+  Location,
+  setLocations
+} from '@events/service/locations/locations'
+import { Context, middleware } from './middleware/middleware'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
 import { EventConfig, getUUID } from '@opencrvs/commons'
 import {
@@ -34,14 +40,6 @@ import {
   RegisterActionInput,
   ValidateActionInput
 } from '@opencrvs/commons/events'
-
-const ContextSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    primaryOfficeId: z.string()
-  }),
-  token: z.string()
-})
 
 const validateEventType = ({
   eventTypes,
@@ -59,8 +57,6 @@ const validateEventType = ({
     })
   }
 }
-
-type Context = z.infer<typeof ContextSchema>
 
 export const t = initTRPC.context<Context>().create({
   transformer: superjson
@@ -171,8 +167,15 @@ export const appRouter = router({
     })
   }),
   events: router({
-    get: publicProcedure.output(z.array(EventIndex)).query(async () => {
-      return getIndexedEvents()
-    })
+    get: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
+  }),
+  locations: router({
+    set: publicProcedure
+      .use(middleware.isNationalSystemAdminUser)
+      .input(z.array(Location).min(1))
+      .mutation(async (options) => {
+        await setLocations(options.input)
+      }),
+    get: publicProcedure.output(z.array(Location)).query(getLocations)
   })
 })

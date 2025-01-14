@@ -15,6 +15,7 @@ import {
   getUUID,
   ActionType
 } from '@opencrvs/commons'
+import { Location } from '@events/service/locations/locations'
 
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
@@ -43,5 +44,24 @@ export function payloadGenerator() {
     }
   }
 
-  return { event }
+  const locations = {
+    /** Create test data by providing count or desired locations */
+    set: (input: Array<Partial<Location>> | number) => {
+      if (typeof input === 'number') {
+        return Array.from({ length: input }).map((_, i) => ({
+          id: getUUID(),
+          name: `Location name ${i}`,
+          partOf: null
+        }))
+      }
+
+      return input.map((location, i) => ({
+        id: location.id ?? getUUID(),
+        name: location.name ?? `Location name ${i}`,
+        partOf: null
+      }))
+    }
+  }
+
+  return { event, locations }
 }
