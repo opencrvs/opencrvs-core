@@ -202,6 +202,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   Location
 ])
 
+export type SelectField = z.infer<typeof Select>
 export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

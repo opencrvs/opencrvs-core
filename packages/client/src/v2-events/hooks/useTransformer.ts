@@ -9,11 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { useIntl } from 'react-intl'
 import { ActionFormData, findPageFields } from '@opencrvs/commons/client'
 import { fieldValueToString } from '@client/v2-events/components/forms/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 export const useTransformer = (eventType: string) => {
+  const intl = useIntl()
+
   const { eventConfiguration } = useEventConfiguration(eventType)
 
   const fields = findPageFields(eventConfiguration)
@@ -21,11 +24,18 @@ export const useTransformer = (eventType: string) => {
   const toString = (values: ActionFormData) => {
     const stringifiedValues: Record<string, string> = {}
     for (const [key, value] of Object.entries(values)) {
-      const fieldType = fields.find((field) => field.id === key)?.type
+      const fieldConfig = fields.find((field) => field.id === key)
+      const fieldType = fieldConfig?.type
       if (!fieldType) {
         throw new Error(`Field not found for ${key}`)
       }
-      stringifiedValues[key] = fieldValueToString(fieldType, value)
+
+      stringifiedValues[key] = fieldValueToString(
+        fieldType,
+        value,
+        intl,
+        fieldConfig.options
+      )
     }
     return stringifiedValues
   }

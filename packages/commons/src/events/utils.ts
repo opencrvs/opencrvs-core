@@ -16,7 +16,7 @@ import { flattenDeep } from 'lodash'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
-import { FieldType } from './FieldConfig'
+import { FieldType, SelectOption, SelectField } from './FieldConfig'
 
 const isMetadataField = <T extends string>(
   field: T | EventMetadataKeys
@@ -27,15 +27,22 @@ const isMetadataField = <T extends string>(
  */
 export const findPageFields = (
   config: EventConfigInput
-): Array<{ id: string; label: TranslationConfig; type: FieldType }> => {
+): Array<{
+  id: string
+  label: TranslationConfig
+  type: FieldType
+  options: SelectOption[] | undefined
+}> => {
   return flattenDeep(
     config.actions.map(({ forms }) =>
       forms.map(({ pages }) =>
         pages.map(({ fields }) =>
-          fields.map(({ id, label, type }) => ({
+          fields.map(({ id, label, type, ...field }) => ({
             id,
             label,
-            type
+            type,
+            options:
+              type === 'SELECT' ? (field as SelectField).options : undefined
           }))
         )
       )

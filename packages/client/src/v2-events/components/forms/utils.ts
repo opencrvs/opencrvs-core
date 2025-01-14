@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IntlShape } from 'react-intl'
 import {
   ActionFormData,
   BaseField,
@@ -16,7 +17,13 @@ import {
   FieldType,
   FieldValue,
   FieldTypeToFieldValue,
-  validate
+  validate,
+  SelectOption,
+  ParagraphFieldValue,
+  RadioGroupFieldValue,
+  DateFieldValue,
+  TextFieldValue,
+  SelectFieldValue
 } from '@opencrvs/commons/client'
 
 import { DependencyInfo } from '@client/forms'
@@ -30,6 +37,7 @@ import {
   radioGroupToString,
   textToString
 } from '@client/v2-events/features/events/registered-fields'
+import { selectFieldToString } from '@client/v2-events/features/events/registered-fields/Select'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -108,17 +116,21 @@ export function getInitialValues(fields: FieldConfig[]) {
 
 export function fieldValueToString<T extends FieldType>(
   field: T,
-  value: FieldTypeToFieldValue<T>
+  value: FieldTypeToFieldValue<T>,
+  intl: IntlShape,
+  options?: SelectOption[] | null
 ) {
   switch (field) {
     case FieldType.DATE:
-      return dateToString(value as FieldTypeToFieldValue<'DATE'>)
+      return dateToString(value as DateFieldValue)
     case FieldType.TEXT:
-      return textToString(value as FieldTypeToFieldValue<'TEXT'>)
+      return textToString(value as TextFieldValue)
     case FieldType.PARAGRAPH:
-      return paragraphToString(value as FieldTypeToFieldValue<'PARAGRAPH'>)
+      return paragraphToString(value as ParagraphFieldValue)
     case FieldType.RADIO_GROUP:
-      return radioGroupToString(value as FieldTypeToFieldValue<'RADIO_GROUP'>)
+      return radioGroupToString(value as RadioGroupFieldValue)
+    case FieldType.SELECT:
+      return selectFieldToString(value as SelectFieldValue, options, intl)
     default:
       return ''
   }

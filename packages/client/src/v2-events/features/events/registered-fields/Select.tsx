@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { IntlShape, MessageDescriptor, useIntl } from 'react-intl'
 import {
   FieldProps,
   SelectFieldValue,
@@ -45,4 +45,20 @@ export function Select({
       />
     </InputField>
   )
+}
+
+export const selectFieldToString = (
+  val: SelectFieldValue,
+  options: SelectOption[] | undefined | null,
+  intl: IntlShape
+) => {
+  if (!val) {
+    return ''
+  }
+  if (!options) {
+    return val as string
+  }
+
+  const selectedOption = options.find(({ value }) => value === val)
+  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
