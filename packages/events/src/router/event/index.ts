@@ -32,7 +32,6 @@ import {
   RegisterActionInput,
   ValidateActionInput
 } from '@opencrvs/commons/events'
-import { getReferenceIds } from '@events/service/events/utils'
 import { router, publicProcedure } from '@events/router/trpc'
 
 const validateEventType = ({
@@ -94,12 +93,7 @@ export const eventRouter = router({
       ctx.user.id
     )
 
-    const referenceIds = getReferenceIds(eventWithUserSpecificDrafts.actions)
-
-    return {
-      ...eventWithUserSpecificDrafts,
-      ...referenceIds
-    }
+    return eventWithUserSpecificDrafts
   }),
   delete: publicProcedure
     .input(z.object({ eventId: z.string() }))

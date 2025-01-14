@@ -18,11 +18,7 @@ test('event can be created and fetched', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent).toEqual({
-    ...event,
-    locationIds: [user.primaryOfficeId],
-    userIds: [user.id]
-  })
+  expect(fetchedEvent).toEqual(event)
 })
 
 test('creating an event is an idempotent operation', async () => {

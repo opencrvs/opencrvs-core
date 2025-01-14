@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ResolvedUser } from '@opencrvs/commons'
+import uniq from 'lodash-es/uniq'
+import isString from 'lodash-es/isString'
+import get from 'lodash-es/get'
+import { ResolvedUser, ActionDocument } from '@opencrvs/commons/client'
 
 /**
  *  Human readable date format for full date and time (e.g. January 09, 2025 · 01.24 PM)
@@ -37,4 +40,24 @@ export function getUsersFullName(
   const match = names.find((name) => name.use === language) ?? names[0]
 
   return joinValues([...match.given, match.family])
+}
+
+/** Utility to get all keys from union */
+type AllKeys<T> = T extends T ? keyof T : never
+
+/**
+ * @returns unique ids of users are referenced in the ActionDocument array.
+ * Used for fetching user data in bulk.
+ */
+export const getUserIdsFromActions = (actions: ActionDocument[]) => {
+  const userIdFields = [
+    'createdBy',
+    'assignedTo'
+  ] satisfies AllKeys<ActionDocument>[]
+
+  const userIds = actions.flatMap((action) =>
+    userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
+  )
+
+  return uniq(userIds)
 }

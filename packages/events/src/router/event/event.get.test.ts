@@ -28,11 +28,7 @@ test('Returns event', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent).toEqual({
-    ...event,
-    locationIds: [user.primaryOfficeId],
-    userIds: [user.id]
-  })
+  expect(fetchedEvent).toEqual(event)
 })
 
 test('Returns event with all actions', async () => {

@@ -32,6 +32,7 @@ import { useUsers } from '@client/v2-events/hooks/useUsers'
 // eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getUserIdsFromActions } from '@client/v2-events/utils'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
@@ -53,7 +54,8 @@ function EventOverviewContainer() {
   const [events] = getEvents.useSuspenseQuery()
   const event = events.find((e) => e.id === params.eventId)
 
-  const [users] = getUsers.useSuspenseQuery(fullEvent.userIds)
+  const userIds = getUserIdsFromActions(fullEvent.actions)
+  const [users] = getUsers.useSuspenseQuery(userIds)
   const locations = useSelector(getLocations)
 
   if (!event) {
