@@ -31,9 +31,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
           draft: false,
           data: {}
         } satisfies CreatedAction
-      ],
-      userIds: [],
-      locationIds: []
+      ]
     }
 
     utils.event.get.setData(newEvent.transactionId, optimisticEvent)
@@ -43,16 +41,8 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     return optimisticEvent
   },
   onSuccess: async (response) => {
-    utils.event.get.setData(response.id, {
-      ...response,
-      userIds: [],
-      locationIds: []
-    })
-    utils.event.get.setData(response.transactionId, {
-      ...response,
-      userIds: [],
-      locationIds: []
-    })
+    utils.event.get.setData(response.id, response)
+    utils.event.get.setData(response.transactionId, response)
     await utils.event.list.invalidate()
   }
 }))
