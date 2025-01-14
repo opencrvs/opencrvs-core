@@ -17,20 +17,20 @@ import { findPageFields, resolveFieldLabels } from './utils'
  * @param config - Event specific configuration
  */
 export const defineConfig = (config: EventConfigInput) => {
-  const parsed = EventConfig.parse(config)
+  const input = EventConfigInput.parse(config)
 
-  const pageFields = findPageFields(parsed).map(({ id, label }) => ({
+  const pageFields = findPageFields(input).map(({ id, label }) => ({
     id,
     label
   }))
 
   return EventConfig.parse({
-    ...parsed,
+    ...input,
     summary: resolveFieldLabels({
-      config: parsed.summary,
+      config: input.summary,
       pageFields
     }),
-    workqueues: parsed.workqueues.map((workqueue) =>
+    workqueues: input.workqueues.map((workqueue) =>
       resolveFieldLabels({
         config: workqueue,
         pageFields

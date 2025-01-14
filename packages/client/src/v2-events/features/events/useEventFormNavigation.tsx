@@ -12,6 +12,8 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { Button, ResponsiveModal, Stack, Text } from '@opencrvs/components'
+import { EventDocument } from '@opencrvs/commons'
+import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEvents } from './useEvents/useEvents'
@@ -63,7 +65,7 @@ export function useEventFormNavigation() {
     navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
   }
 
-  async function exit(eventId: string) {
+  async function exit(event: EventDocument) {
     const exitConfirm = await openModal<boolean | null>((close) => (
       <ResponsiveModal
         autoHeight
@@ -102,10 +104,13 @@ export function useEventFormNavigation() {
       </ResponsiveModal>
     ))
 
-    if (exitConfirm) {
-      deleteEvent.mutate({ eventId })
-      goToHome()
+    if (!exitConfirm) {
+      return
     }
+    if (isUndeclaredDraft(event)) {
+      deleteEvent.mutate({ eventId: event.id })
+    }
+    goToHome()
   }
 
   async function deleteDeclaration(eventId: string) {

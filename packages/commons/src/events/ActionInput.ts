@@ -16,6 +16,7 @@ import { FieldValue } from './FieldValue'
 const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
+  draft: z.boolean().optional().default(false),
   data: z.record(z.string(), FieldValue)
 })
 
@@ -49,14 +50,6 @@ export const NotifyActionInput = BaseActionInput.merge(
   })
 )
 
-export const DraftActionInput = BaseActionInput.merge(
-  z.object({
-    type: z.literal(ActionType.DRAFT).default(ActionType.DRAFT)
-  })
-)
-
-export type DraftActionInput = z.infer<typeof DraftActionInput>
-
 export const DeclareActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.DECLARE).default(ActionType.DECLARE)
@@ -88,7 +81,6 @@ const UnassignActionInput = BaseActionInput.merge(
 export const ActionInput = z.discriminatedUnion('type', [
   CreateActionInput,
   ValidateActionInput,
-  DraftActionInput,
   RegisterActionInput,
   NotifyActionInput,
   DeclareActionInput,
@@ -96,4 +88,5 @@ export const ActionInput = z.discriminatedUnion('type', [
   UnassignActionInput
 ])
 
-export type ActionInput = z.infer<typeof ActionInput>
+export type ActionInput = z.input<typeof ActionInput>
+export type ActionInputWithType = z.infer<typeof ActionInput>

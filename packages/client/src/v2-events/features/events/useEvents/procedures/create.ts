@@ -28,6 +28,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
           createdAtLocation: 'TODO',
+          draft: false,
           data: {}
         } satisfies CreatedAction
       ]

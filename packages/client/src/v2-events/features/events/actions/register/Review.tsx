@@ -22,6 +22,7 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { FormLayout } from '@client/v2-events/layouts/form'
 
 const messages = defineMessages({
   registerActionTitle: {
@@ -116,22 +117,35 @@ export function Review() {
   }
 
   return (
-    <ReviewComponent.Body
-      eventConfig={config}
-      form={form}
-      formConfig={formConfigs[0]}
-      title=""
-      onEdit={handleEdit}
+    <FormLayout
+      route={ROUTES.V2.EVENTS.REGISTER}
+      onSaveAndExit={() => {
+        events.actions.register.mutate({
+          eventId: event.id,
+          data: form,
+          transactionId: uuid(),
+          draft: true
+        })
+        goToHome()
+      }}
     >
-      <ReviewComponent.Actions
-        messages={{
-          title: messages.registerActionTitle,
-          description: messages.registerActionDescription,
-          onConfirm: messages.registerActionDeclare
-        }}
-        onConfirm={handleRegistration}
-      />
-      {modal}
-    </ReviewComponent.Body>
+      <ReviewComponent.Body
+        eventConfig={config}
+        form={form}
+        formConfig={formConfigs[0]}
+        title=""
+        onEdit={handleEdit}
+      >
+        <ReviewComponent.Actions
+          messages={{
+            title: messages.registerActionTitle,
+            description: messages.registerActionDescription,
+            onConfirm: messages.registerActionDeclare
+          }}
+          onConfirm={handleRegistration}
+        />
+        {modal}
+      </ReviewComponent.Body>
+    </FormLayout>
   )
 }

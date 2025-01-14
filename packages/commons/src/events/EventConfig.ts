@@ -11,7 +11,7 @@
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { SummaryConfig } from './SummaryConfig'
+import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
 import { FormConfig, FormConfigInput } from './FormConfig'
 
@@ -32,8 +32,12 @@ export const EventConfig = z.object({
   workqueues: z.array(WorkqueueConfig)
 })
 
+export const EventConfigInput = EventConfig.extend({
+  summary: SummaryConfigInput
+})
+
 export type EventConfig = z.infer<typeof EventConfig>
-export type EventConfigInput = z.input<typeof EventConfig>
+export type EventConfigInput = z.input<typeof EventConfigInput>
 
 export const defineForm = (form: FormConfigInput): FormConfig =>
   FormConfig.parse(form)

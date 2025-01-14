@@ -10,6 +10,7 @@
  */
 
 import React from 'react'
+import { useIntl } from 'react-intl'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
 import { EventIndex } from '@opencrvs/commons/client'
@@ -26,6 +27,7 @@ export function EventSummary({
   event: EventIndex
   summary: SummaryConfig
 }) {
+  const intl = useIntl()
   const { toString } = useTransformer(event.type)
   const data = toString(event.data)
   return (
@@ -36,9 +38,10 @@ export function EventSummary({
             <Summary.Row
               key={field.id}
               data-testid={field.id}
-              label={field.label?.defaultMessage ?? ''}
+              label={intl.formatMessage(field.label)}
               placeholder={
-                '@todo: These placeholder values need to be configurable like "No place of birth"'
+                field.emptyValueMessage &&
+                intl.formatMessage(field.emptyValueMessage)
               }
               value={data[field.id]}
             />

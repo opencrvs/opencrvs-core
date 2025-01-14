@@ -13,14 +13,7 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { z } from 'zod'
 
-import {
-  DeclareActionInput,
-  EventIndex,
-  EventInput,
-  NotifyActionInput,
-  DraftActionInput,
-  RegisterActionInput
-} from '@opencrvs/commons/events'
+import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
 import { getEventConfigurations } from '@events/service/config/config'
 import {
   addAction,
@@ -30,17 +23,23 @@ import {
   getEventById,
   patchEvent
 } from '@events/service/events'
-import { EventConfig, getUUID } from '@opencrvs/commons'
-import { getIndexedEvents } from '@events/service/indexing/indexing'
 import { presignFilesInEvent } from '@events/service/files'
-
-const ContextSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    primaryOfficeId: z.string()
-  }),
-  token: z.string()
-})
+import {
+  getLocations,
+  Location,
+  setLocations
+} from '@events/service/locations/locations'
+import { Context, middleware } from './middleware/middleware'
+import { getIndexedEvents } from '@events/service/indexing/indexing'
+import { EventConfig, getUUID } from '@opencrvs/commons'
+import {
+  DeclareActionInput,
+  EventIndex,
+  EventInput,
+  NotifyActionInput,
+  RegisterActionInput,
+  ValidateActionInput
+} from '@opencrvs/commons/events'
 
 const validateEventType = ({
   eventTypes,
@@ -58,8 +57,6 @@ const validateEventType = ({
     })
   }
 }
-
-type Context = z.infer<typeof ContextSchema>
 
 export const t = initTRPC.context<Context>().create({
   transformer: superjson
@@ -110,7 +107,11 @@ export const appRouter = router({
     get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-      return eventWithSignedFiles
+      const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
+        eventWithSignedFiles,
+        ctx.user.id
+      )
+      return eventWithUserSpecificDrafts
     }),
     delete: publicProcedure
       .input(z.object({ eventId: z.string() }))
@@ -126,14 +127,6 @@ export const appRouter = router({
           token: options.ctx.token
         })
       }),
-      draft: publicProcedure.input(DraftActionInput).mutation((options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
-        })
-      }),
       declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
         return addAction(options.input, {
           eventId: options.input.eventId,
@@ -142,6 +135,16 @@ export const appRouter = router({
           token: options.ctx.token
         })
       }),
+      validate: publicProcedure
+        .input(ValidateActionInput)
+        .mutation((options) => {
+          return addAction(options.input, {
+            eventId: options.input.eventId,
+            createdBy: options.ctx.user.id,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
+            token: options.ctx.token
+          })
+        }),
       register: publicProcedure
         .input(RegisterActionInput.omit({ identifiers: true }))
         .mutation((options) => {
@@ -164,8 +167,15 @@ export const appRouter = router({
     })
   }),
   events: router({
-    get: publicProcedure.output(z.array(EventIndex)).query(async () => {
-      return getIndexedEvents()
-    })
+    get: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
+  }),
+  locations: router({
+    set: publicProcedure
+      .use(middleware.isNationalSystemAdminUser)
+      .input(z.array(Location).min(1))
+      .mutation(async (options) => {
+        await setLocations(options.input)
+      }),
+    get: publicProcedure.output(z.array(Location)).query(getLocations)
   })
 })

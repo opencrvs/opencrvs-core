@@ -220,6 +220,7 @@ export async function seedLocations(token: string) {
       )
     )
   ).flat()
+
   const savedLocationsSet = new Set(savedLocations)
   const locations = (await getLocations()).filter((location) => {
     return !savedLocationsSet.has(location.id)
@@ -251,4 +252,42 @@ export async function seedLocations(token: string) {
       )
     }
   })
+}
+
+function updateLocationPartOf(partOf: string) {
+  const locationPrefix = 'Location/'
+
+  const parent = partOf.replace(locationPrefix, '')
+
+  if (parent === '0') {
+    return null
+  }
+
+  return parent
+}
+
+export async function seedLocationsForV2Events(token: string) {
+  const locations = await getLocations()
+
+  const simplifiedLocations = locations.map((location) => ({
+    id: location.id,
+    name: location.name,
+    partOf: updateLocationPartOf(location.partOf)
+  }))
+
+  // NOTE: TRPC expects certain format, which may seem unconventional.
+  const res = await fetch(`${env.GATEWAY_HOST}/events/locations.set`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ json: simplifiedLocations })
+  })
+
+  if (!res.ok) {
+    console.error(
+      'Unable to seed locations for v2 events. Ensure events service is running.'
+    )
+  }
 }
