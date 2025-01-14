@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useEffect, useState } from 'react'
-import { FieldProps, FieldValue, SelectOption } from '@opencrvs/commons'
+import {
+  LocationFieldValue,
+  FieldProps,
+  SelectOption
+} from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import { Select } from './Select'
 
@@ -42,9 +46,9 @@ export function Location({
   partOf,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: FieldValue | undefined) => void
+  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
   partOf: string | null
-  value?: string
+  value?: LocationFieldValue
 }) {
   const [options, setOptions] = useState<SelectOption[]>([])
 

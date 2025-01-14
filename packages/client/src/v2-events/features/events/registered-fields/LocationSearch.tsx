@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useEffect, useState } from 'react'
-import { FieldProps, FieldValue } from '@opencrvs/commons'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
+import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import { ILocation } from './Location'
 
@@ -30,8 +30,8 @@ export function LocationSearch({
   value,
   ...props
 }: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: FieldValue | undefined) => void
-  value?: string
+  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
+  value?: LocationFieldValue
 }) {
   const [options, setOptions] = useState<SearchLocation[]>([])
   const [loadingStatus, setLoadingStatus] = useState<

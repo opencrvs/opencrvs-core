@@ -10,9 +10,12 @@
  */
 import React from 'react'
 import { MessageDescriptor, useIntl } from 'react-intl'
-import { FieldProps } from '@opencrvs/commons'
+import {
+  FieldProps,
+  SelectFieldValue,
+  SelectOption
+} from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
-import { SelectOption } from '@opencrvs/commons/client'
 import { InputField } from '@client/components/form/InputField'
 
 export function Select({
@@ -21,8 +24,8 @@ export function Select({
   value,
   ...props
 }: FieldProps<'SELECT'> & {
-  onChange: (newValue: string) => void
-  value?: string
+  onChange: (newValue: SelectFieldValue) => void
+  value?: SelectFieldValue
 }) {
   const intl = useIntl()
   const { options } = props

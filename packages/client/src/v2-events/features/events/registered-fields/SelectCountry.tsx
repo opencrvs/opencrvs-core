@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { FieldProps, FieldValue, SelectOption } from '@opencrvs/commons'
+import {
+  FieldProps,
+  SelectFieldValue,
+  SelectOption
+} from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
 import { Select } from './Select'
 
@@ -18,8 +22,8 @@ export function SelectCountry({
   value,
   ...props
 }: FieldProps<'COUNTRY'> & {
-  setFieldValue: (name: string, val: FieldValue | undefined) => void
-  value?: string
+  setFieldValue: (name: string, val: SelectFieldValue | undefined) => void
+  value?: SelectFieldValue
 }) {
   return (
     <Select
