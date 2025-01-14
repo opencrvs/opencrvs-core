@@ -161,7 +161,7 @@ export async function indexEvent(event: EventDocument) {
   })
 }
 
-export async function ensureIndexExists(
+async function ensureIndexExists(
   eventType: string,
   configuration: EventConfig
 ) {
