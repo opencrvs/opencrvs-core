@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from './ActionConfig'
 import { z } from 'zod'
+import { ActionType } from './ActionConfig'
 import { FieldValue } from './FieldValue'
 
 const BaseActionInput = z.object({
@@ -39,7 +39,8 @@ export const RegisterActionInput = BaseActionInput.merge(
 
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
+    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE),
+    duplicates: z.array(z.string())
   })
 )
 
