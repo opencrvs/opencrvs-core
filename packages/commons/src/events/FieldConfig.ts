@@ -176,17 +176,19 @@ const Country = BaseField.extend({
   type: z.literal(FieldType.COUNTRY)
 }).describe('Country select field')
 
+const LocationOptions = z.object({
+  partOf: z
+    .object({
+      $data: z.string()
+    })
+    .optional()
+    .describe('Parent location'),
+  type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
+})
+
 const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  options: z.object({
-    partOf: z
-      .object({
-        $data: z.string()
-      })
-      .optional()
-      .describe('Parent location'),
-    type: z.enum(['ADMIN_STRUCTURE', 'HEALTH_FACILITY', 'CRVS_OFFICE'])
-  })
+  options: LocationOptions
 }).describe('Location input field')
 
 export const FieldConfig = z.discriminatedUnion('type', [
@@ -203,8 +205,10 @@ export const FieldConfig = z.discriminatedUnion('type', [
 ])
 
 export type SelectField = z.infer<typeof Select>
+export type LocationField = z.infer<typeof Location>
 export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
+export type LocationOptions = z.infer<typeof LocationOptions>
 export type FieldConditional = z.infer<typeof FieldConditional>

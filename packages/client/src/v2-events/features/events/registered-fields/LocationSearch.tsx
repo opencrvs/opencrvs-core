@@ -45,9 +45,11 @@ export function LocationSearch({
     const fetchOfflineData = async () => {
       const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
 
-      const facilities = offlineData.facilities as Facility[]
+      const facilities = Object.values(
+        offlineData.facilities as Record<string, Facility>
+      ) as Facility[]
 
-      const locations = Object.values(facilities).map((facility) => ({
+      const locations = facilities.map((facility) => ({
         id: facility.id,
         searchableText: facility.name,
         displayLabel: facility.alias
@@ -82,4 +84,17 @@ export function LocationSearch({
       }
     />
   )
+}
+
+export const searchLocationFieldToString = async (val: LocationFieldValue) => {
+  if (!val) {
+    return ''
+  }
+  const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
+
+  const facilities = Object.values(
+    offlineData.facilities as Record<string, Facility>
+  ) as Facility[]
+
+  return facilities.find(({ id }) => id === val)?.name ?? val
 }
