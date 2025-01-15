@@ -35,7 +35,7 @@ export function Select({
   return (
     <InputField {...props} label={intl.formatMessage(label)} touched={false}>
       <SelectComponent
-        label={'Gender'}
+        label={intl.formatMessage(label)}
         options={formattedOptions}
         value={value ?? ''}
         onChange={onChange}
