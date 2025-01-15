@@ -127,13 +127,22 @@ const DateField = BaseField.extend({
     .optional()
 }).describe('A single date input (dd-mm-YYYY)')
 
+const HTMLFontVariant = z.enum([
+  'reg12',
+  'reg14',
+  'reg16',
+  'reg18',
+  'h4',
+  'h3',
+  'h2',
+  'h1'
+])
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   options: z
     .object({
-      fontVariant: z
-        .enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
-        .optional()
+      fontVariant: HTMLFontVariant.optional()
     })
     .default({})
 }).describe('A read-only HTML <p> paragraph')
@@ -155,7 +164,7 @@ const RadioGroup = BaseField.extend({
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
   items: z.array(TranslationConfig).describe('A list of items'),
-  font: z.enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
+  font: HTMLFontVariant.optional()
 }).describe('A list of bullet points')
 
 const SelectOption = z.object({
