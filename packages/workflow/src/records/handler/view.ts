@@ -32,8 +32,9 @@ export async function viewRecordHandler(
       ...viewedRecord.entry.filter(
         (e) =>
           e.resource.resourceType === 'Task' ||
+          /* PractitionerRole needs to exist in bundle it's needed for creating history of a record */
           e.resource.resourceType === 'PractitionerRole'
-      )!
+      )
     ]
   }
 
