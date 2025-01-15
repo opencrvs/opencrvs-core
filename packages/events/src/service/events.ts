@@ -25,7 +25,7 @@ import { z } from 'zod'
 import { deleteEventIndex, indexEvent } from './indexing/indexing'
 import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
-import { getEventConfigurations } from './config/config'
+import { getEventConfigurations, notifyOnAction } from './config/config'
 import { deleteFile, fileExists } from './files'
 import { searchForDuplicates } from './deduplication/deduplication'
 
@@ -231,6 +231,7 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
+  await notifyOnAction(input, updatedEvent, token)
   return updatedEvent
 }
 

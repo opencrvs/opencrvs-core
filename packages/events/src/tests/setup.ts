@@ -19,6 +19,7 @@ import { getAllFields } from '@opencrvs/commons'
 vi.mock('@events/storage/mongodb')
 vi.mock('@events/storage/elasticsearch')
 vi.mock('@events/service/config/config', () => ({
+  notifyOnAction: () => Promise.resolve(),
   getEventConfigurations: () =>
     Promise.all([
       tennisClubMembershipEvent,
