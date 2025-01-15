@@ -379,7 +379,7 @@ export async function toDownloaded(
   token: string
 ): Promise<{
   downloadedRecord: ValidRecord
-  downloadedRecordWithTaskOnly: Bundle<SavedTask>
+  downloadedBundleWithResources: Bundle<SavedTask>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitionerDetails = createDownloadTask(previousTask)
@@ -401,9 +401,26 @@ export async function toDownloaded(
     resource: downloadedTask
   }
 
+  const tokenPayload = getTokenPayload(token)
+  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
+  const practitionerId = userDetails.practitionerId
+  const practitionerRoleBundle = await getPractitionerRoleByPractitionerId(
+    practitionerId as UUID
+  )
+  /* 
+    When a user tries to access a record for the first time,
+    practitionerRoleBundle is necessary to create the history of the record  
+  */
+  const practitionerRoleEntry = practitionerRoleBundle.entry[0]
+
   const updatedBundle = {
     ...record,
-    entry: [...filteredEntriesWithoutTask, newTaskEntry, taskHistoryEntry]
+    entry: [
+      ...filteredEntriesWithoutTask,
+      newTaskEntry,
+      taskHistoryEntry,
+      practitionerRoleEntry
+    ]
   }
 
   const downloadedRecord = mergeBundles(
@@ -411,13 +428,16 @@ export async function toDownloaded(
     practitionerDetailsBundle
   ) as ValidRecord
 
-  const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
+  const downloadedBundleWithResources: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [{ resource: downloadedTask }]
+    entry: [
+      { resource: downloadedTask },
+      { resource: practitionerRoleEntry.resource }
+    ]
   }
 
-  return { downloadedRecord, downloadedRecordWithTaskOnly }
+  return { downloadedRecord, downloadedBundleWithResources }
 }
 
 export async function toRejected(

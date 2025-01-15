@@ -47,10 +47,8 @@ export async function downloadRecordHandler(
     throw new Error("Task didn't have any status. This should never happen")
   }
 
-  const { downloadedRecordWithTaskOnly, downloadedRecord } = await toDownloaded(
-    record,
-    token
-  )
+  const { downloadedBundleWithResources, downloadedRecord } =
+    await toDownloaded(record, token)
 
   const assignment = findAssignment(record)
   if (assignment) {
@@ -69,7 +67,7 @@ export async function downloadRecordHandler(
   process.nextTick(async () => {
     try {
       // Here the sent bundle is saved with task only
-      await sendBundleToHearth(downloadedRecordWithTaskOnly)
+      await sendBundleToHearth(downloadedBundleWithResources)
       await auditEvent('assigned', downloadedRecord, token)
 
       await indexBundleToRoute(downloadedRecord, token, '/events/assigned')
