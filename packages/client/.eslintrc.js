@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 module.exports = {
-  extends: [
-    '../../.eslintrc.js',
-    'eslint-config-react-app',
-    'plugin:react/recommended'
-  ],
+  extends: ['../../.eslintrc.js', 'eslint-config-react-app', 'plugin:react/recommended', 'plugin:storybook/recommended', 'plugin:storybook/recommended'],
   plugins: ['react', 'formatjs'],
   env: {
     es6: true,
