@@ -18,5 +18,7 @@ const client = new MongoClient(url)
 export async function getClient() {
   await client.connect()
 
-  return client.db('events')
+  // Providing the database name is not necessary, it will read it from the connection string.
+  // e2e-environment uses different name from deployment to deployment, so we can't hardcode it.
+  return client.db()
 }
