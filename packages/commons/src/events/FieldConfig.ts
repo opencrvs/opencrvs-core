@@ -52,7 +52,7 @@ const FieldConditional = z.discriminatedUnion('type', [
 
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(FieldConditional).optional().default([]),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   initialValue: z
     .union([
       z.string(),
