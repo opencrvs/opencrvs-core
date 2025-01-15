@@ -15,6 +15,7 @@ import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { RadioGroup } from '@opencrvs/components/lib/Radio'
 import * as React from 'react'
 
 import styled, { keyframes } from 'styled-components'
@@ -233,7 +234,22 @@ const GeneratedInputField = React.memo(
         />
       )
     }
-    return <div>Unsupported field type {fieldDefinition.type}</div>
+    if (fieldDefinition.type === 'RADIO_GROUP') {
+      return (
+        <InputField {...inputFieldProps}>
+          <RadioGroup
+            {...inputProps}
+            onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+            options={fieldDefinition.options.map((x) => ({
+              label: intl.formatMessage(x.label),
+              value: x.value
+            }))}
+            value={inputProps.value as string}
+          />
+        </InputField>
+      )
+    }
+    // return <div>Unsupported field type {fieldDefinition.type}</div>
   }
 )
 
