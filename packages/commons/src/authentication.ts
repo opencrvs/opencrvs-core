@@ -64,7 +64,8 @@ const systemScopes = {
   notificationApi: 'notification-api',
   webhook: 'webhook',
   nationalId: 'nationalId',
-  selfServicePortal: 'self-service-portal'
+  selfServicePortal: 'self-service-portal',
+  certify: 'certify'
 } as const
 
 export const systemRoleScopes = {
@@ -72,7 +73,11 @@ export const systemRoleScopes = {
   NATIONAL_ID: [systemScopes.nationalId],
   RECORD_SEARCH: [systemScopes.recordsearch],
   WEBHOOK: [systemScopes.webhook],
-  SELF_SERVICE_PORTAL: [systemScopes.selfServicePortal]
+  SELF_SERVICE_PORTAL: [
+    systemScopes.declare,
+    systemScopes.certify,
+    systemScopes.selfServicePortal
+  ]
 }
 
 export type UserRole = keyof typeof userRoleScopes
