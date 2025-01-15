@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 export * from './ActionConfig'
+export * from './AppConfig'
 export * from './EventConfig'
 export * from './FieldConfig'
 export * from './FormConfig'
