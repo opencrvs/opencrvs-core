@@ -38,7 +38,7 @@ import {
   NATIONAL_ID
 } from '@client/utils/constants'
 import { IconProps } from '@opencrvs/components/lib'
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons/client'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'

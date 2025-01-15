@@ -45,7 +45,7 @@ import { advancedSearchInitialState } from '@client/search/advancedSearch/reduce
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons/client'
 
 enum TabId {
   BIRTH = 'birth',

@@ -14,5 +14,7 @@ export * from './scopes'
 export * from './conditionals/conditionals'
 export * from './conditionals/validate'
 export * from './documents'
+export * from './uuid'
+export { DEFAULT_ROLES_DEFINITION } from './authentication'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>

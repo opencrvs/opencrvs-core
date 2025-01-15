@@ -52,7 +52,7 @@ import {
   RejectedRecord,
   SupportedPatientIdentifierCode
 } from '@opencrvs/commons/types'
-import { getUUID, logger, UUID } from '@opencrvs/commons'
+import { getTokenPayload, getUUID, logger, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -109,6 +109,10 @@ import {
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 import { tokenExchangeHandler } from './token-exchange-handler'
+import {
+  getPractitionerRoleByPractitionerId,
+  getUser
+} from '@workflow/features/user/utils'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -303,6 +307,13 @@ export async function toViewed<T extends ValidRecord>(
     toHistoryResource(previousTask)
   ) as SavedBundleEntry<TaskHistory>
 
+  const tokenPayload = getTokenPayload(token)
+  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
+  const practitionerId = userDetails.practitionerId
+  const practitionerRoleBundle = await getPractitionerRoleByPractitionerId(
+    practitionerId as UUID
+  )
+
   const filteredEntries = record.entry.filter(
     (e) => e.resource.resourceType !== 'Task'
   )
@@ -318,7 +329,11 @@ export async function toViewed<T extends ValidRecord>(
         )[0].fullUrl,
         resource: viewedTask
       },
-      taskHistoryEntry
+      taskHistoryEntry,
+      /*  PractitionerRole resource is saved in the bundle 
+      since PractitionerRole is fetched from bundle
+      in the resolvers during readying history of a record */
+      practitionerRoleBundle.entry[0]
     ]
   } as T
 

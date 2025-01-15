@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Scope, SCOPES } from '@opencrvs/commons/client'
+import {
+  Scope,
+  SCOPES,
+  DEFAULT_ROLES_DEFINITION
+} from '@opencrvs/commons/client'
 import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -17,7 +21,6 @@ import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from 'styled-components'
 import { getSchema } from '@client/tests/graphql-schema-mock'
-import { DEFAULT_ROLES_DEFINITION } from '@opencrvs/commons/authentication'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { join } from 'path'
