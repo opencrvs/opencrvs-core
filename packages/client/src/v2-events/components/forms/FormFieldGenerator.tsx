@@ -55,6 +55,7 @@ import { Select } from '@client/v2-events/features/events/registered-fields/Sele
 import { countries } from '@client/utils/countries'
 import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { formatISO } from 'date-fns'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -403,7 +404,7 @@ class FormSectionComponent extends React.Component<AllProps> {
             field,
             {
               $form: makeFormikFieldIdsOpenCRVSCompatible(values),
-              $now: new Date().toISOString().split('T')[0]
+              $now: formatISO(new Date(), { representation: 'date' })
             }
           )
 

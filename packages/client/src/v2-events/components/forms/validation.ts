@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
+import { formatISO } from 'date-fns'
 import {
   ConditionalParameters,
   FieldConfig,
@@ -52,7 +53,7 @@ function getValidationErrors(
 ) {
   const conditionalParameters = {
     $form: values,
-    $now: new Date().toISOString().split('T')[0]
+    $now: formatISO(new Date(), { representation: 'date' })
   }
 
   if (
@@ -80,7 +81,7 @@ function getValidationErrors(
     .filter((validation) => {
       return !validate(validation.validator, {
         $form: values,
-        $now: new Date().toISOString().split('T')[0]
+        $now: formatISO(new Date(), { representation: 'date' })
       })
     })
     .map((validation) => ({ message: validation.message }))

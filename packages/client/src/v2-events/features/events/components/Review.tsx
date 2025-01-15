@@ -13,6 +13,7 @@ import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
+import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   FieldConfig,
@@ -258,7 +259,9 @@ function ReviewComponent({
                               // Omit hidden fields
                               !getConditionalActionsForField(field, {
                                 $form: form,
-                                $now: new Date().toISOString().split('T')[0]
+                                $now: formatISO(new Date(), {
+                                  representation: 'date'
+                                })
                               }).includes('HIDE')
                           )
                           .map((field) => {
