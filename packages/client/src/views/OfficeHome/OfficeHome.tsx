@@ -225,6 +225,7 @@ class OfficeHomeView extends React.Component<
             pageId: newPageNumber
           })
         )
+        return
       }
 
       this.props.router.navigate(
