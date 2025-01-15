@@ -33,7 +33,7 @@ import {
   isInvalidDate,
   TIME_PERIOD
 } from '@client/forms/advancedSearch/fieldDefinitions/utils'
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons/client'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,

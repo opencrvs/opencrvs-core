@@ -26,12 +26,19 @@ export async function viewRecordHandler(
 
   const viewedRecord = await toViewed(record, token)
 
-  const viewedRecordWithTaskOnly: Bundle = {
+  const viewedRecordWithSpecificEntries: Bundle = {
     ...viewedRecord,
-    entry: [viewedRecord.entry.find((e) => e.resource.resourceType === 'Task')!]
+    entry: [
+      ...viewedRecord.entry.filter(
+        (e) =>
+          e.resource.resourceType === 'Task' ||
+          /* PractitionerRole needs to exist in bundle it's needed for creating history of a record */
+          e.resource.resourceType === 'PractitionerRole'
+      )
+    ]
   }
 
-  await sendBundleToHearth(viewedRecordWithTaskOnly)
+  await sendBundleToHearth(viewedRecordWithSpecificEntries)
   await auditEvent('viewed', viewedRecord, token)
 
   return viewedRecord

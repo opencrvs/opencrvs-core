@@ -14,7 +14,7 @@ import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
 import { isValidDate } from '@client/search/advancedSearch/validators'
 import { TIME_PERIOD } from './utils'
-import { UUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons/client'
 
 const createDeathSearchRegistrationSection = (
   hasDeathSearchJurisdictionScope?: boolean,
