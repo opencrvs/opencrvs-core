@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { cleanEnv, url, str } from 'envalid'
+import { cleanEnv, url } from 'envalid'
 
 /**
  * When defining variables aim to be consistent with existing values.
@@ -18,8 +18,7 @@ import { cleanEnv, url, str } from 'envalid'
 export const env = cleanEnv(process.env, {
   EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
   USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
-  // @TODO: Check if str is needed is needed due e2e environment urls
-  ES_HOST: str({ devDefault: 'http://localhost:9200' }),
+  ES_URL: url({ devDefault: 'http://localhost:9200' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' })
