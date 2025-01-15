@@ -38,6 +38,8 @@ import {
   textToString
 } from '@client/v2-events/features/events/registered-fields'
 import { selectFieldToString } from '@client/v2-events/features/events/registered-fields/Select'
+import { selectCountryFieldToString } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { selectLocationFieldToString } from '@client/v2-events/features/events/registered-fields/Location'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -119,7 +121,7 @@ export function getInitialValues(fields: FieldConfig[]) {
   }, {})
 }
 
-export function fieldValueToString<T extends FieldType>(
+export async function fieldValueToString<T extends FieldType>(
   field: T,
   value: FieldTypeToFieldValue<T>,
   intl: IntlShape,
@@ -136,7 +138,12 @@ export function fieldValueToString<T extends FieldType>(
       return radioGroupToString(value as RadioGroupFieldValue)
     case FieldType.SELECT:
       return selectFieldToString(value as SelectFieldValue, options, intl)
+    case FieldType.COUNTRY:
+      return selectCountryFieldToString(value as SelectFieldValue, intl)
+    case FieldType.LOCATION:
+      return selectLocationFieldToString(value as SelectFieldValue)
     default:
+      console.log('error: field value to string not implemented')
       return ''
   }
 }

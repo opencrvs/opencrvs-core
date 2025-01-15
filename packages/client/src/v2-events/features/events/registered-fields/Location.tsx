@@ -56,9 +56,11 @@ export function Location({
     const fetchOfflineData = async () => {
       const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
 
-      const locations = offlineData.locations as AdminStructure[]
+      const locations = Object.values(
+        offlineData.locations as Record<string, AdminStructure>
+      ) as AdminStructure[]
 
-      const filteredLocations = Object.values(locations).filter(
+      const filteredLocations = locations.filter(
         (location) => location.partOf === 'Location/' + (partOf ?? '0')
       )
 
@@ -87,4 +89,17 @@ export function Location({
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )
+}
+
+export const selectLocationFieldToString = async (val: LocationFieldValue) => {
+  if (!val) {
+    return ''
+  }
+  const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
+
+  const locations = Object.values(
+    offlineData.locations as Record<string, AdminStructure>
+  ) as AdminStructure[]
+
+  return locations.find(({ id }) => id === val)?.name ?? val
 }

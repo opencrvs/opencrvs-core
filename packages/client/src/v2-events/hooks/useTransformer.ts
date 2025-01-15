@@ -21,22 +21,26 @@ export const useTransformer = (eventType: string) => {
 
   const fields = findPageFields(eventConfiguration)
 
-  const toString = (values: ActionFormData) => {
+  const toString = async (values: ActionFormData) => {
     const stringifiedValues: Record<string, string> = {}
-    for (const [key, value] of Object.entries(values)) {
-      const fieldConfig = fields.find((field) => field.id === key)
-      const fieldType = fieldConfig?.type
-      if (!fieldType) {
-        throw new Error(`Field not found for ${key}`)
-      }
+    const entries = Object.entries(values)
 
-      stringifiedValues[key] = fieldValueToString(
-        fieldType,
-        value,
-        intl,
-        fieldConfig.options
-      )
-    }
+    await Promise.all(
+      entries.map(async ([key, value]) => {
+        const fieldConfig = fields.find((field) => field.id === key)
+        const fieldType = fieldConfig?.type
+        if (!fieldType) {
+          throw new Error(`Field not found for ${key}`)
+        }
+
+        stringifiedValues[key] = await fieldValueToString(
+          fieldType,
+          value,
+          intl,
+          fieldConfig.options
+        )
+      })
+    )
     return stringifiedValues
   }
   return { toString }

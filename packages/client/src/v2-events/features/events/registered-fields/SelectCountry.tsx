@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { IntlShape } from 'react-intl'
 import {
   FieldProps,
   SelectFieldValue,
@@ -34,4 +35,15 @@ export function SelectCountry({
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )
+}
+
+export const selectCountryFieldToString = (
+  val: SelectFieldValue,
+  intl: IntlShape
+) => {
+  if (!val) {
+    return ''
+  }
+  const selectedCountry = countries.find(({ value }) => value === val)
+  return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }

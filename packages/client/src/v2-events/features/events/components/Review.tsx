@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
+import { isEqual } from 'lodash'
 import {
   ActionFormData,
   FieldConfig,
@@ -201,8 +202,24 @@ function ReviewComponent({
 }) {
   const intl = useIntl()
 
+  const [stringifiedForm, setStringifiedForm] = useState(form)
+
   const { toString } = useTransformer(eventConfig.id)
-  const stringifiedForm = toString(form)
+
+  const prevFormRef = useRef<ActionFormData | null>(null)
+
+  useEffect(() => {
+    if (prevFormRef.current === null || !isEqual(prevFormRef.current, form)) {
+      const fetchStringifiedForm = async () => {
+        setStringifiedForm(await toString(form))
+      }
+      fetchStringifiedForm().catch((error) => {
+        console.error('Error fetching stringified form:', error)
+      })
+
+      prevFormRef.current = form
+    }
+  }, [form, toString])
 
   return (
     <Row>
@@ -261,7 +278,7 @@ function ReviewComponent({
                             (field) =>
                               // Omit hidden fields
                               !getConditionalActionsForField(field, {
-                                $form: stringifiedForm,
+                                $form: form,
                                 $now: new Date().toISOString().split('T')[0]
                               }).includes('HIDE')
                           )
