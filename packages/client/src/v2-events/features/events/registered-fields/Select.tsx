@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { FieldProps } from '@opencrvs/commons'
 import { Select as SelectComponent } from '@opencrvs/components'
 import { SelectOption } from '@opencrvs/commons/client'
@@ -29,7 +29,7 @@ export function Select({
 
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label as MessageDescriptor)
+    label: intl.formatMessage(option.label)
   }))
 
   return (
