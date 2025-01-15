@@ -29,7 +29,6 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
-  CheckBoxFieldValue,
   FieldConfig,
   FieldValue,
   FileFieldValue
@@ -51,7 +50,7 @@ import {
 import { FileInput } from './inputs/FileInput/FileInput'
 
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
-import { Checkbox } from '@client/v2-events/features/events/registered-fields/CheckBox'
+import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
 import { countries } from '@client/utils/countries'
 import { SelectOption } from '@opencrvs/commons'
@@ -229,7 +228,7 @@ const GeneratedInputField = React.memo(
       return (
         <Checkbox
           {...fieldDefinition}
-          value={value as CheckBoxFieldValue}
+          value={value as string}
           setFieldValue={setFieldValue}
         />
       )

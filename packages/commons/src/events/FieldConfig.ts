@@ -177,7 +177,7 @@ const Select = BaseField.extend({
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
-const CheckBox = BaseField.extend({
+const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX)
 }).describe('Check Box')
 
@@ -192,7 +192,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   RadioGroup,
   BulletList,
   Select,
-  CheckBox,
+  Checkbox,
   File,
   Country
 ])
