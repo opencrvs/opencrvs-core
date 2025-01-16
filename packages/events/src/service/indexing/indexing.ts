@@ -83,7 +83,13 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     return { type: 'text' }
   }
 
-  if (field.type === 'RADIO_GROUP') {
+  if (
+    field.type === 'RADIO_GROUP' ||
+    field.type === 'SELECT' ||
+    field.type === 'COUNTRY' ||
+    field.type === 'LOCATION' ||
+    field.type === 'CHECKBOX'
+  ) {
     return { type: 'keyword' }
   }
 
