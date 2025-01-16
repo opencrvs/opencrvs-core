@@ -541,10 +541,11 @@ const BodyContent = ({
                 ...declaration,
                 status: data.fetchRegistration?.registration?.status[0]
                   .type as SUBMISSION_STATUS,
-                assignment: data.fetchRegistration?.registration?.assignment
+                assignment: draft?.assignmentStatus
               }
             } else {
               declaration = getGQLDeclaration(data.fetchRegistration, language)
+              declaration.assignment = draft?.assignmentStatus
             }
 
             return (

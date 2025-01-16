@@ -11,7 +11,6 @@
 import * as Hapi from '@hapi/hapi'
 import { getToken } from '@workflow/utils/auth-utils'
 import { getValidRecordById } from '@workflow/records/index'
-import { Bundle } from '@opencrvs/commons/types'
 import { toViewed } from '@workflow/records/state-transitions'
 import { sendBundleToHearth } from '@workflow/records/fhir'
 import { auditEvent } from '@workflow/records/audit'
@@ -24,19 +23,10 @@ export async function viewRecordHandler(
   const recordId = request.params.id
   const record = await getValidRecordById(recordId, token, true)
 
-  const viewedRecord = await toViewed(record, token)
-
-  const viewedRecordWithSpecificEntries: Bundle = {
-    ...viewedRecord,
-    entry: [
-      ...viewedRecord.entry.filter(
-        (e) =>
-          e.resource.resourceType === 'Task' ||
-          /* PractitionerRole needs to exist in bundle it's needed for creating history of a record */
-          e.resource.resourceType === 'PractitionerRole'
-      )
-    ]
-  }
+  const { viewedRecord, viewedRecordWithSpecificEntries } = await toViewed(
+    record,
+    token
+  )
 
   await sendBundleToHearth(viewedRecordWithSpecificEntries)
   await auditEvent('viewed', viewedRecord, token)

@@ -52,11 +52,13 @@ import {
   getResourceFromBundleById,
   TransactionResponse,
   TaskIdentifierSystem,
-  Location
+  Location,
+  PractitionerRole,
+  URLReference
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getTokenPayload, getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
   ApproveRequestInput,
@@ -69,7 +71,9 @@ import { badRequest, internal } from '@hapi/boom'
 import { getUserOrSystem, isSystem } from './user'
 import {
   getLoggedInPractitionerResource,
-  getPractitionerOfficeId
+  getPractitionerOfficeId,
+  getPractitionerRoleByPractitionerId,
+  getUser
 } from '@workflow/features/user/utils'
 import { z } from 'zod'
 import { fetchLocationHierarchy } from '@workflow/utils/location'
@@ -1160,6 +1164,24 @@ export async function sendBundleToHearth(
   }
 
   return responseBundle
+}
+
+export async function getPractitionerRoleFromToken(
+  token: string
+): Promise<BundleEntry<PractitionerRole>> {
+  const tokenPayload = getTokenPayload(token)
+  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
+  const practitionerId = userDetails.practitionerId
+  const practitionerRoleBundle = (await getPractitionerRoleByPractitionerId(
+    practitionerId as UUID
+  )) as Bundle<PractitionerRole>
+
+  const practitionerRoleResource = practitionerRoleBundle.entry[0].resource
+  return {
+    fullUrl:
+      `/fhir/PractitionerRole/${practitionerRoleResource.id}/_history/${practitionerRoleResource.meta?.versionId}` as URLReference,
+    resource: practitionerRoleResource
+  }
 }
 
 function findSavedReference(
