@@ -20,7 +20,7 @@ export const ReadersContainer = styled(Stack)`
   width: 100%;
 
   & > * {
-    flex-grow: 1;
+    flex: 1;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -28,6 +28,7 @@ export const ReadersContainer = styled(Stack)`
 
     & > * {
       width: 100%;
+      flex: none;
     }
   }
 `
