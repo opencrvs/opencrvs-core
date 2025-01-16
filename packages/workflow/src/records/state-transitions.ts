@@ -50,9 +50,10 @@ import {
   toHistoryResource,
   TaskHistory,
   RejectedRecord,
-  SupportedPatientIdentifierCode
+  SupportedPatientIdentifierCode,
+  PractitionerRole
 } from '@opencrvs/commons/types'
-import { getTokenPayload, getUUID, logger, UUID } from '@opencrvs/commons'
+import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -105,14 +106,11 @@ import {
   withPractitionerDetails,
   mergeChangedResourcesIntoRecord,
   createReinstateTask,
-  mergeBundles
+  mergeBundles,
+  getPractitionerRoleFromToken
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
 import { tokenExchangeHandler } from './token-exchange-handler'
-import {
-  getPractitionerRoleByPractitionerId,
-  getUser
-} from '@workflow/features/user/utils'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -299,7 +297,7 @@ export async function toUpdated(
 export async function toViewed<T extends ValidRecord>(
   record: T,
   token: string
-): Promise<T> {
+) {
   const previousTask: SavedTask = getTaskFromSavedBundle(record)
   const viewedTask = await createViewTask(previousTask, token)
 
@@ -307,12 +305,7 @@ export async function toViewed<T extends ValidRecord>(
     toHistoryResource(previousTask)
   ) as SavedBundleEntry<TaskHistory>
 
-  const tokenPayload = getTokenPayload(token)
-  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
-  const practitionerId = userDetails.practitionerId
-  const practitionerRoleBundle = await getPractitionerRoleByPractitionerId(
-    practitionerId as UUID
-  )
+  const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
 
   const filteredEntries = record.entry.filter(
     (e) => e.resource.resourceType !== 'Task'
@@ -333,11 +326,24 @@ export async function toViewed<T extends ValidRecord>(
       /*  PractitionerRole resource is saved in the bundle 
       since PractitionerRole is fetched from bundle
       in the resolvers during readying history of a record */
-      practitionerRoleBundle.entry[0]
+      practitionerRoleEntry
     ]
   } as T
 
-  return viewedRecord
+  const viewedRecordWithSpecificEntries: Bundle = {
+    ...viewedRecord,
+    entry: [
+      {
+        fullUrl: record.entry.filter(
+          (e) => e.resource.resourceType === 'Task'
+        )[0].fullUrl,
+        resource: viewedTask
+      },
+      practitionerRoleEntry
+    ]
+  }
+
+  return { viewedRecord, viewedRecordWithSpecificEntries }
 }
 
 export function toIdentifierUpserted<T extends ValidRecord>(
@@ -379,7 +385,7 @@ export async function toDownloaded(
   token: string
 ): Promise<{
   downloadedRecord: ValidRecord
-  downloadedBundleWithResources: Bundle<SavedTask>
+  downloadedBundleWithResources: Bundle<SavedTask | PractitionerRole>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
   const taskWithoutPractitionerDetails = createDownloadTask(previousTask)
@@ -401,18 +407,11 @@ export async function toDownloaded(
     resource: downloadedTask
   }
 
-  const tokenPayload = getTokenPayload(token)
-  const userDetails = await getUser(tokenPayload.sub, { Authorization: token })
-  const practitionerId = userDetails.practitionerId
-  const practitionerRoleBundle = await getPractitionerRoleByPractitionerId(
-    practitionerId as UUID
-  )
   /* 
     When a user tries to access a record for the first time,
     practitionerRoleBundle is necessary to create the history of the record  
   */
-  const practitionerRoleEntry = practitionerRoleBundle.entry[0]
-
+  const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
   const updatedBundle = {
     ...record,
     entry: [
@@ -428,7 +427,7 @@ export async function toDownloaded(
     practitionerDetailsBundle
   ) as ValidRecord
 
-  const downloadedBundleWithResources: Bundle<SavedTask> = {
+  const downloadedBundleWithResources: Bundle<SavedTask | PractitionerRole> = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [
