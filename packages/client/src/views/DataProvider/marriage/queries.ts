@@ -285,6 +285,9 @@ const GET_MARRIAGE_REGISTRATION_FOR_REVIEW = gql`
               description
             }
           }
+          primaryOffice {
+            id
+          }
           name {
             firstNames
             familyName
