@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@events/environment'
-import { MongoClient } from 'mongodb'
+import { initTRPC } from '@trpc/server'
+import { Context } from './middleware/middleware'
+import superjson from 'superjson'
 
-const url = env.MONGO_URL
-const client = new MongoClient(url)
+export const t = initTRPC.context<Context>().create({
+  transformer: superjson
+})
 
-export async function getClient() {
-  await client.connect()
-
-  const db = client.db('events')
-  return db
-}
+export const router = t.router
+export const publicProcedure = t.procedure

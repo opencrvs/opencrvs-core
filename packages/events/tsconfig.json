@@ -11,14 +11,14 @@
     "skipLibCheck": true,
     "moduleResolution": "node16",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": ["esnext.asynciterable", "es6", "es2019"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": ["vitest/globals"]
   },
   "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]

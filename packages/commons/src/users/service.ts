@@ -41,7 +41,11 @@ export async function getUser(
   userId: string,
   token: string
 ) {
-  const res = await fetch(new URL(`getUser`, userManagementHost).href, {
+  const hostWithTrailingSlash = userManagementHost.endsWith('/')
+    ? userManagementHost
+    : userManagementHost + '/'
+
+  const res = await fetch(new URL('getUser', hostWithTrailingSlash).href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {

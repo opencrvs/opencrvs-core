@@ -16,10 +16,19 @@ let client: elasticsearch.Client
 export const getOrCreateClient = () => {
   if (!client) {
     client = new elasticsearch.Client({
-      node: env.ES_HOST
+      node: env.ES_URL
     })
+
     return client
   }
 
   return client
+}
+
+export function getEventAliasName() {
+  return `events`
+}
+
+export function getEventIndexName(eventType: string) {
+  return `events_${eventType}`.toLowerCase()
 }
