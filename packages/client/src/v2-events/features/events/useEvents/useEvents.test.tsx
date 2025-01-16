@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { renderHook, RenderHookResult, waitFor } from '@testing-library/react'
-import React, { act, PropsWithChildren } from 'react'
+import React, { PropsWithChildren } from 'react'
 
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'

@@ -1,3 +1,131 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Returns 404 when not found 1`] = `[TRPCError: Event not found with ID: id-not-persisted]`;
+
+exports[`Returns event 1`] = `
+{
+  "actions": [
+    {
+      "createdAt": "<createdAt />",
+      "createdAtLocation": {
+        "externalId": "<externalId />",
+        "id": "<id />",
+        "name": "Location name 0",
+        "partOf": null,
+      },
+      "createdBy": {
+        "id": "<id />",
+        "name": [
+          {
+            "family": "Doe",
+            "given": [
+              "John",
+            ],
+            "use": "en",
+          },
+        ],
+        "systemRole": "REGISTRATION_AGENT",
+      },
+      "data": {},
+      "draft": false,
+      "type": "CREATE",
+    },
+  ],
+  "createdAt": "<createdAt />",
+  "id": "<id />",
+  "transactionId": "<transactionId />",
+  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "updatedAt": "<updatedAt />",
+}
+`;
+
+exports[`Returns event with all actions resolved 1`] = `
+{
+  "actions": [
+    {
+      "createdAt": "<createdAt />",
+      "createdAtLocation": {
+        "externalId": "<externalId />",
+        "id": "<id />",
+        "name": "Location name 0",
+        "partOf": null,
+      },
+      "createdBy": {
+        "id": "<id />",
+        "name": [
+          {
+            "family": "Doe",
+            "given": [
+              "John",
+            ],
+            "use": "en",
+          },
+        ],
+        "systemRole": "REGISTRATION_AGENT",
+      },
+      "data": {},
+      "draft": false,
+      "type": "CREATE",
+    },
+    {
+      "createdAt": "<createdAt />",
+      "createdAtLocation": {
+        "externalId": "<externalId />",
+        "id": "<id />",
+        "name": "Location name 0",
+        "partOf": null,
+      },
+      "createdBy": {
+        "id": "<id />",
+        "name": [
+          {
+            "family": "Doe",
+            "given": [
+              "John",
+            ],
+            "use": "en",
+          },
+        ],
+        "systemRole": "REGISTRATION_AGENT",
+      },
+      "data": {
+        "name": "John Doe",
+      },
+      "draft": false,
+      "type": "DECLARE",
+    },
+    {
+      "createdAt": "<createdAt />",
+      "createdAtLocation": {
+        "externalId": "<externalId />",
+        "id": "<id />",
+        "name": "Location name 0",
+        "partOf": null,
+      },
+      "createdBy": {
+        "id": "<id />",
+        "name": [
+          {
+            "family": "Doe",
+            "given": [
+              "John",
+            ],
+            "use": "en",
+          },
+        ],
+        "systemRole": "REGISTRATION_AGENT",
+      },
+      "data": {
+        "favouritePlayer": "Elena Rybakina",
+      },
+      "draft": false,
+      "type": "VALIDATE",
+    },
+  ],
+  "createdAt": "<createdAt />",
+  "id": "<id />",
+  "transactionId": "<transactionId />",
+  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "updatedAt": "<updatedAt />",
+}
+`;

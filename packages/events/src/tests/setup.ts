@@ -8,7 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { resetServer as resetMongoServer } from '@events/storage/__mocks__/mongodb'
+import { resetServer as resetEventsMongoServer } from '@events/storage/mongodb/__mocks__/events'
+import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { inject, vi } from 'vitest'
 
 import { createIndex } from '@events/service/indexing/indexing'
@@ -16,7 +17,9 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { mswServer } from './msw'
 import { getAllFields } from '@opencrvs/commons'
 
-vi.mock('@events/storage/mongodb')
+vi.mock('@events/storage/mongodb/events')
+vi.mock('@events/storage/mongodb/user-mgnt')
+
 vi.mock('@events/storage/elasticsearch')
 vi.mock('@events/service/config/config', () => ({
   getEventConfigurations: () =>
@@ -26,7 +29,7 @@ vi.mock('@events/service/config/config', () => ({
     ])
 }))
 
-async function resetServer() {
+async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
     // @ts-ignore "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
@@ -37,9 +40,13 @@ async function resetServer() {
   await createIndex(index, getAllFields(tennisClubMembershipEvent))
 }
 
-beforeEach(async () => {
-  return Promise.all([resetMongoServer(), resetServer()])
-})
+beforeEach(() =>
+  Promise.all([
+    resetEventsMongoServer(),
+    resetUserMgntMongoServer(),
+    resetESServer()
+  ])
+)
 
 beforeAll(() =>
   mswServer.listen({

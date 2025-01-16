@@ -9,19 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { payloadGenerator } from '@events/tests/generators'
-import { createTestClient } from '@events/tests/utils'
+
 import { indexAllEvents } from './indexing'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
-const client = createTestClient()
-const generator = payloadGenerator()
-
 test('indexes all records from MongoDB with one function call', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const esClient = getOrCreateClient()
 
   await indexAllEvents(tennisClubMembershipEvent)
@@ -43,6 +43,9 @@ test('indexes all records from MongoDB with one function call', async () => {
 })
 
 test('records are automatically indexed when they are created', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   await client.event.create(generator.event.create())
 
   const esClient = getOrCreateClient()

@@ -8,16 +8,22 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { inject, vi } from 'vitest'
+import { MongoClient } from 'mongodb'
+import { inject } from 'vitest'
 
-/** @knipignore */
-export const getEventIndexName = vi.fn()
-/** @knipignore */
-export const getEventAliasName = vi.fn()
+let client: MongoClient
+let databaseName = 'events_' + Date.now()
 
-export function getOrCreateClient() {
-  return new elasticsearch.Client({
-    node: `http://${inject('ELASTICSEARCH_URI')}`
-  })
+export async function resetServer() {
+  databaseName = 'events_' + Date.now()
+}
+
+export async function getClient() {
+  if (!client) {
+    client = new MongoClient(inject('EVENTS_MONGO_URI'))
+  }
+
+  await client.connect()
+
+  return client.db(databaseName)
 }

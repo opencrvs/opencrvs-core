@@ -13,10 +13,30 @@ import {
   DeclareActionInput,
   EventInput,
   getUUID,
-  ActionType
+  ActionType,
+  ValidateActionInput
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
+import { Db } from 'mongodb'
 
+type Name = {
+  use: string
+  given: string[]
+  family: string
+}
+
+export type CreatedUser = {
+  id: string
+  primaryOfficeId: string
+  systemRole: string
+  name: Array<Name>
+}
+
+type CreateUser = {
+  primaryOfficeId: string
+  systemRole?: string
+  name?: Array<Name>
+}
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
@@ -40,8 +60,26 @@ export function payloadGenerator() {
         transactionId: input?.transactionId ?? getUUID(),
         data: input?.data ?? {},
         eventId
+      }),
+      validate: (
+        eventId: string,
+        input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
+      ) => ({
+        type: ActionType.VALIDATE,
+        transactionId: input?.transactionId ?? getUUID(),
+        data: input?.data ?? {},
+        duplicates: [],
+        eventId
       })
     }
+  }
+
+  const user = {
+    create: (input: CreateUser) => ({
+      systemRole: input?.systemRole ?? 'REGISTRATION_AGENT',
+      name: input?.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
+      primaryOfficeId: input.primaryOfficeId
+    })
   }
 
   const locations = {
@@ -51,6 +89,7 @@ export function payloadGenerator() {
         return Array.from({ length: input }).map((_, i) => ({
           id: getUUID(),
           name: `Location name ${i}`,
+          externalId: getUUID(),
           partOf: null
         }))
       }
@@ -58,10 +97,35 @@ export function payloadGenerator() {
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
+        externalId: location.externalId ?? getUUID(),
         partOf: null
       }))
     }
   }
 
-  return { event, locations }
+  return { event, locations, user }
+}
+
+/**
+ * Helper utility to seed data into the database.
+ * Use with payloadGenerator for creating test data.
+ */
+export function seeder() {
+  const seedUser = async (db: Db, user: Omit<CreatedUser, 'id'>) => {
+    const createdUser = await db.collection('users').insertOne(user)
+
+    return {
+      primaryOfficeId: user.primaryOfficeId,
+      name: user.name,
+      systemRole: user.systemRole,
+      id: createdUser.insertedId.toString()
+    }
+  }
+  const seedLocations = (db: Db, locations: Location[]) =>
+    db.collection('locations').insertMany(locations)
+
+  return {
+    user: seedUser,
+    locations: seedLocations
+  }
 }

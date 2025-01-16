@@ -13,6 +13,11 @@ import { Dictionary, mapKeys } from 'lodash'
 import { MessageDescriptor, useIntl } from 'react-intl'
 
 const INTERNAL_SEPARATOR = '___'
+
+/**
+ * Replaces dots with triple underscores in the object keys.
+ * This is needed to support dot notation in the message variables.
+ */
 function convertDotToTripleUnderscore<T extends {}>(
   obj: T
 ): Dictionary<T[keyof T]> {
@@ -23,6 +28,10 @@ function convertDotToTripleUnderscore<T extends {}>(
   return keysWithUnderscores
 }
 
+/**
+ * Replace dots with triple underscores within the curly braces.
+ * This is needed to support dot notation in the message variables.
+ */
 function convertDotInCurlyBraces(str: string): string {
   return str.replace(/{([^}]+)}/g, (match, content) => {
     // Replace dots with triple underscores within the curly braces
@@ -31,6 +40,12 @@ function convertDotInCurlyBraces(str: string): string {
   })
 }
 
+/**
+ * intl with formatMessage that supports "flat object" dot notation in the message.
+ *
+ * @example intl.formatMessage(`string {with.nested.value}`, {
+ * 'with.nested.value': 'nested value'}) // string nested value`
+ */
 export function useIntlFormatMessageWithFlattenedParams() {
   const intl = useIntl()
 

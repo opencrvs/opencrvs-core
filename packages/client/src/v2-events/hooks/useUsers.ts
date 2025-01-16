@@ -8,16 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { inject, vi } from 'vitest'
 
-/** @knipignore */
-export const getEventIndexName = vi.fn()
-/** @knipignore */
-export const getEventAliasName = vi.fn()
+import { api } from '@client/v2-events/trpc'
 
-export function getOrCreateClient() {
-  return new elasticsearch.Client({
-    node: `http://${inject('ELASTICSEARCH_URI')}`
-  })
+export function useUsers() {
+  return {
+    getUsers: api.user.list
+  }
 }

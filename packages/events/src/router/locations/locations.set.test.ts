@@ -8,39 +8,53 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { userScopes } from '@opencrvs/commons'
 
-const nationalSystemAdminClient = createTestClient([
-  userScopes.nationalSystemAdmin
-])
-
-const registrarClient = createTestClient()
-
-const generator = payloadGenerator()
-
 test('prevents unauthorized access from registrar', async () => {
+  const { user } = await setupTestCase()
+  const registrarClient = createTestClient(user)
+
   await expect(
     registrarClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Allows national system admin to set locations', async () => {
+  const { user, generator } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    userScopes.nationalSystemAdmin
+  ])
+
   await expect(
     nationalSystemAdminClient.locations.set(generator.locations.set(1))
   ).resolves.toEqual(undefined)
 })
 
 test('Prevents sending empty payload', async () => {
+  const { user } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    userScopes.nationalSystemAdmin
+  ])
+
   await expect(
     nationalSystemAdminClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Creates single location', async () => {
+  const { user } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    userScopes.nationalSystemAdmin
+  ])
+
   const locationPayload = [
-    { id: '123-456-789', partOf: null, name: 'Location foobar' }
+    {
+      id: '123-456-789',
+      partOf: null,
+      name: 'Location foobar',
+      externalId: 'foo-bar'
+    }
   ]
 
   await nationalSystemAdminClient.locations.set(locationPayload)
@@ -52,6 +66,11 @@ test('Creates single location', async () => {
 })
 
 test('Creates multiple locations', async () => {
+  const { user, generator } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    userScopes.nationalSystemAdmin
+  ])
+
   const parentId = 'parent-id'
 
   const locationPayload = generator.locations.set([
@@ -69,6 +88,11 @@ test('Creates multiple locations', async () => {
 })
 
 test('Removes existing locations not in payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    userScopes.nationalSystemAdmin
+  ])
+
   const initialPayload = generator.locations.set(5)
 
   await nationalSystemAdminClient.locations.set(initialPayload)

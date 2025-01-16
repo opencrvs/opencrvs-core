@@ -43,7 +43,7 @@ utils.event.delete.setMutationDefaults(({ canonicalMutationFn }) => ({
   },
   retryDelay: 10000,
   onSuccess: ({ id }) => {
-    void utils.events.get.invalidate()
+    void utils.event.list.invalidate()
   },
   /*
    * This ensures that when the application is reloaded with pending mutations in IndexedDB, the

@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
 import { ActionType } from '@opencrvs/commons'
-
-const client = createTestClient()
-const generator = payloadGenerator()
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('actions can be added to created events', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const originalEvent = await client.event.create(generator.event.create())
 
   const event = await client.event.actions.declare(
@@ -30,6 +29,9 @@ test('actions can be added to created events', async () => {
 })
 
 test('Action data can be retrieved', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const originalEvent = await client.event.create(generator.event.create())
 
   const data = { name: 'John Doe', favouriteFruit: 'Banana' }

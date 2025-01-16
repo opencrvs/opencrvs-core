@@ -8,16 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { inject, vi } from 'vitest'
 
-/** @knipignore */
-export const getEventIndexName = vi.fn()
-/** @knipignore */
-export const getEventAliasName = vi.fn()
+import { defineMessages } from 'react-intl'
 
-export function getOrCreateClient() {
-  return new elasticsearch.Client({
-    node: `http://${inject('ELASTICSEARCH_URI')}`
-  })
-}
+export const messages = defineMessages({
+  'event.history.timeFormat': {
+    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
+    id: 'event.history.timeFormat',
+    description: 'Time format for timestamps in event history'
+  }
+})
