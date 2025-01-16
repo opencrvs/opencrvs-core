@@ -19,20 +19,20 @@ import {
 import { Location } from '@events/service/locations/locations'
 import { Db } from 'mongodb'
 
-type Name = {
+interface Name {
   use: string
   given: string[]
   family: string
 }
 
-export type CreatedUser = {
+export interface CreatedUser {
   id: string
   primaryOfficeId: string
   systemRole: string
   name: Array<Name>
 }
 
-type CreateUser = {
+interface CreateUser {
   primaryOfficeId: string
   systemRole?: string
   name?: Array<Name>
@@ -43,12 +43,12 @@ type CreateUser = {
 export function payloadGenerator() {
   const event = {
     create: (input: Partial<EventInput> = {}) => ({
-      transactionId: input?.transactionId ?? getUUID(),
-      type: input?.type ?? 'TENNIS_CLUB_MEMBERSHIP'
+      transactionId: input.transactionId ?? getUUID(),
+      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
     }),
     patch: (id: string, input: Partial<EventInput> = {}) => ({
-      transactionId: input?.transactionId ?? getUUID(),
-      type: input?.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+      transactionId: input.transactionId ?? getUUID(),
+      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
       id
     }),
     actions: {
@@ -57,8 +57,8 @@ export function payloadGenerator() {
         input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
       ) => ({
         type: ActionType.DECLARE,
-        transactionId: input?.transactionId ?? getUUID(),
-        data: input?.data ?? {},
+        transactionId: input.transactionId ?? getUUID(),
+        data: input.data ?? {},
         eventId
       }),
       validate: (
@@ -66,8 +66,8 @@ export function payloadGenerator() {
         input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
       ) => ({
         type: ActionType.VALIDATE,
-        transactionId: input?.transactionId ?? getUUID(),
-        data: input?.data ?? {},
+        transactionId: input.transactionId ?? getUUID(),
+        data: input.data ?? {},
         duplicates: [],
         eventId
       })
@@ -76,8 +76,8 @@ export function payloadGenerator() {
 
   const user = {
     create: (input: CreateUser) => ({
-      systemRole: input?.systemRole ?? 'REGISTRATION_AGENT',
-      name: input?.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
+      systemRole: input.systemRole ?? 'REGISTRATION_AGENT',
+      name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
   }
@@ -121,7 +121,7 @@ export function seeder() {
       id: createdUser.insertedId.toString()
     }
   }
-  const seedLocations = (db: Db, locations: Location[]) =>
+  const seedLocations = async (db: Db, locations: Location[]) =>
     db.collection('locations').insertMany(locations)
 
   return {

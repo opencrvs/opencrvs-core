@@ -71,33 +71,33 @@ export async function createIndex(
 }
 
 function getElasticsearchMappingForType(field: FieldConfig) {
-  if (field.type === 'DATE') {
-    return { type: 'date' }
-  }
+  switch (field.type) {
+    case 'DATE':
+      return { type: 'date' }
 
-  if (field.type === 'TEXT' || field.type === 'PARAGRAPH') {
-    return { type: 'text' }
-  }
+    case 'TEXT':
+    case 'PARAGRAPH':
+      return { type: 'text' }
 
-  if (field.type === 'RADIO_GROUP') {
-    return { type: 'keyword' }
-  }
+    case 'RADIO_GROUP':
+      return { type: 'keyword' }
 
-  if (field.type === 'FILE') {
-    return {
-      type: 'object',
-      properties: {
-        filename: { type: 'keyword' },
-        originalFilename: { type: 'keyword' },
-        type: { type: 'keyword' }
+    case 'FILE':
+      return {
+        type: 'object',
+        properties: {
+          filename: { type: 'keyword' },
+          originalFilename: { type: 'keyword' },
+          type: { type: 'keyword' }
+        }
       }
-    }
-  }
 
-  return assertNever(field)
+    default:
+      assertNever(field)
+  }
 }
 
-const assertNever = (n: never): never => {
+function assertNever(_: never): never {
   throw new Error('Should never happen')
 }
 
@@ -127,7 +127,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   const transformedStreamData = new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
-    transform: (record, _encoding, callback) => {
+    transform: (record: EventDocument, _encoding, callback) => {
       callback(null, eventToEventIndex(record))
     }
   })

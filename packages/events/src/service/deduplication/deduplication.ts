@@ -22,7 +22,9 @@ import {
 } from '@opencrvs/commons/events'
 import { subDays, addDays } from 'date-fns'
 
-const dataReference = (fieldName: string) => `data.${fieldName}`
+function dataReference(fieldName: string) {
+  return `data.${fieldName}`
+}
 
 function generateElasticsearchQuery(
   eventIndex: EventIndex,
@@ -110,7 +112,7 @@ function generateElasticsearchQuery(
 export async function searchForDuplicates(
   eventIndex: EventIndex,
   configuration: DeduplicationConfig
-) {
+): Promise<{ score: number; event: EventIndex | undefined }[]> {
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
@@ -134,6 +136,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source!
+      event: hit._source
     }))
 }

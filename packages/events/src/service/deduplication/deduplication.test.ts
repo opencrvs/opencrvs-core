@@ -135,7 +135,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES: DeduplicationConfig = {
 }
 
 export async function findDuplicates(
-  registrationComparison: Record<string, any>
+  registrationComparison: Record<string, string[]>
 ) {
   const esClient = getOrCreateClient()
   const existingComposition = Object.fromEntries(
