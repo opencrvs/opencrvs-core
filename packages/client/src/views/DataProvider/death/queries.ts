@@ -351,7 +351,9 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
               description
             }
           }
-
+          primaryOffice {
+            id
+          }
           name {
             firstNames
             familyName

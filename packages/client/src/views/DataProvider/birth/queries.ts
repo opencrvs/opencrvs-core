@@ -282,6 +282,9 @@ const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
               description
             }
           }
+          primaryOffice {
+            id
+          }
           name {
             firstNames
             familyName
