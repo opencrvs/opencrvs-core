@@ -164,7 +164,7 @@ const RadioGroup = BaseField.extend({
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
   items: z.array(TranslationConfig).describe('A list of items'),
-  font: HTMLFontVariant.optional()
+  font: HTMLFontVariant
 }).describe('A list of bullet points')
 
 const SelectOption = z.object({
