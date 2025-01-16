@@ -73,7 +73,7 @@ export function evalExpressionInFieldDefinition(
 export function hasInitialValueDependencyInfo(
   value: BaseField['initialValue']
 ): value is DependencyInfo {
-  return typeof value === 'object' && value !== null && 'dependsOn' in value
+  return typeof value === 'object' && 'dependsOn' in value
 }
 
 export function getDependentFields(

@@ -49,7 +49,7 @@ export function Pages() {
   )
   const formPages = configuration.actions
     .find((action) => action.type === ActionType.DECLARE)
-    ?.forms.find((form) => form.active)?.pages
+    ?.forms.find((f) => f.active)?.pages
 
   if (!formPages) {
     throw new Error('Form configuration not found for type: ' + event.type)
