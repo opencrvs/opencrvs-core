@@ -74,14 +74,15 @@ function getElasticsearchMappingForType(field: FieldConfig) {
   switch (field.type) {
     case 'DATE':
       return { type: 'date' }
-
     case 'TEXT':
     case 'PARAGRAPH':
+    case 'BULLET_LIST':
       return { type: 'text' }
-
     case 'RADIO_GROUP':
+    case 'SELECT':
+    case 'COUNTRY':
+    case 'CHECKBOX':
       return { type: 'keyword' }
-
     case 'FILE':
       return {
         type: 'object',
