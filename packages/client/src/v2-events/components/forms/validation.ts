@@ -28,7 +28,7 @@ export interface Errors {
 }
 
 function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
-  const hasShowRule = field.conditionals.some(
+  const hasShowRule = (field.conditionals || []).some(
     (conditional) => conditional.type === 'SHOW'
   )
   const validConditionals = getConditionalActionsForField(field, params)
@@ -37,7 +37,7 @@ function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
 }
 
 function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
-  const hasEnableRule = field.conditionals.some(
+  const hasEnableRule = (field.conditionals || []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
   const validConditionals = getConditionalActionsForField(field, params)
