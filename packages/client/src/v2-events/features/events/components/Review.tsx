@@ -13,6 +13,7 @@ import React from 'react'
 import { defineMessages, MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 
+import { formatISO } from 'date-fns'
 import {
   ActionFormData,
   FieldConfig,
@@ -31,6 +32,7 @@ import {
 
 import { EventConfig } from '@opencrvs/commons'
 import { FileOutput } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { getConditionalActionsForField } from '@client/v2-events/components/forms/utils'
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -251,6 +253,16 @@ function ReviewComponent({
                               // Formatters can explicitly define themselves to be null
                               // this means a value display row in not rendered at all
                               FIELD_TYPE_FORMATTERS[field.type] !== null
+                          )
+                          .filter(
+                            (field) =>
+                              // Omit hidden fields
+                              !getConditionalActionsForField(field, {
+                                $form: form,
+                                $now: formatISO(new Date(), {
+                                  representation: 'date'
+                                })
+                              }).includes('HIDE')
                           )
                           .map((field) => {
                             const Output =

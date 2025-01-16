@@ -39,14 +39,14 @@ function getStatusFromActions(actions: Array<ActionDocument>) {
 }
 
 function getAssignedUserFromActions(actions: Array<ActionDocument>) {
-  return actions.reduce<null | string>((status, action) => {
+  return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.assignedTo
     }
     if (action.type === ActionType.UNASSIGN) {
       return null
     }
-    return status
+    return user
   }, null)
 }
 
