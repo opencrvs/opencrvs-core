@@ -55,5 +55,6 @@ module.exports = {
     'block-scoped-var': 1,
     'import/no-cycle': 1,
     'max-lines': ['warn', 600]
-  }
+  },
+  parser: '@typescript-eslint/parser'
 }
