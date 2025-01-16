@@ -16,7 +16,7 @@ import { v4 as uuid } from 'uuid'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventState, ActionType } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
@@ -37,6 +37,7 @@ import {
   Stack
 } from '@opencrvs/components'
 import { api } from '@client/v2-events/trpc'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 const CertificateContainer = styled.div`
   svg {
@@ -122,6 +123,13 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
+  const { appConfig, certificatesTemplate, language, initiateAppConfig } =
+    useAppConfig()
+
+  useEffect(() => {
+    initiateAppConfig()
+  }, [initiateAppConfig])
+
   const collectCertificateMutation = events.actions.collectCertificate
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
@@ -145,13 +153,8 @@ export function Review() {
   const form = getFormValues(eventId)
   console.trace(form)
 
-  const {
-    isLoadingInProgress,
-    svgCode,
-    handleCertify,
-    isPrintInAdvance,
-    canUserEditRecord
-  } = usePrintableCertificate(form)
+  const { svgCode, handleCertify, isPrintInAdvance, canUserEditRecord } =
+    usePrintableCertificate(form, appConfig, certificatesTemplate, language)
 
   async function handleEdit({
     pageId,
@@ -232,11 +235,11 @@ export function Review() {
     ))
 
     if (saveAndExitConfirm) {
-      handleCertify()
+      handleCertify && handleCertify()
     }
   }
 
-  if (!isLoadingInProgress) {
+  if (!svgCode) {
     return <Spinner id="review-certificate-loading" />
   }
 

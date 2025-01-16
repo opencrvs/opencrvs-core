@@ -29,6 +29,7 @@ import {
 } from '@client/utils/referenceApi'
 import htmlToPdfmake from 'html-to-pdfmake'
 import { Content } from 'pdfmake/interfaces'
+import { LanguageSchema } from '@opencrvs/commons'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -86,12 +87,12 @@ const cache = createIntlCache()
 export function compileSvg(
   templateString: string,
   data: Record<string, any> = {},
-  state: IStoreState
+  language: LanguageSchema
 ): string {
   const intl = createIntl(
     {
-      locale: state.i18n.language,
-      messages: state.i18n.messages
+      locale: language.lang,
+      messages: language.messages
     },
     cache
   )
@@ -168,31 +169,31 @@ export function compileSvg(
     }
   )
 
-  Handlebars.registerHelper(
-    'location',
-    function (this: any, locationId: string | undefined, key: keyof ILocation) {
-      const offlineData = getOfflineData(state)
+  // Handlebars.registerHelper(
+  //   'location',
+  //   function (this: any, locationId: string | undefined, key: keyof ILocation) {
+  //     const offlineData = getOfflineData(state)
 
-      if (!locationId) {
-        return ''
-      }
+  //     if (!locationId) {
+  //       return ''
+  //     }
 
-      if (!['name', 'alias'].includes(key)) {
-        return `Unknown property ${key}`
-      }
+  //     if (!['name', 'alias'].includes(key)) {
+  //       return `Unknown property ${key}`
+  //     }
 
-      const location: AdminStructure | undefined =
-        offlineData.locations[locationId] ??
-        offlineData.facilities[locationId] ??
-        offlineData.offices[locationId]
+  //     const location: AdminStructure | undefined =
+  //       offlineData.locations[locationId] ??
+  //       offlineData.facilities[locationId] ??
+  //       offlineData.offices[locationId]
 
-      const fallback = import.meta.env.DEV
-        ? `Missing location for id: ${locationId}`
-        : locationId
+  //     const fallback = import.meta.env.DEV
+  //       ? `Missing location for id: ${locationId}`
+  //       : locationId
 
-      return location?.[key] ?? fallback
-    }
-  )
+  //     return location?.[key] ?? fallback
+  //   }
+  // )
 
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)

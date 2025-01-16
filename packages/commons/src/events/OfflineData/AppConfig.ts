@@ -22,46 +22,6 @@ const iLoginBackgroundSchema = z.object({
   imageFit: z.string().optional()
 })
 
-enum EventType {
-  Birth = 'birth',
-  Death = 'death',
-  Marriage = 'marriage',
-  TENNIS_CLUB_MEMBERSHIP = 'TENNIS_CLUB_MEMBERSHIP'
-}
-const eventTypeSchema = z.nativeEnum(EventType)
-
-const fontFamilyTypesSchema = z.object({
-  normal: z.string(),
-  bold: z.string(),
-  italics: z.string(),
-  bolditalics: z.string()
-})
-
-const CertificateConfigDataSchema = z.object({
-  id: z.string(),
-  event: eventTypeSchema,
-  label: z.object({
-    id: z.string(),
-    defaultMessage: z.string(),
-    description: z.string()
-  }),
-  isDefault: z.boolean(),
-  fee: z.object({
-    onTime: z.number(),
-    late: z.number(),
-    delayed: z.number()
-  }),
-  svgUrl: z.string(),
-  fonts: z.record(fontFamilyTypesSchema).optional()
-})
-
-const CertificateDataSchema = CertificateConfigDataSchema.extend({
-  hash: z.string().optional(),
-  svg: z.string()
-})
-
-export type CertificateDataSchema = z.infer<typeof CertificateDataSchema>
-
 const iCurrencySchema = z.object({
   isoCode: z.string(),
   languagesAndCountry: z.array(z.string())
@@ -77,7 +37,7 @@ enum SearchCriteria {
 }
 const searchCriteriaTypeSchema = z.nativeEnum(SearchCriteria)
 
-const ApplicationConfigSchema = z.object({
+export const ApplicationConfigSchema = z.object({
   APPLICATION_NAME: z.string(),
   BIRTH: z.object({
     REGISTRATION_TARGET: z.number(),
@@ -113,11 +73,4 @@ const ApplicationConfigSchema = z.object({
   SEARCH_DEFAULT_CRITERIA: searchCriteriaTypeSchema.optional()
 })
 
-export const ApplicationConfigResponseSchema = z.object({
-  config: ApplicationConfigSchema.optional(),
-  certificates: z.array(CertificateDataSchema)
-})
-
-export type ApplicationConfigResponseSchema = z.infer<
-  typeof ApplicationConfigResponseSchema
->
+export type ApplicationConfigSchema = z.infer<typeof ApplicationConfigSchema>

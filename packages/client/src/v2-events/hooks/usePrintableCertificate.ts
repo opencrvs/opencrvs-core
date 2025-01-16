@@ -23,12 +23,17 @@ import {
   getRegisteredDate,
   isCertificateForPrintInAdvance
 } from './utils/certificateUtils'
-import { CertificateDataSchema } from '@opencrvs/commons/events'
+import {
+  ApplicationConfigSchema,
+  CertificateDataSchema,
+  LanguageSchema
+} from '@opencrvs/commons/events'
 import { ActionFormData, isMinioUrl } from '@opencrvs/commons/client'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { useEffect } from 'react'
 import { api } from '../trpc'
+import { is } from 'date-fns/locale'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
@@ -54,19 +59,29 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   return recursiveTransform(template)
 }
 
-export const usePrintableCertificate = (form: ActionFormData) => {
+export const usePrintableCertificate = (
+  form: ActionFormData,
+  appConfig?: ApplicationConfigSchema,
+  certificatesTemplate?: CertificateDataSchema[],
+  language?: LanguageSchema
+) => {
   const handleCertify = () => {}
+
+  if (!appConfig || !language || !certificatesTemplate) return { svgCode: null }
 
   const isPrintInAdvance = false
   const canUserEditRecord = false
   const handleEdit = () => {}
-  const { data: svgCode, isFetched } =
-    api.appConfig.getCertificateTemplateSVGById.useQuery({
-      id: form['collector.certificateTemplateId'] as string
-    })
+  const certificateConfig = certificatesTemplate.find(
+    (x) => x.id === form['collector.certificateTemplateId']
+  )
+
+  if (!certificateConfig) return { svgCode: null }
+  const certificateFonts = certificateConfig?.fonts ?? {}
+  const svgWithoutFonts = compileSvg(certificateConfig.svg, form, language)
+  const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   return {
-    isLoadingInProgress: isFetched,
     svgCode,
     handleCertify,
     isPrintInAdvance,
