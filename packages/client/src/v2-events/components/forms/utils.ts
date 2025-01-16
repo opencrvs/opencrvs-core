@@ -20,7 +20,6 @@ import {
   validate,
   SelectOption,
   ParagraphFieldValue,
-  RadioGroupFieldValue,
   DateFieldValue,
   TextFieldValue,
   SelectFieldValue
@@ -35,7 +34,6 @@ import {
   INITIAL_RADIO_GROUP_VALUE,
   INITIAL_TEXT_VALUE,
   paragraphToString,
-  radioGroupToString,
   textToString
 } from '@client/v2-events/features/events/registered-fields'
 import { selectFieldToString } from '@client/v2-events/features/events/registered-fields/Select'
@@ -137,10 +135,9 @@ export async function fieldValueToString<T extends FieldType>(
       return textToString(value as TextFieldValue)
     case FieldType.PARAGRAPH:
       return paragraphToString(value as ParagraphFieldValue)
-    case FieldType.RADIO_GROUP:
-      return radioGroupToString(value as RadioGroupFieldValue)
     case FieldType.CHECKBOX:
       return checkboxToString(value as CheckboxFieldValue)
+    case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
       return selectFieldToString(
         value as SelectFieldValue,

@@ -10,8 +10,7 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { FieldProps, FieldValue } from '@opencrvs/commons'
-import { RadioGroupFieldValue } from '@opencrvs/commons/client'
+import { RadioGroupFieldValue, FieldProps } from '@opencrvs/commons/client'
 import { RadioGroup as RadioGroupComponent } from '@opencrvs/components'
 
 export const INITIAL_RADIO_GROUP_VALUE = ''
@@ -22,7 +21,7 @@ export function RadioGroup({
   options,
   ...props
 }: FieldProps<'RADIO_GROUP'> & {
-  setFieldValue: (name: string, val: FieldValue | undefined) => void
+  setFieldValue: (name: string, val: RadioGroupFieldValue | undefined) => void
   value?: string
 }) {
   const intl = useIntl()
@@ -42,4 +41,3 @@ export function RadioGroup({
     />
   )
 }
-export const radioGroupToString = (value: RadioGroupFieldValue) => value || ''

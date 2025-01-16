@@ -21,7 +21,8 @@ import {
   SelectOption,
   LocationOptions,
   SelectField,
-  LocationField
+  LocationField,
+  RadioGroupField
 } from './FieldConfig'
 
 const isMetadataField = <T extends string>(
@@ -52,6 +53,8 @@ export const findPageFields = (
                 ? (field as SelectField).options
                 : type === FieldType.LOCATION
                 ? (field as LocationField).options
+                : type === FieldType.RADIO_GROUP
+                ? (field as RadioGroupField).options
                 : undefined
           }))
         )
