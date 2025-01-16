@@ -29,9 +29,10 @@ export function SelectCountry({
   return (
     <Select
       {...props}
+      // @Todo ensure countries are of the same type
       options={countries as SelectOption[]}
       type="SELECT"
-      value={value as string}
+      value={value}
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )

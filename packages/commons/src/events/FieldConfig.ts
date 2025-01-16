@@ -52,7 +52,7 @@ const FieldConditional = z.discriminatedUnion('type', [
 
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(FieldConditional).optional().default([]),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   initialValue: z
     .union([
       z.string(),
@@ -128,13 +128,22 @@ const DateField = BaseField.extend({
     .optional()
 }).describe('A single date input (dd-mm-YYYY)')
 
+const HTMLFontVariant = z.enum([
+  'reg12',
+  'reg14',
+  'reg16',
+  'reg18',
+  'h4',
+  'h3',
+  'h2',
+  'h1'
+])
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   options: z
     .object({
-      fontVariant: z
-        .enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
-        .optional()
+      fontVariant: HTMLFontVariant.optional()
     })
     .default({})
 }).describe('A read-only HTML <p> paragraph')
@@ -160,7 +169,7 @@ const RadioGroup = BaseField.extend({
 const BulletList = BaseField.extend({
   type: z.literal(FieldType.BULLET_LIST),
   items: z.array(TranslationConfig).describe('A list of items'),
-  font: z.enum(['reg12', 'reg14', 'reg16', 'reg18', 'h4', 'h3', 'h2', 'h1'])
+  font: HTMLFontVariant.optional()
 }).describe('A list of bullet points')
 
 const Select = BaseField.extend({
@@ -168,7 +177,7 @@ const Select = BaseField.extend({
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
-const CheckBox = BaseField.extend({
+const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX)
 }).describe('Check Box')
 
@@ -198,7 +207,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   RadioGroup,
   BulletList,
   Select,
-  CheckBox,
+  Checkbox,
   File,
   Country,
   Location

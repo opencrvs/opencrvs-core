@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape, MessageDescriptor, useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
   SelectFieldValue,
@@ -32,13 +32,13 @@ export function Select({
 
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
-    label: intl.formatMessage(option.label as MessageDescriptor)
+    label: intl.formatMessage(option.label)
   }))
 
   return (
     <InputField {...props} label={intl.formatMessage(label)} touched={false}>
       <SelectComponent
-        label={'Gender'}
+        label={intl.formatMessage(label)}
         options={formattedOptions}
         value={value ?? ''}
         onChange={onChange}

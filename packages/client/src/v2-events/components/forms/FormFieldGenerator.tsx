@@ -51,14 +51,13 @@ import {
 import { FileInput } from './inputs/FileInput/FileInput'
 
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
-import { Checkbox } from '@client/v2-events/features/events/registered-fields/CheckBox'
+import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { countries } from '@client/utils/countries'
-import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
 import { Location } from '@client/v2-events/features/events/registered-fields/Location'
 import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
 import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
+import { formatISO } from 'date-fns'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -440,7 +439,7 @@ class FormSectionComponent extends React.Component<AllProps> {
             field,
             {
               $form: makeFormikFieldIdsOpenCRVSCompatible(values),
-              $now: new Date().toISOString().split('T')[0]
+              $now: formatISO(new Date(), { representation: 'date' })
             }
           )
 
