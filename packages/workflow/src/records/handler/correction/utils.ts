@@ -17,11 +17,7 @@ import {
   TransactionResponse
 } from '@opencrvs/commons/types'
 import { NOTIFICATION_SERVICE_URL } from '@workflow/constants'
-<<<<<<< HEAD
 import { partition } from 'lodash'
-=======
-import _ from 'lodash'
->>>>>>> f0917d9e9 (fix: replace temporary url with actual ones in correct record flow)
 
 type Contacts =
   | { email: string }
@@ -103,11 +99,7 @@ export const updateFullUrl = <T extends Bundle>(
   transactionResponse: TransactionResponse,
   bundle: T
 ): T => {
-<<<<<<< HEAD
   const [history, others] = partition(bundle.entry, (entry: BundleEntry) =>
-=======
-  const [history, others] = _.partition(bundle.entry, (entry: BundleEntry) =>
->>>>>>> f0917d9e9 (fix: replace temporary url with actual ones in correct record flow)
     entry.resource.resourceType.endsWith('History')
   )
 
