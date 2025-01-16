@@ -19,15 +19,15 @@ import {
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
-import { getClient } from '@events/storage/mongodb'
+import * as events from '@events/storage/mongodb/events'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
-import { deleteEventIndex, indexEvent } from './indexing/indexing'
+import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
-import { getEventConfigurations } from './config/config'
-import { deleteFile, fileExists } from './files'
-import { searchForDuplicates } from './deduplication/deduplication'
+import { getEventConfigurations } from '@events/service/config/config'
+import { deleteFile, fileExists } from '@events/service/files'
+import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -36,7 +36,7 @@ export const EventInputWithId = EventInput.extend({
 export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
-  const db = await getClient()
+  const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
 
   const document = await collection.findOne({ transactionId })
@@ -51,8 +51,9 @@ class EventNotFoundError extends TRPCError {
     })
   }
 }
+
 export async function getEventById(id: string) {
-  const db = await getClient()
+  const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
@@ -68,7 +69,7 @@ export async function deleteEvent(
   eventId: string,
   { token }: { token: string }
 ) {
-  const db = await getClient()
+  const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: eventId })
@@ -137,7 +138,7 @@ export async function createEvent({
     return existingEvent
   }
 
-  const db = await getClient()
+  const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
 
   const now = new Date().toISOString()
@@ -181,7 +182,7 @@ export async function addAction(
     token: string
   }
 ) {
-  const db = await getClient()
+  const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
 
@@ -309,7 +310,7 @@ export async function patchEvent(eventInput: EventInputWithId) {
     throw new EventNotFoundError(eventInput.id)
   }
 
-  const db = await getClient()
+  const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
 
   const now = new Date().toISOString()

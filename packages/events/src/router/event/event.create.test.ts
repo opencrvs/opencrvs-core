@@ -9,14 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/__mocks__/mongodb'
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
-
-const client = createTestClient()
-const generator = payloadGenerator()
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('event can be created and fetched', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
   const event = await client.event.create(generator.event.create())
 
   const fetchedEvent = await client.event.get(event.id)
@@ -25,17 +22,20 @@ test('event can be created and fetched', async () => {
 })
 
 test('creating an event is an idempotent operation', async () => {
-  const db = await getClient()
+  const { user, generator, eventsDb } = await setupTestCase()
+  const client = createTestClient(user)
 
   const payload = generator.event.create()
 
   await client.event.create(payload)
   await client.event.create(payload)
 
-  expect(await db.collection('events').find().toArray()).toHaveLength(1)
+  expect(await eventsDb.collection('events').find().toArray()).toHaveLength(1)
 })
 
 test('event with unknown type cannot be created', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
   await expect(
     client.event.create(
       generator.event.create({
