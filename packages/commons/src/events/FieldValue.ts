@@ -33,8 +33,8 @@ export type FileFieldValue = z.infer<typeof FileFieldValue>
 const RadioGroupFieldValue = z.string()
 export type RadioGroupFieldValue = z.infer<typeof RadioGroupFieldValue>
 
-const CheckBoxFieldValue = z.enum(['true', 'false'])
-export type CheckBoxFieldValue = z.infer<typeof CheckBoxFieldValue>
+const CheckboxFieldValue = z.enum(['true', 'false'])
+export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 
 const LocationFieldValue = z.string()
 export type LocationFieldValue = z.infer<typeof LocationFieldValue>
@@ -53,7 +53,7 @@ export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
   : T extends 'RADIO_GROUP'
   ? RadioGroupFieldValue
   : T extends 'CHECKBOX'
-  ? CheckBoxFieldValue
+  ? CheckboxFieldValue
   : T extends 'LOCATION'
   ? LocationFieldValue
   : T extends 'SELECT'
@@ -66,7 +66,7 @@ export const FieldValue = z.union([
   ParagraphFieldValue,
   FileFieldValue,
   RadioGroupFieldValue,
-  CheckBoxFieldValue,
+  CheckboxFieldValue,
   LocationFieldValue,
   SelectFieldValue
 ])

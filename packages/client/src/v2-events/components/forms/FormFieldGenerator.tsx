@@ -29,7 +29,7 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
-  CheckBoxFieldValue,
+  CheckboxFieldValue,
   FieldConfig,
   FieldValue,
   FileFieldValue
@@ -230,7 +230,7 @@ const GeneratedInputField = React.memo(
       return (
         <Checkbox
           {...fieldDefinition}
-          value={value as CheckBoxFieldValue}
+          value={value as CheckboxFieldValue}
           setFieldValue={setFieldValue}
         />
       )

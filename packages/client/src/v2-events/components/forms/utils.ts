@@ -26,7 +26,7 @@ import {
   SelectFieldValue
 } from '@opencrvs/commons/client'
 
-import { LocationOptions } from '@opencrvs/commons'
+import { CheckboxFieldValue, LocationOptions } from '@opencrvs/commons'
 import { DependencyInfo } from '@client/forms'
 import {
   dateToString,
@@ -42,6 +42,7 @@ import { selectFieldToString } from '@client/v2-events/features/events/registere
 import { selectCountryFieldToString } from '@client/v2-events/features/events/registered-fields/SelectCountry'
 import { selectLocationFieldToString } from '@client/v2-events/features/events/registered-fields/Location'
 import { searchLocationFieldToString } from '@client/v2-events/features/events/registered-fields/LocationSearch'
+import { checkboxToString } from '@client/v2-events/features/events/registered-fields/Checkbox'
 
 export function handleInitialValue(
   field: FieldConfig,
@@ -138,6 +139,8 @@ export async function fieldValueToString<T extends FieldType>(
       return paragraphToString(value as ParagraphFieldValue)
     case FieldType.RADIO_GROUP:
       return radioGroupToString(value as RadioGroupFieldValue)
+    case FieldType.CHECKBOX:
+      return checkboxToString(value as CheckboxFieldValue)
     case FieldType.SELECT:
       return selectFieldToString(
         value as SelectFieldValue,
@@ -152,6 +155,6 @@ export async function fieldValueToString<T extends FieldType>(
         : selectLocationFieldToString(value as SelectFieldValue)
     default:
       console.log('error: field value to string not implemented')
-      return ''
+      return `${field} toString is missing`
   }
 }
