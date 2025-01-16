@@ -23,7 +23,12 @@ export function ValidateEvent() {
   const validateEvent = events.actions.validate
 
   useEffect(() => {
-    validateEvent.mutate({ eventId, data: {}, transactionId: uuid() })
+    validateEvent.mutate({
+      eventId,
+      data: {},
+      transactionId: uuid(),
+      duplicates: []
+    })
     navigate(ROUTES.V2.path)
   }, [validateEvent, eventId, navigate])
 
