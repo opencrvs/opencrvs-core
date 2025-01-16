@@ -34,6 +34,7 @@ import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import styled from 'styled-components'
+import { useDeclaration } from '@client/declarations/selectors'
 
 interface IDownloadConfig {
   event: string
@@ -131,7 +132,12 @@ export function DownloadButton({
   status,
   className,
   declarationStatus,
-  downloadConfigs: { assignment, event, compositionId, action }
+  downloadConfigs: {
+    assignment: declarationAssignment,
+    event,
+    compositionId,
+    action
+  }
 }: DownloadButtonProps) {
   const intl = useIntl()
   const client = useApolloClient()
@@ -145,6 +151,9 @@ export function DownloadButton({
   )
   const [modal, openModal] = useModal()
   const { isRecordActionable } = usePermissions()
+
+  const declaration = useDeclaration(compositionId)
+  const assignment = declarationAssignment ?? declaration?.assignmentStatus
 
   const assignedToSomeoneElse =
     assignment && assignment.practitionerId !== practitionerId
