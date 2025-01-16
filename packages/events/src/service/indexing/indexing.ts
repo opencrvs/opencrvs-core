@@ -75,11 +75,20 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     return { type: 'date' }
   }
 
-  if (field.type === 'TEXT' || field.type === 'PARAGRAPH') {
+  if (
+    field.type === 'TEXT' ||
+    field.type === 'PARAGRAPH' ||
+    field.type === 'BULLET_LIST'
+  ) {
     return { type: 'text' }
   }
 
-  if (field.type === 'RADIO_GROUP') {
+  if (
+    field.type === 'RADIO_GROUP' ||
+    field.type === 'SELECT' ||
+    field.type === 'COUNTRY' ||
+    field.type === 'CHECKBOX'
+  ) {
     return { type: 'keyword' }
   }
 
