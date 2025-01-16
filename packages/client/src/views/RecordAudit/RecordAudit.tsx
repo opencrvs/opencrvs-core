@@ -545,7 +545,7 @@ const BodyContent = ({
               }
             } else {
               declaration = getGQLDeclaration(data.fetchRegistration, language)
-              declaration.assignment ??= draft?.assignmentStatus
+              declaration.assignment = draft?.assignmentStatus
             }
 
             return (
