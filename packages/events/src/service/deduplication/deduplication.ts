@@ -34,7 +34,7 @@ function generateElasticsearchQuery(
   const matcherFieldWithoutData =
     configuration.type !== 'and' &&
     configuration.type !== 'or' &&
-    eventIndex.data[configuration.fieldId]
+    !eventIndex.data[configuration.fieldId]
 
   if (matcherFieldWithoutData) {
     return null
