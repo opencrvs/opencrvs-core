@@ -15,8 +15,10 @@ import type {
   AdminStructure
 } from '@client/offline/reducer'
 import forms from './forms.json'
-import languages from './languages.json'
-import templates from './templates.json'
+import languages from './languages.json' assert { type: 'json' }
+import templates from './templates.json' assert { type: 'json' }
+import { ILanguage } from '@client/i18n/reducer'
+import { ICertificateData } from '@client/utils/referenceApi'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -399,8 +401,8 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE'
     }
   } satisfies Record<string, AdminStructure>,
-  languages: languages.data,
-  templates: templates,
+  languages: languages.data as unknown as ILanguage[],
+  templates: templates as unknown as ICertificateData[],
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },

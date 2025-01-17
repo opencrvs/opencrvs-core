@@ -29,7 +29,7 @@ export const WithData: Story = {
     msw: {
       handlers: {
         registrationHome: [
-          graphql.query('registrationHome', (req, res, ctx) => {
+          graphql.query('registrationHome', () => {
             return HttpResponse.json({
               data: {
                 inProgressTab: {
