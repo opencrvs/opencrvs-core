@@ -97,7 +97,11 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
   [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
   [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
   [FieldType.FILE]: null,
-  [FieldType.HIDDEN]: null
+  [FieldType.HIDDEN]: null,
+  [FieldType.BULLET_LIST]: null,
+  [FieldType.CHECKBOX]: null,
+  [FieldType.COUNTRY]: null,
+  [FieldType.SELECT]: null
 }
 
 export function getInitialValues(fields: FieldConfig[]) {

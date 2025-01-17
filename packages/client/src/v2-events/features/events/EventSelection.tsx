@@ -111,7 +111,7 @@ function EventSelector() {
         {eventConfigurations.map((event) => (
           <RadioButton
             key={`${event.id}event`}
-            id="select_birth_event"
+            id={`select_${event.id}_event`}
             label={intl.formatMessage(event.label)}
             name={`${event.id}event`}
             selected={eventType === event.id ? event.id : ''}

@@ -12,7 +12,7 @@ import { z } from 'zod'
 import { FieldConfig } from './FieldConfig'
 import { TranslationConfig } from './TranslationConfig'
 
-const FormPage = z.object({
+export const FormPage = z.object({
   id: z.string().describe('Unique identifier for the page'),
   title: TranslationConfig.describe('Header title of the page'),
   fields: z.array(FieldConfig).describe('Fields to be rendered on the page')

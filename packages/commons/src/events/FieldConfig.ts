@@ -20,6 +20,7 @@ import {
 
 export const ConditionalTypes = {
   SHOW: 'SHOW',
+  HIDE: 'HIDE',
   ENABLE: 'ENABLE'
 } as const
 
@@ -33,6 +34,11 @@ const ShowConditional = z.object({
   conditional: Conditional()
 })
 
+const HideConditional = z.object({
+  type: z.literal(ConditionalTypes.HIDE),
+  conditional: Conditional()
+})
+
 const EnableConditional = z.object({
   type: z.literal(ConditionalTypes.ENABLE),
   conditional: Conditional()
@@ -40,12 +46,13 @@ const EnableConditional = z.object({
 
 const FieldConditional = z.discriminatedUnion('type', [
   ShowConditional,
+  HideConditional,
   EnableConditional
 ])
 
 const BaseField = z.object({
   id: FieldId,
-  conditionals: z.array(FieldConditional).optional().default([]),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   initialValue: z
     .union([
       z.string(),
@@ -80,7 +87,11 @@ export const FieldType = {
   PARAGRAPH: 'PARAGRAPH',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
-  HIDDEN: 'HIDDEN'
+  HIDDEN: 'HIDDEN',
+  BULLET_LIST: 'BULLET_LIST',
+  CHECKBOX: 'CHECKBOX',
+  SELECT: 'SELECT',
+  COUNTRY: 'COUNTRY'
 } as const
 
 export const fieldTypes = Object.values(FieldType)
@@ -98,9 +109,10 @@ const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   options: z
     .object({
-      maxLength: z.number().optional().describe('Maximum length of the text')
+      maxLength: z.number().optional().describe('Maximum length of the text'),
+      type: z.enum(['text', 'email', 'password', 'number']).optional()
     })
-    .default({})
+    .default({ type: 'text' })
     .optional()
 }).describe('Text input')
 
@@ -115,11 +127,22 @@ const DateField = BaseField.extend({
     .optional()
 }).describe('A single date input (dd-mm-YYYY)')
 
+const HTMLFontVariant = z.enum([
+  'reg12',
+  'reg14',
+  'reg16',
+  'reg18',
+  'h4',
+  'h3',
+  'h2',
+  'h1'
+])
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   options: z
     .object({
-      fontVariant: z.literal('reg16').optional()
+      fontVariant: HTMLFontVariant.optional()
     })
     .default({})
 }).describe('A read-only HTML <p> paragraph')
@@ -138,14 +161,44 @@ const RadioGroup = BaseField.extend({
   )
 }).describe('Grouped radio options')
 
+const BulletList = BaseField.extend({
+  type: z.literal(FieldType.BULLET_LIST),
+  items: z.array(TranslationConfig).describe('A list of items'),
+  font: HTMLFontVariant
+}).describe('A list of bullet points')
+
+const SelectOption = z.object({
+  value: z.string().describe('The value of the option'),
+  label: TranslationConfig.describe('The label of the option')
+})
+
+const Select = BaseField.extend({
+  type: z.literal(FieldType.SELECT),
+  options: z.array(SelectOption).describe('A list of options')
+}).describe('Select input')
+
+const Checkbox = BaseField.extend({
+  type: z.literal(FieldType.CHECKBOX)
+}).describe('Check Box')
+
+const Country = BaseField.extend({
+  type: z.literal(FieldType.COUNTRY)
+}).describe('Country select field')
+
 export const FieldConfig = z.discriminatedUnion('type', [
   TextField,
   DateField,
   Paragraph,
   RadioGroup,
-  File
+  BulletList,
+  Select,
+  Checkbox,
+  File,
+  Country
 ])
 
 export type FieldConfig = z.infer<typeof FieldConfig>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
+export type SelectOption = z.infer<typeof SelectOption>
+export type FieldConditional = z.infer<typeof FieldConditional>

@@ -11,7 +11,7 @@
 
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import { DATE, PARAGRAPH, TEXT } from '@client/forms'
+import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -27,11 +27,10 @@ import {
 } from './utils'
 import { Errors, getValidationErrorsForForm } from './validation'
 
-import { ActionFormData } from '@opencrvs/commons'
 import {
+  ActionFormData,
   FieldConfig,
   FieldValue,
-  FieldValueByType,
   FileFieldValue
 } from '@opencrvs/commons/client'
 import {
@@ -49,6 +48,14 @@ import {
   useIntl
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
+
+import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
+import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
+import { Select } from '@client/v2-events/features/events/registered-fields/Select'
+import { countries } from '@client/utils/countries'
+import { SelectOption } from '@opencrvs/commons'
+import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { formatISO } from 'date-fns'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -72,7 +79,7 @@ interface GeneratedInputFieldProps<FieldType extends FieldConfig> {
   onChange: (e: React.ChangeEvent) => void
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
-  value: FieldValueByType[FieldType['type']]
+  value: IFormFieldValue
   touched: boolean
   error: string
   formData: ActionFormData
@@ -175,7 +182,7 @@ const GeneratedInputField = React.memo(
       return (
         <InputField {...inputFieldProps}>
           <TextInput
-            type="text"
+            type={fieldDefinition.options?.type ?? 'text'}
             {...inputProps}
             isDisabled={disabled}
             maxLength={fieldDefinition.options?.maxLength}
@@ -194,6 +201,36 @@ const GeneratedInputField = React.memo(
             onChange={handleFileChange}
           />
         </InputField>
+      )
+    }
+    if (fieldDefinition.type === 'BULLET_LIST') {
+      return <BulletList {...fieldDefinition} />
+    }
+    if (fieldDefinition.type === 'SELECT') {
+      return (
+        <Select
+          {...fieldDefinition}
+          value={inputProps.value as string}
+          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'COUNTRY') {
+      return (
+        <SelectCountry
+          {...fieldDefinition}
+          value={inputProps.value as string}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'CHECKBOX') {
+      return (
+        <Checkbox
+          {...fieldDefinition}
+          value={value as string}
+          setFieldValue={setFieldValue}
+        />
       )
     }
     return <div>Unsupported field type {fieldDefinition.type}</div>
@@ -365,10 +402,13 @@ class FormSectionComponent extends React.Component<AllProps> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            { $form: values, $now: new Date().toISOString().split('T')[0] }
+            {
+              $form: makeFormikFieldIdsOpenCRVSCompatible(values),
+              $now: formatISO(new Date(), { representation: 'date' })
+            }
           )
 
-          if (conditionalActions.includes('hide')) {
+          if (conditionalActions.includes('HIDE')) {
             return null
           }
 
