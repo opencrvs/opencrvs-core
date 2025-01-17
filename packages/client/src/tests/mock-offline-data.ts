@@ -8,17 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import { ILanguage } from '@client/i18n/reducer'
 import type {
-  Facility,
+  AdminStructure,
   CRVSOffice,
-  AdminStructure
+  Facility
 } from '@client/offline/reducer'
+import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import {
+  CertificateConfiguration,
+  ICertificateData
+} from '@client/utils/referenceApi'
 import forms from './forms.json'
 import languages from './languages.json'
 import templates from './templates.json'
-import { ILanguage } from '@client/i18n/reducer'
-import { ICertificateData } from '@client/utils/referenceApi'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -57,8 +60,8 @@ const systems: System[] = [
 ]
 
 export const mockOfflineData = {
-  forms: forms.forms,
-  userForms: forms.userForm,
+  forms: forms as any,
+  userForms: forms.userForm as any,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -402,7 +405,10 @@ export const mockOfflineData = {
     }
   } satisfies Record<string, AdminStructure>,
   languages: languages.data as unknown as ILanguage[],
-  templates: templates as unknown as ICertificateData[],
+  templates: templates as unknown as {
+    fonts?: CertificateConfiguration['fonts']
+    certificates: ICertificateData[]
+  },
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },

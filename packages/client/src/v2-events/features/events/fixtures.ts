@@ -11,7 +11,7 @@
 import { v4 as uuid } from 'uuid'
 import { EventConfig, EventIndex, FormConfig } from '@opencrvs/commons/client'
 
-export const DEFAULT_FORM = {
+const DEFAULT_FORM = {
   label: {
     id: 'event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
@@ -260,7 +260,7 @@ export const tennisClubMembershipEvent = {
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
       },
-      forms: [DEFAULT_FORM]
+      rms: [DEFAULT_FORM]
     }
   ],
   deduplication: [
