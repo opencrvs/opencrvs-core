@@ -300,7 +300,7 @@ jobs:
         run: CI="" yarn install --frozen-lockfile
 
       - name: Add origin
-        run: git remote set-url origin git@github.com:opencrvs/opencrvs-core.git
+        run: git remote set-url origin https://github.com/opencrvs/opencrvs-core.git
 
       - name: Fetch full Git history
         run: git fetch --prune --unshallow
