@@ -62,8 +62,6 @@ const mockConfig = {
   },
   MARRIAGE_REGISTRATION: false,
   DATE_OF_BIRTH_UNKNOWN: false,
-  INFORMANT_SIGNATURE: true,
-  INFORMANT_SIGNATURE_REQUIRED: true,
   HEALTH_FACILITY_FILTER: 'UPAZILA',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',

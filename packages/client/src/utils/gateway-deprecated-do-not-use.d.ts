@@ -722,8 +722,6 @@ export interface GQLApplicationConfiguration {
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
-  INFORMANT_SIGNATURE?: boolean
-  INFORMANT_SIGNATURE_REQUIRED?: boolean
   USER_NOTIFICATION_DELIVERY_METHOD?: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
@@ -741,8 +739,6 @@ export interface GQLApplicationConfigurationInput {
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
-  INFORMANT_SIGNATURE?: boolean
-  INFORMANT_SIGNATURE_REQUIRED?: boolean
   USER_NOTIFICATION_DELIVERY_METHOD?: string
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: string
   DATE_OF_BIRTH_UNKNOWN?: boolean
@@ -5184,8 +5180,6 @@ export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
-  INFORMANT_SIGNATURE?: ApplicationConfigurationToINFORMANT_SIGNATUREResolver<TParent>
-  INFORMANT_SIGNATURE_REQUIRED?: ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<TParent>
   USER_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToUSER_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   INFORMANT_NOTIFICATION_DELIVERY_METHOD?: ApplicationConfigurationToINFORMANT_NOTIFICATION_DELIVERY_METHODResolver<TParent>
   DATE_OF_BIRTH_UNKNOWN?: ApplicationConfigurationToDATE_OF_BIRTH_UNKNOWNResolver<TParent>
@@ -5263,20 +5257,6 @@ export interface ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<
 }
 
 export interface ApplicationConfigurationToNID_NUMBER_PATTERNResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_SIGNATUREResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_SIGNATURE_REQUIREDResolver<
   TParent = any,
   TResult = any
 > {

@@ -55,7 +55,6 @@ const config = {
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,
     EXTERNAL_VALIDATION_WORKQUEUE: false,
-    INFORMANT_SIGNATURE: true,
     PRINT_DECLARATION: true
   },
   LANGUAGES: 'en,bn,fr',
