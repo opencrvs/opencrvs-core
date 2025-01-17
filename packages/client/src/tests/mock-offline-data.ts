@@ -8,14 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { readFileSync } from 'fs'
-import { join } from 'path'
 import { System, SystemStatus, SystemType } from '@client/utils/gateway'
 import type {
   Facility,
   CRVSOffice,
   AdminStructure
 } from '@client/offline/reducer'
+import forms from './forms.json'
+import languages from './languages.json'
+import templates from './templates.json'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -54,11 +55,8 @@ const systems: System[] = [
 ]
 
 export const mockOfflineData = {
-  forms: JSON.parse(readFileSync(join(__dirname, './forms.json')).toString())
-    .forms,
-  userForms: JSON.parse(
-    readFileSync(join(__dirname, './forms.json')).toString()
-  ).userForm,
+  forms: forms.forms,
+  userForms: forms.userForm,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
       id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
@@ -401,12 +399,8 @@ export const mockOfflineData = {
       type: 'ADMIN_STRUCTURE'
     }
   } satisfies Record<string, AdminStructure>,
-  languages: JSON.parse(
-    readFileSync(join(__dirname, './languages.json')).toString()
-  ).data,
-  templates: JSON.parse(
-    readFileSync(join(__dirname, './templates.json')).toString()
-  ),
+  languages: languages.data,
+  templates: templates,
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },

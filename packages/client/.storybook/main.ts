@@ -22,7 +22,6 @@ const config: StorybookConfig = {
     options: {}
   },
   viteFinal: (config) => {
-    delete (config.resolve?.alias as any)?.crypto
     config.plugins = config.plugins?.filter((plugins) => {
       const list = Array.isArray(plugins) ? plugins : [plugins]
       return !list

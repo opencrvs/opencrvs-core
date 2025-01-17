@@ -22,7 +22,7 @@
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "chromatic": "npx chromatic --project-token=chpt_00979ecfbf44023"
+    "test-storybook": "test-storybook"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
@@ -83,6 +83,7 @@
     "jwt-decode": "^3.0.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
+    "msw-storybook-addon": "^2.0.4",
     "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
@@ -132,6 +133,7 @@
     "@storybook/react": "^8.4.7",
     "@storybook/react-vite": "^8.4.7",
     "@storybook/test": "^8.4.7",
+    "@storybook/test-runner": "^0.21.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.1.0",
     "@types/browser-image-compression": "^1.0.13",
