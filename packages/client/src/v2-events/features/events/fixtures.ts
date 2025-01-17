@@ -161,7 +161,7 @@ export const tennisClubMembershipEvent = {
           id: 'applicant.firstname',
           label: {
             defaultMessage: 'First name',
-            description: 'Label for the gien field from form.',
+            description: 'Label for the given field on form.',
             id: 'event.tennis-club-membership.summary.field.firstname.label'
           }
         },
