@@ -277,7 +277,10 @@ export const tennisClubMembershipEvent = {
         clauses: [
           {
             fieldId: 'applicant.firstname',
-            type: 'strict'
+            type: 'strict',
+            options: {
+              boost: 1
+            }
           }
         ]
       }

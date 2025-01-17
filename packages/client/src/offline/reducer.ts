@@ -91,7 +91,7 @@ export interface CRVSOffice extends ILocation {
   physicalType: 'Building'
 }
 
-export interface IForms {
+interface IForms {
   version: string
   birth: ISerializedForm
   death: ISerializedForm
