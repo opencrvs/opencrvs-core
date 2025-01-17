@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { v4 as uuid } from 'uuid'
 import { EventConfig, EventIndex, FormConfig } from '@opencrvs/commons/client'
+import { v4 as uuid } from 'uuid'
 
 const DEFAULT_FORM = {
   label: {
@@ -260,7 +260,7 @@ export const tennisClubMembershipEvent = {
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
       },
-      rms: [DEFAULT_FORM]
+      forms: [DEFAULT_FORM]
     }
   ],
   deduplication: [
