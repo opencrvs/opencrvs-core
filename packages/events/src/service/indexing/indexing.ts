@@ -14,18 +14,16 @@ import {
   EventDocument,
   EventIndex,
   FieldConfig,
-  getAllFields,
   getCurrentEventState
 } from '@opencrvs/commons/events'
-
 import { type estypes } from '@elastic/elasticsearch'
-import { getClient } from '@events/storage'
+import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { logger } from '@opencrvs/commons'
+import { getAllFields } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 
@@ -77,11 +75,20 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     return { type: 'date' }
   }
 
-  if (field.type === 'TEXT' || field.type === 'PARAGRAPH') {
+  if (
+    field.type === 'TEXT' ||
+    field.type === 'PARAGRAPH' ||
+    field.type === 'BULLET_LIST'
+  ) {
     return { type: 'text' }
   }
 
-  if (field.type === 'RADIO_GROUP') {
+  if (
+    field.type === 'RADIO_GROUP' ||
+    field.type === 'SELECT' ||
+    field.type === 'COUNTRY' ||
+    field.type === 'CHECKBOX'
+  ) {
     return { type: 'keyword' }
   }
 
@@ -113,7 +120,7 @@ function formFieldsToDataMapping(fields: FieldConfig[]) {
 }
 
 export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const mongoClient = await getClient()
+  const mongoClient = await eventsDb.getClient()
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
   const hasEventsIndex = await esClient.indices.exists({
@@ -161,22 +168,6 @@ export async function indexEvent(event: EventDocument) {
     },
     refresh: 'wait_for'
   })
-}
-
-export async function ensureIndexExists(
-  eventType: string,
-  configuration: EventConfig
-) {
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventType)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
-
-  if (!hasEventsIndex) {
-    logger.error(`Events index ${indexName} does not exist. Creating one.`)
-    await createIndex(indexName, getAllFields(configuration))
-  }
 }
 
 export async function deleteEventIndex(event: EventDocument) {

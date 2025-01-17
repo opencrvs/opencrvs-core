@@ -13,7 +13,7 @@ import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { FormConfig, FormConfigInput } from './FormConfig'
+import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
 
 /**
@@ -43,3 +43,6 @@ export type EventConfigInput = z.input<typeof EventConfigInput>
 
 export const defineForm = (form: FormConfigInput): FormConfig =>
   FormConfig.parse(form)
+
+export const defineFormPage = (formPage: FormPage): FormPage =>
+  FormPage.parse(formPage)
