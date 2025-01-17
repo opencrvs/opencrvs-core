@@ -14,103 +14,106 @@ import {
   getEventIndexName
 } from '@events/storage/elasticsearch'
 import * as elasticsearch from '@elastic/elasticsearch'
-import { z } from 'zod'
+
 import {
   EventIndex,
   DeduplicationConfig,
-  Clause
+  Clause,
+  ClauseOutput
 } from '@opencrvs/commons/events'
 import { subDays, addDays } from 'date-fns'
 
-const dataReference = (fieldName: string) => `data.${fieldName}`
+function dataReference(fieldName: string) {
+  return `data.${fieldName}`
+}
 
 function generateElasticsearchQuery(
   eventIndex: EventIndex,
-  configuration: z.output<typeof Clause>
+  configuration: ClauseOutput
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
-  if (configuration.type === 'and') {
-    const clauses = configuration.clauses
-      .map((clause) => generateElasticsearchQuery(eventIndex, clause))
-      .filter(
-        (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-      )
-    return {
-      bool: {
-        must: clauses
-      } as elasticsearch.estypes.QueryDslBoolQuery
-    }
-  }
-  if (configuration.type === 'or') {
-    return {
-      bool: {
-        should: configuration.clauses
-          .map((clause) => generateElasticsearchQuery(eventIndex, clause))
-          .filter(
-            (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
-          )
-      }
-    }
-  }
-  const truthyFormDataValue = eventIndex.data[configuration.fieldId]
-  if (!truthyFormDataValue) {
+  const matcherFieldWithoutData =
+    configuration.type !== 'and' &&
+    configuration.type !== 'or' &&
+    !eventIndex.data[configuration.fieldId]
+
+  if (matcherFieldWithoutData) {
     return null
   }
 
-  if (configuration.type === 'fuzzy') {
-    return {
-      match: {
-        ['data.' + configuration.fieldId]: {
-          query: eventIndex.data[configuration.fieldId],
-          fuzziness: configuration.options.fuzziness,
-          boost: configuration.options.boost
+  switch (configuration.type) {
+    case 'and':
+      const clauses = configuration.clauses
+        .map((clause) => {
+          return generateElasticsearchQuery(eventIndex, clause)
+        })
+        .filter(
+          (x): x is elasticsearch.estypes.QueryDslQueryContainer => x !== null
+        )
+
+      return {
+        bool: {
+          must: clauses
+        } as elasticsearch.estypes.QueryDslBoolQuery
+      }
+    case 'or':
+      return {
+        bool: {
+          should: configuration.clauses
+            .map((clause) => generateElasticsearchQuery(eventIndex, clause))
+            .filter(
+              (x): x is elasticsearch.estypes.QueryDslQueryContainer =>
+                x !== null
+            )
         }
       }
-    }
-  }
-
-  if (configuration.type === 'strict') {
-    return {
-      match_phrase: {
-        [dataReference(configuration.fieldId)]:
-          eventIndex.data[configuration.fieldId] || ''
-      }
-    }
-  }
-
-  if (configuration.type === 'dateRange') {
-    return {
-      range: {
-        [dataReference(configuration.fieldId)]: {
-          gte: subDays(
-            new Date(eventIndex.data[configuration.options.origin]),
-            configuration.options.days
-          ).toISOString(),
-          lte: addDays(
-            new Date(eventIndex.data[configuration.options.origin]),
-            configuration.options.days
-          ).toISOString()
+    case 'fuzzy':
+      return {
+        match: {
+          ['data.' + configuration.fieldId]: {
+            query: eventIndex.data[configuration.fieldId],
+            fuzziness: configuration.options.fuzziness,
+            boost: configuration.options.boost
+          }
         }
       }
-    }
-  }
-
-  if (configuration.type === 'dateDistance') {
-    return {
-      distance_feature: {
-        field: dataReference(configuration.fieldId),
-        pivot: `${configuration.options.days}d`,
-        origin: eventIndex.data[configuration.options.origin]
+    case 'strict':
+      return {
+        match_phrase: {
+          [dataReference(configuration.fieldId)]:
+            eventIndex.data[configuration.fieldId] || ''
+        }
       }
-    }
+    case 'dateRange':
+      return {
+        range: {
+          [dataReference(configuration.fieldId)]: {
+            // @TODO: Improve types for origin field to be sure it returns a string when accessing data
+            gte: subDays(
+              new Date(eventIndex.data[configuration.options.origin] as string),
+              configuration.options.days
+            ).toISOString(),
+            lte: addDays(
+              new Date(eventIndex.data[configuration.options.origin] as string),
+              configuration.options.days
+            ).toISOString()
+          }
+        }
+      }
+    case 'dateDistance':
+      return {
+        distance_feature: {
+          field: dataReference(configuration.fieldId),
+          pivot: `${configuration.options.days}d`,
+          origin: eventIndex.data[configuration.options.origin]
+        }
+      }
   }
-
-  throw new Error(`Unknown clause type`)
 }
 
 export async function searchForDuplicates(
   eventIndex: EventIndex,
   configuration: DeduplicationConfig
-) {
+): Promise<{ score: number; event: EventIndex | undefined }[]> {
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
@@ -134,6 +137,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source!
+      event: hit._source
     }))
 }
