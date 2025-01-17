@@ -8,27 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as elasticsearch from '@elastic/elasticsearch'
-import { env } from '@events/environment'
 
-let client: elasticsearch.Client | undefined
+export type { ProvidedContext } from 'vitest'
 
-export const getOrCreateClient = () => {
-  if (!client) {
-    client = new elasticsearch.Client({
-      node: env.ES_URL
-    })
-
-    return client
+declare module 'vitest' {
+  export interface ProvidedContext {
+    EVENTS_MONGO_URI: string
+    USER_MGNT_MONGO_URI: string
+    ELASTICSEARCH_URI: string
   }
-
-  return client
-}
-
-export function getEventAliasName() {
-  return `events`
-}
-
-export function getEventIndexName(eventType: string) {
-  return `events_${eventType}`.toLowerCase()
 }
