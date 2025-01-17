@@ -301,7 +301,7 @@ jobs:
       - name: Run Chromatic
         uses: chromaui/action@latest
         with:
-          storybookBaseDir: packages/client
+          workingDir: packages/client
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test-client:
