@@ -13,8 +13,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { graphql, HttpResponse } from 'msw'
 import React from 'react'
 import { OfficeHome } from './OfficeHome'
+import { RegistrationHomeQuery } from '@client/utils/gateway'
 
-const meta: Meta<any> = {
+const meta: Meta<typeof OfficeHome> = {
   title: 'OfficeHome',
   component: OfficeHome,
   decorators: [(Story) => <Story />]
@@ -22,7 +23,7 @@ const meta: Meta<any> = {
 
 export default meta
 
-type Story = StoryObj<any>
+type Story = StoryObj<typeof OfficeHome>
 
 export const WithData: Story = {
   parameters: {
@@ -127,7 +128,7 @@ export const WithData: Story = {
                   __typename: 'EventSearchResultSet'
                 }
               }
-            })
+            } satisfies { data: RegistrationHomeQuery })
           })
         ]
       }

@@ -9,14 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  tennisClubMembershipEvent,
-  tennisClubMembershipEventIndex
-} from '@client/v2-events/features/events/fixtures'
-import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
-import { TRPCProvider } from '@client/v2-events/trpc'
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
+import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
+import { TRPCProvider } from '@client/v2-events/trpc'
 
 const meta: Meta<typeof WorkqueueIndex> = {
   title: 'Workqueue',

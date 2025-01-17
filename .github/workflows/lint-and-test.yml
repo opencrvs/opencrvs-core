@@ -309,10 +309,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Count total commits
-        run: |
-          echo "Total commits: $(git rev-list --count HEAD)"
-
       - name: Run Chromatic
         uses: chromaui/action@latest
         with:
