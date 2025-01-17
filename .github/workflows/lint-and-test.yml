@@ -161,38 +161,6 @@ jobs:
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
-  run-visual-tests:
-    name: Run visual tests
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checking out git repo
-        uses: actions/checkout@v4
-
-      - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            ~/.cache/yarn/v6
-          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: CI="" yarn install --frozen-lockfile
-
-      - name: Run Chromatic
-        uses: chromaui/action@latest
-        with:
-          workingDir: packages/client
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-22.04
@@ -300,6 +268,45 @@ jobs:
 
       - name: Run linting
         run: cd packages/client && yarn lint
+
+  run-visual-tests:
+    name: Run visual tests
+    needs: prepare-client-tests
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Fetch full Git history
+        run: git fetch --prune --unshallow
+
+      - name: Run Chromatic
+        uses: chromaui/action@latest
+        with:
+          workingDir: packages/client
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
   test-client:
     name: Test client
