@@ -88,7 +88,7 @@ import {
 } from './tests/util'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
-  createUserForm: mockOfflineData.forms.userForm
+  createUserForm: mockOfflineData.userForms
 }))
 
 vi.mock('@client/forms/handlebarHelpers', async () => {
@@ -195,7 +195,7 @@ vi.doMock(
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
-      loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
+      loadForms: () => Promise.resolve({ forms: mockOfflineData.forms }),
       importConditionals: () => Promise.resolve({}),
       importValidators: () => Promise.resolve({}),
       importHandlebarHelpers: () => Promise.resolve({})
