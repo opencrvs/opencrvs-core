@@ -547,7 +547,7 @@ const BodyContent = ({
                 assignment: data.fetchRegistration?.registration?.assignment
               }
             } else {
-              declaration = getGQLDeclaration(data.fetchRegistration, language)
+              declaration = getGQLDeclaration(data.fetchRegistration, intl)
             }
 
             return (
@@ -583,7 +583,7 @@ const BodyContent = ({
           }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-            language,
+            intl,
             trackingId
           )
     const wqStatus = workqueueDeclaration?.registration

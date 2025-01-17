@@ -13,8 +13,6 @@ import {
   IPrintableDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { IFormSectionData } from '@client/forms'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { EventType, History, RegStatus } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
@@ -24,67 +22,46 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
+import { EMPTY_STRING } from '@client/utils/constants'
+import { getLocalisedName } from './data-formatting'
+import { IntlShape } from 'react-intl'
 
-const getEngName = (
-  sectionData: IFormSectionData,
-  lastNameFirst: boolean
-): string => {
-  if (lastNameFirst) {
-    return `${sectionData.familyNameEng ?? ''} ${
-      sectionData.firstNamesEng ?? ''
-    }`
-  }
-  return [
-    sectionData.firstNamesEng,
-    sectionData.middleNameEng,
-    sectionData.familyNameEng
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .trim()
-}
-
-const getOtherName = (sectionData: IFormSectionData): string => {
-  return [
-    sectionData.firstNames,
-    sectionData.middleName,
-    sectionData.familyName
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .trim()
-}
-
-const getFullName = (
-  sectionData: IFormSectionData,
-  language = 'en',
-  lastNameFirst = false
-): string => {
-  if (!sectionData) {
-    return EMPTY_STRING
-  }
-  if (language === 'en') {
-    return getEngName(sectionData, lastNameFirst)
-  }
-  return getOtherName(sectionData) || getEngName(sectionData, lastNameFirst)
-}
-
-/*
- * lastNameFirst needs to be removed in #4464
- */
 export const getDeclarationFullName = (
   draft: IDeclaration,
-  language?: string,
-  lastNameFirst?: boolean
+  intl: IntlShape
 ) => {
   switch (draft.event) {
     case EventType.Birth:
-      return getFullName(draft.data.child, language, lastNameFirst)
+      return draft.data.child
+        ? getLocalisedName(intl, {
+            firstNames: draft.data.child.firstNamesEng as string,
+            middleName: draft.data.child.middleNameEng as string,
+            familyName: draft.data.child.familyNameEng as string
+          })
+        : EMPTY_STRING
     case EventType.Death:
-      return getFullName(draft.data.deceased, language, lastNameFirst)
+      return draft.data.deceased
+        ? getLocalisedName(intl, {
+            firstNames: draft.data.deceased.firstNamesEng as string,
+            middleName: draft.data.deceased.middleNameEng as string,
+            familyName: draft.data.deceased.familyNameEng as string
+          })
+        : EMPTY_STRING
     case EventType.Marriage:
-      const brideName = getFullName(draft.data.bride, language, lastNameFirst)
-      const groomName = getFullName(draft.data.groom, language, lastNameFirst)
+      const brideName = draft.data.bride
+        ? getLocalisedName(intl, {
+            firstNames: draft.data.bride.firstNamesEng as string,
+            middleName: draft.data.bride.middleNameEng as string,
+            familyName: draft.data.bride.familyNameEng as string
+          })
+        : EMPTY_STRING
+      const groomName = draft.data.groom
+        ? getLocalisedName(intl, {
+            firstNames: draft.data.groom.firstNamesEng as string,
+            middleName: draft.data.groom.middleNameEng as string,
+            familyName: draft.data.groom.familyNameEng as string
+          })
+        : EMPTY_STRING
       if (brideName && groomName) {
         return `${groomName} & ${brideName}`
       } else {
