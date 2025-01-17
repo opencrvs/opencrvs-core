@@ -301,6 +301,8 @@ jobs:
 
       - name: Fetch full Git history
         run: git fetch --prune --unshallow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Chromatic
         uses: chromaui/action@latest
