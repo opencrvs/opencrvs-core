@@ -16,14 +16,7 @@ import { flattenDeep } from 'lodash'
 import { EventConfig, EventConfigInput } from './EventConfig'
 import { SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
-import {
-  FieldType,
-  SelectOption,
-  LocationOptions,
-  SelectField,
-  LocationField,
-  RadioGroupField
-} from './FieldConfig'
+import { FieldConfig } from './FieldConfig'
 
 const isMetadataField = <T extends string>(
   field: T | EventMetadataKeys
@@ -32,32 +25,11 @@ const isMetadataField = <T extends string>(
 /**
  * @returns All the fields in the event configuration.
  */
-export const findPageFields = (
-  config: EventConfigInput
-): Array<{
-  id: string
-  label: TranslationConfig
-  type: FieldType
-  options: SelectOption[] | LocationOptions | undefined
-}> => {
+export const findPageFields = (config: EventConfigInput): FieldConfig[] => {
   return flattenDeep(
     config.actions.map(({ forms }) =>
       forms.map(({ pages }) =>
-        pages.map(({ fields }) =>
-          fields.map(({ id, label, type, ...field }) => ({
-            id,
-            label,
-            type,
-            options:
-              type === FieldType.SELECT
-                ? (field as SelectField).options
-                : type === FieldType.LOCATION
-                ? (field as LocationField).options
-                : type === FieldType.RADIO_GROUP
-                ? (field as RadioGroupField).options
-                : undefined
-          }))
-        )
+        pages.map(({ fields }) => fields.map((field) => field as FieldConfig))
       )
     )
   )

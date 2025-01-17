@@ -8,10 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
-import { storage } from '@client/storage'
+// eslint-disable-next-line no-restricted-imports
+import { getFacilityLocations } from '@client/offline/selectors'
 import { ILocation } from './Location'
 
 interface SearchLocation {
@@ -25,6 +27,25 @@ export interface Facility extends ILocation {
   physicalType: 'Building'
 }
 
+function toSearchOption(facility: Facility) {
+  return {
+    id: facility.id,
+    searchableText: facility.name,
+    displayLabel: facility.alias
+  }
+}
+
+function useAdminLocations(value?: LocationFieldValue) {
+  const locationMap = useSelector(getFacilityLocations)
+
+  const locations = Object.values(locationMap)
+  const initialLocation =
+    // @TODO: Should disappear when restarting. Otherwise ignore and let markus fix the thing
+    value && locationMap[value] ? toSearchOption(locationMap[value]) : undefined
+  const options = locations.map(toSearchOption)
+  return { options, initialLocation }
+}
+
 export function LocationSearch({
   setFieldValue,
   value,
@@ -33,68 +54,17 @@ export function LocationSearch({
   setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
   value?: LocationFieldValue
 }) {
-  const [options, setOptions] = useState<SearchLocation[]>([])
-  const [loadingStatus, setLoadingStatus] = useState<
-    'loading' | 'success' | 'failed'
-  >('loading')
-  const [selectedLocation, setSelectedLocation] = useState<
-    SearchLocation | undefined
-  >(undefined)
-
-  useEffect(() => {
-    const fetchOfflineData = async () => {
-      const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
-
-      const facilities = Object.values(
-        offlineData.facilities as Record<string, Facility>
-      ) as Facility[]
-
-      const locations = facilities.map((facility) => ({
-        id: facility.id,
-        searchableText: facility.name,
-        displayLabel: facility.alias
-      }))
-      const initialLocation = locations.find((option) => option.id === value)
-
-      setSelectedLocation(initialLocation)
-      setOptions(locations)
-      setLoadingStatus('success')
-    }
-    fetchOfflineData().catch((error) => {
-      setLoadingStatus('failed')
-    })
-  }, [value])
-
-  if (loadingStatus === 'failed') {
-    return 'Error occurred while fetching offline data'
-  }
-
-  if (loadingStatus === 'loading') {
-    return 'Loading...'
-  }
+  const { options, initialLocation } = useAdminLocations()
 
   return (
     <LocationSearchComponent
       buttonLabel="Health facility"
-      selectedLocation={selectedLocation}
-      {...props}
       locationList={options}
       searchHandler={(location: SearchLocation) =>
         setFieldValue(props.id, location.id)
       }
+      selectedLocation={initialLocation}
+      {...props}
     />
   )
-}
-
-export const searchLocationFieldToString = async (val: LocationFieldValue) => {
-  if (!val) {
-    return ''
-  }
-  const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
-
-  const facilities = Object.values(
-    offlineData.facilities as Record<string, Facility>
-  ) as Facility[]
-
-  return facilities.find(({ id }) => id === val)?.name ?? val
 }

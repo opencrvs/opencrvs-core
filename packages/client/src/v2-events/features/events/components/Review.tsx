@@ -203,24 +203,9 @@ function ReviewComponent({
 }) {
   const intl = useIntl()
 
-  const [stringifiedForm, setStringifiedForm] = useState(form)
-
   const { toString } = useTransformer(eventConfig.id)
 
-  const prevFormRef = useRef<ActionFormData | null>(null)
-
-  useEffect(() => {
-    if (prevFormRef.current === null || !isEqual(prevFormRef.current, form)) {
-      const fetchStringifiedForm = async () => {
-        setStringifiedForm(await toString(form))
-      }
-      fetchStringifiedForm().catch((error) => {
-        console.error('Error fetching stringified form:', error)
-      })
-
-      prevFormRef.current = form
-    }
-  }, [form, toString])
+  const stringifiedForm = toString(form)
 
   return (
     <Row>

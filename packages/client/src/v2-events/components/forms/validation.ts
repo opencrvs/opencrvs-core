@@ -37,7 +37,7 @@ function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
 }
 
 function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
-  const hasEnableRule = ((field.conditionals ?? []) || []).some(
+  const hasEnableRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === 'ENABLE'
   )
   const validConditionals = getConditionalActionsForField(field, params)

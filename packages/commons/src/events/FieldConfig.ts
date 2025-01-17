@@ -12,9 +12,15 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from '../conditionals/conditionals'
 import {
+  BulletListFieldValue,
+  CheckboxFieldValue,
+  CountryFieldValue,
   DateFieldValue,
   FileFieldValue,
+  LocationFieldValue,
   ParagraphFieldValue,
+  RadioGroupFieldValue,
+  SelectFieldValue,
   TextFieldValue
 } from './FieldValue'
 
@@ -98,12 +104,17 @@ export const FieldType = {
 export const fieldTypes = Object.values(FieldType)
 export type FieldType = (typeof fieldTypes)[number]
 
-export type FieldValueByType = {
+export interface FieldValueByType {
   [FieldType.TEXT]: TextFieldValue
   [FieldType.DATE]: DateFieldValue
   [FieldType.PARAGRAPH]: ParagraphFieldValue
-  [FieldType.RADIO_GROUP]: string
+  [FieldType.RADIO_GROUP]: RadioGroupFieldValue
+  [FieldType.BULLET_LIST]: BulletListFieldValue
+  [FieldType.CHECKBOX]: CheckboxFieldValue
+  [FieldType.COUNTRY]: CountryFieldValue
+  [FieldType.LOCATION]: LocationFieldValue
   [FieldType.FILE]: FileFieldValue
+  [FieldType.SELECT]: SelectFieldValue
 }
 
 const TextField = BaseField.extend({

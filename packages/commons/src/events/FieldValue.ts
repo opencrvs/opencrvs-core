@@ -20,6 +20,9 @@ export type DateFieldValue = z.infer<typeof DateFieldValue>
 const ParagraphFieldValue = z.string()
 export type ParagraphFieldValue = z.infer<typeof ParagraphFieldValue>
 
+const BulletListFieldValue = z.string()
+export type BulletListFieldValue = z.infer<typeof BulletListFieldValue>
+
 export const FileFieldValue = z
   .object({
     filename: z.string(),
@@ -42,10 +45,15 @@ export type LocationFieldValue = z.infer<typeof LocationFieldValue>
 const SelectFieldValue = z.string()
 export type SelectFieldValue = z.infer<typeof SelectFieldValue>
 
+const CountryFieldValue = z.string()
+export type CountryFieldValue = z.infer<typeof CountryFieldValue>
+
 export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
   ? TextFieldValue
   : T extends 'PARAGRAPH'
   ? ParagraphFieldValue
+  : T extends 'BULLET_LIST'
+  ? BulletListFieldValue
   : T extends 'DATE'
   ? DateFieldValue
   : T extends 'FILE'
@@ -56,6 +64,8 @@ export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
   ? CheckboxFieldValue
   : T extends 'LOCATION'
   ? LocationFieldValue
+  : T extends 'COUNTRY'
+  ? CountryFieldValue
   : T extends 'SELECT'
   ? SelectFieldValue
   : never

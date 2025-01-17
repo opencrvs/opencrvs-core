@@ -8,13 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useState } from 'react'
-import {
-  LocationFieldValue,
-  FieldProps,
-  SelectOption
-} from '@opencrvs/commons/client'
-import { storage } from '@client/storage'
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
+// eslint-disable-next-line no-restricted-imports
+import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Select } from './Select'
 
 export interface ILocation {
@@ -28,16 +26,24 @@ export interface ILocation {
   type: string
   partOf: string
 }
-type JurisdictionType =
-  | 'STATE'
-  | 'DISTRICT'
-  | 'LOCATION_LEVEL_3'
-  | 'LOCATION_LEVEL_4'
-  | 'LOCATION_LEVEL_5'
-interface AdminStructure extends ILocation {
-  type: 'ADMIN_STRUCTURE'
-  jurisdictionType: JurisdictionType
-  physicalType: 'Jurisdiction'
+
+function useAdminLocations(partOf: string) {
+  const locationMap = useSelector(getAdminStructureLocations)
+
+  const locations = Object.values(locationMap)
+
+  const filteredLocations = locations.filter(
+    (location) => location.partOf === 'Location/' + partOf
+  )
+
+  return filteredLocations.map((location) => ({
+    value: location.id,
+    label: {
+      id: 'location.' + location.id,
+      description: 'Label for location: ' + location.name,
+      defaultMessage: location.name
+    }
+  }))
 }
 
 export function Location({
@@ -50,56 +56,15 @@ export function Location({
   partOf: string | null
   value?: LocationFieldValue
 }) {
-  const [options, setOptions] = useState<SelectOption[]>([])
-
-  useEffect(() => {
-    const fetchOfflineData = async () => {
-      const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
-
-      const locations = Object.values(
-        offlineData.locations as Record<string, AdminStructure>
-      ) as AdminStructure[]
-
-      const filteredLocations = locations.filter(
-        (location) => location.partOf === 'Location/' + (partOf ?? '0')
-      )
-
-      setOptions(
-        filteredLocations.map((location) => ({
-          value: location.id,
-          label: {
-            id: 'location.' + location.id,
-            description: 'Label for location: ' + location.name,
-            defaultMessage: location.name
-          }
-        }))
-      )
-    }
-    fetchOfflineData().catch((error) => {
-      console.error('Error fetching offline data:', error)
-    })
-  }, [partOf])
+  const options = useAdminLocations(partOf ?? '0')
 
   return (
     <Select
       {...props}
       options={options}
       type="SELECT"
-      value={value as string}
+      value={value}
       onChange={(val: string) => setFieldValue(props.id, val)}
     />
   )
-}
-
-export const selectLocationFieldToString = async (val: LocationFieldValue) => {
-  if (!val) {
-    return ''
-  }
-  const offlineData = JSON.parse((await storage.getItem('offline')) ?? '{}')
-
-  const locations = Object.values(
-    offlineData.locations as Record<string, AdminStructure>
-  ) as AdminStructure[]
-
-  return locations.find(({ id }) => id === val)?.name ?? val
 }
