@@ -15,8 +15,8 @@ import type {
   AdminStructure
 } from '@client/offline/reducer'
 import forms from './forms.json'
-import languages from './languages.json' assert { type: 'json' }
-import templates from './templates.json' assert { type: 'json' }
+import languages from './languages.json'
+import templates from './templates.json'
 import { ILanguage } from '@client/i18n/reducer'
 import { ICertificateData } from '@client/utils/referenceApi'
 
