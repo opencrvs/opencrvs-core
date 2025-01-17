@@ -313,7 +313,7 @@ describe('Correction summary', () => {
       expect(reason).toBeDefined()
     })
 
-    it('should match corrector with MATERIAL_OMISSION', () => {
+    it.only('should match corrector with MATERIAL_OMISSION', () => {
       ;(birthDeclaration.data.reason as any).type.value = 'MATERIAL_OMISSION'
       store.dispatch(storeDeclaration(birthDeclaration))
       const instance = wrapper

@@ -60,7 +60,7 @@ const systems: System[] = [
 ]
 
 export const mockOfflineData = {
-  forms: forms as any,
+  forms: forms.forms as any,
   userForms: forms.userForm as any,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
