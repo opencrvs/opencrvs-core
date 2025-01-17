@@ -299,15 +299,18 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
+      - name: Disable Git credential helper
+        run: git config --global credential.helper ""
+
       - name: Remove existing SSH origin (if any)
         run: git remote remove origin || true
-      
+
       - name: Add HTTPS origin
         run: git remote add origin https://github.com/opencrvs/opencrvs-core.git
-      
+
       - name: Verify remote URL
         run: git remote -v
-      
+
       - name: Fetch full Git history
         run: git fetch --prune --unshallow
 

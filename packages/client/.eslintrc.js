@@ -12,9 +12,7 @@ module.exports = {
   extends: [
     '../../.eslintrc.js',
     'eslint-config-react-app',
-    'plugin:react/recommended',
-    'plugin:storybook/recommended',
-    'plugin:storybook/recommended'
+    'plugin:react/recommended'
   ],
   plugins: ['react', 'formatjs'],
   env: {
