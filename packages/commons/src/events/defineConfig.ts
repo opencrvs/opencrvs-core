@@ -10,7 +10,7 @@
  */
 
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { findPageFields, resolveFieldLabels } from './utils'
+import { findInputPageFields, resolveFieldLabels } from './utils'
 
 /**
  * Builds a validated configuration for an event
@@ -19,12 +19,7 @@ import { findPageFields, resolveFieldLabels } from './utils'
 export const defineConfig = (config: EventConfigInput) => {
   const input = EventConfigInput.parse(config)
 
-  const pageFields = findPageFields(EventConfig.parse(config)).map(
-    ({ id, label }) => ({
-      id,
-      label
-    })
-  )
+  const pageFields = findInputPageFields(input)
 
   return EventConfig.parse({
     ...input,
