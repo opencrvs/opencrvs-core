@@ -763,7 +763,7 @@ export interface IDReaderFormField extends IFormFieldBase {
 }
 
 export type BannerType = 'pending' | 'verified' | 'failed'
-export interface IIDVerificationBannerFormField extends IFormFieldBase {
+interface IIDVerificationBannerFormField extends IFormFieldBase {
   type: typeof ID_VERIFICATION_BANNER
   bannerType: BannerType
   idFieldName: string
@@ -1011,7 +1011,7 @@ export interface IFormSection {
   canContinue?: string
 }
 
-export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
+type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
   fields: SerializedFormField[]
 }
 
@@ -1297,7 +1297,7 @@ export interface Ii18nIDReaderFormField extends Ii18nFormFieldBase {
   readers: [ReaderType, ...ReaderType[]]
 }
 
-export interface Ii18nBannerFormField extends Ii18nFormFieldBase {
+interface Ii18nIDVerificationBannerFormField extends Ii18nFormFieldBase {
   type: typeof ID_VERIFICATION_BANNER
   bannerType: BannerType
   idFieldName: string
@@ -1337,7 +1337,7 @@ export type Ii18nFormField =
   | Ii18nButtonFormField
   | Ii18nLinkButtonFormField
   | Ii18nIDReaderFormField
-  | Ii18nBannerFormField
+  | Ii18nIDVerificationBannerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue
