@@ -102,6 +102,8 @@ export const convertToLocal = (
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
+  alpha3CountryCode = alpha3CountryCode === 'FAR' ? 'ZMB' : alpha3CountryCode
+
   const phoneUtil = PhoneNumberUtil.getInstance()
   const number = phoneUtil.parse(mobileWithCountryCode)
   const countryCode = alpha3CountryCode
