@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IntlShape } from 'react-intl'
+import differenceInDays from 'date-fns/differenceInDays'
 import { IFormData, IFormSectionGroup, ISelectOption } from '@client/forms'
 import { Event, EventType } from '@client/utils/gateway'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
 import { ICertificate, IPrintableDeclaration } from '@client/declarations'
-import { IntlShape } from 'react-intl'
 import { IOfflineData } from '@client/offline/reducer'
-import differenceInDays from 'date-fns/differenceInDays'
 
 const MONTH_IN_DAYS = 30
 const YEAR_IN_DAYS = 365
@@ -70,9 +70,9 @@ function getDayRanges(
         offlineData.config.BIRTH.REGISTRATION_TARGET
       const BIRTH_LATE_REGISTRATION_TARGET =
         offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
-      const BIRTH_ON_TIME_FEE = templateConfig?.fee.onTime
-      const BIRTH_LATE_FEE = templateConfig?.fee.late
-      const BIRTH_DELAYED_FEE = templateConfig?.fee.delayed
+      const BIRTH_ON_TIME_FEE = templateConfig.fee.onTime
+      const BIRTH_LATE_FEE = templateConfig.fee.late
+      const BIRTH_DELAYED_FEE = templateConfig.fee.delayed
       const birthRanges = [
         { start: 0, end: BIRTH_REGISTRATION_TARGET, value: BIRTH_ON_TIME_FEE },
         {
@@ -88,8 +88,8 @@ function getDayRanges(
     case EventType.Death: {
       const DEATH_REGISTRATION_TARGET =
         offlineData.config.DEATH.REGISTRATION_TARGET
-      const DEATH_ON_TIME_FEE = templateConfig?.fee.onTime
-      const DEATH_DELAYED_FEE = templateConfig?.fee.delayed
+      const DEATH_ON_TIME_FEE = templateConfig.fee.onTime
+      const DEATH_DELAYED_FEE = templateConfig.fee.delayed
 
       const deathRanges = [
         { start: 0, end: DEATH_REGISTRATION_TARGET, value: DEATH_ON_TIME_FEE },
@@ -100,8 +100,8 @@ function getDayRanges(
     case EventType.Marriage: {
       const MARRIAGE_REGISTRATION_TARGET =
         offlineData.config.MARRIAGE.REGISTRATION_TARGET
-      const MARRIAGE_ON_TIME_FEE = templateConfig?.fee.onTime
-      const MARRIAGE_DELAYED_FEE = templateConfig?.fee.delayed
+      const MARRIAGE_ON_TIME_FEE = templateConfig.fee.onTime
+      const MARRIAGE_DELAYED_FEE = templateConfig.fee.delayed
       const marriageRanges = [
         {
           start: 0,
@@ -172,7 +172,9 @@ export function calculatePrice(
   offlineData: IOfflineData,
   certificate: ICertificate
 ) {
-  if (!certificate) return 0
+  if (!certificate) {
+    return 0
+  }
   const days = calculateDays(eventDate, registeredDate)
   const result = getValue(offlineData, certificate, days)
   return result
@@ -274,7 +276,7 @@ export function isCertificateForPrintInAdvance(
   declaration: IPrintableDeclaration | undefined
 ) {
   const collectorType =
-    declaration?.data?.registration?.certificates?.[0]?.collector?.type
+    declaration?.data.registration.certificates[0]?.collector?.type
   if (collectorType && collectorType === 'PRINT_IN_ADVANCE') {
     return true
   }
@@ -283,7 +285,9 @@ export function isCertificateForPrintInAdvance(
 
 export function filterPrintInAdvancedOption(collectionForm: IFormSectionGroup) {
   const filtredCollectionForm = collectionForm.fields.map((field) => {
-    if (field.type !== 'RADIO_GROUP') return field
+    if (field.type !== 'RADIO_GROUP') {
+      return field
+    }
 
     const filteredOption = field.options.filter(
       (option) => option.value !== 'PRINT_IN_ADVANCE'

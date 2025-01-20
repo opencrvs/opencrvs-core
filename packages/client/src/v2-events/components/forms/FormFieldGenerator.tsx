@@ -249,7 +249,6 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    // return <div>Unsupported field type {fieldDefinition.type}</div>
   }
 )
 

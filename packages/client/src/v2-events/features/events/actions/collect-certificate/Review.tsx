@@ -10,22 +10,12 @@
  */
 
 import React, { useEffect } from 'react'
-import { defineMessages } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventState, ActionType } from '@opencrvs/commons/client'
-import { ROUTES } from '@client/v2-events/routes'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
-import { useModal } from '@client/v2-events/hooks/useModal'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
-import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
+import { ActionType } from '@opencrvs/commons/client'
 import {
   Box,
   Button,
@@ -36,7 +26,17 @@ import {
   Spinner,
   Stack
 } from '@opencrvs/components'
+import { ROUTES } from '@client/v2-events/routes'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import { useModal } from '@client/v2-events/hooks/useModal'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { FormLayout } from '@client/v2-events/layouts/form'
+import { usePrintableCertificate } from '@client/v2-events/hooks/usePrintableCertificate'
 import { api } from '@client/v2-events/trpc'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 const CertificateContainer = styled.div`
   svg {
@@ -45,21 +45,21 @@ const CertificateContainer = styled.div`
   }
 `
 const messages = defineMessages({
-  registerActionTitle: {
-    id: 'registerAction.title',
-    defaultMessage: 'Register member',
-    description: 'The title for register action'
+  printActionTitle: {
+    id: 'printAction.title',
+    defaultMessage: 'Print certificate',
+    description: 'The title for print action'
   },
-  registerActionDescription: {
-    id: 'registerAction.description',
+  printActionDescription: {
+    id: 'printAction.description',
     defaultMessage:
-      'By clicking register, you confirm that the information entered is correct and the member can be registered.',
-    description: 'The description for register action'
+      'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
+    description: 'The description for print action'
   },
-  registerActionDeclare: {
-    id: 'registerAction.Declare',
-    defaultMessage: 'Register',
-    description: 'The label for declare button of register action'
+  printActionDeclare: {
+    id: 'printAction.Declare',
+    defaultMessage: 'No, make correction',
+    description: 'The label for declare button of print action'
   },
   printModalTitle: {
     id: 'print.certificate.review.printModalTitle',
@@ -113,7 +113,7 @@ const messages = defineMessages({
 
 /**
  *
- * Preview of event to be registered.
+ * Preview of event to print certificate.
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.COLLECT_CERTIFICATE)
@@ -122,6 +122,13 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
+  const { appConfig, certificatesTemplate, language, initiateAppConfig } =
+    useAppConfig()
+
+  useEffect(() => {
+    initiateAppConfig()
+  }, [initiateAppConfig])
+
   const collectCertificateMutation = events.actions.collectCertificate
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
@@ -135,23 +142,11 @@ export function Review() {
     (action) => action.type === ActionType.COLLECT_CERTIFICATE
   )[0]
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
   const getFormValues = useEventFormData((state) => state.getFormValues)
-
-  // useEffect(() => {
-  //   setFormValues(eventId, getCurrentEventState(event).data)
-  // }, [event, eventId, setFormValues])
-
   const form = getFormValues(eventId)
-  console.trace(form)
 
-  const {
-    isLoadingInProgress,
-    svgCode,
-    handleCertify,
-    isPrintInAdvance,
-    canUserEditRecord
-  } = usePrintableCertificate(form)
+  const { svgCode, handleCertify, isPrintInAdvance, canUserEditRecord } =
+    usePrintableCertificate(form, appConfig, certificatesTemplate, language)
 
   async function handleEdit({
     pageId,
@@ -178,52 +173,38 @@ export function Review() {
     return
   }
 
-  async function handleRegistration() {
-    const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Collect Certificate" close={close} />
-    ))
-    if (confirmedRegistration) {
-      collectCertificateMutation.mutate({
-        eventId: event.id,
-        data: form,
-        transactionId: uuid()
-      })
-
-      goToHome()
-    }
-  }
   const confirmAndPrint = async () => {
     const saveAndExitConfirm = await openModal<boolean>((close) => (
       <ResponsiveModal
+        actions={[
+          <Button
+            key="close-modal"
+            id="close-modal"
+            type="tertiary"
+            onClick={() => {
+              close(false)
+            }}
+          >
+            {intl.formatMessage(messages.cancel)}
+          </Button>,
+          <Button
+            key="print-certificate"
+            id="print-certificate"
+            type="primary"
+            onClick={() => close(true)}
+          >
+            {intl.formatMessage(messages.print)}
+          </Button>
+        ]}
+        contentHeight={100}
+        handleClose={() => close(false)}
         id="confirm-print-modal"
+        show={true}
         title={
           isPrintInAdvance
             ? intl.formatMessage(messages.printModalTitle)
             : intl.formatMessage(messages.printAndIssueModalTitle)
         }
-        actions={[
-          <Button
-            type="tertiary"
-            key="close-modal"
-            onClick={() => {
-              close(false)
-            }}
-            id="close-modal"
-          >
-            {intl.formatMessage(messages.cancel)}
-          </Button>,
-          <Button
-            type="primary"
-            key="print-certificate"
-            onClick={() => close(true)}
-            id="print-certificate"
-          >
-            {intl.formatMessage(messages.print)}
-          </Button>
-        ]}
-        show={true}
-        handleClose={() => close(false)}
-        contentHeight={100}
       >
         {isPrintInAdvance
           ? intl.formatMessage(messages.printModalBody)
@@ -232,11 +213,11 @@ export function Review() {
     ))
 
     if (saveAndExitConfirm) {
-      handleCertify()
+      handleCertify && handleCertify()
     }
   }
 
-  if (!isLoadingInProgress) {
+  if (!svgCode) {
     return <Spinner id="review-certificate-loading" />
   }
 
@@ -257,29 +238,27 @@ export function Review() {
         <Stack direction="column">
           <Box>
             <CertificateContainer
-              id="print"
               dangerouslySetInnerHTML={{ __html: svgCode }}
+              id="print"
             />
           </Box>
           <Content
-            title={intl.formatMessage(messages.registerActionTitle)}
-            bottomActionDirection="row"
             bottomActionButtons={[
               canUserEditRecord ? (
                 <Button
                   key="edit-record"
+                  fullWidth
+                  size="large"
                   type="negative"
-                  onClick={() =>
+                  onClick={async () =>
                     handleEdit({
                       pageId: formConfigs[0].pages[0].id,
                       fieldId: undefined
                     })
                   }
-                  size="large"
-                  fullWidth
                 >
                   <Icon name="X" size="medium" />
-                  {intl.formatMessage(messages.registerActionDeclare)}
+                  {intl.formatMessage(messages.printActionDeclare)}
                 </Button>
               ) : (
                 <></>
@@ -287,39 +266,24 @@ export function Review() {
 
               <Button
                 key="confirm-and-print"
-                type="positive"
-                id="confirm-print"
-                onClick={confirmAndPrint}
-                size="large"
                 fullWidth
+                id="confirm-print"
+                size="large"
+                type="positive"
+                onClick={confirmAndPrint}
               >
                 <Icon name="Check" size="medium" />
                 {intl.formatMessage(messages.confirmAndPrint)}
               </Button>
             ]}
+            bottomActionDirection="row"
+            title={intl.formatMessage(messages.printActionTitle)}
           >
+            {modal}
             {intl.formatMessage(messages.reviewDescription)}
           </Content>
         </Stack>
       </Frame.LayoutCentered>
-      {/* <ReviewComponent.Body
-        eventConfig={config}
-        form={form}
-        formConfig={formConfigs[0]}
-        title=""
-        onEdit={handleEdit}
-      >
-        <ReviewComponent.Actions
-          messages={{
-            title: messages.registerActionTitle,
-            description: messages.registerActionDescription,
-            onConfirm: messages.registerActionDeclare
-          }}
-          onConfirm={handleRegistration}
-        />
-        {modal}
-      </ReviewComponent.Body> */}
-      {/* <ReviewCertificate /> */}
     </FormLayout>
   )
 }

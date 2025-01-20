@@ -14,21 +14,17 @@ import {
   createIntl,
   createIntlCache
 } from 'react-intl'
-import { AdminStructure, ILocation } from '@client/offline/reducer'
+import * as Handlebars from 'handlebars'
+import htmlToPdfmake from 'html-to-pdfmake'
+import { Content } from 'pdfmake/interfaces'
+import { LanguageSchema } from '@opencrvs/commons'
 import { IPDFTemplate } from '@client/pdfRenderer'
 import { certificateBaseTemplate } from '@client/templates/register'
-import * as Handlebars from 'handlebars'
-import { IStoreState } from '@client/store'
-import { getOfflineData } from '@client/offline/selectors'
-import isValid from 'date-fns/isValid'
-import format from 'date-fns/format'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import {
   CertificateConfiguration,
   FontFamilyTypes
 } from '@client/utils/referenceApi'
-import htmlToPdfmake from 'html-to-pdfmake'
-import { Content } from 'pdfmake/interfaces'
 
 type TemplateDataType = string | MessageDescriptor | Array<string>
 function isMessageDescriptor(
@@ -86,12 +82,12 @@ const cache = createIntlCache()
 export function compileSvg(
   templateString: string,
   data: Record<string, any> = {},
-  state: IStoreState
+  language: LanguageSchema
 ): string {
   const intl = createIntl(
     {
-      locale: state.i18n.language,
-      messages: state.i18n.messages
+      locale: language.lang,
+      messages: language.messages
     },
     cache
   )
@@ -109,90 +105,6 @@ export function compileSvg(
     const helper = customHelpers[helperName]({ intl })
     Handlebars.registerHelper(helperName, helper)
   }
-
-  Handlebars.registerHelper(
-    'intl',
-    function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
-      // If even one of the parts is undefined, then return empty string
-      const idParts = args.slice(0, -1)
-      if (idParts.some((part) => part === undefined)) {
-        return ''
-      }
-
-      const id = idParts.join('.')
-
-      return intl.formatMessage({
-        id,
-        defaultMessage: 'Missing translation for ' + id
-      })
-    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
-  )
-
-  Handlebars.registerHelper(
-    'ifCond',
-    function (
-      this: any,
-      v1: string,
-      operator: string,
-      v2: string,
-      options: Handlebars.HelperOptions
-    ) {
-      switch (operator) {
-        case '===':
-          return v1 === v2 ? options.fn(this) : options.inverse(this)
-        case '!==':
-          return v1 !== v2 ? options.fn(this) : options.inverse(this)
-        case '<':
-          return v1 < v2 ? options.fn(this) : options.inverse(this)
-        case '<=':
-          return v1 <= v2 ? options.fn(this) : options.inverse(this)
-        case '>':
-          return v1 > v2 ? options.fn(this) : options.inverse(this)
-        case '>=':
-          return v1 >= v2 ? options.fn(this) : options.inverse(this)
-        case '&&':
-          return v1 && v2 ? options.fn(this) : options.inverse(this)
-        case '||':
-          return v1 || v2 ? options.fn(this) : options.inverse(this)
-        default:
-          return options.inverse(this)
-      }
-    }
-  )
-
-  Handlebars.registerHelper(
-    'formatDate',
-    function (this: any, dateString: string, formatString: string) {
-      const date = new Date(dateString)
-      return isValid(date) ? format(date, formatString) : ''
-    }
-  )
-
-  Handlebars.registerHelper(
-    'location',
-    function (this: any, locationId: string | undefined, key: keyof ILocation) {
-      const offlineData = getOfflineData(state)
-
-      if (!locationId) {
-        return ''
-      }
-
-      if (!['name', 'alias'].includes(key)) {
-        return `Unknown property ${key}`
-      }
-
-      const location: AdminStructure | undefined =
-        offlineData.locations[locationId] ??
-        offlineData.facilities[locationId] ??
-        offlineData.offices[locationId]
-
-      const fallback = import.meta.env.DEV
-        ? `Missing location for id: ${locationId}`
-        : locationId
-
-      return location?.[key] ?? fallback
-    }
-  )
 
   const template = Handlebars.compile(templateString)
   const formattedTemplateData = formatAllNonStringValues(data, intl)

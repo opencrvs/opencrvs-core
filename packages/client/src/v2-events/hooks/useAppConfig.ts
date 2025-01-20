@@ -10,21 +10,53 @@
  */
 
 import { create } from 'zustand'
-import { api } from '@client/v2-events/trpc'
-import { ApplicationConfigResponseSchema } from '@opencrvs/commons/events'
-import { UseTRPCQueryResult } from '@trpc/react-query/shared'
-import { TRPCClientErrorLike } from '@trpc/client'
-import { DefaultErrorShape } from '@trpc/server/unstable-core-do-not-import'
+import {
+  LanguageSchema,
+  ApplicationConfigSchema,
+  CertificateDataSchema
+} from '@opencrvs/commons/events'
+import { storage } from '@client/storage'
 
 interface IApplicationConfig {
-  appConfig: ApplicationConfigResponseSchema
+  appConfig?: ApplicationConfigSchema
+  certificatesTemplate: CertificateDataSchema[]
+  language?: LanguageSchema
   initiateAppConfig: () => Promise<void>
 }
 
+const isTruthyArray = (value: any) => Array.isArray(value) && value.length > 0
+
 export const useAppConfig = create<IApplicationConfig>((set, get) => ({
-  appConfig: { config: undefined, certificates: [] },
+  language: undefined,
+  appConfig: undefined,
+  certificatesTemplate: [],
   initiateAppConfig: async () => {
-    const { data: appConfig } = api.appConfig.get.useQuery()
-    set({ appConfig })
+    try {
+      const offlineJsonString = await storage.getItem('offline')
+      if (offlineJsonString) {
+        const offline = JSON.parse(offlineJsonString)
+
+        if (isTruthyArray(offline['languages'])) {
+          const defaultLangue = await storage.getItem('language')
+          const defaultLangueObj: LanguageSchema = offline['languages'].find(
+            (x: LanguageSchema) => x.lang === defaultLangue
+          )
+          set({ language: defaultLangueObj })
+        }
+
+        if (offline['config']) {
+          set({ appConfig: offline['config'] })
+        }
+
+        if (
+          offline['templates'] &&
+          isTruthyArray(offline['templates']['certificates'])
+        ) {
+          set({ certificatesTemplate: offline['templates']['certificates'] })
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing app config:', error)
+    }
   }
 }))

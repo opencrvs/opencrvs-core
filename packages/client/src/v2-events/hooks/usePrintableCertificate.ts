@@ -9,26 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { formatLongDate } from '@client/utils/date-formatting'
-import { EventType } from '@client/utils/gateway'
-import { getLocationHierarchy } from '@client/utils/locationUtils'
-import { getUserName, UserDetails } from '@client/utils/userUtils'
-import { cloneDeep } from 'lodash'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import { addFontsToSvg, compileSvg, svgToPdfTemplate } from './utils/PDFUtils'
 import {
-  calculatePrice,
-  getEventDate,
-  getRegisteredDate,
-  isCertificateForPrintInAdvance
-} from './utils/certificateUtils'
-import { CertificateDataSchema } from '@opencrvs/commons/events'
+  ApplicationConfigSchema,
+  CertificateDataSchema,
+  LanguageSchema
+} from '@opencrvs/commons/events'
 import { ActionFormData, isMinioUrl } from '@opencrvs/commons/client'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
-import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
-import { useEffect } from 'react'
-import { api } from '../trpc'
+import { addFontsToSvg, compileSvg } from './utils/PDFUtils'
 
 async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   async function recursiveTransform(obj: any) {
@@ -54,19 +42,33 @@ async function replaceMinioUrlWithBase64(template: Record<string, any>) {
   return recursiveTransform(template)
 }
 
-export const usePrintableCertificate = (form: ActionFormData) => {
+export const usePrintableCertificate = (
+  form: ActionFormData,
+  appConfig?: ApplicationConfigSchema,
+  certificatesTemplate?: CertificateDataSchema[],
+  language?: LanguageSchema
+) => {
   const handleCertify = () => {}
 
+  if (!appConfig || !language || !certificatesTemplate) {
+    return { svgCode: null }
+  }
+
   const isPrintInAdvance = false
-  const canUserEditRecord = false
+  const canUserEditRecord = true
   const handleEdit = () => {}
-  const { data: svgCode, isFetched } =
-    api.appConfig.getCertificateTemplateSVGById.useQuery({
-      id: form['collector.certificateTemplateId'] as string
-    })
+  const certificateConfig = certificatesTemplate.find(
+    (x) => x.id === form['collector.certificateTemplateId']
+  )
+
+  if (!certificateConfig) {
+    return { svgCode: null }
+  }
+  const certificateFonts = certificateConfig.fonts ?? {}
+  const svgWithoutFonts = compileSvg(certificateConfig.svg, form, language)
+  const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   return {
-    isLoadingInProgress: isFetched,
     svgCode,
     handleCertify,
     isPrintInAdvance,

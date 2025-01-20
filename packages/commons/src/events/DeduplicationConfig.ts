@@ -135,6 +135,7 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
       DateDistanceMatcher
     ])
   )
+export type Clause = z.infer<typeof Clause>
 
 export const DeduplicationConfig = z.object({
   id: z.string(),

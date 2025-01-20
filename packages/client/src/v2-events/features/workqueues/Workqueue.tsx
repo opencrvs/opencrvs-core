@@ -10,7 +10,7 @@
  */
 
 import { get, mapKeys, orderBy } from 'lodash'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
@@ -31,6 +31,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/v2-events/messages'
 import { ROUTES } from '@client/v2-events/routes'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 /**

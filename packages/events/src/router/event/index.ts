@@ -150,17 +150,17 @@ export const eventRouter = router({
             token: options.ctx.token
           }
         )
+      }),
+    collectCertificate: publicProcedure
+      .input(CollectCertificateActionInput)
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
+        })
       })
   }),
-  collectCertificate: publicProcedure
-    .input(CollectCertificateActionInput)
-    .mutation((options) => {
-      return addAction(options.input, {
-        eventId: options.input.eventId,
-        createdBy: options.ctx.user.id,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        token: options.ctx.token
-      })
-    }),
   list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
 })
