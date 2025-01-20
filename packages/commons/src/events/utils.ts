@@ -13,7 +13,7 @@ import { TranslationConfig } from './TranslationConfig'
 
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { flattenDeep } from 'lodash'
-import { EventConfig, EventConfigInput } from './EventConfig'
+import { EventConfig } from './EventConfig'
 import { SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldConfig } from './FieldConfig'
@@ -25,12 +25,10 @@ const isMetadataField = <T extends string>(
 /**
  * @returns All the fields in the event configuration.
  */
-export const findPageFields = (config: EventConfigInput): FieldConfig[] => {
+export const findPageFields = (config: EventConfig): FieldConfig[] => {
   return flattenDeep(
     config.actions.map(({ forms }) =>
-      forms.map(({ pages }) =>
-        pages.map(({ fields }) => fields.map((field) => field as FieldConfig))
-      )
+      forms.map(({ pages }) => pages.map(({ fields }) => fields))
     )
   )
 }
