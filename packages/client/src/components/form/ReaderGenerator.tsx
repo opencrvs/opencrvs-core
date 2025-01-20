@@ -74,6 +74,8 @@ export const ReaderGenerator = ({
               onScan={(data) => {
                 setFieldValue(field.name, data)
               }}
+              // Error handling to be handled in OCRVS-8330
+              // eslint-disable-next-line no-console
               onError={(error) => console.error(error)}
             />
           )
