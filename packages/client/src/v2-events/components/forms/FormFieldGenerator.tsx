@@ -29,9 +29,13 @@ import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
   ActionFormData,
+  CheckboxFieldValue,
   FieldConfig,
   FieldValue,
-  FileFieldValue
+  FileFieldValue,
+  LocationFieldValue,
+  RadioGroupFieldValue,
+  SelectFieldValue
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -52,9 +56,10 @@ import { FileInput } from './inputs/FileInput/FileInput'
 import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
 import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { countries } from '@client/utils/countries'
-import { SelectOption } from '@opencrvs/commons'
 import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { Location } from '@client/v2-events/features/events/registered-fields/Location'
+import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
 import { formatISO } from 'date-fns'
 
 const fadeIn = keyframes`
@@ -210,7 +215,7 @@ const GeneratedInputField = React.memo(
       return (
         <Select
           {...fieldDefinition}
-          value={inputProps.value as string}
+          value={inputProps.value as SelectFieldValue}
           onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
         />
       )
@@ -219,7 +224,7 @@ const GeneratedInputField = React.memo(
       return (
         <SelectCountry
           {...fieldDefinition}
-          value={inputProps.value as string}
+          value={inputProps.value as SelectFieldValue}
           setFieldValue={setFieldValue}
         />
       )
@@ -228,12 +233,45 @@ const GeneratedInputField = React.memo(
       return (
         <Checkbox
           {...fieldDefinition}
-          value={value as string}
+          value={value as CheckboxFieldValue}
           setFieldValue={setFieldValue}
         />
       )
     }
-    return <div>Unsupported field type {fieldDefinition.type}</div>
+    if (fieldDefinition.type === 'RADIO_GROUP') {
+      return (
+        <RadioGroup
+          {...fieldDefinition}
+          value={value as RadioGroupFieldValue}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'LOCATION') {
+      if (fieldDefinition.options.type === 'HEALTH_FACILITY')
+        return (
+          <LocationSearch
+            {...fieldDefinition}
+            value={value as LocationFieldValue}
+            setFieldValue={setFieldValue}
+          />
+        )
+      return (
+        <Location
+          {...fieldDefinition}
+          value={value as LocationFieldValue}
+          setFieldValue={setFieldValue}
+          partOf={
+            (fieldDefinition.options?.partOf?.$data &&
+              (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                fieldDefinition.options?.partOf.$data
+              ] as string | undefined | null)) ??
+            null
+          }
+        />
+      )
+    }
+    throw new Error(`Unsupported field ${fieldDefinition}`)
   }
 )
 
