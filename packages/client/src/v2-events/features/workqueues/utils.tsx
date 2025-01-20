@@ -52,15 +52,21 @@ export function useIntlFormatMessageWithFlattenedParams() {
   function formatMessage<T extends {}>(message: MessageDescriptor, params?: T) {
     const variables = convertDotToTripleUnderscore(params ?? {})
 
-    return intl.formatMessage(
-      {
-        id: message.id,
-        description: message.description,
-        defaultMessage: convertDotInCurlyBraces(
-          message.defaultMessage as string
+    return (
+      intl
+        .formatMessage(
+          {
+            id: message.id,
+            description: message.description,
+            defaultMessage: convertDotInCurlyBraces(
+              message.defaultMessage as string
+            )
+          },
+          variables
         )
-      },
-      variables
+        // When multiple variables are provided, we trim to ensure empty content in case both are missing.
+        // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
+        .trim()
     )
   }
 

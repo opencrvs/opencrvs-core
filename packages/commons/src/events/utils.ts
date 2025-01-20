@@ -14,7 +14,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { flattenDeep } from 'lodash'
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldType } from './FieldConfig'
 
@@ -89,7 +88,7 @@ export const resolveFieldLabels = ({
   config,
   pageFields
 }: {
-  config: SummaryConfigInput | WorkqueueConfigInput
+  config: WorkqueueConfigInput
   pageFields: { id: string; label: TranslationConfig }[]
 }) => {
   return {
