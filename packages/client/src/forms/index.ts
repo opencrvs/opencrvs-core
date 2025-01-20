@@ -715,8 +715,8 @@ export interface IHttpFormField extends IFormFieldBase {
   type: typeof HTTP
   options: {
     headers: Record<string, string>
-    body: Record<string, any>
-    params?: Record<string, any>
+    body: Record<string, unknown>
+    params?: Record<string, string>
   } & Omit<Request, 'body' | 'headers'>
 }
 export interface IButtonFormField extends IFormFieldBase {
