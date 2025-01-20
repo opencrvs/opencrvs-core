@@ -72,6 +72,7 @@ import { useIntl } from 'react-intl'
 import { IDeclarationData } from './utils'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
+import { useDeclaration } from '@client/declarations/selectors'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -169,10 +170,7 @@ export const ActionMenu: React.FC<{
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent
-            scopes={RECORD_ALLOWED_SCOPES.UPDATE}
-            conditional={isDraft}
-          >
+          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
             <UpdateAction
               declarationId={id}
               declarationStatus={status}
@@ -403,6 +401,8 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
+  const declaration = useDeclaration(declarationId)
+  const isDraft = declaration?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   let pageRoute: string, pageId: 'preview' | 'review'
 
@@ -420,7 +420,7 @@ const UpdateAction: React.FC<IActionItemCommonProps & IDeclarationProps> = ({
     pageId = 'review'
   }
 
-  if (!isUpdatableDeclaration(declarationStatus)) return null
+  if (!isUpdatableDeclaration(declarationStatus) && !isDraft) return null
 
   return (
     <DropdownMenu.Item
