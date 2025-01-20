@@ -21,12 +21,19 @@ import {
   findExtension,
   isTask,
   taskBundleWithExtension,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  updateFHIRBundle,
+  Bundle,
+  Location,
+  Encounter,
+  BundleEntry,
+  getLocationType
 } from '..'
 
 import * as fetchMock from 'jest-fetch-mock'
 
 import { DeathRegistration } from './input'
+import { UUID } from 'src/uuid'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -443,5 +450,127 @@ describe('taskBundleWithExtension()', () => {
       'valueString',
       'mock-value'
     )
+  })
+})
+
+describe('updateFhirBundle', () => {
+  describe('when the type of a location is changed from HEALTH_FACILITY to another type', () => {
+    const facilityId = 'TestFacility1'
+    const encounterId = 'Encounter1'
+
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'document',
+      entry: [
+        {
+          resource: {
+            resourceType: 'Composition',
+            title: 'Birth Declaration',
+            section: [
+              {
+                title: 'Birth encounter',
+                code: {
+                  coding: [
+                    {
+                      system: 'http://opencrvs.org/specs/sections',
+                      code: 'birth-encounter'
+                    }
+                  ],
+                  text: 'Birth encounter'
+                },
+                entry: [
+                  {
+                    reference: `Encounter/${encounterId}`
+                  }
+                ]
+              }
+            ],
+            id: 'Composition1'
+          }
+        },
+        {
+          resource: {
+            resourceType: 'Encounter',
+            status: 'finished',
+            id: encounterId as UUID,
+            location: [
+              {
+                location: {
+                  reference: `Location/${facilityId}` as ResourceIdentifier
+                }
+              }
+            ]
+          }
+        } as BundleEntry<Encounter>,
+        {
+          resource: {
+            resourceType: 'Location',
+            name: 'My Test Facility',
+            type: {
+              coding: [
+                {
+                  system: 'http://opencrvs.org/specs/location-type',
+                  code: 'HEALTH_FACILITY'
+                }
+              ]
+            },
+            id: facilityId
+          }
+        }
+      ]
+    } as Bundle
+
+    const updatedBundle = updateFHIRBundle(
+      bundle,
+      {
+        eventLocation: {
+          address: {
+            country: 'FAR',
+            state: 'State1',
+            district: 'District1',
+            city: 'City1',
+            postalCode: 'Code1',
+            line: ['line1', 'line2', 'line3', 'line4'],
+            partOf: 'Dictrict1'
+          },
+          type: 'PRIVATE_HOME'
+        }
+      },
+      'BIRTH' as EVENT_TYPE
+    )
+
+    const encounter = updatedBundle.entry.find(
+      (e) => e.resource.resourceType === 'Encounter'
+    ) as BundleEntry<Encounter>
+
+    const encounterLocationreference =
+      encounter.resource.location![0].location?.reference
+
+    const originalFacility = updatedBundle.entry.find(
+      (e) => e.resource.id === facilityId
+    )! as BundleEntry<Location>
+
+    const newLocation = updatedBundle.entry.find(
+      (e) =>
+        e.resource.resourceType === 'Location' && e.resource.id !== facilityId
+    ) as BundleEntry<Location>
+
+    const locations = updatedBundle.entry.filter(
+      (entry) => entry.resource.resourceType === 'Location'
+    )
+
+    it('should create a new location', () => {
+      expect(locations.length).toEqual(2)
+      expect(encounterLocationreference).toEqual(newLocation.fullUrl)
+      expect(getLocationType(newLocation.resource)).toEqual('PRIVATE_HOME')
+      expect(newLocation.resource.address).not.toBeUndefined()
+    })
+
+    it('should not edit the original facility', () => {
+      expect(getLocationType(originalFacility.resource)).toEqual(
+        'HEALTH_FACILITY'
+      )
+      expect(originalFacility.resource.address).toBeUndefined()
+    })
   })
 })

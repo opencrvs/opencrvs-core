@@ -37,6 +37,7 @@ type AdvancedSeachParameters {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String
@@ -103,6 +104,7 @@ input AdvancedSearchParametersInput {
   eventLocationLevel3: String
   eventLocationLevel4: String
   eventLocationLevel5: String
+  eventLocationLevel6: String
   childFirstNames: String
   childLastName: String
   childDoB: String

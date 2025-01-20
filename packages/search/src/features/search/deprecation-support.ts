@@ -17,6 +17,7 @@ export function transformDeprecatedParamsToSupported({
   eventLocationLevel3,
   eventLocationLevel4,
   eventLocationLevel5,
+  eventLocationLevel6,
   eventJurisdictionId,
   ...params
 }: IAdvancedSearchParam) {
@@ -26,6 +27,7 @@ export function transformDeprecatedParamsToSupported({
   if (eventLocationLevel3) leafLevel = eventLocationLevel3
   if (eventLocationLevel4) leafLevel = eventLocationLevel4
   if (eventLocationLevel5) leafLevel = eventLocationLevel5
+  if (eventLocationLevel6) leafLevel = eventLocationLevel6
   if (!eventJurisdictionId) eventJurisdictionId = leafLevel
 
   return {

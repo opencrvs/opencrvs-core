@@ -34,6 +34,7 @@ export const ADVANCED_SEARCH_PARAM_FIELDS = gql`
     eventLocationLevel3
     eventLocationLevel4
     eventLocationLevel5
+    eventLocationLevel6
     childFirstNames
     childLastName
     childDoB

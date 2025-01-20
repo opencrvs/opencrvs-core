@@ -126,7 +126,8 @@ export function addEventLocation(
     location.address?.district, //eventLocationLevel2
     location.address?.line?.[10], //eventLocationLevel3
     location.address?.line?.[11], //eventLocationLevel4
-    location.address?.line?.[12] //eventLocationLevel5
+    location.address?.line?.[12], //eventLocationLevel5
+    location.address?.line?.[13] //eventLocationLevel6
   ].filter((maybeString): maybeString is string => Boolean(maybeString))
 }
 

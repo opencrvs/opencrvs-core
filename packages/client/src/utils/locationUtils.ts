@@ -274,7 +274,11 @@ export function generateFullAddress(
   const eventLocationLevel5 =
     address?.line?.[12] && offlineData.locations[address.line[12]]?.name
 
+  const eventLocationLevel6 =
+    address?.line?.[13] && offlineData.locations[address.line[13]]?.name
+
   return [
+    eventLocationLevel6,
     eventLocationLevel5,
     eventLocationLevel4,
     eventLocationLevel3,
