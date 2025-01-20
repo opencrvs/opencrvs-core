@@ -32,7 +32,10 @@ import {
   CheckboxFieldValue,
   FieldConfig,
   FieldValue,
-  FileFieldValue
+  FileFieldValue,
+  LocationFieldValue,
+  RadioGroupFieldValue,
+  SelectFieldValue
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -212,7 +215,7 @@ const GeneratedInputField = React.memo(
       return (
         <Select
           {...fieldDefinition}
-          value={inputProps.value as string}
+          value={inputProps.value as SelectFieldValue}
           onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
         />
       )
@@ -221,7 +224,7 @@ const GeneratedInputField = React.memo(
       return (
         <SelectCountry
           {...fieldDefinition}
-          value={inputProps.value as string}
+          value={inputProps.value as SelectFieldValue}
           setFieldValue={setFieldValue}
         />
       )
@@ -239,7 +242,7 @@ const GeneratedInputField = React.memo(
       return (
         <RadioGroup
           {...fieldDefinition}
-          value={value as string}
+          value={value as RadioGroupFieldValue}
           setFieldValue={setFieldValue}
         />
       )
@@ -249,14 +252,14 @@ const GeneratedInputField = React.memo(
         return (
           <LocationSearch
             {...fieldDefinition}
-            value={value as string}
+            value={value as LocationFieldValue}
             setFieldValue={setFieldValue}
           />
         )
       return (
         <Location
           {...fieldDefinition}
-          value={value as string}
+          value={value as LocationFieldValue}
           setFieldValue={setFieldValue}
           partOf={
             (fieldDefinition.options?.partOf?.$data &&
@@ -268,7 +271,7 @@ const GeneratedInputField = React.memo(
         />
       )
     }
-    // return <div>Unsupported field type {fieldDefinition.type}</div>
+    throw new Error(`Unsupported field ${fieldDefinition}`)
   }
 )
 

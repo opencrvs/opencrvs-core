@@ -56,7 +56,7 @@ export const selectFieldToString = (
     return ''
   }
   if (!options) {
-    return val as string
+    return typeof val === 'string' ? val : ''
   }
 
   const selectedOption = options.find(({ value }) => value === val)
