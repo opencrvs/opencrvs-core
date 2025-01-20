@@ -72,13 +72,13 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { SearchCriteria } from '@client/utils/referenceApi'
+import { Text } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import * as routes from '@client/navigation/routes'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.negative};
-  ${({ theme }) => theme.fonts.reg16};
+
+const ErrorText = styled(Text)`
   text-align: center;
   margin-top: 100px;
 `

@@ -23,6 +23,8 @@ import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
+import { isNavigatorOnline } from '@client/utils'
+import { Text } from '@opencrvs/components/lib/Text'
 import { useOnlineStatus } from '@client/utils'
 
 interface IFetchButtonProps<T = unknown> {
@@ -67,16 +69,12 @@ const ModalContent = styled.div`
   position: relative;
 `
 
-const Heading = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+const Heading = styled(Text)`
   text-align: center;
-  ${({ theme }) => theme.fonts.bold16};
 `
 
-const Info = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
+const Info = styled(Text)`
   text-align: center;
-  ${({ theme }) => theme.fonts.reg16};
 `
 
 const StyledSpinner = styled(Spinner)`
@@ -162,8 +160,8 @@ const FetchButton = (props: IFullProps) => {
     const { variables, modalInfoText } = queryData as IQuery
     return (
       <>
-        {modalInfoText && <Info>{intl.formatMessage(modalInfoText)}</Info>}
-        {variables && <Info>{Object.values(variables)}</Info>}
+        {modalInfoText && <Info variant='reg16' color='copy' element='span'>{intl.formatMessage(modalInfoText)}</Info>}
+        {variables && <Info variant='reg16' color='copy' element='span'>{Object.values(variables)}</Info>}
       </>
     )
   }
