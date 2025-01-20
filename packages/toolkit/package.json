@@ -21,8 +21,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
-    "typescript": "^5.6.3",
-    "@opencrvs/commons": "^1.7.0"
+    "typescript": "^5.6.3"
   },
   "moduleNameMapper": {
     "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js"
