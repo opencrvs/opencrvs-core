@@ -466,7 +466,6 @@ class OfficeHomeView extends React.Component<
             />
           </Link>
         </FABContainer>
-
         {this.state.showCertificateToast && (
           <Toast
             id="print-cert-notification"

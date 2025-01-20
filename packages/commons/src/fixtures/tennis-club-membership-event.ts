@@ -44,16 +44,36 @@ export const tennisClubMembershipEvent = defineConfig({
       },
       fields: [
         {
-          id: 'applicant.firstname'
+          id: 'applicant.firstname',
+          label: {
+            defaultMessage: 'First name',
+            description: 'Label for first name',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.firstname.label'
+          }
         },
         {
-          id: 'event.type'
+          id: 'event.type',
+          label: {
+            defaultMessage: 'Type',
+            description: 'Label for type',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.type.label'
+          }
         },
         {
-          id: 'event.createdAt'
+          id: 'event.createdAt',
+          label: {
+            defaultMessage: 'Created at',
+            description: 'Label for created at',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.createdAt.label'
+          }
         },
         {
-          id: 'event.modifiedAt'
+          id: 'event.modifiedAt',
+          label: {
+            defaultMessage: 'Modified at',
+            description: 'Label for modified at',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.modifiedAt.label'
+          }
         }
       ],
       filters: [

@@ -8,9 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfigInput, FormConfig } from '@opencrvs/commons/client'
+import { EventConfig, EventIndex, FormConfig } from '@opencrvs/commons/client'
+import { v4 as uuid } from 'uuid'
 
-export const DEFAULT_FORM = {
+const DEFAULT_FORM = {
   label: {
     id: 'event.tennis-club-membership.action.declare.form.label',
     defaultMessage: 'Tennis club membership application',
@@ -157,16 +158,36 @@ export const tennisClubMembershipEvent = {
       },
       fields: [
         {
-          id: 'applicant.firstname'
+          id: 'applicant.firstname',
+          label: {
+            defaultMessage: 'First name',
+            description: 'Label for the given field on form.',
+            id: 'event.tennis-club-membership.summary.field.firstname.label'
+          }
         },
         {
-          id: 'event.type'
+          id: 'event.type',
+          label: {
+            defaultMessage: 'Type',
+            description: 'Label for type',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.type.label'
+          }
         },
         {
-          id: 'event.createdAt'
+          id: 'event.createdAt',
+          label: {
+            defaultMessage: 'Created at',
+            description: 'Label for created at',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.createdAt.label'
+          }
         },
         {
-          id: 'event.modifiedAt'
+          id: 'event.modifiedAt',
+          label: {
+            defaultMessage: 'Modified at',
+            description: 'Label for modified at',
+            id: 'event.tennis-club-membership.workqueue.in-progress.field.modifiedAt.label'
+          }
         }
       ],
       filters: [
@@ -256,10 +277,30 @@ export const tennisClubMembershipEvent = {
         clauses: [
           {
             fieldId: 'applicant.firstname',
-            type: 'strict'
+            type: 'strict',
+            options: {
+              boost: 1
+            }
           }
         ]
       }
     }
   ]
-} satisfies EventConfigInput
+} satisfies EventConfig
+
+export const tennisClubMembershipEventIndex: EventIndex = {
+  id: uuid(),
+  type: 'TENNIS_CLUB_MEMBERSHIP',
+  status: 'CREATED',
+  createdAt: '2023-03-01T00:00:00.000Z',
+  createdBy: uuid(),
+  createdAtLocation: uuid(),
+  modifiedAt: '2023-03-01T00:00:00.000Z',
+  assignedTo: null,
+  updatedBy: 'system',
+  data: {
+    'applicant.firstname': 'John',
+    'applicant.surname': 'Doe',
+    'applicant.dob': '1990-01-01'
+  }
+}

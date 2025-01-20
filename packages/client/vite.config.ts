@@ -90,7 +90,7 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        crypto: 'crypto-js'
+        crypto: require.resolve('crypto-js')
       }
     },
     plugins: [
