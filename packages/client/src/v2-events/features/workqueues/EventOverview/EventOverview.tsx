@@ -89,14 +89,21 @@ function EventOverview({
   const intl = useIntlFormatMessageWithFlattenedParams()
   const initialValues = getInitialValues(getAllFields(eventConfiguration))
 
+  const title = intl
+    .formatMessage(summary.title.label, {
+      ...initialValues,
+      ...event.data
+    })
+    .trim()
+
+  const fallbackTitle = summary.title.emptyValueMessage
+    ? intl.formatMessage(summary.title.emptyValueMessage)
+    : ''
   return (
     <Content
       icon={() => <IconWithName name={''} status={'orange'} />}
       size={ContentSize.LARGE}
-      title={intl.formatMessage(summary.title, {
-        ...initialValues,
-        ...event.data
-      })}
+      title={title || fallbackTitle}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >

@@ -20,16 +20,17 @@ const Field = z.object({
   emptyValueMessage: TranslationConfig.optional()
 })
 
+const Title = z.object({
+  id: z.string(),
+  label: TranslationConfig.describe('Title content'),
+  emptyValueMessage: TranslationConfig.optional()
+})
+
 export const SummaryConfig = z
   .object({
-    title: TranslationConfig.describe('Header title of summary'),
+    title: Title.describe('Title of summary view.'),
     fields: z.array(Field).describe('Fields rendered in summary view.')
   })
   .describe('Configuration for summary in event.')
 
-export const SummaryConfigInput = SummaryConfig.extend({
-  fields: z.array(Field)
-})
-
 export type SummaryConfig = z.infer<typeof SummaryConfig>
-export type SummaryConfigInput = z.input<typeof SummaryConfigInput>

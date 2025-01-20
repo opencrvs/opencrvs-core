@@ -19,9 +19,18 @@ export const tennisClubMembershipEvent = defineConfig({
   },
   summary: {
     title: {
-      defaultMessage: 'Summary',
-      description: 'This is the title of the summary',
-      id: 'event.tennis-club-membership.summary.title'
+      id: 'event.tennis-club-membership.summary.title',
+      label: {
+        defaultMessage: 'Summary',
+        description: 'This is the title of the summary',
+        id: 'event.tennis-club-membership.summary.title'
+      },
+      emptyValueMessage: {
+        defaultMessage: 'Membership application',
+        description:
+          'This is the message shown when the applicant name is missing',
+        id: 'event.tennis-club-membership.summary.title.empty'
+      }
     },
     fields: [
       {

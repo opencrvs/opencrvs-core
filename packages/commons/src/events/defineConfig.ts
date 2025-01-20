@@ -17,7 +17,7 @@ import { findPageFields, resolveFieldLabels } from './utils'
  * @param config - Event specific configuration
  */
 export const defineConfig = (config: EventConfigInput) => {
-  const input = EventConfigInput.parse(config)
+  const input = EventConfig.parse(config)
 
   const pageFields = findPageFields(input).map(({ id, label }) => ({
     id,
@@ -26,10 +26,6 @@ export const defineConfig = (config: EventConfigInput) => {
 
   return EventConfig.parse({
     ...input,
-    summary: resolveFieldLabels({
-      config: input.summary,
-      pageFields
-    }),
     workqueues: input.workqueues.map((workqueue) =>
       resolveFieldLabels({
         config: workqueue,
