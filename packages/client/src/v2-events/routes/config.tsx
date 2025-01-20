@@ -15,6 +15,7 @@ import { Debug } from '@client/v2-events/features/debug/debug'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
 import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
 import * as Register from '@client/v2-events/features/events/actions/register'
+import * as CollectCertificate from '@client/v2-events/features/events/actions/collect-certificate'
 import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
 import { EventSelection } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
@@ -106,6 +107,24 @@ export const routesConfig = {
         {
           path: ROUTES.V2.EVENTS.REGISTER.REVIEW.path,
           element: <Register.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.path,
+      element: <Outlet />,
+      children: [
+        {
+          index: true,
+          element: <CollectCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.PAGES.path,
+          element: <CollectCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.COLLECT_CERTIFICATE.REVIEW.path,
+          element: <CollectCertificate.Review />
         }
       ]
     }

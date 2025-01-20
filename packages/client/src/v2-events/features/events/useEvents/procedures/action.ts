@@ -51,12 +51,14 @@ type Mutation =
   | typeof api.event.actions.notify
   | typeof api.event.actions.register
   | typeof api.event.actions.validate
+  | typeof api.event.actions.collectCertificate
 
 type Procedure =
   | typeof utils.event.actions.declare
   | typeof utils.event.actions.notify
   | typeof utils.event.actions.register
   | typeof utils.event.actions.validate
+  | typeof utils.event.actions.collectCertificate
 
 /*
  * This makes sure that if you are offline and do
@@ -163,6 +165,15 @@ utils.event.actions.validate.setMutationDefaults(({ canonicalMutationFn }) => ({
   mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
   onSuccess: updateLocalEvent
 }))
+
+utils.event.actions.collectCertificate.setMutationDefaults(
+  ({ canonicalMutationFn }) => ({
+    retry: true,
+    retryDelay: 10000,
+    mutationFn: waitUntilEventIsCreated(canonicalMutationFn),
+    onSuccess: updateLocalEvent
+  })
+)
 
 export function useEventAction<P extends Procedure, M extends Mutation>(
   procedure: P,

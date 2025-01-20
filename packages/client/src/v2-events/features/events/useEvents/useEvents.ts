@@ -118,6 +118,10 @@ export function useEvents() {
       register: useEventAction(
         utils.event.actions.register,
         api.event.actions.register
+      ),
+      collectCertificate: useEventAction(
+        utils.event.actions.collectCertificate,
+        api.event.actions.collectCertificate
       )
     }
   }

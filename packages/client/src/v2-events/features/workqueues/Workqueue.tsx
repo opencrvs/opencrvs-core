@@ -10,7 +10,7 @@
  */
 
 import { get, mapKeys, orderBy } from 'lodash'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
@@ -32,6 +32,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { messages } from '@client/v2-events/messages'
 import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
+import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.

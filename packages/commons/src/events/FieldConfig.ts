@@ -156,7 +156,7 @@ const RadioGroup = BaseField.extend({
   options: z.array(
     z.object({
       value: z.string().describe('The value of the option'),
-      label: z.string().describe('The label of the option')
+      label: TranslationConfig
     })
   )
 }).describe('Grouped radio options')
