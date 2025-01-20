@@ -41,6 +41,7 @@ function useAdminLocations(value?: LocationFieldValue) {
   const locations = Object.values(locationMap)
   const initialLocation =
     // @TODO: Should disappear when restarting. Otherwise ignore and let markus fix the thing
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     value && locationMap[value] ? toSearchOption(locationMap[value]) : undefined
   const options = locations.map(toSearchOption)
   return { options, initialLocation }
@@ -61,6 +62,7 @@ export function LocationSearch({
       buttonLabel="Health facility"
       locationList={options}
       searchHandler={(location: SearchLocation) =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         setFieldValue(props.id, location.id)
       }
       selectedLocation={initialLocation}
