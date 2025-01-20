@@ -34,13 +34,13 @@ import {
 } from '@opencrvs/commons/events'
 import { router, publicProcedure } from '@events/router/trpc'
 
-const validateEventType = ({
+function validateEventType({
   eventTypes,
   eventInputType
 }: {
   eventTypes: string[]
   eventInputType: string
-}) => {
+}) {
   if (!eventTypes.includes(eventInputType)) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -101,33 +101,39 @@ export const eventRouter = router({
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   actions: router({
-    notify: publicProcedure.input(NotifyActionInput).mutation((options) => {
-      return addAction(options.input, {
-        eventId: options.input.eventId,
-        createdBy: options.ctx.user.id,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        token: options.ctx.token
-      })
-    }),
-    declare: publicProcedure.input(DeclareActionInput).mutation((options) => {
-      return addAction(options.input, {
-        eventId: options.input.eventId,
-        createdBy: options.ctx.user.id,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        token: options.ctx.token
-      })
-    }),
-    validate: publicProcedure.input(ValidateActionInput).mutation((options) => {
-      return addAction(options.input, {
-        eventId: options.input.eventId,
-        createdBy: options.ctx.user.id,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        token: options.ctx.token
-      })
-    }),
+    notify: publicProcedure
+      .input(NotifyActionInput)
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
+        })
+      }),
+    declare: publicProcedure
+      .input(DeclareActionInput)
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
+        })
+      }),
+    validate: publicProcedure
+      .input(ValidateActionInput)
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
+        })
+      }),
     register: publicProcedure
       .input(RegisterActionInput.omit({ identifiers: true }))
-      .mutation((options) => {
+      .mutation(async (options) => {
         return addAction(
           {
             ...options.input,

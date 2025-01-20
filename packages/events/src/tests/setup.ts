@@ -22,7 +22,7 @@ vi.mock('@events/storage/mongodb/user-mgnt')
 
 vi.mock('@events/storage/elasticsearch')
 vi.mock('@events/service/config/config', () => ({
-  getEventConfigurations: () =>
+  getEventConfigurations: async () =>
     Promise.all([
       tennisClubMembershipEvent,
       { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
@@ -40,7 +40,7 @@ async function resetESServer() {
   await createIndex(index, getAllFields(tennisClubMembershipEvent))
 }
 
-beforeEach(() =>
+beforeEach(async () =>
   Promise.all([
     resetEventsMongoServer(),
     resetUserMgntMongoServer(),

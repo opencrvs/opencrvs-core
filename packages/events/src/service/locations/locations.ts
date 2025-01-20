@@ -33,7 +33,10 @@ export type Location = z.infer<typeof Location>
  */
 export async function setLocations(incomingLocations: Array<Location>) {
   const db = await events.getClient()
-  const currentLocations = await db.collection('locations').find().toArray()
+  const currentLocations = await db
+    .collection<Location>('locations')
+    .find()
+    .toArray()
 
   const [locationsToKeep, locationsToRemove] = _.partition(
     currentLocations,

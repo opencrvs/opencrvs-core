@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, FormConfig } from '@opencrvs/commons/client'
+import { EventConfigInput, FormConfig } from '@opencrvs/commons/client'
 
 export const DEFAULT_FORM = {
   label: {
@@ -262,4 +262,4 @@ export const tennisClubMembershipEvent = {
       }
     }
   ]
-} satisfies EventConfig
+} satisfies EventConfigInput
