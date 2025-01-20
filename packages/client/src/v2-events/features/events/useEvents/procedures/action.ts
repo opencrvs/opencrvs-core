@@ -33,6 +33,7 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     const localVersion = utils.event.get.getData(eventId)
 
     if (!localVersion || localVersion.id === localVersion.transactionId) {
+      // eslint-disable-next-line no-console
       console.error(
         'Event that has not been stored yet cannot be actioned upon'
       )

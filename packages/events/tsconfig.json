@@ -18,7 +18,8 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "esModuleInterop": true
   },
   "include": ["src/**/*.ts", "typings", "tslint-rules"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]

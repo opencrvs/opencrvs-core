@@ -33,8 +33,8 @@ export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
   return caller
 }
 
-const createTestToken = (userId: string, scopes?: Scope[]) =>
-  jwt.sign(
+function createTestToken(userId: string, scopes?: Scope[]) {
+  return jwt.sign(
     { scope: scopes ?? userRoleScopes.REGISTRATION_AGENT, sub: userId },
     readFileSync(join(__dirname, './cert.key')),
     {
@@ -43,6 +43,7 @@ const createTestToken = (userId: string, scopes?: Scope[]) =>
       audience: 'opencrvs:events-user'
     }
   )
+}
 
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
