@@ -715,7 +715,7 @@ export interface IHttpFormField extends IFormFieldBase {
   type: typeof HTTP
   options: {
     headers: Record<string, string>
-    body: Record<string, unknown>
+    body?: Record<string, unknown>
     params?: Record<string, string>
   } & Omit<Request, 'body' | 'headers'>
 }
@@ -1260,7 +1260,8 @@ interface Ii18nHttpFormField extends Ii18nFormFieldBase {
   type: typeof HTTP
   options: {
     headers: Record<string, string>
-    body: Record<string, any>
+    body?: Record<string, unknown>
+    params?: Record<string, string>
   } & Omit<Request, 'body' | 'headers'>
 }
 

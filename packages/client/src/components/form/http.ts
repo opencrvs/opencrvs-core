@@ -108,7 +108,7 @@ class HttpError extends Error {
   }
 }
 
-export function useHttp<T = any>(
+export function useHttp<T = unknown>(
   field: IHttpFormField,
   onChange: ({
     loading,
