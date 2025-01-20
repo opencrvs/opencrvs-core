@@ -30,6 +30,7 @@ import { requestCorrectionRoute } from '@workflow/records/handler/correction/req
 import { makeCorrectionRoute } from '@workflow/records/handler/correction/make-correction'
 import { eventNotificationHandler } from '@workflow/records/handler/eventNotificationHandler'
 import { upsertRegistrationHandler } from '@workflow/records/handler/upsert-identifiers'
+import { updateField } from '@workflow/records/handler/update-field'
 
 export const getRoutes = () => {
   const routes = [
@@ -163,7 +164,16 @@ export const getRoutes = () => {
     approveCorrectionRoute,
     rejectCorrectionRoute,
     requestCorrectionRoute,
-    makeCorrectionRoute
+    makeCorrectionRoute,
+    {
+      method: 'POST',
+      path: '/records/{id}/update-field',
+      handler: updateField,
+      config: {
+        tags: ['api'],
+        description: 'Update a single field in a registration'
+      }
+    }
   ]
 
   return routes

@@ -11,7 +11,6 @@
 
 import { UUID, logger } from '@opencrvs/commons'
 import {
-  Bundle,
   Composition,
   Patient,
   Practitioner,
@@ -26,7 +25,6 @@ import {
   SupportedPatientIdentifierCode,
   ValidRecord
 } from '@opencrvs/commons/types'
-import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import {
   OPENCRVS_SPECIFICATION_URL,
   RegStatus
@@ -39,31 +37,6 @@ import {
 import { getPractitionerRef } from '@workflow/features/user/utils'
 import { ITokenPayload } from '@workflow/utils/auth-utils'
 import { isEqual } from 'lodash'
-import fetch from 'node-fetch'
-
-export async function invokeRegistrationValidation(
-  bundle: Saved<Bundle>,
-  headers: Record<string, string>
-): Promise<Bundle> {
-  const res = await fetch(
-    new URL('event-registration', COUNTRY_CONFIG_URL).toString(),
-    {
-      method: 'POST',
-      body: JSON.stringify(bundle),
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      }
-    }
-  )
-  if (!res.ok) {
-    const errorText = await res.text()
-    throw new Error(
-      `Error calling country configuration event-registration [${res.statusText} ${res.status}]: ${errorText}`
-    )
-  }
-  return bundle
-}
 
 export async function setupRegistrationWorkflow(
   taskResource: Task,
