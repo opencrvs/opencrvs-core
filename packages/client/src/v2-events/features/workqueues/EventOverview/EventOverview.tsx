@@ -89,12 +89,10 @@ function EventOverview({
   const intl = useIntlFormatMessageWithFlattenedParams()
   const initialValues = getInitialValues(getAllFields(eventConfiguration))
 
-  const title = intl
-    .formatMessage(summary.title.label, {
-      ...initialValues,
-      ...event.data
-    })
-    .trim()
+  const title = intl.formatMessage(summary.title.label, {
+    ...initialValues,
+    ...event.data
+  })
 
   const fallbackTitle = summary.title.emptyValueMessage
     ? intl.formatMessage(summary.title.emptyValueMessage)
