@@ -12,14 +12,12 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 
 const Field = z.object({
-  id: z.string().describe('Id of a field defined under form.'),
+  id: z.string().describe('Id of summary field'),
+  value: TranslationConfig.describe(
+    'Summary field value. Can utilise values defined in configuration and EventMetadata'
+  ),
   label: TranslationConfig,
   emptyValueMessage: TranslationConfig.optional()
-})
-
-const FieldInput = Field.extend({
-  // label is enforced during runtime.
-  label: TranslationConfig.optional()
 })
 
 export const SummaryConfig = z
@@ -30,7 +28,7 @@ export const SummaryConfig = z
   .describe('Configuration for summary in event.')
 
 export const SummaryConfigInput = SummaryConfig.extend({
-  fields: z.array(FieldInput)
+  fields: z.array(Field)
 })
 
 export type SummaryConfig = z.infer<typeof SummaryConfig>

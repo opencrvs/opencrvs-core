@@ -105,8 +105,11 @@ const initialValueMapping: Record<FieldType, FieldValue | null> = {
 }
 
 export function getInitialValues(fields: FieldConfig[]) {
-  return fields.reduce((initialValues, field) => {
-    return { ...initialValues, [field.id]: initialValueMapping[field.type] }
+  return fields.reduce((initialValues: Record<string, FieldValue>, field) => {
+    return {
+      ...initialValues,
+      [field.id]: initialValueMapping[field.type]
+    }
   }, {})
 }
 

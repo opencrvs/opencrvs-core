@@ -88,6 +88,7 @@ function EventOverview({
   const { eventConfiguration } = useEventConfiguration(event.type)
   const intl = useIntlFormatMessageWithFlattenedParams()
   const initialValues = getInitialValues(getAllFields(eventConfiguration))
+
   return (
     <Content
       icon={() => <IconWithName name={''} status={'orange'} />}
@@ -99,7 +100,11 @@ function EventOverview({
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
     >
-      <EventSummary event={event} summary={summary} />
+      <EventSummary
+        defaultValues={initialValues}
+        event={event}
+        summary={summary}
+      />
       <EventHistory history={history} />
     </Content>
   )
