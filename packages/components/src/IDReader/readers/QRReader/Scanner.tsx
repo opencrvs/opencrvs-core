@@ -13,7 +13,7 @@ import QRScanner from 'qr-scanner'
 import styled from 'styled-components'
 
 interface ScannerProps {
-  onError: (error: 'mount') => void
+  onError: (error: 'mount' | 'parse') => void
   onScan: (data: Record<string, unknown>) => void
 }
 
@@ -33,14 +33,6 @@ const Video = styled.video`
   object-fit: cover;
 `
 
-const withValidation = (callback: (res: Record<string, unknown>) => void) => {
-  return (res: { data: string }) => {
-    if (Boolean(res.data)) {
-      callback(JSON.parse(res.data))
-    }
-  }
-}
-
 const Scanner = (props: ScannerProps) => {
   const scanner = useRef<QRScanner>()
   const videoElement = useRef<HTMLVideoElement>(null)
@@ -52,9 +44,15 @@ const Scanner = (props: ScannerProps) => {
     if (currentVideoElement && !scanner.current) {
       scanner.current = new QRScanner(
         currentVideoElement,
-        withValidation(onScan),
+        (result) => {
+          if (result.data) {
+            // TODO: handle parse error
+            onScan(JSON.parse(result.data))
+          }
+        },
         {
-          onDecodeError: onError,
+          // TODO: improve error handling
+          onDecodeError: () => onError('parse'),
           preferredCamera: 'environment',
           highlightCodeOutline: true,
           highlightScanRegion: false
