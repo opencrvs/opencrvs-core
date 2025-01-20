@@ -22,7 +22,7 @@ interface SearchLocation {
   displayLabel: string
 }
 
-export interface Facility extends ILocation {
+interface Facility extends ILocation {
   type: 'HEALTH_FACILITY'
   physicalType: 'Building'
 }
