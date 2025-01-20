@@ -10,8 +10,8 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { FieldProps, FieldValue } from '@opencrvs/commons'
 import { Checkbox as CheckboxComponent } from '@opencrvs/components'
+import { FieldProps, CheckboxFieldValue } from '@opencrvs/commons/client'
 
 export function Checkbox({
   setFieldValue,
@@ -19,8 +19,8 @@ export function Checkbox({
   value,
   ...props
 }: FieldProps<'CHECKBOX'> & {
-  setFieldValue: (name: string, val: FieldValue | undefined) => void
-  value?: string
+  setFieldValue: (name: string, val: CheckboxFieldValue | undefined) => void
+  value?: CheckboxFieldValue
 }) {
   const intl = useIntl()
 
@@ -39,3 +39,6 @@ export function Checkbox({
     />
   )
 }
+
+export const checkboxToString = (value: CheckboxFieldValue) =>
+  value === 'true' ? 'Yes' : 'No'
