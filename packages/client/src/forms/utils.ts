@@ -779,7 +779,7 @@ export function isFieldButton(field: IFormField): field is IButtonFormField {
   return field.type === BUTTON
 }
 
-export function isFieldIDReader(field: IFormField): field is IDReaderFormField {
+function isFieldIDReader(field: IFormField): field is IDReaderFormField {
   return field.type === ID_READER
 }
 

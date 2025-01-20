@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export interface QRReaderType {
+interface QRReaderType {
   labels: {
     button: string
     scannerDialogSupportingCopy: string
@@ -26,7 +26,7 @@ export interface IDReaderProps {
   children: React.ReactNode
 }
 
-export interface Scan {
+interface Scan {
   onScan: (code: Record<string, unknown>) => void
   onError: (error: 'mount' | 'parse') => void
 }
