@@ -70,41 +70,71 @@ const DateDistanceMatcher = Matcher.extend({
   })
 })
 
-export type And = {
+export type AndInput = {
   type: 'and'
-  clauses: any[]
+  clauses: ClauseInput[]
 }
 
-const And: z.ZodType<And> = z.object({
+export type AndOutput = {
+  type: 'and'
+  clauses: ClauseOutput[]
+}
+
+export type OrInput = {
+  type: 'or'
+  clauses: ClauseInput[]
+}
+
+export type OrOutput = {
+  type: 'or'
+  clauses: ClauseOutput[]
+}
+
+const And = z.object({
   type: z.literal('and'),
   clauses: z.lazy(() => Clause.array())
 })
 
-export type Or = {
-  type: 'or'
-  clauses: any[]
-}
-
-const Or: z.ZodType<Or> = z.object({
+const Or = z.object({
   type: z.literal('or'),
   clauses: z.lazy(() => Clause.array())
 })
 
-export type Clause =
-  | And
-  | Or
-  | z.infer<typeof FuzzyMatcher>
-  | z.infer<typeof StrictMatcher>
-  | z.infer<typeof DateRangeMatcher>
+export type ClauseInput =
+  | AndInput
+  | OrInput
+  | z.input<typeof FuzzyMatcher>
+  | z.input<typeof StrictMatcher>
+  | z.input<typeof DateRangeMatcher>
+  | z.input<typeof DateDistanceMatcher>
 
-export const Clause = z.union([
-  And,
-  Or,
-  FuzzyMatcher,
-  StrictMatcher,
-  DateRangeMatcher,
-  DateDistanceMatcher
-])
+export type ClauseOutput =
+  | AndOutput
+  | OrOutput
+  | z.output<typeof FuzzyMatcher>
+  | z.output<typeof StrictMatcher>
+  | z.output<typeof DateRangeMatcher>
+  | z.output<typeof DateDistanceMatcher>
+
+/**
+ * Defines a deduplication clause. Clauses are either matcher clauses or logical clauses. Logical clauses (and, or) are used to combine multiple clauses.
+ * Since the definiton is recursive, we use z.lazy to define the schema.
+ * Zod supports recursive schemas, but needs help with Input and Output types.
+ *
+ * Default assumption is that the ZodType is the input. Markers use default values, so we need to explicitly define output type, too.
+ *
+ */
+export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
+  z.lazy(() =>
+    z.discriminatedUnion('type', [
+      And,
+      Or,
+      FuzzyMatcher,
+      StrictMatcher,
+      DateRangeMatcher,
+      DateDistanceMatcher
+    ])
+  )
 
 export const DeduplicationConfig = z.object({
   id: z.string(),

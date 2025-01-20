@@ -99,9 +99,9 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   const config = await getEventConfigurations(token)
 
   const form = config
-    .find((config) => config.id === event.type)
+    .find((c) => c.id === event.type)
     ?.actions.find((action) => action.type === event.type)
-    ?.forms.find((form) => form.active)
+    ?.forms.find((f) => f.active)
 
   const fieldTypes = form?.pages.flatMap((page) => page.fields)
 
@@ -189,9 +189,9 @@ export async function addAction(
   const config = await getEventConfigurations(token)
 
   const form = config
-    .find((config) => config.id === event.type)
+    .find((c) => c.id === event.type)
     ?.actions.find((action) => action.type === input.type)
-    ?.forms.find((form) => form.active)
+    ?.forms.find((f) => f.active)
 
   const fieldTypes = form?.pages.flatMap((page) => page.fields)
 
@@ -251,45 +251,42 @@ export async function validate(
 ) {
   const config = await getEventConfigurations(token)
   const storedEvent = await getEventById(eventId)
-  const form = config.find((config) => config.id === storedEvent.type)
+  const form = config.find((c) => c.id === storedEvent.type)
 
   if (!form) {
     throw new Error(`Form not found with event type: ${storedEvent.type}`)
   }
+
   let duplicates: EventIndex[] = []
 
-  if (form.deduplication) {
-    const futureEventState = getCurrentEventState({
-      ...storedEvent,
-      actions: [
-        ...storedEvent.actions,
-        {
-          ...input,
-          createdAt: new Date().toISOString(),
-          createdBy,
-          createdAtLocation
-        }
-      ]
+  const futureEventState = getCurrentEventState({
+    ...storedEvent,
+    actions: [
+      ...storedEvent.actions,
+      {
+        ...input,
+        createdAt: new Date().toISOString(),
+        createdBy,
+        createdAtLocation
+      }
+    ]
+  })
+
+  const resultsFromAllRules = await Promise.all(
+    form.deduplication.map(async (deduplication) => {
+      const matches = await searchForDuplicates(futureEventState, deduplication)
+      return matches
     })
+  )
 
-    const resultsFromAllRules = await Promise.all(
-      form.deduplication.map(async (deduplication) => {
-        const duplicates = await searchForDuplicates(
-          futureEventState,
-          deduplication
-        )
-        return duplicates
-      })
-    )
-
-    duplicates = resultsFromAllRules
-      .flat()
-      .sort((a, b) => b.score - a.score)
-      .map((hit) => hit.event)
-      .filter((event, index, self) => {
-        return self.findIndex((t) => t.id === event.id) === index
-      })
-  }
+  duplicates = resultsFromAllRules
+    .flat()
+    .sort((a, b) => b.score - a.score)
+    .filter((hit): hit is { score: number; event: EventIndex } => !!hit.event)
+    .map((hit) => hit.event)
+    .filter((event, index, self) => {
+      return self.findIndex((t) => t.id === event.id) === index
+    })
 
   const event = await addAction(
     { ...input, duplicates: duplicates.map((d) => d.id) },
@@ -305,10 +302,6 @@ export async function validate(
 
 export async function patchEvent(eventInput: EventInputWithId) {
   const existingEvent = await getEventById(eventInput.id)
-
-  if (!existingEvent) {
-    throw new EventNotFoundError(eventInput.id)
-  }
 
   const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')

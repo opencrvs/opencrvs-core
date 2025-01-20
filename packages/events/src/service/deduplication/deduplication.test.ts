@@ -14,7 +14,7 @@ import { DeduplicationConfig, getUUID } from '@opencrvs/commons'
 import { searchForDuplicates } from './deduplication'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 
-const LEGACY_BIRTH_DEDUPLICATION_RULES: DeduplicationConfig = {
+const LEGACY_BIRTH_DEDUPLICATION_RULES = {
   id: 'Legacy birth deduplication check',
   label: {
     id: 'deduplication.legacy',
@@ -135,7 +135,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES: DeduplicationConfig = {
 }
 
 export async function findDuplicates(
-  registrationComparison: Record<string, any>
+  registrationComparison: Record<string, string[]>
 ) {
   const esClient = getOrCreateClient()
   const existingComposition = Object.fromEntries(
@@ -179,7 +179,7 @@ export async function findDuplicates(
       modifiedAt: '2025-01-01',
       updatedBy: 'test'
     },
-    LEGACY_BIRTH_DEDUPLICATION_RULES
+    DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
   )
 
   return results
@@ -255,7 +255,7 @@ describe('deduplication tests', () => {
         modifiedAt: '2025-01-01',
         updatedBy: 'test'
       },
-      LEGACY_BIRTH_DEDUPLICATION_RULES
+      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
     )
     expect(results).toHaveLength(0)
   })

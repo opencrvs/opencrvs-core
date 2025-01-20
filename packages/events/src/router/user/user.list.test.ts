@@ -53,8 +53,8 @@ test('Returns multiple users', async () => {
   )
 
   const userIds = []
-  for (const user of usersToCreate) {
-    const userId = (await seed.user(userMgntDb, user))?.id
+  for (const userToCreate of usersToCreate) {
+    const userId = (await seed.user(userMgntDb, userToCreate)).id
     userIds.push(userId)
   }
 

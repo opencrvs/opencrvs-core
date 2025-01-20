@@ -18,6 +18,7 @@ import {
 } from '@opencrvs/commons'
 import fetch from 'node-fetch'
 import { getEventConfigurations } from '@events/service/config/config'
+import { z } from 'zod'
 
 function getFieldDefinitionForActionDataField(
   configuration: EventConfig,
@@ -166,5 +167,7 @@ async function presignFiles(
     throw new Error('Failed to presign files')
   }
 
-  return res.json()
+  const fileUrls = z.array(z.string()).parse(await res.json())
+
+  return fileUrls
 }
