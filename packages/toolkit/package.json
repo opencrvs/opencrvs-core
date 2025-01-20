@@ -9,7 +9,6 @@
     "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
-    "test": "yarn build",
     "build": "rimraf dist && tsc --build && yarn build-common-events:js && yarn copy-common-events:ts && yarn build-common-conditionals:js && yarn copy-common-conditionals:ts",
     "build-common-events:js": "esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external",
     "build-common-conditionals:js": "esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external",

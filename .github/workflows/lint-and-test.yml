@@ -374,7 +374,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          working-directory: packages/toolkit
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
