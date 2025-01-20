@@ -12,6 +12,7 @@
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { Divider, DividerProps } from './Divider'
+import { Text } from '../Text'
 
 export default {
   title: 'Input/Divider',
@@ -36,3 +37,11 @@ Customized.args = {
   border: '2px',
   color: 'red'
 }
+
+export const DividerWithLabel: Story<DividerProps> = (args) => (
+  <Template {...args}>
+    <Text variant="reg14" element="span">
+      This is a divider with label
+    </Text>
+  </Template>
+)
