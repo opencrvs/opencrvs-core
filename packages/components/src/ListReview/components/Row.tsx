@@ -63,11 +63,9 @@ export const RowContainer = styled.tr`
   @media (max-width: 576px) {
     /* Styles for small phones */
     td:first-child {
-      width: 200px;
       padding-right: 0px;
     }
     td:nth-child(2) {
-      width: 200px;
       padding-right: 0px;
     }
   }
