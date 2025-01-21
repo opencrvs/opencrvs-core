@@ -518,14 +518,13 @@ export const resolvers: GQLResolver = {
         return markEventAsCertified(id, details, authHeader, EVENT_TYPE.BIRTH)
       }
     ),
-    markBirthAsIssued: requireAssignment(
-      (_, { id, details }, { headers: authHeader }) => {
-        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-          throw new Error('User does not have enough scope')
-        }
-        return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
+    // @todo: add new query for certify and issue later where require assignment wrapper will be used
+    markBirthAsIssued: (_, { id, details }, { headers: authHeader }) => {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+        throw new Error('User does not have enough scope')
       }
-    ),
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.BIRTH)
+    },
     markDeathAsCertified: requireAssignment(
       (_, { id, details }, { headers: authHeader }) => {
         if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
@@ -534,14 +533,13 @@ export const resolvers: GQLResolver = {
         return markEventAsCertified(id, details, authHeader, EVENT_TYPE.DEATH)
       }
     ),
-    markDeathAsIssued: requireAssignment(
-      (_, { id, details }, { headers: authHeader }) => {
-        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-          throw new Error('User does not have enough scope')
-        }
-        return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
+    // @todo: add new query for certify and issue later where require assignment wrapper will be used
+    markDeathAsIssued: (_, { id, details }, { headers: authHeader }) => {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+        throw new Error('User does not have enough scope')
       }
-    ),
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.DEATH)
+    },
     markMarriageAsCertified: requireAssignment(
       (_, { id, details }, { headers: authHeader }) => {
         if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
@@ -555,14 +553,13 @@ export const resolvers: GQLResolver = {
         )
       }
     ),
-    markMarriageAsIssued: requireAssignment(
-      (_, { id, details }, { headers: authHeader }) => {
-        if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
-          throw new Error('User does not have enough scope')
-        }
-        return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
+    // @todo: add new query for certify and issue later where require assignment wrapper will be used
+    markMarriageAsIssued: (_, { id, details }, { headers: authHeader }) => {
+      if (!hasScope(authHeader, SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES)) {
+        throw new Error('User does not have enough scope')
       }
-    ),
+      return markEventAsIssued(id, details, authHeader, EVENT_TYPE.MARRIAGE)
+    },
     async markEventAsNotDuplicate(_, { id }, { headers: authHeader }) {
       const isAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!isAssignedToThisUser) {
