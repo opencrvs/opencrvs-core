@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { JSONSchema } from '@opencrvs/commons/conditionals'
 import { ActionDocument } from '@opencrvs/commons/events'
 
@@ -94,18 +95,55 @@ export function eventHasAction(type: ActionDocument['type']) {
   }
 }
 
+export type FieldAPI = {
+  inArray: (values: string[]) => FieldAPI
+  isBeforeNow: () => FieldAPI
+  isEqualTo: (value: string) => FieldAPI
+  isUndefined: () => FieldAPI
+  not: {
+    inArray: (values: string[]) => FieldAPI
+    equalTo: (value: string) => FieldAPI
+  }
+  /**
+   * joins multiple conditions with OR instead of AND.
+   * @example field('fieldId').or((field) => field.isUndefined().not.inArray(['value1', 'value2'])).apply()
+   */
+  or: (callback: (field: FieldAPI) => FieldAPI) => FieldAPI
+  /**
+   *  @private
+   *  @returns array of conditions. Used internally by methods that consolidate multiple conditions into one.
+   */
+  _apply: () => JSONSchema[]
+  /**
+   * @public
+   * @returns single object for consolidated conditions
+   */
+  apply: () => JSONSchema
+}
+
+/**
+ * Generate conditional rules for a field.
+ * @param fieldId - The field ID conditions are being applied to
+ *
+ * @returns @see FieldAPI
+ */
 export function field(fieldId: string) {
-  return {
-    isBeforeNow: () => ({
-      type: 'object',
-      properties: {
+  const conditions: JSONSchema[] = []
+
+  const addCondition = (rule: JSONSchema) => {
+    conditions.push(rule)
+    return api
+  }
+
+  const api: FieldAPI = {
+    isBeforeNow: () =>
+      addCondition({
         $form: {
           type: 'object',
           properties: {
             [fieldId]: {
               type: 'string',
               format: 'date',
-              // https://ajv.js.org/packages/ajv-formats.html#keywords-to-compare-values-formatmaximum-formatminimum-and-formatexclusivemaximum-formatexclusiveminimum
               formatMaximum: { $data: '2/$now' }
             }
           },
@@ -115,97 +153,64 @@ export function field(fieldId: string) {
           type: 'string',
           format: 'date'
         }
-      },
-      required: ['$form', '$now']
-    }),
-    isEqualTo: (value: string) => ({
-      type: 'object',
-      properties: {
-        $form: {
+      }),
+    isEqualTo: (value: string) =>
+      addCondition({
+        [fieldId]: {
+          const: value
+        }
+      }),
+    isUndefined: () =>
+      addCondition({
+        not: {
           type: 'object',
-          properties: {
-            [fieldId]: {
-              const: value
-            }
-          },
           required: [fieldId]
         }
-      },
-      required: ['$form']
-    }),
-    isInArray: (values: string[]) => ({
-      type: 'object',
-      properties: {
-        $form: {
-          type: 'object',
-          properties: {
-            [fieldId]: {
+      }),
+    inArray: (values: string[]) =>
+      addCondition({
+        [fieldId]: {
+          enum: values
+        }
+      }),
+    not: {
+      inArray: (values: string[]) =>
+        addCondition({
+          [fieldId]: {
+            not: {
               enum: values
             }
-          },
-          required: [fieldId]
-        }
-      },
-      required: ['$form']
-    }),
-    isNotInArray: (values: string[]) => ({
-      type: 'object',
-      properties: {
-        $form: {
-          type: 'object',
-          properties: {
-            [fieldId]: {
-              not: {
-                enum: values
-              }
+          }
+        }),
+      equalTo: (value: string) =>
+        addCondition({
+          [fieldId]: {
+            not: {
+              const: value
             }
-          },
-          required: [fieldId]
-        }
-      },
-      required: ['$form']
-    }),
-    isUndefinedOrInArray: (values: string[]) => ({
-      type: 'object',
-      properties: {
-        $form: {
+          }
+        })
+    },
+    or: (callback: (field: FieldAPI) => FieldAPI) => {
+      const nestedConditions = callback(field(fieldId))._apply()
+      return addCondition({
+        type: 'object',
+        anyOf: nestedConditions
+      })
+    },
+    _apply: () => conditions,
+    apply: () => {
+      if (conditions.length === 1) {
+        return {
           type: 'object',
-          anyOf: [
-            {
-              required: [fieldId],
-              properties: {
-                [fieldId]: {
-                  enum: values
-                }
-              }
-            },
-            { not: { required: [fieldId] } }
-          ]
+          properties: { $form: { properties: conditions[0] } },
+          required: ['$form', fieldId]
         }
-      },
-      required: ['$form']
-    }),
-    isUndefinedOrNotInArray: (values: string[]) => ({
-      type: 'object',
-      properties: {
-        $form: {
-          type: 'object',
-          anyOf: [
-            {
-              required: [fieldId],
-              properties: {
-                [fieldId]: {
-                  not: {
-                    enum: values
-                  }
-                }
-              }
-            },
-            { not: { required: [fieldId] } }
-          ]
-        }
-      },
-      required: ['$form']
-    })
+      }
+
+      return { type: 'object', allOf: conditions, required: ['$form', fieldId] }
+    }
   }
+
+  return api
 }
