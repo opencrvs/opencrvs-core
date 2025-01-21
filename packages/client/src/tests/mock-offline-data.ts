@@ -459,10 +459,8 @@ export const mockOfflineData = {
       DEATH_REGISTRATION: true,
       MARRIAGE_REGISTRATION: true,
       EXTERNAL_VALIDATION_WORKQUEUE: true,
-      INFORMANT_SIGNATURE: false,
       PRINT_DECLARATION: true,
-      DATE_OF_BIRTH_UNKNOWN: true,
-      INFORMANT_SIGNATURE_REQUIRED: false
+      DATE_OF_BIRTH_UNKNOWN: true
     },
     HEALTH_FACILITY_FILTER: 'DISTRICT',
     LANGUAGES: 'en,bn',

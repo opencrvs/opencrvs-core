@@ -35,7 +35,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
     }
 
     utils.event.get.setData(newEvent.transactionId, optimisticEvent)
-    utils.events.get.setData(undefined, (eventIndices) =>
+    utils.event.list.setData(undefined, (eventIndices) =>
       eventIndices?.concat(getCurrentEventState(optimisticEvent))
     )
     return optimisticEvent
@@ -43,7 +43,7 @@ utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
   onSuccess: async (response) => {
     utils.event.get.setData(response.id, response)
     utils.event.get.setData(response.transactionId, response)
-    await utils.events.get.invalidate()
+    await utils.event.list.invalidate()
   }
 }))
 

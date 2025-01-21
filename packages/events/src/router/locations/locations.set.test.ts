@@ -8,48 +8,69 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
 
-const dataSeedingClient = createTestClient([SCOPES.USER_DATA_SEEDING])
-
-const registrarClient = createTestClient()
-
-const generator = payloadGenerator()
-
 test('prevents unauthorized access from registrar', async () => {
+  const { user } = await setupTestCase()
+  const registrarClient = createTestClient(user)
+
   await expect(
     registrarClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
-test('Allows client to set locations', async () => {
+test('Allows national system admin to set locations', async () => {
+  const { user, generator } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    SCOPES.CONFIG_UPDATE_ALL
+  ])
+
   await expect(
-    dataSeedingClient.locations.set(generator.locations.set(1))
+    nationalSystemAdminClient.locations.set(generator.locations.set(1))
   ).resolves.toEqual(undefined)
 })
 
 test('Prevents sending empty payload', async () => {
+  const { user } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    SCOPES.CONFIG_UPDATE_ALL
+  ])
+
   await expect(
-    dataSeedingClient.locations.set([])
+    nationalSystemAdminClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Creates single location', async () => {
+  const { user } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    SCOPES.CONFIG_UPDATE_ALL
+  ])
+
   const locationPayload = [
-    { id: '123-456-789', partOf: null, name: 'Location foobar' }
+    {
+      id: '123-456-789',
+      partOf: null,
+      name: 'Location foobar',
+      externalId: 'foo-bar'
+    }
   ]
 
-  await dataSeedingClient.locations.set(locationPayload)
+  await nationalSystemAdminClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await nationalSystemAdminClient.locations.get()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(locationPayload)
 })
 
 test('Creates multiple locations', async () => {
+  const { user, generator } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    SCOPES.CONFIG_UPDATE_ALL
+  ])
+
   const parentId = 'parent-id'
 
   const locationPayload = generator.locations.set([
@@ -59,27 +80,32 @@ test('Creates multiple locations', async () => {
     {}
   ])
 
-  await dataSeedingClient.locations.set(locationPayload)
+  await nationalSystemAdminClient.locations.set(locationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await nationalSystemAdminClient.locations.get()
 
   expect(locations).toEqual(locationPayload)
 })
 
 test('Removes existing locations not in payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const nationalSystemAdminClient = createTestClient(user, [
+    SCOPES.CONFIG_UPDATE_ALL
+  ])
+
   const initialPayload = generator.locations.set(5)
 
-  await dataSeedingClient.locations.set(initialPayload)
+  await nationalSystemAdminClient.locations.set(initialPayload)
 
-  const initialLocations = await dataSeedingClient.locations.get()
+  const initialLocations = await nationalSystemAdminClient.locations.get()
   expect(initialLocations).toHaveLength(initialPayload.length)
 
   const [removedLocation, ...remainingLocationsPayload] = initialPayload
 
-  await dataSeedingClient.locations.set(remainingLocationsPayload)
+  await nationalSystemAdminClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
-    await dataSeedingClient.locations.get()
+    await nationalSystemAdminClient.locations.get()
 
   expect(remainingLocationsAfterDeletion).toHaveLength(
     remainingLocationsPayload.length

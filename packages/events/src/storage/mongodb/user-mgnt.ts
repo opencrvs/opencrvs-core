@@ -12,12 +12,13 @@
 import { env } from '@events/environment'
 import { MongoClient } from 'mongodb'
 
-const url = env.MONGO_URL
+const url = env.USER_MGNT_MONGO_URL
 const client = new MongoClient(url)
 
 export async function getClient() {
   await client.connect()
 
-  const db = client.db('events')
-  return db
+  // Providing the database name is not necessary, it will read it from the connection string.
+  // e2e-environment uses different name from deployment to deployment, so we can't hardcode it.
+  return client.db()
 }
