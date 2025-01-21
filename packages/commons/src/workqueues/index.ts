@@ -8,11 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './search'
-export * from './events'
-export * from './conditionals/conditionals'
-export * from './conditionals/validate'
-export * from './documents'
-export * from './workqueues'
 
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+import { allWorkqueue } from './all'
+export { RootWorkqueueConfig } from './WorkqueueConfig'
+
+export const workqueues = { all: allWorkqueue }

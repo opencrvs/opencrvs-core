@@ -51,7 +51,7 @@ export function Pages({
     total
   } = usePagination(formPages.length, Math.max(pageIdx, 0))
   const page = formPages[currentPage]
-  const formValues = getFormValues(eventId, getInitialValues(page.fields))
+  const formValues = getFormValues(eventId, {})
 
   useEffect(() => {
     const pageChanged = formPages[currentPage].id !== pageId

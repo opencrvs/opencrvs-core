@@ -10,7 +10,7 @@
  */
 
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { findInputPageFields, resolveFieldLabels } from './utils'
+import { findInputPageFields, resolveSummayFieldLabels } from './utils'
 
 /**
  * Builds a validated configuration for an event
@@ -23,15 +23,9 @@ export const defineConfig = (config: EventConfigInput) => {
 
   return EventConfig.parse({
     ...input,
-    summary: resolveFieldLabels({
+    summary: resolveSummayFieldLabels({
       config: input.summary,
       pageFields
-    }),
-    workqueues: input.workqueues.map((workqueue) =>
-      resolveFieldLabels({
-        config: workqueue,
-        pageFields
-      })
-    )
+    })
   })
 }

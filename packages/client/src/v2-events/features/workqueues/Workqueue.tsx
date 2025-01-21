@@ -18,8 +18,12 @@ import styled, { useTheme } from 'styled-components'
 import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
-import { WorkqueueConfig } from '@opencrvs/commons'
-import { EventIndex } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  EventIndex,
+  RootWorkqueueConfig,
+  workqueues
+} from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
   ColumnContentAlignment,
@@ -44,6 +48,7 @@ const ToolTipContainer = styled.span`
 
 const NondecoratedLink = styled(Link)`
   text-decoration: none;
+  color: 'primary';
 `
 
 function changeSortedColumn(
@@ -73,16 +78,7 @@ export function WorkqueueIndex() {
   const { getEvents, getOutbox } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
 
-  const [config] = useEventConfigurations()
-
-  const workqueueConfig =
-    config.workqueues.find((workqueue) => workqueue.id === searchParams.id) ??
-    config.workqueues[0]
-
-  // eslint-disable-next-line
-  if (!workqueueConfig) {
-    return null
-  }
+  const configs = useEventConfigurations()
 
   const events = getEvents.useQuery()
   const outbox = getOutbox()
@@ -94,7 +90,8 @@ export function WorkqueueIndex() {
 
   return (
     <Workqueue
-      config={workqueueConfig}
+      config={workqueues.all}
+      eventConfigs={configs}
       events={eventsWithoutOutbox.concat(outbox)}
       {...searchParams}
     />
@@ -108,10 +105,12 @@ function Workqueue({
   events,
   config,
   limit,
-  offset
+  offset,
+  eventConfigs
 }: {
+  eventConfigs: EventConfig[]
   events: EventIndex[]
-  config: WorkqueueConfig
+  config: RootWorkqueueConfig
   limit: number
   offset: number
 }) {
@@ -120,13 +119,8 @@ function Workqueue({
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
   const drafts = getDrafts()
-  const statuses = config.filters.flatMap((filter) => filter.status)
 
   const workqueue = events
-    .filter((event) => statuses.length === 0 || statuses.includes(event.status))
-    .map((event) =>
-      mapKeys(event, (_, key) => (key === 'data' ? key : `${key}`))
-    )
     .map((event) => {
       const { data, ...rest } = event
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,8 +142,36 @@ function Workqueue({
         return event.status
       }
 
+      const eventConfig = eventConfigs.find((e) => e.id === event.type)
+
+      const t = eventConfig?.workqueues[0].fields.map(
+        ({ label, values, column }) => {
+          if (!values || !label) {
+            return ''
+          }
+          const valueMap = Object.fromEntries(
+            Object.entries(values).map(([key, value]) => [
+              key,
+              (event as { [key: string]: any })[value] ?? ''
+            ])
+          )
+
+          return [column, intl.formatMessage(label, valueMap)]
+        }
+      )
+
+      const wqData =
+        t?.reduce((acc, [key, value]) => {
+          if (key) {
+            acc[key] = value
+          }
+          return acc
+        }, {} as { [key: string]: string }) ?? {}
+
       return {
+        ...wqData,
         ...event,
+        event: eventConfig?.label ? intl.formatMessage(eventConfig.label) : '-',
         // eslint-disable-next-line
         createdAt: intl.formatDate(new Date(event.createdAt)),
         // eslint-disable-next-line
@@ -165,22 +187,15 @@ function Workqueue({
             status: getEventStatus()
           }
         ),
-
-        [config.fields[0].id]: isInOutbox ? (
-          <IconWithName
-            name={get(event, config.fields[0].id) ?? 'N/A'}
-            status={'OUTBOX'}
-          />
+        [config.columns[0].id]: isInOutbox ? (
+          <IconWithName name={wqData.title} status={'OUTBOX'} />
         ) : (
           <NondecoratedLink
             to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
               eventId: event.id
             })}
           >
-            <IconWithName
-              name={get(event, config.fields[0].id) ?? 'N/A'}
-              status={event.status}
-            />
+            <IconWithName name={wqData.title} status={event.status} />
           </NondecoratedLink>
         )
       }
@@ -253,23 +268,23 @@ function Workqueue({
     alignment?: ColumnContentAlignment
   }> {
     if (width > theme.grid.breakpoints.lg) {
-      return config.fields.map((field, i) => ({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        label: intl.formatMessage(field.label!),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return config.columns.map((column) => ({
+        label: intl.formatMessage(column.label),
         width: 35,
-        key: field.id,
+        key: column.id,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === field.id
+        isSorted: sortedCol === column.id
       }))
     } else {
-      return config.fields
-        .map((field, i) => ({
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          label: intl.formatMessage(field.label!),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return config.columns
+        .map((column) => ({
+          label: intl.formatMessage(column.label),
           width: 35,
-          key: field.id,
+          key: column.id,
           sortFunction: onColumnClick,
-          isSorted: sortedCol === field.id
+          isSorted: sortedCol === column.id
         }))
         .slice(0, 2)
     }
@@ -287,7 +302,7 @@ function Workqueue({
       noContent={workqueue.length === 0}
       noResultText={'No results'}
       paginationId={Math.round(offset / limit)}
-      title={intl.formatMessage(config.title)}
+      title={intl.formatMessage(config.label)}
       totalPages={totalPages}
     >
       <ReactTooltip id="validateTooltip">

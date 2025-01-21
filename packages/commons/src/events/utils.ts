@@ -92,11 +92,11 @@ export const resolveLabelsFromKnownFields = ({
   })
 }
 
-export const resolveFieldLabels = ({
+export const resolveSummayFieldLabels = ({
   config,
   pageFields
 }: {
-  config: SummaryConfigInput | WorkqueueConfigInput
+  config: SummaryConfigInput
   pageFields: { id: string; label: TranslationConfig }[]
 }) => {
   return {
@@ -104,6 +104,27 @@ export const resolveFieldLabels = ({
     fields: resolveLabelsFromKnownFields({
       pageFields,
       refFields: config.fields
+    })
+  }
+}
+
+export const resolveWorkqueueFieldLabels = ({
+  config,
+  pageFields
+}: {
+  config: WorkqueueConfigInput
+  pageFields: { id: string; label: TranslationConfig }[]
+}) => {
+  return {
+    ...config,
+    fields: resolveLabelsFromKnownFields({
+      pageFields,
+      refFields: config.fields.reduce<{ id: string }[]>((acc, field) => {
+        const values = Object.values(field.values ?? {}).map((value) => ({
+          id: value
+        }))
+        return acc.concat(values)
+      }, [])
     })
   }
 }
