@@ -14,7 +14,14 @@ import { z } from 'zod'
 import { ActionFormData, EventDocument } from '../events'
 
 export function Conditional() {
-  return z.any() as z.ZodType<JSONSchema>
+  /*
+   * Using JSONSchema directly here would cause a
+   * "The inferred type of this node exceeds the maximum length the compiler will serialize."
+   * error, so I've copied the type here
+   */
+  return z.any() as z.ZodType<
+    Omit<JSONSchemaType<ConditionalParameters>, 'properties'>
+  >
 }
 
 export type ConditionalParameters = { $now: string } & (
