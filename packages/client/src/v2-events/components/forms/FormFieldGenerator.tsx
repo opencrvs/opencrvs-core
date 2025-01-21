@@ -11,8 +11,7 @@
 
 /* eslint-disable */
 import { InputField } from '@client/components/form/InputField'
-import { DATE, PARAGRAPH, TEXT } from '@client/forms'
-import { IAdvancedSearchFormState } from '@client/search/advancedSearch/utils'
+import { DATE, IFormFieldValue, PARAGRAPH, TEXT } from '@client/forms'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { Text } from '@opencrvs/components/lib/Text'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
@@ -29,10 +28,14 @@ import {
 import { Errors, getValidationErrorsForForm } from './validation'
 
 import {
+  ActionFormData,
+  CheckboxFieldValue,
   FieldConfig,
   FieldValue,
-  FieldValueByType,
-  FileFieldValue
+  FileFieldValue,
+  LocationFieldValue,
+  RadioGroupFieldValue,
+  SelectFieldValue
 } from '@opencrvs/commons/client'
 import {
   Field,
@@ -49,7 +52,15 @@ import {
   useIntl
 } from 'react-intl'
 import { FileInput } from './inputs/FileInput/FileInput'
-import { ActionFormData } from '@opencrvs/commons'
+
+import { BulletList } from '@client/v2-events/features/events/registered-fields/BulletList'
+import { Checkbox } from '@client/v2-events/features/events/registered-fields/Checkbox'
+import { Select } from '@client/v2-events/features/events/registered-fields/Select'
+import { SelectCountry } from '@client/v2-events/features/events/registered-fields/SelectCountry'
+import { Location } from '@client/v2-events/features/events/registered-fields/Location'
+import { RadioGroup } from '@client/v2-events/features/events/registered-fields'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields/LocationSearch'
+import { formatISO } from 'date-fns'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -73,7 +84,7 @@ interface GeneratedInputFieldProps<FieldType extends FieldConfig> {
   onChange: (e: React.ChangeEvent) => void
   onBlur: (e: React.FocusEvent) => void
   resetDependentSelectValues: (name: string) => void
-  value: FieldValueByType[FieldType['type']]
+  value: IFormFieldValue
   touched: boolean
   error: string
   formData: ActionFormData
@@ -176,7 +187,7 @@ const GeneratedInputField = React.memo(
       return (
         <InputField {...inputFieldProps}>
           <TextInput
-            type="text"
+            type={fieldDefinition.options?.type ?? 'text'}
             {...inputProps}
             isDisabled={disabled}
             maxLength={fieldDefinition.options?.maxLength}
@@ -197,7 +208,70 @@ const GeneratedInputField = React.memo(
         </InputField>
       )
     }
-    return <div>Unsupported field type {fieldDefinition.type}</div>
+    if (fieldDefinition.type === 'BULLET_LIST') {
+      return <BulletList {...fieldDefinition} />
+    }
+    if (fieldDefinition.type === 'SELECT') {
+      return (
+        <Select
+          {...fieldDefinition}
+          value={inputProps.value as SelectFieldValue}
+          onChange={(val: string) => setFieldValue(fieldDefinition.id, val)}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'COUNTRY') {
+      return (
+        <SelectCountry
+          {...fieldDefinition}
+          value={inputProps.value as SelectFieldValue}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'CHECKBOX') {
+      return (
+        <Checkbox
+          {...fieldDefinition}
+          value={value as CheckboxFieldValue}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'RADIO_GROUP') {
+      return (
+        <RadioGroup
+          {...fieldDefinition}
+          value={value as RadioGroupFieldValue}
+          setFieldValue={setFieldValue}
+        />
+      )
+    }
+    if (fieldDefinition.type === 'LOCATION') {
+      if (fieldDefinition.options.type === 'HEALTH_FACILITY')
+        return (
+          <LocationSearch
+            {...fieldDefinition}
+            value={value as LocationFieldValue}
+            setFieldValue={setFieldValue}
+          />
+        )
+      return (
+        <Location
+          {...fieldDefinition}
+          value={value as LocationFieldValue}
+          setFieldValue={setFieldValue}
+          partOf={
+            (fieldDefinition.options?.partOf?.$data &&
+              (makeFormikFieldIdsOpenCRVSCompatible(formData)[
+                fieldDefinition.options?.partOf.$data
+              ] as string | undefined | null)) ??
+            null
+          }
+        />
+      )
+    }
+    throw new Error(`Unsupported field ${fieldDefinition}`)
   }
 )
 
@@ -223,7 +297,7 @@ interface ExposedProps {
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
-  initialValues?: IAdvancedSearchFormState
+  initialValues?: ActionFormData
 }
 
 type AllProps = ExposedProps & IntlShapeProps & FormikProps<ActionFormData>
@@ -366,10 +440,13 @@ class FormSectionComponent extends React.Component<AllProps> {
 
           const conditionalActions: string[] = getConditionalActionsForField(
             field,
-            { $form: values, $now: new Date().toISOString().split('T')[0] }
+            {
+              $form: makeFormikFieldIdsOpenCRVSCompatible(values),
+              $now: formatISO(new Date(), { representation: 'date' })
+            }
           )
 
-          if (conditionalActions.includes('hide')) {
+          if (conditionalActions.includes('HIDE')) {
             return null
           }
 
@@ -452,6 +529,7 @@ export const FormFieldGenerator: React.FC<ExposedProps> = (props) => {
 
   return (
     <Formik<ActionFormData>
+      enableReinitialize={true}
       initialValues={initialValues}
       validate={(values) =>
         getValidationErrorsForForm(

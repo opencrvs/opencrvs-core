@@ -116,10 +116,7 @@ export default defineConfig(({ mode }) => {
       setupFiles: './src/setupTests.ts',
       testTimeout: 60000,
       hookTimeout: 60000,
-      globals: true,
-      coverage: {
-        reporter: ['text', 'json', 'html']
-      }
+      globals: true
     },
     server: {
       // to get the manifest.json and images from country-config during development time

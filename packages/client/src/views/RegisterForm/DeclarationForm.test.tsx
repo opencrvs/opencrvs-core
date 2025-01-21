@@ -123,7 +123,7 @@ describe('when user starts a new declaration', () => {
          */
         store.dispatch(storeDeclaration(draft))
 
-        router.navigate(
+        await router.navigate(
           formatUrl(DRAFT_BIRTH_PARENT_FORM, {
             declarationId: draft.id.toString()
           })
@@ -228,6 +228,7 @@ describe('when user starts a new declaration', () => {
 
           it('renders list of document upload field', async () => {
             await flushPromises()
+            await waitForElement(app, '#form_section_id_documents-view-group')
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
               .find('section')

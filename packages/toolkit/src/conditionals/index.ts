@@ -11,6 +11,8 @@
 import { JSONSchema } from '@opencrvs/commons/conditionals'
 import { ActionDocument } from '@opencrvs/commons/events'
 
+export * as deduplication from './deduplication'
+
 export function defineConditional(conditional: JSONSchema): JSONSchema {
   return conditional
 }
@@ -69,9 +71,19 @@ export function eventHasAction(type: ActionDocument['type']) {
               properties: {
                 type: {
                   const: type
+                },
+                draft: {
+                  type: 'boolean'
                 }
               },
-              required: ['type']
+              required: ['type'],
+              not: {
+                properties: {
+                  draft: {
+                    const: true
+                  }
+                }
+              }
             }
           }
         },
@@ -105,6 +117,95 @@ export function field(fieldId: string) {
         }
       },
       required: ['$form', '$now']
+    }),
+    isEqualTo: (value: string) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              const: value
+            }
+          },
+          required: [fieldId]
+        }
+      },
+      required: ['$form']
+    }),
+    isInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              enum: values
+            }
+          },
+          required: [fieldId]
+        }
+      },
+      required: ['$form']
+    }),
+    isNotInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          properties: {
+            [fieldId]: {
+              not: {
+                enum: values
+              }
+            }
+          },
+          required: [fieldId]
+        }
+      },
+      required: ['$form']
+    }),
+    isUndefinedOrInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          anyOf: [
+            {
+              required: [fieldId],
+              properties: {
+                [fieldId]: {
+                  enum: values
+                }
+              }
+            },
+            { not: { required: [fieldId] } }
+          ]
+        }
+      },
+      required: ['$form']
+    }),
+    isUndefinedOrNotInArray: (values: string[]) => ({
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          anyOf: [
+            {
+              required: [fieldId],
+              properties: {
+                [fieldId]: {
+                  not: {
+                    enum: values
+                  }
+                }
+              }
+            },
+            { not: { required: [fieldId] } }
+          ]
+        }
+      },
+      required: ['$form']
     })
   }
 }

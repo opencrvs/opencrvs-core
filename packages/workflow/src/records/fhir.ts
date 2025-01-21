@@ -768,18 +768,21 @@ export function createWaitingForValidationTask(
   }
 }
 
-export function createRegisterTask(previousTask: SavedTask): Task {
+export function createRegisterTask(
+  previousTask: SavedTask,
+  comment?: string
+): Task {
   const timeLoggedMSExtension = previousTask.extension.find(
     (e) => e.url === 'http://opencrvs.org/specs/extension/timeLoggedMS'
-  )!
+  )
 
   const registeredTask = createNewTaskResource(
     previousTask,
-    [timeLoggedMSExtension],
+    timeLoggedMSExtension ? [timeLoggedMSExtension] : [],
     'REGISTERED'
   )
 
-  const comments = previousTask?.note?.[0]?.text
+  const comments = comment ?? previousTask?.note?.[0]?.text
 
   return {
     ...registeredTask,

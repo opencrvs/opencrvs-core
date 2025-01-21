@@ -7,12 +7,17 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
-name: Lint, run unit tests and security scans
+name: Lint and run unit tests
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
 
 jobs:
   setup:
+    name: Setup tests
     permissions:
       contents: read
       pull-requests: write
@@ -28,6 +33,7 @@ jobs:
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
         # to fail
         continue-on-error: true
+        if: github.event_name == 'pull_request'
         with:
           message: >
             Oops! Looks like you forgot to update the changelog.
@@ -44,6 +50,7 @@ jobs:
           echo "matrix=${PACKAGES}" >> $GITHUB_OUTPUT
 
   test:
+    name: Test
     needs: setup
     runs-on: ubuntu-22.04
     strategy:
@@ -136,27 +143,173 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: CI="" yarn install --frozen-lockfile
 
-      # TODO: Move out of the matrix to be built once and shared
       - name: Build common package
-        if: steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
         run: cd packages/commons && yarn build
 
-      - name: Build components client and login
-        if: steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
+      - name: Build components
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/components')
         run: |
           cd packages/components && yarn build
 
       # TODO: should run parallel to unit tests as can take as much as unit tests
       - name: Run linting
-        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-lint != 'true'
         run: cd ${{ matrix.package }} && yarn lint
 
       - name: Run Unit Test
-        if: steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
+        if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && steps.check-scripts.outputs.skip-test != 'true'
         run: cd ${{ matrix.package }} && yarn test
 
-  lint-knip:
+  prepare-client-tests:
+    name: Prepare client tests
     runs-on: ubuntu-22.04
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Extract dependencies for client
+        id: extract-dependencies
+        run: |
+          DEPENDENCIES=$(node -e "
+            const { execSync } = require('child_process');
+            const output = execSync('yarn --silent workspaces info', { encoding: 'utf-8' });
+            const json = JSON.parse(output.replaceAll('@opencrvs', 'packages'));
+
+            const getDependencies = (pkg) =>
+              json[pkg].workspaceDependencies.concat(
+                json[pkg].workspaceDependencies.flatMap(getDependencies)
+              );
+
+            console.log(
+              getDependencies('packages/client').join(' ')
+            );
+          ")
+          echo "DEPENDENCIES=${DEPENDENCIES}" >> $GITHUB_ENV
+          echo "Found dependencies: $DEPENDENCIES"
+
+      - name: Remove other package directories
+        run: |
+          for dir in packages/*; do
+            if echo "packages/client $DEPENDENCIES" | grep -q -w "$dir"; then
+              echo "Skipping $dir"
+            else
+              echo "Removing $dir"
+              rm -rf "$dir"
+            fi
+          done
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Build common package
+        run: cd packages/commons && yarn build
+
+      - name: Build components
+        run: |
+          cd packages/components && yarn build
+
+      - name: Upload filesystem as artifact
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: client
+          include-hidden-files: true
+          path: |
+            .
+            !**/node_modules
+
+  lint-client:
+    name: Lint client
+    needs: prepare-client-tests
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Compile
+        run: cd packages/client && yarn test:compilation
+
+      - name: Run linting
+        run: cd packages/client && yarn lint
+
+  test-client:
+    name: Test client
+    needs: prepare-client-tests
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shards: [1, 2, 3, 4, 5]
+
+    steps:
+      - name: Download filesystem artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.cache/yarn/v6
+          key: node-${{ hashFiles('**/yarn.lock', format('{0}/{1}','packages/client','package.json')) }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: CI="" yarn install --frozen-lockfile
+
+      - name: Run Unit Test
+        run: cd packages/client && yarn test -- --shard $(( ${{ strategy.job-index }} + 1 ))/${{ strategy.job-total }}
+
+  lint-knip:
+    name: Lint unused exports with Knip
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout base branch
         uses: actions/checkout@v4
@@ -208,3 +361,23 @@ jobs:
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
           exit 1
+
+  build-toolkit:
+    name: Build toolkit
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+        working-directory: packages/toolkit

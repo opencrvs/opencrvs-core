@@ -246,6 +246,7 @@ export async function confirmRegistration(
   details: {
     registrationNumber: string
     identifiers?: IdentifierInput[]
+    comment?: string
   }
 ) {
   const res: ReadyForReviewRecord = await createRequest(

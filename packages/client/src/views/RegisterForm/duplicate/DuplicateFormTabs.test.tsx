@@ -915,13 +915,13 @@ const actualDeclarationMock = {
       {
         id: 'countries.FAR',
         defaultMessage: 'Farajaland',
-        description: 'Fictional country for OpenCRSV demo'
+        description: 'Fictional country for OpenCRVS demo'
       }
     ],
     placeOfBirthCountry: {
       id: 'countries.FAR',
       defaultMessage: 'Farajaland',
-      description: 'Fictional country for OpenCRSV demo'
+      description: 'Fictional country for OpenCRVS demo'
     },
     placeOfBirthState: 'Central',
     placeOfBirthDistrict: 'Ibombo',
@@ -943,13 +943,13 @@ const actualDeclarationMock = {
       {
         id: 'countries.FAR',
         defaultMessage: 'Farajaland',
-        description: 'Fictional country for OpenCRSV demo'
+        description: 'Fictional country for OpenCRVS demo'
       }
     ],
     motherCountry: {
       id: 'countries.FAR',
       defaultMessage: 'Farajaland',
-      description: 'Fictional country for OpenCRSV demo'
+      description: 'Fictional country for OpenCRVS demo'
     },
     motherCity: '',
     motherAddressLine3: '',

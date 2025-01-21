@@ -10,9 +10,11 @@
  */
 
 import React from 'react'
+import { useIntl } from 'react-intl'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import { SummaryConfig } from '@opencrvs/commons/events'
 import { EventIndex } from '@opencrvs/commons/client'
+import { useTransformer } from '@client/v2-events/hooks/useTransformer'
 
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
@@ -25,20 +27,23 @@ export function EventSummary({
   event: EventIndex
   summary: SummaryConfig
 }) {
+  const intl = useIntl()
+  const { toString } = useTransformer(event.type)
+  const data = toString(event.data)
   return (
     <>
       <Summary id="summary">
         {summary.fields.map((field) => {
-          const message = 'message'
-
           return (
             <Summary.Row
               key={field.id}
               data-testid={field.id}
-              label={field.label?.defaultMessage ?? ''}
-              placeholder={message}
-              // @ts-ignore
-              value={event.data[field.id] ?? '-'}
+              label={intl.formatMessage(field.label)}
+              placeholder={
+                field.emptyValueMessage &&
+                intl.formatMessage(field.emptyValueMessage)
+              }
+              value={data[field.id]}
             />
           )
         })}
