@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 module.exports = {
-  extends: '../../.eslintrc.js',
+  extends: '../../.eslintrc.events.js',
   env: {
     es6: true
   },

@@ -11,8 +11,8 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { queryClient } from '@client/v2-events/trpc'
 import { getToken } from '@client/utils/authUtils'
+import { queryClient } from '@client/v2-events/trpc'
 
 async function uploadFile({
   file,
@@ -40,7 +40,23 @@ async function uploadFile({
   return response
 }
 
-const MUTATION_KEY = 'uploadFile'
+async function deleteFile({ filename }: { filename: string }): Promise<void> {
+  const response = await fetch('/api/files/' + filename, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  if (!response.ok) {
+    throw new Error('File deletation upload failed')
+  }
+
+  return
+}
+
+const UPLOAD_MUTATION_KEY = 'uploadFile'
+const DELETE_MUTATION_KEY = 'deleteFile'
 
 /* Must match the one defined src-sw.ts */
 const CACHE_NAME = 'workbox-runtime'
@@ -99,37 +115,62 @@ async function removeCached(filename: string) {
   return cache.delete(getFullURL(filename))
 }
 
-queryClient.setMutationDefaults([MUTATION_KEY], {
+queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
+  retry: true,
+  retryDelay: 5000,
+  mutationFn: deleteFile
+})
+queryClient.setMutationDefaults([UPLOAD_MUTATION_KEY], {
   retry: true,
   retryDelay: 5000,
   mutationFn: uploadFile
 })
 
 interface Options {
-  onSuccess?: (data: { filename: string }) => void
+  onSuccess?: (data: {
+    originalFilename: string
+    type: string
+    filename: string
+  }) => void
 }
 
 export function useFileUpload(fieldId: string, options: Options = {}) {
-  const mutation = useMutation({
+  const upload = useMutation({
     mutationFn: uploadFile,
-    mutationKey: [MUTATION_KEY, fieldId],
+    mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
     onMutate: async ({ file, transactionId }) => {
       const extension = file.name.split('.').pop()
       const temporaryUrl = `${transactionId}.${extension}`
 
       await cacheFile(temporaryUrl, file)
 
-      options.onSuccess?.({ filename: temporaryUrl })
+      options.onSuccess?.({
+        ...file,
+        originalFilename: file.name,
+        type: file.type,
+        filename: temporaryUrl
+      })
     },
     onSuccess: (data) => {
       void removeCached(data.url)
     }
   })
 
+  const del = useMutation({
+    mutationFn: deleteFile,
+    mutationKey: [DELETE_MUTATION_KEY, fieldId],
+    onSuccess: (data, { filename }) => {
+      void removeCached(filename)
+    }
+  })
+
   return {
     getFullURL,
+    deleteFile: (filename: string) => {
+      return del.mutate({ filename })
+    },
     uploadFiles: (file: File) => {
-      return mutation.mutate({ file, transactionId: uuid() })
+      return upload.mutate({ file, transactionId: uuid() })
     }
   }
 }

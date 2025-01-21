@@ -204,7 +204,8 @@ export function getChangedValues(
         originalDraftData[section.id] ??= {}
 
         if (
-          !conditionalActions.includes('hide') &&
+          (!conditionalActions.includes('hide') ||
+            fieldDef.name === 'detailsExist') &&
           !isMetaTypeField(fieldDef) &&
           hasFieldChanged(
             fieldDef,

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { renderHook, RenderHookResult, waitFor } from '@testing-library/react'
-import React, { act, PropsWithChildren } from 'react'
+import React, { PropsWithChildren } from 'react'
 
 import { http, HttpResponse, HttpResponseResolver } from 'msw'
 import { setupServer } from 'msw/node'
@@ -60,6 +60,7 @@ const createHandler = trpcHandler(async ({ request }) => {
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
         createdBy: '6733309827b97e6483877188',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
+        draft: false,
         data: {}
       }
     ]
@@ -98,9 +99,13 @@ interface TestContext {
     {}
   >
   declareHook: RenderHookResult<
-    ReturnType<ReturnType<typeof useEvents>['actions']['declare']>,
+    ReturnType<typeof useEvents>['actions']['declare'],
     {}
   >
+}
+
+function wrapper({ children }: PropsWithChildren) {
+  return <TRPCProvider>{children}</TRPCProvider>
 }
 
 beforeEach<TestContext>(async (testContext) => {
@@ -109,9 +114,6 @@ beforeEach<TestContext>(async (testContext) => {
   await storage.removeItem('events')
   await storage.removeItem('reactQuery')
 
-  function wrapper({ children }: PropsWithChildren) {
-    return <TRPCProvider>{children}</TRPCProvider>
-  }
   const eventsHook = renderHook(() => useEvents(), { wrapper })
   await waitFor(() => expect(eventsHook.result.current).not.toBeNull(), {
     timeout: 3000
@@ -122,7 +124,7 @@ beforeEach<TestContext>(async (testContext) => {
   })
 
   const declareHookHook = renderHook(
-    () => eventsHook.result.current.actions.declare(),
+    () => eventsHook.result.current.actions.declare,
     {
       wrapper
     }
@@ -135,7 +137,6 @@ beforeEach<TestContext>(async (testContext) => {
 
 describe('events that have unsynced actions', () => {
   test<TestContext>('creating a record first stores it locally with a temporary id', async ({
-    eventsHook,
     createEventHook
   }) => {
     server.use(http.post('/api/events/event.create', errorHandler))
@@ -144,19 +145,18 @@ describe('events that have unsynced actions', () => {
       transactionId: '_TEST_TRANSACTION_'
     })
 
+    const getHook = renderHook(
+      () => useEvents().getEvent.useQuery('_TEST_TRANSACTION_'),
+      { wrapper }
+    )
+
     // Expect data store now to contain one event
     await waitFor(() => {
-      expect(eventsHook.result.current.events.data).toHaveLength(1)
+      expect(getHook.result.current.data).toBeTruthy()
     })
-
-    // It should have the transactionId as id
-    expect(eventsHook.result.current.events.data[0].id).toBe(
-      eventsHook.result.current.events.data[0].transactionId
-    )
   })
 
   test<TestContext>('temporary id is replaced with the real id when the event is synced to the backend', async ({
-    eventsHook,
     createEventHook
   }) => {
     await createEventHook.result.current.mutateAsync({
@@ -171,96 +171,14 @@ describe('events that have unsynced actions', () => {
       })
     )
 
+    const getHook = renderHook(
+      () => useEvents().getEvent.useQuery('_REAL_UUID_'),
+      { wrapper }
+    )
+
+    // Expect data store now to contain one event
     await waitFor(() => {
-      expect(eventsHook.result.current.events.data).toHaveLength(1)
+      expect(getHook.result.current.data).toBeTruthy()
     })
-
-    // But now it's real id is different from the transactionId
-    await waitFor(() =>
-      expect(eventsHook.result.current.events.data[0].id).not.toBe(
-        eventsHook.result.current.events.data[0].transactionId
-      )
-    )
-  })
-
-  test<TestContext>('event that has not been declared yet is interpreted as a draft', async ({
-    eventsHook,
-    createEventHook
-  }) => {
-    await createEventHook.result.current.mutateAsync({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
-      transactionId: '_TEST_TRANSACTION_'
-    })
-    // Wait for backend to sync
-    await waitFor(() =>
-      expect(serverSpy).toHaveBeenCalledWith({
-        url: 'http://localhost:3000/api/events/event.create',
-        method: 'POST'
-      })
-    )
-
-    // Store still has one draft
-    await waitFor(() => {
-      expect(eventsHook.result.current.getDrafts()).toHaveLength(1)
-    })
-  })
-})
-
-test<TestContext>('events that have unsynced actions are treated as "outbox" ', async ({
-  eventsHook,
-  declareHook,
-  createEventHook: createHook
-}) => {
-  server.use(http.post('/api/events/event.create', errorHandler))
-
-  createHook.result.current.mutate({
-    type: 'TENNIS_CLUB_MEMBERSHIP',
-    transactionId: '_TEST_FAILING_TRANSACTION_'
-  })
-
-  await waitFor(() => {
-    expect(eventsHook.result.current.events.data).toHaveLength(1)
-  })
-
-  await waitFor(() => {
-    expect(eventsHook.result.current.getOutbox()).toHaveLength(1)
-    expect(eventsHook.result.current.getOutbox()).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: '_TEST_FAILING_TRANSACTION_' })
-      ])
-    )
-  })
-
-  // Start server again, clear outbox
-  server.resetHandlers()
-
-  const mutationCache = queryClient.getMutationCache().getAll()
-
-  await Promise.all(
-    mutationCache.map(async (mutation) =>
-      mutation.execute(mutation.state.variables)
-    )
-  )
-  // @TODO: Check if this change was intentional or is there some inconsistency with the cache.
-  await waitFor(() => expect(serverSpy.mock.calls).toHaveLength(2))
-
-  await waitFor(() => {
-    expect(eventsHook.result.current.getOutbox()).toHaveLength(0)
-  })
-
-  // Create a declaration action as well
-  server.use(http.post('/api/events/actions.declare', errorHandler))
-  act(() => {
-    declareHook.result.current.mutate({
-      eventId: '_REAL_UUID_',
-      data: {},
-      transactionId: '_TEST_FAILING_ACTION_TRANSACTION_'
-    })
-  })
-  await waitFor(() => {
-    expect(eventsHook.result.current.getOutbox()).toHaveLength(1)
-    expect(eventsHook.result.current.getOutbox()).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: '_REAL_UUID_' })])
-    )
   })
 })

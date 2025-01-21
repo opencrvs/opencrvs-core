@@ -8,40 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { useIntl } from 'react-intl'
-import {
-  get,
-  InputField,
-  TextInput,
-  useFormContext
-} from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons'
+import { TextFieldValue } from '@opencrvs/commons/client'
 
-export function TextField({ id, label, required }: FieldProps<'TEXT'>) {
-  const intl = useIntl()
-  const {
-    register,
-    formState: { errors, touchedFields }
-  } = useFormContext()
-  const error = get(errors, id)?.message
-  const touched = get(touchedFields, id)
+export const INITIAL_TEXT_VALUE = ''
 
-  return (
-    <InputField
-      error={error}
-      id={id}
-      label={intl.formatMessage(label)}
-      touched={touched}
-    >
-      <TextInput
-        type="text"
-        {...register(id, {
-          required: required
-            ? '[not i18n yet..]: This field is required'
-            : undefined
-        })}
-      />
-    </InputField>
-  )
-}
+export const textToString = (text: TextFieldValue) => text || INITIAL_TEXT_VALUE

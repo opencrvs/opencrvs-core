@@ -9,4 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export * from './mongodb'
+import { EventDocument } from '@opencrvs/commons/events'
+
+export function getEventWithOnlyUserSpecificDrafts(
+  event: EventDocument,
+  userId: string
+): EventDocument {
+  return {
+    ...event,
+    actions: event.actions.filter((action) => {
+      return !action.draft || action.createdBy === userId
+    })
+  }
+}
