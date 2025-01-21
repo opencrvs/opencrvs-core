@@ -10,20 +10,24 @@
  */
 
 import {
-  ActionInput,
+  ActionInputWithType,
   EventDocument,
+  EventIndex,
   EventInput,
-  FileFieldValue
+  FileFieldValue,
+  getCurrentEventState,
+  isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
-import { getClient } from '@events/storage/mongodb'
+import * as events from '@events/storage/mongodb/events'
 import { ActionType, getUUID } from '@opencrvs/commons'
 import { z } from 'zod'
-import { deleteEventIndex, indexEvent } from './indexing/indexing'
+import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
-import { getEventConfigurations } from './config/config'
-import { deleteFile, fileExists } from './files'
+import { getEventConfigurations } from '@events/service/config/config'
+import { deleteFile, fileExists } from '@events/service/files'
+import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -32,7 +36,7 @@ export const EventInputWithId = EventInput.extend({
 export type EventInputWithId = z.infer<typeof EventInputWithId>
 
 async function getEventByTransactionId(transactionId: string) {
-  const db = await getClient()
+  const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
 
   const document = await collection.findOne({ transactionId })
@@ -47,8 +51,9 @@ class EventNotFoundError extends TRPCError {
     })
   }
 }
+
 export async function getEventById(id: string) {
-  const db = await getClient()
+  const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: id })
@@ -64,7 +69,7 @@ export async function deleteEvent(
   eventId: string,
   { token }: { token: string }
 ) {
-  const db = await getClient()
+  const db = await events.getClient()
 
   const collection = db.collection<EventDocument>('events')
   const event = await collection.findOne({ id: eventId })
@@ -73,9 +78,8 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const hasNonDeletableActions = event.actions.some(
-    ({ type }) => type !== ActionType.CREATE && type !== ActionType.DRAFT
-  )
+  const hasNonDeletableActions = !isUndeclaredDraft(event)
+
   if (hasNonDeletableActions) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
@@ -87,7 +91,7 @@ export async function deleteEvent(
 
   const { id } = event
   await collection.deleteOne({ id })
-  await deleteEventIndex(id)
+  await deleteEventIndex(event)
   return { id }
 }
 
@@ -95,9 +99,9 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   const config = await getEventConfigurations(token)
 
   const form = config
-    .find((config) => config.id === event.type)
+    .find((c) => c.id === event.type)
     ?.actions.find((action) => action.type === event.type)
-    ?.forms.find((form) => form.active)
+    ?.forms.find((f) => f.active)
 
   const fieldTypes = form?.pages.flatMap((page) => page.fields)
 
@@ -134,7 +138,7 @@ export async function createEvent({
     return existingEvent
   }
 
-  const db = await getClient()
+  const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
 
   const now = new Date().toISOString()
@@ -152,6 +156,7 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdAtLocation,
+        draft: false,
         data: {}
       }
     ]
@@ -164,7 +169,7 @@ export async function createEvent({
 }
 
 export async function addAction(
-  input: ActionInput,
+  input: ActionInputWithType,
   {
     eventId,
     createdBy,
@@ -177,16 +182,16 @@ export async function addAction(
     token: string
   }
 ) {
-  const db = await getClient()
+  const db = await events.getClient()
   const now = new Date().toISOString()
   const event = await getEventById(eventId)
 
   const config = await getEventConfigurations(token)
 
   const form = config
-    .find((config) => config.id === event.type)
+    .find((c) => c.id === event.type)
     ?.actions.find((action) => action.type === input.type)
-    ?.forms.find((form) => form.active)
+    ?.forms.find((f) => f.active)
 
   const fieldTypes = form?.pages.flatMap((page) => page.fields)
 
@@ -215,7 +220,8 @@ export async function addAction(
           ...input,
           createdBy,
           createdAt: now,
-          createdAtLocation
+          createdAtLocation,
+          draft: input.draft || false
         }
       },
       $set: {
@@ -229,14 +235,75 @@ export async function addAction(
   return updatedEvent
 }
 
+export async function validate(
+  input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
+  {
+    eventId,
+    createdBy,
+    token,
+    createdAtLocation
+  }: {
+    eventId: string
+    createdBy: string
+    createdAtLocation: string
+    token: string
+  }
+) {
+  const config = await getEventConfigurations(token)
+  const storedEvent = await getEventById(eventId)
+  const form = config.find((c) => c.id === storedEvent.type)
+
+  if (!form) {
+    throw new Error(`Form not found with event type: ${storedEvent.type}`)
+  }
+
+  let duplicates: EventIndex[] = []
+
+  const futureEventState = getCurrentEventState({
+    ...storedEvent,
+    actions: [
+      ...storedEvent.actions,
+      {
+        ...input,
+        createdAt: new Date().toISOString(),
+        createdBy,
+        createdAtLocation
+      }
+    ]
+  })
+
+  const resultsFromAllRules = await Promise.all(
+    form.deduplication.map(async (deduplication) => {
+      const matches = await searchForDuplicates(futureEventState, deduplication)
+      return matches
+    })
+  )
+
+  duplicates = resultsFromAllRules
+    .flat()
+    .sort((a, b) => b.score - a.score)
+    .filter((hit): hit is { score: number; event: EventIndex } => !!hit.event)
+    .map((hit) => hit.event)
+    .filter((event, index, self) => {
+      return self.findIndex((t) => t.id === event.id) === index
+    })
+
+  const event = await addAction(
+    { ...input, duplicates: duplicates.map((d) => d.id) },
+    {
+      eventId,
+      createdBy,
+      token,
+      createdAtLocation
+    }
+  )
+  return event
+}
+
 export async function patchEvent(eventInput: EventInputWithId) {
   const existingEvent = await getEventById(eventInput.id)
 
-  if (!existingEvent) {
-    throw new EventNotFoundError(eventInput.id)
-  }
-
-  const db = await getClient()
+  const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
 
   const now = new Date().toISOString()

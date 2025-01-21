@@ -8,30 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
-import { EventStatus } from '@opencrvs/commons'
 
-const client = createTestClient()
-const generator = payloadGenerator()
+import { EventStatus } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns empty list when no events', async () => {
-  const fetchedEvents = await client.events.get()
+  const { user } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const fetchedEvents = await client.event.list()
 
   expect(fetchedEvents).toEqual([])
 })
 
 test('Returns multiple events', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   for (let i = 0; i < 10; i++) {
     await client.event.create(generator.event.create())
   }
 
-  const events = await client.events.get()
+  const events = await client.event.list()
 
   expect(events).toHaveLength(10)
 })
 
 test('Returns aggregated event with updated status and values', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const initialData = { name: 'John Doe', favouriteFruit: 'Banana' }
   const event = await client.event.create(generator.event.create())
   await client.event.actions.declare(
@@ -40,7 +46,7 @@ test('Returns aggregated event with updated status and values', async () => {
     })
   )
 
-  const initialEvents = await client.events.get()
+  const initialEvents = await client.event.list()
 
   expect(initialEvents).toHaveLength(1)
   expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
@@ -53,7 +59,7 @@ test('Returns aggregated event with updated status and values', async () => {
     })
   )
 
-  const updatedEvents = await client.events.get()
+  const updatedEvents = await client.event.list()
 
   expect(updatedEvents).toHaveLength(1)
 

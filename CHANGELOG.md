@@ -38,6 +38,7 @@
 
 ### Bug fixes
 
+- Fix task history getting corrupted if a user views a record while it's in external validation [#8278](https://github.com/opencrvs/opencrvs-core/issues/8278)
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - "Choose a new password" form now allows the user to submit the form using the "Enter/Return" key [#5502](https://github.com/opencrvs/opencrvs-core/issues/5502)
 - Dropdown options now flow to multiple rows in forms [#7653](https://github.com/opencrvs/opencrvs-core/pull/7653)
@@ -47,7 +48,17 @@
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 
+## 1.6.3 Release candidate
+
+### Improvements
+
+- For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
+
 ## 1.6.2 Release candidate
+
+### Deprecated
+
+- `INFORMANT_SIGNATURE` & `INFORMANT_SIGNATURE_REQUIRED` are now deprecated and part of form config
 
 ### Bug fixes
 

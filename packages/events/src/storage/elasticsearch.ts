@@ -11,15 +11,24 @@
 import * as elasticsearch from '@elastic/elasticsearch'
 import { env } from '@events/environment'
 
-let client: elasticsearch.Client
+let client: elasticsearch.Client | undefined
 
 export const getOrCreateClient = () => {
   if (!client) {
     client = new elasticsearch.Client({
-      node: env.ES_HOST
+      node: env.ES_URL
     })
+
     return client
   }
 
   return client
+}
+
+export function getEventAliasName() {
+  return `events`
+}
+
+export function getEventIndexName(eventType: string) {
+  return `events_${eventType}`.toLowerCase()
 }

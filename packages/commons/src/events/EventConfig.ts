@@ -11,9 +11,10 @@
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
 import { TranslationConfig } from './TranslationConfig'
-import { SummaryConfig } from './SummaryConfig'
+import { SummaryConfig, SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfig } from './WorkqueueConfig'
-import { FormConfig, FormConfigInput } from './FormConfig'
+import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
+import { DeduplicationConfig } from './DeduplicationConfig'
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
@@ -29,11 +30,19 @@ export const EventConfig = z.object({
   summary: SummaryConfig,
   label: TranslationConfig,
   actions: z.array(ActionConfig),
-  workqueues: z.array(WorkqueueConfig)
+  workqueues: z.array(WorkqueueConfig),
+  deduplication: z.array(DeduplicationConfig).optional().default([])
+})
+
+export const EventConfigInput = EventConfig.extend({
+  summary: SummaryConfigInput
 })
 
 export type EventConfig = z.infer<typeof EventConfig>
-export type EventConfigInput = z.input<typeof EventConfig>
+export type EventConfigInput = z.input<typeof EventConfigInput>
 
 export const defineForm = (form: FormConfigInput): FormConfig =>
   FormConfig.parse(form)
+
+export const defineFormPage = (formPage: FormPage): FormPage =>
+  FormPage.parse(formPage)

@@ -11,9 +11,15 @@
 
 import { cleanEnv, url } from 'envalid'
 
+/**
+ * When defining variables aim to be consistent with existing values.
+ * Define URLs without trailing slashes, include the protocol.
+ */
 export const env = cleanEnv(process.env, {
-  MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
-  ES_HOST: url({ devDefault: 'http://localhost:9200' }),
+  EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
+  USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
+  ES_URL: url({ devDefault: 'http://localhost:9200' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
-  DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' })
+  DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
+  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' })
 })

@@ -20,7 +20,9 @@
     "@opencrvs/commons": "^1.7.0",
     "@trpc/server": "^11.0.0-rc.532",
     "app-module-path": "^2.2.0",
+    "date-fns": "^4.1.0",
     "envalid": "^8.0.0",
+    "jsonwebtoken": "^9.0.0",
     "mongodb": "6.9.0",
     "superjson": "1.9.0-0",
     "tsconfig-paths": "^3.13.0",
@@ -28,6 +30,7 @@
   },
   "devDependencies": {
     "@testcontainers/elasticsearch": "^10.15.0",
+    "@types/jsonwebtoken": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "cross-env": "^7.0.0",
@@ -43,7 +46,7 @@
     "testcontainers": "^10.15.0",
     "ts-jest": "27.1.4",
     "ts-node": "^6.1.1",
-    "typescript": "4.9.5",
+    "typescript": "5.6.3",
     "vite-tsconfig-paths": "^3.5.0",
     "vitest": "^2.1.5"
   },

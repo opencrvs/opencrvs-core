@@ -10,27 +10,24 @@
  */
 
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { findPageFields, resolveFieldLabels } from './utils'
+import { findInputPageFields, resolveFieldLabels } from './utils'
 
 /**
  * Builds a validated configuration for an event
  * @param config - Event specific configuration
  */
 export const defineConfig = (config: EventConfigInput) => {
-  const parsed = EventConfig.parse(config)
+  const input = EventConfigInput.parse(config)
 
-  const pageFields = findPageFields(parsed).map(({ id, label }) => ({
-    id,
-    label
-  }))
+  const pageFields = findInputPageFields(input)
 
   return EventConfig.parse({
-    ...parsed,
+    ...input,
     summary: resolveFieldLabels({
-      config: parsed.summary,
+      config: input.summary,
       pageFields
     }),
-    workqueues: parsed.workqueues.map((workqueue) =>
+    workqueues: input.workqueues.map((workqueue) =>
       resolveFieldLabels({
         config: workqueue,
         pageFields
