@@ -53,6 +53,16 @@ export const getLocations = createSelector(getOfflineData, (data) => ({
   ...data.offices
 }))
 
+export const getAdminStructureLocations = createSelector(
+  getOfflineData,
+  (data) => data.locations
+)
+
+export const getFacilityLocations = createSelector(
+  getOfflineData,
+  (data) => data.facilities
+)
+
 export const selectCountryBackground = (store: IStoreState) => {
   const countryBackground = getKey(store, 'offlineData').config
     ?.LOGIN_BACKGROUND

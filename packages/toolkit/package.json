@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "0.0.21-riku-events",
+  "version": "0.0.17-events",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
