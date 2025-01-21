@@ -123,7 +123,7 @@ describe('when user starts a new declaration', () => {
          */
         store.dispatch(storeDeclaration(draft))
 
-        router.navigate(
+        await router.navigate(
           formatUrl(DRAFT_BIRTH_PARENT_FORM, {
             declarationId: draft.id.toString()
           })

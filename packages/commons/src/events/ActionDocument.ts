@@ -16,6 +16,7 @@ const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   data: z.record(z.string(), FieldValue),
+  draft: z.boolean().optional().default(false),
   createdAtLocation: z.string()
 })
 
@@ -54,12 +55,6 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
-const DraftAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.DRAFT)
-  })
-)
-
 const CreatedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.CREATE)
@@ -80,7 +75,6 @@ const CustomAction = ActionBase.merge(
 
 export const ActionDocument = z.discriminatedUnion('type', [
   CreatedAction,
-  DraftAction,
   ValidateAction,
   NotifiedAction,
   RegisterAction,
@@ -91,6 +85,21 @@ export const ActionDocument = z.discriminatedUnion('type', [
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>
+
+export const ResolvedUser = z.object({
+  id: z.string(),
+  systemRole: z.string(),
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  )
+})
+
+export type ResolvedUser = z.infer<typeof ResolvedUser>
+
 export type CreatedAction = z.infer<typeof CreatedAction>
 
 export type ActionFormData = ActionDocument['data']

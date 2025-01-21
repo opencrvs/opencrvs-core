@@ -9,28 +9,28 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { get, mapKeys, orderBy } from 'lodash'
 import React, { useState } from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
-import { orderBy, mapKeys, get } from 'lodash'
 
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Link } from 'react-router-dom'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
+import { WorkqueueConfig } from '@opencrvs/commons'
 import { EventIndex } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
-import { WorkqueueConfig } from '@opencrvs/commons'
 import {
-  Workqueue as WorkqueueComponent,
+  ColumnContentAlignment,
   SORT_ORDER,
-  ColumnContentAlignment
+  Workqueue as WorkqueueComponent
 } from '@opencrvs/components/lib/Workqueue'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
-import { ROUTES } from '@client/v2-events/routes'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/v2-events/messages'
+import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 /**
@@ -101,8 +101,6 @@ export function WorkqueueIndex() {
   )
 }
 
-type EventWithSyncStatus = EventIndex & { inOutbox?: boolean }
-
 /**
  * A Workqueue that displays a table of events based on search criteria.
  */
@@ -112,16 +110,16 @@ function Workqueue({
   limit,
   offset
 }: {
-  events: EventWithSyncStatus[]
+  events: EventIndex[]
   config: WorkqueueConfig
   limit: number
   offset: number
 }) {
   const intl = useIntl()
   const theme = useTheme()
-  const { getOutbox } = useEvents()
+  const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
-
+  const drafts = getDrafts()
   const statuses = config.filters.flatMap((filter) => filter.status)
 
   const workqueue = events
@@ -138,6 +136,17 @@ function Workqueue({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+
+      const getEventStatus = () => {
+        if (isInOutbox) {
+          return 'OUTBOX'
+        }
+        if (isInDrafts) {
+          return 'DRAFT'
+        }
+        return event.status
+      }
 
       return {
         ...event,
@@ -150,9 +159,11 @@ function Workqueue({
           {
             id: `events.status`,
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} other {Unknown}}'
           },
-          { status: isInOutbox ? 'OUTBOX' : event.status }
+          {
+            status: getEventStatus()
+          }
         ),
 
         [config.fields[0].id]: isInOutbox ? (

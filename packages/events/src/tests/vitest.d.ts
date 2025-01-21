@@ -9,14 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@events/environment'
-import { MongoClient } from 'mongodb'
+export type { ProvidedContext } from 'vitest'
 
-const url = env.MONGO_URL
-const client = new MongoClient(url)
-
-export async function getClient() {
-  await client.connect()
-  const db = client.db('events')
-  return db
+declare module 'vitest' {
+  export interface ProvidedContext {
+    EVENTS_MONGO_URI: string
+    USER_MGNT_MONGO_URI: string
+    ELASTICSEARCH_URI: string
+  }
 }
