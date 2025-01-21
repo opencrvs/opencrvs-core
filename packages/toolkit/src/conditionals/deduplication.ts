@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ClauseInput } from '@opencrvs/commons/events'
+import { Clause } from '@opencrvs/commons/events'
 
-export function and(clauses: ClauseInput[]): ClauseInput {
+export function and(clauses: Clause[]): Clause {
   return {
     type: 'and',
     clauses
   }
 }
 
-export function or(clauses: ClauseInput[]): ClauseInput {
+export function or(clauses: Clause[]): Clause {
   return {
     type: 'or',
     clauses
