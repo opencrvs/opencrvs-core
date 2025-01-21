@@ -8,14 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
 
-const client = createTestClient()
-
-const generator = payloadGenerator()
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Prevents updating event with unknown type', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const event = await client.event.create(generator.event.create())
 
   await expect(
@@ -28,6 +27,9 @@ test('Prevents updating event with unknown type', async () => {
 })
 
 test('stored events can be modified', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
   const originalEvent = await client.event.create(generator.event.create())
 
   const event = await client.event.patch(

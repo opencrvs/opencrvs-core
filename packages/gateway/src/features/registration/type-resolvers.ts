@@ -84,14 +84,13 @@ import {
   isTaskOrTaskHistory,
   resourceIdentifierToUUID,
   Address,
-  findLastOfficeFromSavedBundle,
   findLastOfficeLocationFromSavedBundle,
   notCorrectedHistory,
   findResourceFromBundleById,
   getUserRoleFromHistory,
   SavedOffice
 } from '@opencrvs/commons/types'
-
+import { findAssignment } from '@opencrvs/commons/assignment'
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
@@ -1051,23 +1050,15 @@ export const typeResolvers: GQLResolver = {
     },
     certificates: resolveCertificates,
     assignment: async (task, _, context) => {
-      const assignmentExtension = findExtension(
-        `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
-        task.extension
-      )
-      const record = context.dataSources.recordsAPI.fetchRecord()
-      const office = record && findLastOfficeFromSavedBundle(record)
+      const record = context.dataSources.recordsAPI.getRecord()
 
-      if (assignmentExtension && record) {
-        const regLastUserExtension = findExtension(
-          `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
-          task.extension
-        )!
+      if (!record) {
+        return null
+      }
+      const assignment = findAssignment(record)
 
-        const practitionerId = resourceIdentifierToUUID(
-          regLastUserExtension.valueReference.reference
-        )
-
+      if (assignment) {
+        const practitionerId = assignment?.practitioner.id
         const user = findResourceFromBundleById<Practitioner>(
           record,
           practitionerId
@@ -1077,7 +1068,7 @@ export const typeResolvers: GQLResolver = {
           practitionerId: user.id,
           firstName: user.name[0].given?.join(' '),
           lastName: user.name[0].family,
-          officeName: office?.name || ''
+          officeName: assignment?.office.name || ''
         }
       }
 

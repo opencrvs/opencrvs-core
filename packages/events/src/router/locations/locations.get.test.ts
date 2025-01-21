@@ -8,36 +8,36 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient } from '@events/tests/utils'
-import { payloadGenerator } from '@events/tests/generators'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
 
-const dataSeedingClient = createTestClient([SCOPES.USER_DATA_SEEDING])
-const generator = payloadGenerator()
-
-test('Returns empty list when no locations are set', async () => {
-  const locations = await dataSeedingClient.locations.get()
-
-  expect(locations).toEqual([])
-})
-
 test('Returns single location in right format', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+
   const setLocationPayload = [
-    { id: '123-456-789', partOf: null, name: 'Location foobar' }
+    {
+      id: '123-456-789',
+      partOf: null,
+      name: 'Location foobar',
+      externalId: 'ext-id-123'
+    }
   ]
 
-  await dataSeedingClient.locations.set(setLocationPayload)
+  await client.locations.set(setLocationPayload)
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await client.locations.get()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(setLocationPayload)
 })
 
 test('Returns multiple locations', async () => {
-  await dataSeedingClient.locations.set(generator.locations.set(5))
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
+  await client.locations.set(generator.locations.set(5))
 
-  const locations = await dataSeedingClient.locations.get()
+  const locations = await client.locations.get()
 
   expect(locations).toHaveLength(5)
 })
