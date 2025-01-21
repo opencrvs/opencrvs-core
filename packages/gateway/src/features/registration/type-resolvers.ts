@@ -1284,7 +1284,8 @@ export const typeResolvers: GQLResolver = {
 
       return { ...userResponse, role }
     },
-    certificateTemplateId(docRef: DocumentReference, _) {
+    certificateTemplateId(parent: { docRef: DocumentReference }, _) {
+      const docRef = parent.docRef
       const certificateTemplateId = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/certificateTemplateId`,
         docRef.extension as Extension[]

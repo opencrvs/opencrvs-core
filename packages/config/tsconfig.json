@@ -11,7 +11,7 @@
     "sourceMap": true,
     "moduleResolution": "node16",
     "outDir": "build/dist",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": ["esnext.asynciterable", "es6", "es2019"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
