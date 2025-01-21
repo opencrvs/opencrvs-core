@@ -170,14 +170,23 @@ export const ActionMenu: React.FC<{
               isActionable={isActionable}
             />
           </ProtectedComponent>
-          <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
+          {isDraft ? (
             <UpdateAction
               declarationId={id}
               declarationStatus={status}
               type={type}
               isActionable={isActionable || isDraft}
             />
-          </ProtectedComponent>
+          ) : (
+            <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.UPDATE}>
+              <UpdateAction
+                declarationId={id}
+                declarationStatus={status}
+                type={type}
+                isActionable={isActionable || isDraft}
+              />
+            </ProtectedComponent>
+          )}
           <ProtectedComponent scopes={RECORD_ALLOWED_SCOPES.ARCHIVE}>
             <ArchiveAction
               toggleDisplayDialog={toggleDisplayDialog}
