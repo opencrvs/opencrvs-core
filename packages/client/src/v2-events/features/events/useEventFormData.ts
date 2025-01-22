@@ -11,6 +11,7 @@
 
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { useEffect, useRef } from 'react'
 import { ActionFormData } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 
@@ -51,6 +52,9 @@ export const useEventFormData = create<EventFormData>()(
     }),
     {
       name: 'event-form-data',
+      onRehydrateStorage: () => (state) => {
+        console.log('Hydration complete:', state)
+      },
       storage: createJSONStorage(() => ({
         getItem: async (key) => {
           return storage.getItem(key)
@@ -65,3 +69,34 @@ export const useEventFormData = create<EventFormData>()(
     }
   )
 )
+/**
+ * Based on https://github.com/pmndrs/zustand?tab=readme-ov-file#transient-updates-for-often-occurring-state-changes
+ *
+ * Access state through subscription-pattern to avoid re-renders on every state change
+ */
+export const useSubscribeEventFormData = () => {
+  // Fetch initial state
+  const stateEventIdRef = useRef(useEventFormData.getState().eventId)
+  const stateFormRef = useRef(useEventFormData.getState().formValues)
+
+  useEffect(
+    () =>
+      useEventFormData.subscribe(
+        (state) => (stateEventIdRef.current = state.eventId)
+      ),
+    []
+  )
+
+  useEffect(
+    () =>
+      useEventFormData.subscribe(
+        (state) => (stateFormRef.current = state.formValues)
+      ),
+    []
+  )
+
+  return {
+    eventId: stateEventIdRef.current,
+    formValues: stateFormRef.current
+  }
+}
