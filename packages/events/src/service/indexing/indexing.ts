@@ -82,6 +82,7 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     case 'SELECT':
     case 'COUNTRY':
     case 'CHECKBOX':
+    case 'LOCATION':
       return { type: 'keyword' }
     case 'FILE':
       return {
@@ -133,7 +134,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  return esClient.helpers.bulk({
+  await esClient.helpers.bulk({
     retries: 3,
     wait: 3000,
     datasource: stream.pipe(transformedStreamData),
