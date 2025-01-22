@@ -52,9 +52,6 @@ export const useEventFormData = create<EventFormData>()(
     }),
     {
       name: 'event-form-data',
-      onRehydrateStorage: () => (state) => {
-        console.log('Hydration complete:', state)
-      },
       storage: createJSONStorage(() => ({
         getItem: async (key) => {
           return storage.getItem(key)
@@ -75,7 +72,6 @@ export const useEventFormData = create<EventFormData>()(
  * Access state through subscription-pattern to avoid re-renders on every state change
  */
 export const useSubscribeEventFormData = () => {
-  // Fetch initial state
   const stateEventIdRef = useRef(useEventFormData.getState().eventId)
   const stateFormRef = useRef(useEventFormData.getState().formValues)
 
