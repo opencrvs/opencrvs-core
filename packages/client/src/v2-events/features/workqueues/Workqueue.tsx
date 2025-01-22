@@ -183,6 +183,10 @@ function Workqueue({
           {}
         )
 
+      const anchor = config.columns.some((column) => column.id === 'title')
+        ? 'title'
+        : config.columns[0].id
+
       return {
         ...wqData,
         ...event,
@@ -202,15 +206,15 @@ function Workqueue({
             status: getEventStatus()
           }
         ),
-        title: isInOutbox ? (
-          <IconWithName name={wqData.title} status={'OUTBOX'} />
+        [anchor]: isInOutbox ? (
+          <IconWithName name={wqData[anchor]} status={'OUTBOX'} />
         ) : (
           <NondecoratedLink
             to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
               eventId: event.id
             })}
           >
-            <IconWithName name={wqData.title} status={event.status} />
+            <IconWithName name={wqData[anchor]} status={event.status} />
           </NondecoratedLink>
         )
       }
