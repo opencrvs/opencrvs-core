@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "0.0.19-events-ml",
+  "version": "0.0.22-events-ml",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -10,7 +10,8 @@
     "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
   "dependencies": {
     "ajv": "^8.17.1",
