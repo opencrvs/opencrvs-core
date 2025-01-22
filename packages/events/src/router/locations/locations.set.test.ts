@@ -22,31 +22,25 @@ test('prevents unauthorized access from registrar', async () => {
 
 test('Allows national system admin to set locations', async () => {
   const { user, generator } = await setupTestCase()
-  const nationalSystemAdminClient = createTestClient(user, [
-    SCOPES.CONFIG_UPDATE_ALL
-  ])
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   await expect(
-    nationalSystemAdminClient.locations.set(generator.locations.set(1))
+    dataSeedingClient.locations.set(generator.locations.set(1))
   ).resolves.toEqual(undefined)
 })
 
 test('Prevents sending empty payload', async () => {
   const { user } = await setupTestCase()
-  const nationalSystemAdminClient = createTestClient(user, [
-    SCOPES.CONFIG_UPDATE_ALL
-  ])
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   await expect(
-    nationalSystemAdminClient.locations.set([])
+    dataSeedingClient.locations.set([])
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
 test('Creates single location', async () => {
   const { user } = await setupTestCase()
-  const nationalSystemAdminClient = createTestClient(user, [
-    SCOPES.CONFIG_UPDATE_ALL
-  ])
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const locationPayload = [
     {
@@ -57,9 +51,9 @@ test('Creates single location', async () => {
     }
   ]
 
-  await nationalSystemAdminClient.locations.set(locationPayload)
+  await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toHaveLength(1)
   expect(locations).toMatchObject(locationPayload)
@@ -67,9 +61,7 @@ test('Creates single location', async () => {
 
 test('Creates multiple locations', async () => {
   const { user, generator } = await setupTestCase()
-  const nationalSystemAdminClient = createTestClient(user, [
-    SCOPES.CONFIG_UPDATE_ALL
-  ])
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const parentId = 'parent-id'
 
@@ -80,32 +72,30 @@ test('Creates multiple locations', async () => {
     {}
   ])
 
-  await nationalSystemAdminClient.locations.set(locationPayload)
+  await dataSeedingClient.locations.set(locationPayload)
 
-  const locations = await nationalSystemAdminClient.locations.get()
+  const locations = await dataSeedingClient.locations.get()
 
   expect(locations).toEqual(locationPayload)
 })
 
 test('Removes existing locations not in payload', async () => {
   const { user, generator } = await setupTestCase()
-  const nationalSystemAdminClient = createTestClient(user, [
-    SCOPES.CONFIG_UPDATE_ALL
-  ])
+  const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const initialPayload = generator.locations.set(5)
 
-  await nationalSystemAdminClient.locations.set(initialPayload)
+  await dataSeedingClient.locations.set(initialPayload)
 
-  const initialLocations = await nationalSystemAdminClient.locations.get()
+  const initialLocations = await dataSeedingClient.locations.get()
   expect(initialLocations).toHaveLength(initialPayload.length)
 
   const [removedLocation, ...remainingLocationsPayload] = initialPayload
 
-  await nationalSystemAdminClient.locations.set(remainingLocationsPayload)
+  await dataSeedingClient.locations.set(remainingLocationsPayload)
 
   const remainingLocationsAfterDeletion =
-    await nationalSystemAdminClient.locations.get()
+    await dataSeedingClient.locations.get()
 
   expect(remainingLocationsAfterDeletion).toHaveLength(
     remainingLocationsPayload.length
