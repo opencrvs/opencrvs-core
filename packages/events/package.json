@@ -12,7 +12,7 @@
     "lint": "eslint -c .eslintrc.js --fix ./src --max-warnings=0",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc && tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build"
   },
   "dependencies": {
