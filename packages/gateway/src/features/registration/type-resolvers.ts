@@ -1239,14 +1239,11 @@ export const typeResolvers: GQLResolver = {
       const practitionerRef =
         docRef.extension &&
         findExtension(
-          `${OPENCRVS_SPECIFICATION_URL}extension/collector`,
+          `${OPENCRVS_SPECIFICATION_URL}extension/certifier`,
           docRef.extension
         )
 
-      if (
-        !practitionerRef?.valueReference?.reference?.startsWith('Practitioner')
-      )
-        return null
+      if (!practitionerRef) return null
 
       const practitionerId = resourceIdentifierToUUID(
         practitionerRef.valueReference.reference as ResourceIdentifier

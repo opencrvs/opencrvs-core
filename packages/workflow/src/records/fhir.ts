@@ -222,6 +222,7 @@ export function createDocumentReferenceEntryForCertificate(
   temporaryRelatedPersonId: UUID,
   eventType: EVENT_TYPE,
   hasShowedVerifiedDocument: boolean,
+  certifierReference?: ResourceIdentifier,
   certificateTemplateId?: string,
   paymentUrl?: URNReference | ResourceIdentifier
 ): BundleEntry<DocumentReference> {
@@ -240,6 +241,16 @@ export function createDocumentReferenceEntryForCertificate(
             reference: `urn:uuid:${temporaryRelatedPersonId}`
           }
         },
+        ...(certifierReference
+          ? [
+              {
+                url: 'http://opencrvs.org/specs/extension/certifier' as const,
+                valueReference: {
+                  reference: certifierReference
+                }
+              }
+            ]
+          : []),
         {
           url: 'http://opencrvs.org/specs/extension/hasShowedVerifiedDocument',
           valueBoolean: hasShowedVerifiedDocument

@@ -1025,11 +1025,17 @@ export async function toCertified(
     record
   )
 
+  const practitionerReference = findExtension(
+    'http://opencrvs.org/specs/extension/regLastUser',
+    certifiedTask.extension
+  )!.valueReference.reference
+
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    practitionerReference,
     certificateDetails.certificateTemplateId
   )
 
@@ -1116,6 +1122,7 @@ export async function toIssued(
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
+    undefined,
     certificateDetails.certificateTemplateId,
     paymentReconciliation.fullUrl
   )
