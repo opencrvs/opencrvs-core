@@ -26,6 +26,10 @@ cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/conditionals
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
 cp -r ../events/build/types/router/router.d.ts ./dist/api
-sed -i '' 's|@opencrvs/events/build/types|.|g' dist/api/index.d.ts
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -i '' 's|@opencrvs/events/build/types|.|g' dist/api/index.d.ts
+else
+  sed -i 's|@opencrvs/events/build/types|.|g' dist/api/index.d.ts
+fi
 
 echo "Build completed successfully."
