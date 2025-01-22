@@ -152,6 +152,12 @@ export type KnownExtensionType = StringExtensionType & {
       reference: ResourceIdentifier | URNReference /* Unsaved */
     }
   }
+  'http://opencrvs.org/specs/extension/certifier': {
+    url: 'http://opencrvs.org/specs/extension/certifier'
+    valueReference: {
+      reference: ResourceIdentifier
+    }
+  }
   'http://opencrvs.org/specs/extension/relatedperson-affidavittype': {
     url: 'http://opencrvs.org/specs/extension/relatedperson-affidavittype'
     valueAttachment: {
