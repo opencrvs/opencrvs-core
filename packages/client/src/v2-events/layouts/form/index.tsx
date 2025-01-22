@@ -28,27 +28,27 @@ type AllowedRoute =
  */
 export function FormLayout({
   route,
-  children
+  children,
+  onSaveAndExit
 }: {
   route: AllowedRoute
   children: React.ReactNode
+  onSaveAndExit: () => void
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
 
-  const [event] = events.getEvent(eventId)
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
 
-  if (!configuration) {
-    throw new Error('Event configuration not found')
-  }
-
   return (
     <Frame
-      header={<FormHeader label={configuration.label} />}
+      header={
+        <FormHeader label={configuration.label} onSaveAndExit={onSaveAndExit} />
+      }
       skipToContentText="Skip to form"
     >
       <React.Suspense fallback={<Spinner id="event-form-spinner" />}>

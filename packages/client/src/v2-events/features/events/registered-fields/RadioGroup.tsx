@@ -9,25 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import {
-  InputField,
-  useFormContext,
-  RadioGroup as RadioGroupComponent
-} from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons'
+import { useIntl } from 'react-intl'
+import { RadioGroupFieldValue, FieldProps } from '@opencrvs/commons/client'
+import { RadioGroup as RadioGroupComponent } from '@opencrvs/components'
 
-export function RadioGroup({ id, options }: FieldProps<'RADIO_GROUP'>) {
-  const { setValue, watch } = useFormContext()
-  const value = watch(id)
+export const INITIAL_RADIO_GROUP_VALUE = ''
+
+export function RadioGroup({
+  setFieldValue,
+  value,
+  options,
+  ...props
+}: FieldProps<'RADIO_GROUP'> & {
+  setFieldValue: (name: string, val: RadioGroupFieldValue | undefined) => void
+  value?: string
+}) {
+  const intl = useIntl()
+
+  const radioOptions = options.map((option) => ({
+    ...option,
+    label: intl.formatMessage(option.label)
+  }))
 
   return (
-    <InputField id={id} touched={false}>
-      <RadioGroupComponent
-        name={id}
-        options={options}
-        value={value}
-        onChange={(val) => setValue(id, val)}
-      />
-    </InputField>
+    <RadioGroupComponent
+      name={props.id}
+      options={radioOptions}
+      value={value ?? INITIAL_RADIO_GROUP_VALUE}
+      onChange={(val: string) => setFieldValue(props.id, val)}
+      {...props}
+    />
   )
 }

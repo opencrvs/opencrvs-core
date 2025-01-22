@@ -14,14 +14,38 @@ export interface DividerProps {
   width?: string
   border?: string
   color?: string
+  children?: React.ReactNode
 }
 
 export const Divider = styled.div<DividerProps>`
+  ${({ children, border, color, theme, width }) =>
+    children
+      ? `
+  display: flex;
+  align-items: center;
+  width: ${width || '100%'};
+
+  :before, :after {
+    flex: 1;
+    content: '';
+    padding: 0 1px 1px;
+    background-color: ${color || theme.colors.grey200};
+    margin: 16px;
+  }
+  
+  :before {
+    margin-left: 0;
+  }
+
+  :after {
+    margin-right: 0;
+  }
+      `
+      : `
   margin-bottom: 20px;
   padding: 8px 0px;
-  border-bottom: ${({ border }) => border || '1px'} solid
-    ${({ color, theme }) => color || theme.colors.grey200};
-  width: ${({ width }) => width || '100%'};
+  border-bottom: ${border || '1px'} solid ${color || theme.colors.grey200};
+  width: ${width || '100%'};`}
 `
 
 export const DividerVertical = styled.div`

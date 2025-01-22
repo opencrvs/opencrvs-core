@@ -9,218 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  hashKey,
-  MutationKey,
-  QueryObserver,
-  useSuspenseQuery
-} from '@tanstack/react-query'
+import { hashKey } from '@tanstack/react-query'
 import { getQueryKey } from '@trpc/react-query'
-import { EventDocument, CreatedAction } from '@opencrvs/commons/client'
+import { EventDocument, EventIndex } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { storage } from '@client/storage'
-
-/*
- * Local event storage
- */
-const EVENTS_PERSISTENT_STORE_STORAGE_KEY = ['persisted-events']
-
-function getCanonicalEventId(
-  events: EventDocument[],
-  eventIdOrTransactionId: string
-) {
-  const event = events.find(
-    (e) =>
-      e.id === eventIdOrTransactionId ||
-      e.transactionId === eventIdOrTransactionId
-  )
-
-  return event?.id
-}
-
-/**
- * Wraps a canonical mutation function to handle outdated temporary IDs.
- *
- * When an event is created offline and actions referring to that event
- * are also created offline, there may be cases where a request in the
- * buffer still uses a temporary ID to reference the event. This wrapper
- * ensures that the `eventId` parameter is updated to its canonical value
- * before the mutation function is called.
- *
- * @param {function(params: T): Promise<R>} canonicalMutationFn - The mutation function to wrap.
- * @returns {function(params: T): Promise<R>} - A wrapped mutation function that resolves the canonical `eventId` before invocation.
- */
-function wrapMutationFnEventIdResolution<T extends { eventId: string }, R>(
-  canonicalMutationFn: (params: T) => Promise<R>
-): (params: T) => Promise<R> {
-  return async (params: T) => {
-    const events = queryClient.getQueryData<EventDocument[]>(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    )
-
-    if (!events) {
-      return canonicalMutationFn(params)
-    }
-
-    const id = getCanonicalEventId(events, params.eventId)
-    if (!id) {
-      return canonicalMutationFn(params)
-    }
-
-    const modifiedParams: T = {
-      ...params,
-      eventId: getCanonicalEventId(events, params.eventId)
-    }
-    return canonicalMutationFn(modifiedParams)
-  }
-}
-
-utils.event.actions.declare.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
-}))
-
-utils.event.actions.draft.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
-}))
-
-utils.event.actions.register.setMutationDefaults(({ canonicalMutationFn }) => ({
-  retry: true,
-  retryDelay: 10000,
-  mutationFn: wrapMutationFnEventIdResolution(canonicalMutationFn)
-}))
-
-utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn,
-  retry: true,
-  onMutate: (newEvent) => {
-    const optimisticEvent = {
-      id: newEvent.transactionId,
-      type: newEvent.type,
-      transactionId: newEvent.transactionId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      actions: [
-        {
-          type: 'CREATE',
-          createdAt: new Date().toISOString(),
-          createdBy: 'offline',
-          createdAtLocation: 'TODO',
-          data: {}
-        } satisfies CreatedAction
-      ]
-    }
-
-    // Do this as very first synchronous operation so UI can trust
-    // that the event is created when changing view for instance
-    queryClient.setQueryData(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (events: EventDocument[]) => {
-        return [...events, optimisticEvent]
-      }
-    )
-
-    return optimisticEvent
-  },
-  onSuccess: async (response) => {
-    const events = queryClient.getQueryData<EventDocument[]>(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    )
-
-    if (!events) {
-      return
-    }
-
-    queryClient
-      .getMutationCache()
-      .getAll()
-      .forEach((mutation) => {
-        /*
-         * Update ongoing mutations with the new event ID so that transaction id is not used for querying
-         */
-        const hashQueryKey = (
-          key: MutationKey | ReturnType<typeof getQueryKey> | undefined
-        ) => key?.flat().join('.')
-
-        if (
-          hashQueryKey(mutation.options.mutationKey) ===
-          hashQueryKey(getQueryKey(api.event.actions.declare))
-        ) {
-          const variables = mutation.state.variables as Exclude<
-            ReturnType<
-              typeof api.event.actions.declare.useMutation
-            >['variables'],
-            undefined
-          >
-
-          if (variables.eventId === response.transactionId) {
-            variables.eventId = response.id
-          }
-        }
-      })
-
-    await queryClient.invalidateQueries({
-      queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-    })
-
-    queryClient.setQueryData(
-      EVENTS_PERSISTENT_STORE_STORAGE_KEY,
-      (state: EventDocument[]) => {
-        return [
-          ...state.filter((e) => e.transactionId !== response.transactionId),
-          response
-        ]
-      }
-    )
-
-    await queryClient.cancelQueries({
-      queryKey: getQueryKey(api.event.get, response.transactionId, 'query')
-    })
-  }
-}))
-
-queryClient.setQueryDefaults(EVENTS_PERSISTENT_STORE_STORAGE_KEY, {
-  queryFn: readEventsFromStorage
-})
-
-const observer = new QueryObserver<EventDocument[]>(queryClient, {
-  queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-})
-
-observer.subscribe((observerEvent) => {
-  observerEvent.data?.forEach((event) => {
-    queryClient.setQueryData(
-      getQueryKey(api.event.get, event.id, 'query'),
-      event
-    )
-
-    queryClient.setQueryData(
-      getQueryKey(api.event.get, event.transactionId, 'query'),
-      event
-    )
-  })
-  /*
-   * Persist events to browser storage
-   */
-  if (observerEvent.data) {
-    void writeEventsToStorage(observerEvent.data)
-  }
-})
-
-async function readEventsFromStorage() {
-  const data = await storage
-    .getItem<EventDocument[]>('events')
-    .then((e) => e || [])
-
-  return data
-}
-
-async function writeEventsToStorage(events: EventDocument[]) {
-  return storage.setItem('events', events)
-}
+import { useEventAction } from './procedures/action'
+import { createEvent } from './procedures/create'
+import { useDeleteEventMutation } from './procedures/delete'
 
 function getPendingMutations(
   mutationCreator: Parameters<typeof getQueryKey>[0]
@@ -243,10 +38,10 @@ function filterOutboxEventsWithMutation<
     | typeof api.event.actions.declare
     | typeof api.event.actions.register
 >(
-  events: EventDocument[],
+  events: EventIndex[],
   mutation: T,
   filter: (
-    event: EventDocument,
+    event: EventIndex,
     parameters: Exclude<ReturnType<T['useMutation']>['variables'], undefined>
   ) => boolean
 ) {
@@ -260,118 +55,70 @@ function filterOutboxEventsWithMutation<
 }
 
 export function useEvents() {
-  function createEvent() {
-    return api.event.create.useMutation({})
-  }
+  const eventsList = api.event.list.useQuery().data ?? []
 
-  function draft() {
-    return api.event.actions.draft.useMutation({})
-  }
+  function getDrafts(): EventDocument[] {
+    const queries = queryClient.getQueriesData<EventDocument>({
+      queryKey: getQueryKey(api.event.get)
+    })
 
-  function declare() {
-    return api.event.actions.declare.useMutation({})
-  }
-
-  function register() {
-    return api.event.actions.register.useMutation({})
-  }
-
-  function getEvent(id: string) {
-    return api.event.get.useSuspenseQuery(id)
-  }
-
-  function getDrafts() {
-    return storedEvents.data.filter(
-      (event) => !event.actions.some((a) => a.type === 'DECLARE')
-    )
+    return queries
+      .map((query) => query[1])
+      .filter((event): event is EventDocument =>
+        Boolean(event && event.actions[event.actions.length - 1].draft)
+      )
   }
 
   function getOutbox() {
-    const eventFromCreateMutations = filterOutboxEventsWithMutation(
-      storedEvents.data,
-      api.event.create,
-      (event, parameters) => event.transactionId === parameters.transactionId
-    )
-
     const eventFromDeclareActions = filterOutboxEventsWithMutation(
-      storedEvents.data,
+      eventsList,
       api.event.actions.declare,
       (event, parameters) => {
-        return (
-          event.id === parameters.eventId ||
-          event.transactionId === parameters.eventId
-        )
+        return event.id === parameters.eventId && !parameters.draft
       }
     )
 
     const eventFromRegisterActions = filterOutboxEventsWithMutation(
-      storedEvents.data,
+      eventsList,
       api.event.actions.register,
       (event, parameters) => {
-        return (
-          event.id === parameters.eventId ||
-          event.transactionId === parameters.eventId
-        )
+        return event.id === parameters.eventId && !parameters.draft
       }
     )
 
-    const pendingActions = getPendingMutations(api.event.actions.declare).map(
-      (mutation) => {
-        const variables = mutation.state.variables as Exclude<
-          ReturnType<typeof api.event.actions.declare.useMutation>['variables'],
-          undefined
-        >
-        return {
-          eventId: variables.eventId,
-          action: {
-            type: 'DECLARE' as const,
-            createdAt: new Date().toISOString(),
-            createdBy: 'offline',
-            createdAtLocation: 'TODO',
-            data: variables.data
-          }
-        }
-      }
-    )
-
-    return eventFromCreateMutations
+    return eventFromDeclareActions
       .concat(eventFromDeclareActions)
       .concat(eventFromRegisterActions)
       .filter(
         /* uniqueById */
         (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
       )
-      .map((event) => {
-        return {
-          ...event,
-          actions: event.actions.concat(
-            pendingActions
-              .filter(
-                (a) =>
-                  a.eventId === event.id || a.eventId === event.transactionId
-              )
-              .map((a) => a.action)
-          )
-        }
-      })
   }
-
-  const storedEvents = useSuspenseQuery<EventDocument[]>({
-    queryKey: EVENTS_PERSISTENT_STORE_STORAGE_KEY
-  })
 
   return {
     createEvent,
-    events: storedEvents,
-    getEvent,
-    getEventById: api.event.get,
-    getEvents: api.events.get,
-    getDrafts,
+    getEvent: api.event.get,
+    getEvents: api.event.list,
+    deleteEvent: useDeleteEventMutation(),
     getOutbox,
+    getDrafts,
     actions: {
-      draft,
-      declare,
-      register
+      validate: useEventAction(
+        utils.event.actions.validate,
+        api.event.actions.validate
+      ),
+      notify: useEventAction(
+        utils.event.actions.notify,
+        api.event.actions.notify
+      ),
+      declare: useEventAction(
+        utils.event.actions.declare,
+        api.event.actions.declare
+      ),
+      register: useEventAction(
+        utils.event.actions.register,
+        api.event.actions.register
+      )
     }
   }
 }

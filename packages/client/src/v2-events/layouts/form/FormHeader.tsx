@@ -12,11 +12,10 @@
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import { v4 as uuid } from 'uuid'
+import { isUndeclaredDraft } from '@opencrvs/commons/client'
 import type { TranslationConfig } from '@opencrvs/commons/events'
+import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import { AppBar, Button, Icon } from '@opencrvs/components'
-import { useEventFormData } from '@client/v2-events//features/events/useEventFormData'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 
@@ -42,11 +41,16 @@ const messages = defineMessages({
   }
 })
 
-export function FormHeader({ label }: { label: TranslationConfig }) {
+export function FormHeader({
+  label,
+  onSaveAndExit
+}: {
+  label: TranslationConfig
+  onSaveAndExit: () => void
+}) {
   const intl = useIntl()
-  const { modal, exit, goToHome } = useEventFormNavigation()
-  const events = useEvents()
-  const formValues = useEventFormData((state) => state.formValues)
+  const { modal, exit, deleteDeclaration } = useEventFormNavigation()
+
   const { eventId } = useParams<{
     eventId: string
   }>()
@@ -54,17 +58,16 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
   if (!eventId) {
     throw new Error('Event id is required')
   }
-
-  const createDraft = events.actions.draft()
-
-  const saveAndExit = useCallback(() => {
-    createDraft.mutate({ eventId, data: formValues, transactionId: uuid() })
-    goToHome()
-  }, [createDraft, eventId, formValues, goToHome])
+  const events = useEvents()
+  const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const onExit = useCallback(async () => {
-    await exit()
-  }, [exit])
+    await exit(event)
+  }, [event, exit])
+
+  const onDelete = useCallback(async () => {
+    await deleteDeclaration(eventId)
+  }, [eventId, deleteDeclaration])
 
   return (
     <AppBar
@@ -77,7 +80,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
               id="save-exit-btn"
               size="small"
               type="primary"
-              onClick={saveAndExit}
+              onClick={onSaveAndExit}
             >
               <Icon name="DownloadSimple" />
               {intl.formatMessage(messages.saveExitButton)}
@@ -87,6 +90,23 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
             <Icon name="X" />
             {intl.formatMessage(messages.exitButton)}
           </Button>
+          <ToggleMenu
+            id={`event-menu`}
+            menuItems={
+              isUndeclaredDraft(event)
+                ? [
+                    {
+                      label: 'Delete declaration',
+                      icon: <Icon name="Trash" />,
+                      handler: onDelete
+                    }
+                  ]
+                : []
+            }
+            toggleButton={
+              <Icon color="primary" name="DotsThreeVertical" size="large" />
+            }
+          />
           {modal}
         </>
       }
@@ -101,7 +121,7 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
               disabled={false}
               size="small"
               type="icon"
-              onClick={saveAndExit}
+              onClick={onSaveAndExit}
             >
               <Icon name="DownloadSimple" />
             </Button>
@@ -109,6 +129,20 @@ export function FormHeader({ label }: { label: TranslationConfig }) {
           <Button size="small" type="icon" onClick={onExit}>
             <Icon name="X" />
           </Button>
+          <ToggleMenu
+            id={`event-menu`}
+            menuItems={[
+              {
+                label: 'Delete declaration',
+                icon: <Icon name="Trash" />,
+                handler: onDelete
+              }
+            ]}
+            toggleButton={
+              <Icon color="primary" name="DotsThreeVertical" size="large" />
+            }
+          />
+          {modal}
         </>
       }
       mobileTitle={intl.formatMessage(messages.newVitalEventRegistration, {

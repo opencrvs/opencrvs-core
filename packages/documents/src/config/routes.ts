@@ -20,6 +20,7 @@ import {
 } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
 import { MINIO_BUCKET } from '@documents/minio/constants'
+import { deleteDocument } from '@documents/features/deleteDocument/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -100,6 +101,15 @@ export const getRoutes = () => {
       handler: vsExportUploaderHandler,
       config: {
         auth: false,
+        tags: ['api']
+      }
+    },
+    // delete a document
+    {
+      method: 'DELETE',
+      path: `/files/{filename}`,
+      handler: deleteDocument,
+      config: {
         tags: ['api']
       }
     },

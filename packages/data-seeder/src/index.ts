@@ -10,7 +10,7 @@
  */
 import { env } from './environment'
 import fetch from 'node-fetch'
-import { seedLocations } from './locations'
+import { seedLocations, seedLocationsForV2Events } from './locations'
 import { seedRoles } from './roles'
 import { seedUsers } from './users'
 import { parseGQLResponse, raise } from './utils'
@@ -85,6 +85,7 @@ async function deactivateSuperuser(token: string) {
       }
     })
   })
+
   parseGQLResponse(await res.json())
 }
 
@@ -92,8 +93,12 @@ async function main() {
   const token = await getToken()
   console.log('Seeding roles')
   const roleIdMap = await seedRoles(token)
-  console.log('Seeding locations')
+  console.log('Seeding locations for v1 system')
   await seedLocations(token)
+
+  console.log('Seeding locations for v2 system (events)')
+  await seedLocationsForV2Events(token)
+
   console.log('Seeding users')
   await seedUsers(token, roleIdMap)
   await deactivateSuperuser(token)

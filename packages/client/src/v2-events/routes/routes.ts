@@ -26,6 +26,7 @@ export const ROUTES = {
             params: { eventId: string().defined() }
           }),
           CREATE: route('create'),
+          DELETE: route('delete/:eventId'),
           DECLARE: route(
             'declare/:eventId',
             {
