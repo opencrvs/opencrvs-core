@@ -15,7 +15,7 @@ import '@opencrvs/commons/monitoring'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
-import { appRouter } from './router'
+import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
 import { getUserId } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'

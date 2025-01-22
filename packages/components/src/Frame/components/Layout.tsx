@@ -71,4 +71,9 @@ export const LayoutForm = styled.section`
     margin: 0 auto;
     width: 568px;
   }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${Content} {
+      width: 100%;
+    }
+  }
 `
