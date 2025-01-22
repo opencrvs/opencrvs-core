@@ -23,7 +23,6 @@ export const WorkqueueConfig = z
       z.object({
         // @TODO: Improve typing by enforcing EventMetadataKeys and form page fields as possible values
         column: z.string(),
-        values: z.record(z.string(), z.string()).optional(),
         label: TranslationConfig.optional()
       })
     ),

@@ -165,18 +165,12 @@ function Workqueue({
       }
 
       const wqData = eventWorkqueue.fields
-        .map(({ label, values, column }) => {
-          if (!values || !label) {
+        .map(({ label, column }) => {
+          if (!label) {
             return ''
           }
-          const resolvedValues = Object.fromEntries(
-            Object.entries(values).map(([key, value]) => [
-              key,
-              event[value] ?? ''
-            ])
-          )
 
-          return [column, intl.formatMessage(label, resolvedValues)]
+          return [column, intl.formatMessage(label, event)]
         })
         .reduce<{ [key: string]: string }>(
           (acc, [key, value]) => ({ ...acc, [key]: value }),

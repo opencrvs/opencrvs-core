@@ -14,7 +14,6 @@ import { TranslationConfig } from './TranslationConfig'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { flattenDeep } from 'lodash'
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { WorkqueueConfigInput } from './WorkqueueConfig'
 import { FieldConfig } from './FieldConfig'
 
 const isMetadataField = <T extends string>(
@@ -89,27 +88,6 @@ export const resolveLabelsFromKnownFields = ({
       label: pageLabel.label
     }
   })
-}
-
-export const resolveWorkqueueFieldLabels = ({
-  config,
-  pageFields
-}: {
-  config: WorkqueueConfigInput
-  pageFields: { id: string; label: TranslationConfig }[]
-}) => {
-  return {
-    ...config,
-    fields: resolveLabelsFromKnownFields({
-      pageFields,
-      refFields: config.fields.reduce<{ id: string }[]>((acc, field) => {
-        const values = Object.values(field.values ?? {}).map((value) => ({
-          id: value
-        }))
-        return acc.concat(values)
-      }, [])
-    })
-  }
 }
 
 export function getAllFields(configuration: EventConfig) {
