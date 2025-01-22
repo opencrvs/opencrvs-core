@@ -41,7 +41,7 @@ import {
   UPDATE_WORKQUEUE_PAGINATION,
   IQueryData
 } from './actions'
-import { Scope, SCOPES } from '@opencrvs/commons/client'
+import { SCOPES } from '@opencrvs/commons/client'
 
 export const EVENT_STATUS = {
   IN_PROGRESS: 'IN_PROGRESS',
@@ -129,7 +129,6 @@ async function getFilteredDeclarations(
   unassignedDeclarations: IDeclaration[]
 }> {
   const state = getState()
-  const scope = getScope(state)
   const savedDeclarations = state.declarationsState.declarations
 
   const workqueueDeclarations = Object.entries(workqueue.data).flatMap(
@@ -137,27 +136,6 @@ async function getFilteredDeclarations(
       return queryData[1].results
     }
   ) as Array<GQLEventSearchSet | null>
-
-  // for field agent, no declarations should be unassigned
-  // for registration agent, sent for approval declarations should not be unassigned
-
-  // for other agents, check if the status of workqueue declaration
-  // has changed and if that declaration is saved in the store
-  // also declaration should not show as unassigned when it is being submitted
-  const declareScopes = [
-    SCOPES.RECORD_DECLARE_BIRTH,
-    SCOPES.RECORD_DECLARE_DEATH,
-    SCOPES.RECORD_DECLARE_MARRIAGE,
-    SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
-    SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
-    SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
-  ] as Scope[]
-
-  if (scope?.some((x) => declareScopes.includes(x)))
-    return {
-      currentlyDownloadedDeclarations: savedDeclarations,
-      unassignedDeclarations: []
-    }
 
   const unassignedDeclarations = workqueueDeclarations
     .filter(
