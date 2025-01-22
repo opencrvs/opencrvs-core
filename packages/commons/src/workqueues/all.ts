@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { defaultColumns, defineWorkQueue } from './WorkqueueConfig'
+import { defineWorkQueue } from './WorkqueueConfig'
 
 export const allWorkqueue = defineWorkQueue({
   id: 'all',
@@ -35,5 +35,6 @@ export const allWorkqueue = defineWorkQueue({
         id: 'workqueue.all.column.event'
       }
     }
-  ]
+  ],
+  defaultColumns: ['status', 'createdAt', 'modifiedAt']
 })

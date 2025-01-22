@@ -11,13 +11,13 @@
 
 import { TranslationConfig } from '../events/TranslationConfig'
 import { z } from 'zod'
-
-export const defaultColumns = z.enum(['dateOfEvent', 'dateOfRegister'])
+import { DefaultColumnKeys, WorkQueueColumnConfig } from './defaultColumns'
 
 export const rootWorkqueueConfig = z.object({
   id: z.string(),
   label: TranslationConfig,
-  columns: z.array(z.object({ id: z.string(), label: TranslationConfig }))
+  columns: z.array(WorkQueueColumnConfig),
+  defaultColumns: z.array(DefaultColumnKeys)
 })
 
 export type RootWorkqueueConfig = z.infer<typeof rootWorkqueueConfig>

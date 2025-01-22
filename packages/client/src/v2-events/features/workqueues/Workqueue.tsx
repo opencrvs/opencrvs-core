@@ -19,9 +19,10 @@ import { Link } from 'react-router-dom'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 
 import {
-  EventConfig,
+  defaultColumns,
   EventIndex,
   RootWorkqueueConfig,
+  TranslationConfig,
   workqueues
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
@@ -238,39 +239,18 @@ function Workqueue({
     isSorted?: boolean
     alignment?: ColumnContentAlignment
   }> {
-    return [
-      {
-        label: intl.formatMessage({
-          id: 'events.workqueues.status',
-          defaultMessage: 'Status'
-        }),
-        width: 25,
-        key: 'status',
-        sortFunction: onColumnClick,
-        isSorted: sortedCol === 'status'
-      },
-      {
-        label: intl.formatMessage({
-          id: 'events.workqueues.createdAt',
-          defaultMessage: 'Created'
-        }),
-        width: 25,
-        key: 'createdAt',
-        sortFunction: onColumnClick,
-        isSorted: sortedCol === 'createdAt'
-      },
-      {
-        label: intl.formatMessage({
-          id: 'events.workqueues.modifiedAt',
-          defaultMessage: 'Modified'
-        }),
-        width: 25,
-        key: 'modifiedAt',
-        sortFunction: onColumnClick,
-        isSorted: sortedCol === 'modifiedAt'
-      }
-    ]
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return config.defaultColumns.map((column) => ({
+      label: intl.formatMessage(
+        defaultColumns[column].label as TranslationConfig
+      ),
+      width: 25,
+      key: column,
+      sortFunction: onColumnClick,
+      isSorted: sortedCol === column
+    }))
   }
+
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<{
     label?: string

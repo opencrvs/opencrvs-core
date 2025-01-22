@@ -11,5 +11,6 @@
 
 import { allWorkqueue } from './all'
 export { RootWorkqueueConfig } from './WorkqueueConfig'
+export { defaultColumns } from './defaultColumns'
 
 export const workqueues = { all: allWorkqueue }
