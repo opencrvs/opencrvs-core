@@ -78,8 +78,6 @@ export function WorkqueueIndex({ workqueueId }: { workqueueId: string }) {
   const { getEvents, getOutbox } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
 
-  const configs = useEventConfigurations()
-
   const events = getEvents.useQuery()
   const outbox = getOutbox()
 
@@ -87,6 +85,7 @@ export function WorkqueueIndex({ workqueueId }: { workqueueId: string }) {
     events.data?.filter(
       (event) => !outbox.find((outboxEvent) => outboxEvent.id === event.id)
     ) || []
+
   const workqueueConfig =
     workqueueId in workqueues
       ? workqueues[workqueueId as keyof typeof workqueues]
@@ -99,7 +98,6 @@ export function WorkqueueIndex({ workqueueId }: { workqueueId: string }) {
   return (
     <Workqueue
       config={workqueueConfig}
-      eventConfigs={configs}
       events={eventsWithoutOutbox.concat(outbox)}
       {...searchParams}
     />
@@ -113,10 +111,8 @@ function Workqueue({
   events,
   config,
   limit,
-  offset,
-  eventConfigs
+  offset
 }: {
-  eventConfigs: EventConfig[]
   events: EventIndex[]
   config: RootWorkqueueConfig
   limit: number
@@ -127,6 +123,8 @@ function Workqueue({
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
   const drafts = getDrafts()
+
+  const eventConfigs = useEventConfigurations()
 
   const workqueue = events
     .map((event) => {
@@ -153,31 +151,41 @@ function Workqueue({
 
       const eventConfig = eventConfigs.find((e) => e.id === event.type)
 
-      const wqData =
-        eventConfig?.workqueues
-          .find((wq) => wq.id === config.id)
-          ?.fields.map(({ label, values, column }) => {
-            if (!values || !label) {
-              return ''
-            }
-            const resolvedValues = Object.fromEntries(
-              Object.entries(values).map(([key, value]) => [
-                key,
-                event[value] ?? ''
-              ])
-            )
+      if (!eventConfig) {
+        return {}
+      }
 
-            return [column, intl.formatMessage(label, resolvedValues)]
-          })
-          ?.reduce<{ [key: string]: string }>(
-            (acc, [key, value]) => ({ ...acc, [key]: value }),
-            {}
-          ) ?? {}
+      const eventWorkqueue = eventConfig.workqueues.find(
+        (wq) => wq.id === config.id
+      )
+
+      if (!eventWorkqueue) {
+        return {}
+      }
+
+      const wqData = eventWorkqueue.fields
+        .map(({ label, values, column }) => {
+          if (!values || !label) {
+            return ''
+          }
+          const resolvedValues = Object.fromEntries(
+            Object.entries(values).map(([key, value]) => [
+              key,
+              event[value] ?? ''
+            ])
+          )
+
+          return [column, intl.formatMessage(label, resolvedValues)]
+        })
+        .reduce<{ [key: string]: string }>(
+          (acc, [key, value]) => ({ ...acc, [key]: value }),
+          {}
+        )
 
       return {
         ...wqData,
         ...event,
-        event: eventConfig?.label ? intl.formatMessage(eventConfig.label) : '-',
+        event: intl.formatMessage(eventConfig.label),
         // eslint-disable-next-line
         createdAt: intl.formatDate(new Date(event.createdAt)),
         // eslint-disable-next-line
@@ -193,7 +201,7 @@ function Workqueue({
             status: getEventStatus()
           }
         ),
-        [config.columns[0].id]: isInOutbox ? (
+        title: isInOutbox ? (
           <IconWithName name={wqData.title} status={'OUTBOX'} />
         ) : (
           <NondecoratedLink
