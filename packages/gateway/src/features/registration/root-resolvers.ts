@@ -61,7 +61,8 @@ import {
   markNotADuplicate,
   rejectRegistration,
   confirmRegistration,
-  upsertRegistrationIdentifier
+  upsertRegistrationIdentifier,
+  updateField
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { UnassignError, UserInputError } from '@gateway/utils/graphql-errors'
@@ -657,6 +658,15 @@ export const resolvers: GQLResolver = {
       } catch (error) {
         throw new Error(`Failed to confirm registration: ${error.message}`)
       }
+    },
+    async updateField(_, { id, details }, { headers: authHeader }) {
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      const record = await updateField(id, authHeader, details)
+
+      return record.id
     }
   }
 }
