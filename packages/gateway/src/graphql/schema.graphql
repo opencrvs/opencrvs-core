@@ -223,7 +223,7 @@ type Mutation {
     identifierType: String!
     identifierValue: String!
   ): ID!
-  updateField(id: ID!, details: UpdateFieldInput!): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!

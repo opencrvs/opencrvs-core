@@ -664,9 +664,9 @@ export const resolvers: GQLResolver = {
         throw new Error('User does not have access to the record')
       }
 
-      const record = await updateField(id, authHeader, details)
+      await updateField(id, authHeader, details)
 
-      return record.id
+      return true
     }
   }
 }

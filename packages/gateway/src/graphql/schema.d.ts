@@ -88,7 +88,7 @@ export interface GQLMutation {
   confirmRegistration: string
   rejectRegistration: string
   upsertRegistrationIdentifier: string
-  updateField: string
+  updateField: boolean
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
