@@ -134,7 +134,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  await esClient.helpers.bulk({
+  return esClient.helpers.bulk({
     retries: 3,
     wait: 3000,
     datasource: stream.pipe(transformedStreamData),

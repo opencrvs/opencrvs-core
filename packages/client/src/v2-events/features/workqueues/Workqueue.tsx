@@ -74,7 +74,7 @@ function changeSortedColumn(
   }
 }
 
-export function WorkqueueIndex() {
+export function WorkqueueIndex({ workqueueId }: { workqueueId: string }) {
   const { getEvents, getOutbox } = useEvents()
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUE)
 
@@ -87,10 +87,18 @@ export function WorkqueueIndex() {
     events.data?.filter(
       (event) => !outbox.find((outboxEvent) => outboxEvent.id === event.id)
     ) || []
+  const workqueueConfig =
+    workqueueId in workqueues
+      ? workqueues[workqueueId as keyof typeof workqueues]
+      : null
+
+  if (!workqueueConfig) {
+    return null
+  }
 
   return (
     <Workqueue
-      config={workqueues.all}
+      config={workqueueConfig}
       eventConfigs={configs}
       events={eventsWithoutOutbox.concat(outbox)}
       {...searchParams}
@@ -126,7 +134,8 @@ function Workqueue({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { ...rest, ...mapKeys(data as any, (_, key) => `${key}`) }
     })
-    .map((event) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((event: Omit<EventIndex, 'data'> & { [key: string]: any }) => {
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
@@ -144,29 +153,26 @@ function Workqueue({
 
       const eventConfig = eventConfigs.find((e) => e.id === event.type)
 
-      const t = eventConfig?.workqueues[0].fields.map(
-        ({ label, values, column }) => {
-          if (!values || !label) {
-            return ''
-          }
-          const valueMap = Object.fromEntries(
-            Object.entries(values).map(([key, value]) => [
-              key,
-              (event as { [key: string]: any })[value] ?? ''
-            ])
-          )
-
-          return [column, intl.formatMessage(label, valueMap)]
-        }
-      )
-
       const wqData =
-        t?.reduce((acc, [key, value]) => {
-          if (key) {
-            acc[key] = value
-          }
-          return acc
-        }, {} as { [key: string]: string }) ?? {}
+        eventConfig?.workqueues
+          .find((wq) => wq.id === config.id)
+          ?.fields.map(({ label, values, column }) => {
+            if (!values || !label) {
+              return ''
+            }
+            const resolvedValues = Object.fromEntries(
+              Object.entries(values).map(([key, value]) => [
+                key,
+                event[value] ?? ''
+              ])
+            )
+
+            return [column, intl.formatMessage(label, resolvedValues)]
+          })
+          ?.reduce<{ [key: string]: string }>(
+            (acc, [key, value]) => ({ ...acc, [key]: value }),
+            {}
+          ) ?? {}
 
       return {
         ...wqData,
