@@ -23,7 +23,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getAllFields } from '@opencrvs/commons'
+import { getAllFields, logger } from '@opencrvs/commons'
 import { Transform } from 'stream'
 import { z } from 'zod'
 
@@ -42,6 +42,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
   const hasEventsIndex = await esClient.indices.exists({
     index: indexName
   })
+
   if (!hasEventsIndex) {
     await createIndex(indexName, getAllFields(eventConfiguration))
   }
@@ -75,6 +76,7 @@ export async function createIndex(
       }
     }
   })
+
   return client.indices.putAlias({
     index: indexName,
     name: getEventAliasName()
@@ -194,6 +196,9 @@ export async function getIndexedEvents() {
   })
 
   if (!hasEventsIndex) {
+    logger.error(
+      'Event index not created. Sending empty array. Ensure indexing is running.'
+    )
     return []
   }
 
