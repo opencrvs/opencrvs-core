@@ -73,6 +73,7 @@ import { IDeclarationData } from './utils'
 import { useNavigate } from 'react-router-dom'
 import * as routes from '@client/navigation/routes'
 import { useDeclaration } from '@client/declarations/selectors'
+import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 
 export const ActionMenu: React.FC<{
   declaration: IDeclarationData
@@ -127,7 +128,7 @@ export const ActionMenu: React.FC<{
         )
     )
     if (unassignConfirm) {
-      dispatch(unassignDeclaration(id, client))
+      dispatch(unassignDeclaration(id, client, [FETCH_DECLARATION_SHORT_INFO]))
     }
     return
   }
