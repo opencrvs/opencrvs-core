@@ -525,6 +525,8 @@ const BodyContent = ({
                 null
               )
             }
+            if (!draft || draft?.downloadStatus === DOWNLOAD_STATUS.UNASSIGNING)
+              refetch()
 
             let declaration
             if (
