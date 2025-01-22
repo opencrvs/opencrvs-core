@@ -131,7 +131,7 @@ export async function createEvent({
   createdBy: string
   createdAtLocation: string
   transactionId: string
-}) {
+}): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
 
   if (existingEvent) {

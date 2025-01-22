@@ -7,6 +7,8 @@ OpenCRVS toolkit for building country configurations.
 ```
 src/
   events/ # re-exports events module from commons package
+  conditionals/ # provides tools for easily formulating complex conditionals and deduplication rules
+  api/ # provides an API wrapper for OpenCRVS APIs with strict typing and validation
   lib.ts # standard library. currently empty
 ```
 
