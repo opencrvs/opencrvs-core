@@ -8,17 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@opencrvs/commons'
 import { Bundle, EVENT_TYPE, Saved, ValidRecord } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 
 const ACTION_NOTIFY_URL = (event: EVENT_TYPE, action: string) =>
-  new URL(
-    `event/${event.toLowerCase() as Lowercase<EVENT_TYPE>}/action/${action}`,
-    COUNTRY_CONFIG_URL
-  )
+  new URL(`events/${event}/actions/${action}`, COUNTRY_CONFIG_URL)
 
+/**
+ * Notifies legacy events to country configuration
+ * @deprecated
+ */
 export async function notifyForAction({
   event,
   action,
@@ -34,20 +34,10 @@ export async function notifyForAction({
     method: 'POST',
     body: JSON.stringify(record),
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/fhir+json',
       ...headers
     }
   })
-
-  if (response.status === 404) {
-    logger.debug(
-      `Non-issue: No country configuration endpoint for POST ${ACTION_NOTIFY_URL(
-        event,
-        action
-      )}. To optionally hook into this action, you must implement the corresponding action route in your country configuration.`
-    )
-    return
-  }
 
   if (!response.ok) {
     throw new Error(
