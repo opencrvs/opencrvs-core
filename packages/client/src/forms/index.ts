@@ -75,7 +75,9 @@ export const HEADING3 = 'HEADING3'
 export const SIGNATURE = 'SIGNATURE'
 export const HTTP = 'HTTP'
 export const BUTTON = 'BUTTON'
-export const REDIRECT = 'REDIRECT'
+export const LINK_BUTTON = 'LINK_BUTTON'
+export const ID_READER = 'ID_READER'
+export const ID_VERIFICATION_BANNER = 'ID_VERIFICATION_BANNER'
 
 export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
@@ -715,7 +717,8 @@ export interface IHttpFormField extends IFormFieldBase {
   type: typeof HTTP
   options: {
     headers: Record<string, string>
-    body: Record<string, any>
+    body?: Record<string, unknown>
+    params?: Record<string, string>
   } & Omit<Request, 'body' | 'headers'>
 }
 export interface IButtonFormField extends IFormFieldBase {
@@ -729,11 +732,43 @@ export interface IButtonFormField extends IFormFieldBase {
   }
 }
 
-export interface IRedirectFormField extends IFormFieldBase {
-  type: typeof REDIRECT
+export interface ILinkButtonFormField extends IFormFieldBase {
+  type: typeof LINK_BUTTON
+  icon?: {
+    desktop: IconProps['name']
+    mobile: IconProps['name']
+  }
   options: {
     url: string
+    callback: {
+      trigger: string
+      /**
+       * If the redirection url has the exact same param keys
+       * with exact same values sepecified in the below `params`
+       * field, only then the callback will be triggered
+       */
+      params: Record<string, string>
+    }
   }
+}
+
+export interface QRReaderType {
+  type: 'QR'
+}
+
+export type ReaderType = QRReaderType | ILinkButtonFormField
+export interface IDReaderFormField extends IFormFieldBase {
+  type: typeof ID_READER
+  dividerLabel: MessageDescriptor
+  manualInputInstructionLabel: MessageDescriptor
+  readers: [ReaderType, ...ReaderType[]]
+}
+
+export type BannerType = 'pending' | 'verified' | 'failed'
+interface IIDVerificationBannerFormField extends IFormFieldBase {
+  type: typeof ID_VERIFICATION_BANNER
+  bannerType: BannerType
+  idFieldName: string
 }
 
 export type IFormField =
@@ -771,7 +806,9 @@ export type IFormField =
   | ISignatureFormField
   | IHttpFormField
   | IButtonFormField
-  | IRedirectFormField
+  | ILinkButtonFormField
+  | IDReaderFormField
+  | IIDVerificationBannerFormField
 
 export interface IPreviewGroup {
   id: string
@@ -976,7 +1013,7 @@ export interface IFormSection {
   canContinue?: string
 }
 
-export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
+type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
   fields: SerializedFormField[]
 }
 
@@ -1225,7 +1262,8 @@ interface Ii18nHttpFormField extends Ii18nFormFieldBase {
   type: typeof HTTP
   options: {
     headers: Record<string, string>
-    body: Record<string, any>
+    body?: Record<string, unknown>
+    params?: Record<string, string>
   } & Omit<Request, 'body' | 'headers'>
 }
 
@@ -1240,13 +1278,33 @@ export interface Ii18nButtonFormField extends Ii18nFormFieldBase {
   }
 }
 
-interface Ii18nRedirectFormField extends Ii18nFormFieldBase {
-  type: typeof REDIRECT
+export interface Ii18nLinkButtonFormField extends Ii18nFormFieldBase {
+  type: typeof LINK_BUTTON
+  icon?: {
+    desktop: IconProps['name']
+    mobile: IconProps['name']
+  }
   options: {
     url: string
+    callback: {
+      trigger: string
+      params: Record<string, string>
+    }
   }
 }
 
+export interface Ii18nIDReaderFormField extends Ii18nFormFieldBase {
+  type: typeof ID_READER
+  dividerLabel: string
+  manualInputInstructionLabel: string
+  readers: [ReaderType, ...ReaderType[]]
+}
+
+interface Ii18nIDVerificationBannerFormField extends Ii18nFormFieldBase {
+  type: typeof ID_VERIFICATION_BANNER
+  bannerType: BannerType
+  idFieldName: string
+}
 export type Ii18nFormField =
   | Ii18nTextFormField
   | Ii18nTelFormField
@@ -1280,7 +1338,9 @@ export type Ii18nFormField =
   | Ii18nSignatureField
   | Ii18nHttpFormField
   | Ii18nButtonFormField
-  | Ii18nRedirectFormField
+  | Ii18nLinkButtonFormField
+  | Ii18nIDReaderFormField
+  | Ii18nIDVerificationBannerFormField
 
 export interface IFormSectionData {
   [key: string]: IFormFieldValue

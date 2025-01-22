@@ -323,7 +323,7 @@ export async function toViewed<T extends ValidRecord>(
         resource: viewedTask
       },
       taskHistoryEntry,
-      /*  PractitionerRole resource is saved in the bundle 
+      /*  PractitionerRole resource is saved in the bundle
       since PractitionerRole is fetched from bundle
       in the resolvers during readying history of a record */
       practitionerRoleEntry
@@ -407,9 +407,9 @@ export async function toDownloaded(
     resource: downloadedTask
   }
 
-  /* 
+  /*
     When a user tries to access a record for the first time,
-    practitionerRoleBundle is necessary to create the history of the record  
+    practitionerRoleBundle is necessary to create the history of the record
   */
   const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
   const updatedBundle = {
@@ -1024,23 +1024,18 @@ export async function toCertified(
     temporaryRelatedPersonId,
     record
   )
+
   const practitionerReference = findExtension(
     'http://opencrvs.org/specs/extension/regLastUser',
     certifiedTask.extension
   )!.valueReference.reference
 
-  /* For 'PRINT_IN_ADVANCE' records, there will be no related person entry to add. Thus the
-  related person id should not be referenced rather the regLastUser Practitioner is referenced.*/
-  const collectorReference =
-    certificateDetails.collector.relationship !== 'PRINT_IN_ADVANCE'
-      ? (`urn:uuid:${temporaryRelatedPersonId}` as const)
-      : practitionerReference
-
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
+    temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
-    collectorReference,
+    practitionerReference,
     certificateDetails.certificateTemplateId
   )
 
@@ -1122,13 +1117,12 @@ export async function toIssued(
     record
   )
 
-  const collectorReference = `urn:uuid:${temporaryRelatedPersonId}` as const
-
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
+    temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
-    collectorReference,
+    undefined,
     certificateDetails.certificateTemplateId,
     paymentReconciliation.fullUrl
   )
