@@ -378,6 +378,14 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build
+      - name: Build commons
+        run: yarn build
+        working-directory: packages/commons
+
+      - name: Build events
+        run: yarn build
+        working-directory: packages/events
+
+      - name: Build toolkit
         run: yarn build
         working-directory: packages/toolkit
