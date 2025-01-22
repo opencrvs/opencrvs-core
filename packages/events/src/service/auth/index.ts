@@ -9,20 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig, EventConfigInput } from './EventConfig'
-import { findInputPageFields } from './utils'
+import { env } from '@events/environment'
+import fetch from 'node-fetch'
 
-/**
- * Builds a validated configuration for an event
- * @param config - Event specific configuration
- */
-export const defineConfig = (config: EventConfigInput) => {
-  const input = EventConfig.parse(config)
-
-  const pageFields = findInputPageFields(input)
-
-  return EventConfig.parse({
-    ...input,
-    pageFields
-  })
+export async function getAnonymousToken() {
+  const res = await fetch(new URL('/anonymous-token', env.AUTH_URL).toString())
+  const { token } = await res.json()
+  return token as string
 }
