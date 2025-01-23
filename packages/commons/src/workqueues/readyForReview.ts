@@ -26,15 +26,7 @@ export const inReviewWorkqueue = defineWorkQueue({
         description: 'This is the label for the workqueue column',
         id: 'workqueue.in-reveiw.column.title'
       }
-    },
-    {
-      id: 'event',
-      label: {
-        defaultMessage: 'Event',
-        description: 'This is the label for the workqueue column',
-        id: 'workqueue.in-reveiw.column.event'
-      }
     }
   ],
-  defaultColumns: ['createdAt', 'modifiedAt']
+  defaultColumns: ['event', 'createdAt', 'modifiedAt']
 })

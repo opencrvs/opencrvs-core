@@ -26,15 +26,7 @@ export const registeredWorkqueue = defineWorkQueue({
         description: 'This is the label for the workqueue column',
         id: 'workqueue.registered.column.title'
       }
-    },
-    {
-      id: 'event',
-      label: {
-        defaultMessage: 'Event',
-        description: 'This is the label for the workqueue column',
-        id: 'workqueue.registered.column.event'
-      }
     }
   ],
-  defaultColumns: ['createdAt', 'modifiedAt']
+  defaultColumns: ['event', 'createdAt', 'modifiedAt']
 })
