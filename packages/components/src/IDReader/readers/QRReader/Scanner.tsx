@@ -12,6 +12,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import QRScanner from 'qr-scanner'
 import styled from 'styled-components'
 import { ErrorHandler } from 'src/IDReader/types'
+import { throttle } from 'lodash'
 
 interface ScannerProps {
   onError: ErrorHandler
@@ -67,7 +68,7 @@ const Scanner = (props: ScannerProps) => {
     const currentVideoElement = videoElement?.current
     if (currentVideoElement && !scanner.current) {
       scanner.current = new QRScanner(currentVideoElement, onScanSuccess, {
-        onDecodeError: onScanError,
+        onDecodeError: throttle(onScanError, 5000),
         preferredCamera: 'environment',
         highlightCodeOutline: true,
         highlightScanRegion: false
