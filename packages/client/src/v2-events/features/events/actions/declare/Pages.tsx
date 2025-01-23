@@ -93,6 +93,7 @@ export function Pages() {
 
   return (
     <FormLayout
+      action={ActionType.DECLARE}
       route={ROUTES.V2.EVENTS.DECLARE}
       onSaveAndExit={() => {
         events.actions.declare.mutate({

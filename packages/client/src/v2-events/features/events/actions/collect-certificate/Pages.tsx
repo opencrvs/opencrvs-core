@@ -26,6 +26,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { FormLayout } from '@client/v2-events/layouts/form'
 import { defaultCertificateCollectorFormConfig } from './defaultCertificateCollectorFormConfig'
+import { FormPage } from '@opencrvs/commons'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
@@ -53,7 +54,7 @@ export function Pages() {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-  const formPages = configuration.actions
+  let formPages = configuration.actions
     .find((action) => action.type === ActionType.COLLECT_CERTIFICATE)
     ?.forms.find((form) => form.active)?.pages
 
@@ -65,8 +66,9 @@ export function Pages() {
     defaultCertificateCollectorFormConfig,
     formPages.length ? formPages[0] : {}
   )
-  const currentPageId =
-    formPages.find((p) => p.id === pageId)?.id || collectFormPage.id
+  const currentPageId = formPages.find(
+    (p) => p.id === collectFormPage[0].id
+  )?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -86,6 +88,7 @@ export function Pages() {
 
   return (
     <FormLayout
+      action={ActionType.COLLECT_CERTIFICATE}
       route={ROUTES.V2.EVENTS.COLLECT_CERTIFICATE}
       onSaveAndExit={() => {
         events.actions.collectCertificate.mutate({

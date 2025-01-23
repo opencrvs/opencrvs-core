@@ -12,10 +12,10 @@
 import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import { isUndeclaredDraft } from '@opencrvs/commons/client'
+import { ActionType, isUndeclaredDraft } from '@opencrvs/commons/client'
 import type { TranslationConfig } from '@opencrvs/commons/events'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
-import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon, Print } from '@opencrvs/components/lib/icons'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
 
@@ -41,10 +41,27 @@ const messages = defineMessages({
   }
 })
 
+export const ActionIcons: { [key in ActionType]: React.JSX.Element } = {
+  CREATE: <DeclarationIcon color={getDeclarationIconColor()} />,
+  ASSIGN: <DeclarationIcon color={getDeclarationIconColor()} />,
+  UNASSIGN: <DeclarationIcon color={getDeclarationIconColor()} />,
+  REGISTER: <DeclarationIcon color={getDeclarationIconColor()} />,
+  VALIDATE: <DeclarationIcon color={getDeclarationIconColor()} />,
+  CORRECT: <DeclarationIcon color={getDeclarationIconColor()} />,
+  DETECT_DUPLICATE: <DeclarationIcon color={getDeclarationIconColor()} />,
+  NOTIFY: <DeclarationIcon color={getDeclarationIconColor()} />,
+  DECLARE: <DeclarationIcon color={getDeclarationIconColor()} />,
+  DELETE: <DeclarationIcon color={getDeclarationIconColor()} />,
+  COLLECT_CERTIFICATE: <Print color={getDeclarationIconColor()} />,
+  CUSTOM: <DeclarationIcon color={getDeclarationIconColor()} />
+}
+
 export function FormHeader({
+  action,
   label,
   onSaveAndExit
 }: {
+  action: ActionType
   label: TranslationConfig
   onSaveAndExit: () => void
 }) {
@@ -71,7 +88,7 @@ export function FormHeader({
 
   return (
     <AppBar
-      desktopLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
+      desktopLeft={ActionIcons[action]}
       desktopRight={
         <>
           {
@@ -110,9 +127,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      desktopTitle={intl.formatMessage(messages.newVitalEventRegistration, {
-        event: intl.formatMessage(label)
-      })}
+      desktopTitle={intl.formatMessage(label)}
       mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
       mobileRight={
         <>

@@ -223,6 +223,7 @@ export function Review() {
 
   return (
     <FormLayout
+      action={ActionType.COLLECT_CERTIFICATE}
       route={ROUTES.V2.EVENTS.COLLECT_CERTIFICATE}
       onSaveAndExit={() => {
         events.actions.collectCertificate.mutate({

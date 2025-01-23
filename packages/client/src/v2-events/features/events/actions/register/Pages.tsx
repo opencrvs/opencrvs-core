@@ -76,6 +76,7 @@ export function Pages() {
 
   return (
     <FormLayout
+      action={ActionType.REGISTER}
       route={ROUTES.V2.EVENTS.REGISTER}
       onSaveAndExit={() => {
         events.actions.register.mutate({

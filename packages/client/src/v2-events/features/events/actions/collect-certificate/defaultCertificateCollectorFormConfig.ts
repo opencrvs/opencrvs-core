@@ -11,61 +11,90 @@ import { FormPage } from '@opencrvs/commons'
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export const defaultCertificateCollectorFormConfig: FormPage = {
-  id: 'collector',
-  title: {
-    id: 'event.tennis-club-membership.action.certificate.form.section.who.title',
-    defaultMessage: 'Who is collecting the certificate?',
-    description: 'This is the title of the section'
-  },
-  fields: [
-    {
-      id: 'collector.firstname',
-      type: 'TEXT',
-      required: true,
-      label: {
-        defaultMessage: "Collector's first name",
-        description: 'This is the label for the field',
-        id: 'event.tennis-club-membership.action.certificate.form.section.who.field.firstname.label'
-      }
+export const defaultCertificateCollectorFormConfig: FormPage[] = [
+  {
+    id: 'collector',
+    title: {
+      id: 'event.tennis-club-membership.action.certificate.form.section.who.title',
+      defaultMessage: 'Who is collecting the certificate?',
+      description: 'This is the title of the section'
     },
-    {
-      id: 'collector.surname',
-      type: 'TEXT',
-      required: true,
-      label: {
-        defaultMessage: "Collector's surname",
-        description: 'This is the label for the field',
-        id: 'event.tennis-club-membership.action.certificate.form.section.who.field.surname.label'
-      }
-    },
-    {
-      id: 'collector.certificateTemplateId',
-      type: 'RADIO_GROUP',
-      required: true,
-      label: {
-        defaultMessage: 'Select Certificate Template',
-        description: 'This is the label for the field',
-        id: 'event.tennis-club-membership.action.certificate.form.section.who.field.surname.label'
-      },
-      options: [
-        {
-          label: {
-            id: 'certificates.tennis-club-membership.certificate.copy',
-            defaultMessage: 'Tennis Club Membership Certificate copy',
-            description: 'The label for a tennis-club-membership certificate'
-          },
-          value: 'tennis-club-membership-certificate'
+    fields: [
+      {
+        id: 'collector.certificateTemplateId',
+        type: 'SELECT',
+        required: true,
+        label: {
+          defaultMessage: 'Select Certificate Template',
+          description: 'This is the label for the field',
+          id: 'event.tennis-club-membership.action.certificate.form.section.who.field.surname.label'
         },
-        {
-          label: {
-            id: 'certificates.tennis-club-membership.certificate.certified-copy',
-            defaultMessage: 'Tennis Club Membership Certificate certified copy',
-            description: 'The label for a tennis-club-membership certificate'
+        validation: [
+          {
+            message: {
+              id: '',
+              defaultMessage: '',
+              description: ''
+            }
+            // validator: field
+          }
+        ],
+        options: [
+          {
+            label: {
+              id: 'certificates.tennis-club-membership.certificate.copy',
+              defaultMessage: 'Tennis Club Membership Certificate copy',
+              description: 'The label for a tennis-club-membership certificate'
+            },
+            value: 'tennis-club-membership-certificate'
           },
-          value: 'tennis-club-membership-certified-certificate'
-        }
-      ]
-    }
-  ]
-}
+          {
+            label: {
+              id: 'certificates.tennis-club-membership.certificate.certified-copy',
+              defaultMessage:
+                'Tennis Club Membership Certificate certified copy',
+              description: 'The label for a tennis-club-membership certificate'
+            },
+            value: 'tennis-club-membership-certified-certificate'
+          }
+        ]
+      },
+      {
+        id: 'collector.requesterId',
+        type: 'SELECT',
+        required: true,
+        label: {
+          defaultMessage: 'Requester',
+          description: 'This is the label for the field',
+          id: 'event.tennis-club-membership.action.certificate.form.section.requester.label'
+        },
+        options: [
+          {
+            label: {
+              id: 'event.tennis-club-membership.action.certificate.form.section.requester.informant.label',
+              defaultMessage: 'Print and issue Informant',
+              description: 'This is the label for the field'
+            },
+            value: 'INFORMANT'
+          },
+          {
+            label: {
+              id: 'event.tennis-club-membership.action.certificate.form.section.requester.other.label',
+              defaultMessage: 'Print and issue someone else',
+              description: 'This is the label for the field'
+            },
+            value: 'OTHER'
+          },
+          {
+            label: {
+              id: 'event.tennis-club-membership.action.certificate.form.section.requester.printInAdvance.label',
+              defaultMessage: 'Print in advance',
+              description: 'This is the label for the field'
+            },
+            value: 'PRINT_IN_ADVANCE'
+          }
+        ]
+      }
+    ]
+  }
+]

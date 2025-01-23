@@ -17,6 +17,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { FormHeader } from './FormHeader'
+import { ActionType } from '@opencrvs/commons/client'
 
 type AllowedRoute =
   | typeof ROUTES.V2.EVENTS.REGISTER
@@ -28,27 +29,34 @@ type AllowedRoute =
  *
  */
 export function FormLayout({
+  action,
   route,
   children,
   onSaveAndExit
 }: {
+  action: ActionType
   route: AllowedRoute
   children: React.ReactNode
   onSaveAndExit: () => void
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
-
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-
+  const page = configuration.actions.find((x) => x.type === action)
+  if (!page) {
+    throw new Error('Form page not found')
+  }
   return (
     <Frame
       header={
-        <FormHeader label={configuration.label} onSaveAndExit={onSaveAndExit} />
+        <FormHeader
+          action={action}
+          label={page.label}
+          onSaveAndExit={onSaveAndExit}
+        />
       }
       skipToContentText="Skip to form"
     >
