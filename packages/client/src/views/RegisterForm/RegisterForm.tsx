@@ -1276,7 +1276,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                     )}
                                   </Alert>
                                 )}
-
                               <FormFieldGenerator
                                 id={`${activeSection.id}-${activeSectionGroup.id}`}
                                 key={this.state.formFieldKey}

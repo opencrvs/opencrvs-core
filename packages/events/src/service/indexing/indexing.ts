@@ -36,6 +36,17 @@ function eventToEventIndex(event: EventDocument): EventIndex {
  */
 type EventIndexMapping = { [key in keyof EventIndex]: estypes.MappingProperty }
 
+export async function ensureIndexExists(eventConfiguration: EventConfig) {
+  const esClient = getOrCreateClient()
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const hasEventsIndex = await esClient.indices.exists({
+    index: indexName
+  })
+  if (!hasEventsIndex) {
+    await createIndex(indexName, getAllFields(eventConfiguration))
+  }
+}
+
 export async function createIndex(
   indexName: string,
   formFields: FieldConfig[]
@@ -82,6 +93,7 @@ function getElasticsearchMappingForType(field: FieldConfig) {
     case 'SELECT':
     case 'COUNTRY':
     case 'CHECKBOX':
+    case 'LOCATION':
       return { type: 'keyword' }
     case 'FILE':
       return {
@@ -133,7 +145,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  return esClient.helpers.bulk({
+  await esClient.helpers.bulk({
     retries: 3,
     wait: 3000,
     datasource: stream.pipe(transformedStreamData),

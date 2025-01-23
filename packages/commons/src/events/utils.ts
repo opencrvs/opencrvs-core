@@ -14,31 +14,37 @@ import { TranslationConfig } from './TranslationConfig'
 import { EventMetadataKeys, eventMetadataLabelMap } from './EventMetadata'
 import { flattenDeep } from 'lodash'
 import { EventConfig, EventConfigInput } from './EventConfig'
-import { SummaryConfigInput } from './SummaryConfig'
 import { WorkqueueConfigInput } from './WorkqueueConfig'
-import { FieldType } from './FieldConfig'
+import { FieldConfig } from './FieldConfig'
 
 const isMetadataField = <T extends string>(
   field: T | EventMetadataKeys
 ): field is EventMetadataKeys => field in eventMetadataLabelMap
 
 /**
- * @returns All the fields in the event configuration.
+ * @returns All the fields in the event configuration input.
  */
-export const findPageFields = (
+export const findInputPageFields = (
   config: EventConfigInput
-): Array<{ id: string; label: TranslationConfig; type: FieldType }> => {
+): { id: string; label: TranslationConfig }[] => {
   return flattenDeep(
     config.actions.map(({ forms }) =>
       forms.map(({ pages }) =>
         pages.map(({ fields }) =>
-          fields.map(({ id, label, type }) => ({
-            id,
-            label,
-            type
-          }))
+          fields.map(({ id, label }) => ({ id, label }))
         )
       )
+    )
+  )
+}
+
+/**
+ * @returns All the fields in the event configuration.
+ */
+export const findPageFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep(
+    config.actions.map(({ forms }) =>
+      forms.map(({ pages }) => pages.map(({ fields }) => fields))
     )
   )
 }
@@ -89,7 +95,7 @@ export const resolveFieldLabels = ({
   config,
   pageFields
 }: {
-  config: SummaryConfigInput | WorkqueueConfigInput
+  config: WorkqueueConfigInput
   pageFields: { id: string; label: TranslationConfig }[]
 }) => {
   return {

@@ -136,6 +136,8 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
     ])
   )
 
+export type Clause = z.infer<typeof Clause>
+
 export const DeduplicationConfig = z.object({
   id: z.string(),
   label: TranslationConfig,
