@@ -14,7 +14,7 @@ import { t } from '@events/router/trpc'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { Scope, userRoleScopes } from '@opencrvs/commons'
+import { Scope, TokenWithBearer, userRoleScopes } from '@opencrvs/commons'
 import { CreatedUser, payloadGenerator } from './generators'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
@@ -33,8 +33,8 @@ export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
   return caller
 }
 
-function createTestToken(userId: string, scopes?: Scope[]) {
-  return jwt.sign(
+function createTestToken(userId: string, scopes?: Scope[]): TokenWithBearer {
+  const token = jwt.sign(
     { scope: scopes ?? userRoleScopes.REGISTRATION_AGENT, sub: userId },
     readFileSync(join(__dirname, './cert.key')),
     {
@@ -43,6 +43,8 @@ function createTestToken(userId: string, scopes?: Scope[]) {
       audience: 'opencrvs:events-user'
     }
   )
+
+  return `Bearer ${token}`
 }
 
 /**
