@@ -138,79 +138,162 @@ export function field(fieldId: string) {
   const api: FieldAPI = {
     isBeforeNow: () =>
       addCondition({
-        $form: {
-          type: 'object',
-          properties: {
-            [fieldId]: {
-              type: 'string',
-              format: 'date',
-              formatMaximum: { $data: '2/$now' }
-            }
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                type: 'string',
+                format: 'date',
+                formatMaximum: { $data: '2/$now' }
+              }
+            },
+            required: [fieldId]
           },
-          required: [fieldId]
+          $now: {
+            type: 'string',
+            format: 'date'
+          }
         },
-        $now: {
-          type: 'string',
-          format: 'date'
-        }
+        required: ['$form', '$now']
       }),
     isEqualTo: (value: string) =>
       addCondition({
-        [fieldId]: {
-          const: value
-        }
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                const: value
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
       }),
     isUndefined: () =>
       addCondition({
-        not: {
-          type: 'object',
-          required: [fieldId]
-        }
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            not: {
+              type: 'object',
+              required: [fieldId]
+            }
+          }
+        },
+        required: ['$form']
       }),
     inArray: (values: string[]) =>
       addCondition({
-        [fieldId]: {
-          enum: values
-        }
+        type: 'object',
+        properties: {
+          $form: {
+            type: 'object',
+            properties: {
+              [fieldId]: {
+                enum: values
+              }
+            },
+            required: [fieldId]
+          }
+        },
+        required: ['$form']
       }),
     not: {
       inArray: (values: string[]) =>
         addCondition({
-          [fieldId]: {
-            not: {
-              enum: values
+          type: 'object',
+          properties: {
+            $form: {
+              type: 'object',
+              properties: {
+                [fieldId]: {
+                  not: {
+                    enum: values
+                  }
+                }
+              },
+              required: [fieldId]
             }
-          }
+          },
+          required: ['$form']
         }),
       equalTo: (value: string) =>
         addCondition({
-          [fieldId]: {
-            not: {
-              const: value
+          type: 'object',
+          properties: {
+            $form: {
+              type: 'object',
+              properties: {
+                [fieldId]: {
+                  not: {
+                    const: value
+                  }
+                }
+              },
+              required: [fieldId]
             }
-          }
+          },
+          required: ['$form']
         })
     },
     or: (callback: (field: FieldAPI) => FieldAPI) => {
       const nestedConditions = callback(field(fieldId))._apply()
-      return addCondition({
-        type: 'object',
-        anyOf: nestedConditions
-      })
+
+      return addCondition(ensureWrapper(nestedConditions, 'or'))
     },
     _apply: () => conditions,
     apply: () => {
       if (conditions.length === 1) {
-        return {
-          type: 'object',
-          properties: { $form: { properties: conditions[0] } },
-          required: ['$form', fieldId]
-        }
+        return conditions[0]
       }
 
-      return { type: 'object', allOf: conditions, required: ['$form', fieldId] }
+      return ensureWrapper(conditions, 'and')
     }
   }
 
   return api
+}
+
+type BooleanConnector = 'and' | 'or'
+
+/**
+ * Makes sure JSON Schema conditions are wrapped in an object with a $form property.
+ */
+const ensureWrapper = (
+  conditions: JSONSchema[],
+  booleanConnector: BooleanConnector
+) => {
+  const conditionsWithConnector = (
+    conditions: JSONSchema[],
+    connector: BooleanConnector
+  ) => (connector === 'and' ? { allOf: conditions } : { anyOf: conditions })
+
+  const needsWrapper = conditions.some(
+    (condition) =>
+      !(
+        condition.type === 'object' &&
+        condition.properties &&
+        condition.properties.$form
+      )
+  )
+
+  if (needsWrapper) {
+    return {
+      type: 'object',
+      properties: {
+        $form: {
+          type: 'object',
+          ...conditionsWithConnector(conditions, booleanConnector)
+        }
+      }
+    }
+  }
+
+  return conditionsWithConnector(conditions, booleanConnector)
 }
