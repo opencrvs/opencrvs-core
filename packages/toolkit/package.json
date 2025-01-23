@@ -11,7 +11,8 @@
     "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "build:all": "lerna run build --include-dependencies --scope @opencrvs/toolkit && ./build.sh"
   },
   "dependencies": {
     "ajv": "^8.17.1",
