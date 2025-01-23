@@ -11,10 +11,8 @@
 import React from 'react'
 import { Header } from '@client/components/Header/Header'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
-import {
-  Navigation,
-  WORKQUEUE_TABS
-} from '@client/components/interface/Navigation'
+import { Navigation } from '@client/components/interface/Navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import styled from 'styled-components'
 import {
   DeclarationIcon,
@@ -47,7 +45,6 @@ import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   PrimaryButton,
   TertiaryButton,
@@ -63,6 +60,7 @@ import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { IForm } from '@client/forms'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
+import { Scope, SCOPES } from '@opencrvs/commons/client'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
@@ -96,6 +94,7 @@ import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 
 import { UserDetails } from '@client/utils/userUtils'
 import { client } from '@client/utils/apolloClient'
+import { usePermissions } from '@client/hooks/useAuthorization'
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { ActionMenu } from './ActionMenu'
 import {
@@ -138,7 +137,7 @@ interface IStateProps {
   userDetails: UserDetails | null
   language: string
   resources: IOfflineData
-  scope: Scope | null
+  scope: Scope[]
   declarationId?: string
   draft: IDeclaration | null
   tab?: IRecordAuditTabs
@@ -247,7 +246,6 @@ function RecordAuditBody({
   draft,
   duplicates,
   intl,
-  scope,
   refetchDeclarationInfo,
   userDetails,
   registerForm,
@@ -258,7 +256,7 @@ function RecordAuditBody({
   draft: IDeclaration | null
   duplicates?: string[]
   intl: IntlShape
-  scope: Scope | null
+  scope: Scope[]
   userDetails: UserDetails | null
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
@@ -272,6 +270,8 @@ function RecordAuditBody({
   const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
 
   const [actionDetailsData, setActionDetailsData] = React.useState<History>()
+
+  const { hasScope } = usePermissions()
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -294,7 +294,6 @@ function RecordAuditBody({
     <ActionMenu
       declaration={declaration}
       duplicates={duplicates}
-      scope={scope as any}
       draft={draft}
       toggleDisplayDialog={toggleDisplayDialog}
     />
@@ -360,9 +359,7 @@ function RecordAuditBody({
 
   const isValidatedOnReview =
     declaration.status === SUBMISSION_STATUS.VALIDATED &&
-    hasRegisterScope(scope)
-      ? true
-      : false
+    hasScope(SCOPES.RECORD_REGISTER)
 
   const hasDuplicates = !!(
     duplicates &&
@@ -544,10 +541,13 @@ const BodyContent = ({
                 ...declaration,
                 status: data.fetchRegistration?.registration?.status[0]
                   .type as SUBMISSION_STATUS,
-                assignment: data.fetchRegistration?.registration?.assignment
+                assignment: draft?.assignmentStatus
               }
             } else {
               declaration = getGQLDeclaration(data.fetchRegistration, language)
+              /* draft might not be in store for unassigned record,
+              in that case use the one from the short declaration info query */
+              declaration.assignment ??= draft?.assignmentStatus
             }
 
             return (
@@ -579,7 +579,7 @@ const BodyContent = ({
         draft.submissionStatus === SUBMISSION_STATUS.DRAFT)
         ? {
             ...getDraftDeclarationData(draft, resources, intl, trackingId),
-            assignment: workqueueDeclaration?.registration?.assignment
+            assignment: draft?.assignmentStatus
           }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
@@ -645,7 +645,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
       ) || null,
     language: getLanguage(state),
     resources: getOfflineData(state),
-    scope: getScope(state),
+    scope: getScope(state)!,
     tab: tab as IRecordAuditTabs,
     userDetails: state.profile.userDetails,
     registerForm: state.registerForm,

@@ -7,6 +7,7 @@
     "./lib": "./dist/lib.js",
     "./api": "./dist/api/index.js",
     "./events": "./dist/events/index.js",
+    "./scopes": "./dist/scopes/index.js",
     "./conditionals": "./dist/conditionals/index.js"
   },
   "scripts": {
@@ -25,6 +26,7 @@
     "@opencrvs/events": "^1.7.0"
   },
   "moduleNameMapper": {
-    "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js"
+    "@opencrvs/commons/events": "@opencrvs/commons/build/dist/common/events/index.js",
+    "@opencrvs/commons/scopes": "@opencrvs/commons/build/dist/common/scopes.js"
   }
 }
