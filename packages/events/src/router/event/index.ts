@@ -25,6 +25,7 @@ import { presignFilesInEvent } from '@events/service/files'
 import { getIndexedEvents } from '@events/service/indexing/indexing'
 import { EventConfig, getUUID } from '@opencrvs/commons'
 import {
+  CollectCertificateActionInput,
   DeclareActionInput,
   EventIndex,
   EventInput,
@@ -54,13 +55,7 @@ function validateEventType({
 export const eventRouter = router({
   config: router({
     get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
-      try {
-        return getEventConfigurations(options.ctx.token)
-      } catch (error) {
-        console.log(options.ctx.token)
-        console.log(error)
-        return getEventConfigurations(options.ctx.token)
-      }
+      return getEventConfigurations(options.ctx.token)
     })
   }),
   create: publicProcedure.input(EventInput).mutation(async (options) => {
@@ -155,6 +150,16 @@ export const eventRouter = router({
             token: options.ctx.token
           }
         )
+      }),
+    collectCertificate: publicProcedure
+      .input(CollectCertificateActionInput)
+      .mutation(async (options) => {
+        return addAction(options.input, {
+          eventId: options.input.eventId,
+          createdBy: options.ctx.user.id,
+          createdAtLocation: options.ctx.user.primaryOfficeId,
+          token: options.ctx.token
+        })
       })
   }),
   list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
