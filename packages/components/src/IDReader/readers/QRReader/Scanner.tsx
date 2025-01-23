@@ -90,6 +90,7 @@ const Scanner = (props: ScannerProps) => {
       } else {
         scanner?.current?.stop()
       }
+      scanner.current?.destroy()
     }
   }, [onScan, onError, validator, onScanSuccess, onScanError])
 
