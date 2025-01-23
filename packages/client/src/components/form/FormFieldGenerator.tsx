@@ -191,6 +191,7 @@ type GeneratedInputFieldProps = {
   touched: boolean
   error: string
   draftData: IFormData
+  draftId: string
   disabled?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
@@ -210,6 +211,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
     value,
     nestedFields,
     draftData,
+    draftId,
     disabled,
     dynamicDispatch,
     onUploadingStateChanged,
@@ -664,6 +666,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <LinkButtonField
           form={values}
           draft={draftData}
+          draftId={draftId}
           fieldDefinition={fieldDefinition}
           fields={fields}
           setFieldValue={setFieldValue}
@@ -807,7 +810,7 @@ export const mapFieldsToValues = (
   }, {})
 
 type ISetTouchedFunction = (touched: FormikTouched<FormikValues>) => void
-interface IFormSectionProps {
+interface IFormFieldGeneratorProps {
   fields: IFormField[]
   id: string
   fieldsToShowValidationErrors?: IFormField[]
@@ -818,6 +821,7 @@ interface IFormSectionProps {
   requiredErrorMessage?: MessageDescriptor
   onUploadingStateChanged?: (isUploading: boolean) => void
   initialValues?: IAdvancedSearchFormState
+  draftId: string
 }
 
 interface IStateProps {
@@ -829,7 +833,7 @@ interface IDispatchProps {
   dynamicDispatch: typeof dynamicDispatch
 }
 
-type Props = IFormSectionProps &
+type Props = IFormFieldGeneratorProps &
   IStateProps &
   IDispatchProps &
   FormikProps<IFormSectionData> &
@@ -939,6 +943,7 @@ class FormSectionComponent extends React.Component<Props> {
           updatedValues,
           this.props.offlineCountryConfig,
           this.props.draftData,
+          this.props.draftId,
           this.props.userDetails
         )
         updateDependentFields(field.name)
@@ -989,6 +994,7 @@ class FormSectionComponent extends React.Component<Props> {
       offlineCountryConfig,
       intl,
       draftData,
+      draftId,
       userDetails,
       setValues,
       dynamicDispatch
@@ -1016,6 +1022,7 @@ class FormSectionComponent extends React.Component<Props> {
             { ...draftData?.[sectionName], ...values },
             offlineCountryConfig,
             draftData,
+            draftId,
             userDetails
           )
 
@@ -1182,6 +1189,7 @@ class FormSectionComponent extends React.Component<Props> {
                       fields={fields}
                       values={values}
                       draftData={draftData}
+                      draftId={draftId}
                       disabled={isFieldDisabled}
                       dynamicDispatch={dynamicDispatch}
                     />
@@ -1244,6 +1252,7 @@ class FormSectionComponent extends React.Component<Props> {
                             touched={nestedFieldTouched || false}
                             error={nestedError}
                             draftData={draftData}
+                            draftId={draftId}
                             dynamicDispatch={dynamicDispatch}
                             onUploadingStateChanged={
                               this.props.onUploadingStateChanged
@@ -1283,6 +1292,7 @@ class FormSectionComponent extends React.Component<Props> {
                       fields={fields}
                       values={values}
                       draftData={draftData}
+                      draftId={draftId}
                       dynamicDispatch={dynamicDispatch}
                     />
                   )}
@@ -1312,6 +1322,7 @@ class FormSectionComponent extends React.Component<Props> {
                         touched={touched[field.name] || false}
                         error={isFieldDisabled ? '' : error}
                         draftData={draftData}
+                        draftId={draftId}
                         fields={fields}
                         values={values}
                         dynamicDispatch={dynamicDispatch}
@@ -1332,7 +1343,9 @@ class FormSectionComponent extends React.Component<Props> {
   }
 }
 
-export const FormFieldGenerator: React.FC<IFormSectionProps> = (props) => {
+export const FormFieldGenerator: React.FC<IFormFieldGeneratorProps> = (
+  props
+) => {
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const intl = useIntl()
