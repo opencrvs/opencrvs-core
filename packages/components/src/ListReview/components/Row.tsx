@@ -17,19 +17,21 @@ export const RowContainer = styled.tr`
   td {
     padding: 14px 0;
     vertical-align: top;
+    word-wrap: anywhere;
+    white-space: normal;
   }
 
   td:first-child {
     margin: 0;
     ${({ theme }) => theme.fonts.bold16}
-    min-width: 300px;
+    width: 300px;
     padding-right: 48px;
   }
 
   td:nth-child(2) {
     margin: 0;
     ${({ theme }) => theme.fonts.reg16}
-    width: 100%;
+    width: 300px;
     padding-right: 48px;
   }
 
@@ -55,6 +57,16 @@ export const RowContainer = styled.tr`
     td:last-child {
       vertical-align: top;
       min-width: 100px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    /* Styles for small phones */
+    td:first-child {
+      padding-right: 0px;
+    }
+    td:nth-child(2) {
+      padding-right: 0px;
     }
   }
 `

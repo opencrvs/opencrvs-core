@@ -11,10 +11,11 @@
 
 import { z } from 'zod'
 import * as _ from 'lodash'
-import { getClient } from '@events/storage'
+import * as events from '@events/storage/mongodb/events'
 
 export const Location = z.object({
   id: z.string(),
+  externalId: z.string().nullable(),
   name: z.string(),
   partOf: z.string().nullable()
 })
@@ -31,8 +32,11 @@ export type Location = z.infer<typeof Location>
  * @param incomingLocations - Locations to be set
  */
 export async function setLocations(incomingLocations: Array<Location>) {
-  const db = await getClient()
-  const currentLocations = await db.collection('locations').find().toArray()
+  const db = await events.getClient()
+  const currentLocations = await db
+    .collection<Location>('locations')
+    .find()
+    .toArray()
 
   const [locationsToKeep, locationsToRemove] = _.partition(
     currentLocations,
@@ -58,7 +62,7 @@ export async function setLocations(incomingLocations: Array<Location>) {
 }
 
 export const getLocations = async () => {
-  const db = await getClient()
+  const db = await events.getClient()
 
   return db.collection<Location>('locations').find().toArray()
 }

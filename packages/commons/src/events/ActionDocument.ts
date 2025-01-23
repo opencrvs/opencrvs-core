@@ -85,6 +85,21 @@ export const ActionDocument = z.discriminatedUnion('type', [
 ])
 
 export type ActionDocument = z.infer<typeof ActionDocument>
+
+export const ResolvedUser = z.object({
+  id: z.string(),
+  systemRole: z.string(),
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  )
+})
+
+export type ResolvedUser = z.infer<typeof ResolvedUser>
+
 export type CreatedAction = z.infer<typeof CreatedAction>
 
 export type ActionFormData = ActionDocument['data']

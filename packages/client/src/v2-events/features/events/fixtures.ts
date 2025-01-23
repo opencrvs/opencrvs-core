@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventConfig, FormConfig } from '@opencrvs/commons/client'
+import { EventConfigInput, FormConfig } from '@opencrvs/commons/client'
 
 export const DEFAULT_FORM = {
   label: {
@@ -132,16 +132,24 @@ export const tennisClubMembershipEvent = {
   },
   summary: {
     title: {
-      defaultMessage: '{applicant.firstname} {applicant.surname}',
-      description: 'This is the title of the summary',
-      id: 'event.tennis-club-membership.summary.title'
+      id: 'event.tennis-club-membership.summary.title',
+      label: {
+        defaultMessage: '{applicant.firstname} {applicant.surname}',
+        description: 'This is the title of the summary',
+        id: 'event.tennis-club-membership.summary.title.label'
+      }
     },
     fields: [
       {
         id: 'applicant.firstname',
+        value: {
+          defaultMessage: '{applicant.firstname}',
+          description: 'Value for the matching field on form.',
+          id: 'event.tennis-club-membership.summary.field.firstname.value'
+        },
         label: {
           defaultMessage: 'First name',
-          description: 'Label for the gien field from form.',
+          description: 'Label for the given field on form.',
           id: 'event.tennis-club-membership.summary.field.firstname.label'
         }
       }
@@ -241,5 +249,25 @@ export const tennisClubMembershipEvent = {
       },
       forms: [DEFAULT_FORM]
     }
+  ],
+  deduplication: [
+    {
+      id: 'STANDARD CHECK',
+      label: {
+        defaultMessage: 'Standard check',
+        description:
+          'This could be shown to the user in a reason for duplicate detected',
+        id: '...'
+      },
+      query: {
+        type: 'and',
+        clauses: [
+          {
+            fieldId: 'applicant.firstname',
+            type: 'strict'
+          }
+        ]
+      }
+    }
   ]
-} satisfies EventConfig
+} satisfies EventConfigInput

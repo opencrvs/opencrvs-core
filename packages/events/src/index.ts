@@ -15,12 +15,15 @@ import '@opencrvs/commons/monitoring'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('app-module-path').addPath(require('path').join(__dirname, '../'))
 
-import { appRouter } from './router'
+import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
 import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
-import { getUser } from '@opencrvs/commons'
+import { getUser, logger } from '@opencrvs/commons'
 import { env } from './environment'
+import { getEventConfigurations } from './service/config/config'
+import { ensureIndexExists } from './service/indexing/indexing'
+import { getAnonymousToken } from './service/auth'
 
 const server = createHTTPServer({
   router: appRouter,
@@ -57,4 +60,14 @@ const server = createHTTPServer({
   }
 })
 
-server.listen(5555)
+export async function main() {
+  const configurations = await getEventConfigurations(await getAnonymousToken())
+  for (const configuration of configurations) {
+    logger.info(`Loaded event configuration: ${configuration.id}`)
+    await ensureIndexExists(configuration)
+  }
+
+  server.listen(5555)
+}
+
+void main()
