@@ -21,5 +21,6 @@ export const env = cleanEnv(process.env, {
   ES_URL: url({ devDefault: 'http://localhost:9200' }),
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
-  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' })
+  USER_MANAGEMENT_URL: url({ devDefault: 'http://localhost:3030' }),
+  AUTH_URL: url({ devDefault: 'http://localhost:4040' })
 })

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { inScope, Scope, SCOPES } from '@opencrvs/commons'
+import { inScope, Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
 import { TRPCError, AnyTRPCMiddlewareFunction } from '@trpc/server'
 
 import { z } from 'zod'
@@ -19,7 +19,7 @@ const ContextSchema = z.object({
     id: z.string(),
     primaryOfficeId: z.string()
   }),
-  token: z.string()
+  token: z.string() as z.ZodType<TokenWithBearer>
 })
 
 export type Context = z.infer<typeof ContextSchema>

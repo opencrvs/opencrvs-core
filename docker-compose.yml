@@ -95,6 +95,7 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
+      - AUTH_URL=http://auth:4040
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION}

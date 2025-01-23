@@ -11,6 +11,8 @@
 
 import { IAuthHeader } from './http'
 import decode from 'jwt-decode'
+import { Nominal } from './nominal'
+import { z } from 'zod'
 
 import { Scope, SCOPES } from './scopes'
 export { scopes, Scope, SCOPES } from './scopes'
@@ -220,7 +222,13 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   return decoded
 }
 
-export const getUserId = (token: string): string => {
+export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
   return tokenPayload.sub
 }
+
+export const TokenWithBearer = z
+  .string()
+  .regex(/^Bearer\s/) as z.ZodType<`Bearer ${string}`>
+export type TokenWithBearer = z.infer<typeof TokenWithBearer>
+export type Token = Nominal<string, 'TokenWithoutBearer'>

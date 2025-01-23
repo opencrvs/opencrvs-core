@@ -17,7 +17,8 @@ npx tsc --build
 
 # Build common events
 npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
-cp -r ../commons/build/dist/common/events/*.d.ts ./dist/events
+mkdir -p ./dist/commons/events
+cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 
 # Build common scopes
 npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
@@ -25,15 +26,19 @@ cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
 
 # Build common conditionals
 npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
-cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/conditionals
+mkdir -p ./dist/commons/conditionals
+cp -r ../commons/build/dist/common/conditionals/*.d.ts ./dist/commons/conditionals
 
 # Build api client
 npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
-cp -r ../events/build/types/router/router.d.ts ./dist/api
+mkdir -p ./dist/commons/api
+cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' 's|@opencrvs/events/build/types|.|g' dist/api/index.d.ts
+  sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
+  find dist -type f -exec sed -i '' 's|@opencrvs/commons|../commons|g' {} +
 else
-  sed -i 's|@opencrvs/events/build/types|.|g' dist/api/index.d.ts
+  sed -i 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts
+  find dist -type f -exec sed -i 's|@opencrvs/commons|../commons|g' {} +
 fi
 
 echo "Build completed successfully."
