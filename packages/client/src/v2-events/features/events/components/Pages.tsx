@@ -13,10 +13,10 @@ import React, { useEffect } from 'react'
 import { useIntl } from 'react-intl'
 import { FormWizard } from '@opencrvs/components'
 import { FormPage } from '@opencrvs/commons'
+import { ActionFormData } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { usePagination } from '@client/v2-events/hooks/usePagination'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
 
 /**
  *
@@ -27,11 +27,13 @@ export function Pages({
   pageId,
   showReviewButton,
   formPages,
+  form,
   onFormPageChange,
   onSubmit
 }: {
   eventId: string
   pageId: string
+  form: ActionFormData
   showReviewButton?: boolean
   formPages: FormPage[]
   onFormPageChange: (nextPageId: string) => void
@@ -39,9 +41,7 @@ export function Pages({
 }) {
   const intl = useIntl()
 
-  const getFormValues = useEventFormData((state) => state.getFormValues)
   const setFormValues = useEventFormData((state) => state.setFormValues)
-
   const pageIdx = formPages.findIndex((p) => p.id === pageId)
 
   const {
@@ -51,7 +51,6 @@ export function Pages({
     total
   } = usePagination(formPages.length, Math.max(pageIdx, 0))
   const page = formPages[currentPage]
-  const formValues = getFormValues(eventId, getInitialValues(page.fields))
 
   useEffect(() => {
     const pageChanged = formPages[currentPage].id !== pageId
@@ -73,9 +72,9 @@ export function Pages({
     >
       <FormFieldGenerator
         fields={page.fields}
-        formData={formValues}
+        formData={form}
         id="locationForm"
-        initialValues={formValues}
+        initialValues={form}
         setAllFieldsDirty={false}
         onChange={(values) => {
           setFormValues(eventId, values)
