@@ -19,15 +19,17 @@ import {
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
+import {
+  getEventConfigurations,
+  notifyOnAction
+} from '@events/service/config/config'
+import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { deleteFile, fileExists } from '@events/service/files'
+import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
 import { ActionType, getUUID } from '@opencrvs/commons'
-import { z } from 'zod'
-import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as _ from 'lodash'
 import { TRPCError } from '@trpc/server'
-import { getEventConfigurations } from '@events/service/config/config'
-import { deleteFile, fileExists } from '@events/service/files'
-import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { z } from 'zod'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -232,6 +234,7 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
+  await notifyOnAction(input, updatedEvent, token)
   return updatedEvent
 }
 
