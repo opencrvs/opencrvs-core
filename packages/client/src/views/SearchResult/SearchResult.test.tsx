@@ -10,23 +10,25 @@
  */
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
+
 import { merge } from 'lodash'
 import * as React from 'react'
 import { queries } from '@client/profile/queries'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { createStore } from '@client/store'
-import { createTestComponent, mockUserResponse } from '@client/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  REGISTRAR_DEFAULT_SCOPES,
+  setScopes
+} from '@client/tests/util'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 
 import { waitForElement } from '@client/tests/wait-for-element'
 import { EventType } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
-import { vi, Mock } from 'vitest'
+import { vi } from 'vitest'
 
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
@@ -41,7 +43,14 @@ const nameObj = {
         },
         { use: 'bn', firstNames: '', familyName: '', __typename: 'HumanName' }
       ],
-      systemRole: 'DISTRICT_REGISTRAR'
+      role: {
+        id: 'DISTRICT_REGISTRAR',
+        label: {
+          defaultMessage: 'District Registrar',
+          description: 'Name for user role Field Agent',
+          id: 'userRole.fieldAgent'
+        }
+      }
     }
   }
 }
@@ -55,8 +64,7 @@ describe('SearchResult tests', () => {
 
   beforeEach(async () => {
     ;({ store } = createStore())
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
   })
 
   it('sets loading state while waiting for data', async () => {
@@ -77,7 +85,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: '',
               nationalId: '',
               registrationNumber: '',
@@ -320,7 +327,6 @@ describe('SearchResult tests', () => {
               nationalId: '',
               registrationNumber: '',
               contactNumber: '+8801622688232',
-              declarationLocationId: '1234567s2323289',
               contactEmail: ''
             },
             sort: 'DESC'
@@ -392,7 +398,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -485,7 +490,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -586,7 +590,6 @@ describe('SearchResult tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -671,8 +674,7 @@ describe('SearchResult downloadButton tests', () => {
 
   beforeEach(async () => {
     ;({ store } = createStore())
-    getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth())
+    setScopes(REGISTRAR_DEFAULT_SCOPES, store)
   })
   it('renders review button in search page', async () => {
     const declaration = {
@@ -692,7 +694,6 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',
@@ -788,7 +789,6 @@ describe('SearchResult downloadButton tests', () => {
           query: SEARCH_EVENTS,
           variables: {
             advancedSearchParameters: {
-              declarationLocationId: '2a83cf14-b959-47f4-8097-f75a75d1867f',
               trackingId: 'DW0UTHR',
               nationalId: '',
               registrationNumber: '',

@@ -56,9 +56,9 @@ jobs:
           # another workflow is calling this one
 
           if [ "${{ github.event_name }}" == 'push' ]; then
-          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+            BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           elif [ "${{ github.event_name }}" == 'pull_request' ]; then
-          BRANCH=${{ github.event.pull_request.head.ref }}
+            BRANCH=${{ github.event.pull_request.head.ref }}
           else
           BRANCH=${{ inputs.branch_name }}
           fi

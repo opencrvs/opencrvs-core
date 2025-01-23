@@ -20,6 +20,10 @@ npx esbuild src/events/index.ts --bundle --format=cjs --outdir=./dist/events --a
 mkdir -p ./dist/commons/events
 cp -r ../commons/build/dist/common/events/*.d.ts ./dist/commons/events
 
+# Build common scopes
+npx esbuild src/scopes/index.ts --bundle --format=cjs --outdir=./dist/scopes --allow-overwrite --packages=external
+cp -r ../commons/build/dist/common/scopes.d.ts ./dist/scopes/index.d.ts
+
 # Build common conditionals
 npx esbuild src/conditionals/index.ts --bundle --format=cjs --outdir=./dist/conditionals --allow-overwrite --packages=external
 mkdir -p ./dist/commons/conditionals

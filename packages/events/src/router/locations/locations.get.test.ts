@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { createTestClient, setupTestCase } from '@events/tests/utils'
-import { userScopes } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 
 test('Returns single location in right format', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [userScopes.nationalSystemAdmin])
+  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
   const setLocationPayload = [
     {
@@ -34,7 +34,7 @@ test('Returns single location in right format', async () => {
 
 test('Returns multiple locations', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [userScopes.nationalSystemAdmin])
+  const client = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
   await client.locations.set(generator.locations.set(5))
 
   const locations = await client.locations.get()
