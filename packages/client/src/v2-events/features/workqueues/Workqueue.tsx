@@ -23,7 +23,8 @@ import {
   EventIndex,
   RootWorkqueueConfig,
   TranslationConfig,
-  workqueues
+  workqueues,
+  getAllFields
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -36,7 +37,9 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/v2-events/messages'
 import { ROUTES } from '@client/v2-events/routes'
+import { getInitialValues } from '@client/v2-events/components/forms/utils'
 import { WQContentWrapper } from './components/ContentWrapper'
+import { useIntlFormatMessageWithFlattenedParams } from './utils'
 
 /**
  * Based on packages/client/src/views/OfficeHome/requiresUpdate/RequiresUpdate.tsx and others in the same directory.
@@ -120,6 +123,7 @@ function Workqueue({
   offset: number
 }) {
   const intl = useIntl()
+  const flattendIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
   const { getOutbox, getDrafts } = useEvents()
   const outbox = getOutbox()
@@ -156,6 +160,8 @@ function Workqueue({
         return {}
       }
 
+      const initialValues = getInitialValues(getAllFields(eventConfig))
+
       const eventWorkqueue = eventConfig.workqueues.find(
         (wq) => wq.id === config.id
       )
@@ -170,7 +176,10 @@ function Workqueue({
             return ''
           }
 
-          return [column, intl.formatMessage(label, event)]
+          return [
+            column,
+            flattendIntl.formatMessage(label, { ...initialValues, ...event })
+          ]
         })
         .reduce<{ [key: string]: string }>(
           (acc, [key, value]) => ({ ...acc, [key]: value }),
