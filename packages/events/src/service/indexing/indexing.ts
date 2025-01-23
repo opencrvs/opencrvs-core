@@ -187,20 +187,10 @@ export async function deleteEventIndex(event: EventDocument) {
 }
 
 export async function getIndexedEvents() {
-  // @ToDo: remove hardcoded events
-  const events = ['BIRTH', 'TENNIS_CLUB_MEMBERSHIP']
-  const indexedEventsPromises = events.map(async (event) =>
-    getIndexedEventsByIndex(getEventIndexName(event))
-  )
-  const indexedEventsArrays = await Promise.all(indexedEventsPromises)
-  return indexedEventsArrays.flat()
-}
-
-export async function getIndexedEventsByIndex(index: string) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.exists({
-    index
+    index: getEventAliasName()
   })
 
   if (!hasEventsIndex) {
@@ -208,7 +198,7 @@ export async function getIndexedEventsByIndex(index: string) {
   }
 
   const response = await esClient.search({
-    index,
+    index: getEventAliasName(),
     size: 10000,
     request_cache: false
   })
