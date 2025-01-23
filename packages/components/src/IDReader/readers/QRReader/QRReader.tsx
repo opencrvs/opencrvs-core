@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Button } from '../../../Button'
 import { Icon } from '../../../Icon'
 import styled from 'styled-components'
@@ -32,25 +32,29 @@ const Info = styled(Stack)`
 `
 
 export const QRReader = (props: ScannableQRReader) => {
-  const { labels, validator } = props
+  const { labels, validator, onScan, onError } = props
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
   const windowSize = useWindowSize()
   const theme = getTheme()
   const isSmallDevice = windowSize.width <= theme.grid.breakpoints.md
   const [isDataInvalid, setIsDataInvalid] = useState(false)
-  const handleScanSuccess = (
-    data: Parameters<ScannableQRReader['onScan']>[0]
-  ) => {
-    props.onScan(data)
-    setIsDataInvalid(false)
-    setScannerDialogOpen(false)
-  }
-  const handleScanError: ErrorHandler = (type, error) => {
-    if (type === 'invalid' || type === 'parse') {
-      setIsDataInvalid(true)
-    }
-    props.onError(type, error)
-  }
+  const handleScanSuccess = useCallback(
+    (data: Parameters<ScannableQRReader['onScan']>[0]) => {
+      onScan(data)
+      setIsDataInvalid(false)
+      setScannerDialogOpen(false)
+    },
+    [onScan]
+  )
+  const handleScanError: ErrorHandler = useCallback(
+    (type, error) => {
+      if (type === 'invalid' || type === 'parse') {
+        setIsDataInvalid(true)
+      }
+      onError(type, error)
+    },
+    [onError]
+  )
   return (
     <>
       <Button
