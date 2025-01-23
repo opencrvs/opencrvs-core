@@ -54,51 +54,58 @@ export const tennisClubMembershipEvent = defineConfig({
     ]
   },
   workqueues: [
-    // {
-    //   id: 'in-progress',
-    //   title: {
-    //     defaultMessage: 'In progress',
-    //     description: 'Label for in progress workqueue',
-    //     id: 'event.tennis-club-membership.workqueue.in-progress.label'
-    //   },
-    //   fields: [
-    //     {
-    //       id: 'applicant.firstname'
-    //     },
-    //     {
-    //       id: 'event.type'
-    //     },
-    //     {
-    //       id: 'event.createdAt'
-    //     },
-    //     {
-    //       id: 'event.modifiedAt'
-    //     }
-    //   ],
-    //   filters: [
-    //     {
-    //       status: ['CREATED']
-    //     }
-    //   ]
-    // },
-    // {
-    //   id: 'all',
-    //   fields: [
-    //     {
-    //       column: 'name',
-    //       label: {
-    //         defaultMessage: '{firstname} {lastname}',
-    //         description: 'Label for name in all workqueue',
-    //         id: 'event.tennis-club-membership.workqueue.all.name.label'
-    //       },
-    //       values: {
-    //         fistname: 'applicant.firstname',
-    //         surname: 'applicant.surname'
-    //       }
-    //     },
-    //     {
-    //       column: 'dateOfEvent'
-    //     }
+    {
+      id: 'all',
+      fields: [
+        {
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.all.name.label'
+          }
+        }
+      ],
+      filters: []
+    },
+    {
+      id: 'ready-for-review',
+
+      fields: [
+        {
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.readyForReview.name.label'
+          }
+        }
+      ],
+      filters: [
+        {
+          status: ['DECLARED']
+        }
+      ]
+    },
+    {
+      id: 'registered',
+
+      fields: [
+        {
+          column: 'title',
+          label: {
+            defaultMessage: '{applicant.firstname} {applicant.surname}',
+            description: 'Label for name in all workqueue',
+            id: 'event.tennis-club-membership.workqueue.registered.name.label'
+          }
+        }
+      ],
+      filters: [
+        {
+          status: ['REGISTERED']
+        }
+      ]
+    }
   ],
   actions: [
     {
