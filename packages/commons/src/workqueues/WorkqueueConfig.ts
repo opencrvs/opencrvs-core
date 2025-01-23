@@ -15,7 +15,7 @@ import { DefaultColumnKeys, WorkQueueColumnConfig } from './defaultColumns'
 
 export const rootWorkqueueConfig = z.object({
   id: z.string(),
-  label: TranslationConfig,
+  title: TranslationConfig,
   columns: z.array(WorkQueueColumnConfig),
   defaultColumns: z.array(DefaultColumnKeys)
 })

@@ -11,12 +11,12 @@
 
 import { defineWorkQueue } from './WorkqueueConfig'
 
-export const allWorkqueue = defineWorkQueue({
-  id: 'all',
+export const registeredWorkqueue = defineWorkQueue({
+  id: 'registered',
   title: {
-    defaultMessage: 'All events',
-    description: 'This is the label for the workqueue',
-    id: 'workqueue.all.label'
+    defaultMessage: 'Ready to print',
+    description: 'Label for registered workqueue',
+    id: 'event.workqueue.registered.label'
   },
   columns: [
     {
@@ -24,7 +24,7 @@ export const allWorkqueue = defineWorkQueue({
       label: {
         defaultMessage: 'Title',
         description: 'This is the label for the workqueue column',
-        id: 'workqueue.all.column.title'
+        id: 'workqueue.registered.column.title'
       }
     },
     {
@@ -32,9 +32,9 @@ export const allWorkqueue = defineWorkQueue({
       label: {
         defaultMessage: 'Event',
         description: 'This is the label for the workqueue column',
-        id: 'workqueue.all.column.event'
+        id: 'workqueue.registered.column.event'
       }
     }
   ],
-  defaultColumns: ['status', 'createdAt', 'modifiedAt']
+  defaultColumns: ['createdAt', 'modifiedAt']
 })

@@ -303,7 +303,7 @@ function Workqueue({
       noContent={workqueue.length === 0}
       noResultText={'No results'}
       paginationId={Math.round(offset / limit)}
-      title={intl.formatMessage(config.label)}
+      title={intl.formatMessage(config.title)}
       totalPages={totalPages}
     >
       <ReactTooltip id="validateTooltip">
