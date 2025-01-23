@@ -37,7 +37,7 @@ export function FormLayout({
   action: ActionType
   route: AllowedRoute
   children: React.ReactNode
-  onSaveAndExit: () => void
+  onSaveAndExit?: () => void
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()

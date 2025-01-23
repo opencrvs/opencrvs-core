@@ -63,10 +63,10 @@ export function FormHeader({
 }: {
   action: ActionType
   label: TranslationConfig
-  onSaveAndExit: () => void
+  onSaveAndExit?: () => void
 }) {
   const intl = useIntl()
-  const { modal, exit, deleteDeclaration } = useEventFormNavigation()
+  const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
 
   const { eventId } = useParams<{
     eventId: string
@@ -91,72 +91,86 @@ export function FormHeader({
       desktopLeft={ActionIcons[action]}
       desktopRight={
         <>
-          {
-            <Button
-              disabled={false}
-              id="save-exit-btn"
-              size="small"
-              type="primary"
-              onClick={onSaveAndExit}
-            >
-              <Icon name="DownloadSimple" />
-              {intl.formatMessage(messages.saveExitButton)}
+          {onSaveAndExit ? (
+            <>
+              <Button
+                disabled={false}
+                id="save-exit-btn"
+                size="small"
+                type="primary"
+                onClick={onSaveAndExit}
+              >
+                <Icon name="DownloadSimple" />
+                {intl.formatMessage(messages.saveExitButton)}
+              </Button>
+
+              <Button size="small" type="secondary" onClick={onExit}>
+                <Icon name="X" />
+                {intl.formatMessage(messages.exitButton)}
+              </Button>
+              <ToggleMenu
+                id={'event-menu'}
+                menuItems={
+                  isUndeclaredDraft(event)
+                    ? [
+                        {
+                          label: 'Delete declaration',
+                          icon: <Icon name="Trash" />,
+                          handler: onDelete
+                        }
+                      ]
+                    : []
+                }
+                toggleButton={
+                  <Icon color="primary" name="DotsThreeVertical" size="large" />
+                }
+              />
+            </>
+          ) : (
+            <Button size="small" type="icon" onClick={goToHome}>
+              <Icon name="X" />
             </Button>
-          }
-          <Button size="small" type="secondary" onClick={onExit}>
-            <Icon name="X" />
-            {intl.formatMessage(messages.exitButton)}
-          </Button>
-          <ToggleMenu
-            id={'event-menu'}
-            menuItems={
-              isUndeclaredDraft(event)
-                ? [
-                    {
-                      label: 'Delete declaration',
-                      icon: <Icon name="Trash" />,
-                      handler: onDelete
-                    }
-                  ]
-                : []
-            }
-            toggleButton={
-              <Icon color="primary" name="DotsThreeVertical" size="large" />
-            }
-          />
+          )}
           {modal}
         </>
       }
       desktopTitle={intl.formatMessage(label)}
-      mobileLeft={<DeclarationIcon color={getDeclarationIconColor()} />}
+      mobileLeft={ActionIcons[action]}
       mobileRight={
         <>
-          {
-            <Button
-              disabled={false}
-              size="small"
-              type="icon"
-              onClick={onSaveAndExit}
-            >
-              <Icon name="DownloadSimple" />
+          {onSaveAndExit ? (
+            <>
+              <Button
+                disabled={false}
+                size="small"
+                type="icon"
+                onClick={onSaveAndExit}
+              >
+                <Icon name="DownloadSimple" />
+              </Button>
+
+              <Button size="small" type="icon" onClick={onExit}>
+                <Icon name="X" />
+              </Button>
+              <ToggleMenu
+                id={'event-menu'}
+                menuItems={[
+                  {
+                    label: 'Delete declaration',
+                    icon: <Icon name="Trash" />,
+                    handler: onDelete
+                  }
+                ]}
+                toggleButton={
+                  <Icon color="primary" name="DotsThreeVertical" size="large" />
+                }
+              />
+            </>
+          ) : (
+            <Button size="small" type="icon" onClick={goToHome}>
+              <Icon name="X" />
             </Button>
-          }
-          <Button size="small" type="icon" onClick={onExit}>
-            <Icon name="X" />
-          </Button>
-          <ToggleMenu
-            id={'event-menu'}
-            menuItems={[
-              {
-                label: 'Delete declaration',
-                icon: <Icon name="Trash" />,
-                handler: onDelete
-              }
-            ]}
-            toggleButton={
-              <Icon color="primary" name="DotsThreeVertical" size="large" />
-            }
-          />
+          )}
           {modal}
         </>
       }

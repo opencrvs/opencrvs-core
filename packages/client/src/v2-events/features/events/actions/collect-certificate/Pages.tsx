@@ -90,18 +90,10 @@ export function Pages() {
     <FormLayout
       action={ActionType.COLLECT_CERTIFICATE}
       route={ROUTES.V2.EVENTS.COLLECT_CERTIFICATE}
-      onSaveAndExit={() => {
-        events.actions.collectCertificate.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          draft: true
-        })
-        goToHome()
-      }}
     >
       {modal}
       <PagesComponent
+        form={form}
         eventId={eventId}
         formPages={formPages}
         pageId={currentPageId}
