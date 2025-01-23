@@ -8,13 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import QRScanner from 'qr-scanner'
 import styled from 'styled-components'
+import { ErrorHandler } from 'src/IDReader/types'
 
 interface ScannerProps {
-  onError: (error: 'mount' | 'parse') => void
+  onError: ErrorHandler
   onScan: (data: Record<string, unknown>) => void
+  validator?: (data: Record<string, unknown>) => boolean
 }
 
 const QRReader = styled.div`
@@ -37,34 +39,46 @@ const Scanner = (props: ScannerProps) => {
   const scanner = useRef<QRScanner>()
   const videoElement = useRef<HTMLVideoElement>(null)
   const [qrOn, setQrOn] = useState(true)
-  const { onError, onScan } = props
+  const { onError, onScan, validator } = props
+  const onScanSuccess = useCallback(
+    (result: QRScanner.ScanResult) => {
+      if (result.data) {
+        try {
+          const data = JSON.parse(result.data)
+          if (validator && !validator(data)) {
+            onError('invalid', new Error('Invalid QR code'))
+          }
+          onScan(data)
+        } catch (error) {
+          onError('parse', error)
+        }
+      }
+    },
+    [onScan, onError, validator]
+  )
+  const onScanError = useCallback(
+    (error: Error) => {
+      onError('parse', error)
+    },
+    [onError]
+  )
 
   useEffect(() => {
     const currentVideoElement = videoElement?.current
     if (currentVideoElement && !scanner.current) {
-      scanner.current = new QRScanner(
-        currentVideoElement,
-        (result) => {
-          if (result.data) {
-            // TODO: handle parse error
-            onScan(JSON.parse(result.data))
-          }
-        },
-        {
-          // TODO: improve error handling
-          onDecodeError: () => onError('parse'),
-          preferredCamera: 'environment',
-          highlightCodeOutline: true,
-          highlightScanRegion: false
-        }
-      )
+      scanner.current = new QRScanner(currentVideoElement, onScanSuccess, {
+        onDecodeError: onScanError,
+        preferredCamera: 'environment',
+        highlightCodeOutline: true,
+        highlightScanRegion: false
+      })
 
       scanner?.current
         ?.start()
         .then(() => setQrOn(true))
-        .catch((err) => {
-          if (err) {
-            onError('mount')
+        .catch((error) => {
+          if (error) {
+            setQrOn(false)
           }
         })
     }
@@ -77,15 +91,15 @@ const Scanner = (props: ScannerProps) => {
         scanner?.current?.stop()
       }
     }
-  }, [onScan, onError])
+  }, [onScan, onError, validator, onScanSuccess, onScanError])
 
   useEffect(() => {
-    if (!qrOn) alert('Could not scan')
+    if (!qrOn) alert('Please allow camera access to scan QR code')
   }, [qrOn])
 
   return (
     <QRReader>
-      <Video ref={videoElement}></Video>
+      <Video ref={videoElement} />
     </QRReader>
   )
 }

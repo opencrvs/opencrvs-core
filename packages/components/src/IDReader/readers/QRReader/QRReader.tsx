@@ -18,7 +18,7 @@ import Scanner from './Scanner'
 import { Box } from '../../../Box'
 import { Stack } from '../../../Stack'
 import { Text } from '../../../Text'
-import { ScannableQRReader } from '../../../IDReader/types'
+import { ErrorHandler, ScannableQRReader } from '../../../IDReader/types'
 import { useWindowSize } from '../../../hooks'
 import { getTheme } from '../../../theme'
 
@@ -32,16 +32,24 @@ const Info = styled(Stack)`
 `
 
 export const QRReader = (props: ScannableQRReader) => {
-  const { labels } = props
+  const { labels, validator } = props
   const [isScannerDialogOpen, setScannerDialogOpen] = useState(false)
   const windowSize = useWindowSize()
   const theme = getTheme()
   const isSmallDevice = windowSize.width <= theme.grid.breakpoints.md
+  const [isDataInvalid, setIsDataInvalid] = useState(false)
   const handleScanSuccess = (
     data: Parameters<ScannableQRReader['onScan']>[0]
   ) => {
     props.onScan(data)
+    setIsDataInvalid(false)
     setScannerDialogOpen(false)
+  }
+  const handleScanError: ErrorHandler = (type, error) => {
+    if (type === 'invalid' || type === 'parse') {
+      setIsDataInvalid(true)
+    }
+    props.onError(type, error)
   }
   return (
     <>
@@ -65,8 +73,17 @@ export const QRReader = (props: ScannableQRReader) => {
           {labels.scannerDialogSupportingCopy}
         </Text>
         <ScannerBox>
-          <Scanner onScan={handleScanSuccess} onError={props.onError} />
+          <Scanner
+            onScan={handleScanSuccess}
+            validator={validator}
+            onError={handleScanError}
+          />
         </ScannerBox>
+        {isDataInvalid && (
+          <Text element="p" variant="bold16" color="redDark">
+            This QR code is not recognised. Please try again.
+          </Text>
+        )}
         <Info
           gap={16}
           justifyContent="space-between"

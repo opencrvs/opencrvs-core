@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 interface QRReaderType {
+  validator?: (data: Parameters<Scan['onScan']>[0]) => boolean
   labels: {
     button: string
     scannerDialogSupportingCopy: string
@@ -26,9 +27,16 @@ export interface IDReaderProps {
   children: React.ReactNode
 }
 
+/**
+ * parse: Error when the scanner fails to parse the QR code
+ * invalid: Error when the scanner fails to validate the QR code with the validator
+ */
+type ErrorType = 'parse' | 'invalid'
+export type ErrorHandler = (type: ErrorType, error: Error) => void
+
 interface Scan {
   onScan: (code: Record<string, unknown>) => void
-  onError: (error: 'mount' | 'parse') => void
+  onError: ErrorHandler
 }
 
 export interface ScannableQRReader extends QRReaderType, Scan {}
