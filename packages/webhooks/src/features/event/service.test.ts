@@ -794,14 +794,6 @@ const registeredRecord = {
                 code: 'LOCAL_REGISTRAR'
               }
             ]
-          },
-          {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/types',
-                code: '[{"lang":"en","label":"Local Registrar"},{"lang":"fr","label":"Registraire local"}]'
-              }
-            ]
           }
         ],
         location: [

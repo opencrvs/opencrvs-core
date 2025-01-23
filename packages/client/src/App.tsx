@@ -8,17 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ErrorBoundary } from '@client/components/ErrorBoundary'
-import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
-import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { useApolloClient } from '@client/utils/apolloClient'
-import { ApolloProvider } from '@client/utils/ApolloProvider'
-import { getTheme } from '@opencrvs/components/lib/theme'
-import { Provider } from 'react-redux'
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
-
-import * as React from 'react'
 
 import { NotificationComponent } from '@client/components/Notification'
 import { Page } from '@client/components/Page'
@@ -27,8 +16,17 @@ import { ProtectedRoute } from '@client/components/ProtectedRoute'
 import ScrollToTop from '@client/components/ScrollToTop'
 import { SessionExpireConfirmation } from '@client/components/SessionExpireConfirmation'
 import * as routes from '@client/navigation/routes'
+import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
+import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
+import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
+import { Home } from '@client/views/OfficeHome/Home'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
+import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
+import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
+import { Leaderboards } from '@client/views/Performance/Leaderboards'
+import { RegistrationList } from '@client/views/Performance/RegistrationsList'
+import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
@@ -41,22 +39,23 @@ import { CompletenessRates } from '@client/views/SysAdmin/Performance/Completene
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
-
-import { SystemRoleType } from '@client/utils/gateway'
-import { AdvancedSearchResult } from '@client/views/AdvancedSearch/AdvancedSearchResult'
-import { IssueCertificate } from '@client/views/IssueCertificate/IssueCertificate'
-import { IssuePayment } from '@client/views/IssueCertificate/IssueCollectorForm/IssuePayment'
-import { Home } from '@client/views/OfficeHome/Home'
-import { AdministrativeLevels } from '@client/views/Organisation/AdministrativeLevels'
-import { PerformanceDashboard } from '@client/views/Performance/Dashboard'
-import { Leaderboards } from '@client/views/Performance/Leaderboards'
-import { RegistrationList } from '@client/views/Performance/RegistrationsList'
-import { PerformanceStatistics } from '@client/views/Performance/Statistics'
 import { VerifyCertificatePage } from '@client/views/VerifyCertificate/VerifyCertificatePage'
 import { ViewRecord } from '@client/views/ViewRecord/ViewRecord'
+import { SCOPES } from '@opencrvs/commons/client'
+import { getTheme } from '@opencrvs/components'
+import * as React from 'react'
+import { Provider } from 'react-redux'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { StyledErrorBoundary } from './components/StyledErrorBoundary'
+import { I18nContainer } from './i18n/components/I18nContainer'
+import { useApolloClient } from './utils/apolloClient'
+import { ApolloProvider } from './utils/ApolloProvider'
 
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 import { AppStore } from './store'
+import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { ReloadModal } from './views/Modals/ReloadModal'
@@ -70,7 +69,6 @@ import { SystemList } from './views/SysAdmin/Config/Systems/Systems'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
-import { routesConfig as v2RoutesConfig } from './v2-events/routes/config'
 
 // Injecting global styles for the body tag - used only once
 // eslint-disable-line
@@ -149,7 +147,7 @@ export const routesConfig = [
       {
         path: routes.ALL_USER_EMAIL,
         element: (
-          <ProtectedRoute roles={[SystemRoleType.NationalSystemAdmin]}>
+          <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
             <AllUserEmail />
           </ProtectedRoute>
         )
@@ -158,10 +156,11 @@ export const routesConfig = [
         path: routes.ADVANCED_SEARCH,
         element: (
           <ProtectedRoute
-            roles={[
-              SystemRoleType.LocalRegistrar,
-              SystemRoleType.RegistrationAgent,
-              SystemRoleType.NationalRegistrar
+            scopes={[
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_DEATH_MY_JURISDICTION
             ]}
           >
             <AdvancedSearchConfig />
@@ -172,10 +171,13 @@ export const routesConfig = [
         path: routes.ADVANCED_SEARCH_RESULT,
         element: (
           <ProtectedRoute
-            roles={[
-              SystemRoleType.LocalRegistrar,
-              SystemRoleType.RegistrationAgent,
-              SystemRoleType.NationalRegistrar
+            scopes={[
+              SCOPES.SEARCH_BIRTH,
+              SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+              SCOPES.SEARCH_DEATH,
+              SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+              SCOPES.SEARCH_MARRIAGE,
+              SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
             ]}
           >
             <AdvancedSearchResult />
@@ -200,13 +202,10 @@ export const routesConfig = [
         path: routes.TEAM_USER_LIST,
         element: (
           <ProtectedRoute
-            roles={[
-              SystemRoleType.RegistrationAgent,
-              SystemRoleType.LocalRegistrar,
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalRegistrar,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement
+            scopes={[
+              SCOPES.ORGANISATION_READ_LOCATIONS,
+              SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+              SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
             ]}
           >
             <UserList />
@@ -216,7 +215,7 @@ export const routesConfig = [
       {
         path: routes.SYSTEM_LIST,
         element: (
-          <ProtectedRoute roles={[SystemRoleType.NationalSystemAdmin]}>
+          <ProtectedRoute scopes={[SCOPES.CONFIG_UPDATE_ALL]}>
             <SystemList />
           </ProtectedRoute>
         )
@@ -224,12 +223,7 @@ export const routesConfig = [
       {
         path: routes.VS_EXPORTS,
         element: (
-          <ProtectedRoute
-            roles={[
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.NationalRegistrar
-            ]}
-          >
+          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS]}>
             <VSExport />
           </ProtectedRoute>
         )
@@ -243,14 +237,7 @@ export const routesConfig = [
       {
         path: routes.PERFORMANCE_STATISTICS,
         element: (
-          <ProtectedRoute
-            roles={[
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement,
-              SystemRoleType.NationalRegistrar
-            ]}
-          >
+          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
             <PerformanceStatistics />
           </ProtectedRoute>
         )
@@ -258,14 +245,7 @@ export const routesConfig = [
       {
         path: routes.PERFORMANCE_LEADER_BOARDS,
         element: (
-          <ProtectedRoute
-            roles={[
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement,
-              SystemRoleType.NationalRegistrar
-            ]}
-          >
+          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
             <Leaderboards />
           </ProtectedRoute>
         )
@@ -273,14 +253,7 @@ export const routesConfig = [
       {
         path: routes.PERFORMANCE_DASHBOARD,
         element: (
-          <ProtectedRoute
-            roles={[
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement,
-              SystemRoleType.NationalRegistrar
-            ]}
-          >
+          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ_DASHBOARDS]}>
             <PerformanceDashboard />
           </ProtectedRoute>
         )
@@ -289,13 +262,10 @@ export const routesConfig = [
         path: routes.ORGANISATIONS_INDEX,
         element: (
           <ProtectedRoute
-            roles={[
-              SystemRoleType.RegistrationAgent,
-              SystemRoleType.LocalRegistrar,
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement,
-              SystemRoleType.NationalRegistrar
+            scopes={[
+              SCOPES.ORGANISATION_READ_LOCATIONS,
+              SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+              SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION
             ]}
           >
             <AdministrativeLevels />
@@ -313,16 +283,7 @@ export const routesConfig = [
       {
         path: routes.PERFORMANCE_HOME,
         element: (
-          <ProtectedRoute
-            roles={[
-              SystemRoleType.RegistrationAgent,
-              SystemRoleType.LocalRegistrar,
-              SystemRoleType.LocalSystemAdmin,
-              SystemRoleType.NationalSystemAdmin,
-              SystemRoleType.PerformanceManagement,
-              SystemRoleType.NationalRegistrar
-            ]}
-          >
+          <ProtectedRoute scopes={[SCOPES.PERFORMANCE_READ]}>
             <PerformanceHome />
           </ProtectedRoute>
         )

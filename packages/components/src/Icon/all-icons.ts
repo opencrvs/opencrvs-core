@@ -71,6 +71,7 @@ export {
   ArchiveBox,
   ArrowCircleDown,
   FileArrowUp,
+  FileDotted,
   PencilLine,
   PencilCircle,
   Handshake,
