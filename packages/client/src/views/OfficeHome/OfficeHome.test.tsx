@@ -8,14 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { checkAuth } from '@client/profile/profileActions'
+
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import {
   createTestComponent,
   mockUserResponse,
-  flushPromises
+  flushPromises,
+  setScopes,
+  REGISTRAR_DEFAULT_SCOPES
 } from '@client/tests/util'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
@@ -25,14 +27,12 @@ import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { SELECTOR_ID } from './inProgress/InProgress'
-import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { vi, Mock } from 'vitest'
+import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
+import { Scope, SCOPES, scopes } from '@opencrvs/commons/client'
+import { vi } from 'vitest'
 import { REGISTRAR_HOME_TAB } from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 
-const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-const getItem = window.localStorage.getItem as Mock
 const mockFetchUserDetails = vi.fn()
 const mockListSyncController = vi.fn()
 
@@ -72,8 +72,7 @@ let client = createClient(store)
 beforeEach(async () => {
   ;({ store } = createStore())
   client = createClient(store)
-  getItem.mockReturnValue(registerScopeToken)
-  await store.dispatch(checkAuth())
+  setScopes(REGISTRAR_DEFAULT_SCOPES, store)
 })
 
 describe('OfficeHome related tests', () => {
@@ -443,6 +442,52 @@ describe('OfficeHome related tests', () => {
       )
 
       await waitForElement(testComponent, '#search-result-error-text-count')
+    })
+  })
+
+  describe('new event button should be visible when the user has the correct scopes', () => {
+    const build = async () =>
+      await createTestComponent(<OfficeHome />, {
+        store,
+        apolloClient: client,
+        path: REGISTRAR_HOME_TAB,
+        initialEntries: [
+          formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.inProgress
+          })
+        ]
+      })
+
+    const requiredScopes = [
+      SCOPES.RECORD_DECLARE_BIRTH,
+      SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_DEATH,
+      SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION,
+      SCOPES.RECORD_DECLARE_MARRIAGE,
+      SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION
+    ] as Scope[]
+
+    const allOtherScopes = scopes.filter(
+      (scope) => !requiredScopes.includes(scope)
+    )
+    const tests = [
+      [[requiredScopes[0]], true],
+      [[requiredScopes[1]], true],
+      [[requiredScopes[2]], true],
+      [[requiredScopes[3]], true],
+      [[requiredScopes[4]], true],
+      [[requiredScopes[5]], true],
+      [allOtherScopes, false]
+    ]
+    tests.forEach(([scopes, visible]) => {
+      it(`should render when user has correct scopes ${scopes}`, async () => {
+        setScopes(scopes as Scope[], store)
+        const testComponent = await build()
+
+        expect(testComponent.component.exists('#new_event_declaration')).toBe(
+          visible
+        )
+      })
     })
   })
 })
