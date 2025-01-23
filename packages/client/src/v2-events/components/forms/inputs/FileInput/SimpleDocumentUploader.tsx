@@ -22,7 +22,7 @@ import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { DocumentPreview } from './DocumentPreview'
 import { DocumentListPreview } from './DocumentListPreview'
 
-const DocumentUploader = styled(ImageUploader)`
+const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   color: ${({ theme }) => theme.colors.primary};
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
@@ -30,7 +30,7 @@ const DocumentUploader = styled(ImageUploader)`
   ${({ theme }) => theme.fonts.bold14};
   height: 40px;
   text-transform: initial;
-
+  width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 0px;
     margin-top: 10px;
@@ -47,6 +47,7 @@ type IFullProps = {
   label?: string
   file?: FileFieldValue
   description?: string
+  fullWidth?: boolean
   allowedDocType?: string[]
   error?: string
   disableDeleteInPreview?: boolean
@@ -70,7 +71,8 @@ function SimpleDocumentUploaderComponent({
   error: errorProps,
   disableDeleteInPreview,
   requiredErrorMessage,
-  touched
+  touched,
+  fullWidth
 }: IFullProps) {
   const [error, setError] = useState('')
   const [previewImage, setPreviewImage] = useState<FileFieldValue | null>(null)
@@ -155,6 +157,7 @@ function SimpleDocumentUploaderComponent({
       )}
       {!file && (
         <DocumentUploader
+          fullWidth={fullWidth}
           id="upload_document"
           name={name}
           onChange={handleFileChange}

@@ -204,6 +204,7 @@ const GeneratedInputField = React.memo(
             {...inputProps}
             value={value}
             onChange={handleFileChange}
+            fullWidth={fieldDefinition.options?.fullWidth}
           />
         </InputField>
       )

@@ -160,7 +160,16 @@ const Paragraph = BaseField.extend({
 }).describe('A read-only HTML <p> paragraph')
 
 const File = BaseField.extend({
-  type: z.literal(FieldType.FILE)
+  type: z.literal(FieldType.FILE),
+  options: z
+    .object({
+      fullWidth: z
+        .boolean()
+        .describe(
+          'Whether the file upload button should take the full width of the container or not'
+        )
+    })
+    .optional()
 }).describe('File upload')
 
 const SelectOption = z.object({
