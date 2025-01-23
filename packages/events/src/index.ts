@@ -28,13 +28,17 @@ import { getAnonymousToken } from './service/auth'
 const server = createHTTPServer({
   router: appRouter,
   createContext: async function createContext(opts) {
-    const token = TokenWithBearer.parse(opts.req.headers.authorization)
+    const parseResult = TokenWithBearer.safeParse(
+      opts.req.headers.authorization
+    )
 
-    if (!token) {
+    if (!parseResult.success) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
       })
     }
+
+    const token = parseResult.data
 
     const userId = getUserId(token)
 
@@ -55,7 +59,7 @@ const server = createHTTPServer({
         id: userId,
         primaryOfficeId
       },
-      token
+      token: token
     }
   }
 })
