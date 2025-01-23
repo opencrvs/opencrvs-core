@@ -18,6 +18,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/client'
 import { api, queryClient, utils } from '@client/v2-events/trpc'
+import { createTemporaryId, isTemporaryId } from './create'
 
 async function updateLocalEvent(updatedEvent: EventDocument) {
   utils.event.get.setData(updatedEvent.id, updatedEvent)
@@ -32,7 +33,7 @@ function waitUntilEventIsCreated<T extends { eventId: string }, R>(
 
     const localVersion = utils.event.get.getData(eventId)
 
-    if (!localVersion || localVersion.id === localVersion.transactionId) {
+    if (!localVersion || isTemporaryId(localVersion.id)) {
       // eslint-disable-next-line no-console
       console.error(
         'Event that has not been stored yet cannot be actioned upon'
@@ -117,6 +118,7 @@ function updateEventOptimistically<T extends ActionInput>(
       actions: [
         ...localEvent.actions,
         {
+          id: createTemporaryId(),
           type: actionType,
           data: variables.data,
           draft: false,

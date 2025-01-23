@@ -9,15 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { ActionDocument } from './ActionDocument'
+import { Pages } from './Pages'
+import { Review } from './Review'
 
-export const EventDocument = z.object({
-  id: z.string(),
-  type: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  actions: z.array(ActionDocument)
-})
-
-export type EventDocument = z.infer<typeof EventDocument>
+export { Pages, Review }

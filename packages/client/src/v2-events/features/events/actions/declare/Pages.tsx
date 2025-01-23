@@ -20,10 +20,11 @@ import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { ROUTES } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts/form'
+import { ROUTES } from '@client/v2-events/routes'
+import { isTemporaryId } from '@client/v2-events/features/events/useEvents/procedures/create'
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
@@ -80,7 +81,7 @@ export function Pages() {
    * ID.
    */
   useEffect(() => {
-    const hasTemporaryId = event.id === event.transactionId
+    const hasTemporaryId = isTemporaryId(event.id)
 
     if (eventId !== event.id && !hasTemporaryId) {
       navigate(
@@ -89,7 +90,7 @@ export function Pages() {
         })
       )
     }
-  }, [event.id, event.transactionId, eventId, navigate])
+  }, [event.id, eventId, navigate])
 
   return (
     <FormLayout

@@ -12,22 +12,18 @@
 import {
   ActionInputWithType,
   EventDocument,
-  EventIndex,
   EventInput,
   FileFieldValue,
-  getCurrentEventState,
   isUndeclaredDraft
 } from '@opencrvs/commons/events'
 
-import * as events from '@events/storage/mongodb/events'
-import { ActionType, getUUID } from '@opencrvs/commons'
-import { z } from 'zod'
-import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as _ from 'lodash'
-import { TRPCError } from '@trpc/server'
 import { getEventConfigurations } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
-import { searchForDuplicates } from '@events/service/deduplication/deduplication'
+import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
+import * as events from '@events/storage/mongodb/events'
+import { ActionType, getUUID } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import { z } from 'zod'
 
 export const EventInputWithId = EventInput.extend({
   id: z.string()
@@ -121,6 +117,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
+type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 export async function createEvent({
   eventInput,
   createdAtLocation,
@@ -139,7 +136,7 @@ export async function createEvent({
   }
 
   const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
+  const collection = db.collection<EventDocumentWithTransActionId>('events')
 
   const now = new Date().toISOString()
   const id = getUUID()
@@ -157,10 +154,11 @@ export async function createEvent({
         createdBy,
         createdAtLocation,
         draft: false,
+        id: getUUID(),
         data: {}
       }
     ]
-  } satisfies EventDocument)
+  })
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -221,7 +219,8 @@ export async function addAction(
           createdBy,
           createdAt: now,
           createdAtLocation,
-          draft: input.draft || false
+          draft: input.draft || false,
+          id: getUUID()
         }
       },
       $set: {
@@ -233,71 +232,6 @@ export async function addAction(
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)
   return updatedEvent
-}
-
-export async function validate(
-  input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
-  {
-    eventId,
-    createdBy,
-    token,
-    createdAtLocation
-  }: {
-    eventId: string
-    createdBy: string
-    createdAtLocation: string
-    token: string
-  }
-) {
-  const config = await getEventConfigurations(token)
-  const storedEvent = await getEventById(eventId)
-  const form = config.find((c) => c.id === storedEvent.type)
-
-  if (!form) {
-    throw new Error(`Form not found with event type: ${storedEvent.type}`)
-  }
-
-  let duplicates: EventIndex[] = []
-
-  const futureEventState = getCurrentEventState({
-    ...storedEvent,
-    actions: [
-      ...storedEvent.actions,
-      {
-        ...input,
-        createdAt: new Date().toISOString(),
-        createdBy,
-        createdAtLocation
-      }
-    ]
-  })
-
-  const resultsFromAllRules = await Promise.all(
-    form.deduplication.map(async (deduplication) => {
-      const matches = await searchForDuplicates(futureEventState, deduplication)
-      return matches
-    })
-  )
-
-  duplicates = resultsFromAllRules
-    .flat()
-    .sort((a, b) => b.score - a.score)
-    .filter((hit): hit is { score: number; event: EventIndex } => !!hit.event)
-    .map((hit) => hit.event)
-    .filter((event, index, self) => {
-      return self.findIndex((t) => t.id === event.id) === index
-    })
-
-  const event = await addAction(
-    { ...input, duplicates: duplicates.map((d) => d.id) },
-    {
-      eventId,
-      createdBy,
-      token,
-      createdAtLocation
-    }
-  )
-  return event
 }
 
 export async function patchEvent(eventInput: EventInputWithId) {
