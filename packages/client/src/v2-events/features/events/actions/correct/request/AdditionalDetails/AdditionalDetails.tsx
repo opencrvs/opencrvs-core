@@ -100,7 +100,8 @@ export function AdditionalDetails() {
       >
         <PagesComponent
           eventId={event.id}
-          formData={correctionRequestData.getFormValues()}
+          // @TODO: Use subscription if needed
+          form={correctionRequestData.getFormValues()}
           formPages={formPages}
           pageId={currentPageId}
           setFormData={correctionRequestData.setFormValues}
